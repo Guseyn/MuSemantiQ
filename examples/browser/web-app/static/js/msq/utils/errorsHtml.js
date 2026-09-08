@@ -28,9 +28,9 @@ export default function errorsHtml(errors) {
     <table>
       <thead>
         <tr>
-          <th data-index>#</th>
-          <th data-line>Line</th>
-          <th data-message>Message</th>
+          <th data-index scope="col">#</th>
+          <th data-line scope="col">Line</th>
+          <th data-message scope="col">Message</th>
         </tr>
       </thead>
       <tbody>${rows}</tbody>

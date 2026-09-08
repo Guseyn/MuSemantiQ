@@ -10,8 +10,19 @@ export default /*css*/`
     gap: 0.0em;
     font-family: sans-serif;
   }
-  div[data-inner-wrapper]:not(:hover) div[data-utils] {
-    display: none;
+  /* Revealed on hover, and on focus so the buttons are reachable by Tab.
+     Hidden with opacity rather than display, because a display:none button is
+     not focusable and Tab would skip the toolbar entirely; pointer-events is
+     what keeps the invisible buttons from swallowing clicks on the score. */
+  div[data-utils] {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease 0s;
+  }
+  div[data-inner-wrapper]:hover div[data-utils],
+  div[data-inner-wrapper]:focus-within div[data-utils] {
+    opacity: 1;
+    pointer-events: auto;
   }
   div[data-utils] button {
     text-align: center;
@@ -32,6 +43,11 @@ export default /*css*/`
   }
   div[data-utils] button:not(:disabled):active {
     background: rgba(204, 204, 204, 0.6);
+  }
+  /* The wrapper clips overflow, so the ring is drawn inside the button. */
+  div[data-utils] button:focus-visible {
+    outline: none;
+    box-shadow: inset 0 0 0 2px var(--font-color);
   }
   div[data-utils] button svg {
     vertical-align: middle;

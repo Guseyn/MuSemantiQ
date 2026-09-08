@@ -69,16 +69,16 @@ class MuSemantiQSVGMIDI extends MSQTemplateElement {
 
     const elm = this.createShadowHost({
       renderedBy: 'msq-svg-midi',
-      title: inputText,
+      label: 'Music score with MIDI player',
       styles: [ utilsPanel, svgWithTopRadius, playerRadius ],
       html: /*html*/`
         <div data-inner-wrapper>
-          <div data-utils>
-            <button data-download-svg>${downloadIcon}</button>
-            <button data-view-svg>${previewIcon}</button>
-            <button data-copy-msq>${copyIcon}</button>
+          <div data-utils role="toolbar" aria-label="Score actions">
+            <button type="button" data-download-svg aria-label="Download the score as SVG">${downloadIcon}</button>
+            <button type="button" data-view-svg aria-label="Open the score in a new tab">${previewIcon}</button>
+            <button type="button" data-copy-msq aria-label="Copy the MuSemantiQ source">${copyIcon}</button>
           </div>
-          <div data-svg-container data-scroll>
+          <div data-svg-container data-scroll tabindex="0" role="group" aria-label="Score">
             ${svgString}
           </div>
           <midi-player
@@ -88,6 +88,8 @@ class MuSemantiQSVGMIDI extends MSQTemplateElement {
         </div>
       `
     })
+
+    this.labelScore(elm.shadowRoot, 'Engraved music score')
 
     elm.shadowRoot.querySelector('button[data-download-svg]').addEventListener('click', () => {
       downloadContent({
@@ -111,6 +113,7 @@ class MuSemantiQSVGMIDI extends MSQTemplateElement {
     overrideMidiPlayerStyles(midiPlayer)
     addUtilsToMidiPlayerControlPanel(midiPlayer, [
       {
+        label: 'Download the MIDI file',
         innerHTML: downloadIcon,
         onClick: () => downloadContent({
           fileName: this.getAttribute('data-file-name') || this.id,
@@ -119,6 +122,7 @@ class MuSemantiQSVGMIDI extends MSQTemplateElement {
         })
       },
       {
+        label: 'Copy the MuSemantiQ source',
         innerHTML: copyIcon,
         onClick: (event) => copyText({
           event,

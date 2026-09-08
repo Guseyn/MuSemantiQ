@@ -20,6 +20,8 @@ export default function showHintMessage(shadowHost, text) {
   }
   const hintMessage = document.createElement('div')
   hintMessage.setAttribute('data-hint', '')
+  // It disappears on its own, so it has to be announced where it stands.
+  hintMessage.setAttribute('role', 'status')
   hintMessage.textContent = text
   wrapper.appendChild(hintMessage)
   setTimeout(() => {

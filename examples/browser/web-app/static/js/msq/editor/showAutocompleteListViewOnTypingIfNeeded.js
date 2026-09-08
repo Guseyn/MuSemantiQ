@@ -1,5 +1,11 @@
 import textWidthInTextarea from '#msq/editor/textWidthInTextarea.js'
 import createdElementWithStylesAndAttributes from '#msq/editor/createdElementWithStylesAndAttributes.js'
+import {
+  isAutocompleteListViewOpened,
+  openAutocompleteListView,
+  closeAutocompleteListView,
+  selectOptionInAutocompleteListView
+} from '#msq/editor/createdAutocompleteListView.js'
 import highlightTextareaValueInDivUnderneathItWithoutRefIds from '#msq/editor/highlightTextareaValueInDivUnderneathItWithoutRefIds.js'
 import listsOfPossibleOptionsToCompleteWordByProgressionOfCommandsFromScenarios from '#msq/editor/listsOfPossibleOptionsToCompleteWordByProgressionOfCommandsFromScenarios.js'
 import isPrintableKeycode from '#msq/editor/isPrintableKeycode.js'
@@ -69,7 +75,7 @@ const foundOptionsForUncompletedWord = (charIndexWhereCaretIsOn, listsOfPossible
   return []
 }
 
-const fillAutocompleteListViewWithOptionsForUncompletedWord = (uncompletedWord, autocompleteListView, optionsForUncompletedWord) => {
+const fillAutocompleteListViewWithOptionsForUncompletedWord = (uncompletedWord, autocompleteListView, textarea, optionsForUncompletedWord) => {
   autocompleteListView.innerHTML = ''
   autocompleteListView.optionIndex = 0
   optionsForUncompletedWord.forEach((optionTextValue, optionIndex) => {
@@ -77,7 +83,10 @@ const fillAutocompleteListViewWithOptionsForUncompletedWord = (uncompletedWord, 
       'div',
       {},
       {
-        'data-option': ''
+        'data-option': '',
+        'id': `${autocompleteListView.id}-option-${optionIndex}`,
+        'role': 'option',
+        'aria-selected': 'false'
       }
     )
     const optionTextValueWrappedWithMatchinHighlight = optionTextValue.replace(
@@ -89,15 +98,12 @@ const fillAutocompleteListViewWithOptionsForUncompletedWord = (uncompletedWord, 
     optionElement.index = optionIndex
     optionElement.textValue = optionTextValue
     autocompleteListView.appendChild(optionElement)
-    if (optionIndex === 0) {
-      optionElement.classList.add('selected')
-      optionElement.scrollIntoView({ block: 'nearest' })
-    }
   })
+  selectOptionInAutocompleteListView(autocompleteListView, textarea, 0)
 }
 
 const completeWord = (textarea, divUnderneathTextarea, autocompleteListView, columnNumberOfCharWhichIsFirstNonSpaceCharBeforeTheColumnNumberWhereCaretIsOn, lastColumnNumberOnTheLineWhereCaretIsOnForCurrentUncompletedWord, numberOfCharsIncludingNewLineCharsBeforeFirstCharInTheLineWhereCaretIsOn) => {
-  if (autocompleteListView.style.display !== 'none') {
+  if (isAutocompleteListViewOpened(autocompleteListView)) {
     const selectedOptionElement = autocompleteListView.childNodes[autocompleteListView.optionIndex]
     if (
       (columnNumberOfCharWhichIsFirstNonSpaceCharBeforeTheColumnNumberWhereCaretIsOn !== undefined) &&
@@ -117,19 +123,9 @@ const completeWord = (textarea, divUnderneathTextarea, autocompleteListView, col
       textarea.scrollLeft = scrollLeftOfTextareaBefore
       const caretPositionAfterWordCompletion = numberOfCharsIncludingNewLineCharsBeforeFirstCharInTheLineWhereCaretIsOn + columnNumberOfCharWhichIsFirstNonSpaceCharBeforeTheColumnNumberWhereCaretIsOn + selectedOptionElement.textValue.length
       textarea.setSelectionRange(caretPositionAfterWordCompletion, caretPositionAfterWordCompletion)
-      autocompleteListView.style.display = 'none'
+      closeAutocompleteListView(autocompleteListView, textarea)
       highlightTextareaValueInDivUnderneathItWithoutRefIds(divUnderneathTextarea, textarea, false)
     }
-  }
-}
-
-const selectedOptionInAutocompleteList = (autocompleteListView, optionIndex) => {
-  if (autocompleteListView.childNodes[autocompleteListView.optionIndex]) {
-    autocompleteListView.childNodes[autocompleteListView.optionIndex].classList.remove('selected')
-  }
-  autocompleteListView.optionIndex = optionIndex
-  if (autocompleteListView.childNodes[autocompleteListView.optionIndex]) {
-    autocompleteListView.childNodes[autocompleteListView.optionIndex].classList.add('selected')
   }
 }
 
@@ -150,7 +146,7 @@ export default (autocompleteListView, textarea, divUnderneathTextarea) => {
     const itIsBackSpacePressed = event.keyCode === 8
     const itIsPrintableKeyPressed = isPrintableKeycode(event.keyCode)
     const isCmdPressed = ((isMacOS && event.metaKey) || (!isMacOS && event.ctrlKey))
-    if (itIsBackSpacePressed && autocompleteListView.style.display === 'none') {
+    if (itIsBackSpacePressed && !isAutocompleteListViewOpened(autocompleteListView)) {
       return
     }
     if (!itIsSpaceBarPressed && !itIsEnterPressed && !itIsTabPressed && !isCmdPressed && itIsPrintableKeyPressed) {
@@ -215,10 +211,8 @@ export default (autocompleteListView, textarea, divUnderneathTextarea) => {
           const charIndexWhereCaretIsOn = numberOfCharsIncludingNewLineCharsBeforeFirstCharInTheLineWhereCaretIsOn + columnNumberOfCharWhichIsFirstNonSpaceCharBeforeTheColumnNumberWhereCaretIsOn
           const optionsForUncompletedWord = foundOptionsForUncompletedWord(charIndexWhereCaretIsOn, listsOfPossibleOptionsToCompleteWordByProgressionOfCommandsFromScenarios, currentUncompletedWord, caretInOnSpace, textarea.mapOfCharIndexesWithProgressionOfCommandsFromScenarios)
           if (optionsForUncompletedWord.length > 0) {
-            if (autocompleteListView.style.display === 'none') {
-              autocompleteListView.style.display = ''
-            }
-            fillAutocompleteListViewWithOptionsForUncompletedWord(currentUncompletedWord, autocompleteListView, optionsForUncompletedWord)
+            openAutocompleteListView(autocompleteListView, textarea)
+            fillAutocompleteListViewWithOptionsForUncompletedWord(currentUncompletedWord, autocompleteListView, textarea, optionsForUncompletedWord)
             const textTillFirstNonSpaceCharBeforeTheColumnNumberOnTheLineWhereCaretIsOn = textareaValueOnTheLineWhereCaretIsOn.slice(0, columnNumberOfCharWhichIsFirstNonSpaceCharBeforeTheColumnNumberWhereCaretIsOn)
             const widthOfTextTillFirstNonSpaceCharBeforeTheColumnNumberOnTheLineWhereCaretIsOn = textWidthInTextarea(textarea, textTillFirstNonSpaceCharBeforeTheColumnNumberOnTheLineWhereCaretIsOn)
             const textareaComputedStyle = window.getComputedStyle(textarea)
@@ -241,23 +235,29 @@ export default (autocompleteListView, textarea, divUnderneathTextarea) => {
             autocompleteListView.style.left = `${leftOfAutocompleteListView}px`
             autocompleteListView.style.top = `${topOfAutocompleteListView}px`
           } else {
-            autocompleteListView.style.display = 'none'
+            closeAutocompleteListView(autocompleteListView, textarea)
           }
         } else {
-          autocompleteListView.style.display = 'none'
+          closeAutocompleteListView(autocompleteListView, textarea)
         }
       }
     } else if (!itIsArrowUpPressed && !itIsArrowDownPressed) {
-      autocompleteListView.style.display = 'none'
+      closeAutocompleteListView(autocompleteListView, textarea)
     }
   })
   textarea.addEventListener('keydown', (event) => {
-    if (autocompleteListView.style.display !== 'none') {
+    if (isAutocompleteListViewOpened(autocompleteListView)) {
       const itIsArrowUpPressed = event.keyCode === 38
       const itIsArrowDownPressed = event.keyCode === 40
       const itIsEnterPressed = event.keyCode === 13
       const itIsTabPressed = event.keyCode === 9
-      if (itIsTabPressed || itIsEnterPressed) {
+      const itIsEscapePressed = event.keyCode === 27
+      if (itIsEscapePressed) {
+        // Tab completes a word while the list is open, so without a way to
+        // dismiss it there would be no way to Tab out of the editor at all.
+        event.preventDefault()
+        closeAutocompleteListView(autocompleteListView, textarea)
+      } else if (itIsTabPressed || itIsEnterPressed) {
         if (enterOrTabIsUp) {
           event.preventDefault()
           completeWord(textarea, divUnderneathTextarea, autocompleteListView, columnNumberOfCharWhichIsFirstNonSpaceCharBeforeTheColumnNumberWhereCaretIsOn, lastColumnNumberOnTheLineWhereCaretIsOnForCurrentUncompletedWord, numberOfCharsIncludingNewLineCharsBeforeFirstCharInTheLineWhereCaretIsOn)
@@ -265,20 +265,15 @@ export default (autocompleteListView, textarea, divUnderneathTextarea) => {
         }
       } else if (itIsArrowUpPressed || itIsArrowDownPressed) {
         event.preventDefault()
-        autocompleteListView.optionIndex = autocompleteListView.optionIndex || 0
-        if (autocompleteListView.childNodes[autocompleteListView.optionIndex]) {
-          autocompleteListView.childNodes[autocompleteListView.optionIndex].classList.remove('selected')
-          const newOptionIndex = autocompleteListView.optionIndex + (itIsArrowUpPressed ? -1 : 1)
-          if (autocompleteListView.childNodes[newOptionIndex]) {
-            autocompleteListView.childNodes[newOptionIndex].classList.add('selected')
-            autocompleteListView.childNodes[newOptionIndex].scrollIntoView({ block: 'nearest' })
-            autocompleteListView.optionIndex = newOptionIndex
-          } else {
-            const newOptionIndex = (itIsArrowUpPressed ? (autocompleteListView.childNodes.length - 1) : 0)
-            autocompleteListView.childNodes[newOptionIndex].classList.add('selected')
-            autocompleteListView.childNodes[newOptionIndex].scrollIntoView({ block: 'nearest' })
-            autocompleteListView.optionIndex = newOptionIndex
-          }
+        const optionsCount = autocompleteListView.childNodes.length
+        if (optionsCount > 0) {
+          const currentOptionIndex = autocompleteListView.optionIndex || 0
+          const step = itIsArrowUpPressed ? -1 : 1
+          selectOptionInAutocompleteListView(
+            autocompleteListView,
+            textarea,
+            (currentOptionIndex + step + optionsCount) % optionsCount
+          )
         }
       }
     }
@@ -291,26 +286,26 @@ export default (autocompleteListView, textarea, divUnderneathTextarea) => {
     }
   })
   autocompleteListView.addEventListener('click', (event) => {
-    selectedOptionInAutocompleteList(autocompleteListView, event.target.index)
+    selectOptionInAutocompleteListView(autocompleteListView, textarea, event.target.index)
     completeWord(textarea, divUnderneathTextarea, autocompleteListView, columnNumberOfCharWhichIsFirstNonSpaceCharBeforeTheColumnNumberWhereCaretIsOn, lastColumnNumberOnTheLineWhereCaretIsOnForCurrentUncompletedWord, numberOfCharsIncludingNewLineCharsBeforeFirstCharInTheLineWhereCaretIsOn)
   })
   textarea.addEventListener('select', () => {
-    if (autocompleteListView.style.display !== 'none') {
+    if (isAutocompleteListViewOpened(autocompleteListView)) {
       if (textarea.selectionStart !== textarea.selectionEnd) {
-        autocompleteListView.style.display = 'none'
+        closeAutocompleteListView(autocompleteListView, textarea)
       }
     }
   })
   textarea.addEventListener('click', () => {
-    autocompleteListView.style.display = 'none'
+    closeAutocompleteListView(autocompleteListView, textarea)
   })
   textarea.addEventListener('scroll', () => {
-    if ((autocompleteListView.style.display !== 'none') && !textarea.weAreTypingInTextarea) {
-      autocompleteListView.style.display = 'none'
+    if ((isAutocompleteListViewOpened(autocompleteListView)) && !textarea.weAreTypingInTextarea) {
+      closeAutocompleteListView(autocompleteListView, textarea)
     }
   })
   const resizeObserver = new ResizeObserver(entries => {
-    autocompleteListView.style.display = 'none'
+    closeAutocompleteListView(autocompleteListView, textarea)
   })
   resizeObserver.observe(textarea)
 }

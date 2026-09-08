@@ -58,17 +58,17 @@ class MuSemantiQEditor extends MSQTemplateElement {
   #buildView(generated) {
     const elm = this.createShadowHost({
       renderedBy: 'msq-editor',
-      title: this.msqText,
+      label: 'Music score editor',
       styles: [ utilsPanel, svgWithTopRadius, highlights, editorCss, layout ],
       html: /*html*/`
         <div data-inner-wrapper>
-          <div data-utils>
-            <button data-download-svg>${downloadIcon}</button>
-            <button data-read-msq>${readIcon}</button>
-            <button data-view-preview hidden>${previewIcon}</button>
-            <button data-copy-msq>${copyIcon}</button>
+          <div data-utils role="toolbar" aria-label="Editor actions">
+            <button type="button" data-download-svg aria-label="Download the score as SVG">${downloadIcon}</button>
+            <button type="button" data-read-msq aria-label="Edit the MuSemantiQ source">${readIcon}</button>
+            <button type="button" data-view-preview hidden aria-label="Render the score">${previewIcon}</button>
+            <button type="button" data-copy-msq aria-label="Copy the MuSemantiQ source">${copyIcon}</button>
           </div>
-          <div data-svg-container data-scroll></div>
+          <div data-svg-container data-scroll tabindex="0" role="group" aria-label="Score"></div>
           <div data-text-container hidden></div>
         </div>
       `
@@ -180,6 +180,7 @@ class MuSemantiQEditor extends MSQTemplateElement {
     this.svgDataSrc = svgDataSrc
     this.renderedHighlightsHtml = (highlightsHtmlBuffer || []).join('')
     this.svgContainer.innerHTML = svg
+    this.labelScore(this.svgContainer, 'Engraved music score')
 
     const previousPlayer = this.wrapper.querySelector('midi-player')
     if (previousPlayer) {
@@ -269,7 +270,6 @@ class MuSemantiQEditor extends MSQTemplateElement {
     const textarea = this.editor.textarea
     if (textarea.isRenderedWithLatestInputText !== true) {
       this.msqText = textarea.value
-      this.host.setAttribute('title', this.msqText)
       this.wrapper.style.opacity = '0.5'
       try {
         this.#mountGenerated(await this.#generate(this.msqText))
@@ -280,11 +280,20 @@ class MuSemantiQEditor extends MSQTemplateElement {
         this.wrapper.style.removeProperty('opacity')
       }
     }
+    // Hiding the button that was just activated would drop focus to the body
+    // and restart Tab from the top of the page, so hand it to the button that
+    // takes its place.
+    const focusWasInside = this.host.shadowRoot.activeElement !== null
+
     this.textContainer.hidden = true
     this.svgContainer.hidden = false
     this.midiPlayer.hidden = false
     this.previewButton.hidden = true
     this.readButton.hidden = false
+
+    if (focusWasInside) {
+      this.readButton.focus()
+    }
   }
 }
 

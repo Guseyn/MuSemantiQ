@@ -1,9 +1,13 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title></title>
+    <title>MuSemantiQ — Browser Web Components Example</title>
+    <meta
+      name="description"
+      content="Live examples of the MuSemantiQ web components: rendering music written as text into an engraved SVG score, playing it back as MIDI, and editing it in the browser."
+    >
     <script type="importmap">
       {
         "imports": {
@@ -20,80 +24,176 @@
     </script>
   </head>
   <body>
-    <template
-      is="msq-font-loader"
-      data-font-sources-reference="msqFontSources"
-      data-font-config='
-        {
-          "chord-letters": {
-            "gentium plus": "/font/chord-letters/GentiumPlus-Regular.ttf"
-          },
-          "text": {
-            "noto-serif": {
-              "regular": "/font/text/NotoSerif-Regular.ttf",
-              "bold":    "/font/text/NotoSerif-Bold.ttf"
-            }
-          },
-          "music": {
-            "bravura": {
-              "font": "/font/music/Bravura.otf",
-              "js":   "/js/msq/worker/drawer/font/music-js/bravura.js"
+    <header>
+      <h1>MuSemantiQ</h1>
+      <p>
+        The Semantic Music Engine. You write music as plain text, and MuSemantiQ
+        engraves it as an SVG score and plays it back as MIDI.
+      </p>
+      <p>
+        This page demonstrates the browser web components, served by
+        <code>npm run examples:browser</code>.
+      </p>
+
+      <nav aria-label="Examples on this page">
+        <ul>
+          <li><a href="#score">Score</a></li>
+          <li><a href="#playback">Playback</a></li>
+          <li><a href="#score-and-playback">Score with playback</a></li>
+          <li><a href="#editor">Editor</a></li>
+        </ul>
+      </nav>
+
+      <noscript>
+        <p>
+          The examples on this page are rendered in the browser, so JavaScript
+          has to be enabled to see them.
+        </p>
+      </noscript>
+
+      <p>
+        The components are customized built-in elements, which WebKit does not
+        support. Use a Chromium-based browser or Firefox.
+      </p>
+    </header>
+
+    <main>
+      <p>
+        Every example below is a <code>&lt;template is="..."&gt;</code> holding
+        MuSemantiQ source as its text content. On upgrade, each template replaces
+        itself with the rendered component. They are all wrapped in a single
+        <code>&lt;template is="msq-font-loader"&gt;</code>, which loads the music,
+        text and chord-letter fonts once and publishes them under the reference
+        <code>msqFontSources</code> that the other components point at.
+      </p>
+
+      <template
+        is="msq-font-loader"
+        data-font-sources-reference="msqFontSources"
+        data-font-config='
+          {
+            "chord-letters": {
+              "gentium plus": "/font/chord-letters/GentiumPlus-Regular.ttf"
             },
-            "leland": {
-              "font": "/font/music/Leland.otf",
-              "js":   "/js/msq/worker/drawer/font/music-js/leland.js"
+            "text": {
+              "noto-serif": {
+                "regular": "/font/text/NotoSerif-Regular.ttf",
+                "bold":    "/font/text/NotoSerif-Bold.ttf"
+              }
+            },
+            "music": {
+              "bravura": {
+                "font": "/font/music/Bravura.otf",
+                "js":   "/js/msq/worker/drawer/font/music-js/bravura.js"
+              },
+              "leland": {
+                "font": "/font/music/Leland.otf",
+                "js":   "/js/msq/worker/drawer/font/music-js/leland.js"
+              }
             }
           }
-        }
-      '
-    >
-      <template
-        is="msq-svg"
-        data-font-sources="msqFontSources"
+        '
       >
-        a with accent
-        a
-        a with accent
-        a
-        a with accent
-        a
+        <section id="score" aria-labelledby="score-heading">
+          <h2 id="score-heading">
+            Score — <code>&lt;template is="msq-svg"&gt;</code>
+          </h2>
+          <p>
+            Engraves the source as an SVG score and nothing else. Hover the score
+            to reveal its toolbar: download the SVG, open it in a new tab, or copy
+            the MuSemantiQ source behind it.
+          </p>
+          <template
+            is="msq-svg"
+            data-font-sources="msqFontSources"
+          >
+            a with accent
+            a
+            a with accent
+            a
+            a with accent
+            a
+          </template>
+        </section>
+
+        <section id="playback" aria-labelledby="playback-heading">
+          <h2 id="playback-heading">
+            Playback — <code>&lt;template is="msq-midi"&gt;</code>
+          </h2>
+          <p>
+            Turns the same source into MIDI and gives you a player for it, without
+            engraving anything. This is the one component that needs no fonts, so
+            it takes no <code>data-font-sources</code>.
+          </p>
+          <template
+            is="msq-midi"
+          >
+            a with accent
+            a
+            a with accent
+            a
+            a with accent
+            a
+          </template>
+        </section>
+
+        <section id="score-and-playback" aria-labelledby="score-and-playback-heading">
+          <h2 id="score-and-playback-heading">
+            Score with playback — <code>&lt;template is="msq-svg-midi"&gt;</code>
+          </h2>
+          <p>
+            Both at once: the engraved score with a player underneath it. Notes are
+            highlighted in the score as they sound.
+          </p>
+          <template
+            is="msq-svg-midi"
+            data-font-sources="msqFontSources"
+          >
+            a with accent
+            a
+            a with accent
+            a
+            a with accent
+            a
+          </template>
+        </section>
+
+        <section id="editor" aria-labelledby="editor-heading">
+          <h2 id="editor-heading">
+            Editor — <code>&lt;template is="msq-editor"&gt;</code>
+          </h2>
+          <p>
+            The full editing surface: switch between the score and the source with
+            the toolbar buttons, then edit the source with syntax highlighting and
+            autocompletion and preview the result. Hold Cmd or Ctrl to navigate
+            between a word in the source and the element it drew in the score.
+          </p>
+          <p>
+            This example also starts with <code>music font is leland</code>, showing
+            that the music font is chosen from the source itself, out of the fonts
+            the loader above registered.
+          </p>
+          <template
+            is="msq-editor"
+            data-font-sources="msqFontSources"
+          >
+            music font is leland
+            a with accent
+            a
+            a with accent
+            a
+            a with accent
+            a
+          </template>
+        </section>
       </template>
-      <hr>
-      <template
-        is="msq-midi"
-      >
-        a with accent
-        a
-        a with accent
-        a
-        a with accent
-        a
-      </template>
-      <hr>
-      <template
-        is="msq-svg-midi"
-        data-font-sources="msqFontSources"
-      >
-        a with accent
-        a
-        a with accent
-        a
-        a with accent
-        a
-      </template>
-      <hr>
-      <template
-        is="msq-editor"
-        data-font-sources="msqFontSources"
-      >
-        music font is leland
-        a with accent
-        a
-        a with accent
-        a
-        a with accent
-        a
-      </template>
-    </template>
+    </main>
+
+    <footer>
+      <p>
+        <a href="https://github.com/Guseyn/MuSemantiQ">MuSemantiQ on GitHub</a>
+        — released under the Credited Source License (CSL) v1.0.
+      </p>
+    </footer>
   </body>
 </html>

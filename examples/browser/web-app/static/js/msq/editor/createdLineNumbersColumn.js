@@ -7,7 +7,9 @@ export default (divUnderneathTextarea) => {
     {
     },
     {
-      'data-line-numbers': ''
+      'data-line-numbers': '',
+      /* Decoration: the caret's line is already reported by the textarea. */
+      'aria-hidden': 'true'
     }
   )
   insertElementBeforeSpecifiedOne(createdLineNumbersColumn, divUnderneathTextarea)

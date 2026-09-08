@@ -28,21 +28,23 @@ class MuSemantiQSVG extends MSQTemplateElement {
   #buildView({ svgString, svgDataSrc, inputText, errors }) {
     const elm = this.createShadowHost({
       renderedBy: 'msq-svg',
-      title: inputText,
+      label: 'Music score',
       styles: [ utilsPanel, svgWithFullRadius ],
       html: /*html*/`
         <div data-inner-wrapper>
-          <div data-utils>
-            <button data-download-svg>${downloadIcon}</button>
-            <button data-view-svg>${previewIcon}</button>
-            <button data-copy-msq>${copyIcon}</button>
+          <div data-utils role="toolbar" aria-label="Score actions">
+            <button type="button" data-download-svg aria-label="Download the score as SVG">${downloadIcon}</button>
+            <button type="button" data-view-svg aria-label="Open the score in a new tab">${previewIcon}</button>
+            <button type="button" data-copy-msq aria-label="Copy the MuSemantiQ source">${copyIcon}</button>
           </div>
-          <div data-scroll>
+          <div data-scroll tabindex="0" role="group" aria-label="Score">
             ${svgString}
           </div>
         </div>
       `
     })
+
+    this.labelScore(elm.shadowRoot, 'Engraved music score')
 
     elm.shadowRoot.querySelector('button[data-download-svg]').addEventListener('click', () => {
       downloadContent({

@@ -8,7 +8,9 @@ export default (textarea) => {
     },
     {
       'data-highlights': '',
-      'data-no-ehtml': 'true'
+      'data-no-ehtml': 'true',
+      /* A coloured copy of the textarea's own value, purely to look at. */
+      'aria-hidden': 'true'
     }
   )
   const textContainer = createdElementWithStylesAndAttributes(

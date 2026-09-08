@@ -5,7 +5,7 @@ export default /*css*/`
   }
   div[data-inner-wrapper][data-has-errors] div[data-scroll],
   div[data-inner-wrapper][data-has-errors] div[data-text-container],
-  div[data-inner-wrapper][data-has-errors] svg {
+  div[data-inner-wrapper][data-has-errors] div[data-scroll] > svg {
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
   }

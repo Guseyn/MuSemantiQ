@@ -34,7 +34,7 @@ class MuSemantiQMIDI extends MSQTemplateElement {
 
     const elm = this.createShadowHost({
       renderedBy: 'msq-midi',
-      title: inputText,
+      label: 'MIDI player',
       styles: [ playerRadius ],
       html: /*html*/`
         <div data-inner-wrapper>
@@ -52,6 +52,7 @@ class MuSemantiQMIDI extends MSQTemplateElement {
     overrideMidiPlayerStyles(midiPlayer)
     addUtilsToMidiPlayerControlPanel(midiPlayer, [
       {
+        label: 'Download the MIDI file',
         innerHTML: downloadIcon,
         onClick: () => downloadContent({
           fileName: this.getAttribute('data-file-name') || this.id,
@@ -60,6 +61,7 @@ class MuSemantiQMIDI extends MSQTemplateElement {
         })
       },
       {
+        label: 'Copy the MuSemantiQ source',
         innerHTML: copyIcon,
         onClick: (event) => copyText({
           event,

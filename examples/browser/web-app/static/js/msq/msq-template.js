@@ -78,17 +78,37 @@ export default class MSQTemplateElement extends HTMLTemplateElement {
    * `styles` are appended after the shared ones, so an element can override
    * them; `html` is the shadow root's markup, which must contain the
    * div[data-inner-wrapper] that updateErrors() appends to.
+   *
+   * `label` names the element for assistive technology. It is deliberately a
+   * short description of the element rather than the MSQ source: the source is
+   * already readable in the editor and copyable from the toolbar, and as a
+   * label it would be read out in full every time focus entered the element.
    */
-  createShadowHost({ renderedBy, title, styles = [], html }) {
+  createShadowHost({ renderedBy, label, styles = [], html }) {
     const elm = document.createElement('div')
     elm.attachShadow({ mode: 'open' })
-    elm.setAttribute('title', title)
+    elm.setAttribute('role', 'group')
+    elm.setAttribute('aria-label', label)
     elm.setAttribute('data-rendered-by', `template[is="${renderedBy}"]`)
     elm.shadowRoot.innerHTML = /*html*/`
       <style>${[ tokens, surface, errorsCss, ...styles ].join('\n')}</style>
       ${html}
     `
     return elm
+  }
+
+  /**
+   * The score is a worker-generated <svg> with no accessible name of its own,
+   * and it is inserted as markup, so it can only be labelled afterwards.
+   */
+  labelScore(container, label) {
+    const svg = container.querySelector('svg')
+    if (!svg) {
+      return
+    }
+    svg.setAttribute('role', 'img')
+    svg.setAttribute('aria-label', label)
+    svg.setAttribute('focusable', 'false')
   }
 
   replaceSelf(elm) {
@@ -116,6 +136,11 @@ export default class MSQTemplateElement extends HTMLTemplateElement {
     if (!panel) {
       panel = document.createElement('div')
       panel.setAttribute('data-errors', '')
+      panel.setAttribute('role', 'group')
+      panel.setAttribute('aria-label', 'Errors')
+      // Polite rather than an alert: the editor re-renders this on demand, and
+      // interrupting whatever is being read for a parse error is too much.
+      panel.setAttribute('aria-live', 'polite')
       wrapper.appendChild(panel)
     }
     panel.innerHTML = html

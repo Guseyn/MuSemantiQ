@@ -48,6 +48,9 @@ export default function initializeEditor({
   textarea.setAttribute('autocomplete', 'off')
   textarea.setAttribute('spellcheck', 'false')
   textarea.setAttribute('placeholder', 'Type here...')
+  // The highlight layer underneath is aria-hidden, so this is the only
+  // accessible name the text view has.
+  textarea.setAttribute('aria-label', 'MuSemantiQ source')
 
   // The modules reach the rendered SVG through `initialParentElement.shadowRoot`.
   textarea.initialParentElement = shadowHost
