@@ -21,7 +21,8 @@
     "nodes:update": "rsync -a --delete ../../my-projects/nodes.js/nodes/ examples/browser/nodes/",
     "eui:update": "rsync -a --delete ../../my-projects/e-ui/static/js/e-ui/ examples/browser/web-app/static/js/e-ui/ && cp -rf ../../my-projects/e-ui/static/css/e-ui.css examples/browser/web-app/static/css/e-ui.css",
 
-    "examples:browser": "npm run setup:symlinks && npm run create:msq:worker && node examples/browser/web-app/main.js"
+    "examples:browser": "npm run setup:symlinks && npm run create:msq:worker && node examples/browser/web-app/main.js",
+    "examples:cli": "node examples/cli/msq.js"
   },
   "repository": {
     "type": "git",
@@ -48,6 +49,9 @@
   },
   "worker.importmap": {
     "#msq": "/js/msq/worker"
+  },
+  "engines": {
+    "node": ">=22"
   },
   "devDependencies": {
     "c8": "^11.0.0"
