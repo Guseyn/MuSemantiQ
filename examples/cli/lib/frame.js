@@ -79,8 +79,16 @@ export class Frame {
 
     this.widths = painted.map(displayWidth)
     this.cursorRow = row
+
+    /*
+     * When a caret position was asked for the caret is visible, so the repaint
+     * is bracketed by hide/show: otherwise it would be seen travelling up the
+     * frame and back on every keystroke. Ends shown, which is the state a text
+     * field should be left in.
+     */
+    const conceal = cursor !== undefined
     // One write per frame: no tearing, no flicker.
-    this.output.write(out)
+    this.output.write(conceal ? `${CSI}?25l${out}${CSI}?25h` : out)
   }
 
   /** Erase the frame, leaving the cursor where the frame began. */

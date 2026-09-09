@@ -13,6 +13,16 @@ const SHOW_CURSOR = '\x1b[?25h'
 const BRACKETED_PASTE_ON = '\x1b[?2004h'
 const BRACKETED_PASTE_OFF = '\x1b[?2004l'
 
+/*
+ * Caret shape, via DECSCUSR — the space before the `q` is part of the sequence.
+ * A blinking bar shows where typing will land, and letting the terminal do the
+ * blinking costs nothing: no timer, no repainting. `0` hands the caret back to
+ * whatever the user configured. Terminals that do not understand these ignore
+ * them silently.
+ */
+const CARET_BLINKING_BAR = '\x1b[5 q'
+const CARET_TERMINAL_DEFAULT = '\x1b[0 q'
+
 /* Signals whose default action kills the process without running 'exit'. */
 const SIGNAL_EXIT_CODES = {
   SIGINT: 130,
@@ -45,7 +55,7 @@ export function requireInteractive(input = process.stdin, output = process.stdou
  * acquire throws, which surfaces the "two prompts racing because an await was
  * forgotten" bug immediately instead of as scrambled input.
  */
-export function acquire({ input = process.stdin, output = process.stdout, raw = true, hideCursor = true, bracketedPaste = true, flag } = {}) {
+export function acquire({ input = process.stdin, output = process.stdout, raw = true, hideCursor = true, blinkingCaret = false, bracketedPaste = true, flag } = {}) {
   if (activeSession) {
     throw new Error('a prompt is already active on this terminal')
   }
@@ -56,8 +66,8 @@ export function acquire({ input = process.stdin, output = process.stdout, raw = 
     input,
     output,
     raw: false,
-    cursorHidden: false,
     bracketedPaste: false,
+    caretStyled: false,
     offResize: null
   }
   activeSession = session
@@ -80,7 +90,10 @@ export function acquire({ input = process.stdin, output = process.stdout, raw = 
   let prologue = ''
   if (hideCursor) {
     prologue += HIDE_CURSOR
-    session.cursorHidden = true
+  }
+  if (blinkingCaret) {
+    prologue += CARET_BLINKING_BAR
+    session.caretStyled = true
   }
   if (bracketedPaste && session.raw) {
     // Without this a multi-line paste arrives as a burst of Return keys, which
@@ -113,9 +126,13 @@ export function restore() {
   activeSession = null
 
   try {
-    let epilogue = ''
-    if (session.cursorHidden) {
-      epilogue += SHOW_CURSOR
+    /*
+     * Unconditional: a widget that keeps the caret visible still hides it while
+     * repainting, so the process dying mid-frame must not leave it hidden.
+     */
+    let epilogue = SHOW_CURSOR
+    if (session.caretStyled) {
+      epilogue += CARET_TERMINAL_DEFAULT
     }
     if (session.bracketedPaste) {
       epilogue += BRACKETED_PASTE_OFF

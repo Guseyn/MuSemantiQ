@@ -46,7 +46,7 @@ export async function askForPlan() {
 
   const source = inputKind === 'path'
     ? await askForInputPath()
-    : sourceFromText(await pasteBlock({ message: 'Paste your MuSemantiQ text' }))
+    : sourceFromText(await pasteBlock({ message: 'Paste your MuSemantiQ text (press ^D on new line to finish)' }))
 
   /*
    * Fonts are only asked about when something will be engraved; a performance
@@ -115,7 +115,7 @@ async function askForInputPath() {
 
 async function askForFontConfig() {
   const answer = await textInput({
-    message: 'Font config',
+    message: 'Font config (press Enter to use default config)',
     hint: 'path to a JSON file, or Enter to use the built-in fonts',
     completePaths: true,
     validate: async (value) => {
