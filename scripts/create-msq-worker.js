@@ -97,8 +97,14 @@ function rewriteImports(code, map) {
   return rewritten
 }
 
-// Build-time tools that run on Node and are never imported by the worker.
-const SKIPPED_DIRECTORIES = new Set([ 'tools' ])
+/*
+Build-time entry points that import Node built-ins, so they must not reach the
+browser. The rest of src/tools is pure and is shared with the font viewer page.
+*/
+const SKIPPED_FILES = new Set([
+  'generate-smufl-js-font.js',
+  'generate-magenta-sound-font.js'
+])
 
 /**
  * Process all files recursively
@@ -110,16 +116,12 @@ function processDirectory(dir, outBaseDir) {
     const srcPath = path.join(dir, entry.name)
     const outPath = path.join(outBaseDir, entry.name)
 
-    if (entry.isDirectory() && SKIPPED_DIRECTORIES.has(entry.name)) {
-      continue
-    }
-
     if (entry.isDirectory()) {
       // Create directory in output
       fs.mkdirSync(outPath, { recursive: true })
       // Recursively process directory
       processDirectory(srcPath, outPath)
-    } else if (entry.isFile() && entry.name.endsWith('.js')) {
+    } else if (entry.isFile() && entry.name.endsWith('.js') && !SKIPPED_FILES.has(entry.name)) {
       // Read file
       let code = fs.readFileSync(srcPath, 'utf-8')
 

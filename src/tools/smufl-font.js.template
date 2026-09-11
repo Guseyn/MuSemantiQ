@@ -178,21 +178,21 @@ export default function ({
       points: [
         __POINTS:treble.points__
       ],
-      yCorrection: -4.0 * intervalBetweenStaveLines
+      yCorrection: __YCORRECTION:treble__
     },
     bass: {
       unicode: __UNICODE:bass__,
       points: [
         __POINTS:bass.points__
       ],
-      yCorrection: -2.57 * intervalBetweenStaveLines
+      yCorrection: __YCORRECTION:bass__
     },
     alto: {
       unicode: __UNICODE:alto__,
       points: [
         __POINTS:alto.points__
       ],
-      yCorrection: -2.05 * intervalBetweenStaveLines
+      yCorrection: __YCORRECTION:alto__
     },
     trebleOctaveEightUp: {
       unicode: __UNICODE:trebleOctaveEightUp__,
@@ -254,7 +254,7 @@ export default function ({
       points: [
         __POINTS:wholeNoteBody.points__
       ],
-      yCorrection: -1.09 * intervalBetweenStaveLines
+      yCorrection: __YCORRECTION:wholeNoteBody__
     },
     ghostWholeNoteBody: {
       unicode: __UNICODE:ghostWholeNoteBody__,
@@ -285,7 +285,7 @@ export default function ({
       points: [
         __POINTS:sharpKey.points__
       ],
-      yCorrection: -2.785 * intervalBetweenStaveLines
+      yCorrection: __YCORRECTION:sharpKey__
     },
     sesquisharpKey: {
       unicode: __UNICODE:sesquisharpKey__,
@@ -313,7 +313,7 @@ export default function ({
       points: [
         __POINTS:naturalKey.points__
       ],
-      yCorrection: -2.69 * intervalBetweenStaveLines
+      yCorrection: __YCORRECTION:naturalKey__
     },
     flatKey: {
       unicode: __UNICODE:flatKey__,
@@ -411,21 +411,21 @@ export default function ({
       points: [
         __POINTS:quadrupleWholeRest.points__
       ],
-      yCorrection: -1 * intervalBetweenStaveLines
+      yCorrection: __YCORRECTION:quadrupleWholeRest__
     },
     doubleWholeRest: {
       unicode: __UNICODE:doubleWholeRest__,
       points: [
         __POINTS:doubleWholeRest.points__
       ],
-      yCorrection: 0 * intervalBetweenStaveLines
+      yCorrection: __YCORRECTION:doubleWholeRest__
     },
     wholeRest: {
       unicode: __UNICODE:wholeRest__,
       points: [
         __POINTS:wholeRest.points__
       ],
-      yCorrection: -0.525 * intervalBetweenStaveLines
+      yCorrection: __YCORRECTION:wholeRest__
     },
     halfRest: {
       unicode: __UNICODE:halfRest__,
@@ -545,21 +545,21 @@ export default function ({
       points: [
         __POINTS:singleMixedSimile.points__
       ],
-      yCorrection: -1.05 * intervalBetweenStaveLines
+      yCorrection: __YCORRECTION:singleMixedSimile__
     },
     mixedSimile: {
       unicode: __UNICODE:mixedSimile__,
       points: [
         __POINTS:mixedSimile.points__
       ],
-      yCorrection: -1.05 * intervalBetweenStaveLines
+      yCorrection: __YCORRECTION:mixedSimile__
     },
     simile: {
       unicode: __UNICODE:simile__,
       points: [
         __POINTS:simile.points__
       ],
-      yCorrection: -1.05 * intervalBetweenStaveLines
+      yCorrection: __YCORRECTION:simile__
     },
     oneTopFlag: {
       unicode: __UNICODE:oneTopFlag__,
@@ -573,14 +573,14 @@ export default function ({
       points: [
         __POINTS:twoTopFlags.points__
       ],
-      yCorrection: -3.4 * intervalBetweenStaveLines
+      yCorrection: __YCORRECTION:twoTopFlags__
     },
     threeTopFlags: {
       unicode: __UNICODE:threeTopFlags__,
       points: [
         __POINTS:threeTopFlags.points__
       ],
-      yCorrection: -4.0 * intervalBetweenStaveLines
+      yCorrection: __YCORRECTION:threeTopFlags__
     },
     fourTopFlags: {
       unicode: __UNICODE:fourTopFlags__,
@@ -601,7 +601,7 @@ export default function ({
       points: [
         __POINTS:sixTopFlags.points__
       ],
-      yCorrection: -6.2 * intervalBetweenStaveLines
+      yCorrection: __YCORRECTION:sixTopFlags__
     },
     oneBottomFlag: {
       unicode: __UNICODE:oneBottomFlag__,
@@ -650,7 +650,7 @@ export default function ({
       points: [
         __POINTS:breathMarkAsComma.points__
       ],
-      yCorrection: -1.5 * intervalBetweenStaveLines
+      yCorrection: __YCORRECTION:breathMarkAsComma__
     },
     breathMarkAsDoubleSlash: {
       unicode: __UNICODE:breathMarkAsDoubleSlash__,
@@ -1117,7 +1117,7 @@ export default function ({
         points: [
           __POINTS:tupletLetters.:.points__
         ],
-        yCorrection: 0.7 * intervalBetweenStaveLines
+        yCorrection: __YCORRECTION:tupletLetters.:__
       }
     },
     timeSignatureLetters: {

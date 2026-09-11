@@ -1769,7 +1769,7 @@ export default function ({
         1.36 * intervalBetweenStaveLines, 6.70 * intervalBetweenStaveLines, 1.26 * intervalBetweenStaveLines, 6.72 * intervalBetweenStaveLines, 1.14 * intervalBetweenStaveLines, 6.72 * intervalBetweenStaveLines,
         'Z'
       ],
-      yCorrection: -4.0 * intervalBetweenStaveLines
+      yCorrection: -3.249 * intervalBetweenStaveLines
     },
     bass: {
       unicode: '\uE062',
@@ -1870,7 +1870,7 @@ export default function ({
         2.62 * intervalBetweenStaveLines, 3.58 * intervalBetweenStaveLines, 2.64 * intervalBetweenStaveLines, 3.63 * intervalBetweenStaveLines, 2.69 * intervalBetweenStaveLines, 3.63 * intervalBetweenStaveLines,
         'Z'
       ],
-      yCorrection: -2.57 * intervalBetweenStaveLines
+      yCorrection: -1.829 * intervalBetweenStaveLines
     },
     alto: {
       unicode: '\uE05C',
@@ -2096,7 +2096,7 @@ export default function ({
         1.52 * intervalBetweenStaveLines, 6.47 * intervalBetweenStaveLines, 1.61 * intervalBetweenStaveLines, 6.48 * intervalBetweenStaveLines, 1.71 * intervalBetweenStaveLines, 6.48 * intervalBetweenStaveLines,
         'Z'
       ],
-      yCorrection: -2.05 * intervalBetweenStaveLines
+      yCorrection: -2.347 * intervalBetweenStaveLines
     },
     trebleOctaveEightUp: {
       unicode: '\uE053',
@@ -3270,7 +3270,7 @@ export default function ({
         0.95 * intervalBetweenStaveLines, 1.65 * intervalBetweenStaveLines, 0.82 * intervalBetweenStaveLines, 1.69 * intervalBetweenStaveLines, 0.69 * intervalBetweenStaveLines, 1.70 * intervalBetweenStaveLines,
         'Z'
       ],
-      yCorrection: -1.09 * intervalBetweenStaveLines
+      yCorrection: -1.402 * intervalBetweenStaveLines
     },
     ghostWholeNoteBody: {
       unicode: '\uE0A7',
@@ -3648,7 +3648,7 @@ export default function ({
         0.94 * intervalBetweenStaveLines, 3.03 * intervalBetweenStaveLines, 0.94 * intervalBetweenStaveLines, 3.22 * intervalBetweenStaveLines, 0.92 * intervalBetweenStaveLines, 3.40 * intervalBetweenStaveLines,
         'Z'
       ],
-      yCorrection: -2.785 * intervalBetweenStaveLines
+      yCorrection: -3.061 * intervalBetweenStaveLines
     },
     sesquisharpKey: {
       unicode: '\uED37',
@@ -4053,7 +4053,7 @@ export default function ({
         0.48 * intervalBetweenStaveLines, 3.85 * intervalBetweenStaveLines, 0.32 * intervalBetweenStaveLines, 3.88 * intervalBetweenStaveLines, 0.16 * intervalBetweenStaveLines, 3.90 * intervalBetweenStaveLines,
         'Z'
       ],
-      yCorrection: -2.69 * intervalBetweenStaveLines
+      yCorrection: -3.658 * intervalBetweenStaveLines
     },
     flatKey: {
       unicode: '\uE260',
@@ -4963,7 +4963,7 @@ export default function ({
         0.02 * intervalBetweenStaveLines, 2.95 * intervalBetweenStaveLines, 0.05 * intervalBetweenStaveLines, 2.98 * intervalBetweenStaveLines, 0.16 * intervalBetweenStaveLines, 2.98 * intervalBetweenStaveLines,
         'Z'
       ],
-      yCorrection: -1 * intervalBetweenStaveLines
+      yCorrection: -1.001 * intervalBetweenStaveLines
     },
     doubleWholeRest: {
       unicode: '\uE4E2',
@@ -5037,7 +5037,7 @@ export default function ({
         -0.00 * intervalBetweenStaveLines, 0.94 * intervalBetweenStaveLines, 0.02 * intervalBetweenStaveLines, 1.02 * intervalBetweenStaveLines, 0.21 * intervalBetweenStaveLines, 1.02 * intervalBetweenStaveLines,
         'Z'
       ],
-      yCorrection: -0.525 * intervalBetweenStaveLines
+      yCorrection: -0.465 * intervalBetweenStaveLines
     },
     halfRest: {
       unicode: '\uE4E4',
@@ -6067,7 +6067,7 @@ export default function ({
         2.87 * intervalBetweenStaveLines, 2.53 * intervalBetweenStaveLines, 2.94 * intervalBetweenStaveLines, 2.62 * intervalBetweenStaveLines, 2.97 * intervalBetweenStaveLines, 2.73 * intervalBetweenStaveLines,
         'Z'
       ],
-      yCorrection: -1.05 * intervalBetweenStaveLines
+      yCorrection: -1.038 * intervalBetweenStaveLines
     },
     simile: {
       unicode: '\uE504',
@@ -6104,7 +6104,7 @@ export default function ({
         0.19 * intervalBetweenStaveLines, 2.84 * intervalBetweenStaveLines, 0.20 * intervalBetweenStaveLines, 2.86 * intervalBetweenStaveLines, 0.22 * intervalBetweenStaveLines, 2.86 * intervalBetweenStaveLines,
         'Z'
       ],
-      yCorrection: -1.05 * intervalBetweenStaveLines
+      yCorrection: -0.951 * intervalBetweenStaveLines
     },
     oneTopFlag: {
       unicode: '\uE240',
@@ -6223,7 +6223,7 @@ export default function ({
         1.06 * intervalBetweenStaveLines, 1.72 * intervalBetweenStaveLines, 1.17 * intervalBetweenStaveLines, 1.98 * intervalBetweenStaveLines, 1.15 * intervalBetweenStaveLines, 2.27 * intervalBetweenStaveLines,
         'Z'
       ],
-      yCorrection: -3.4 * intervalBetweenStaveLines
+      yCorrection: -3.418 * intervalBetweenStaveLines
     },
     threeTopFlags: {
       unicode: '\uE244',
@@ -6312,7 +6312,7 @@ export default function ({
         0.46 * intervalBetweenStaveLines, 5.15 * intervalBetweenStaveLines, 0.74 * intervalBetweenStaveLines, 5.39 * intervalBetweenStaveLines, 0.77 * intervalBetweenStaveLines, 5.82 * intervalBetweenStaveLines,
         'Z'
       ],
-      yCorrection: -4.0 * intervalBetweenStaveLines
+      yCorrection: -4.15 * intervalBetweenStaveLines
     },
     fourTopFlags: {
       unicode: '\uE246',
@@ -6741,7 +6741,7 @@ export default function ({
         0.81 * intervalBetweenStaveLines, 7.88 * intervalBetweenStaveLines, 0.79 * intervalBetweenStaveLines, 7.94 * intervalBetweenStaveLines, 0.78 * intervalBetweenStaveLines, 8.03 * intervalBetweenStaveLines,
         'Z'
       ],
-      yCorrection: -6.2 * intervalBetweenStaveLines
+      yCorrection: -6.243 * intervalBetweenStaveLines
     },
     oneBottomFlag: {
       unicode: '\uE241',
@@ -7417,7 +7417,7 @@ export default function ({
         0.33 * intervalBetweenStaveLines, 0.98 * intervalBetweenStaveLines, 0.34 * intervalBetweenStaveLines, 1.04 * intervalBetweenStaveLines, 0.33 * intervalBetweenStaveLines, 1.10 * intervalBetweenStaveLines,
         'Z'
       ],
-      yCorrection: -1.5 * intervalBetweenStaveLines
+      yCorrection: -1.508 * intervalBetweenStaveLines
     },
     breathMarkAsDoubleSlash: {
       unicode: '\uE549\uE549',
@@ -17566,7 +17566,7 @@ export default function ({
           0.16 * intervalBetweenStaveLines, 0.90 * intervalBetweenStaveLines, 0.18 * intervalBetweenStaveLines, 0.94 * intervalBetweenStaveLines, 0.21 * intervalBetweenStaveLines, 0.94 * intervalBetweenStaveLines,
           'Z'
         ],
-        yCorrection: 0.7 * intervalBetweenStaveLines
+        yCorrection: 1.204 * intervalBetweenStaveLines
       }
     },
     timeSignatureLetters: {

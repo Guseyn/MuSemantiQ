@@ -35,9 +35,10 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 import opentype from '#msq/drawer/lib/opentype/opentype.js'
 import bboxForPath from '#msq/drawer/elements/basic/bboxForPath.js'
-import generateUnicodePoints from '#msq/drawer/generateUnicodePoints.js'
 import glyphTable from '#msq/tools/smufl-glyph-table.js'
 import { scanMusicJsFont, INTERVAL_BETWEEN_STAVE_LINES } from '#msq/tools/scanMusicJsFont.js'
+import { pointArrayLines } from '#msq/tools/pointArrayLines.js'
+import { traceGlyph, yCorrectionFor } from '#msq/tools/tracedGlyph.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -46,9 +47,6 @@ const TEMPLATE_PATH = path.join(__dirname, 'smufl-font.js.template')
 // A generated glyph counts as drifting when either side of its bounding box
 // differs from Bravura's by more than this, in stave-line intervals.
 const DRIFT_THRESHOLD = 0.1
-
-// The music-js files write coordinates to this many decimals.
-const COORDINATE_DECIMALS = 2
 
 /**
  * Format a codepoint the way the music-js files write it.
@@ -64,53 +62,6 @@ function unicodeLabel(characters) {
   return [ ...characters ].map(
     (character) => 'U+' + character.codePointAt(0).toString(16).toUpperCase().padStart(4, '0')
   ).join(' ')
-}
-
-/**
- * Convert a traced path from pixels to the stave-line intervals the music-js
- * files are written in.
- */
-function pointsInStaveIntervals(points, interval) {
-  return points.map(
-    (point) => typeof point === 'string'
-      ? point
-      : Number((point / interval).toFixed(COORDINATE_DECIMALS))
-  )
-}
-
-/**
- * Lay a point array out the way the committed music-js fonts are written: each
- * command letter on its own line, followed by its coordinates.
- */
-function pointArrayLines(points) {
-  const lines = []
-  let coordinates = []
-
-  const flushCoordinates = () => {
-    if (coordinates.length) {
-      lines.push(coordinates.join(', '))
-      coordinates = []
-    }
-  }
-
-  for (const point of points) {
-    if (typeof point === 'string') {
-      flushCoordinates()
-      lines.push(`'${point}'`)
-    } else {
-      // A coordinate that rounds to negative zero is written '-0.00', the way
-      // toFixed produced it before the value made the round trip through Number.
-      const written = Object.is(point, -0)
-        ? `-${(0).toFixed(COORDINATE_DECIMALS)}`
-        : point.toFixed(COORDINATE_DECIMALS)
-      coordinates.push(`${written} * intervalBetweenStaveLines`)
-    }
-  }
-  flushCoordinates()
-
-  return lines.map(
-    (line, index) => index === lines.length - 1 ? line : `${line},`
-  )
 }
 
 /**
@@ -141,16 +92,20 @@ function resolveCharacters(font, glyph) {
  * size is what the committed fonts did, and it keeps the curve rounding honest.
  */
 function tracePoints(characters, font, musicFontSourceSize, scale) {
-  return pointsInStaveIntervals(
-    generateUnicodePoints(
-      characters,
-      font,
-      null,
-      musicFontSourceSize * (scale === undefined ? 1 : scale),
-      INTERVAL_BETWEEN_STAVE_LINES
-    ),
-    INTERVAL_BETWEEN_STAVE_LINES
-  )
+  return traceGlyph(font, characters, { musicFontSourceSize, scale })
+}
+
+/**
+ * Write a correction the way the music-js fonts do: no trailing zeros beyond
+ * what the value needs, but never fewer decimals than the entry is written with,
+ * so a value that has not moved is written exactly as it was.
+ */
+function correctionValue(value, decimals = 0) {
+  const written = String(Number(value.toFixed(3)))
+  const [ whole, fraction = '' ] = written.split('.')
+  return fraction.length >= decimals
+    ? written
+    : `${whole}.${fraction.padEnd(decimals, '0')}`
 }
 
 /**
@@ -217,7 +172,10 @@ function reportHtml(fontName, rows) {
     const badges = [
       row.missing ? '<span class="badge missing">MISSING</span>' : '',
       row.drift ? `<span class="badge drift">DRIFT ${escapeHtml(row.drift)}</span>` : '',
-      row.source === 'fallback' ? '<span class="badge fallback">FALLBACK</span>' : ''
+      row.source === 'fallback' ? '<span class="badge fallback">FALLBACK</span>' : '',
+      row.anchored
+        ? `<span class="badge anchored">${escapeHtml(row.anchored.from)} @ ${row.anchored.reference.toFixed(2)} · yCorrection ${escapeHtml(row.anchored.value)}</span>`
+        : ''
     ].join('')
 
     return [
@@ -259,6 +217,7 @@ function reportHtml(fontName, rows) {
   .missing { background: #d92d20; color: #fff; }
   .drift { background: #f5a623; color: #3a2500; }
   .fallback { background: #dbe7ff; color: #14306e; }
+  .anchored { background: #d7f5e3; color: #10462a; }
   .empty { color: #b42318; font-size: 12px; }
   @media (prefers-color-scheme: dark) {
     body { background: #16181d; color: #e8e8ea; }
@@ -268,6 +227,7 @@ function reportHtml(fontName, rows) {
     td.glyph { color: #e8e8ea; }
     tr.is-missing { background: #2a1b1b; }
     .fallback { background: #1d3260; color: #cfe0ff; }
+    .anchored { background: #143d28; color: #bff0d4; }
   }
 </style>
 </head>
@@ -325,8 +285,25 @@ async function main() {
   console.log(`Output:   ${outputPath}`)
   console.log()
 
+  /*
+  Where each anchored entry's correction goes. The template carries a marker
+  instead of a literal wherever a rule was proven; everything else stays as it
+  is written.
+  */
+  const correctionMarkers = new Map()
+  lines.forEach((line, index) => {
+    const marker = line.match(/^(\s*)yCorrection: __YCORRECTION:(.+?)__(,?)\s*$/)
+    if (marker) {
+      correctionMarkers.set(marker[2], {
+        line: index, indent: marker[1].length, comma: marker[3] === ','
+      })
+    }
+  })
+
   const replacements = []
   const rows = []
+  const correctionRows = []
+  const anchored = new Map()
   let missingCount = 0
   let fallbackCount = 0
   let driftCount = 0
@@ -366,9 +343,37 @@ async function main() {
         ? 'missing'
         : used.some((one) => one.source === 'fallback') ? 'fallback' : 'smufl'
 
-      const points = source === 'missing'
-        ? []
+      const traced = source === 'missing'
+        ? { points: [], height: 0 }
         : tracePoints(characters, font, musicFontSourceSize, glyph.scale)
+      const points = traced.points
+
+      /*
+      An anchored entry's vertical correction is computed rather than inherited:
+      the rule puts the glyph's SMuFL origin on stave line `k`, so the correction
+      is `k - height`. Entries without an anchor keep the template's value, which
+      is a stave position chosen by hand and not derivable from the outline.
+      */
+      if (glyph.yAnchor && source !== 'missing' && correctionMarkers.has(entryPath)) {
+        const marker = correctionMarkers.get(entryPath)
+        const corrected = yCorrectionFor(glyph.yAnchor, traced)
+        replacements.push({
+          startLine: marker.line,
+          endLine: marker.line,
+          textLines: [
+            `${' '.repeat(marker.indent)}yCorrection: ` +
+            `${correctionValue(corrected, glyph.yAnchor.decimals)}` +
+            ` * intervalBetweenStaveLines${marker.comma ? ',' : ''}`
+          ]
+        })
+        const computed = {
+          from: glyph.yAnchor.from,
+          reference: glyph.yAnchor.k,
+          value: correctionValue(corrected, glyph.yAnchor.decimals)
+        }
+        correctionRows.push({ id: entryPath, ...computed })
+        anchored.set(array.id, computed)
+      }
 
       const reference = glyph.bbox ? glyph.bbox[index] : null
       const box = boundingBox(points)
@@ -414,6 +419,7 @@ async function main() {
       )
 
       rows.push({
+        anchored: anchored.get(array.id),
         id: array.id,
         unicode: `${unicodeLabel(characters)}${source === 'fallback' ? ' (fallback)' : ''}`,
         svg: previewSvg(points),
@@ -455,12 +461,24 @@ async function main() {
   fs.writeFileSync(htmlPath, reportHtml(path.basename(fontPath), rows), 'utf-8')
 
   console.log()
+  console.log(`${correctionRows.length} vertical corrections computed from glyph geometry:`)
+  for (const row of correctionRows) {
+    console.log(
+      `    ${row.id.padEnd(24)} ${row.from.padEnd(7)} at ${row.reference.toFixed(2).padStart(6)}` +
+      `  ->  yCorrection ${row.value}`
+    )
+  }
+  console.log()
   console.log(`${rows.length} point arrays: ${rows.length - missingCount} traced, ${missingCount} empty`)
   console.log(`${fallbackCount} resolved through a private-use fallback`)
-  console.log(`${driftCount} drift from Bravura by more than ${DRIFT_THRESHOLD} stave-line intervals`)
-  if (driftCount) {
-    console.log('  re-tune yCorrection / yOffset for:')
-    for (const row of rows.filter((one) => one.drift)) {
+  const needTuning = rows.filter((one) => one.drift && !one.anchored)
+  console.log(
+    `${driftCount} drift from Bravura by more than ${DRIFT_THRESHOLD} stave-line intervals` +
+    ` (${driftCount - needTuning.length} of them positioned by a rule)`
+  )
+  if (needTuning.length) {
+    console.log('  re-tune yCorrection / yOffset by hand for:')
+    for (const row of needTuning) {
       console.log(`    ${row.id.padEnd(44)} ${row.drift}`)
     }
   }
