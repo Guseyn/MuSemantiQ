@@ -16,9 +16,6 @@ import noteKeyNames from '/js/msq/worker/language/parser/scenarios/static-object
 const mainNoteKeyNames = [ 'sharp', 'flat', 'natural', 'double sharp', 'double flat', 'demisharp', 'demiflat', 'sesquisharp', 'sesquiflat' ]
 import articulationNames from '/js/msq/worker/language/parser/scenarios/static-objects/articulationNames.js'
 import ornamentKeyNames from '/js/msq/worker/language/parser/scenarios/static-objects/ornamentKeyNames.js'
-import musicFonts from '/js/msq/worker/language/parser/scenarios/static-objects/musicFonts.js'
-import textFonts from '/js/msq/worker/language/parser/scenarios/static-objects/textFonts.js'
-import chordLettersFonts from '/js/msq/worker/language/parser/scenarios/static-objects/chordLettersFonts.js'
 
 const autoCompletesForStyles = (style, autocompletes = []) => {
   autocompletes.push(`${style} is `)
@@ -70,7 +67,12 @@ const autoCompletesForKeySignatureNamesBefore = (keySignatureName, autocompletes
   return autocompletes
 }
 
-export default {
+/**
+ * The font names come from whatever the font loader registered for this editor,
+ * not from a list kept here: the parser accepts exactly those names, so a
+ * hardcoded copy could only ever drift out of sync with it.
+ */
+export default (supportedFontNames = {}) => ({
   'general': [
     'compress units by 1.5 times',
     'compress units by 2.0 times',
@@ -154,13 +156,13 @@ export default {
     ...cssColors
   ],
   'music font style name is': [
-    ...musicFonts
+    ...(supportedFontNames['music'] || [])
   ],
   'text font style name is': [
-    ...textFonts
+    ...(supportedFontNames['text'] || [])
   ],
   'chord letters font style name is': [
-    ...chordLettersFonts
+    ...(supportedFontNames['chord-letters'] || [])
   ],
   'midi setting name is': [
     ...instrumentNames
@@ -1231,4 +1233,4 @@ export default {
     'in line ',
     'line '
   ]
-}
+})

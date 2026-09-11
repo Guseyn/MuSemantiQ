@@ -1,0 +1,13 @@
+This directory holds the General MIDI soundbank the browser example plays
+through. It is expected to exist; its contents are not tracked.
+
+Expected:
+
+  SGM.sf2      any General MIDI .sf2 soundbank, placed here by hand
+
+Not tracked because the file is ~310 MB — over GitHub's 100 MB blob limit, so
+it cannot be pushed at all. Download a GM soundbank and drop it in under this
+name, or point the tools at whatever name you use.
+
+The sample sets in ../magenta-sf are rendered from this file by
+src/tools/generate-magenta-sound-font.js.

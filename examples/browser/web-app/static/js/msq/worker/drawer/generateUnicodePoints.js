@@ -35,3 +35,5 @@ function generateUnicodePoints(unicode, musicFontSource, textFontSource, musicFo
   }
   return drawnTextPathMovedToTopLeftCorner.flat()
 }
+
+export default generateUnicodePoints

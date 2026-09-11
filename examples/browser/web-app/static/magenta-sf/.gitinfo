@@ -1,0 +1,19 @@
+This directory holds the Magenta-format sample sets the browser example loads.
+It is expected to exist; its contents are not tracked.
+
+Expected layout, one directory per soundbank:
+
+  <soundbank>/<instrument>/instrument.json
+  <soundbank>/<instrument>/p<pitch>_v<velocity>.mp3
+
+Not tracked because a full 128-instrument set is ~5,100 files and ~184 MB, and
+it can be rebuilt at any time.
+
+To regenerate (needs fluidsynth and lame on PATH — `brew install fluidsynth
+lame` on macOS), from the repository root:
+
+  node src/tools/generate-magenta-sound-font.js \
+    examples/browser/web-app/static/sf/SGM.sf2
+
+That writes SGM/ here. Pass an instruments range to build a subset, e.g.
+'0-10,15,20,30-40' — a full set takes a long time to render.

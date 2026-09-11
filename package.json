@@ -38,6 +38,7 @@
     "#msq/drawer/*": "./src/drawer/*",
     "#msq/language/*": "./src/language/*",
     "#msq/midi/*": "./src/midi/*",
+    "#msq/tools/*": "./src/tools/*",
     "#msq/api.js": "./src/api.js",
 
     "#nodes/*": "./examples/browser/nodes/*"

@@ -97,6 +97,9 @@ function rewriteImports(code, map) {
   return rewritten
 }
 
+// Build-time tools that run on Node and are never imported by the worker.
+const SKIPPED_DIRECTORIES = new Set([ 'tools' ])
+
 /**
  * Process all files recursively
  */
@@ -106,6 +109,10 @@ function processDirectory(dir, outBaseDir) {
   for (const entry of entries) {
     const srcPath = path.join(dir, entry.name)
     const outPath = path.join(outBaseDir, entry.name)
+
+    if (entry.isDirectory() && SKIPPED_DIRECTORIES.has(entry.name)) {
+      continue
+    }
 
     if (entry.isDirectory()) {
       // Create directory in output

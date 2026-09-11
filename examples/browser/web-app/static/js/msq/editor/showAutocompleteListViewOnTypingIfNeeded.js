@@ -7,7 +7,7 @@ import {
   selectOptionInAutocompleteListView
 } from '#msq/editor/createdAutocompleteListView.js'
 import highlightTextareaValueInDivUnderneathItWithoutRefIds from '#msq/editor/highlightTextareaValueInDivUnderneathItWithoutRefIds.js'
-import listsOfPossibleOptionsToCompleteWordByProgressionOfCommandsFromScenarios from '#msq/editor/listsOfPossibleOptionsToCompleteWordByProgressionOfCommandsFromScenarios.js'
+import listsOfPossibleOptionsToCompleteWordByProgressionOfCommandsFromScenariosFor from '#msq/editor/listsOfPossibleOptionsToCompleteWordByProgressionOfCommandsFromScenarios.js'
 import isPrintableKeycode from '#msq/editor/isPrintableKeycode.js'
 
 const isMacOS = navigator.platform.indexOf('Mac') !== -1
@@ -130,6 +130,12 @@ const completeWord = (textarea, divUnderneathTextarea, autocompleteListView, col
 }
 
 export default (autocompleteListView, textarea, divUnderneathTextarea) => {
+  // Built once per editor: the font names are fixed for the life of the
+  // textarea, and every other list here is static.
+  const listsOfPossibleOptionsToCompleteWordByProgressionOfCommandsFromScenarios =
+    listsOfPossibleOptionsToCompleteWordByProgressionOfCommandsFromScenariosFor(
+      textarea.supportedFontNames
+    )
   autocompleteListView.optionIndex = 0
 
   let numberOfCharsIncludingNewLineCharsBeforeFirstCharInTheLineWhereCaretIsOn

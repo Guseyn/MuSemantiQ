@@ -189,6 +189,10 @@ export async function setupFonts(fontConfig) {
       'leland': {
         'font': './src/drawer/font/music/Leland.otf',
         'js': '#msq/drawer/font/music-js/leland.js'
+      },
+      'petaluma': {
+        'font': './src/drawer/font/music/Petaluma.otf',
+        'js': '#msq/drawer/font/music-js/petaluma.js'
       }
     }
   }

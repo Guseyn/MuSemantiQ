@@ -138,3 +138,14 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# Font proof sheets written next to each generated music-js font
+# by src/tools/generate-smufl-js-font.js
+*.preview.html
+
+# Soundbank and rendered samples for the browser example. Both are far too
+# large to track and are reproducible, so only their .gitinfo notes are kept.
+examples/browser/web-app/static/sf/*
+!examples/browser/web-app/static/sf/.gitinfo
+examples/browser/web-app/static/magenta-sf/*
+!examples/browser/web-app/static/magenta-sf/.gitinfo
