@@ -3,59 +3,43 @@
 /**
  * Music-js font generator.
  *
- * Traces every glyph MuSemantiQ draws out of a SMuFL `.otf` and writes the
- * music-js file the drawer consumes — the same shape as
- * src/drawer/font/music-js/bravura.js, with each `points` array rendered from
- * the font instead of pasted in by hand.
+ * Traces every glyph MuSemantiQ draws out of a SMuFL `.otf` and writes the font
+ * file the drawer consumes, in the same shape as
+ * src/drawer/font/music-js/bravura.js.
  *
- * Two files drive it, both alongside this one:
+ * The tracing is the one the legacy font viewer used (unison's
+ * ViewFontEndpoint): draw the character at `musicFontSourceSize * interval` with
+ * the baseline centred, move the path to the top-left corner, then write each
+ * coordinate as `n.nn * intervalBetweenStaveLines`, command letters quoted on
+ * their own line.
  *
- *   smufl-font.js.template   the file skeleton: the factory signature, every
- *                            scalar metric and every hand-tuned correction,
- *                            with `__UNICODE:<entry>__` and
- *                            `__POINTS:<entry>.<field>__` where glyph data goes
- *   smufl-glyph-table.js     entry path -> SMuFL codepoint (+ a private-use
- *                            fallback, and Bravura's bbox for drift reporting)
- *
- * A glyph the font does not carry, under either codepoint, gets an empty
- * `points` array and is listed in the HTML report rather than silently keeping
- * another font's shape.
+ * The shape itself — which entries exist, their codepoints, and every
+ * adjustment value — comes from smufl-font-scaffold.js, whose values are the
+ * mean of bravura.js and leland.js. Nothing here computes a correction: a
+ * generated font starts from that midpoint and is tuned in the font viewer.
  *
  * Usage:
  *
- *   node src/tools/generate-smufl-js-font.js <font.otf> <output.js> [--html <path>]
- *
- * The corrections in the template are Bravura's, so a freshly generated font
- * draws correct shapes at inherited offsets: re-tune the entries the report
- * flags as drifting.
+ *   node src/tools/generate-smufl-js-font.js <font.otf> <output.js>
  */
 
 import fs from 'fs'
 import path from 'path'
-import { fileURLToPath } from 'url'
 import opentype from '#msq/drawer/lib/opentype/opentype.js'
-import bboxForPath from '#msq/drawer/elements/basic/bboxForPath.js'
-import glyphTable from '#msq/tools/smufl-glyph-table.js'
-import { scanMusicJsFont, INTERVAL_BETWEEN_STAVE_LINES } from '#msq/tools/scanMusicJsFont.js'
-import { pointArrayLines } from '#msq/tools/pointArrayLines.js'
-import { traceGlyph, yCorrectionFor } from '#msq/tools/tracedGlyph.js'
+import generateUnicodePoints from '#msq/drawer/generateUnicodePoints.js'
+import scaffold from '#msq/tools/smufl-font-scaffold.js'
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
+// The interval the committed fonts were traced at, and the divisor their
+// coordinates are written in.
+const INTERVAL_BETWEEN_STAVE_LINES = 8.5
 
-const TEMPLATE_PATH = path.join(__dirname, 'smufl-font.js.template')
+// The music-js files write coordinates to this many decimals.
+const COORDINATE_DECIMALS = 2
 
-// A generated glyph counts as drifting when either side of its bounding box
-// differs from Bravura's by more than this, in stave-line intervals.
-const DRIFT_THRESHOLD = 0.1
-
-/**
- * Format a codepoint the way the music-js files write it.
- */
-function escapedUnicode(characters) {
-  const escaped = [ ...characters ].map(
-    (character) => '\\u' + character.codePointAt(0).toString(16).toUpperCase().padStart(4, '0')
-  ).join('')
-  return `'${escaped}'`
+const MULTIPLIER = {
+  interval: ' * intervalBetweenStaveLines',
+  default: ' * MUSCIC_FONT_SOURCE_SIZE * defaultIntervalBetweenStaveLines',
+  plain: ''
 }
 
 function unicodeLabel(characters) {
@@ -64,427 +48,213 @@ function unicodeLabel(characters) {
   ).join(' ')
 }
 
+function escapedUnicode(characters) {
+  return `'${[ ...characters ].map(
+    (character) => '\\u' + character.codePointAt(0).toString(16).toUpperCase().padStart(4, '0')
+  ).join('')}'`
+}
+
+const indentOf = (depth) => ' '.repeat(depth * 2)
+
+const quoteKey = (key) => /^[A-Za-z_][A-Za-z0-9_]*$/.test(key) ? key : `'${key}'`
+
 /**
- * Resolve one entry's codepoints against the font, character by character.
+ * Trace one glyph into music-js coordinates.
  *
- * Each character is tried as its standard SMuFL codepoint first, then as the
- * private-use fallback the table names for that entry.
+ * `generateUnicodePoints` returns pixels at the size it drew; dividing by the
+ * interval turns them into the multiples the file is written in.
+ *
+ * A few glyphs are engraved smaller than the rest — time-signature digits,
+ * metronome-mark notes — so the entry's scale reduces the size the glyph is
+ * drawn at, rather than shrinking the traced path afterwards. Tracing small is
+ * what the committed fonts did, and it keeps the curve rounding honest.
  */
-function resolveCharacters(font, glyph) {
-  return [ ...glyph.smufl ].map((character, index) => {
-    if (font.charToGlyphIndex(character) !== 0) {
-      return { character, source: 'smufl' }
+function tracePoints(characters, font, musicFontSourceSize, scale = 1) {
+  return generateUnicodePoints(
+    characters, font, null, musicFontSourceSize * scale, INTERVAL_BETWEEN_STAVE_LINES
+  ).map(
+    (point) => typeof point === 'string'
+      ? point
+      : Number((point / INTERVAL_BETWEEN_STAVE_LINES).toFixed(COORDINATE_DECIMALS))
+  )
+}
+
+/**
+ * Lay a point array out the way the committed fonts write it: every command
+ * letter on its own line, followed by the coordinates it takes.
+ */
+function pointArrayLines(points) {
+  const lines = []
+  let coordinates = []
+
+  const flushCoordinates = () => {
+    if (coordinates.length) {
+      lines.push(coordinates.join(', '))
+      coordinates = []
     }
-    const fallback = glyph.fallback ? [ ...glyph.fallback ][index] : undefined
-    if (fallback !== undefined && font.charToGlyphIndex(fallback) !== 0) {
-      return { character: fallback, source: 'fallback' }
+  }
+
+  for (const point of points) {
+    if (typeof point === 'string') {
+      flushCoordinates()
+      lines.push(`'${point}'`)
+    } else {
+      // A coordinate that rounds to negative zero keeps its sign, the way
+      // toFixed wrote it before the value passed through Number.
+      const written = Object.is(point, -0)
+        ? `-${(0).toFixed(COORDINATE_DECIMALS)}`
+        : point.toFixed(COORDINATE_DECIMALS)
+      coordinates.push(`${written} * intervalBetweenStaveLines`)
     }
-    return { character, source: 'missing' }
+  }
+  flushCoordinates()
+
+  // Commas between the lines of the array; the closing bracket supplies the rest.
+  return lines.map((line, index) => index === lines.length - 1 ? line : `${line},`)
+}
+
+/**
+ * Write a scalar the way the committed fonts write it: no trailing zeros, and a
+ * bare integer stays bare.
+ */
+function scalarValue(value, unit) {
+  return `${String(Number(value.toFixed(4)))}${MULTIPLIER[unit]}`
+}
+
+/**
+ * Render one scaffold node as a property: its name, and the lines of its value.
+ *
+ * Commas are added by the caller, which is the only place that knows whether a
+ * property is the last of its object.
+ */
+function renderNode(node, depth, context) {
+  const pad = indentOf(depth)
+  const key = quoteKey(node.name)
+
+  if (node.kind === 'scalar') {
+    return [ `${pad}${key}: ${scalarValue(node.value, node.unit)}` ]
+  }
+  if (node.kind === 'literal') {
+    return [ `${pad}${key}: ${JSON.stringify(node.value)}` ]
+  }
+  if (node.kind === 'array') {
+    return [ `${pad}${key}: [ ${node.value.join(', ')} ]` ]
+  }
+  if (node.kind === 'group') {
+    return [
+      `${pad}${key}: {`,
+      ...properties(node.entries.map((entry) => renderNode(entry, depth + 1, context))),
+      `${pad}}`
+    ]
+  }
+
+  const characters = [ ...node.smufl ]
+  const parts = [ [ `${indentOf(depth + 1)}unicode: ${escapedUnicode(node.smufl)}` ] ]
+
+  node.fields.forEach((field, index) => {
+    /*
+    One point field means the whole codepoint string is drawn as a single run;
+    several mean one character each, in the order the fields are listed — an up
+    and a down form, or the three pieces of a multi-measure rest.
+    */
+    const drawn = node.fields.length <= 1 ? node.smufl : characters[index]
+    const missing = [ ...drawn ].filter(
+      (character) => context.font.charToGlyphIndex(character) === 0
+    )
+
+    if (missing.length) {
+      context.missing.push(`${node.name}.${field}: ${unicodeLabel(drawn)}`)
+      parts.push([ `${indentOf(depth + 1)}${field}: []` ])
+      return
+    }
+
+    context.traced++
+    parts.push([
+      `${indentOf(depth + 1)}${field}: [`,
+      ...pointArrayLines(
+        tracePoints(drawn, context.font, context.musicFontSourceSize, node.scale)
+      ).map((line) => `${indentOf(depth + 2)}${line}`),
+      `${indentOf(depth + 1)}]`
+    ])
+  })
+
+  for (const adjustment of node.rest || []) {
+    parts.push(renderNode(adjustment, depth + 1, context))
+  }
+
+  return [ `${pad}${key}: {`, ...properties(parts), `${pad}}` ]
+}
+
+/**
+ * Comma-separate a list of properties, each of which may span several lines.
+ */
+function properties(rendered) {
+  return rendered.flatMap((lines, index) => {
+    const last = index === rendered.length - 1
+    return lines.map(
+      (line, position) => (!last && position === lines.length - 1) ? `${line},` : line
+    )
   })
 }
 
-/**
- * Trace one point array out of the font, in stave-line intervals.
- *
- * A few glyphs are engraved smaller than the rest — time signature digits,
- * metronome-mark notes — so the entry's scale reduces the size the glyph is
- * drawn at, rather than shrinking the path afterwards. Tracing at the smaller
- * size is what the committed fonts did, and it keeps the curve rounding honest.
- */
-function tracePoints(characters, font, musicFontSourceSize, scale) {
-  return traceGlyph(font, characters, { musicFontSourceSize, scale })
-}
+function generate(font, fontPath) {
+  const sourceSize = scaffold.find((node) => node.name === 'musicFontSourceSize')
+  const musicFontSourceSize = sourceSize ? sourceSize.value : 4.0
+  const context = { font, musicFontSourceSize, traced: 0, missing: [] }
 
-/**
- * Write a correction the way the music-js fonts do: no trailing zeros beyond
- * what the value needs, but never fewer decimals than the entry is written with,
- * so a value that has not moved is written exactly as it was.
- */
-function correctionValue(value, decimals = 0) {
-  const written = String(Number(value.toFixed(3)))
-  const [ whole, fraction = '' ] = written.split('.')
-  return fraction.length >= decimals
-    ? written
-    : `${whole}.${fraction.padEnd(decimals, '0')}`
-}
+  const body = properties([
+    [ `${indentOf(2)}musicFontSource` ],
+    ...scaffold.map((node) => renderNode(node, 2, context))
+  ])
 
-/**
- * Bounding box of a point array.
- *
- * Measured in pixels, because bboxForPath's "is this cubic really a quadratic"
- * epsilon is an absolute one: the same path measured in stave-line intervals
- * takes different branches and comes out a hair different. Pixels are also what
- * the drawer itself measures.
- */
-function boundingBox(points) {
-  if (!points.length) {
-    return null
-  }
-  const pixels = points.map(
-    (point) => typeof point === 'number' ? point * INTERVAL_BETWEEN_STAVE_LINES : point
-  )
-  const box = bboxForPath(pixels.join(' '))
+  const file = `'use strict'
+
+// font size(for font file) is ${musicFontSourceSize} * intervalBetweenStaveLines
+const MUSCIC_FONT_SOURCE_SIZE = ${musicFontSourceSize.toFixed(1)}
+
+/*
+Generated by src/tools/generate-smufl-js-font.js from ${path.basename(fontPath)}.
+
+The point arrays are traced from that font. Every other value starts from
+src/tools/smufl-font-scaffold.js, which holds the mean of bravura.js and
+leland.js — tune them in the font viewer at /html/font-viewer.html.
+*/
+export default function ({
+  defaultIntervalBetweenStaveLines,
+  intervalBetweenStaveLines,
+  musicFontSource
+}) {
   return {
-    left: box.minLeft,
-    top: box.minTop,
-    width: box.maxRight - box.minLeft,
-    height: box.maxBottom - box.minTop,
-    intervalWidth: (box.maxRight - box.minLeft) / INTERVAL_BETWEEN_STAVE_LINES,
-    intervalHeight: (box.maxBottom - box.minTop) / INTERVAL_BETWEEN_STAVE_LINES
+${body.join('\n')}
   }
 }
-
-/**
- * Render one report row's glyph, at a size that keeps the whole table legible.
- */
-function previewSvg(points) {
-  const box = boundingBox(points)
-  if (!box) {
-    return '<span class="empty">no points</span>'
-  }
-  // 16px per stave-line interval reads comfortably next to 14px body text.
-  const pixelsPerInterval = 16
-  const path = points.map(
-    (point) => typeof point === 'number' ? point * INTERVAL_BETWEEN_STAVE_LINES : point
-  )
-  return [
-    `<svg viewBox="${box.left.toFixed(2)} ${box.top.toFixed(2)}`,
-    `${box.width.toFixed(2)} ${box.height.toFixed(2)}"`,
-    `height="${Math.min(96, Math.max(10, box.intervalHeight * pixelsPerInterval)).toFixed(0)}"`,
-    `width="${Math.min(240, Math.max(6, box.intervalWidth * pixelsPerInterval)).toFixed(0)}">`,
-    `<path d="${path.join(' ')}" fill="currentColor" fill-rule="evenodd"/></svg>`
-  ].join(' ')
-}
-
-function escapeHtml(value) {
-  return String(value)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-}
-
-function reportHtml(fontName, rows) {
-  const missing = rows.filter((row) => row.missing).length
-  const drifted = rows.filter((row) => row.drift).length
-
-  const body = rows.map((row) => {
-    const badges = [
-      row.missing ? '<span class="badge missing">MISSING</span>' : '',
-      row.drift ? `<span class="badge drift">DRIFT ${escapeHtml(row.drift)}</span>` : '',
-      row.source === 'fallback' ? '<span class="badge fallback">FALLBACK</span>' : '',
-      row.anchored
-        ? `<span class="badge anchored">${escapeHtml(row.anchored.from)} @ ${row.anchored.reference.toFixed(2)} · yCorrection ${escapeHtml(row.anchored.value)}</span>`
-        : ''
-    ].join('')
-
-    return [
-      `<tr class="${row.missing ? 'is-missing' : ''}">`,
-      `<td class="name"><code>${escapeHtml(row.id)}</code>${badges}</td>`,
-      `<td class="unicode"><code>${escapeHtml(row.unicode)}</code></td>`,
-      `<td class="glyph">${row.svg}</td>`,
-      '</tr>'
-    ].join('')
-  }).join('\n')
-
-  return `<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>${escapeHtml(fontName)} — music-js glyphs</title>
-<style>
-  :root { color-scheme: light dark; }
-  body {
-    margin: 0; padding: 24px;
-    font: 14px/1.5 -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    background: #fff; color: #111;
-  }
-  h1 { font-size: 20px; margin: 0 0 4px; }
-  .summary { color: #555; margin-bottom: 20px; }
-  table { border-collapse: collapse; width: 100%; }
-  th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid #e3e3e3; vertical-align: middle; }
-  th { position: sticky; top: 0; background: #fff; border-bottom: 2px solid #111; }
-  td.name { width: 34%; }
-  td.unicode { width: 16%; white-space: nowrap; }
-  td.glyph { color: #111; }
-  tr.is-missing { background: #fff5f5; }
-  code { font: 12px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace; }
-  .badge {
-    display: inline-block; margin-left: 8px; padding: 1px 6px; border-radius: 3px;
-    font-size: 10px; font-weight: 600; letter-spacing: .04em; vertical-align: middle;
-  }
-  .missing { background: #d92d20; color: #fff; }
-  .drift { background: #f5a623; color: #3a2500; }
-  .fallback { background: #dbe7ff; color: #14306e; }
-  .anchored { background: #d7f5e3; color: #10462a; }
-  .empty { color: #b42318; font-size: 12px; }
-  @media (prefers-color-scheme: dark) {
-    body { background: #16181d; color: #e8e8ea; }
-    th { background: #16181d; border-bottom-color: #e8e8ea; }
-    th, td { border-bottom-color: #2c3039; }
-    .summary { color: #a0a4ad; }
-    td.glyph { color: #e8e8ea; }
-    tr.is-missing { background: #2a1b1b; }
-    .fallback { background: #1d3260; color: #cfe0ff; }
-    .anchored { background: #143d28; color: #bff0d4; }
-  }
-</style>
-</head>
-<body>
-<h1>${escapeHtml(fontName)}</h1>
-<p class="summary">
-  ${rows.length} glyphs · ${missing} missing · ${drifted} drifting from Bravura ·
-  rendered from the generated point arrays at
-  ${INTERVAL_BETWEEN_STAVE_LINES}px between stave lines
-</p>
-<table>
-<thead><tr><th>name</th><th>unicode</th><th>glyph</th></tr></thead>
-<tbody>
-${body}
-</tbody>
-</table>
-</body>
-</html>
 `
+  return { file, ...context }
 }
 
 async function main() {
-  const args = process.argv.slice(2)
-  const htmlFlag = args.indexOf('--html')
-  const htmlOverride = htmlFlag === -1 ? null : args[htmlFlag + 1]
-  const positional = htmlFlag === -1 ? args : [ ...args.slice(0, htmlFlag), ...args.slice(htmlFlag + 2) ]
-  const [ fontArg, outputArg ] = positional
-
+  const [ fontArg, outputArg ] = process.argv.slice(2)
   if (!fontArg || !outputArg) {
-    throw new Error(
-      'Usage: node src/tools/generate-smufl-js-font.js <font.otf> <output.js> [--html <path>]'
-    )
+    throw new Error('Usage: node src/tools/generate-smufl-js-font.js <font.otf> <output.js>')
   }
 
   const fontPath = path.resolve(fontArg)
   const outputPath = path.resolve(outputArg)
-  const htmlPath = htmlOverride ? path.resolve(htmlOverride) : `${outputPath}.preview.html`
-
   if (!fs.existsSync(fontPath)) {
     throw new Error(`Can't find music font: ${fontPath}`)
   }
 
   const font = await opentype.load(fontPath)
-  const template = fs.readFileSync(TEMPLATE_PATH, 'utf-8')
-  const { lines, entries, arrays } = scanMusicJsFont(template)
-
-  const sourceSize = template.match(/musicFontSourceSize: ([\d.]+)/)
-  if (!sourceSize) {
-    throw new Error('Template does not declare musicFontSourceSize')
-  }
-  const musicFontSourceSize = Number(sourceSize[1])
-
-  console.log(`Tracing ${path.basename(fontPath)} at ${musicFontSourceSize} * ${INTERVAL_BETWEEN_STAVE_LINES}px`)
-  console.log(`Template: ${TEMPLATE_PATH}`)
-  console.log(`Output:   ${outputPath}`)
-  console.log()
-
-  /*
-  Where each anchored entry's correction goes. The template carries a marker
-  instead of a literal wherever a rule was proven; everything else stays as it
-  is written.
-  */
-  const correctionMarkers = new Map()
-  lines.forEach((line, index) => {
-    const marker = line.match(/^(\s*)yCorrection: __YCORRECTION:(.+?)__(,?)\s*$/)
-    if (marker) {
-      correctionMarkers.set(marker[2], {
-        line: index, indent: marker[1].length, comma: marker[3] === ','
-      })
-    }
-  })
-
-  const replacements = []
-  const rows = []
-  const correctionRows = []
-  const anchored = new Map()
-  let missingCount = 0
-  let fallbackCount = 0
-  let driftCount = 0
-
-  // Resolve every entry's codepoints, then trace each of its point arrays.
-  for (const [ entryPath, glyph ] of Object.entries(glyphTable)) {
-    const entry = entries.get(entryPath)
-    if (!entry) {
-      console.warn(`  ! '${entryPath}' is in the glyph table but not in the template`)
-      continue
-    }
-
-    const resolved = resolveCharacters(font, glyph)
-    const resolvedUnicode = resolved.map((one) => one.character).join('')
-
-    if (entry.unicodeLine !== -1) {
-      replacements.push({
-        startLine: entry.unicodeLine,
-        endLine: entry.unicodeLine,
-        textLines: [
-          `${' '.repeat(entry.unicodeIndent)}unicode: ${escapedUnicode(resolvedUnicode)},`
-        ]
-      })
-    }
-
-    for (const [ index, array ] of entry.fields.entries()) {
-      /*
-      An entry with one point field draws its whole codepoint string as a
-      single text run — `breathMarkAsDoubleSlash` is one glyph twice. An entry
-      with several takes one character per field, in template order: upPoints
-      then downPoints, leftPoints then centerPoints then rightPoints.
-      */
-      const single = entry.fields.length <= 1
-      const used = single ? resolved : [ resolved[index] ]
-      const characters = used.map((one) => one.character).join('')
-      const source = used.some((one) => one.source === 'missing')
-        ? 'missing'
-        : used.some((one) => one.source === 'fallback') ? 'fallback' : 'smufl'
-
-      const traced = source === 'missing'
-        ? { points: [], height: 0 }
-        : tracePoints(characters, font, musicFontSourceSize, glyph.scale)
-      const points = traced.points
-
-      /*
-      An anchored entry's vertical correction is computed rather than inherited:
-      the rule puts the glyph's SMuFL origin on stave line `k`, so the correction
-      is `k - height`. Entries without an anchor keep the template's value, which
-      is a stave position chosen by hand and not derivable from the outline.
-      */
-      if (glyph.yAnchor && source !== 'missing' && correctionMarkers.has(entryPath)) {
-        const marker = correctionMarkers.get(entryPath)
-        const corrected = yCorrectionFor(glyph.yAnchor, traced)
-        replacements.push({
-          startLine: marker.line,
-          endLine: marker.line,
-          textLines: [
-            `${' '.repeat(marker.indent)}yCorrection: ` +
-            `${correctionValue(corrected, glyph.yAnchor.decimals)}` +
-            ` * intervalBetweenStaveLines${marker.comma ? ',' : ''}`
-          ]
-        })
-        const computed = {
-          from: glyph.yAnchor.from,
-          reference: glyph.yAnchor.k,
-          value: correctionValue(corrected, glyph.yAnchor.decimals)
-        }
-        correctionRows.push({ id: entryPath, ...computed })
-        anchored.set(array.id, computed)
-      }
-
-      const reference = glyph.bbox ? glyph.bbox[index] : null
-      const box = boundingBox(points)
-      let drift = null
-      if (box && reference) {
-        const widthDrift = Math.abs(box.intervalWidth - reference[0])
-        const heightDrift = Math.abs(box.intervalHeight - reference[1])
-        if (widthDrift > DRIFT_THRESHOLD || heightDrift > DRIFT_THRESHOLD) {
-          drift = [
-            `${reference[0]}×${reference[1]} →`,
-            `${box.intervalWidth.toFixed(2)}×${box.intervalHeight.toFixed(2)}`
-          ].join(' ')
-        }
-      }
-
-      if (source === 'missing') {
-        missingCount++
-        console.warn(`  ! ${array.id}: ${unicodeLabel(characters)} not in the font — points left empty`)
-      } else if (source === 'fallback') {
-        fallbackCount++
-      }
-      if (drift) {
-        driftCount++
-      }
-
-      // A missing glyph collapses its whole array to `[]`, so the gap is plain
-      // to see; a traced one replaces just the marker line.
-      const closing = lines[array.endLine]
-      replacements.push(
-        source === 'missing'
-          ? {
-            startLine: array.startLine,
-            endLine: array.endLine,
-            textLines: [ `${array.indent}${array.field}: []${closing.trim().endsWith(',') ? ',' : ''}` ]
-          }
-          : {
-            startLine: array.startLine + 1,
-            endLine: array.endLine - 1,
-            textLines: pointArrayLines(points).map(
-              (line) => `${array.indent}  ${line}`
-            )
-          }
-      )
-
-      rows.push({
-        anchored: anchored.get(array.id),
-        id: array.id,
-        unicode: `${unicodeLabel(characters)}${source === 'fallback' ? ' (fallback)' : ''}`,
-        svg: previewSvg(points),
-        missing: source === 'missing',
-        source,
-        drift
-      })
-    }
-  }
-
-  // Anything still holding a marker means the table and template disagree.
-  const untouched = arrays.filter(
-    (array) => !entries.get(array.entry.path) || !glyphTable[array.entry.path]
-  )
-  for (const array of untouched) {
-    if (array.body.some((line) => line.includes('__POINTS:'))) {
-      throw new Error(`No glyph table row for '${array.entry.path}' (marker ${array.id})`)
-    }
-  }
-
-  replacements.sort((one, another) => one.startLine - another.startLine)
-
-  const output = []
-  let cursor = 0
-  for (const replacement of replacements) {
-    output.push(...lines.slice(cursor, replacement.startLine))
-    output.push(...replacement.textLines)
-    cursor = replacement.endLine + 1
-  }
-  output.push(...lines.slice(cursor))
-
-  const generated = output.join('\n')
-  if (generated.includes('__POINTS:') || generated.includes('__UNICODE:')) {
-    throw new Error('Template markers left unfilled — the glyph table is incomplete')
-  }
+  const { file, traced, missing } = generate(font, fontPath)
 
   fs.mkdirSync(path.dirname(outputPath), { recursive: true })
-  fs.writeFileSync(outputPath, generated, 'utf-8')
-  fs.writeFileSync(htmlPath, reportHtml(path.basename(fontPath), rows), 'utf-8')
+  fs.writeFileSync(outputPath, file, 'utf-8')
 
-  console.log()
-  console.log(`${correctionRows.length} vertical corrections computed from glyph geometry:`)
-  for (const row of correctionRows) {
-    console.log(
-      `    ${row.id.padEnd(24)} ${row.from.padEnd(7)} at ${row.reference.toFixed(2).padStart(6)}` +
-      `  ->  yCorrection ${row.value}`
-    )
+  for (const gap of missing) {
+    console.warn(`  ! ${gap} is not in this font — written as an empty array`)
   }
-  console.log()
-  console.log(`${rows.length} point arrays: ${rows.length - missingCount} traced, ${missingCount} empty`)
-  console.log(`${fallbackCount} resolved through a private-use fallback`)
-  const needTuning = rows.filter((one) => one.drift && !one.anchored)
-  console.log(
-    `${driftCount} drift from Bravura by more than ${DRIFT_THRESHOLD} stave-line intervals` +
-    ` (${driftCount - needTuning.length} of them positioned by a rule)`
-  )
-  if (needTuning.length) {
-    console.log('  re-tune yCorrection / yOffset by hand for:')
-    for (const row of needTuning) {
-      console.log(`    ${row.id.padEnd(44)} ${row.drift}`)
-    }
-  }
-  console.log()
+  console.log(`${traced} point arrays traced, ${missing.length} empty`)
   console.log(`Wrote ${outputPath}`)
-  console.log(`Report ${htmlPath}`)
 }
 
 main().catch((error) => {

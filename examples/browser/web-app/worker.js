@@ -4,11 +4,15 @@ import server from '#nodes/server.js'
 import app from '#nodes/app.js'
 import src from '#nodes/src.js'
 
+import devApi from './dev-api.js'
+
 const baseFolder = path.join('examples', 'browser', 'web-app', 'static')
 
 server(
   app({
     indexFile: './examples/browser/web-app/static/html/index.html',
+    // Read and write endpoints the font viewer at /html/font-viewer.html needs.
+    api: devApi,
     static: [
       src(/^\/((html\/static-templates\/)|css|js|images|docs|font|md|midi)/, {
         baseFolder,

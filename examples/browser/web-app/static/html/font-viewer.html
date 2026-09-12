@@ -7,21 +7,13 @@
 <style>
   :root {
     color-scheme: light dark;
-    --bg: #ffffff;
-    --fg: #14161a;
-    --muted: #6a7180;
-    --line: #dfe3ea;
-    --panel: #f7f8fa;
-    --accent: #0b6bcb;
-    --ink: #14161a;
-    --stave: #9aa2b1;
-    --anchor: #0b6bcb;
+    --bg: #ffffff; --fg: #14161a; --muted: #6a7180; --line: #dfe3ea;
+    --panel: #f7f8fa; --accent: #0b6bcb; --danger: #b42318;
   }
   @media (prefers-color-scheme: dark) {
     :root {
       --bg: #16181d; --fg: #e8e9ec; --muted: #98a0ae; --line: #2b303a;
-      --panel: #1d2027; --accent: #6aa9ff; --ink: #e8e9ec;
-      --stave: #69717f; --anchor: #6aa9ff;
+      --panel: #1d2027; --accent: #6aa9ff; --danger: #ff9a92;
     }
   }
   * { box-sizing: border-box; }
@@ -29,12 +21,12 @@
     margin: 0; padding: 24px 16px; background: var(--bg); color: var(--fg);
     font: 14px/1.55 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   }
-  .wrap { max-width: 1080px; margin: 0 auto; }
+  [data-viewer] { max-width: 1100px; margin: 0 auto; }
   h1 { font-size: 19px; margin: 0 0 2px; }
-  .lede { color: var(--muted); margin: 0 0 20px; }
-  .controls {
-    display: grid; gap: 12px; margin-bottom: 20px;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  [data-lede] { color: var(--muted); margin: 0 0 20px; }
+  [data-controls] {
+    display: grid; gap: 12px; margin-bottom: 18px;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   }
   label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
   input, select {
@@ -44,55 +36,66 @@
   input:focus-visible, select:focus-visible, button:focus-visible {
     outline: 2px solid var(--accent); outline-offset: 1px;
   }
-  .panels { display: grid; gap: 16px; grid-template-columns: 1fr; }
-  @media (min-width: 760px) { .panels { grid-template-columns: 1fr 1fr; } }
-  .panel { border: 1px solid var(--line); border-radius: 8px; background: var(--panel); padding: 14px; min-width: 0; }
-  .panel h2 {
+  input:disabled {
+    background: var(--panel); color: var(--muted); cursor: not-allowed;
+  }
+  input:disabled::placeholder { color: var(--muted); }
+  [data-panel] {
+    border: 1px solid var(--line); border-radius: 8px; background: var(--panel);
+    padding: 14px; margin-bottom: 16px; min-width: 0;
+  }
+  [data-panel] h2 {
     font-size: 11px; text-transform: uppercase; letter-spacing: .07em;
     color: var(--muted); margin: 0 0 10px; font-weight: 600;
   }
-  .panel.wide { grid-column: 1 / -1; }
-  .figure { overflow-x: auto; background: var(--bg); border-radius: 6px; padding: 10px; }
-  svg { display: block; }
-  .metrics { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 10px; color: var(--muted); font-size: 12px; }
-  .metrics b { color: var(--fg); font-weight: 600; }
+  #editor { background: var(--bg); border-radius: 6px; overflow-x: auto; }
   textarea {
     width: 100%; height: 260px; resize: vertical; padding: 10px;
     border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--fg);
     font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; white-space: pre;
   }
   button {
-    padding: 7px 12px; border: 1px solid var(--line); border-radius: 5px;
+    padding: 7px 13px; border: 1px solid var(--line); border-radius: 5px;
     background: var(--bg); color: var(--fg); font: inherit; cursor: pointer;
   }
   button:hover { border-color: var(--accent); color: var(--accent); }
-  .row { display: flex; gap: 8px; align-items: center; margin-top: 10px; flex-wrap: wrap; }
-  .note { color: var(--muted); font-size: 12px; margin: 8px 0 0; }
-  .error { color: #b42318; }
+  button[data-variant="primary"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+  button[data-variant="primary"]:hover { opacity: .9; color: #fff; }
+  [data-row] { display: flex; gap: 10px; align-items: center; margin-top: 10px; flex-wrap: wrap; }
+  [data-note] { color: var(--muted); font-size: 12px; margin: 8px 0 0; }
+  [data-note="error"] { color: var(--danger); }
+  [data-metrics] { display: flex; flex-wrap: wrap; gap: 6px 18px; color: var(--muted); font-size: 12px; }
+  [data-metrics] b { color: var(--fg); font-weight: 600; }
   code { font: 12px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace; }
+
+  [data-combobox] { position: relative; }
+  [data-combobox-list] {
+    position: absolute; z-index: 5; left: 0; right: 0; top: calc(100% + 2px);
+    margin: 0; padding: 4px; list-style: none; max-height: 280px; overflow-y: auto;
+    background: var(--bg); border: 1px solid var(--line); border-radius: 6px;
+    box-shadow: 0 6px 20px rgb(0 0 0 / .18);
+  }
+  [data-combobox-option] { padding: 5px 8px; border-radius: 4px; cursor: pointer; font-size: 13px; }
+  [data-combobox-option][data-active] { background: var(--accent); color: #fff; }
+  [data-combobox-empty] { padding: 5px 8px; color: var(--muted); font-size: 13px; }
 </style>
 </head>
 <body>
-<div class="wrap">
+<div data-viewer>
   <h1>Font viewer</h1>
-  <p class="lede">
-    Trace one glyph out of a SMuFL font, see where its correction puts it on the
-    stave, and copy the points in music-js form. Everything runs in the page.
+  <p data-lede>
+    Trace a glyph out of a SMuFL font, see it engraved where it is actually used,
+    and write the result back into the music-js font.
   </p>
 
-  <div class="controls">
+  <div data-controls>
     <div>
       <label for="font">Music font</label>
-      <select id="font">
-        <option value="/font/music/Bravura.otf">Bravura</option>
-        <option value="/font/music/Leland.otf">Leland</option>
-        <option value="/font/music/Petaluma.otf">Petaluma</option>
-        <option value="/font/music/MuseJazz.otf">MuseJazz</option>
-      </select>
+      <select id="font" is="searchable-select" data-placeholder="Search fonts…"></select>
     </div>
     <div>
       <label for="entry">Glyph table entry</label>
-      <select id="entry"><option value="">— pick by codepoint —</option></select>
+      <select id="entry" is="searchable-select" data-placeholder="Search glyph entries…"></select>
     </div>
     <div>
       <label for="codepoint">Character or U+XXXX</label>
@@ -100,28 +103,11 @@
     </div>
     <div>
       <label for="size">Font size (× interval)</label>
-      <input id="size" type="number" value="4.0" step="0.1" min="0.1">
+      <input id="size" type="number" value="4.0" step="0.005" min="0.1">
     </div>
     <div>
       <label for="interval">Interval between stave lines</label>
       <input id="interval" type="number" value="8.5" step="0.5" min="1">
-    </div>
-    <div>
-      <label for="scale">Scale</label>
-      <input id="scale" type="number" value="1" step="0.005" min="0.05">
-    </div>
-    <div>
-      <label for="term">Anchor by</label>
-      <select id="term">
-        <option value="height">height (origin)</option>
-        <option value="bottom">bottom</option>
-        <option value="top">top</option>
-        <option value="center">centre</option>
-      </select>
-    </div>
-    <div>
-      <label for="reference">Put it at</label>
-      <input id="reference" type="number" value="3" step="0.5">
     </div>
     <div>
       <label for="correction">yCorrection</label>
@@ -129,33 +115,26 @@
     </div>
   </div>
 
-  <div class="panels">
-    <div class="panel">
-      <h2>Glyph</h2>
-      <div class="figure" id="glyph"></div>
-      <div class="metrics" id="metrics"></div>
-      <p class="note" id="status"></p>
-    </div>
+  <div data-panel>
+    <h2>Engraved example</h2>
+    <div id="editor"></div>
+    <p data-note id="status"></p>
+  </div>
 
-    <div class="panel">
-      <h2>On the stave</h2>
-      <div class="figure" id="stave"></div>
-      <p class="note">
-        The correction is <code>reference &minus; term</code>: pick which measurement
-        of the glyph registers it, and where that measurement should land. The blue
-        line marks a whole-interval reference. Type a correction directly to nudge it
-        by hand.
-      </p>
+  <div data-panel>
+    <h2>Points</h2>
+    <div data-metrics id="metrics"></div>
+    <textarea id="points" spellcheck="false" readonly></textarea>
+    <div data-row>
+      <button id="apply" data-variant="primary" type="button">Apply</button>
+      <button id="copy" type="button">Copy points</button>
+      <span data-note id="applied" role="status"></span>
     </div>
-
-    <div class="panel wide">
-      <h2>Points</h2>
-      <textarea id="points" spellcheck="false" readonly></textarea>
-      <div class="row">
-        <button id="copy" type="button">Copy points</button>
-        <span class="note" id="copied" role="status"></span>
-      </div>
-    </div>
+    <p data-note>
+      Apply writes the points and the yCorrection above into
+      <code>src/drawer/font/music-js/&lt;font&gt;.js</code> for the selected entry.
+      Nothing on disk changes until you press it.
+    </p>
   </div>
 </div>
 
@@ -163,41 +142,68 @@
   { "imports": { "#msq/": "/js/msq/" } }
 </script>
 <script type="module">
+import '#msq/msq-font-loader-template.js'
+import '#msq/msq-editor-template.js'
 import opentype from '#msq/worker/drawer/lib/opentype/opentype.js'
-import bboxForPath from '#msq/worker/drawer/elements/basic/bboxForPath.js'
-import { traceGlyph, TERMS, yCorrectionFor } from '#msq/worker/tools/tracedGlyph.js'
-import { pointArrayLines } from '#msq/worker/tools/pointArrayLines.js'
-import glyphTable from '#msq/worker/tools/smufl-glyph-table.js'
+import generateUnicodePoints from '#msq/worker/drawer/generateUnicodePoints.js'
+import scaffold from '#msq/worker/tools/smufl-font-scaffold.js'
+import glyphExample from '#msq/font-viewer/glyphExamples.js'
+import '#msq/font-viewer/searchable-select.js'
+import { readYCorrection, patchYCorrection } from '#msq/font-viewer/patchYCorrection.js'
+import worker from '#msq/utils/worker-instance.js'
+import { registerFontNames } from '#msq/utils/fontNames.js'
 
-const NUMBER_OF_STAVE_LINES = 5
-const fonts = new Map()
+const MUSIC_FONTS = [
+  { name: 'bravura', file: 'Bravura.otf' },
+  { name: 'leland', file: 'Leland.otf' },
+  { name: 'petaluma', file: 'Petaluma.otf' },
+  { name: 'musejazz', file: 'MuseJazz.otf' }
+]
+const FONT_SOURCES_REFERENCE = 'msqFontSources'
+const COORDINATE_DECIMALS = 2
 
 const control = (id) => document.getElementById(id)
 const elements = {
   font: control('font'), entry: control('entry'), codepoint: control('codepoint'),
-  size: control('size'), interval: control('interval'), scale: control('scale'),
-  term: control('term'), reference: control('reference'), correction: control('correction'),
-  glyph: control('glyph'), stave: control('stave'), points: control('points'),
-  metrics: control('metrics'), status: control('status'), copied: control('copied')
+  size: control('size'), interval: control('interval'), correction: control('correction'),
+  editor: control('editor'), status: control('status'), points: control('points'),
+  metrics: control('metrics'), applied: control('applied')
 }
 
-// Entries the generator knows about, so a glyph can be picked by name.
-for (const [ path, glyph ] of Object.entries(glyphTable)) {
+// Every glyph the scaffold defines, flattened so nested letter maps are pickable.
+const glyphs = new Map()
+const collect = (nodes, prefix) => {
+  for (const node of nodes) {
+    if (node.kind === 'glyph') {
+      glyphs.set(prefix + node.name, node)
+    } else if (node.kind === 'group') {
+      collect(node.entries, `${prefix}${node.name}.`)
+    }
+  }
+}
+collect(scaffold, '')
+
+for (const { name } of MUSIC_FONTS) {
   const option = document.createElement('option')
-  option.value = path
-  option.textContent = path
-  option.dataset.smufl = glyph.smufl
-  option.dataset.scale = glyph.scale === undefined ? '1' : String(glyph.scale)
-  option.dataset.term = glyph.yAnchor === undefined ? '' : glyph.yAnchor.from
-  option.dataset.reference = glyph.yAnchor === undefined ? '' : String(glyph.yAnchor.k)
+  option.value = name
+  option.textContent = name
+  elements.font.appendChild(option)
+}
+for (const name of glyphs.keys()) {
+  const option = document.createElement('option')
+  option.value = name
+  option.textContent = name
   elements.entry.appendChild(option)
 }
+elements.entry.value = 'treble'
 
-async function fontFor(url) {
-  if (!fonts.has(url)) {
-    fonts.set(url, await opentype.load(url))
+const loadedFonts = new Map()
+async function fontFor(name) {
+  if (!loadedFonts.has(name)) {
+    const { file } = MUSIC_FONTS.find((one) => one.name === name)
+    loadedFonts.set(name, await opentype.load(`/font/music/${file}`))
   }
-  return fonts.get(url)
+  return loadedFonts.get(name)
 }
 
 /**
@@ -209,160 +215,422 @@ function charactersFrom(value) {
   return codepoint ? String.fromCodePoint(parseInt(codepoint[1], 16)) : text
 }
 
-function label(characters) {
-  return [ ...characters ].map(
-    (character) => 'U+' + character.codePointAt(0).toString(16).toUpperCase().padStart(4, '0')
-  ).join(' ')
-}
-
-function svgFor(points, interval) {
-  const pixels = points.map((point) => typeof point === 'number' ? point * interval : point)
-  const path = pixels.join(' ')
-  const box = bboxForPath(path)
-  const width = box.maxRight - box.minLeft
-  const height = box.maxBottom - box.minTop
-  return `<svg viewBox="${box.minLeft} ${box.minTop} ${width} ${height}"
-    width="${Math.max(8, Math.min(460, width * 2))}" height="${Math.max(8, Math.min(320, height * 2))}"
-    role="img" aria-label="Traced glyph">
-    <path d="${path}" fill="var(--ink)" fill-rule="evenodd"/></svg>`
-}
+const unicodeLabel = (characters) => [ ...characters ].map(
+  (character) => 'U+' + character.codePointAt(0).toString(16).toUpperCase().padStart(4, '0')
+).join(' ')
 
 /**
- * The glyph against real stave lines, sitting at the given correction.
- *
- * `points` already hold the glyph with its SMuFL origin at y = height, so the
- * drawer's `topOffset + yCorrection` is reproduced here by translating the path
- * by the correction alone.
+ * Lay a point array out the way the music-js fonts hold it — the same shape the
+ * generator writes, so what is copied from here can be pasted straight in.
  */
-function staveSvg(points, interval, correction, staveLine) {
-  const pixels = points.map((point) => typeof point === 'number' ? point * interval : point)
-  const path = pixels.join(' ')
-  const box = bboxForPath(path)
-
-  const shift = correction * interval
-  const staveHeight = (NUMBER_OF_STAVE_LINES - 1) * interval
-  const top = Math.min(box.minTop + shift, 0) - interval
-  const bottom = Math.max(box.maxBottom + shift, staveHeight) + interval
-  const left = Math.min(box.minLeft, 0) - interval * 2
-  const right = Math.max(box.maxRight, 0) + interval * 4
-
+function pointArrayLines(points) {
   const lines = []
-  for (let index = 0; index < NUMBER_OF_STAVE_LINES; index++) {
-    const y = index * interval
-    const anchored = index === staveLine
-    lines.push(
-      `<line x1="${left}" y1="${y}" x2="${right}" y2="${y}"
-        stroke="${anchored ? 'var(--anchor)' : 'var(--stave)'}"
-        stroke-width="${anchored ? interval * 0.16 : interval * 0.1}"/>`
-    )
+  let coordinates = []
+  const flush = () => {
+    if (coordinates.length) {
+      lines.push(coordinates.join(', '))
+      coordinates = []
+    }
   }
-
-  return `<svg viewBox="${left} ${top} ${right - left} ${bottom - top}"
-    width="${Math.max(120, Math.min(520, (right - left) * 1.8))}"
-    height="${Math.max(80, Math.min(360, (bottom - top) * 1.8))}"
-    role="img" aria-label="Glyph placed against stave lines">
-    ${lines.join('')}
-    <path d="${path}" transform="translate(0 ${shift})" fill="var(--ink)" fill-rule="evenodd"/>
-  </svg>`
+  for (const point of points) {
+    if (typeof point === 'string') {
+      flush()
+      lines.push(`'${point}'`)
+    } else {
+      const written = Object.is(point, -0)
+        ? `-${(0).toFixed(COORDINATE_DECIMALS)}`
+        : point.toFixed(COORDINATE_DECIMALS)
+      coordinates.push(`${written} * intervalBetweenStaveLines`)
+    }
+  }
+  flush()
+  return lines.map((line, index) => index === lines.length - 1 ? line : `${line},`)
 }
 
-let lastTrace = null
+let traced = []
 
-async function render({ recomputeCorrection = true } = {}) {
-  elements.status.textContent = ''
-  elements.status.classList.remove('error')
-
+/**
+ * Trace the current character at the current size, and show the result.
+ */
+async function traceGlyph() {
+  elements.status.setAttribute('data-note', '')
   const characters = charactersFrom(elements.codepoint.value)
   if (!characters) {
-    elements.status.textContent = 'Enter a character or codepoint.'
     return
   }
 
   const interval = Number(elements.interval.value) || 8.5
-  const scale = Number(elements.scale.value) || 1
-  const musicFontSourceSize = Number(elements.size.value) || 4.0
-
-  let font
-  try {
-    font = await fontFor(elements.font.value)
-  } catch (error) {
-    elements.status.textContent = `Could not load the font: ${error.message}`
-    elements.status.classList.add('error')
-    return
-  }
+  const size = Number(elements.size.value) || 4.0
+  const font = await fontFor(elements.font.value)
 
   const missing = [ ...characters ].filter(
     (character) => font.charToGlyphIndex(character) === 0
   )
   if (missing.length) {
-    elements.glyph.innerHTML = ''
-    elements.stave.innerHTML = ''
+    traced = []
     elements.points.value = ''
-    elements.metrics.textContent = ''
-    elements.status.textContent =
-      `${label(missing.join(''))} is not in this font — it would be written as an empty points array.`
-    elements.status.classList.add('error')
+    elements.metrics.innerHTML =
+      `<span>${unicodeLabel(characters)} is <b>not in this font</b></span>`
     return
   }
 
-  const traced = traceGlyph(font, characters, { musicFontSourceSize, scale, interval })
-  lastTrace = traced
+  traced = generateUnicodePoints(characters, font, null, size, interval).map(
+    (point) => typeof point === 'string'
+      ? point
+      : Number((point / interval).toFixed(COORDINATE_DECIMALS))
+  )
+  elements.points.value = pointArrayLines(traced).join('\n')
 
-  const anchor = { from: elements.term.value, k: Number(elements.reference.value) || 0 }
-  const derived = yCorrectionFor(anchor, traced)
-  if (recomputeCorrection) {
-    elements.correction.value = derived.toFixed(3)
-  }
-  const correction = Number(elements.correction.value) || 0
-  // The highlighted line is only meaningful when the reference is a stave position.
-  const staveLine = Math.round(anchor.k)
-
-  elements.glyph.innerHTML = svgFor(traced.points, interval)
-  elements.stave.innerHTML = staveSvg(traced.points, interval, correction, staveLine)
-  elements.points.value = pointArrayLines(traced.points).join('\n')
+  const numbers = traced.filter((point) => typeof point === 'number')
+  const xs = numbers.filter((value, index) => index % 2 === 0)
+  const ys = numbers.filter((value, index) => index % 2 === 1)
   elements.metrics.innerHTML = [
-    `${label(characters)}`,
-    `width <b>${traced.width.toFixed(3)}</b>`,
-    `height <b>${traced.height.toFixed(3)}</b>`,
-    `${anchor.from} <b>${TERMS[anchor.from](traced).toFixed(3)}</b>`,
-    `derived yCorrection <b>${derived.toFixed(3)}</b>`
+    unicodeLabel(characters),
+    `width <b>${(Math.max(...xs) - Math.min(...xs)).toFixed(2)}</b>`,
+    `height <b>${(Math.max(...ys) - Math.min(...ys)).toFixed(2)}</b>`,
+    `<b>${numbers.length / 2}</b> points`
   ].map((metric) => `<span>${metric}</span>`).join('')
 }
 
-elements.entry.addEventListener('change', () => {
-  const option = elements.entry.selectedOptions[0]
-  if (!option || !option.value) {
-    return
+/**
+ * The fonts the page registers. `musicJs` overrides where one music font's
+ * module comes from, which is how a typed correction reaches the worker.
+ */
+function fontConfig(musicJs = {}) {
+  return {
+    'chord-letters': {
+      'gentium plus': '/font/chord-letters/GentiumPlus-Regular.ttf',
+      'gothic a1': '/font/chord-letters/GothicA1-Regular.ttf'
+    },
+    'text': {
+      'noto-serif': {
+        'regular': '/font/text/NotoSerif-Regular.ttf', 'bold': '/font/text/NotoSerif-Bold.ttf'
+      },
+      'noto-sans': {
+        'regular': '/font/text/NotoSans-Regular.ttf', 'bold': '/font/text/NotoSans-Bold.ttf'
+      }
+    },
+    'music': Object.fromEntries(MUSIC_FONTS.map(({ name, file }) => [ name, {
+      font: `/font/music/${file}`,
+      js: musicJs[name] || `/js/msq/worker/drawer/font/music-js/${name}.js`
+    } ]))
   }
-  elements.codepoint.value = label(option.dataset.smufl).split(' ')[0]
-  elements.scale.value = option.dataset.scale
-  if (option.dataset.term) {
-    elements.term.value = option.dataset.term
-    elements.reference.value = option.dataset.reference
-  }
-  render()
-})
-
-for (const id of [ 'font', 'codepoint', 'size', 'interval', 'scale', 'term', 'reference' ]) {
-  elements[id].addEventListener('input', () => render())
-  elements[id].addEventListener('change', () => render())
 }
 
-// Typing a correction by hand must not be overwritten by the derived one.
-elements.correction.addEventListener('input', () => render({ recomputeCorrection: false }))
+// The music-js source of each font, fetched once so it can be patched in place.
+const fontSources = new Map()
+async function musicJsSource(name) {
+  if (!fontSources.has(name)) {
+    const response = await fetch(`/js/msq/worker/drawer/font/music-js/${name}.js`)
+    fontSources.set(name, await response.text())
+  }
+  return fontSources.get(name)
+}
+
+/*
+Registering a preview.
+
+The worker refuses a second registration under a reference it already holds, so
+each preview gets its own. The patched font goes in as a blob: the worker
+imports it like any other module, and nothing is written to disk.
+*/
+let previewCount = 0
+const previews = new Map()
+
+async function referenceWithCorrection(font, entry, correction) {
+  const source = await musicJsSource(font)
+  const current = readYCorrection(source, entry)
+  if (current === null || correction === null || correction === current) {
+    return FONT_SOURCES_REFERENCE
+  }
+
+  const key = `${font}|${entry}|${correction}`
+  if (previews.has(key)) {
+    return previews.get(key)
+  }
+
+  const patched = patchYCorrection(source, entry, correction)
+  const url = URL.createObjectURL(new Blob([ patched ], { type: 'text/javascript' }))
+  const reference = `${FONT_SOURCES_REFERENCE}-preview-${++previewCount}`
+  const config = fontConfig({ [font]: url })
+
+  await new Promise((resolve, reject) => {
+    const id = crypto.randomUUID()
+    const onMessage = (event) => {
+      if (event.data.id !== id) {
+        return
+      }
+      worker.removeEventListener('message', onMessage)
+      event.data.error ? reject(new Error(event.data.error)) : resolve()
+    }
+    worker.addEventListener('message', onMessage)
+    worker.postMessage({ id, name: 'fonts.setup', fontConfig: config, fontSourcesReference: reference })
+  })
+
+  registerFontNames(reference, config)
+  previews.set(key, reference)
+  return reference
+}
+
+/*
+Rendering the example.
+
+An msq-editor cannot be re-rendered: it replaces itself with the engraved view
+and guards on having rendered once. So each time anything changes we build a
+fresh template and let insertion drive it, which is the element's own lifecycle.
+*/
+async function renderEditor() {
+  const entry = elements.entry.value
+  const font = elements.font.value
+  const source = `music font is ${font}\n\n${glyphExample(entry)}`
+
+  const typed = elements.correction.value === '' ? null : Number(elements.correction.value)
+  let reference = FONT_SOURCES_REFERENCE
+  try {
+    reference = await referenceWithCorrection(font, entry, typed)
+  } catch (error) {
+    elements.status.textContent = `Could not preview the correction: ${error.message}`
+    elements.status.setAttribute('data-note', 'error')
+  }
+
+  const template = document.createElement('template', { is: 'msq-editor' })
+  template.setAttribute('data-font-sources', reference)
+  template.setAttribute('data-editor-height', '320px')
+  // The source goes in through innerState rather than as content, which is the
+  // hook MSQTemplateElement reads before falling back to its template content.
+  template.innerState = source
+
+  elements.editor.replaceChildren(template)
+  elements.status.textContent = `${entry} — engraved with ${font}` +
+    (reference === FONT_SOURCES_REFERENCE ? '' : `, yCorrection ${typed} previewed`)
+}
+
+let renderSoon = null
+function refresh({ retrace = true } = {}) {
+  clearTimeout(renderSoon)
+  renderSoon = setTimeout(async () => {
+    if (retrace) {
+      await traceGlyph()
+    }
+    await renderEditor()
+  }, 120)
+}
+
+/**
+ * Picking an entry fills in its codepoint, its size and its correction, so the
+ * three inputs always describe the glyph on screen.
+ */
+async function loadEntry() {
+  const glyph = glyphs.get(elements.entry.value)
+  if (!glyph) {
+    return
+  }
+  elements.codepoint.value = unicodeLabel(glyph.smufl).split(' ')[0]
+  const sourceSize = scaffold.find((node) => node.name === 'musicFontSourceSize')
+  elements.size.value = String((sourceSize ? sourceSize.value : 4) * (glyph.scale || 1))
+  await syncCorrectionFromFont()
+}
+
+/**
+ * Show the yCorrection the selected font actually holds for the selected entry.
+ *
+ * It comes out of that font's own music-js file rather than out of the scaffold,
+ * whose value is only the midpoint the font started from — switching font has to
+ * show what that font says, since that is what Apply would overwrite.
+ *
+ * Most glyphs are not positioned by a yCorrection at all: an articulation sits at
+ * a yOffset from the note, and many entries carry neither. Offering an input for
+ * a value the entry does not have would invite tuning something that can never
+ * take effect, so it is disabled and says which value the glyph does use.
+ */
+async function syncCorrectionFromFont() {
+  const glyph = glyphs.get(elements.entry.value)
+  let correction = null
+  try {
+    correction = readYCorrection(
+      await musicJsSource(elements.font.value), elements.entry.value
+    )
+  } catch {
+    correction = null
+  }
+
+  const offset = ((glyph && glyph.rest) || []).find((one) => one.name === 'yOffset')
+  elements.correction.value = correction === null ? '' : String(correction)
+  elements.correction.disabled = correction === null
+  elements.correction.placeholder = correction !== null
+    ? ''
+    : offset
+      ? `not used — positioned by yOffset ${offset.value}`
+      : 'not used by this glyph'
+  refresh()
+}
+
+/*
+The controls live in the address bar.
+
+Everything the page shows is derived from these six values, so putting them in
+the query string makes a view reloadable and shareable, and lets the back button
+walk through what was looked at. Only committed changes are recorded — picking a
+font or a glyph, or leaving a field — so a back press steps between states rather
+than between keystrokes.
+*/
+const URL_FIELDS = [ 'font', 'entry', 'codepoint', 'size', 'interval', 'correction' ]
+let applyingUrl = false
+
+function writeUrl({ push = false } = {}) {
+  if (applyingUrl) {
+    return
+  }
+  const params = new URLSearchParams()
+  for (const field of URL_FIELDS) {
+    const value = elements[field].value
+    if (value !== '' && !elements[field].disabled) {
+      params.set(field, value)
+    }
+  }
+  const url = `${location.pathname}?${params}`
+  if (url === `${location.pathname}${location.search}`) {
+    return
+  }
+  history[push ? 'pushState' : 'replaceState'](null, '', url)
+
+}
+
+async function applyUrl() {
+  const params = new URLSearchParams(location.search)
+  applyingUrl = true
+
+  if (params.has('font') && [ ...elements.font.options ].some((o) => o.value === params.get('font'))) {
+    elements.font.value = params.get('font')
+    elements.font.refresh()
+  }
+  if (params.has('entry') && glyphs.has(params.get('entry'))) {
+    elements.entry.value = params.get('entry')
+    elements.entry.refresh()
+  }
+
+  // Fill in the entry's own defaults first, so anything the url does not carry
+  // still describes the glyph rather than whatever was on screen before.
+  await loadEntry()
+
+  for (const field of [ 'codepoint', 'size', 'interval', 'correction' ]) {
+    if (params.has(field) && !elements[field].disabled) {
+      elements[field].value = params.get(field)
+    }
+  }
+  applyingUrl = false
+  // Seed the address bar so the very first view is reloadable too, without
+  // adding a history entry for simply having opened the page.
+  writeUrl()
+  refresh()
+}
+
+window.addEventListener('popstate', () => { applyUrl() })
+
+elements.entry.addEventListener('change', async () => {
+  await loadEntry()
+  writeUrl({ push: true })
+})
+elements.font.addEventListener('change', async () => {
+  await syncCorrectionFromFont()
+  writeUrl({ push: true })
+})
+for (const id of [ 'codepoint', 'size', 'interval', 'correction' ]) {
+  elements[id].addEventListener('change', () => writeUrl({ push: true }))
+}
+/*
+Typing redraws but does not touch the address bar. Replacing the current entry
+on every keystroke would overwrite the very state a back press should return to,
+so the url only moves when a value is committed — on blur, on Enter, or on
+picking from a list.
+*/
+for (const id of [ 'codepoint', 'size', 'interval' ]) {
+  elements[id].addEventListener('input', () => refresh())
+}
+elements.correction.addEventListener('input', () => refresh({ retrace: false }))
 
 control('copy').addEventListener('click', async () => {
   try {
     await navigator.clipboard.writeText(elements.points.value)
-    elements.copied.textContent = 'Copied.'
+    elements.applied.textContent = 'Points copied.'
   } catch {
     elements.points.select()
-    elements.copied.textContent = 'Selected — press Cmd/Ctrl+C.'
+    elements.applied.textContent = 'Selected — press Cmd/Ctrl+C.'
   }
-  setTimeout(() => { elements.copied.textContent = '' }, 2000)
+  setTimeout(() => { elements.applied.textContent = '' }, 2500)
 })
 
-render()
+control('apply').addEventListener('click', async () => {
+  const entry = elements.entry.value
+  if (!traced.length) {
+    elements.applied.textContent = 'Nothing traced to apply.'
+    return
+  }
+  elements.applied.textContent = 'Applying…'
+  try {
+    const response = await fetch('/dev/font-glyph', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        font: elements.font.value,
+        entry,
+        points: traced,
+        yCorrection: elements.correction.value === ''
+          ? undefined
+          : Number(elements.correction.value)
+      })
+    })
+    const result = await response.json()
+    if (!response.ok) {
+      throw new Error(result.error || `the server answered ${response.status}`)
+    }
+    // What is on disk has changed, so the cached copy the preview patches must go.
+    fontSources.delete(result.font)
+    elements.applied.textContent =
+      `Wrote ${result.wrote} point lines into ${result.font}.js${result.yCorrection ? ' and its yCorrection' : ''}.`
+  } catch (error) {
+    elements.applied.textContent = `Could not apply: ${error.message}`
+  }
+})
+
+// Surface what the element swallows: render() is called without await.
+window.addEventListener('unhandledrejection', (event) => {
+  elements.status.textContent = `Render failed: ${event.reason?.message || event.reason}`
+  elements.status.setAttribute('data-note', 'error')
+})
+
+/*
+Fonts are registered once for the life of the page — the worker refuses a second
+registration under the same reference — by letting a font loader unwrap itself
+around the mount point before anything asks for an engraving.
+*/
+const loader = document.createElement('template', { is: 'msq-font-loader' })
+loader.setAttribute('data-font-sources-reference', FONT_SOURCES_REFERENCE)
+loader.setAttribute('data-font-config', JSON.stringify(fontConfig()))
+
+/*
+The loader unwraps by inserting a *copy* of its content, so the marker has to be
+recognisable by attribute — a reference to the node put in would point at the
+original, which never reaches the document.
+*/
+const ready = document.createElement('div')
+ready.setAttribute('data-fonts-ready', '')
+loader.content.appendChild(ready)
+elements.editor.replaceChildren(loader)
+
+// The selects enhance themselves on connect; they only need telling when their
+// value has been set from script rather than chosen from the list.
+elements.font.refresh()
+elements.entry.refresh()
+
+// The loader replaces itself once the worker has the fonts; only then is there
+// any point asking for an engraving.
+new MutationObserver((records, observer) => {
+  if (elements.editor.querySelector('[data-fonts-ready]')) {
+    observer.disconnect()
+    applyUrl()
+  }
+}).observe(elements.editor, { childList: true, subtree: true })
 </script>
 </body>
 </html>
