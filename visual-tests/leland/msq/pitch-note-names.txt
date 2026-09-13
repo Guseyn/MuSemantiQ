@@ -1,0 +1,16 @@
+music font is leland
+
+comment: "
+  A C major scale up and back down, one letter per note.
+  Without an octave number a note sits in the octave the clef puts it in.
+"
+
+measure
+treble clef
+c d e f
+measure
+g a b c5
+measure
+b a g f
+measure
+e d c

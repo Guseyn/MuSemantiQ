@@ -1,5 +1,0 @@
-a with turn with sharp key above 1 up
-
-comment: "
-  we moved mordent on one interval between stave lines up
-"

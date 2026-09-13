@@ -1,9 +1,0 @@
-measure
-tempo is "1/4 = 120"
-a a a a a a a a
-measure
-tempo is "doppio piu mosso"
-a a a a a a a a
-measure
-tempo is "doppio piu lento"
-a a a a a a a a

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MuSemantiQ dev tools</title>
+  <link rel="preload" href="/html/static-templates/dev-tools-template.html" as="fetch" crossorigin="anonymous">
+  <link rel="stylesheet" href="/css/e-ui.css">
+  <link rel="stylesheet" href="/css/dev-tools.css">
+  <script type="importmap">
+    {
+      "imports": {
+        "#ehtml/": "/js/ehtml/",
+        "#ehtml/main": "/js/ehtml/main.js",
+        "#e-ui/": "/js/e-ui/"
+      }
+    }
+  </script>
+  <script type="module">
+    import '#e-ui/e-dialog.js'
+    import '#e-ui/e-confirm.js'
+    import '#e-ui/e-toast.js'
+    import '#ehtml/main'
+  </script>
+  <script src="/js/app.js"></script>
+</head>
+<body>
+  <template
+    is="e-wrapper"
+    data-src="/html/static-templates/dev-tools-template.html"
+    data-where-to-place="main > div"
+    data-how-to-place="inside">
+
+    <h1 is="e-h">Dev tools</h1>
+
+    <div is="e-grid" data-gap="md" data-columns="2" data-margin-top="md">
+      <a is="e-link-button" href="/html/font-viewer.html">Font viewer</a>
+      <a is="e-link-button" href="/html/test-viewer.html">Test viewer</a>
+    </div>
+
+    <p is="e-p" data-margin-top="lg">
+      <span is="e-muted">
+        The font viewer traces a glyph out of a SMuFL font, engraves it where it is
+        actually used, and writes the result back into the music-js font. The test
+        viewer compares what the last suite run produced against the committed
+        baselines, and adopts the new one when it is right.
+      </span>
+    </p>
+
+  </template>
+</body>
+</html>

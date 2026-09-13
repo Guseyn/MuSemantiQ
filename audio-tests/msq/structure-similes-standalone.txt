@@ -1,0 +1,16 @@
+comment: "
+  Measure similes written as their own command inside the measure.
+"
+
+measure
+treble clef
+1/4 c e g e
+measure
+simile of previous measure
+measure
+1/4 d f a f
+measure
+1/4 e g b g
+measure
+simile of two previous measures
+measure

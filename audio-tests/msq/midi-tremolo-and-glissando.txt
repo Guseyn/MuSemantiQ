@@ -1,0 +1,17 @@
+comment: "
+  A tremolo is played as repeated notes; a glissando slides through the
+  pitches between its ends.
+"
+
+measure
+treble clef
+1/2 a with tremolo with 3 strokes
+1/2 b with tremolo with 2 strokes
+measure
+1 f with tremolo with next
+1 a with tremolo with next
+measure
+1/4 c5 with glissando after
+1/4 g
+1/4 c with glissando before up
+1/4 e

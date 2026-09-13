@@ -1,4 +1,0 @@
-tempo is "1/4 = 90"
-c repeat 2 times
-
-tuplet 3 from note 1 to note 3 above stave

@@ -1,0 +1,18 @@
+music font is leland
+
+comment: "
+  A pedal can carry its own wording, be nudged vertically, and be released
+  before or after the unit it is written on, or at the end of the measure.
+"
+
+measure
+treble clef
+1/4 c with pedal "Ped." 2 down before
+1/4 e
+1/4 g
+1/4 c5 with release after
+measure
+1/4 c with pedal before
+1/4 e
+1/4 g
+1/4 c5 with release at the end of measure

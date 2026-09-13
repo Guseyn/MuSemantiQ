@@ -1,0 +1,24 @@
+music font is leland
+
+comment: "
+  A glissando that begins before the unit it names and ends after another,
+  each end naming the stave it belongs to. This is how a slide between the
+  hands is written.
+"
+
+measure
+brace from stave 1 to stave 2
+stave with treble clef
+stave with bass clef
+
+measure
+stave
+1/4 c5
+1/4 rest
+stave
+1/4 rest
+1/4 c3
+
+glissando up starts before first unit on first stave
+
+glissando down finishes after first unit on second stave

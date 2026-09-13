@@ -1,0 +1,15 @@
+comment: "
+  Ornaments nudged clear of the notes, and given a direction of their own.
+"
+
+measure
+treble clef
+1/4 a with trill up 1 up
+1/4 b with trill down
+1/4 c5 with turn up 1 up
+1/4 d5 with mordent down 1 down
+measure
+1/4 e5 with turn above stave
+1/4 f5 with trill above stave 2 up
+1/4 g5 is octave up 1 up
+1/4 a5 with text "1" above stave

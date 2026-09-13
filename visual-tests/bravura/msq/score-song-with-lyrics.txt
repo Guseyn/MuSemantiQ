@@ -1,0 +1,73 @@
+comment: "
+  A vocal line over an accompaniment: words under the melody, a hairpin, a
+  repeated strain with a first and second time bar, and a coda.
+
+  The opening measure declares the staves and the settings that repeat on
+  every page line, so the first measure of music is the second of the page.
+  Measures are numbered within their page line, which is why the commands at
+  the end name the line as well as the measure.
+"
+
+title is "A Song"
+subtitle is "for voice and piano"
+
+measure
+time signature is 4:4 for each line
+brace from stave 2 to stave 3 for each line
+instrument title is "Voice" for stave 1 for each line
+instrument "Piano" between stave 2 and stave 3 for each line
+stave with treble clef
+stave with treble clef
+stave with bass clef
+
+measure
+starts with double bold barline,
+with colon at the start
+stave
+1/4 e with dynamic "p", with lyrics "When"
+1/4 f with lyrics "that"
+1/4 g with lyrics "I"
+1/4 a with lyrics "was"
+stave
+chord
+c e g
+
+chord
+c f a
+
+chord
+c e g
+
+chord
+c f a
+stave
+1/2 c3
+1/2 f3
+
+measure
+ends with double bold barline
+with colon at the end
+stave
+1/2 g with dynamic "mf", with lyrics "young"
+1/2 rest
+stave
+1 chord
+c e g
+stave
+1 c3
+
+new line
+measure
+stave
+coda at the end of the measure
+1 a with lyrics "long"
+stave
+1 chord
+c f a
+stave
+1 f3
+
+crescendo on first line, in second measure, on first stave
+from first unit to 4th unit
+
+volta on first line with text "1." from second measure to third measure

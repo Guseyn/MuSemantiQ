@@ -1,0 +1,37 @@
+comment: "
+  Four voices across two staves, each sounding independently, which is what
+  a chorale needs.
+"
+
+measure
+brace from stave 1 to stave 2
+stave with treble clef
+stave with bass clef
+
+measure
+stave
+voice
+1/4 g a b c5
+voice
+1/4 e f g e
+stave
+voice
+1/4 c d e g
+voice
+1/4 c3 d3 e3 c3
+
+measure
+stave
+voice
+1/2 d5
+1/2 c5
+voice
+1/2 f
+1/2 e
+stave
+voice
+1/2 a
+1/2 g
+voice
+1/2 d3
+1/2 c3

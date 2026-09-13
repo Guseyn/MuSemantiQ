@@ -13,91 +13,144 @@
  * font rewrites that one line and nothing else.
  */
 
+/*
+Where a note sits changes what a glyph has to do.
+
+In treble clef the stave lines are e g b d5 f5 and the spaces between them are
+f a c5 e5, and a notehead straddling a line is a different problem from one
+sitting in a space — an accidental centres differently, a stem leaves from a
+different edge, an articulation has half a step more or less to clear. So these
+show a glyph on a line note and on a space note rather than on one of them, and
+reach past the stave where ledger lines come into it.
+*/
+const LINE_NOTE = 'b'
+const SPACE_NOTE = 'a'
+
 const bothStemDirections = (articulation) => `measure
 ${articulation} up, with stem up
 ${articulation} up, with stem down
 ${articulation} down, with stem up
 ${articulation} down, with stem down`
 
-const withArticulation = (name) => bothStemDirections(`a with ${name}`)
+const withArticulation = (name) => `${bothStemDirections(`${LINE_NOTE} with ${name}`)}
+
+${bothStemDirections(`${SPACE_NOTE} with ${name}`)}`
 
 const withOrnament = (name) => `measure
-1/2 a with ${name}
+1/2 ${LINE_NOTE} with ${name}
+1/2 ${SPACE_NOTE} with ${name}
+measure
+1/2 d5 with ${name}, with stem down
 1/2 c5 with ${name}, with stem down`
 
 const withOrnamentKey = (key) => `measure
-1/2 a with turn with ${key} above
+1/2 ${LINE_NOTE} with turn with ${key} above
+1/2 ${SPACE_NOTE} with turn with ${key} above
+measure
+1/2 d5 with mordent with ${key} below, with stem down
 1/2 c5 with mordent with ${key} below, with stem down`
 
 const withClef = (clef) => `measure
 stave with ${clef}
-a b c5 d5`
+e f g a
+b c5 d5 e5`
 
 const withAccidental = (key) => `measure
+e with ${key} key
+f with ${key} key
+g with ${key} key
 a with ${key} key
+measure
+b with ${key} key, with stem down
 c5 with ${key} key, with stem down
+d5 with ${key} key, with stem down
+e5 with ${key} key, with stem down
+measure
+c with ${key} key
+a5 with ${key} key, with stem down
 chord
 f a with ${key} key c5`
 
 const withRest = (duration) => `measure
 ${duration} rest
-${duration} a
+${duration} ${LINE_NOTE}
 ${duration} rest
-${duration} c5`
+${duration} ${SPACE_NOTE}`
 
 const withFlags = (duration) => `measure
 voice
-${duration} c with stem down, d e f
-c5 with stem up, d5 e5 f5`
+${duration} e with stem down, f g a
+b with stem up, c5 d5 e5`
 
 const withNoteBody = (duration) => `measure
+${duration} e
+${duration} f
+${duration} g
 ${duration} a
-${duration} b
+measure
+${duration} b with stem down
 ${duration} c5 with stem down
+${duration} d5 with stem down
+${duration} e5 with stem down
+measure
+${duration} c
+${duration} a5 with stem down
 chord
 ${duration} f a c5`
 
 const ghostNoteBody = (duration) => `measure
-${duration} a is ghost
-${duration} c5 is ghost, with stem down
-${duration} a`
+${duration} ${LINE_NOTE} is ghost
+${duration} ${SPACE_NOTE} is ghost
+measure
+${duration} d5 is ghost, with stem down
+${duration} c5 is ghost, with stem down`
 
 const withBrace = (staves) => `measure
 brace from first stave to ${staves} stave
 ${'stave\n'.repeat(staves === 'second' ? 2 : staves === 'third' ? 3 : 4).trim()}`
 
 const withWave = (command) => `measure
-1/2 a ${command}
-1/2 c5`
+1/2 ${LINE_NOTE} ${command}
+1/2 ${SPACE_NOTE} ${command}`
 
 const withDynamic = (text) => `measure
-a with dynamic "${text}"
+${LINE_NOTE} with dynamic "${text}"
+${SPACE_NOTE} with dynamic "${text}"
+d5 with dynamic "${text}" below, with stem down
 c5 with dynamic "${text}" below, with stem down`
 
 const withTempo = (note) => `measure
 tempo is "${note} = 120"
-a b c5 d5`
+e f g a
+b c5 d5 e5`
 
 const withTimeSignature = (signature) => `measure
 time signature is ${signature}
-a b c5 d5`
+e f g a
+b c5 d5 e5`
 
 const withTuplet = (value) => `measure
-1/8 a beamed, b, c5
-tuplet ${value} with brackets from first unit to third unit`
+1/8 g beamed, a, b
+1/8 c5 beamed, d5, e5
+tuplet ${value} with brackets from first unit to third unit
+tuplet ${value} with brackets from fourth unit to 6th unit`
 
 const withPedal = (text) => `measure
-a with pedal "${text}"
-b
+${LINE_NOTE} with pedal "${text}"
+${SPACE_NOTE}
+d5
 c5 with release`
 
 const withOctaveSign = (command) => `measure
-a is ${command}
-b
-c5`
+${LINE_NOTE} is ${command}
+${SPACE_NOTE} is ${command}
+d5 is ${command}
+c5 is ${command}`
 
 const withNoteLetter = (text) => `measure
-a with text "${text}" above
+${LINE_NOTE} with text "${text}" above
+${SPACE_NOTE} with text "${text}" above
+d5 with text "${text}" below, with stem down
 c5 with text "${text}" below, with stem down`
 
 /**
@@ -105,7 +158,8 @@ c5 with text "${text}" below, with stem down`
  * own, such as a brace tier the drawer picks by height.
  */
 const PLAIN = `measure
-a b c5 d5`
+e f g a
+b c5 d5 e5`
 
 const examples = {
   // articulations
@@ -148,9 +202,18 @@ const examples = {
   ghostDarkNoteBody: ghostNoteBody('1/4'),
   ghostHalfNoteBody: ghostNoteBody('1/2'),
   ghostWholeNoteBody: ghostNoteBody('1'),
+  // A dot belongs in a space, so on a line note it lifts into the space above.
   noteDot: `measure
+1/4 e dotted
+1/4 f dotted
+1/4 g dotted
 1/4 a dotted
-1/4 c5 with two dots, with stem down
+measure
+1/4 b dotted, with stem down
+1/4 c5 dotted, with stem down
+1/4 d5 with two dots, with stem down
+1/4 e5 with two dots, with stem down
+measure
 chord with dot
 f a c5`,
 
@@ -209,6 +272,8 @@ measure
 ends with double bold barline, with repeat sign at the end
 a b c5 d5`,
   simile: `measure
+b repeat three times
+measure
 a repeat three times`,
   mixedSimile: `measure with simile of two previous measures 3 times
 stave`,
@@ -232,6 +297,9 @@ c5 with release`,
   // waves
   trillWavePeriod: withWave('with trill with wave after'),
   glissandoWavePeriod: `measure
+1/2 b with glissando after up
+1/2 d5
+measure
 1/2 a with glissando after up
 1/2 c5`,
   arpeggioWavePeriod: `measure

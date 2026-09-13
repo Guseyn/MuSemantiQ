@@ -1,0 +1,21 @@
+music font is leland
+
+comment: "
+  A tuplet can name both sides of the ratio, and can run across a barline.
+"
+
+measure
+treble clef
+1/8 a beamed, b, c5, d5, e5, f5 not beamed
+measure
+1/4 g5
+1/4 f5
+1/4 e5
+1/4 d5
+
+tuplet 6:4 in first measure
+from first unit to 6th unit
+
+tuplet 3
+from first unit in second measure
+to third unit in second measure

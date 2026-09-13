@@ -1,0 +1,84 @@
+/*
+What the dev tools add on top of e-ui.
+
+Only two things: the interface face everywhere, and the dropdown that
+`searchable-select` builds — a `<select>` you can type into, which e-ui knows
+nothing about because it is a MuSemantiQ component.
+*/
+
+:root {
+  /* These are tools, not typography. */
+  --e-font-typography: var(--e-font-interface);
+}
+
+/*
+The combobox the searchable select unwraps into.
+
+The native select stays as the value holder and hides itself, so what is seen is
+this input and its list. It is given the same shape as an e-ui field so a
+searchable select and a plain input sitting next to each other match.
+*/
+[data-combobox] {
+  position: relative;
+  width: 100%;
+}
+
+[data-combobox] > input {
+  width: 100%;
+}
+
+[data-combobox-list] {
+  position: absolute;
+  z-index: 5;
+  left: 0;
+  right: 0;
+  top: calc(100% + 4px);
+  margin: 0;
+  padding: var(--e-spacing-xs);
+  list-style: none;
+  max-height: 280px;
+  overflow-y: auto;
+  background: var(--e-surface-bg);
+  border: 1px solid var(--e-border);
+  border-radius: var(--e-radius-md);
+  box-shadow: 0 6px 20px rgb(0 0 0 / 0.18);
+}
+
+[data-combobox-option] {
+  padding: var(--e-spacing-xs) var(--e-spacing-sm);
+  border-radius: var(--e-radius-sm);
+  cursor: pointer;
+  font-size: var(--e-font-size-sm);
+}
+
+[data-combobox-option][data-active] {
+  background: var(--e-primary);
+  color: #fff;
+}
+
+[data-combobox-empty] {
+  padding: var(--e-spacing-xs) var(--e-spacing-sm);
+  color: var(--e-muted);
+  font-size: var(--e-font-size-sm);
+}
+
+/*
+A field in a stacked column fills the row it is given.
+
+A bare `label` is inline, so a width on it does nothing until it is told to be a
+column — which is also what puts the caption above the control rather than
+beside it.
+*/
+[data-fields] label {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-spacing-xs);
+  width: 100%;
+}
+
+[data-fields] input,
+[data-fields] select,
+[data-fields] textarea,
+[data-fields] [data-combobox] {
+  width: 100%;
+}

@@ -1,0 +1,11 @@
+comment: "
+  A simile stands for the unit before it, or for a whole group of them.
+"
+
+measure
+treble clef
+1/4 c
+c repeat 3 times
+measure
+1/4 c e g e
+simile from first unit to fourth unit 1 times

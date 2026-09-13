@@ -1,0 +1,18 @@
+music font is leland
+
+comment: "
+  A slur onto a grace note attaches to the note body rather than the stem.
+"
+
+measure
+treble clef
+1/8 g5 is crushed grace, with stem up
+1/4 a5
+1/8 f5 is grace, with stem up
+1/4 g5
+
+slur from first unit to second unit
+with right point attached to note body
+
+slur from third unit to fourth unit
+with right point attached to middle of stem

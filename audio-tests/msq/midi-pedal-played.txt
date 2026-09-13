@@ -1,0 +1,15 @@
+comment: "
+  Under a pedal the notes keep sounding after they are released.
+"
+
+measure
+treble clef
+1/4 c with pedal before
+1/4 e
+1/4 g
+1/4 c5
+measure
+1/4 b
+1/4 g
+1/4 d
+1/4 c with release

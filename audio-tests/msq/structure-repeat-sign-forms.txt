@@ -1,0 +1,22 @@
+comment: "
+  The repeat dots on their own, and against the bold barlines that usually
+  carry them, at the start and at the end of a measure.
+"
+
+measure
+with repeat sign at the start
+treble clef
+1/4 c d e f
+measure
+with repeat sign at the end
+1/4 g a b c5
+measure
+with repeat sign at the start
+with repeat sign at the end
+1/4 c5 b a g
+measure
+starts with double bold barline
+with colon at the start
+ends with double bold barline
+with colon at the end
+1/4 f e d c

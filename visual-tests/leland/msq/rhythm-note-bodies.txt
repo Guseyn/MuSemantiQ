@@ -1,0 +1,36 @@
+music font is leland
+
+comment: "
+  Every note body the font draws, above and below the middle line so both
+  stem directions are used.
+"
+
+measure
+treble clef
+4 c
+4 c5
+measure
+2 c
+2 c5
+measure
+1 c
+1 c5
+measure
+1/2 c
+1/2 c5
+
+new line
+measure
+1/4 c
+1/4 c5
+1/8 c
+1/8 c5
+1/16 c
+1/16 c5
+measure
+1/32 c
+1/32 c5
+1/64 c
+1/64 c5
+1/128 c
+1/128 c5

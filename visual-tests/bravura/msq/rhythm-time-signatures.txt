@@ -1,0 +1,17 @@
+comment: "
+  A time signature as two numbers, as common time, and as cut common time.
+"
+
+measure
+time signature is 3:4
+treble clef
+c d e
+measure
+time signature is 6:8
+1/8 f beamed, g, a, b, c5, d5 not beamed
+measure
+time signature is c
+1/4 e5 f5 g5 a5
+measure
+time signature is crossed c
+1/2 b5 a5

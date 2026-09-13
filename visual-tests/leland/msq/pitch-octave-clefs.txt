@@ -1,0 +1,22 @@
+music font is leland
+
+comment: "
+  Clefs that transpose by an octave or two, written above and below the
+  ordinary treble and bass.
+"
+
+measure
+stave with octave up clef
+stave with octave down clef
+stave with two octaves up clef
+stave with two octaves down clef
+
+measure
+stave
+g a b
+stave
+g a b
+stave
+g a b
+stave
+g a b

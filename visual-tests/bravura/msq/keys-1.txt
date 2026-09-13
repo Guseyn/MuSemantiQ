@@ -1,9 +1,0 @@
-a with sharp key
-a with flat key
-a with natural key
-a with double sharp key
-a with double flat key
-a with demisharp key
-a with sesquisharp key
-a with demiflat key
-a with sesquiflat key

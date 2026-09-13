@@ -1,9 +1,0 @@
-measure starts with barline
-stave
-stave
-
-side note: "
-  You can aslo type:
-  measure opens with barline
-  measure begins with barline
-"

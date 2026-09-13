@@ -1,0 +1,11 @@
+music font is leland
+
+comment: "
+  A named paper size instead of an explicit height.
+"
+
+page format is a4
+
+measure
+treble clef
+1/4 c d e f

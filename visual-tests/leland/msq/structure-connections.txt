@@ -1,0 +1,24 @@
+music font is leland
+
+comment: "
+  A brace joins the two hands of a keyboard part; a bracket joins a family
+  of instruments.
+"
+
+measure
+brace from stave 1 to stave 2
+bracket from stave 3 to stave 4
+stave with treble clef
+stave with bass clef
+stave with treble clef
+stave with bass clef
+
+measure
+stave
+c5 d5
+stave
+c3 d3
+stave
+e5 f5
+stave
+e3 f3

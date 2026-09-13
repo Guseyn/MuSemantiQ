@@ -1,0 +1,26 @@
+comment: "
+  The quick end.
+"
+
+measure
+tempo is "Allegro"
+treble clef
+1/8 c beamed, d, e, f, g, a, b, c5 not beamed
+measure
+tempo is "Allegro vivace"
+1/8 c5 beamed, b, a, g, f, e, d, c not beamed
+measure
+tempo is "Vivace"
+1/8 c beamed, d, e, f, g, a, b, c5 not beamed
+measure
+tempo is "Vivacissimo"
+1/8 c5 beamed, b, a, g, f, e, d, c not beamed
+measure
+tempo is "Allegrissimo"
+1/8 c beamed, d, e, f, g, a, b, c5 not beamed
+measure
+tempo is "Presto"
+1/8 c5 beamed, b, a, g, f, e, d, c not beamed
+measure
+tempo is "Prestissimo"
+1/8 c beamed, d, e, f, g, a, b, c5 not beamed

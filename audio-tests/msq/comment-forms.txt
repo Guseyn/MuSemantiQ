@@ -1,0 +1,17 @@
+comment: "a comment that opens and closes on one line"
+
+side note: "
+  A side note reads the same way but is meant for the reader rather than
+  for the author, and can carry 'words in quotes' inside it.
+"
+
+comment: "
+  A comment spanning several lines keeps its own line breaks, and can sit
+  between commands as well as before them.
+"
+
+measure
+treble clef
+1/4 c d e f
+
+comment: "and one at the end, after all the music"

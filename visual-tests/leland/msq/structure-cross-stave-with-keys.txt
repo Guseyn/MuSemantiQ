@@ -1,0 +1,23 @@
+music font is leland
+
+comment: "
+  Cross-stave notes carrying accidentals, which have to be stacked against
+  the stave they belong to rather than the one they are written on.
+"
+
+measure
+brace from stave 1 to stave 2
+stave with treble clef
+stave with bass clef
+
+measure
+stave
+1/16 f sharp on next stave beamed, a flat on next stave, c sharp, e flat,
+g sharp, b flat, d5 sharp, f5 sharp not beamed
+stave
+
+measure
+stave
+chord
+c3 sharp on next stave, g3 sharp on next stave, e flat, g sharp, c5 sharp
+stave

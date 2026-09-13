@@ -1,9 +1,0 @@
-chord is grace, is tied with next
-a c on next stave
-chord is grace, is tied with next
-a c on next stave
-chord is grace, is tied with next
-a c on next stave
-chord is grace
-a c on next stave
-stave

@@ -1,0 +1,12 @@
+comment: "
+  The trailing empty measure a page line would otherwise draw is hidden.
+"
+
+hide the last measure
+
+measure
+treble clef
+1/4 c d e f
+measure
+1/4 g a b c5
+measure

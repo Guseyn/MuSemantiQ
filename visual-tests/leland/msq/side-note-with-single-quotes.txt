@@ -1,6 +1,0 @@
-music font is leland
-
-side note: "
-  This comment includes 'words with quotes'
-"
-a b d e f c e f a

@@ -1,0 +1,20 @@
+music font is leland
+
+comment: "
+  Short labels on units, for fingerings and string numbers.
+"
+
+measure
+treble clef
+1/4 a with text "1" above
+1/4 b with text "2" below
+1/4 c5 with text "3" beside
+1/4 d5 with text "4" above 1 up
+measure
+chord with text "1" up
+c e g
+
+chord
+c with text "3" down
+e with text "2" beside
+g with text "1" up

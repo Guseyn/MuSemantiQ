@@ -1,0 +1,10 @@
+comment: "
+  A unit nudged left or right of where the spacing would put it.
+"
+
+measure
+treble clef
+1/4 c
+1/4 d is right by 4
+1/4 e
+1/4 f is left by 2

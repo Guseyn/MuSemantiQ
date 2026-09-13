@@ -1,9 +1,0 @@
-1/2 chord tied with next
-c e g b
-1/4 chord
-c e g b
-
-1/2 chord tied with next
-c d e f g
-1/4 chord
-c d e f g

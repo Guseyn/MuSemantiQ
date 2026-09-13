@@ -1,9 +1,0 @@
-music font is leland
-
-1/8 a is beamed with next
-c
-
-comment: "
-  As you can see `next` is highlighted with the same color as other units.
-  It means that you can be navigated by clicking on `next` to the next note/chord.
-"

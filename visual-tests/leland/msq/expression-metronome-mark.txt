@@ -1,0 +1,17 @@
+music font is leland
+
+comment: "
+  A metronome mark draws the note symbol it names, in every value the
+  language knows, plain and dotted.
+"
+
+measure
+metronome mark is "1/4 = 120"
+treble clef
+1/4 c d e f
+measure
+metronome mark is "1 dotted, 1/2 with dot, 1/4 dotted, 1/8 with dot, 1/16 dotted, 1/32 with dot"
+1/4 g a b c5
+measure
+metronome mark is "whole, half, quarter, eighth, sixteenth, thirty second, sixty fourth"
+1/4 c5 b a g

@@ -1,0 +1,31 @@
+music font is leland
+
+comment: "
+  Volta brackets named by the page line they sit on, opening and closing
+  before and after the measures they cover, and nudged clear of the stave.
+"
+
+new line
+measure
+treble clef
+1/4 c d e f
+measure
+1/4 g a b c5
+measure
+ends with double bold barline
+with colon at the end
+1/4 b a g f
+
+new line
+measure
+1/4 c d e f
+measure
+1/4 g a b c5
+measure
+ends with double bold barline
+1/4 c5 g e c
+
+volta on first line with text "1." from first measure to third measure
+
+volta on second line with text "2."
+starts before first measure and finishes after third measure 1 up

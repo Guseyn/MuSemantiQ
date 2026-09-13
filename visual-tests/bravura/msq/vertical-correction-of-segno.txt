@@ -1,9 +1,0 @@
-measure
-sign 1 up
-treble clef
-a b d e
-measure
-measure
-measure
-
-comment: "we just moved sign on one interval between stave lines up"

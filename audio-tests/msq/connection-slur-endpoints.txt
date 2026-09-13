@@ -1,0 +1,18 @@
+comment: "
+  A slur that opens before the unit it names and closes after another, which
+  is what a phrase mark reaching past its notes needs.
+"
+
+measure
+treble clef
+1/4 c d e f
+measure
+1/4 g a b c5
+
+slur in first measure
+starts before first unit
+finishes after fourth unit
+
+slur in second measure
+starts below first unit
+finishes above fourth unit

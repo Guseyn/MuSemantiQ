@@ -1,8 +1,0 @@
-a with tremolo with next, tied with next
-a
-rest
-a with tremolo, tied with next
-a, tied with next
-a
-voice
-c rest c c c

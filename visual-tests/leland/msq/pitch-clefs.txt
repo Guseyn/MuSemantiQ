@@ -1,0 +1,31 @@
+music font is leland
+
+comment: "
+  The seven clefs that name a line of the stave, each carrying the same
+  written note so the sounding pitch differs from stave to stave.
+"
+
+measure
+stave with treble clef
+stave with bass clef
+stave with alto clef
+stave with tenor clef
+stave with soprano clef
+stave with mezzo soprano clef
+stave with baritone clef
+
+measure
+stave
+c d e
+stave
+c d e
+stave
+c d e
+stave
+c d e
+stave
+c d e
+stave
+c d e
+stave
+c d e

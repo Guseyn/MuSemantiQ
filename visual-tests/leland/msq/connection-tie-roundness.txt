@@ -1,0 +1,17 @@
+music font is leland
+
+comment: "
+  How far a tie bends, from the flattest to the roundest.
+"
+
+measure
+treble clef
+1/4 a tied with next up with roundness 1
+1/4 a
+1/4 b tied with next up with roundness 5
+1/4 b
+measure
+1/4 c5 tied with next up with roundness 10
+1/4 c5
+1/4 d5 tied with next down with roundness 7, with stem down
+1/4 d5

@@ -1,3 +1,0 @@
-music font is leland
-
-title is "Title", subtitle is "Subtitle"

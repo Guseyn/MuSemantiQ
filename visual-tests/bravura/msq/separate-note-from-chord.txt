@@ -1,4 +1,0 @@
-chord
-c e g
-
-a

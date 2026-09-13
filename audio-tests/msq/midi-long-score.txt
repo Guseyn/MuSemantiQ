@@ -1,0 +1,63 @@
+comment: "
+  A longer piece that puts the pieces together: two hands, a repeat, a key
+  change, dynamics, pedal, ornaments, ties and a fermata at the close.
+"
+
+title is "Little Piece"
+
+measure
+key signature is g major for each line
+time signature is 3:4 for each line
+brace from stave 1 to stave 2 for each line
+instrument title is "Piano" for stave 1
+stave with treble clef
+stave with bass clef
+
+measure
+starts with double bold barline,
+with colon at the start
+stave
+tempo is "Allegretto"
+1/8 g with dynamic "mp" beamed, a, b, c5, d5, e5 not beamed
+stave
+1/4 g3 with pedal before
+1/4 b3
+1/4 d
+
+measure
+stave
+1/4 d5 with trill
+1/2 g5 tied with next up
+stave
+1/4 g3
+1/2 b3 with release
+
+measure
+ends with double bold barline
+with colon at the end
+stave
+1/2 g5
+1/4 rest
+stave
+1/2 g3
+1/4 rest
+
+new line
+measure
+key signature is c major
+stave
+1/8 c5 beamed, b, a, g, f, e not beamed
+stave
+1/4 c3 e3 g3
+
+measure
+ends with double bold barline
+stave
+1/2 d with fermata up
+1/4 c
+stave
+1/2 g3 with fermata up
+1/4 c3
+
+crescendo in second measure on first stave
+from first unit to 6th unit

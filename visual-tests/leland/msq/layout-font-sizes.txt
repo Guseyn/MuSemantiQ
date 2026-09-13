@@ -1,0 +1,27 @@
+music font is leland
+
+comment: "
+  The text on a page sizes independently of the music.
+"
+
+title is "Sizes"
+subtitle is "a subtitle"
+composer is "a composer"
+right subtitle is "a date"
+page number is "2"
+
+title font size is 10
+subtitle font size is 6
+left subtitle font size is 5
+right subtitle font size is 5
+page number font size is 4
+title top offset is 3
+subtitle top offset is 2
+left and right subtitles top offset is 2
+page number bottom offset is 3
+instrument title font size is 4
+
+measure
+instrument title is "Violin" for stave 1
+treble clef
+1/4 c d e f

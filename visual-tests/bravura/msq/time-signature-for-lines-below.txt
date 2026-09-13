@@ -1,9 +1,0 @@
-measure
-time signature is c for lines below
-
-new line
-new line
-time signature is 3:8 for each line
-
-new line
-new line

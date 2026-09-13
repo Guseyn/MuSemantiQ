@@ -1,0 +1,17 @@
+comment: "
+  A da capo sends the player back to the beginning and then out to the coda,
+  so the measures are sounded in a different order from the one written.
+"
+
+measure
+treble clef
+1/4 d f a d5
+measure
+coda at the end of the measure
+1/4 c e g c5
+measure
+1/4 e g b e5
+measure
+ends with double bold barline
+repetition note "D.C. al Coda"
+1/4 c e g e

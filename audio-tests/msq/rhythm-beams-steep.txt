@@ -1,0 +1,13 @@
+comment: "
+  Beams over wide leaps, which slope steeply and have to keep their stems
+  long enough to reach.
+"
+
+measure
+treble clef
+1/8 c beamed, c5, d, d5, e, e5, f, f5 not beamed
+measure
+1/16 g5 beamed, g, a5, a, b5, b, c5, c not beamed
+measure
+1/8 c3 beamed, c5, c3, c5 not beamed
+1/8 g5 beamed, g3, g5, g3 not beamed

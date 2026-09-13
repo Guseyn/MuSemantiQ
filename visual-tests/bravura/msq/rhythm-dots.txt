@@ -1,0 +1,19 @@
+comment: "
+  A dot adds half the value again; a second dot adds half of that. Written
+  here as a dotted rhythm that fills each measure.
+"
+
+measure
+treble clef
+1/4 a dotted
+1/8 b
+1/4 c5 dotted
+1/8 b
+measure
+1/2 a with 2 dots
+1/16 b
+1/16 c5
+measure
+1/4 rest dotted
+1/8 a
+1/2 b

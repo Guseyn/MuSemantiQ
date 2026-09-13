@@ -1,4 +1,0 @@
-font size is 12
-
-stave
-a b c d e f

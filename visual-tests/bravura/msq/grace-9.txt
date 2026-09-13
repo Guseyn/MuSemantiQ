@@ -1,6 +1,0 @@
-1/8 f5 is grace, with stem up
-1/4 e5 with stem down
-
-slur with right point attached to middle of stem 1.6 up
-starts at first unit
-and finishes at second unit

@@ -1,8 +1,0 @@
-measure
-time signature is 3:4
-measure
-time signature is 4:4
-measure
-time signature is c
-measure
-time signature is crossed c

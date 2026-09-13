@@ -1,0 +1,35 @@
+music font is leland
+
+comment: "
+  A tie leans away from the stem by default, and can be forced either way,
+  on single notes and inside chords.
+"
+
+measure
+treble clef
+1/2 c tied with next up
+1/2 c
+measure
+1/2 c5 tied with next down
+1/2 c5
+measure
+1/2 c tied with next down, with stem down
+1/2 c
+measure
+1/2 c5 tied with next up, with stem up
+1/2 c5
+
+new line
+measure
+voice
+1/2 g tied with next up
+1/2 g
+voice
+1/2 c tied with next down
+1/2 c
+measure
+1/2 chord tied with next up
+c e g c5
+
+1/2 chord
+c e g c5

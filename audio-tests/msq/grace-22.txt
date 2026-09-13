@@ -1,9 +1,0 @@
-tempo is "1/4 = 50"
-
-1/8 a
-1/8 a is grace
-1/8 a is grace
-1/8 a
-
-octave up from note 1 to note 2
-two octaves up from note 3 to note 4

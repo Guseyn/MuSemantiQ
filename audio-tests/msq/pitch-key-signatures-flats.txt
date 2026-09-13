@@ -1,0 +1,28 @@
+comment: "
+  The flat side of the circle of fifths.
+"
+
+measure
+key signature is f major
+treble clef
+f g a
+measure
+key signature is b flat major
+b c5 d5
+measure
+key signature is e flat major
+e f g
+measure
+key signature is a flat major
+a b c5
+
+new line
+measure
+key signature is d flat major
+d e f
+measure
+key signature is g flat major
+g a b
+measure
+key signature is c flat major
+c d e

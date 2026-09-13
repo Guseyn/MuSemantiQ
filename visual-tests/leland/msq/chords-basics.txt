@@ -1,0 +1,29 @@
+music font is leland
+
+comment: "
+  Chords as units: beamed together, dotted, tied, and with the stem forced.
+"
+
+measure
+treble clef
+1/8 chord beamed
+c e g
+
+1/8 chord
+d f a
+
+1/8 chord
+e g b
+
+1/8 chord not beamed
+f a c5
+
+measure
+1/4 chord dotted
+c e g
+
+1/8 chord
+d f a
+
+1/2 chord with 2 dots
+e g b

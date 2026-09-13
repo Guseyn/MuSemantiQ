@@ -1,6 +1,0 @@
-measure
-c c c
-measure
-measure rest 3 times
-measure
-c c c

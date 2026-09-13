@@ -1,0 +1,11 @@
+{
+  "port": 8889,
+  "host": "127.0.0.1",
+  "domain": "",
+  "key": "./examples/browser/web-app/ssl/key.tmp.pem",
+  "cert": "./examples/browser/web-app/ssl/cert.tmp.pem",
+  "webroot": "web-app",
+  "proxy": {
+    "port": 80
+  }
+}

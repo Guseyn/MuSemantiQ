@@ -1,0 +1,24 @@
+comment: "
+  A glissando that reaches into another measure names it by number.
+"
+
+measure
+stave with treble clef
+stave with bass clef
+
+measure
+stave
+1/4 a with glissando after measure 2
+stave
+1/16 a beamed b c d a b c d not beamed
+
+measure
+stave
+stave
+1/16 a beamed b c d a b c d not beamed
+
+measure
+stave
+1/4 a with glissando before measure 2
+stave
+1/16 a beamed b c d a b c d not beamed

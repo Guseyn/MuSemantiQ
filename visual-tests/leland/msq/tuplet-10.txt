@@ -1,9 +1,0 @@
-a b c
-stave
-a a
-measure
-a b c
-stave
-a a
-
-tuplet 3 starts at note 1 and finishes after note 3

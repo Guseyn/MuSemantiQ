@@ -1,6 +1,0 @@
-music font is leland
-
-1/8 c with chord "C^halfdim13"
-c with chord "Cmaj13"
-c with chord "C13sharp5"
-c with chord "C/F^sharp"

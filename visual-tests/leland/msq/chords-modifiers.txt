@@ -1,0 +1,32 @@
+music font is leland
+
+comment: "
+  A chord takes the same modifiers a single note does.
+"
+
+measure
+treble clef
+1/4 chord is ghost
+c e g
+
+1/4 chord with staccato up, with accent up
+d f a
+
+1/4 chord with mordent
+e g b
+
+1/4 chord with dynamic "mf" below
+f a c5
+
+measure
+1/8 chord is grace, with stem up
+c e g
+
+1/4 chord is right by 3
+d f a
+
+1/4 chord is rest
+e g b
+
+1/4 chord with bass clef before
+c3 e3 g3

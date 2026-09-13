@@ -1,8 +1,0 @@
-title top offset is 9
-subtitle top offset is 9
-left and right subtitles top offset is 9
-
-title is "Title"
-subtitle is "Subtitle"
-left subtitle is "Left subtitle"
-right subtitle is "Right subtitle"

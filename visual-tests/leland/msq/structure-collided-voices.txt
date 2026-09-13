@@ -1,0 +1,23 @@
+music font is leland
+
+comment: "
+  Voices that share a stave and run into each other: unisons, seconds, and
+  notes whose stems would overlap.
+"
+
+measure
+treble clef
+voice
+1/4 c d e f
+voice
+1/4 c d e f
+measure
+voice
+1/4 e f g a
+voice
+1/4 d e f g
+measure
+voice
+1/8 c beamed, d, e, f, g, a, b, c5 not beamed
+voice
+1/4 c c c c

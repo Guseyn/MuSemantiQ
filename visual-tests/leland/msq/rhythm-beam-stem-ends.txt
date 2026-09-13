@@ -1,0 +1,18 @@
+music font is leland
+
+comment: "
+  Beamed groups whose first and last stems sit at very different heights,
+  which is what decides how the beam slopes and how long each stem runs.
+"
+
+measure
+treble clef
+1/8 c3 beamed, d, e, f5 not beamed
+1/8 g5 beamed, f, e, d3 not beamed
+measure
+1/16 c beamed, c, c, c, c5, c5, c5, c5 not beamed
+measure
+1/16 a5 beamed, g5, f5, e5, d5, c5, b, a not beamed
+measure
+1/32 c beamed, d, e, f, g, a, b, c5,
+d5, e5, f5, g5, a5, b5, c5, d5 not beamed

@@ -1,5 +1,0 @@
-chord is arpeggiated with arrow down, is grace
-a b c
-
-chord is arpeggiated with arrow down
-a b c

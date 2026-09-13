@@ -1,0 +1,26 @@
+music font is leland
+
+comment: "
+  Every note value the language can write, from the quadruple whole down to
+  the two-hundred-fifty-sixth, halving at each step.
+"
+
+measure
+treble clef
+4 a
+measure
+2 a
+measure
+1 a
+measure
+1/2 a
+
+new line
+measure
+1/4 a
+1/8 a
+1/16 a
+1/32 a
+1/64 a
+1/128 a
+1/256 a

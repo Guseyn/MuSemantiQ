@@ -1,8 +1,0 @@
-music font is leland
-
-voice
-chord is arpeggiated with chord below
-a c5 e5
-voice
-chord is arpeggiated
-g3 b3 d

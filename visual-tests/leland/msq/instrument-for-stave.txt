@@ -1,6 +1,0 @@
-music font is leland
-
-instrument title is "Guitar" for first stave
-stave
-
-side note: "You can also just use `instrument`, and you can omit `is`"

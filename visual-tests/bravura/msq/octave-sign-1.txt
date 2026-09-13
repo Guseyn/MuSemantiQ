@@ -1,4 +1,0 @@
-a is octave up
-a is octave down
-a is two octaves up
-a is two octaves down

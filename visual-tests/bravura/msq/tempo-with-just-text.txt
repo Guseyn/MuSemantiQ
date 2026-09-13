@@ -1,3 +1,0 @@
-measure
-tempo is "Allegro"
-c d e f

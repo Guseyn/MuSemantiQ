@@ -1,6 +1,0 @@
-music font is leland
-
-voice
-1/8 c5 d5 e5
-voice
-1/8 c d e

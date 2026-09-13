@@ -1,3 +1,0 @@
-treble clef
-c d e f g a b c5
-c with bass clef before d e f g a b c3

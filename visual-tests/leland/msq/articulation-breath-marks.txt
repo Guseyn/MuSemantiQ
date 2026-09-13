@@ -1,0 +1,19 @@
+music font is leland
+
+comment: "
+  A breath between two phrases, as a comma and as a pair of slashes, with a
+  vertical nudge on the last one.
+"
+
+measure
+treble clef
+1/4 c d e f
+measure
+1/4 g with breath comma before
+a b c5
+measure
+1/4 b with breath double slashes before
+a g f
+measure
+1/4 e with breath comma before 1 down
+d c

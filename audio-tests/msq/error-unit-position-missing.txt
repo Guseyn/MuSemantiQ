@@ -1,0 +1,14 @@
+comment: "
+  Span commands whose endpoint names no unit at all.
+"
+
+measure
+1/8 a beamed, b, c5 not beamed
+
+slur starts before unit
+
+tuplet 3 finishes at unit
+
+octave sign to
+
+glissando starts at unit

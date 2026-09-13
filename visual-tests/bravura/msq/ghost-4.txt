@@ -1,5 +1,0 @@
-chord is ghost
-f c5 a5
-
-chord
-g d5 b5

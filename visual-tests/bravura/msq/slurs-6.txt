@@ -1,7 +1,0 @@
-voice
-a5 d5 f5 g5
-voice
-a d f g
-
-slur in first voice from first note to fourth unit
-slur in second voice from first note to fourth unit down

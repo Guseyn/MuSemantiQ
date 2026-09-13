@@ -1,7 +1,0 @@
-measure
-brace from stave 1 to stave 2
-bracket from stave three to stave four
-stave
-stave
-stave
-stave

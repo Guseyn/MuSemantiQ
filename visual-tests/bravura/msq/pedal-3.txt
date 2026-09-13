@@ -1,7 +1,0 @@
-stave
-a with pedal 2 down
-b
-
-comment: "
-  Here we moved pedal mark on two intervals between stave lines down.
-"

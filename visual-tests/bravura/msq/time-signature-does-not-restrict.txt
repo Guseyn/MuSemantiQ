@@ -1,4 +1,0 @@
-measure
-time signature is 3:4
-
-a b d e f c

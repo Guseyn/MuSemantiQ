@@ -1,0 +1,36 @@
+comment: "
+  The tempo words that change speed as the passage goes, rather than setting
+  it once. Each one bends the tempo across the measure it opens.
+"
+
+measure
+tempo is "1/4 = 120"
+treble clef
+1/8 c beamed, d, e, f, g, a, b, c5 not beamed
+measure
+tempo is "accelerando"
+1/8 c5 beamed, b, a, g, f, e, d, c not beamed
+measure
+tempo is "rallentando"
+1/8 c beamed, d, e, f, g, a, b, c5 not beamed
+measure
+tempo is "ritardando"
+1/8 c5 beamed, b, a, g, f, e, d, c not beamed
+measure
+tempo is "allargando"
+1/8 c beamed, d, e, f, g, a, b, c5 not beamed
+measure
+tempo is "calando"
+1/8 c5 beamed, b, a, g, f, e, d, c not beamed
+measure
+tempo is "lentando"
+1/8 c beamed, d, e, f, g, a, b, c5 not beamed
+measure
+tempo is "stringendo"
+1/8 c5 beamed, b, a, g, f, e, d, c not beamed
+measure
+tempo is "precipitando"
+1/8 c beamed, d, e, f, g, a, b, c5 not beamed
+measure
+tempo is "tardando"
+1/8 c5 beamed, b, a, g, f, e, d, c not beamed

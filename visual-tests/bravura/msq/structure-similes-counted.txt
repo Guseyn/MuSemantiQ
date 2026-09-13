@@ -1,0 +1,18 @@
+comment: "
+  A measure simile can stand for several bars at once, and a two-bar simile
+  can be counted too.
+"
+
+measure
+treble clef
+1/4 c e g e
+measure with simile of previous measure 2 times
+measure
+measure
+1/4 d f a f
+measure
+1/4 e g b g
+measure with simile of two previous measures 2 times
+measure
+measure
+measure

@@ -1,0 +1,24 @@
+comment: "
+  A dal segno jumps back to the sign rather than to the beginning.
+"
+
+measure
+treble clef
+1/2 c
+1/2 d
+measure
+sign at the end of the measure
+1/4 c d e f
+measure
+1/8 c beamed, d, e, f, g, a, b, c5 not beamed
+measure
+coda at the end of the measure
+1/4 g a b c5
+
+new line
+measure
+1/4 c5 b a g
+measure
+ends with double bold barline
+repetition note "D.S. al Coda"
+1/4 f e d c

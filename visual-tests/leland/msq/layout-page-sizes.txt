@@ -1,0 +1,19 @@
+music font is leland
+
+comment: "
+  The page frame: how wide a line runs, how tall the page is, and the space
+  around it.
+"
+
+page line width is 700
+page height is 900
+page left and right paddings is 6
+page top padding is 10
+page bottom padding is 6
+page lines top offset is 6
+
+measure
+treble clef
+1/4 c d e f
+measure
+1/4 g a b c5

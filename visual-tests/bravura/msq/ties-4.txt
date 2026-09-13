@@ -1,8 +1,0 @@
-1/2 a tied with next, with roundness 1
-1/8 a
-
-1/2 a tied with next, with roundness 5
-1/8 a
-
-1/2 a tied with next, with roundness 10
-1/8 a

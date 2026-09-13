@@ -1,9 +1,0 @@
-music font is leland
-
-measure
-sign
-treble clef
-a b d e
-measure
-measure
-measure

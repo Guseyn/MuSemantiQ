@@ -1,9 +1,0 @@
-music font is leland
-
-1 a is left by 1
-chord is left by 1
-a c
-
-1/8 a is right by 2
-chord is right by 2
-a c

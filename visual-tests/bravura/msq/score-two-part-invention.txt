@@ -1,0 +1,58 @@
+comment: "
+  A short two-voice keyboard piece. Both hands, a brace, a key signature and
+  a time signature restated on every line, slurs that cross the barline and
+  a tie into the final chord.
+"
+
+title is "Invention"
+composer is "after J. S. Bach"
+
+measure
+key signature is f major for each line
+time signature is 3:4 for each line
+brace from stave 1 to stave 2 for each line
+instrument title is "Piano" for stave 1
+stave with treble clef
+stave with bass clef
+
+measure
+stave
+tempo is "Andante"
+1/8 f beamed, g, a, b flat, c5, d5 not beamed
+stave
+1/4 f3 with pedal before
+1/4 a3
+1/4 c
+
+measure
+stave
+1/8 e5 beamed, f5, e5, d5, c5, b flat not beamed
+stave
+1/4 f3
+1/4 a3
+1/4 c with release
+
+slur in second measure from first unit to 6th unit
+
+new line
+measure
+stave
+1/4 a with dynamic "mp"
+1/2 g tied with next up
+stave
+1/4 c3 e3 g3
+
+measure
+stave
+1/2 g
+1/4 f with fermata up
+stave
+1/2 c3
+1/4 f3 with fermata up
+
+measure
+ends with double bold barline
+stave
+1 rest
+stave
+1 rest

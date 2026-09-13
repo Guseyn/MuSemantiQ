@@ -1,6 +1,0 @@
-stave
-a
-b is right by 4
-b
-b
-b

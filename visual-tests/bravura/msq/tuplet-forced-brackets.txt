@@ -1,8 +1,0 @@
-1/8 e flat beamed
-a flat
-a3 flat tied with next
-1/4 a3 tied with next
-1/8 a3 beamed b3 a3 not beamed
-
-tuplet 3 from unit 1 to unit 3
-tuplet 3 from unit 5 to unit 7 above stave

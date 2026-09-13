@@ -1,0 +1,24 @@
+comment: "
+  Ties inside chords, above and below, and across a barline.
+"
+
+measure
+treble clef
+1/2 chord tied with next up
+c e g
+
+1/2 chord
+c e g
+
+measure
+1/2 chord tied with next down, with stem down
+c5 e5 g5
+
+1/2 chord with stem down
+c5 e5 g5
+
+measure
+1/4 c tied with next up
+1/4 c tied with next up
+1/4 c tied with next up
+1/4 c

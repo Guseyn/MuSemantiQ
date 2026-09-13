@@ -1,0 +1,12 @@
+music font is leland
+
+comment: "
+  A glissando written on the unit it leaves or arrives at.
+"
+
+measure
+treble clef
+1/4 c5 with glissando after
+1/4 g
+1/4 c with glissando before up
+1/4 e

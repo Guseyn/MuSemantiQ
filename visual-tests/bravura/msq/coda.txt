@@ -1,6 +1,0 @@
-measure
-coda
-measure
-coda
-treble clef
-a b d

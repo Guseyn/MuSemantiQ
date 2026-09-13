@@ -1,0 +1,31 @@
+music font is leland
+
+comment: "
+  The sharp side of the circle of fifths, one measure per key, each opening
+  on its own tonic.
+"
+
+measure
+key signature is g major
+treble clef
+g a b
+measure
+key signature is d major
+d e f
+measure
+key signature is a major
+a b c5
+measure
+key signature is e major
+e f g
+
+new line
+measure
+key signature is b major
+b c5 d5
+measure
+key signature is f sharp major
+f g a
+measure
+key signature is c sharp major
+c d e

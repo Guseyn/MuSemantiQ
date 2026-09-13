@@ -1,6 +1,0 @@
-measure
-brace from stave 1 to stave 2 for each line
-stave
-stave
-new line
-new line

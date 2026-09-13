@@ -1,0 +1,18 @@
+music font is leland
+
+comment: "
+  A whole-measure note centred over the bar rather than sitting at its start.
+"
+
+measure
+stave with treble clef
+stave with bass clef
+
+measure
+stave
+voice
+1 a5 is centralized
+voice
+1/4 a b c5 a
+stave
+1 rest is centralized

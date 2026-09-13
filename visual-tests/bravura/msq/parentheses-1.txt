@@ -1,6 +1,0 @@
-a with parentheses
-
-comment: "
-  Instead of `parentheses` you can use `brackets`:
-  a with brackets
-"

@@ -1,0 +1,11 @@
+comment: "
+  A measure of silence, and several of them counted into one bar.
+"
+
+measure
+treble clef
+1/4 c d e f
+measure with measure rest
+measure with multi measure rest 8 times
+measure
+1/4 g a b c5

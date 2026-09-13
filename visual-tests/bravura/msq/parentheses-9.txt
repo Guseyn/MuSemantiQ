@@ -1,2 +1,0 @@
-chord with parentheses
-a b c

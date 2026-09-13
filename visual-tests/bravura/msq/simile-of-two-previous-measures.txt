@@ -1,7 +1,0 @@
-measure
-c d e
-measure
-d e f
-
-measure with simile of two previous measures 3 times
-measure

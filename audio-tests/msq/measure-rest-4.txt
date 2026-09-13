@@ -1,6 +1,0 @@
-time signature is 3:4
-c c c
-measure
-measure rest
-measure
-c c c

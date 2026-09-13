@@ -1,7 +1,0 @@
-measure
-metronome mark is "1 dotted, 1/2 with dot, 1/4 dotted, 1/8 with dot, 1/16 dotted, 1/32 with dot"
-c d e f
-
-comment: "
-  In this example, you can see all the supported note symbols.
-"

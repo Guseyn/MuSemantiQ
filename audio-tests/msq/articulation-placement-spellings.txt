@@ -1,0 +1,22 @@
+comment: "
+  Marks can be placed with `above` and `below` as well as with `up` and
+  `down`, and a trill or a dynamic can take a direction of its own.
+"
+
+measure
+treble clef
+1/4 a with stem down, with accent above
+1/4 b with stem up, with tenuto below
+1/2 c5 with trill above
+1/4 d5 with trill below
+measure
+1/4 e5 with dynamic "p" up
+1/4 f5 with dynamic "f" down
+1/4 g5 with dynamic "mf" above stave
+1/4 a5 with dynamic "mp" below stave
+measure
+1/4 chord with accent above
+c e g
+
+1/4 chord with dynamic "ff" below stave
+d f a

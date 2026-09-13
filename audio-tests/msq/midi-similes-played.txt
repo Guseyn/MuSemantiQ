@@ -1,0 +1,18 @@
+comment: "
+  A simile is played as the music it stands for, whether it repeats a unit,
+  a beat or a whole measure.
+"
+
+measure
+treble clef
+1/4 c
+c repeat 3 times
+measure
+1/8 d beamed, e, f not beamed
+1/8 g beamed, a, b not beamed
+measure
+1/4 c e g e
+measure
+simile of previous measure
+
+repeat of previous beat in measure 2 from unit 1 to unit 3

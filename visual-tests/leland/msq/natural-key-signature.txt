@@ -1,9 +1,0 @@
-music font is leland
-
-measure
-key signature is e flat major
-stave with treble clef
-stave with bass clef
-
-measure
-key signature is e flat major to c major

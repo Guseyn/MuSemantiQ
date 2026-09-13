@@ -1,5 +1,0 @@
-chord
-a b d with # key
-stave
-1 chord
-c with # key d

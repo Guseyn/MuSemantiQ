@@ -1,6 +1,0 @@
-music font is leland
-
-measure
-repetition note "Repetition note" 2 up
-
-comment: "We moved up repetition note on two intervals between stave lines"

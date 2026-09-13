@@ -1,0 +1,14 @@
+comment: "
+  A beat repeated, and a run of beats repeated, each drawn as a slash
+  through the measure.
+"
+
+measure
+treble clef
+1/8 d beamed, e, f
+measure
+1/8 d beamed, e, f not beamed
+g beamed, e, f
+
+repeat of previous beat in measure 1 from unit 1 to unit 3
+repeat of previous beats in measure 2 from unit 1 to unit 6

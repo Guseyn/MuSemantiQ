@@ -20,16 +20,25 @@ if (!workerImportMap) {
 
 // Source and output directories
 const srcDir = path.join(projectRoot, 'src')
-const outDir = path.join(
-  projectRoot,
-  'examples/browser/web-app/static/js/msq/worker'
-)
 
-// Create output directory
-if (fs.existsSync(outDir)) {
-  fs.rmSync(outDir, { recursive: true })
+/*
+Both browser apps run MuSemantiQ inside a module worker, where import maps do
+not apply, so each needs its own copy of src/ with the specifiers rewritten to
+real URLs. They get the same tree, written twice, so the watcher keeps both in
+step without knowing there is more than one.
+*/
+const outDirs = [
+  'examples/browser/web-app/static/js/msq/worker',
+  'dev-tools/web-app/static/js/msq/worker'
+].map((relative) => path.join(projectRoot, relative))
+
+// Create output directories
+for (const outDir of outDirs) {
+  if (fs.existsSync(outDir)) {
+    fs.rmSync(outDir, { recursive: true })
+  }
+  fs.mkdirSync(outDir, { recursive: true })
 }
-fs.mkdirSync(outDir, { recursive: true })
 
 /**
  * Build import map for resolution
@@ -135,9 +144,11 @@ function processDirectory(dir, outBaseDir) {
 }
 
 try {
-  processDirectory(srcDir, outDir)
+  for (const outDir of outDirs) {
+    processDirectory(srcDir, outDir)
+    console.log(`[create-msq-worker] Output: ${outDir}`)
+  }
   console.log(`[create-msq-worker] Successfully processed ${srcDir}`)
-  console.log(`[create-msq-worker] Output: ${outDir}`)
 } catch (error) {
   console.error('[create-msq-worker] Error:', error.message)
   process.exit(1)

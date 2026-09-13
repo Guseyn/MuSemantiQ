@@ -1,6 +1,0 @@
-music font is leland
-
-voice
-a5 repeat three times 2 up
-voice
-c repeat three times 2 down

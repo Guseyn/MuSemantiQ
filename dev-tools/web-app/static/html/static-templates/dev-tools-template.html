@@ -1,0 +1,37 @@
+<header is="e-header">
+  <span is="e-bold">MuSemantiQ dev tools</span>
+</header>
+
+<main is="e-main" data-centralized>
+  <div is="e-box" data-block-center data-default-main-width data-padding="xl">
+    <div is="e-row" data-justify-content="space-between" data-keep-flex-direction-row-in-mobile>
+      <div is="e-row" data-gap="md" data-keep-flex-direction-row-in-mobile>
+        <a is="e-link" data-underlined href="/html/font-viewer.html"
+           style="font-weight: ${window.location.pathname.endsWith('font-viewer.html') ? '700' : '400'}">
+          Font viewer
+        </a>
+        <a is="e-link" data-underlined href="/html/test-viewer.html"
+           style="font-weight: ${window.location.pathname.endsWith('test-viewer.html') ? '700' : '400'}">
+          Test viewer
+        </a>
+      </div>
+      <span is="e-muted" data-font-size="sm">
+        working tree · <span data-text="${window.location.host}"></span>
+      </span>
+    </div>
+
+    <hr is="e-divider">
+
+    <!-- the page's own content lands here -->
+  </div>
+</main>
+
+<footer is="e-footer" data-justify-content="center">
+  <span is="e-muted" data-font-size="sm">
+    These tools read and write files in the repository. Nothing here is served to anyone else.
+  </span>
+</footer>
+
+<e-toast data-type="success" data-position="top-right" data-hide-after-n-seconds="4"></e-toast>
+<e-toast data-type="error" data-position="top-right" data-hide-after-n-seconds="8"></e-toast>
+<e-confirm id="confirm"></e-confirm>

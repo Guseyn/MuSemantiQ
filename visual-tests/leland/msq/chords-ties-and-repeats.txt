@@ -1,0 +1,17 @@
+music font is leland
+
+comment: "
+  A chord tied into the next, and a chord repeated by a simile.
+"
+
+measure
+treble clef
+1/2 chord tied with next up with roundness 6
+c e g
+
+1/2 chord
+c e g
+
+measure
+1/4 chord repeat 3 times
+d f a

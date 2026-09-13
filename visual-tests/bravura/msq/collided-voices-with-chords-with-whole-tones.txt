@@ -1,9 +1,0 @@
-voice
-chord
-e5 f5 g5
-
-g5
-voice
-e5
-chord
-e5 f5 g5

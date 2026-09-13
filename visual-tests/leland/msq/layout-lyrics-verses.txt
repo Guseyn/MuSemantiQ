@@ -1,0 +1,17 @@
+music font is leland
+
+comment: "
+  Two verses under one line, with syllables, melismas and a word held by an
+  underscore, and a vertical nudge on the second verse.
+"
+
+measure
+treble clef
+1/4 c with lyrics "Hark" followed by dash, with lyrics "See" followed by dash 1 down
+1/4 d with lyrics "the" , with lyrics "how" 1 down
+1/4 e with lyrics "her" where underscore starts, with lyrics "they" 1 down
+1/4 f with lyrics "run" 1 down
+measure
+1/4 g
+1/4 a with lyrics "ald" where underscore ends
+1/2 b with lyrics "sing" , with lyrics "now" 1 down

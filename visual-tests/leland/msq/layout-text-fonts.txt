@@ -1,0 +1,17 @@
+music font is leland
+
+comment: "
+  The text and chord-letter faces can be chosen separately from the music font.
+"
+
+text font is noto-sans
+chord letters font is gothic a1
+
+title is "Other faces"
+
+measure
+treble clef
+1/4 c with chord "Cmaj7"
+1/4 d with chord "Dm7"
+1/4 g with chord "G7"
+1/4 c with chord "C6"

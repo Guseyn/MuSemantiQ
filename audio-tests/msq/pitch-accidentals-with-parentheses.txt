@@ -1,0 +1,10 @@
+comment: "
+  A cautionary accidental is written with parentheses around the sign.
+"
+
+measure
+treble clef
+f sharp
+g
+f sharp with parentheses
+g

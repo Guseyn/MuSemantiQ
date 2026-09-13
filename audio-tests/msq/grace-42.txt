@@ -1,7 +1,0 @@
-tempo is "1/4 = 50"
-
-a is tied with next, is grace
-a is tied with next, is grace, repeat 3 times
-new line
-a is tied with next, is grace
-a, is grace, repeat 3 times

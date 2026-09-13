@@ -1,0 +1,10 @@
+comment: "
+  Both at once, before the same unit.
+"
+
+measure
+key signature is g major
+treble clef
+g a
+d3 with bass clef and key signature f major before
+c3

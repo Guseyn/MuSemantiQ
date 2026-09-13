@@ -1,6 +1,0 @@
-tempo is "1/4 = 50"
-
-c5 is grace, with key signature a major before
-c5
-c5 is grace, with natural key
-c5

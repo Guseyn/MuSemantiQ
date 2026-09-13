@@ -1,6 +1,0 @@
-treble clef
-c
-c with bass clef before
-c with treble clef before
-c is octave up
-c with bass clef before, is octave up

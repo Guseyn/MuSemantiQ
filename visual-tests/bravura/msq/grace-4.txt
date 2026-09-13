@@ -1,5 +1,0 @@
-chord is grace
-f c5 a5
-
-chord grace
-g d5 b5

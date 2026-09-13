@@ -1,0 +1,9 @@
+comment: "
+  Several marks on one note, which stack outward from the stave.
+"
+
+measure
+treble clef
+1/4 a with staccato up, with accent up
+1/4 b with tenuto up, with marcato up
+1/2 c5 with fermata up, with accent up

@@ -1,7 +1,0 @@
-1/4 a with tremolo with next, 
-voice
-c
-measure
-b b
-voice
-c

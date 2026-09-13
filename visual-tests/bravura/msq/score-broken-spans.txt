@@ -1,0 +1,25 @@
+comment: "
+  A single long line with no explicit page break. The page width forces the
+  wrap, so the slurs and the octave sign are cut in two and each half has to
+  be drawn with its own open end.
+"
+
+page line width is 320
+
+measure
+treble clef
+1/8 c beamed, d, e, f, g, a, b, c5 not beamed
+measure
+1/8 d5 beamed, e5, f5, g5, a5, b5, c5, d5 not beamed
+measure
+1/8 c5 beamed, b, a, g, f, e, d, c not beamed
+measure
+1 c
+
+slur in first measure from first unit to 8th unit
+slur in second measure from first unit to 8th unit
+slur in third measure from first unit to 8th unit
+
+octave up
+from first unit in second measure
+to 8th unit in second measure

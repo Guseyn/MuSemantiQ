@@ -1,0 +1,26 @@
+music font is leland
+
+comment: "
+  Three staves in one system, and a measure where one of them falls silent.
+"
+
+measure
+stave with treble clef
+stave with alto clef
+stave with bass clef
+
+measure
+stave
+1/4 c5 d5 e5 f5
+stave
+1/4 c d e f
+stave
+1/4 c3 d3 e3 f3
+
+measure
+stave
+1 g5
+stave
+1 rest
+stave
+1 g3

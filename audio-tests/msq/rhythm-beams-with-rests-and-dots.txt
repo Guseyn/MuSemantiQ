@@ -1,0 +1,13 @@
+comment: "
+  Dotted values under a beam, and beamed groups on either side of a rest.
+"
+
+measure
+treble clef
+1/8 c dotted beamed, 1/16 d, 1/8 e dotted, 1/16 f not beamed
+1/4 rest
+1/8 g dotted beamed, 1/16 a not beamed
+measure
+1/16 b beamed, c5, 1/8 d5 dotted, 1/32 e5, f5 not beamed
+1/4 rest
+1/4 g5

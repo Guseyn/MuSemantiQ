@@ -1,0 +1,15 @@
+comment: "
+  Accidentals on notes close enough together that their signs have to be
+  stacked into columns rather than sitting in one line.
+"
+
+measure
+treble clef
+chord
+c sharp, e flat, g sharp, b flat
+
+chord
+c sharp, d sharp, e sharp, f sharp
+
+chord
+c flat, e flat, g flat, b double flat

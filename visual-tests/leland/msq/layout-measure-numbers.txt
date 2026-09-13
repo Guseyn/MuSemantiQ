@@ -1,0 +1,20 @@
+music font is leland
+
+comment: "
+  Measure numbers over the first measure of each line, over all of them, and
+  below the stave instead of above.
+"
+
+measure numbers for first measures
+
+new line
+measure
+treble clef
+1/4 c d e f
+measure
+1/4 g a b c5
+new line
+measure
+1/4 c5 b a g
+measure
+1/4 f e d c

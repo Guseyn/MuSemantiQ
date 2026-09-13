@@ -1,0 +1,23 @@
+comment: "
+  A dynamic sets how hard a note is struck, and a hairpin moves it between
+  two markings note by note.
+"
+
+measure
+treble clef
+1/4 c with dynamic "pp"
+1/4 d with dynamic "p"
+1/4 e with dynamic "mf"
+1/4 f with dynamic "ff"
+measure
+1/4 g a b c5
+measure
+1/4 c5 b a g
+
+crescendo in second measure
+starts with "pp" at first unit
+finishes with "ff" at fourth unit
+
+diminuendo in third measure
+starts with "ff" at first unit
+finishes with "pp" at fourth unit

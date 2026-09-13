@@ -1,2 +1,0 @@
-tempo is "1/4 = 50"
-a is grace, repeat 5 times

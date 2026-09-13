@@ -1,8 +1,0 @@
-stretch units by 5 times
-
-4 a2
-4 a6
-4 a2
-
-glissando from note 1 to note 2
-glissando from note 2 to note 3

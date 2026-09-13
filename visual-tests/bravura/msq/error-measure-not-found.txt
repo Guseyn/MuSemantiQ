@@ -1,0 +1,13 @@
+comment: "
+  A volta reaching past the last measure, and one whose endpoint names no
+  measure.
+"
+
+measure
+a b c5
+measure
+a b c5
+
+volta with text "1." from first measure to 5th measure
+
+volta with text "2." starts at

@@ -1,0 +1,17 @@
+music font is leland
+
+comment: "
+  One wave spanning both hands, which is written on the upper chord.
+"
+
+measure
+stave with treble clef
+stave with bass clef
+
+measure
+stave
+chord is arpeggiated with chord below
+c5 e5 g5
+stave
+chord is arpeggiated
+c3 g3 c

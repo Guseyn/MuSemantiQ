@@ -1,9 +1,0 @@
-measure
-tempo is "1/4 = 120"
-1/8 a b c d e f
-measure
-tempo is "accelerando"
-1/8 a b c d e f a b c d e f a b c d e f a b
-measure
-tempo is "allargando"
-1/8 a b c d e f a b c d e f a b c d e f a b

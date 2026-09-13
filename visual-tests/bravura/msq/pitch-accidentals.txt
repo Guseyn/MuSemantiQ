@@ -1,0 +1,19 @@
+comment: "
+  Every accidental the language knows, including the quarter-tone ones.
+  Written as a rising line so each sign is read against the one before it.
+"
+
+measure
+treble clef
+a flat
+a natural
+a sharp
+measure
+a double flat
+a double sharp
+measure
+a demiflat
+a demisharp
+measure
+a sesquiflat
+a sesquisharp

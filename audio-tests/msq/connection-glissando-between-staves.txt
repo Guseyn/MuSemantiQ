@@ -1,0 +1,34 @@
+comment: "
+  As its own command a glissando names both ends, so it can cross staves and
+  measures, and can be drawn as a wave or as a straight line.
+"
+
+measure
+stave
+a
+stave
+rest
+measure
+stave
+rest
+stave
+a
+
+measure
+stave
+a
+stave
+rest
+measure
+stave
+rest
+stave
+a
+
+glissando as line
+from first unit in first measure on first stave
+to first unit in second measure on second stave
+
+glissando as wave
+from first unit in third measure on first stave
+to first unit in fourth measure on second stave

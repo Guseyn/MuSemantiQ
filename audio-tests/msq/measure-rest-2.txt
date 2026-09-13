@@ -1,6 +1,0 @@
-measure
-c c c
-measure
-measure rest
-measure
-c c c

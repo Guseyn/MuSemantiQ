@@ -1,0 +1,11 @@
+title is "Prelude"
+subtitle is "from the First Book"
+composer is "J. S. Bach"
+right subtitle is "1722"
+page number is "1"
+
+measure
+treble clef
+1/4 c e g c5
+measure
+1/4 b g d b3

@@ -1,9 +1,0 @@
-font color is black
-
-octave 8 up clef
-measure
-octave 8 down clef
-measure
-octave fifteen up clef
-measure
-octave fifteen down clef

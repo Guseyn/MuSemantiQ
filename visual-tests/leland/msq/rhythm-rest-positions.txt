@@ -1,0 +1,26 @@
+music font is leland
+
+comment: "
+  A rest can be placed high or low on the stave, which is what two voices
+  sharing one stave need so their rests do not collide. It can also be
+  pinned to the line a named note would sit on.
+"
+
+measure
+treble clef
+voice
+1/4 top rest
+a
+1/4 top rest
+b
+voice
+1/4 bottom rest
+c
+1/4 bottom rest
+d
+
+measure
+1/4 middle rest
+1/4 rest
+1/4 g is rest
+1/4 e is rest

@@ -1,5 +1,0 @@
-1/2 chord with 2 dots
-c d e f g a b c5 d5 e5 f5 g5 a5 b5
-
-1/2 chord with 2 dots, with stem down
-c d e f g a b c5 d5 e5 f5 g5 a5 b5

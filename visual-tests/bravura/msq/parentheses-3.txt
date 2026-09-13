@@ -1,2 +1,0 @@
-chord with parentheses from note 1 to note 2
-c e g b

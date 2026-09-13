@@ -1,2 +1,0 @@
-chord  repeat 3 times
-a b c

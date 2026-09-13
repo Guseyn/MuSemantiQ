@@ -1,6 +1,0 @@
-measure
-a d f g
-measure
-a d f g
-
-slur from first note in first measure to fourth unit in second measure

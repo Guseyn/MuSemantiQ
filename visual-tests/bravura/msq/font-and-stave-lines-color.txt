@@ -1,4 +1,0 @@
-font color is #36454F
-stave lines color is #36454F
-
-c d e f g a b

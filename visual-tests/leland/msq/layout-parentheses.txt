@@ -1,0 +1,17 @@
+music font is leland
+
+comment: "
+  Parentheses around a whole chord, around one note of it, and around a
+  range within it.
+"
+
+measure
+treble clef
+chord with parentheses
+c e g
+
+chord
+c, e, g with parentheses, b
+
+chord with parentheses from second note to third note
+c e g b

@@ -1,0 +1,27 @@
+music font is leland
+
+comment: "
+  The arpeggio wave is drawn as tall as the chord it spans, so chords of
+  different reach give waves of different length.
+"
+
+measure
+treble clef
+chord is arpeggiated
+c e
+
+chord is arpeggiated
+c e g
+
+chord is arpeggiated
+c e g c5
+
+chord is arpeggiated
+c e g c5 e5 g5
+
+measure
+chord is arpeggiated with arrow up
+c e g c5 e5 g5 c
+
+chord is arpeggiated with arrow down
+c3 g3 e g c5 e5

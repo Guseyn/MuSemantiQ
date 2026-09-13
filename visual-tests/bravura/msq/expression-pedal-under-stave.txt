@@ -1,0 +1,16 @@
+comment: "
+  In a two-stave score the pedal line belongs under the lower stave.
+"
+
+measure
+stave with treble clef
+stave with bass clef
+
+measure
+stave
+1/4 c5 e5 g5 e5
+stave
+1/4 c3 with pedal before under second stave
+g3
+1/4 c3
+g3 with release

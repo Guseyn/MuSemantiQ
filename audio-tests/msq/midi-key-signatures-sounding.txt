@@ -1,0 +1,16 @@
+comment: "
+  A key signature raises or lowers every note it covers, and a mid-measure
+  change takes effect from the unit it precedes.
+"
+
+measure
+key signature is e major
+treble clef
+1/4 c d e f
+measure
+1/4 g a
+1/4 b with key signature f major before
+1/4 c5
+measure
+key signature is f major to c major
+1/4 c d e f

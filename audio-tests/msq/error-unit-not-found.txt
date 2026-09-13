@@ -1,0 +1,7 @@
+comment: "
+  A slur pointing past the last unit of the measure. The endpoint cannot be
+  resolved, so the slur is dropped and the reach is reported.
+"
+
+a b a b a
+slur from unit 1 to unit 6

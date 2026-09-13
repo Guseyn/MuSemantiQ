@@ -1,0 +1,23 @@
+comment: "
+  An instrument named for a later page line replaces the one before it, so
+  the same stave changes voice part way through.
+"
+
+measure
+instrument title is "Flute" for stave 1
+stave with treble clef
+stave with bass clef
+
+measure
+stave
+1/4 c5 d5 e5 f5
+stave
+1/4 c3 d3 e3 f3
+
+new line
+measure
+instrument title is "Clarinet" for stave 1
+stave
+1/4 g5 a5 b5 c5
+stave
+1/4 g3 a3 b3 c3

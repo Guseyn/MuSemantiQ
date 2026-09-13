@@ -1,0 +1,28 @@
+comment: "
+  A keyboard texture where both hands share a beamed group, chords cross the
+  brace, and the stems have to reach between the staves.
+"
+
+measure
+brace from stave 1 to stave 2
+stave with treble clef
+stave with bass clef
+
+measure
+stave
+1/16 c5 beamed, g, e, c, g3 on next stave, e3 on next stave,
+c3 on next stave, g3 on next stave,
+c on current stave, e, g, c5, e5, g5, e5, c5 not beamed
+stave
+
+measure
+stave
+chord
+c3 on next stave, g3 on next stave, c, e, g, c5
+stave
+
+measure
+stave
+stave
+chord
+c3, e3, g3, c on previous stave, e on previous stave

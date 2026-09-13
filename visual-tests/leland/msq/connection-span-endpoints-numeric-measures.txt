@@ -1,0 +1,30 @@
+music font is leland
+
+comment: "
+  Endpoints naming their measure by number, and tuplet brackets opening
+  before and closing after the units they name.
+"
+
+measure
+treble clef
+1/8 c beamed, d, e, f not beamed
+measure
+1/8 g beamed, a, b, c5 not beamed
+
+slur
+starts at unit 1 in measure 1
+finishes at unit 4 in measure 2
+
+glissando
+starts at unit 4 in measure 1
+finishes at unit 1 in measure 2
+
+crescendo
+starts with "p" at unit 1 in measure 1
+finishes with "f" at unit 4 in measure 2
+
+tuplet 3 in measure 2
+starts before first unit
+finishes after third unit
+
+repeat of previous beat on first line in measure 1 from unit 1 to unit 2

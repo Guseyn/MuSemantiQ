@@ -1,5 +1,0 @@
-music font is leland
-
-page number bottom offset is 8
-
-page number is "4"

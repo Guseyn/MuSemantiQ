@@ -1,0 +1,11 @@
+comment: "
+  A beam runs until something stops it. The first unit opens the group and
+  the last one closes it.
+"
+
+measure
+treble clef
+1/8 c beamed, d, e, f not beamed
+1/8 g beamed, a, b, c5 not beamed
+measure
+1/16 c5 beamed, b, a, g, f, e, d, c not beamed

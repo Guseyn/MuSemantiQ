@@ -1,8 +1,0 @@
-music font is leland
-
-a with turn with sharp key above
-a with turn with sharp key below
-a with turn with flat key above
-a with turn with flat key below
-a with turn with natural key above
-a with turn with natural key below

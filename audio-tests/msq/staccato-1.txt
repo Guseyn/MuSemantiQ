@@ -1,8 +1,0 @@
-instrument title is "Violin"
-
-a
-a with staccato
-a
-a with staccato
-a
-a with staccato

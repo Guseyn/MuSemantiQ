@@ -1,0 +1,19 @@
+comment: "
+  The marks that tell a player where to jump: a segno, a coda, and the words
+  that name the jump.
+"
+
+measure
+sign at the start of the measure
+treble clef
+1/4 c d e f
+measure
+coda at the end of the measure
+1/4 g a b c5
+measure
+repetition note "D.S. al Coda" at the end of the measure
+1/4 c5 b a g
+measure
+sign 1 up
+repetition note "Fine" at the start of the measure 2 up
+1/4 f e d c

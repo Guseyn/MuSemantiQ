@@ -9,9 +9,18 @@
     "src/language/lib",
     "src/midi/lib",
     "src/language/parser/scenarios/string/*",
-    "src/worker.js/*",
     "src/drawer/generateUnicodePoints.js",
-    "src/drawer/font-urls.js"
+    "src/drawer/font-urls.js",
+
+    "src/drawer/font/**",
+    "src/tools/**",
+
+    "src/worker.js",
+    "src/utils.js",
+    "src/midi/base64FromUint8.js",
+
+    "src/drawer/elements/basic/animatedSvgString.js",
+    "src/language/schema/**"
   ],
   "reporter": [
     "text",

@@ -1,0 +1,14 @@
+comment: "
+  Grace notes, beamed together and slurred into the note they decorate.
+  A crushed grace carries the slash through its stem.
+"
+
+measure
+treble clef
+1/8 g is grace, beamed with next, with stem up
+a is grace
+1/4 b
+1/8 c5 is crushed grace, with stem up
+1/4 d5
+
+slur from first unit to third unit

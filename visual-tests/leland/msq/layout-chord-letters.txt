@@ -1,0 +1,18 @@
+music font is leland
+
+comment: "
+  Chord symbols above the stave, with the raised and lowered figures the
+  notation uses.
+"
+
+measure
+treble clef
+1/4 c with chord "C"
+1/4 e with chord "C^9"
+1/4 g with chord "C^halfdim13"
+1/4 c5 with chord "C/F^sharp"
+measure
+1/4 d with chord "A^flat/C"
+1/4 f with chord "Dm7" 1 up
+1/4 a with chord "G7" below measure
+1/4 c5 with chord "Cmaj7"

@@ -1,0 +1,24 @@
+music font is leland
+
+comment: "
+  A line that crosses from one hand to the other, with its beam spanning
+  both staves. A note says which stave it belongs to; the setting holds
+  until another one is given.
+"
+
+measure
+brace from stave 1 to stave 2
+stave with treble clef
+stave with bass clef
+
+measure
+stave
+1/8 c5 beamed, g, e, c on next stave, g3 on next stave, e3 on next stave,
+c3 on next stave, g3 on next stave not beamed
+stave
+
+measure
+stave
+1/8 c3 on next stave beamed, e3 on next stave, g3 on next stave,
+c on current stave, e, g, c5, e5 not beamed
+stave

@@ -1,0 +1,33 @@
+music font is leland
+
+comment: "
+  An octave sign on a single unit, and as a bracket over a passage, one and
+  two octaves, up and down.
+"
+
+measure
+treble clef
+1/4 c5 is octave up
+1/4 d5 is two octaves up
+1/4 c is octave down
+1/4 c is two octaves down
+
+new line
+measure
+1/4 c5 d5 e5
+measure
+1/4 f5 g5 a5
+
+octave up on second line
+from first unit in first measure
+to third unit in second measure
+
+new line
+measure
+1/4 c d e
+measure
+1/4 f g a
+
+two octaves lower on third line 1 down
+from first unit in first measure
+to third unit in second measure

@@ -1,0 +1,22 @@
+music font is leland
+
+comment: "
+  The dynamics that mark a single note rather than a passage.
+"
+
+measure
+treble clef
+1/4 a with dynamic "fp"
+b with dynamic "fz"
+c5 with dynamic "sf"
+d5 with dynamic "sfp"
+measure
+1/4 e5 with dynamic "sfpp"
+f5 with dynamic "sfz"
+g5 with dynamic "sfzp"
+a5 with dynamic "sffz"
+measure
+1/4 b5 with dynamic "rf"
+a5 with dynamic "rfz"
+g5 with dynamic "z"
+f5 with dynamic "s"

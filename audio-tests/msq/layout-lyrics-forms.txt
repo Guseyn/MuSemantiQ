@@ -1,0 +1,21 @@
+comment: "
+  Lyrics in every form the language writes them: plain syllables, dashes
+  between them, an underscore holding a word over several notes, a syllable
+  with no text carrying only the underscore, and a nudge.
+"
+
+measure
+treble clef
+1/4 c with lyrics "A"
+1/4 d with lyrics "men" followed by dash
+1/4 e with lyrics "a" followed by dash
+1/4 f with lyrics "men"
+measure
+1/4 g with lyrics "glo" where underscore starts
+1/4 a
+1/4 b
+1/4 c5 with lyrics "ri" where underscore ends
+measure
+1/4 d5 with lyrics "a" 1 down
+1/4 e5 with lyrics "in" 2 down
+1/2 f5 with lyrics "deo"

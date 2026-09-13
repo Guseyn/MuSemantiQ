@@ -1,0 +1,19 @@
+music font is leland
+
+comment: "
+  A line of text under the notes: syllables joined by a dash, a word held
+  over several notes by an underscore, and a second verse beneath the first.
+"
+
+measure
+treble clef
+1/4 c with lyrics "Glo" followed by dash
+1/4 d with lyrics "ri"  followed by dash
+1/4 e with lyrics "a"
+1/4 f with lyrics "in" where underscore starts
+measure
+1/4 g
+1/4 a with lyrics "ex" where underscore ends
+1/2 b with lyrics "cel" followed by dash
+measure
+1 c5 with lyrics "sis"

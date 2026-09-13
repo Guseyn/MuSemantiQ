@@ -1,0 +1,11 @@
+comment: "
+  A tempo as plain words, and lifted clear of the notes below it.
+"
+
+measure
+tempo is "Allegro"
+treble clef
+1/4 c d e f
+measure
+tempo is "Meno mosso" 2 up
+1/4 g a b c5

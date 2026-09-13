@@ -1,5 +1,0 @@
-1/4 c c c c
-measure
-measure rest
-measure
-1/4 c c c c

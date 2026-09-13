@@ -1,0 +1,19 @@
+music font is leland
+
+comment: "
+  A tie holds one pitch across a barline and across a chord.
+"
+
+measure
+treble clef
+1/2 c tied with next up
+1/2 e
+measure
+1/2 c tied with next down, with stem down
+1/2 c
+measure
+1/2 chord tied with next up
+c e g
+
+1/2 chord
+c e g

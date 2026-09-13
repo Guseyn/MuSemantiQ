@@ -1,7 +1,0 @@
-new line
-key signature is f sharp major for each line
-treble clef
-a
-a with bass clef before
-new line
-a

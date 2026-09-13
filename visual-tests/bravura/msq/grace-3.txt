@@ -1,7 +1,0 @@
-1/8 a is grace, beamed with next, stem down
-b is grace
-c5 is grace
-d5 is grace
-
-slur with roundness 5
-from first unit to fourth unit

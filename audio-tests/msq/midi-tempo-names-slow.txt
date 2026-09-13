@@ -1,0 +1,36 @@
+comment: "
+  The slow end of the tempo vocabulary. Each name sets an absolute speed for
+  the measure it opens.
+"
+
+measure
+tempo is "Larghissimo"
+treble clef
+1/4 c d e f
+measure
+tempo is "Grave"
+1/4 g a b c5
+measure
+tempo is "Solenne"
+1/4 c d e f
+measure
+tempo is "Lento"
+1/4 g a b c5
+measure
+tempo is "Lentissimo"
+1/4 c d e f
+measure
+tempo is "Largo"
+1/4 g a b c5
+measure
+tempo is "Larghetto"
+1/4 c d e f
+measure
+tempo is "Adagio"
+1/4 g a b c5
+measure
+tempo is "Adagietto"
+1/4 c d e f
+measure
+tempo is "Tranquillo"
+1/4 g a b c5

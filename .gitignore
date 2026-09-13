@@ -149,3 +149,20 @@ examples/browser/web-app/static/sf/*
 !examples/browser/web-app/static/sf/.gitinfo
 examples/browser/web-app/static/magenta-sf/*
 !examples/browser/web-app/static/magenta-sf/.gitinfo
+
+# Everything under dev-tools/ that a command rebuilds. `npm run dev-tools` runs
+# all of them before starting the server, so a clone needs none of it tracked:
+#
+#   nodes/            npm run dev-tools:nodes:update   (from ../nodes.js)
+#   js/ehtml/         npm run dev-tools:ehtml:update   (from ../EHTML)
+#   js/e-ui/, e-ui.css  npm run dev-tools:eui:update   (from ../e-ui)
+#   js/msq/           npm run dev-tools:msq:update + create:msq:worker (from src/)
+#   font/             npm run setup:symlinks
+#
+# Only the app itself — its pages, its api and its config — is tracked.
+dev-tools/nodes/
+dev-tools/web-app/static/js/ehtml/
+dev-tools/web-app/static/js/e-ui/
+dev-tools/web-app/static/js/msq/
+dev-tools/web-app/static/css/e-ui.css
+dev-tools/web-app/static/font/

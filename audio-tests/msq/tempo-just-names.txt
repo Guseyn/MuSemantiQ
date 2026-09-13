@@ -1,6 +1,0 @@
-measure
-tempo is "Larghissimo"
-c d e f
-measure
-tempo is "Andantino"
-g a b c5

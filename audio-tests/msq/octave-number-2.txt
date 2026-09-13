@@ -1,4 +1,0 @@
-treble clef
-c d e f g a b c5
-bass clef
-c d e f g a b c3

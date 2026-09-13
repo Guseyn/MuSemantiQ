@@ -1,5 +1,0 @@
-a with dynamic "p"
-a with dynamic "m"
-a with dynamic "f"
-a with dynamic "r"
-a with dynamic "z"

@@ -1,0 +1,25 @@
+comment: "
+  Every way a simile can stand for what came before it.
+"
+
+measure
+treble clef
+1/4 c e g e
+measure
+simile of previous measure
+measure
+1/4 d f a f
+measure
+1/4 e g b g
+measure
+simile of two previous measures
+
+new line
+measure
+1/4 c
+c repeat 3 times
+measure
+1/8 d beamed, e, f not beamed
+1/8 g beamed, a, b not beamed
+
+repeat of previous beat on second line in measure 2 from unit 1 to unit 3

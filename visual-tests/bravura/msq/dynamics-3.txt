@@ -1,4 +1,0 @@
-a with dynamic "p" above stave 
-a with dynamic "mp" below stave
-a with dynamic "mf" above stave
-a with dynamic "f" below stave

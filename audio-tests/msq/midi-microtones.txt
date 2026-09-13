@@ -1,0 +1,15 @@
+comment: "
+  Quarter-tone accidentals bend the pitch between the semitones.
+"
+
+measure
+treble clef
+1/4 a
+1/4 a demisharp
+1/4 a sharp
+1/4 a sesquisharp
+measure
+1/4 b
+1/4 b demiflat
+1/4 b flat
+1/4 b sesquiflat

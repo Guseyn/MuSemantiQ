@@ -1,0 +1,16 @@
+music font is leland
+
+comment: "
+  A slur can be told which units to pass over on its way, above or below
+  each of them, which is how a long phrase mark is shaped.
+"
+
+measure
+treble clef
+1/8 c beamed, e, g, c5, g, e, c, e not beamed
+
+slur in measure 1 on stave 1
+starts below unit 1
+goes through above unit 4
+goes through below unit 6
+finishes at unit 8

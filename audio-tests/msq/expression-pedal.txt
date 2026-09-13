@@ -1,0 +1,12 @@
+comment: "
+  A pedal held under a phrase and released at the end of it, written before
+  the unit it starts on.
+"
+
+measure
+treble clef
+1/4 c with pedal before
+e g c5
+measure
+1/4 b g e
+1/4 c with release

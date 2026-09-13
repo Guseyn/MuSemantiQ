@@ -1,8 +1,0 @@
-new line
-a d f g
-
-new line
-a d f g
-
-slur on first line from first unit to fourth unit
-slur on second line from first unit to fourth unit

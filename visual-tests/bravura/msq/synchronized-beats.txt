@@ -1,8 +1,0 @@
-stave
-d e f
-stave
-d e f
-g f e
-d e f
-
-repeat of prev. beat in first stave from first unit to third unit two times

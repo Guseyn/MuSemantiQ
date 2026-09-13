@@ -1,9 +1,0 @@
-a with dynamic "p" above stave 1 up
-a with dynamic "mp" below stave 1 down
-a with dynamic "mf" above stave 1 up
-a with dynamic "f" below stave 1 down
-
-comment: "
-  `1 up` moves dynamic mark on one interval between stave lines up;
-  `1 down` moves dynamic mark on one interval between stave lines down;
-"

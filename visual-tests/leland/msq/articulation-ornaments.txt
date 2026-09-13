@@ -1,0 +1,16 @@
+music font is leland
+
+comment: "
+  The three ornaments, plain and inverted, with a trill carrying its wave.
+"
+
+measure
+treble clef
+1/4 a with trill
+1/2 b with trill with wave after
+1/4 c5 with mordent
+measure
+1/4 d5 with mordent inverted
+1/4 e5 with turn
+1/4 f5 with turn inverted
+1/4 g5 with turn after

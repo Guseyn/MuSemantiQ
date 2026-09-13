@@ -1,0 +1,14 @@
+music font is leland
+
+comment: "
+  Mixed values under one beam, where the shorter notes carry extra lines
+  that stop and start inside the group.
+"
+
+measure
+treble clef
+1/8 c beamed, 1/16 d, e, 1/8 f, 1/16 g, a, 1/8 b, c5 not beamed
+measure
+1/16 c5 beamed, 1/8 b, 1/16 a, 1/32 g, f, 1/16 e, 1/8 d, 1/16 c not beamed
+measure
+1/8 c beamed, 1/16 d, 1/32 e, 1/64 f, 1/64 g, 1/32 a, 1/16 b, 1/8 c5 not beamed

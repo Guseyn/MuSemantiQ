@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test viewer · MuSemantiQ dev tools</title>
+  <link rel="preload" href="/html/static-templates/dev-tools-template.html" as="fetch" crossorigin="anonymous">
+  <link rel="stylesheet" href="/css/e-ui.css">
+  <link rel="stylesheet" href="/css/dev-tools.css">
+  <script type="importmap">
+    {
+      "imports": {
+        "#ehtml/": "/js/ehtml/",
+        "#ehtml/main": "/js/ehtml/main.js",
+        "#e-ui/": "/js/e-ui/",
+        "#msq/": "/js/msq/"
+      }
+    }
+  </script>
+  <script type="module">
+    import '#e-ui/e-tab.js'
+    import '#e-ui/e-dialog.js'
+    import '#e-ui/e-confirm.js'
+    import '#e-ui/e-toast.js'
+    import '#ehtml/main'
+  </script>
+  <script src="/js/app.js"></script>
+  <style>
+    /*
+    The two panes sit in a row, each asking for the full width and allowed to
+    shrink, so they settle at half each and scroll on their own. Comparing two
+    tall scores therefore never grows the page. An e-row centres its children by
+    default; these should line up at the top.
+    */
+    div[is="e-row"][data-sides] { align-items: flex-start; }
+    [data-side] { min-width: 0; display: flex; flex-direction: column; }
+    /*
+    A score is drawn at the size it was engraved rather than squeezed into half
+    a pane, so the detail being compared is actually readable, and the box it
+    sits in scrolls both ways. The minimum height is what stops a short example
+    giving you a letterbox to peer through.
+    */
+    [data-scrolls] {
+      min-height: 60vh;
+      max-height: 78vh;
+      margin-top: var(--e-spacing-sm);
+    }
+    [data-score] { background: #fff; border-radius: var(--e-radius-md); }
+    [data-side] img { display: block; max-width: none; }
+    [data-sounds] { margin-top: var(--e-spacing-sm); }
+    [data-side] pre {
+      white-space: pre-wrap; word-break: break-word;
+      font-size: 11px; line-height: 1.45; margin: 0;
+    }
+    [data-artifact-list] { display: flex; flex-wrap: wrap; gap: var(--e-spacing-xs); }
+    [data-artifact-list] button[data-current="true"] { outline: 2px solid var(--e-primary); }
+  </style>
+</head>
+<body>
+  <template
+    is="e-wrapper"
+    data-src="/html/static-templates/dev-tools-template.html"
+    data-where-to-place="main > div"
+    data-how-to-place="inside">
+
+    <h1 is="e-h">Test viewer</h1>
+    <p is="e-p">
+      <span is="e-muted">
+        Pick a test, compare what the last run produced against the committed baseline,
+        and adopt the new one when it is the output you meant.
+      </span>
+    </p>
+
+    <div is="e-card" data-width="full" data-padding="md" data-margin-top="md" data-fields>
+      <label>
+        Test
+        <select id="test" is="searchable-select" data-placeholder="Search tests…"></select>
+      </label>
+    </div>
+
+    <e-tabs id="suites" data-apply-hash-navigation data-margin-top="md">
+      <e-tab data-title="Visual"></e-tab>
+      <e-tab data-title="Audio"></e-tab>
+    </e-tabs>
+
+    <div id="viewer" data-margin-top="lg"></div>
+
+  </template>
+
+<script type="module" src="/js/test-viewer.js"></script>
+</body>
+</html>

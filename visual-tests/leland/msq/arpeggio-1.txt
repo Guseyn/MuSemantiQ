@@ -1,7 +1,0 @@
-music font is leland
-
-chord is arpeggiated
-c e g b
-
-chord is arpeggio
-c e g b

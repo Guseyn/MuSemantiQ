@@ -1,0 +1,17 @@
+music font is leland
+
+comment: "
+  How tightly the units of a line are packed, tightened on one line and
+  loosened on the next.
+"
+
+compress units by 1.2 times in line 1
+stretch units by 1.3 times in line 2
+
+new line
+measure
+treble clef
+1/8 c beamed, d, e, f, g, a, b, c5 not beamed
+new line
+measure
+1/8 c5 beamed, b, a, g, f, e, d, c not beamed

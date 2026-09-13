@@ -1,0 +1,11 @@
+music font is leland
+
+measure
+treble clef
+1/4 c
+
+comment: "a comment can interrupt a voice without ending it"
+
+1/4 d
+1/4 e
+1/4 f

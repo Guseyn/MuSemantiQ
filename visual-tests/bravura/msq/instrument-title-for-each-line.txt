@@ -1,5 +1,0 @@
-instrument "Piano" between first stave and second stave for each line
-stave
-stave
-new line
-new line

@@ -1,8 +1,0 @@
-stave
-chord on next stave
-c d e
-chord on current stave
-f g a
-chord
-b c5 d5
-stave

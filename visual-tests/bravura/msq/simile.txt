@@ -1,6 +1,0 @@
-a repeat three times
-
-comment: "
-  You can also type:
-  a simile three times
-"

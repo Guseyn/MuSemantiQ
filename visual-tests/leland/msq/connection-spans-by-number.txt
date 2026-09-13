@@ -1,0 +1,32 @@
+music font is leland
+
+comment: "
+  Every span command can name its line, measure, stave, voice and units by
+  number as well as by ordinal.
+"
+
+measure
+brace from stave 1 to stave 2
+stave with treble clef
+stave with bass clef
+
+measure
+stave
+voice
+1/8 c beamed, d, e, f, g, a not beamed
+voice
+1/4 c c c
+stave
+1/4 c3 e3 g3
+
+slur in line 1, in measure 2, on stave 1, in voice 1
+from unit 1 to unit 6
+
+tuplet 3 in line 1, in measure 2, on stave 1, in voice 1
+from unit 1 to unit 3
+
+crescendo in line 1, in measure 2, on stave 2, in voice 1
+from unit 1 to unit 3
+
+octave up in line 1, in measure 2, on stave 1, in voice 2
+from unit 1 to unit 3

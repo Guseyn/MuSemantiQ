@@ -1,7 +1,0 @@
-measure
-c
-measure
-c5
-
-glissando starts at first note in first measure
-and finishes at first note in second measure

@@ -1,0 +1,15 @@
+comment: "
+  A repeated section, opening and closing with colons against bold barlines.
+"
+
+measure
+starts with double bold barline,
+with colon at the start
+treble clef
+1/4 c e g c5
+measure
+1/4 b g d b3
+measure
+ends with double bold barline
+with colon at the end
+1/4 c e g c5

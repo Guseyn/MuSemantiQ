@@ -1,7 +1,0 @@
-music font is leland
-
-voice
-a b d e
-stave
-measure
-new line

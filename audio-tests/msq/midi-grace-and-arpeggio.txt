@@ -1,0 +1,19 @@
+comment: "
+  Grace notes are taken from the time of the note they lean on, and an
+  arpeggiated chord is spread rather than struck together.
+"
+
+measure
+treble clef
+1/8 g is grace, beamed with next, with stem up
+a is grace
+1/2 b
+measure
+1/8 c5 is crushed grace, with stem up
+1/2 d5
+measure
+chord is arpeggiated
+c e g c5
+
+chord is arpeggiated with arrow down
+c e g c5

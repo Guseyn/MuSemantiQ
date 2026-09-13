@@ -1,0 +1,29 @@
+comment: "
+  A tie can hang off the start or the end of a line, pointing at music on
+  another system, and can name the measure it reaches.
+"
+
+new line
+measure
+treble clef
+1/2 a is tied after up
+1/2 b
+measure
+1/2 a is tied before up
+1/2 b
+
+new line
+measure
+voice
+1/2 a is tied after measure 2 up
+1/2 b
+voice
+1/2 c
+1/2 d
+measure
+voice
+1/2 a is tied before measure 2 up
+1/2 b
+voice
+1/2 c
+1/2 d

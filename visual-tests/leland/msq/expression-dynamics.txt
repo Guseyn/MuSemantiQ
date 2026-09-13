@@ -1,0 +1,29 @@
+music font is leland
+
+comment: "
+  A phrase that walks the whole dynamic range, from the quietest marking to
+  the loudest and back.
+"
+
+measure
+treble clef
+1/4 c with dynamic "pppppp"
+d with dynamic "ppppp"
+e with dynamic "pppp"
+f with dynamic "ppp"
+measure
+1/4 g with dynamic "pp"
+a with dynamic "p"
+b with dynamic "mp"
+c5 with dynamic "mf"
+
+new line
+measure
+1/4 d5 with dynamic "f"
+e5 with dynamic "ff"
+f5 with dynamic "fff"
+g5 with dynamic "ffff"
+measure
+1/4 a5 with dynamic "fffff"
+g5 with dynamic "ffffff"
+1/2 f5 with dynamic "p"

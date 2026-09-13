@@ -1,0 +1,14 @@
+music font is leland
+
+comment: "
+  The bracket form, which draws a line under the passage rather than the
+  word, and closes with a bracket.
+"
+
+measure
+treble clef
+1/4 c with pedal opens with bracket
+e g c5
+measure
+1/4 b g e
+1/4 c with release bracket

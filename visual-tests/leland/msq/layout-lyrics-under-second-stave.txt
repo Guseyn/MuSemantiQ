@@ -1,0 +1,20 @@
+music font is leland
+
+comment: "
+  In a two-stave score the words can belong under the lower stave.
+"
+
+lyrics is under stave 2
+
+measure
+stave with treble clef
+stave with bass clef
+
+measure
+stave
+1/4 c5 d5 e5 f5
+stave
+1/4 c with lyrics "one"
+1/4 d with lyrics "two"
+1/4 e with lyrics "three"
+1/4 f with lyrics "four"

@@ -1,0 +1,26 @@
+comment: "
+  Chords built of seconds, which have to displace their note bodies to
+  either side of the stem, and chords in two voices that overlap.
+"
+
+measure
+treble clef
+chord
+c d e f g
+
+chord
+c5 b a g f
+
+measure
+voice
+chord
+e g c5
+
+chord
+f a d5
+voice
+chord
+c e
+
+chord
+d f

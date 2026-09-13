@@ -1,5 +1,0 @@
-measure
-coda at the start of the measure
-measure
-coda at the end of the measure
-measure

@@ -1,0 +1,35 @@
+comment: "
+  A note can belong to the stave above, the stave it is written on, or the
+  one below, and the setting holds until it is changed.
+"
+
+measure
+brace from stave 1 to stave 3
+stave with treble clef
+stave with treble clef
+stave with bass clef
+
+measure
+stave
+1/4 c5 e5 g5 e5
+stave
+1/4 c on previous stave
+1/4 e
+1/4 g on next stave
+1/4 e
+stave
+1/4 c3 e3 g3 e3
+
+measure
+stave
+stave
+chord
+c3 on next stave, g3 on next stave, e, g, c5 on previous stave
+stave
+
+measure
+stave
+1/8 c5 beamed, g, e, c, g3 on next stave, e3 on next stave,
+c3 on next stave, g3 on next stave not beamed
+stave
+stave

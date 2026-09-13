@@ -1,0 +1,18 @@
+comment: "
+  Moving from one key to another cancels the signs the old key carried,
+  which is written as a transition rather than as a plain key signature.
+"
+
+measure
+key signature is e flat major
+treble clef
+e f g
+measure
+key signature is e flat major to c major
+c d e
+measure
+key signature is a major
+a b c5
+measure
+key signature is a major to c major
+f g a

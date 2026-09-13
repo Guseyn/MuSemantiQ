@@ -1,0 +1,19 @@
+comment: "
+  Tied notes sound as one; a tuplet squeezes its notes into the time of
+  fewer.
+"
+
+measure
+treble clef
+1/2 c tied with next up
+1/2 c
+measure
+1/8 d beamed, e, f not beamed
+1/8 g beamed, a, b not beamed
+measure
+1/4 c5 tied with next up
+1/4 c5
+1/2 c5
+
+tuplet 3 in second measure from first unit to third unit
+tuplet 3 in second measure from fourth unit to 6th unit

@@ -1,0 +1,36 @@
+music font is leland
+
+comment: "
+  Every articulation the language knows, once above the note and once below,
+  so both placements are drawn.
+"
+
+measure
+treble clef
+a with stem down, with staccato up
+a with stem down, with spiccato up
+a with stem down, with accent up
+a with stem down, with tenuto up
+a with stem down, with marcato up
+a with stem down, with fermata up
+measure
+a with stem down, with left hand pizzicato up
+a with stem down, with snap pizzicato up
+a with stem down, with natural harmonic up
+a with stem down, with up bow up
+a with stem down, with down bow up
+
+new line
+measure
+a with stem up, with staccato down
+a with stem up, with spiccato down
+a with stem up, with accent down
+a with stem up, with tenuto down
+a with stem up, with marcato down
+a with stem up, with fermata down
+measure
+a with stem up, with left hand pizzicato down
+a with stem up, with snap pizzicato down
+a with stem up, with natural harmonic down
+a with stem up, with up bow down
+a with stem up, with down bow down

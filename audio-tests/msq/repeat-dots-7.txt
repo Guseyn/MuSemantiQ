@@ -1,7 +1,0 @@
-font size is 3.5
-
-measure
-1/4 c d e f g a b c5
-
-measure with repeat sign at the end
-1/4 c d e f g a b c5

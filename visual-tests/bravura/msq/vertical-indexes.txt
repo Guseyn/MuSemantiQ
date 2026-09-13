@@ -1,5 +1,0 @@
-chord
-a b d with # key
-voice
-1 chord
-c d 

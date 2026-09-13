@@ -1,0 +1,22 @@
+comment: "
+  A key signature declared for each line is repeated at the head of every
+  page line, the way a printed score restates it.
+"
+
+measure
+key signature is d major for each line
+stave with treble clef
+stave with bass clef
+
+measure
+stave
+d e f
+stave
+d3 e3 f3
+
+new line
+measure
+stave
+g a b
+stave
+g3 a3 b3

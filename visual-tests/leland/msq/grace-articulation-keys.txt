@@ -1,8 +1,0 @@
-music font is leland
-
-a with turn with sharp key above, is grace
-a with turn with sharp key below, is grace
-a with turn with flat key above, is grace
-a with turn with flat key below, is grace
-a with turn with natural key above, is grace
-a with turn with natural key below, is grace

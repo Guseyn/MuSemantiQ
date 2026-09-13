@@ -1,0 +1,10 @@
+comment: "
+  A dynamic sits below the stave by default; it can be put above, or nudged.
+"
+
+measure
+treble clef
+1/4 a with dynamic "p" above
+b with dynamic "f" below
+c5 with dynamic "mf" above stave
+d5 with dynamic "mp" below stave 1 down

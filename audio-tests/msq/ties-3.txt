@@ -1,7 +1,0 @@
-chord is tied with next, with stem down
-c e g
-
-g e c
-voice
-top rest
-g5 with stem up, e5 c6

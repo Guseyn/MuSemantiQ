@@ -1,0 +1,22 @@
+music font is leland
+
+comment: "
+  The endpoints of a span can open before and close after the unit they
+  name, in the numeric form too.
+"
+
+measure
+treble clef
+1/8 c beamed, d, e, f, g, a not beamed
+
+slur
+starts before unit 1
+finishes after unit 6
+
+tuplet 3 with brackets
+starts before unit 1
+finishes after unit 3
+
+glissando
+starts at unit 4
+finishes at unit 6

@@ -1,0 +1,22 @@
+comment: "
+  A chord that reaches into the stave below, and one that is not a ghost
+  after an earlier chord was.
+"
+
+measure
+brace from stave 1 to stave 2
+stave with treble clef
+stave with bass clef
+
+measure
+stave
+1/4 chord is ghost
+c e g
+
+1/4 chord is not ghost
+c e g
+stave
+1/4 chord on next stave
+c3 e3 g3
+
+1/4 rest

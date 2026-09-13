@@ -1,0 +1,33 @@
+comment: "
+  A setting can apply to the line it is written on and every line after it,
+  rather than to all of them.
+"
+
+new line
+measure
+stave with treble clef
+stave with bass clef
+
+measure
+stave
+1/4 c5 d5 e5 f5
+stave
+1/4 c3 d3 e3 f3
+
+new line
+measure
+key signature is d major for lines below
+time signature is 3:4 for lines below
+brace from stave 1 to stave 2 for lines below
+instrument title is "Piano" for stave 1 for lines below
+stave
+1/4 d5 e5 f5
+stave
+1/4 d3 e3 f3
+
+new line
+measure
+stave
+1/4 g5 a5 b5
+stave
+1/4 g3 a3 b3

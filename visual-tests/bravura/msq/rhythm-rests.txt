@@ -1,0 +1,24 @@
+comment: "
+  The same values as rests. A rest hangs from its own line of the stave
+  rather than from a pitch.
+"
+
+measure
+treble clef
+4 rest
+measure
+2 rest
+measure
+1 rest
+measure
+1/2 rest
+
+new line
+measure
+1/4 rest
+1/8 rest
+1/16 rest
+1/32 rest
+1/64 rest
+1/128 rest
+1/256 rest

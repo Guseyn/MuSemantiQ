@@ -1,0 +1,28 @@
+music font is leland
+
+comment: "
+  A bar of rest written as a measure rest, counted over several bars, and
+  spread across the staves of a system.
+"
+
+measure
+stave with treble clef
+stave with bass clef
+
+measure
+stave
+1/4 c5 d5 e5 f5
+stave
+1/4 c3 d3 e3 f3
+
+measure with measure rest
+
+measure with multi measure rest 4 times
+
+measure with multi measure rest 12 times
+
+measure
+stave
+1/4 g5 a5 b5 c5
+stave
+1/4 g3 a3 b3 c3

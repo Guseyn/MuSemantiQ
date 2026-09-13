@@ -1,0 +1,17 @@
+comment: "
+  A note stays a ghost until something says otherwise, so the setting can be
+  turned back off.
+"
+
+measure
+treble clef
+1/4 a is ghost
+1/4 b
+1/4 c5 is not ghost
+1/4 d5
+measure
+1/4 chord is ghost
+c e g
+
+1/4 chord is not ghost
+c e g

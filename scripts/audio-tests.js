@@ -203,7 +203,9 @@ async function runAudioTest() {
     } catch (error) {
       process.stdout.write(`"${testName}" ${red('failed')} for ${testType}\n\n`)
       listOfFailedTests.push({
-        name: testName
+        name: testName,
+        // Which artifact gave way, so the test viewer can open straight to it.
+        testType
       })
     } finally {
       await Promise.all(
@@ -231,9 +233,9 @@ async function runAudioTest() {
   )
   if (listOfFailedTests.length > 0) {
     throw new Error(
-      `There are (${listOfFailedTests.length})  failed audio tests. Please check http://127.0.0.1:8000/audio-tests/all-audio-tests.html\n\n`
+      `There are (${listOfFailedTests.length})  failed audio tests. Please check https://127.0.0.1:8889/html/test-viewer.html#audio\n\n`
     )
   } else {
-    process.stdout.write(`All aduio tests passed. Please check http://127.0.0.1:8000/audio-tests/all-aduio-tests.html\n\n`)
+    process.stdout.write(`All audio tests passed. Please check https://127.0.0.1:8889/html/test-viewer.html#audio\n\n`)
   }
 }

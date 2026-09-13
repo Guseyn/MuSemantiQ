@@ -1,0 +1,21 @@
+music font is leland
+
+comment: "
+  Opening and closing barlines written as their own commands inside the
+  measure, and a measure that opens with no barline at all.
+"
+
+measure
+without start barline
+treble clef
+1/4 c d e f
+measure
+opening barline
+1/4 g a b c5
+measure
+closing double barline
+1/4 c5 b a g
+measure
+opening double bold barline
+closing dotted barline
+1/4 f e d c

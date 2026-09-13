@@ -1,3 +1,0 @@
-interval between stave lines is 12
-
-stave

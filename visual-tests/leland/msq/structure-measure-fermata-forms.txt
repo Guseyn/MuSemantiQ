@@ -1,0 +1,18 @@
+music font is leland
+
+comment: "
+  A fermata over the barline, at the end of a measure and over the final one.
+"
+
+measure
+treble clef
+1/4 c d e f
+measure
+ends with fermata
+1/4 g a b c5
+measure
+1/4 c5 b a g
+measure
+ends with fermata
+ends with double bold barline
+1 c

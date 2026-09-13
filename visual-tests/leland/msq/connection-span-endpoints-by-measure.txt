@@ -1,0 +1,35 @@
+music font is leland
+
+comment: "
+  An endpoint can name the measure and stave it belongs to, which is how a
+  span reaches across a system.
+"
+
+measure
+stave with treble clef
+stave with bass clef
+
+measure
+stave
+1/8 c beamed, d, e, f not beamed
+stave
+1/4 c3 e3
+
+measure
+stave
+1/8 g beamed, a, b, c5 not beamed
+stave
+1/4 g3 c
+
+slur
+starts at first unit in second measure on first stave
+goes through third unit in second measure on first stave
+finishes at fourth unit in third measure on first stave
+
+glissando
+starts at second unit in second measure on second stave
+finishes at first unit in third measure on second stave
+
+crescendo
+starts with "p" at first unit in second measure
+finishes with "f" at fourth unit in third measure

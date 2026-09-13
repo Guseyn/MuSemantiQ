@@ -1,0 +1,20 @@
+music font is leland
+
+comment: "
+  A ghost note, whose head is an x rather than a body, in every value.
+"
+
+measure
+treble clef
+4 a is ghost
+measure
+1 a is ghost
+1/4 b is ghost
+1/8 c5 is ghost
+1/8 d5 is ghost
+measure
+1/16 a is ghost
+1/16 b is ghost
+1/8 c5 is ghost
+1/4 rest
+1/4 rest

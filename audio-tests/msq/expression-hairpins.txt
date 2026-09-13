@@ -1,0 +1,28 @@
+comment: "
+  A crescendo and a diminuendo, each naming the dynamic it starts and ends on,
+  then the same pair drawn above the stave and nudged clear of the notes.
+"
+
+measure
+treble clef
+1/4 c d e f
+measure
+1/4 g a b c5
+measure
+1/4 c5 b a g
+measure
+1/4 f e d c
+
+crescendo in first measure
+starts with "p" at 1st unit
+finishes with "f" at 4th unit
+
+diminuendo in second measure
+starts with "f" at 1st unit
+finishes with "pp" at 4th unit
+
+crescendo above stave in third measure
+from first unit to fourth unit
+
+diminuendo above stave in fourth measure
+from first unit to fourth unit 1 up

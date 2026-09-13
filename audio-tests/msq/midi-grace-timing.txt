@@ -1,0 +1,19 @@
+comment: "
+  Grace notes take their time from the note they lean on: a crushed grace
+  takes almost none, a run of graces shares it.
+"
+
+measure
+treble clef
+1/8 g is grace, beamed with next, with stem up
+a is grace
+b is grace
+1/2 c5
+measure
+1/8 d5 is crushed grace, with stem up
+1/2 e5
+measure
+1/8 f5 is grace, with stem up
+1/4 g5
+1/8 a5 is crushed grace, with stem up
+1/4 b5

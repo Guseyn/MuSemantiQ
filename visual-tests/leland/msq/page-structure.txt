@@ -1,6 +1,0 @@
-music font is leland
-
-title is "Title"
-subtitle is "Subtitle"
-left subtitle is "Left subtitle"
-right subtitle is "Right subtitle"

@@ -1,7 +1,0 @@
-comment: "
-  It's just a draft, probably more instruments will be added in the future.
-"
-
-instrument "Violin" for first stave
-stave with alto clef
-a b d e f c e f a

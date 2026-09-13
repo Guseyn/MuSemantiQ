@@ -1,0 +1,26 @@
+music font is leland
+
+comment: "
+  A tuplet number can be put above or below, against the notes or clear of
+  the stave, with or without a bracket, and nudged.
+"
+
+measure
+treble clef
+1/8 c beamed, d, e not beamed
+1/8 f beamed, g, a not beamed
+measure
+1/8 b3 beamed, c, d not beamed
+1/8 e beamed, f, g not beamed
+
+tuplet 3 up with brackets in first measure
+from first unit to third unit
+
+tuplet 3 above with brackets in first measure
+from fourth unit to 6th unit
+
+tuplet 3 down with brackets in second measure
+from first unit to third unit
+
+tuplet 3 below stave with brackets in second measure
+from fourth unit to 6th unit 1 down

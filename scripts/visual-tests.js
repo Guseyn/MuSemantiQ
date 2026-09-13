@@ -204,7 +204,9 @@ async function runVisualTestForFont(visualTestDirForFont) {
     } catch (error) {
       process.stdout.write(`"${testName}" ${red('failed')} for ${testType}\n\n`)
       listOfFailedTests.push({
-        name: testName
+        name: testName,
+        // Which artifact gave way, so the test viewer can open straight to it.
+        testType
       })
     } finally {
       await Promise.all(
@@ -231,9 +233,9 @@ async function runVisualTestForFont(visualTestDirForFont) {
   )
   if (listOfFailedTests.length > 0) {
     throw new Error(
-      `There are (${listOfFailedTests.length})  failed visual tests. Please check http://127.0.0.1:8000/visual-tests/all-visual-tests.html\n\n`
+      `There are (${listOfFailedTests.length})  failed visual tests. Please check https://127.0.0.1:8889/html/test-viewer.html#visual\n\n`
     )
   } else {
-    process.stdout.write(`All visual tests passed. Please check http://127.0.0.1:8000/visual-tests/all-visual-tests.html\n\n`)
+    process.stdout.write(`All visual tests passed. Please check https://127.0.0.1:8889/html/test-viewer.html#visual\n\n`)
   }
 }

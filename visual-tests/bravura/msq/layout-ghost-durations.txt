@@ -1,0 +1,32 @@
+comment: "
+  A ghost note in every value and in both stem directions, so each note body
+  is drawn as a cross.
+"
+
+measure
+treble clef
+4 a is ghost
+measure
+2 a is ghost
+2 c5 is ghost
+measure
+1 a is ghost
+1 c5 is ghost
+measure
+1/2 a is ghost
+1/2 c5 is ghost
+
+new line
+measure
+1/4 a is ghost
+1/8 a is ghost
+1/16 a is ghost
+1/32 a is ghost
+1/64 a is ghost
+1/128 a is ghost
+1/256 a is ghost
+measure
+1/4 c5 is ghost, with stem down
+1/8 c5 is ghost, with stem down
+1/16 c5 is ghost, with stem down
+1/4 rest

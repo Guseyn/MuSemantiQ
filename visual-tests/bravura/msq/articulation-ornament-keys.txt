@@ -1,0 +1,11 @@
+comment: "
+  An ornament can carry an accidental above or below it, saying which way
+  the alternating note leans.
+"
+
+measure
+treble clef
+1/4 a with turn with sharp key above
+1/4 b with turn with flat key below
+1/4 c5 with turn with sharp key above, with natural key below
+1/4 d5 with mordent with flat key above

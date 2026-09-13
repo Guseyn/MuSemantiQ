@@ -1,0 +1,12 @@
+comment: "
+  Restated at the head of every page line.
+"
+
+measure
+time signature is 5:4
+treble clef
+c d e f g
+
+new line
+measure
+a b c5 d5 e5

@@ -1,0 +1,14 @@
+comment: "
+  A beamed group whose stems have to reach between two staves.
+"
+
+measure
+brace from stave 1 to stave 2
+stave with treble clef
+stave with bass clef
+
+measure
+stave
+1/16 c5 beamed, b, a, g, f on next stave, e on next stave,
+d on next stave, c on next stave not beamed
+stave

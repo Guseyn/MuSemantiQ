@@ -1,0 +1,13 @@
+comment: "
+  Colours can be named, given as a hex triplet, or given as rgb.
+"
+
+background color is lavenderblush
+stave lines color is #2A2922
+font color is rgb(40, 40, 60)
+
+title is "Coloured"
+
+measure
+treble clef
+1/4 c e g c5

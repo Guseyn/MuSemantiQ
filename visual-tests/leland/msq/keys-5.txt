@@ -1,5 +1,0 @@
-music font is leland
-
-f clef
-chord with stem down
-g3 b3 flat c4 e4 

@@ -1,6 +1,0 @@
-c d e f g a b c5
-c d e f g a b c5
-c d e f g a b c5
-
-octave up from 9th unit to 16th unit
-two octaves up from 17th unit to 24th unit

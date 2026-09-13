@@ -1,0 +1,30 @@
+comment: "
+  The same span commands as before, written with ordinals rather than
+  numbers. Both spellings are accepted everywhere a position is named.
+"
+
+measure
+brace from stave 1 to stave 2
+stave with treble clef
+stave with bass clef
+
+measure
+stave
+voice
+1/8 c beamed, d, e, f, g, a not beamed
+voice
+1/4 c c c
+stave
+1/4 c3 e3 g3
+
+slur on first line, in second measure, on first stave, in first voice
+from first unit to 6th unit
+
+tuplet 3 on first line, in second measure, on first stave, in second voice
+from first unit to third unit
+
+crescendo up on first line, in second measure, on second stave, in first voice
+from first unit to third unit
+
+repeat of previous beat on first line, in second measure, on first stave, in second voice
+from first unit to third unit 1 down

@@ -1,4 +1,0 @@
-instrument is "Violin"
-
-1/16 a with tremolo with three strokes
-

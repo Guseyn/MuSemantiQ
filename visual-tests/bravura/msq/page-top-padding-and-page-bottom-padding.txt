@@ -1,4 +1,0 @@
-page top padding is 4
-page bottom padding is 6
-
-new line

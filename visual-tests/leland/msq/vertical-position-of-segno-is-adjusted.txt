@@ -1,8 +1,0 @@
-music font is leland
-
-measure
-sign
-a b d e
-measure
-sign
-c5 d5 e5

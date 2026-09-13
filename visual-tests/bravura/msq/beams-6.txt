@@ -1,6 +1,0 @@
-1/16 chord beamed with next
-c d e
-chord
-e f g
-chord
-a b c5 

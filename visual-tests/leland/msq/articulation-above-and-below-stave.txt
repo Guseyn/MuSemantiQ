@@ -1,0 +1,13 @@
+music font is leland
+
+comment: "
+  Pushed clear of the stave rather than sitting against the note, and nudged
+  by a given number of intervals between stave lines.
+"
+
+measure
+treble clef
+a with accent above stave
+a with accent below stave
+a with staccato above stave 1 up
+a with staccato below stave 1 down

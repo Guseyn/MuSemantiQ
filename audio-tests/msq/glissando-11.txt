@@ -1,9 +1,0 @@
-stretch units by 4 times
-
-chord
-g e f
-
-chord
-g e f
-
-glissando from chord 1 to chord 2

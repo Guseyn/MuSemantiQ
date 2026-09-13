@@ -1,0 +1,15 @@
+comment: "
+  Notes that belong to another stave sound in the octave that stave's clef
+  puts them in.
+"
+
+measure
+brace from stave 1 to stave 2
+stave with treble clef
+stave with bass clef
+
+measure
+stave
+1/8 c5 beamed, g, e, c on next stave, g3 on next stave, e3 on next stave,
+c3 on next stave, g3 on next stave not beamed
+stave

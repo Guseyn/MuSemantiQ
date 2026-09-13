@@ -1,6 +1,0 @@
-measure
-measure
-measure
-ends with double bold barline
-with repeat sign at the end
-volta with text "1, 2." from first measure to third measure

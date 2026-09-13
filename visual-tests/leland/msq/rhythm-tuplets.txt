@@ -1,0 +1,25 @@
+music font is leland
+
+comment: "
+  Triplets, written with and without a bracket, above and below the stave.
+"
+
+measure
+treble clef
+1/8 c beamed, d, e not beamed
+1/8 f beamed, g, a not beamed
+measure
+1/8 b3 beamed, c, d not beamed
+1/8 e beamed, f, g not beamed
+
+tuplet 3 in first measure
+from first unit to third unit
+
+tuplet 3 with brackets in first measure
+from fourth unit to 6th unit
+
+tuplet 3 above stave with brackets in second measure
+from first unit to third unit
+
+tuplet 3 below stave with brackets in second measure
+from fourth unit to 6th unit

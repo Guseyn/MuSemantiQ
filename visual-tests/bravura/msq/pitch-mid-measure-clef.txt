@@ -1,0 +1,13 @@
+comment: "
+  A clef change part way through a measure, so a line that runs low can be
+  read without ledger lines.
+"
+
+measure
+treble clef
+g5 e5 c5
+a3 with bass clef before
+measure
+f3 d3
+b3 with treble clef before
+d5

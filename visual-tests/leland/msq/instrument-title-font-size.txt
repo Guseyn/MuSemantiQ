@@ -1,9 +1,0 @@
-music font is leland
-
-instrument font size is 17
-
-measure
-brace from first stave to second stave
-instrument "Piano" between first stave and second stave
-stave
-stave

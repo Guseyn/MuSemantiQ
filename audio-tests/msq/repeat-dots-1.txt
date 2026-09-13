@@ -1,4 +1,0 @@
-measure with repeat sign at the start
-c d e f g a b c5
-measure with repeat sign at the end
-c d e f g a b c5

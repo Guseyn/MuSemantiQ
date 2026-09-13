@@ -1,0 +1,19 @@
+comment: "
+  A fermata holds its note for longer than written, by the amount the page
+  sets.
+"
+
+fermata duration is 3
+
+measure
+treble clef
+1/4 c d e f
+measure
+1/2 g with fermata up
+1/2 a
+measure
+1 c5 with fermata up
+measure
+ends with fermata
+1/4 g e c
+1/4 rest

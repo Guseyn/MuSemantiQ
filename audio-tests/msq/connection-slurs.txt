@@ -1,0 +1,27 @@
+comment: "
+  A slur over a phrase, drawn above and below, and one that carries its own
+  roundness. Measures are numbered within their page line, so a slur on a
+  later line names that line too.
+"
+
+measure
+treble clef
+1/8 c beamed, d, e, f, g, a, b, c5 not beamed
+measure
+1/8 c5 beamed, b, a, g, f, e, d, c not beamed
+
+slur in first measure from first unit to 8th unit
+
+slur down in second measure from first unit to 8th unit
+
+new line
+measure
+1/4 c e g c5
+measure
+1/4 c5 g e c
+
+slur on second line, in first measure from first unit to fourth unit with roundness 10
+
+slur on second line, in second measure from first unit to fourth unit
+with left point 1 up
+with right point 1 up

@@ -1,9 +1,0 @@
-measure
-stave
-a
-stave
-a
-measure
-
-glissando up starts before first unit on first stave
-glissando down finishes after first unit on second stave

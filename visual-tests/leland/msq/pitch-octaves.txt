@@ -1,0 +1,12 @@
+music font is leland
+
+comment: "
+  The same note name in five octaves. The digit after the letter names the
+  octave, and it stays in force until another one is given.
+"
+
+measure
+treble clef
+c3 c c5
+measure
+c5 c c3

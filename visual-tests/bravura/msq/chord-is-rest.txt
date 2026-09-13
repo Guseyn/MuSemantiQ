@@ -1,2 +1,0 @@
-chord is rest
-a b d

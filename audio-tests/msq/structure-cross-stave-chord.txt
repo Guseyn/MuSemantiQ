@@ -1,0 +1,21 @@
+comment: "
+  One chord whose notes are shared between the hands, and one that reaches
+  back to the stave above.
+"
+
+measure
+brace from stave 1 to stave 2
+stave with treble clef
+stave with bass clef
+
+measure
+stave
+chord
+c3 on next stave, g3 on next stave, e, g, c5
+stave
+
+measure
+stave
+stave
+chord
+c3, g3, e on previous stave, g on previous stave

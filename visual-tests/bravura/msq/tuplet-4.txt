@@ -1,6 +1,0 @@
-1/8 a beamed, b, a not beamed
-
-tuplet 3 below stave with brackets 0.5 down
-from first unit to third unit
-
-comment: "Here we moved tuplet down on half of interval between stave lines."

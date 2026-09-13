@@ -1,9 +1,0 @@
-music font is leland
-
-measure
-tempo is "Allegro" 2 up
-c d e f
-
-comment: "
-  Let's lift tempo on two intervals between stave lines
-"

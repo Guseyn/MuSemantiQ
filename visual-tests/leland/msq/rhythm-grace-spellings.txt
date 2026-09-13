@@ -1,0 +1,12 @@
+music font is leland
+
+comment: "
+  A crushed grace can be written as such, or as a grace carrying a crush line.
+"
+
+measure
+treble clef
+1/8 g is crushed grace, with stem up
+1/4 a
+1/8 b is grace with crush line, with stem up
+1/4 c5

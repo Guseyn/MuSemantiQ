@@ -1,9 +1,0 @@
-voice
-a is tied with next
-a is tied with next
-a is tied with next
-a
-d
-voice
-1 c
-d

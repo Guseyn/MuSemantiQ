@@ -1,7 +1,0 @@
-instrument "Guitar"
-
-a b c d e
-
-measure
-
-a b c d e

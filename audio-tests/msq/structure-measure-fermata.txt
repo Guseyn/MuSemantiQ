@@ -1,0 +1,12 @@
+comment: "
+  A fermata over the barline, which is where a piece pauses between phrases.
+"
+
+measure
+treble clef
+1/4 c d e f
+measure
+ends with fermata
+1/4 g a b c5
+measure
+1/2 c5

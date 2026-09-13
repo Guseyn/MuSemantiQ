@@ -1,0 +1,14 @@
+comment: "
+  The three settings that shape how a page sounds rather than how it looks.
+"
+
+default instrument is violin
+default tempo is "1/4 = 76"
+fermata duration is 4
+
+measure
+treble clef
+1/4 c d e f
+measure
+1/2 g
+1/2 a with fermata up

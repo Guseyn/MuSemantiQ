@@ -1,0 +1,20 @@
+music font is leland
+
+comment: "
+  Two voices on one stave, their stems pointing away from each other, and
+  the rests they need to stay out of each other's way.
+"
+
+measure
+treble clef
+voice
+1/4 g a b c5
+voice
+1/4 c c c c
+measure
+voice
+1/2 d5
+1/4 c5 b
+voice
+1/4 rest
+1/4 g f e

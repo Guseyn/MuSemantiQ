@@ -1,5 +1,0 @@
-page lines top offset is 4
-
-title is "Title"
-
-new line

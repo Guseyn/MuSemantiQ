@@ -1,0 +1,29 @@
+comment: "
+  The walking tempos.
+"
+
+measure
+tempo is "Andante moderato"
+treble clef
+1/4 c d e f
+measure
+tempo is "Andante"
+1/4 g a b c5
+measure
+tempo is "Andantino"
+1/4 c d e f
+measure
+tempo is "Moderato"
+1/4 g a b c5
+measure
+tempo is "Allegretto"
+1/4 c d e f
+measure
+tempo is "Allegro moderato"
+1/4 g a b c5
+measure
+tempo is "Tempo giusto"
+1/4 c d e f
+measure
+tempo is "Tempo primo"
+1/4 g a b c5

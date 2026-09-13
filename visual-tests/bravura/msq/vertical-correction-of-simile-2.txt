@@ -1,9 +1,0 @@
-1/8 c beamed d e
-
-repeat from unit 1 to unit 3 three times 2 down
-
-
-comment: "
-  `2 down` means we lower vertical position 
-  of an element on 2 intervals between stave lines
-"

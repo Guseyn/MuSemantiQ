@@ -1,6 +1,0 @@
-music font is leland
-
-chord
-with parentheses from note 1 to note 3 
-with parentheses from note 6 to note 7
-c e g b d5 f5 a5

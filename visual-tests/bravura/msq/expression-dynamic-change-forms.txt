@@ -1,0 +1,22 @@
+comment: "
+  Hairpins drawn in every direction and placement, including one that ends
+  without naming a dynamic.
+"
+
+measure
+treble clef
+1/4 c d e f
+measure
+1/4 g a b c5
+measure
+1/4 c5 b a g
+measure
+1/4 f e d c
+
+crescendo up in first measure from first unit to fourth unit
+diminuendo down in second measure from first unit to fourth unit
+crescendo below stave in third measure from first unit to fourth unit 1 down
+
+diminuendo in fourth measure
+starts with "ff" at first unit
+finishes with "pp" at fourth unit

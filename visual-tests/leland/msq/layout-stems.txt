@@ -1,0 +1,18 @@
+music font is leland
+
+comment: "
+  Stems follow the pitch by default, and can be forced either way.
+"
+
+measure
+treble clef
+1/4 c
+1/4 c5
+1/4 c with stem down
+1/4 c5 with stem up
+measure
+chord with stem down
+c e g
+
+chord with stem up
+c5 e5 g5

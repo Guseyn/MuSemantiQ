@@ -1,9 +1,0 @@
-tempo is "1/32 = 50"
-
-1/32 a is grace, beamed
-a is grace
-1/16 a is grace
-a is grace
-1/8 a is grace
-a is grace
-a

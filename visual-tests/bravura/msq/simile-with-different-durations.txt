@@ -1,4 +1,0 @@
-1/256 a repeat 2 times
-1/16 a repeat 2 times
-1/8 a repeat 2 times
-1/4 a repeat 2 times

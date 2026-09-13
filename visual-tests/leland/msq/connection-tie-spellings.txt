@@ -1,0 +1,17 @@
+music font is leland
+
+comment: "
+  A tie takes `above` and `below` as well as `up` and `down`, and the
+  hanging forms carry a roundness too.
+"
+
+measure
+treble clef
+1/2 a tied with next above
+1/2 a
+measure
+1/2 b tied with next below, with stem down
+1/2 b
+measure
+1/2 c5 is tied after above with roundness 8
+1/2 d5

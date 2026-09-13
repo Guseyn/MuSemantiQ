@@ -1,7 +1,0 @@
-stave
-c c c c
-stave
-d d d d
-
-crescendo on first stave from note 1 to note 4
-diminuendo on second stave from note 1 to note 4

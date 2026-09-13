@@ -1,0 +1,15 @@
+comment: "
+  An octave sign moves what sounds without moving what is written.
+"
+
+measure
+treble clef
+1/4 c5 is octave up
+1/4 d5 is two octaves up
+1/4 c is octave down
+1/4 c is two octaves down
+measure
+1/4 c5 d5 e5 f5
+
+octave up in second measure
+from first unit to fourth unit

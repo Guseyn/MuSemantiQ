@@ -1,0 +1,30 @@
+music font is leland
+
+comment: "
+  An arpeggiated chord, with and without an arrow, and one whose wave runs
+  on into the chord below it.
+"
+
+measure
+stave with treble clef
+stave with bass clef
+
+measure
+stave
+chord is arpeggiated
+c e g b
+
+chord is arpeggiated with arrow up
+c e g b
+
+chord is arpeggiated with arrow down
+c e g b
+stave
+chord
+c3 e3 g3
+
+chord
+c3 e3 g3
+
+chord
+c3 e3 g3

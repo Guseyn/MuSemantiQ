@@ -1,0 +1,20 @@
+comment: "
+  A beam can be opened and closed in either wording: `beamed` on its own, or
+  `beamed with next`, and the matching negatives.
+"
+
+measure
+treble clef
+1/8 c beamed with next
+1/8 d beamed with next
+1/8 e not beamed with next
+1/8 f
+measure
+1/8 chord beamed with next
+c e g
+
+1/8 chord not beamed with next
+d f a
+
+1/4 chord
+e g b

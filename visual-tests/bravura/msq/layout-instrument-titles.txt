@@ -1,0 +1,28 @@
+comment: "
+  A title against a single stave, one centred between a pair, and both
+  restated on every page line.
+"
+
+measure
+instrument title is "Flute" for stave 1 for each line
+instrument "Piano" between stave 2 and stave 3 for each line
+stave with treble clef
+stave with treble clef
+stave with bass clef
+
+measure
+stave
+1/4 c5 d5 e5 f5
+stave
+1/4 c d e f
+stave
+1/4 c3 d3 e3 f3
+
+new line
+measure
+stave
+1/4 g5 a5 b5 c5
+stave
+1/4 g a b c5
+stave
+1/4 g3 a3 b3 c3

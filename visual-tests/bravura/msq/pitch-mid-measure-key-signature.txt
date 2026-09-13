@@ -1,0 +1,14 @@
+comment: "
+  A key can change part way through a measure, before the unit it applies to.
+"
+
+measure
+key signature is f sharp major
+treble clef
+f g
+a with key signature g major before
+b
+measure
+c5 d5
+e5 with key signature c major before
+f5

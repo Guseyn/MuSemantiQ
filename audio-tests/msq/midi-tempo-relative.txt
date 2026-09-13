@@ -1,0 +1,32 @@
+comment: "
+  Tempo words that are measured against the speed already in force.
+"
+
+measure
+tempo is "1/4 = 100"
+treble clef
+1/4 c d e f
+measure
+tempo is "meno mosso"
+1/4 g a b c5
+measure
+tempo is "piu mosso"
+1/4 c d e f
+measure
+tempo is "mosso"
+1/4 g a b c5
+measure
+tempo is "meno moto"
+1/4 c d e f
+measure
+tempo is "doppio movimento"
+1/4 g a b c5
+measure
+tempo is "doppio piu mosso"
+1/4 c d e f
+measure
+tempo is "doppio piu lento"
+1/4 g a b c5
+measure
+tempo is "ritenuto"
+1/4 c d e f

@@ -1,7 +1,0 @@
-font color is black
-
-tenor clef
-alto clef
-baritone clef
-mezzo soprano clef
-soprano clef

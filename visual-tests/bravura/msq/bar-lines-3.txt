@@ -1,9 +1,0 @@
-measure opens with double bold barline
-stave
-stave
-
-side note: "
-  You can aslo type:
-  measure starts with double bold barline
-  measure begins with double bold barline
-"

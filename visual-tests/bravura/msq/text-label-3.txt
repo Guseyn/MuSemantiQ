@@ -1,7 +1,0 @@
-a with text "1" above 1 up
-a with text "1" below 1 down
-
-comment: "
-  Here we moved first text label on one interval between stave lines up,
-  and second text label on one interval between stave lines down.
-"

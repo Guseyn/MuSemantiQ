@@ -1,6 +1,0 @@
-a with breath as comma before 1 down
-a with breath as double slashes before 1 down
-
-comment: "
-  `1 down` means that we move breath mark on one interval between stave line down
-"

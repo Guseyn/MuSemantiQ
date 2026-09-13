@@ -1,0 +1,7 @@
+comment: "
+  A clef that does not exist. The page still parses and still draws; the
+  unrecognised line is reported instead of stopping the score.
+"
+
+stave with fancy clef
+a b c5

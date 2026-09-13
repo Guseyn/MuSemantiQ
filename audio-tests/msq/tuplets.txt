@@ -1,6 +1,0 @@
-measure
-c c c
-measure
-c c c
-
-tuplet 3 in second measure from note 1 to note 3 above stave

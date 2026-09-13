@@ -1,0 +1,16 @@
+comment: "
+  A da capo al fine plays from the top again and stops where Fine is written.
+"
+
+measure
+treble clef
+1/4 c e g c5
+measure
+repetition note "Fine" at the end of the measure
+1/4 b g d b3
+measure
+1/4 a c5 e5 a5
+measure
+ends with double bold barline
+repetition note "D.C. al Fine"
+1/4 g b d5 g5

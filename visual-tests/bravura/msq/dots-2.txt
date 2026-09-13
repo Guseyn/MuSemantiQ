@@ -1,8 +1,0 @@
-voice
-1/4 a with two dots
-1/2 a
-voice
-1/4 g3
-1/8 g3
-1/16 g3
-1/2 g3

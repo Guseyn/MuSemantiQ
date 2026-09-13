@@ -1,0 +1,24 @@
+comment: "
+  The commands a measure carries can be written on their own lines inside it
+  rather than after the word `measure`.
+"
+
+measure
+no opening barline
+treble clef
+1/4 c d e f
+measure
+opens with barline
+closes with double barline
+1/4 g a b c5
+measure
+repeat sign at the start
+repeat sign at the end
+1/4 c5 b a g
+measure
+measure rest
+measure
+multi measure rest 6 times
+measure
+fermata at the end
+1/4 f e d c

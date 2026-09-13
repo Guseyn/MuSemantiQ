@@ -1,8 +1,0 @@
-c c with dynamic "ffffff" 
-c is grace 
-c is grace 
-c is grace
-c c c c 
-
-crescendo starts with "pp" from note 4 
-and finishes with "fff" at note 9

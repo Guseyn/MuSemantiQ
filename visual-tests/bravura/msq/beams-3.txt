@@ -1,4 +1,0 @@
-stave
-1/8 c beamed, d, e not beamed with next, f, g, a
-stave
-1/8 c beamed, d, e not beamed, f, g, a

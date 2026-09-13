@@ -1,6 +1,0 @@
-tempo is "1/4 = 20"
-
-key signature is d major
-
-1/2 b with trill, with stem down
-1/4 f5

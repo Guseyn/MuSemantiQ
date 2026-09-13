@@ -1,0 +1,44 @@
+comment: "
+  Chords in every note value, so each body is drawn stacked as well as alone.
+"
+
+measure
+treble clef
+4 chord
+c e g
+
+measure
+2 chord
+c e g
+
+1 chord
+c e g
+
+measure
+1/2 chord
+c e g
+
+1/4 chord
+c e g
+
+1/8 chord
+c e g
+
+1/8 chord
+c e g
+
+measure
+1/16 chord
+c e g
+
+1/16 chord
+c e g
+
+1/32 chord
+c e g
+
+1/32 chord
+c e g
+
+1/4 rest
+1/4 rest

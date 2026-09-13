@@ -1,0 +1,16 @@
+comment: "
+  Tuplets inside similes and similes under tuplets, which is where the
+  timing of a repeated group has to be worked out twice.
+"
+
+measure
+treble clef
+1/8 c beamed, d, e not beamed
+1/8 f beamed, g, a not beamed
+measure
+1/8 b3 beamed, c, d not beamed
+simile from first unit to third unit 1 times
+
+tuplet 3 in first measure from first unit to third unit
+tuplet 3 in first measure from fourth unit to 6th unit
+tuplet 3 in second measure from first unit to third unit

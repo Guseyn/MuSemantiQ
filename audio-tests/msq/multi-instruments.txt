@@ -1,7 +1,0 @@
-instrument "Guitar" for first stave
-instrument "Bass guitar" for second stave
-
-stave
-a b c d e
-stave with bass clef
-a b c d e

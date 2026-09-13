@@ -1,5 +1,0 @@
-a is tied with next
-a is tied with next, repeat 3 times
-new line
-a is tied with next
-a, repeat 3 times

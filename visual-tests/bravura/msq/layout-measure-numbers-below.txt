@@ -1,0 +1,14 @@
+comment: "
+  Numbered on every measure, written under the stave.
+"
+
+measure numbers for all measures below measures
+
+new line
+measure
+treble clef
+1/4 c d e f
+measure
+1/4 g a b c5
+measure
+1/4 c5 b a g

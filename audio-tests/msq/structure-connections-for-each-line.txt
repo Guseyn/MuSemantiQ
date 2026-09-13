@@ -1,0 +1,21 @@
+comment: "
+  A brace restated on every page line, the way a printed score repeats it.
+"
+
+measure
+brace from stave 1 to stave 2 for each line
+stave with treble clef
+stave with bass clef
+
+measure
+stave
+c5 d5 e5
+stave
+c3 d3 e3
+
+new line
+measure
+stave
+f5 g5 a5
+stave
+f3 g3 a3
