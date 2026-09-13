@@ -1,0 +1,5 @@
+measure
+stave
+1/16 f3 on next stave, with sharp key, with stem up
+stave
+1/4 a, with stem up

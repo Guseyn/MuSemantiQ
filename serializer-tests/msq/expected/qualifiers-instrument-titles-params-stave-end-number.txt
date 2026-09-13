@@ -1,0 +1,6 @@
+measure
+instrument "Piano" between stave 1 and stave 2
+stave
+1/4 a, with stem up
+stave
+1/4 a, with stem up

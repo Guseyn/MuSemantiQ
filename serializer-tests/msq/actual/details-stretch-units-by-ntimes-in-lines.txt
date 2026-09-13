@@ -1,0 +1,5 @@
+stretch units by 1.07 times in line 1
+
+measure
+stave
+1/4 a, with stem up

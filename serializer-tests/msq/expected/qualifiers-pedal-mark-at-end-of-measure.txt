@@ -1,0 +1,4 @@
+measure
+stave
+1/4 a, with pedal, before, with stem up
+1/4 a, with release, at the end of measure, with stem up

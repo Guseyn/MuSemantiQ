@@ -1,0 +1,9 @@
+comment: "
+over
+several lines
+"
+measure
+stave
+1/4 a, with stem up
+1/4 b, with stem up
+1/4 c, with stem up

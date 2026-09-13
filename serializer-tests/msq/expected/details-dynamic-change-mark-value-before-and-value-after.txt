@@ -1,0 +1,7 @@
+measure
+stave
+1/4 a, with stem up
+1/4 a, with stem up
+crescendo up from unit 1 to unit 2
+starts with "p" at 1st unit
+finishes with "f" at 2nd unit

@@ -1,0 +1,3 @@
+measure
+stave
+1/4 a, is tied after measure 2 up, with stem up

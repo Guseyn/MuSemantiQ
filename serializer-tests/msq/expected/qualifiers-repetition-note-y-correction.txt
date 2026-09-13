@@ -1,0 +1,4 @@
+measure
+repetition note "R" at the start of the measure 2 up
+stave
+1/4 a, with stem up

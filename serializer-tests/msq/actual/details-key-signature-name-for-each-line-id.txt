@@ -1,0 +1,4 @@
+measure
+key signature is g major for each line
+stave
+1/4 a, with stem up

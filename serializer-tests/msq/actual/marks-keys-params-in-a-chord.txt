@@ -1,0 +1,4 @@
+measure
+stave
+1/4 chord, with stem up
+f, a flat

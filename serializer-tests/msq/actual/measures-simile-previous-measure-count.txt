@@ -1,0 +1,8 @@
+measure
+stave
+1/4 a, with stem up
+
+measure
+with simile of previous measure 3 times
+stave
+1/4 a, with stem up

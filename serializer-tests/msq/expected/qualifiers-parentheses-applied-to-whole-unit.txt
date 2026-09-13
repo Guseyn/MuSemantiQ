@@ -1,0 +1,4 @@
+measure
+stave
+1/4 chord, with parentheses, with stem up
+c, e, g

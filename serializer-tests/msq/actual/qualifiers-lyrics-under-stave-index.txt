@@ -1,0 +1,7 @@
+lyrics is under stave 2
+
+measure
+stave
+1/4 a, with lyrics "x", with stem up
+stave
+1/4 a, with stem up

@@ -1,0 +1,4 @@
+measure
+time signature is 3:4 for each line
+stave
+1/4 a, with stem up

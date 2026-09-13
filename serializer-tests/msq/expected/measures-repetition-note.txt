@@ -1,0 +1,4 @@
+measure
+repetition note "D.C. al Coda" at the end of the measure
+stave
+1/4 a, with stem up

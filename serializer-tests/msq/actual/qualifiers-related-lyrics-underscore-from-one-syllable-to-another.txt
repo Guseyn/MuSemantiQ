@@ -1,0 +1,4 @@
+measure
+stave
+1/4 a, with lyrics "what" with underscore starts, with stem up
+1/4 a, with lyrics "is" where underscore ends, with stem up

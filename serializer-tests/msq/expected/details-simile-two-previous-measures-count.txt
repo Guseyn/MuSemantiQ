@@ -1,0 +1,12 @@
+measure
+stave
+1/4 a, with stem up
+
+measure
+stave
+1/4 a, with stem up
+
+measure
+with simile of two previous measures 3 times
+stave
+1/4 a, with stem up

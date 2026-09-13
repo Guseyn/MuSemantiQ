@@ -1,0 +1,4 @@
+measure
+stave
+1/4 chord, with stem up
+c with text "1", e with text "2", g with text "3"

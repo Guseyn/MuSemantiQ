@@ -1,0 +1,4 @@
+measure
+stave
+1/4 a, is tied with next down, with stem up
+1/4 a, with stem up

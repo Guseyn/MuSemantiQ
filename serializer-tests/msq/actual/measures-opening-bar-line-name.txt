@@ -1,0 +1,4 @@
+measure
+starts with double bold barline
+stave
+1/4 a, with stem up

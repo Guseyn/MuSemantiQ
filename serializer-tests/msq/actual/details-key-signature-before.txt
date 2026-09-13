@@ -1,0 +1,4 @@
+measure
+stave
+1/4 a, with stem up
+1/4 a, with treble clef before, with key signature g major before, with stem up

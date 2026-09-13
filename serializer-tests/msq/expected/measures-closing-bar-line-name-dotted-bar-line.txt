@@ -1,0 +1,4 @@
+measure
+ends with dotted barline
+stave
+1/4 a, with stem up

@@ -1,0 +1,4 @@
+measure
+with measure rest
+stave
+1/4 a, with stem up

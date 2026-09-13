@@ -207,7 +207,7 @@ async function runVisualTestForFont(visualTestDirForFont) {
         name: testName
       })
     } finally {
-      await Promise.race(
+      await Promise.all(
         [
           fs.writeFile(`visual-tests/${visualTestDirForFont}/svg/actual/${testName}.svg`, allSvgPages),
           fs.writeFile(`visual-tests/${visualTestDirForFont}/page-schema/actual/${testName}.json`, stringifiedPageSchema),

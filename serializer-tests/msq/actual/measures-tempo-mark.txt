@@ -1,0 +1,4 @@
+measure
+tempo is "Allegro"
+stave
+1/4 a, with stem up

@@ -1,0 +1,6 @@
+measure
+bracket from stave 1 to stave 2
+stave
+1/4 a, with stem up
+stave
+1/4 a, with stem up

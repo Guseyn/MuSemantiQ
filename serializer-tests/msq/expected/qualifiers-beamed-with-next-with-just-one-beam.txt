@@ -1,0 +1,5 @@
+measure
+stave
+1/16 a, beamed with next, with stem up
+1/16 a, beamed with only primary line, with stem up
+1/16 a, not beamed, with stem up

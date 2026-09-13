@@ -1,0 +1,4 @@
+measure
+without start barline
+stave
+1/4 a, with stem up

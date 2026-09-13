@@ -1,0 +1,6 @@
+measure
+brace from stave 1 to stave 2 for each line
+stave
+1/4 a, with stem up
+stave
+1/4 a, with stem up

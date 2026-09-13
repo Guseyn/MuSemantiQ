@@ -1,0 +1,5 @@
+measure
+stave
+1/8 a, beamed with next, with stem up
+1/8 a, not beamed, with stem up
+1/8 a, with stem up

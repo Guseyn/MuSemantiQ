@@ -1,0 +1,3 @@
+measure
+stave
+1/4 a, with dynamic "sfz", with stem up

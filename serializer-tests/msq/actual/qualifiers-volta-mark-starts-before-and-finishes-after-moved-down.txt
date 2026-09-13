@@ -1,0 +1,8 @@
+measure
+stave
+1/4 a, with stem up
+
+measure
+stave
+1/4 a, with stem up
+volta with text "1, 2." starts before measure 1 and finishes after measure 2 1.5 down

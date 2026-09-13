@@ -1,0 +1,3 @@
+measure
+stave
+1/8 a, with stem up

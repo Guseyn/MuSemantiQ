@@ -65,7 +65,8 @@ async function runAudioTest() {
       htmlHighlightsForEachPage,
       errorsForEachPage,
       customStylesForEachPage,
-      midiSettingsForEachPage
+      midiSettingsForEachPage,
+      commentsForEachPage
     } = generateIntermediateStructuresForMultiplePages({
       multiplePagesText,
       supportedFontNames
@@ -93,26 +94,50 @@ async function runAudioTest() {
 
     const stringifiedPageSchema = JSON.stringify(pageSchemaForEachPage)
     const stringifiedErrors = JSON.stringify(errorsForEachPage)
+    const stringifiedCustomStyles = JSON.stringify(customStylesForEachPage)
+    const stringifiedMidiSettings = JSON.stringify(midiSettingsForEachPage)
+    const stringifiedComments = JSON.stringify(commentsForEachPage)
     const midiData = midiForAllPages.data
 
-    const [
-      expectedSvgAsString,
-      expectedStringifiedPageSchema,
-      expectedStringifiedHtmlHighlights,
-      expectedStringifiedErrors,
-      expectedMidiData
-    ] = await Promise.all(
-      [
-        fs.readFile(`audio-tests/svg/expected/${testName}.svg`, 'utf-8'),
-        fs.readFile(`audio-tests/page-schema/expected/${testName}.json`, 'utf-8'),
-        fs.readFile(`audio-tests/html-highlights/expected/${testName}.html`, 'utf-8'),
-        fs.readFile(`audio-tests/errors/expected/${testName}.json`, 'utf-8'),
-        fs.readFile(`audio-tests/midi/expected/${testName}.mid`, { encoding: null })
-      ]
-    )
+    let expectedSvgAsString
+    let expectedStringifiedPageSchema
+    let expectedStringifiedHtmlHighlights
+    let expectedStringifiedErrors
+    let expectedStringifiedCustomStyles
+    let expectedStringifiedMidiSettings
+    let expectedStringifiedComments
+    let expectedMidiData
 
     let testType
     try {
+      /*
+      Reading the expected files is part of the test rather than a step before
+      it: a test whose expected file is missing is a failure like any other, and
+      the actual files still get written so it can be looked at and adopted.
+      */
+      testType = 'reading expected files';
+      [
+        expectedSvgAsString,
+        expectedStringifiedPageSchema,
+        expectedStringifiedHtmlHighlights,
+        expectedStringifiedErrors,
+        expectedStringifiedCustomStyles,
+        expectedStringifiedMidiSettings,
+        expectedStringifiedComments,
+        expectedMidiData
+      ] = await Promise.all(
+        [
+          fs.readFile(`audio-tests/svg/expected/${testName}.svg`, 'utf-8'),
+          fs.readFile(`audio-tests/page-schema/expected/${testName}.json`, 'utf-8'),
+          fs.readFile(`audio-tests/html-highlights/expected/${testName}.html`, 'utf-8'),
+          fs.readFile(`audio-tests/errors/expected/${testName}.json`, 'utf-8'),
+          fs.readFile(`audio-tests/custom-styles/expected/${testName}.json`, 'utf-8'),
+          fs.readFile(`audio-tests/midi-settings/expected/${testName}.json`, 'utf-8'),
+          fs.readFile(`audio-tests/comments/expected/${testName}.json`, 'utf-8'),
+          fs.readFile(`audio-tests/midi/expected/${testName}.mid`, { encoding: null })
+        ]
+      )
+
       testType = 'svg'
       assert.strictEqual(
         allSvgPages,
@@ -141,6 +166,27 @@ async function runAudioTest() {
         `${red('Failed')} for "${testName}" test`
       )
       process.stdout.write(`"${testName}" ${green('passed')} for ${testType}\n`)
+      testType = 'custom-styles'
+      assert.strictEqual(
+        stringifiedCustomStyles,
+        expectedStringifiedCustomStyles,
+        `${red('Failed')} for "${testName}" test`
+      )
+      process.stdout.write(`"${testName}" ${green('passed')} for ${testType}\n`)
+      testType = 'midi-settings'
+      assert.strictEqual(
+        stringifiedMidiSettings,
+        expectedStringifiedMidiSettings,
+        `${red('Failed')} for "${testName}" test`
+      )
+      process.stdout.write(`"${testName}" ${green('passed')} for ${testType}\n`)
+      testType = 'comments'
+      assert.strictEqual(
+        stringifiedComments,
+        expectedStringifiedComments,
+        `${red('Failed')} for "${testName}" test`
+      )
+      process.stdout.write(`"${testName}" ${green('passed')} for ${testType}\n`)
       testType = 'midi'
       assert.strictEqual(
         Buffer.compare(
@@ -160,12 +206,15 @@ async function runAudioTest() {
         name: testName
       })
     } finally {
-      await Promise.race(
+      await Promise.all(
         [
           fs.writeFile(`audio-tests/svg/actual/${testName}.svg`, allSvgPages),
           fs.writeFile(`audio-tests/page-schema/actual/${testName}.json`, stringifiedPageSchema),
           fs.writeFile(`audio-tests/html-highlights/actual/${testName}.html`, htmlHighlightsForAllPages),
           fs.writeFile(`audio-tests/errors/actual/${testName}.json`, stringifiedErrors),
+          fs.writeFile(`audio-tests/custom-styles/actual/${testName}.json`, stringifiedCustomStyles),
+          fs.writeFile(`audio-tests/midi-settings/actual/${testName}.json`, stringifiedMidiSettings),
+          fs.writeFile(`audio-tests/comments/actual/${testName}.json`, stringifiedComments),
           fs.writeFile(`audio-tests/midi/actual/${testName}.mid`, midiData)
         ]
       )

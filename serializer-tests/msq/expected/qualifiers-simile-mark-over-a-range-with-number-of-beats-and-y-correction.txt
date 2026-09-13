@@ -1,0 +1,7 @@
+measure
+stave
+1/4 c, with stem up
+1/4 d, with stem up
+1/4 e, with stem up
+1/4 f, with stem up
+simile from unit 1 to unit 4 3 times 2 down

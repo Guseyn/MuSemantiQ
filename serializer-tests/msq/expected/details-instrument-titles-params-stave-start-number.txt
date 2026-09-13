@@ -1,0 +1,6 @@
+measure
+instrument title is "Piano" for stave 1
+stave
+1/4 a, with stem up
+stave
+1/4 a, with stem up

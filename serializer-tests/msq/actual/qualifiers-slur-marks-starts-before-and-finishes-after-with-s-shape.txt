@@ -1,0 +1,5 @@
+measure
+stave
+1/4 a, with stem up
+1/4 a, with stem up
+slur down starts before unit 1 finishes after unit 2 with s-shape with left point 2.5 up with right point 6.5 down

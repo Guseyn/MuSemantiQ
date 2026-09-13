@@ -1,0 +1,4 @@
+measure
+with repeat sign at the start
+stave
+1/4 a, with stem up

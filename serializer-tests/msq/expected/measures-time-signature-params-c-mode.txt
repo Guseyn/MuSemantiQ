@@ -1,0 +1,4 @@
+measure
+time signature is c
+stave
+1/4 a, with stem up

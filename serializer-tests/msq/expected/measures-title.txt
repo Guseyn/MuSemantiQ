@@ -1,0 +1,5 @@
+title is "Title"
+
+measure
+stave
+1/4 a, with stem up

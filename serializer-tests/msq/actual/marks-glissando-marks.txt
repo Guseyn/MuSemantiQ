@@ -1,0 +1,4 @@
+measure
+stave
+1/4 a, with glissando after up, with stem up
+1/4 a, with stem up

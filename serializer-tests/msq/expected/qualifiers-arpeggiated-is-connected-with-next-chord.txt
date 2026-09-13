@@ -1,0 +1,7 @@
+measure
+stave
+1/4 chord, is arpeggiated with chord below, with stem up
+c, e, g
+
+1/4 chord, is arpeggiated, with stem up
+c, e, g

@@ -12,7 +12,8 @@
 
     "test:visual:all": "node scripts/visual-tests.js",
     "test:audio:all": "node scripts/audio-tests.js",
-    "test:all": "npm run test:visual:all && npm run test:audio:all",
+    "test:serializer:all": "node scripts/serializer-tests.js",
+    "test:all": "npm run test:visual:all && npm run test:audio:all && npm run test:serializer:all",
     "coverage": "c8 npm run test:all",
     "coverage:report": "c8 report --reporter=html",
     "coverage:check": "c8 check-coverage --statements 86 --branches 74 --functions 70 --lines 86",

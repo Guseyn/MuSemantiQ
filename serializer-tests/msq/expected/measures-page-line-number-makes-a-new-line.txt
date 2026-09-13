@@ -1,0 +1,9 @@
+measure
+stave
+1/4 a, with stem up
+
+new line
+
+measure
+stave
+1/4 a, with stem up
