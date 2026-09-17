@@ -141,35 +141,32 @@ const fontSource = endpoint('/dev/font-source/:font', 'GET', async ({ stream, pa
   stream.end(source)
 })
 
-const applyGlyph = endpoint('/dev/font-glyph', 'POST', async ({ stream }) => {
-  let request
-  try {
-    request = JSON.parse((await body(stream, { maxSize: 8 })).toString('utf-8'))
-  } catch (error) {
-    return respondWith(stream, 400, { error: `Could not read the request: ${error.message}` })
-  }
-
+/**
+ * Read the request both endpoints below take, and work out the font it would
+ * change. Everything either of them does begins here.
+ */
+async function glyphEdit(request) {
   const { font, entry, points, yCorrection } = request
   if (typeof font !== 'string' || typeof entry !== 'string' || !Array.isArray(points)) {
-    return respondWith(stream, 400, { error: 'Expected { font, entry, points, yCorrection? }' })
+    return { status: 400, error: 'Expected { font, entry, points, yCorrection? }' }
   }
 
   const file = fontFileFor(font)
   if (!file) {
-    return respondWith(stream, 400, { error: 'Not a music-js font name' })
+    return { status: 400, error: 'Not a music-js font name' }
   }
 
   let source
   try {
     source = await fs.readFile(file, 'utf-8')
   } catch {
-    return respondWith(stream, 404, { error: `No such music-js font: ${font}` })
+    return { status: 404, error: `No such music-js font: ${font}` }
   }
 
   const lines = source.split('\n')
   const found = locate(lines, entry)
   if (!found) {
-    return respondWith(stream, 404, { error: `No point array found for '${entry}' in ${font}.js` })
+    return { status: 404, error: `No point array found for '${entry}' in ${font}.js` }
   }
 
   /*
@@ -207,14 +204,75 @@ const applyGlyph = endpoint('/dev/font-glyph', 'POST', async ({ stream }) => {
     updated = [ ...updated.slice(0, edit.start), ...edit.lines, ...updated.slice(edit.end + 1) ]
   }
 
-  await fs.writeFile(file, updated.join('\n'), 'utf-8')
-  respondWith(stream, 200, {
+  return {
+    status: 200,
+    file,
+    source: updated.join('\n'),
     font,
     entry,
     field: array.field,
     wrote: written.length,
     yCorrection: typeof yCorrection === 'number' && found.yCorrection !== null
+  }
+}
+
+const readRequest = async (stream) =>
+  JSON.parse((await body(stream, { maxSize: 8 })).toString('utf-8'))
+
+/**
+ * The font as it *would* be, without writing anything.
+ *
+ * The viewer engraves through the worker, off the font module the worker
+ * imported — so a traced glyph cannot reach the score by any route but giving
+ * the worker a different module. That is what this is for: the page takes the
+ * source back, makes a blob of it and registers that, which is how a changed
+ * size or interval shows up on the stave before anything is committed.
+ *
+ * It is the same edit `/dev/font-glyph` makes; only the last step differs.
+ */
+const previewGlyph = endpoint('/dev/font-glyph/preview', 'POST', async ({ stream }) => {
+  let request
+  try {
+    request = await readRequest(stream)
+  } catch (error) {
+    return respondWith(stream, 400, { error: `Could not read the request: ${error.message}` })
+  }
+
+  const edit = await glyphEdit(request)
+  if (edit.error) {
+    return respondWith(stream, edit.status, { error: edit.error })
+  }
+
+  stream.respond({
+    'content-type': 'text/javascript; charset=utf-8',
+    'content-length': Buffer.byteLength(edit.source),
+    'cache-control': 'no-store',
+    ':status': 200
+  })
+  stream.end(edit.source)
+})
+
+const applyGlyph = endpoint('/dev/font-glyph', 'POST', async ({ stream }) => {
+  let request
+  try {
+    request = await readRequest(stream)
+  } catch (error) {
+    return respondWith(stream, 400, { error: `Could not read the request: ${error.message}` })
+  }
+
+  const edit = await glyphEdit(request)
+  if (edit.error) {
+    return respondWith(stream, edit.status, { error: edit.error })
+  }
+
+  await fs.writeFile(edit.file, edit.source, 'utf-8')
+  respondWith(stream, 200, {
+    font: edit.font,
+    entry: edit.entry,
+    field: edit.field,
+    wrote: edit.wrote,
+    yCorrection: edit.yCorrection
   })
 })
 
-export default [ fontSource, applyGlyph ]
+export default [ fontSource, previewGlyph, applyGlyph ]

@@ -23,29 +23,196 @@
     import '#ehtml/main'
   </script>
   <script src="/js/app.js"></script>
+  <style>
+    :root {
+      --e-primary: #222f3e;
+      --e-fg: #222f3e;
+    }
+    /*
+    The tools as panels rather than a row of buttons: each one has to say what it
+    is for, and a name alone does not.
+    */
+    [data-panels] {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(19rem, 1fr));
+      gap: var(--e-spacing-md);
+    }
+    a[data-panel] {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--e-spacing-md);
+      padding: var(--e-spacing-lg);
+      text-decoration: none;
+      color: inherit;
+      background: var(--e-surface-bg);
+      border: 1px solid var(--e-border);
+      border-radius: var(--e-radius-lg);
+      transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+    }
+    a[data-panel]:hover {
+      border-color: var(--e-primary);
+      box-shadow: var(--e-shadow-md);
+      transform: translateY(-1px);
+    }
+    a[data-panel]:focus-visible {
+      outline: 2px solid var(--e-primary);
+      outline-offset: 2px;
+    }
+    /* The icon sits on its own tinted ground, so the panels scan as a set. */
+    a[data-panel] [data-icon] {
+      flex: none;
+      display: grid;
+      place-items: center;
+      width: 2.75rem;
+      height: 2.75rem;
+      border-radius: var(--e-radius-md);
+      background: var(--e-primary-transparent-accent-bg);
+      color: var(--e-primary);
+    }
+    a[data-panel] b {
+      display: block;
+      margin-bottom: 0.15rem;
+    }
+    a[data-panel] [data-says] {
+      color: var(--e-muted);
+      font-size: var(--e-font-size-sm);
+      line-height: 1.45;
+    }
+    /*
+    One drawing for all of them: a 24-unit square, stroked in the current colour,
+    nothing filled but the noteheads. Anything else would read as another family.
+    */
+    a[data-panel] svg {
+      width: 1.5rem;
+      height: 1.5rem;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.6;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    a[data-panel] [data-note] { fill: currentColor; stroke: none; }
+  </style>
 </head>
 <body>
   <template
     is="e-wrapper"
     data-src="/html/static-templates/dev-tools-template.html"
-    data-where-to-place="main > div"
-    data-how-to-place="inside">
+    data-where-to-place="main > div > hr"
+    data-how-to-place="after">
 
     <h1 is="e-h">Dev tools</h1>
-
-    <div is="e-grid" data-gap="md" data-columns="2" data-margin-top="md">
-      <a is="e-link-button" href="/html/font-viewer.html">Font viewer</a>
-      <a is="e-link-button" href="/html/test-viewer.html">Test viewer</a>
-    </div>
-
-    <p is="e-p" data-margin-top="lg">
+    <p is="e-p">
       <span is="e-muted">
-        The font viewer traces a glyph out of a SMuFL font, engraves it where it is
-        actually used, and writes the result back into the music-js font. The test
-        viewer compares what the last suite run produced against the committed
-        baselines, and adopts the new one when it is right.
+        Five things that read and write this working tree.
       </span>
     </p>
+
+    <div data-panels data-margin-top="lg">
+
+      <a data-panel href="/html/font-viewer.html">
+        <span data-icon>
+          <!-- a glyph under a lens: one character traced out of a font -->
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="10.5" cy="10.5" r="7"></circle>
+            <path d="M15.6 15.6 L21 21"></path>
+            <ellipse data-note cx="9.6" cy="12.4" rx="2.2" ry="1.6"
+              transform="rotate(-20 8.8 12.4)"></ellipse>
+            <path d="M10.9 11.9 V6"></path>
+          </svg>
+        </span>
+        <span>
+          <b is="e-b">Font viewer</b>
+          <span data-says>
+            Trace a glyph out of a SMuFL font, see it engraved where it is
+            actually used, and write the result back into the music-js font.
+          </span>
+        </span>
+      </a>
+
+      <a data-panel href="/html/test-viewer.html">
+        <span data-icon>
+          <!-- two panes and a tick: a run held against its baseline -->
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="2.5" y="4.5" width="8" height="15" rx="1.5"></rect>
+            <rect x="13.5" y="4.5" width="8" height="15" rx="1.5"></rect>
+            <path d="M5 9.5 H8"></path>
+            <path d="M5 12.5 H8"></path>
+            <path d="M15.3 12.2 L17 13.9 L19.9 10.6"></path>
+          </svg>
+        </span>
+        <span>
+          <b is="e-b">Test viewer</b>
+          <span data-says>
+            Compare what the last suite run produced against the committed
+            baselines, side by side, and adopt the new one when it is right.
+          </span>
+        </span>
+      </a>
+
+      <a data-panel href="/html/music-xml.html">
+        <span data-icon>
+          <!-- a document, in angle brackets: a score as a file -->
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M6 2.5 h7.5 L19 8 v13.5 H6 z"></path>
+            <path d="M13.5 2.5 V8 H19"></path>
+            <path d="M11.2 12.6 L9 14.8 L11.2 17"></path>
+            <path d="M14.3 12.6 L16.5 14.8 L14.3 17"></path>
+          </svg>
+        </span>
+        <span>
+          <b is="e-b">MusicXML <span is="e-tag" data-font-size="xs">beta</span></b>
+          <span data-says>
+            Convert a score either way and engrave the result, which is how you
+            see what a conversion actually kept.
+          </span>
+        </span>
+      </a>
+
+      <a data-panel href="/html/font-generator.html">
+        <span data-icon>
+          <!-- a font file coming down onto a stave -->
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="5" y="2.5" width="14" height="9" rx="1.5"></rect>
+            <path d="M9.4 9 L12 4.6 L14.6 9"></path>
+            <path d="M10.4 7.4 h3.2"></path>
+            <path d="M12 13 V16.4"></path>
+            <path d="M9.9 14.4 L12 16.5 L14.1 14.4"></path>
+            <path d="M3.5 19 H20.5"></path>
+            <path d="M3.5 21.5 H20.5"></path>
+          </svg>
+        </span>
+        <span>
+          <b is="e-b">Music font generator</b>
+          <span data-says>
+            Turn a SMuFL .otf into a music-js font the drawer can use. What comes
+            out is a scaffold, not a finished font.
+          </span>
+        </span>
+      </a>
+
+      <a data-panel href="/html/magenta-sound-font-generator.html">
+        <span data-icon>
+          <!-- a note, and the levels it is rendered into -->
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <ellipse data-note cx="6.2" cy="16.4" rx="2.5" ry="1.9"
+              transform="rotate(-20 5.6 16.4)"></ellipse>
+            <path d="M8 15.9 V4.5"></path>
+            <path d="M12.5 10.5 V17.5"></path>
+            <path d="M16 7 V21"></path>
+            <path d="M19.5 12 V16"></path>
+          </svg>
+        </span>
+        <span>
+          <b is="e-b">Magenta sound font generator</b>
+          <span data-says>
+            Render an .sf2 soundbank into the sample set the player loads. It
+            needs FluidSynth and Lame, and it takes a while.
+          </span>
+        </span>
+      </a>
+
+    </div>
 
   </template>
 </body>

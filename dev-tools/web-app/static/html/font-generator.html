@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Music font generator · MuSemantiQ dev tools</title>
+  <link rel="preload" href="/html/static-templates/dev-tools-template.html" as="fetch" crossorigin="anonymous">
+  <link rel="stylesheet" href="/css/e-ui.css">
+  <link rel="stylesheet" href="/css/dev-tools.css">
+  <script type="importmap">
+    {
+      "imports": {
+        "#ehtml/": "/js/ehtml/",
+        "#ehtml/main": "/js/ehtml/main.js",
+        "#e-ui/": "/js/e-ui/"
+      }
+    }
+  </script>
+  <script type="module">
+    import '#e-ui/e-file-upload-template.js'
+    import '#e-ui/e-dialog.js'
+    import '#e-ui/e-confirm.js'
+    import '#e-ui/e-toast.js'
+    import '#ehtml/main'
+  </script>
+  <script src="/js/app.js"></script>
+  <style>
+    :root {
+      --e-primary: #222f3e;
+      --e-fg: #222f3e;
+    }
+    pre[data-out] {
+      max-height: 40vh; overflow: auto; margin: 0;
+      white-space: pre-wrap; font-size: 11px; line-height: 1.45;
+    }
+  </style>
+</head>
+<body>
+  <template
+    is="e-wrapper"
+    data-src="/html/static-templates/dev-tools-template.html"
+    data-where-to-place="main > div > hr"
+    data-how-to-place="after">
+
+    <h1 is="e-h">Music font generator</h1>
+    <p is="e-p">
+      <span is="e-muted">
+        Trace a SMuFL <code is="e-code">.otf</code> into the music-js font the
+        drawer reads. The font file is kept in
+        <code is="e-code">src/drawer/font/music</code>, and the table it becomes
+        is written to <code is="e-code">src/drawer/font/music-js</code> under the
+        font's own name in lower case — which is then what
+        <code is="e-code">music font is …</code> accepts.
+      </span>
+    </p>
+
+    <!--
+    A generated font is a starting point and nothing more. Saying so plainly, and
+    before the button rather than after the result, is the difference between a
+    tool that helps and one that quietly produces something unfinished.
+    -->
+    <div is="e-info" data-padding="md" data-margin-top="md">
+      <b is="e-b">What comes out is a scaffold</b>
+      <p is="e-p" data-margin-top="sm">
+        <span is="e-muted" data-font-size="sm">
+          Every glyph is traced at its real size, but where each one sits — above
+          all its <code is="e-code">yCorrection</code> — starts from the midpoint
+          of Bravura and Leland, because no font file carries those values. They
+          have to be set by eye, the way the committed fonts were: open the new
+          font in the
+          <a is="e-link" data-underlined href="/html/font-viewer.html">font viewer</a>,
+          walk the glyph entries, and adjust each correction against the engraved
+          example until it sits where Bravura's does. Until that is done, expect
+          accidentals, articulations and clefs to be a little out.
+        </span>
+      </p>
+    </div>
+
+    <form is="e-form" data-no-style data-width="full" data-margin-top="lg">
+      <div is="e-card" data-width="full" data-padding="lg" data-fields>
+        <template
+          is="e-file-upload"
+          data-name="font"
+          data-label-text="SMuFL font"
+          data-action-text="Choose an .otf, or drop one here"
+          data-details-text="It is traced as it is — nothing is scaled or rewritten."
+          data-icon-src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='24' height='24' fill='none' stroke='%2336454F' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3.2 17.6 L7 8 L10.8 17.6'/%3E%3Cpath d='M4.9 13.9 h4.2'/%3E%3Cellipse cx='15.8' cy='16.8' rx='2.8' ry='2.1' transform='rotate(-20 15.2 16.8)' fill='%2336454F' stroke='none'/%3E%3Cpath d='M17.75 16.3 V5.4'/%3E%3Cpath d='M17.75 5.4 c2.3 0.5 3.8 1.9 3.9 4 -1 -1.4 -2.2 -2.1 -3.9 -2.3'/%3E%3C/svg%3E"
+          data-validation-absence-error-message="Choose a font file first"
+          data-required
+          data-show-errors-in-toast></template>
+
+        <div is="e-row" data-gap="sm" data-margin-top="md" data-keep-flex-direction-row-in-mobile>
+          <!--
+          The whole exchange is the form's: the chosen file arrives at the
+          endpoint as { font: [ { name, content } ] }, and what comes back is
+          rendered by the templates below. `overwrite` starts false and is only
+          set by the answer to the confirm, which is what makes a second run
+          over an existing font deliberate.
+          -->
+          <button
+            id="generate"
+            data-primary
+            type="button"
+            data-request-url="/dev/font/generate"
+            data-request-method="POST"
+            onclick="this.form.submit(this)"
+            data-button-ajax-text="tracing…"
+            data-response-name="generated"
+            data-actions-on-response="
+              if (generated.statusCode === 200) {
+                changeValueOf('#overwrite', 'false')
+                mapToTemplate('#generated-template', generated.body)
+                showToast(`${generated.body.font} generated.`)
+                document.getElementById('fonts').trigger()
+                return
+              }
+              if (generated.statusCode === 409) {
+                confirmAction(generated.body.error + ' Replace it?', 'Replace it', 'Leave it')
+                  .then((confirmed) => {
+                    if (!confirmed) { return }
+                    changeValueOf('#overwrite', 'true')
+                    document.getElementById('generate').click()
+                  })
+                return
+              }
+              showError(generated.body.error || `The server answered ${generated.statusCode}.`)
+              if (generated.body.output) {
+                mapToTemplate('#failed-template', generated.body)
+              }
+            ">
+            Generate the music-js font
+          </button>
+          <div is="e-spacer"></div>
+          <span is="e-muted" data-font-size="sm">
+            A font has about two hundred glyphs to trace; it takes a few seconds.
+          </span>
+        </div>
+
+        <!-- Not a field anyone fills in: the answer to the confirm, carried on
+             the next attempt. -->
+        <input type="hidden" id="overwrite" name="overwrite" value="false">
+      </div>
+    </form>
+
+    <div id="result" data-margin-top="lg"></div>
+
+    <!--
+    Reusable and told where to put itself: a native template is consumed the
+    first time it is mapped, and this page is meant to be used more than once.
+    -->
+    <template
+      is="e-reusable"
+      id="generated-template"
+      data-insert-into="#result"
+      data-object-name="font">
+      <div is="e-card" data-width="full" data-padding="lg">
+        <div is="e-row" data-justify-content="space-between" data-keep-flex-direction-row-in-mobile>
+          <h2 is="e-h" data-text="${font.font}"></h2>
+          <span is="e-muted" data-font-size="sm"
+            data-text="${font.replaced ? 'replaced what was there' : 'a new font'}"></span>
+        </div>
+        <p is="e-p" data-margin-top="sm">
+          <span is="e-muted" data-font-size="sm">
+            Written to <code is="e-code" data-text="${font.musicJs}"></code>, from
+            <code is="e-code" data-text="${font.otf}"></code>. Put
+            <code is="e-code" data-text="music font is ${font.font}"></code> at the
+            top of a score to use it — and tune it before you trust it.
+          </span>
+        </p>
+        <div is="e-row" data-gap="sm" data-margin-top="md" data-keep-flex-direction-row-in-mobile>
+          <a is="e-link-button" href="/html/font-viewer.html">Tune it in the font viewer</a>
+        </div>
+        <details is="e-details" data-margin-top="md">
+          <summary>what the generator said</summary>
+          <pre is="e-pre" data-out data-text="${font.output}"></pre>
+        </details>
+      </div>
+    </template>
+
+    <template
+      is="e-reusable"
+      id="failed-template"
+      data-insert-into="#result"
+      data-object-name="failure">
+      <div is="e-card" data-width="full" data-padding="lg">
+        <b is="e-b">It did not finish</b>
+        <pre is="e-pre" data-out data-margin-top="sm" data-text="${failure.output}"></pre>
+      </div>
+    </template>
+
+    <h2 is="e-h" data-margin-top="lg">What is there now</h2>
+
+    <!--
+    `data-reusable` keeps it in the document: without it an e-json unwraps itself
+    once it has answered, and this one is asked again after every font generated.
+    -->
+    <e-json
+      id="fonts"
+      data-reusable
+      data-src="/dev/fonts"
+      data-response-name="listed"
+      data-actions-on-response="
+        if (listed.statusCode !== 200) {
+          showError(listed.body.error || 'Could not read the fonts.')
+          return
+        }
+        mapToTemplate('#font-list-template', listed.body)
+      "></e-json>
+    <!--
+    Outside the e-json: e-ui gives it display:none, since it is a request rather
+    than something to look at. That is normally invisible because an e-json
+    unwraps itself once it has answered — but a reusable one stays put, and
+    anything left inside it would never be seen.
+    -->
+    <div id="font-list" data-margin-top="sm"></div>
+
+    <template
+      is="e-reusable"
+      id="font-list-template"
+      data-insert-into="#font-list"
+      data-object-name="listing">
+      <div is="e-card" data-width="full" data-padding="md">
+        <ul is="e-list" data-type="bullet">
+          <template is="e-for-each" data-list-to-iterate="${listing.music}" data-item-name="font">
+            <li is="e-list-item">
+              <code is="e-code" data-text="${font.file ? font.file : font.name}"></code>
+              <span is="e-muted" data-font-size="sm" data-text="— ${font.says}"></span>
+            </li>
+          </template>
+        </ul>
+      </div>
+    </template>
+
+  </template>
+</body>
+</html>

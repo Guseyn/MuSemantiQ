@@ -13,6 +13,11 @@ export const REPOSITORY_ROOT = process.cwd()
 export const MUSIC_JS_DIRECTORY = path.join(REPOSITORY_ROOT, 'src/drawer/font/music-js')
 
 /**
+ * Where the test trees live. A suite's `name` is its path under this.
+ */
+export const TEST_ROOT = 'test'
+
+/**
  * The suites the test viewer knows about, and what each one keeps.
  *
  * `msq` is the input rather than a comparison, so it is listed apart from the
@@ -65,6 +70,12 @@ export const SUITES = [
 ]
 
 export const suiteNamed = (name) => SUITES.find((suite) => suite.name === name) || null
+
+/**
+ * Where a suite's folders are on disk.
+ */
+export const suiteDirectory = (suite) =>
+  path.join(REPOSITORY_ROOT, TEST_ROOT, suite.name)
 
 /**
  * A JSON reply, never cached — everything here is the state of the working tree

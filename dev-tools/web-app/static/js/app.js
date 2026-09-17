@@ -62,6 +62,57 @@ window.whenPresent = function (selector) {
 }
 
 /**
+ * Send one file to an endpoint as the request body, reporting progress.
+ *
+ * EHTML's form would do this on its own, but it reads a file with a FileReader
+ * into a base64 data URL first — fine for a font of a few hundred kilobytes,
+ * impossible for a General MIDI soundbank, which is commonly 310 MB and would
+ * become a ~415 MB string in the tab before the request even started. So a file
+ * that big is handed to fetch as it is and streamed straight through.
+ */
+window.uploadFile = function (url, file, onProgress) {
+  return new Promise((resolve, reject) => {
+    const request = new XMLHttpRequest()
+    request.open('POST', `${url}${url.includes('?') ? '&' : '?'}name=${encodeURIComponent(file.name)}`)
+    request.setRequestHeader('content-type', 'application/octet-stream')
+    request.upload.addEventListener('progress', (event) => {
+      if (event.lengthComputable && onProgress) {
+        onProgress(Math.round((event.loaded / event.total) * 100))
+      }
+    })
+    request.addEventListener('load', () => {
+      try {
+        resolve({ status: request.status, body: JSON.parse(request.responseText) })
+      } catch {
+        reject(new Error(`the server answered ${request.status}`))
+      }
+    })
+    request.addEventListener('error', () => reject(new Error('the upload failed')))
+    request.send(file)
+  })
+}
+
+/**
+ * Ask an <e-json> to fetch again, every so many seconds, for as long as the
+ * page says to. Used to watch work that outlives the request that started it.
+ */
+window.keepRefreshing = function (selector, seconds) {
+  const node = document.querySelector(selector)
+  if (!node || node.refreshing) {
+    return
+  }
+  node.refreshing = setInterval(() => node.trigger(), seconds * 1000)
+}
+
+window.stopRefreshing = function (selector) {
+  const node = document.querySelector(selector)
+  if (node && node.refreshing) {
+    clearInterval(node.refreshing)
+    node.refreshing = null
+  }
+}
+
+/**
  * Bytes, said the way a person reads them.
  */
 window.readableBytes = function (bytes) {

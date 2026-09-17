@@ -134,6 +134,32 @@ function pageMeta(schema) {
 function measureCommands(measure) {
   const lines = []
 
+  /*
+  The bar lines come first.
+
+  Not for looks: the parser will not take `ends with …` after a connection, an
+  instrument title or even a time signature has been named, so writing them in
+  the order they are thought of produces a measure that does not read back.
+  */
+  if (measure.openingBarLineName) {
+    lines.push(`starts with ${OPENING_BAR_LINE_WORDS[measure.openingBarLineName] || measure.openingBarLineName}`)
+  }
+  if (measure.withoutStartBarLine) {
+    lines.push('without start barline')
+  }
+  if (measure.closingBarLineName && measure.closingBarLineName !== 'barLine') {
+    lines.push(`ends with ${BAR_LINE_WORDS[measure.closingBarLineName] || measure.closingBarLineName}`)
+  }
+  if (measure.repeatDotsMarkAtTheStart) {
+    lines.push('with repeat sign at the start')
+  }
+  if (measure.repeatDotsMarkAtTheEnd) {
+    lines.push('with repeat sign at the end')
+  }
+  if (measure.endsWithFermata) {
+    lines.push('ends with fermata')
+  }
+
   if (measure.timeSignatureParams) {
     const { cMode, crossed, numerator, denominator } = measure.timeSignatureParams
     const value = cMode ? (crossed ? 'crossed c' : 'c') : `${numerator}:${denominator}`
@@ -182,25 +208,6 @@ function measureCommands(measure) {
   }
   if (measure.simileTwoPreviousMeasuresCount) {
     lines.push(`with simile of two previous measures ${measure.simileTwoPreviousMeasuresCount} times`)
-  }
-
-  if (measure.openingBarLineName) {
-    lines.push(`starts with ${OPENING_BAR_LINE_WORDS[measure.openingBarLineName] || measure.openingBarLineName}`)
-  }
-  if (measure.withoutStartBarLine) {
-    lines.push('without start barline')
-  }
-  if (measure.closingBarLineName && measure.closingBarLineName !== 'barLine') {
-    lines.push(`ends with ${BAR_LINE_WORDS[measure.closingBarLineName] || measure.closingBarLineName}`)
-  }
-  if (measure.repeatDotsMarkAtTheStart) {
-    lines.push('with repeat sign at the start')
-  }
-  if (measure.repeatDotsMarkAtTheEnd) {
-    lines.push('with repeat sign at the end')
-  }
-  if (measure.endsWithFermata) {
-    lines.push('ends with fermata')
   }
 
   if (measure.coda) {

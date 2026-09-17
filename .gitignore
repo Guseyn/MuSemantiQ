@@ -140,15 +140,31 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
 # Font proof sheets written next to each generated music-js font
-# by src/tools/generate-smufl-js-font.js
+# by tools/smufl/generate-smufl-js-font.js
 *.preview.html
 
-# Soundbank and rendered samples for the browser example. Both are far too
-# large to track and are reproducible, so only their .gitinfo notes are kept.
+# The soundbank, and the sample sets rendered from it. Both are far too large
+# to track and are reproducible, so only their .gitinfo notes are kept. The
+# rendered sets live beside the code that plays them and reach each app through
+# a symlink, the way the fonts do.
 examples/browser/web-app/static/sf/*
 !examples/browser/web-app/static/sf/.gitinfo
-examples/browser/web-app/static/magenta-sf/*
-!examples/browser/web-app/static/magenta-sf/.gitinfo
+src/midi/sound-banks/*
+!src/midi/sound-banks/.gitinfo
+src/midi/magenta-sound-font/*
+!src/midi/magenta-sound-font/.gitinfo
+
+# What a generator wrote while it ran, kept so a failed render can be read back.
+.generator-logs/
+examples/browser/web-app/static/magenta-sound-font/
+
+# Each app's static/js/msq is assembled rather than written: the components are
+# copied from web-components/ and the engine beside them is generated from src/.
+# Both halves have one source, so neither copy is tracked.
+#
+#   js/msq/            npm run web-components:update
+#   js/msq/worker/     npm run create:msq:worker
+examples/browser/web-app/static/js/msq/
 
 # Everything under dev-tools/ that a command rebuilds. `npm run dev-tools` runs
 # all of them before starting the server, so a clone needs none of it tracked:
@@ -156,7 +172,7 @@ examples/browser/web-app/static/magenta-sf/*
 #   nodes/            npm run dev-tools:nodes:update   (from ../nodes.js)
 #   js/ehtml/         npm run dev-tools:ehtml:update   (from ../EHTML)
 #   js/e-ui/, e-ui.css  npm run dev-tools:eui:update   (from ../e-ui)
-#   js/msq/           npm run dev-tools:msq:update + create:msq:worker (from src/)
+#   js/msq/           npm run web-components:update + create:msq:worker
 #   font/             npm run setup:symlinks
 #
 # Only the app itself — its pages, its api and its config — is tracked.
@@ -166,3 +182,4 @@ dev-tools/web-app/static/js/e-ui/
 dev-tools/web-app/static/js/msq/
 dev-tools/web-app/static/css/e-ui.css
 dev-tools/web-app/static/font/
+dev-tools/web-app/static/magenta-sound-font/

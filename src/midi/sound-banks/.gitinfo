@@ -1,0 +1,12 @@
+This directory holds the .sf2 soundbanks the Magenta sample sets are rendered
+from. It is expected to exist; its contents are not tracked.
+
+  <name>.sf2      any General MIDI soundbank
+
+Not tracked because a full GM bank is ~310 MB — over GitHub's 100 MB blob limit,
+so it cannot be pushed at all. Download one and drop it in, or upload it through
+the "Magenta sound font generator" dev tool, which puts it here.
+
+What is rendered from it lands in ../magenta-sound-font, beside it, and reaches
+each app through a symlink made by `npm run setup:symlinks`. See that folder's
+.gitinfo for the command.

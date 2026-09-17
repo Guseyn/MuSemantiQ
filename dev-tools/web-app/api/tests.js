@@ -15,12 +15,12 @@ import endpoint from '#dev-nodes/endpoint.js'
 import body from '#dev-nodes/body.js'
 
 import {
-  REPOSITORY_ROOT, SUITES, suiteNamed, respondWith, resolveInside, isSafeTestName
+  SUITES, suiteNamed, suiteDirectory, respondWith, resolveInside, isSafeTestName
 } from './shared.js'
 
 const testNamesOf = async (suite) => {
   try {
-    return (await fs.readdir(path.join(REPOSITORY_ROOT, suite.name, 'msq')))
+    return (await fs.readdir(path.join(suiteDirectory(suite), 'msq')))
       .filter((file) => file.endsWith('.txt'))
       .map((file) => path.basename(file, '.txt'))
       .sort()
@@ -31,7 +31,7 @@ const testNamesOf = async (suite) => {
 
 const readList = async (suite, file) => {
   try {
-    return JSON.parse(await fs.readFile(path.join(REPOSITORY_ROOT, suite.name, file), 'utf-8'))
+    return JSON.parse(await fs.readFile(path.join(suiteDirectory(suite), file), 'utf-8'))
   } catch {
     return []
   }
@@ -87,7 +87,7 @@ const testStatus = endpoint('/dev/tests/status?suite&test', 'GET', async ({ stre
     const file = `${test}.${artifact.extension}`
     const sides = {}
     for (const side of [ 'actual', 'expected' ]) {
-      const at = resolveInside(REPOSITORY_ROOT, suite.name, artifact.name, side, file)
+      const at = resolveInside(suiteDirectory(suite), artifact.name, side, file)
       try {
         sides[side] = at ? await fs.readFile(at) : null
       } catch {
@@ -145,8 +145,8 @@ const adopt = endpoint('/dev/tests/adopt', 'POST', async ({ stream }) => {
   const adopted = []
   for (const artifact of wanted) {
     const file = `${request.test}.${artifact.extension}`
-    const from = resolveInside(REPOSITORY_ROOT, suite.name, artifact.name, 'actual', file)
-    const to = resolveInside(REPOSITORY_ROOT, suite.name, artifact.name, 'expected', file)
+    const from = resolveInside(suiteDirectory(suite), artifact.name, 'actual', file)
+    const to = resolveInside(suiteDirectory(suite), artifact.name, 'expected', file)
     if (!from || !to) {
       return respondWith(stream, 400, { error: 'Path escapes the suite' })
     }
@@ -163,4 +163,80 @@ const adopt = endpoint('/dev/tests/adopt', 'POST', async ({ stream }) => {
   respondWith(stream, 200, { suite: suite.name, test: request.test, adopted })
 })
 
-export default [ testsIndex, testStatus, adopt ]
+/**
+ * Write a new test into every suite of a kind.
+ *
+ * A visual test is not one file: the same music is run against each font, and
+ * the corpus keeps a copy per suite — identical but for the `music font is …`
+ * line the font's own suite carries. Adding one by hand means remembering that,
+ * and a corpus where bravura has a test leland does not is a corpus that no
+ * longer compares anything. So the name and the music are given once here, and
+ * they land in each suite of that kind.
+ *
+ * Only the input is written. The artifacts appear when the suite is next run,
+ * and the expected side when you adopt them in the viewer.
+ */
+const addTest = endpoint('/dev/tests/new', 'POST', async ({ stream }) => {
+  let request
+  try {
+    request = JSON.parse((await body(stream, { maxSize: 4 })).toString('utf-8'))
+  } catch (error) {
+    return respondWith(stream, 400, { error: `Could not read the request: ${error.message}` })
+  }
+
+  const test = (request.test || '').trim()
+  const kind = request.kind === 'audio' ? 'audio' : 'visual'
+  const msq = typeof request.msq === 'string' ? request.msq : ''
+
+  if (!isSafeTestName(test)) {
+    return respondWith(stream, 400, {
+      error: 'A test name is letters, digits, dashes and underscores — and no dots,' +
+        ' since the runners read everything before the first one as the name.'
+    })
+  }
+  if (!msq.trim()) {
+    return respondWith(stream, 400, { error: 'Write some MSQ for it first.' })
+  }
+
+  const suites = SUITES.filter((suite) => suite.kind === kind)
+  const written = []
+  const already = []
+
+  for (const suite of suites) {
+    const at = resolveInside(suiteDirectory(suite), 'msq', `${test}.txt`)
+    if (!at) {
+      return respondWith(stream, 400, { error: 'That name does not stay in the suite.' })
+    }
+    try {
+      await fs.access(at)
+      already.push(suite.name)
+      continue
+    } catch {
+      // Not there yet, which is what we want.
+    }
+
+    /*
+    Which font a suite is for is written into the test itself, as its first
+    line. The corpus does it that way rather than passing the font in, so a test
+    file says on its face what it engraves with.
+    */
+    const font = suite.name.includes('/') ? suite.name.split('/').pop() : null
+    const text = font && font !== 'bravura'
+      ? `music font is ${font}\n\n${msq.trim()}\n`
+      : `${msq.trim()}\n`
+
+    await fs.mkdir(path.dirname(at), { recursive: true })
+    await fs.writeFile(at, text, 'utf-8')
+    written.push(suite.name)
+  }
+
+  if (!written.length) {
+    return respondWith(stream, 409, {
+      error: `There is already a test called ${test} in ${already.join(' and ')}.`
+    })
+  }
+
+  respondWith(stream, 200, { test, kind, wrote: written, already })
+})
+
+export default [ testsIndex, testStatus, adopt, addTest ]

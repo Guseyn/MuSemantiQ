@@ -9,5 +9,6 @@ Not tracked because the file is ~310 MB — over GitHub's 100 MB blob limit, so
 it cannot be pushed at all. Download a GM soundbank and drop it in under this
 name, or point the tools at whatever name you use.
 
-The sample sets in ../magenta-sf are rendered from this file by
-src/tools/generate-magenta-sound-font.js.
+The sample sets in src/midi/magenta-sound-font — which ../magenta-sound-font
+points at — are rendered from this file by
+tools/magenta/generate-magenta-sound-font.js.

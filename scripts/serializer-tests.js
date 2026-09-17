@@ -33,7 +33,7 @@ import {
 } from '#msq/api.js'
 import serialize from '#msq/language/serializer/serialize.js'
 
-const ROOT = 'serializer-tests'
+const ROOT = 'test/serializer-tests'
 
 /*
 The four inputs, each named by the folder holding it and the field of the parse

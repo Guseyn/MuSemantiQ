@@ -8,7 +8,9 @@
     "postinstall": "node scripts/setup-symlinks.js",
     "setup:symlinks": "node scripts/setup-symlinks.js",
     "create:msq:worker": "node scripts/create-msq-worker.js",
+    "web-components:update": "node scripts/copy-web-components.js",
     "watch:src": "node scripts/watch-msq-src.js",
+    "watch:web-components": "node scripts/watch-web-components.js",
 
     "test:visual:all": "node scripts/visual-tests.js",
     "test:audio:all": "node scripts/audio-tests.js",
@@ -25,11 +27,10 @@
     "dev-tools:ehtml:update": "rsync -a --delete ../../my-projects/EHTML/src/ dev-tools/web-app/static/js/ehtml/",
     "dev-tools:nodes:update": "rsync -a --delete ../../my-projects/nodes.js/nodes/ dev-tools/nodes/",
     "dev-tools:eui:update": "rsync -a --delete ../../my-projects/e-ui/static/js/e-ui/ dev-tools/web-app/static/js/e-ui/ && cp -rf ../../my-projects/e-ui/static/css/e-ui.css dev-tools/web-app/static/css/e-ui.css",
-    "dev-tools:msq:update": "rsync -a --delete --exclude worker examples/browser/web-app/static/js/msq/ dev-tools/web-app/static/js/msq/",
     "dev-tools:vendor": "npm run dev-tools:nodes:update && npm run dev-tools:ehtml:update && npm run dev-tools:eui:update",
-    "dev-tools": "npm run dev-tools:vendor && npm run setup:symlinks && npm run create:msq:worker && npm run dev-tools:msq:update && node dev-tools/web-app/main.js",
+    "dev-tools": "npm run dev-tools:vendor && npm run setup:symlinks && npm run create:msq:worker && npm run web-components:update && node dev-tools/web-app/main.js",
 
-    "examples:browser": "npm run setup:symlinks && npm run create:msq:worker && node examples/browser/web-app/main.js",
+    "examples:browser": "npm run setup:symlinks && npm run create:msq:worker && npm run web-components:update && node examples/browser/web-app/main.js",
     "examples:cli": "node examples/cli/msq.js"
   },
   "repository": {
@@ -46,8 +47,9 @@
     "#msq/drawer/*": "./src/drawer/*",
     "#msq/language/*": "./src/language/*",
     "#msq/midi/*": "./src/midi/*",
-    "#msq/tools/*": "./src/tools/*",
     "#msq/api.js": "./src/api.js",
+
+    "#tools/*": "./tools/*",
 
     "#nodes/*": "./examples/browser/nodes/*",
     "#dev-nodes/*": "./dev-tools/nodes/*"
@@ -55,7 +57,8 @@
   "browser.importmap": {
     "#ehtml/": "/js/ehtml/",
     "#e-ui/": "/js/e-ui/",
-    "#msq": "/js/msq"
+    "#msq/": "/js/msq/web-components/",
+    "#msq-worker/": "/js/msq/worker/"
   },
   "worker.importmap": {
     "#msq": "/js/msq/worker"
