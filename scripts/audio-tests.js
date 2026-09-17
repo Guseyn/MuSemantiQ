@@ -15,9 +15,12 @@ import {
 const PAGE_DELIMITER = '====next page===='
 const EMPTY_STRING = ''
 
+// Every test tree lives under test/ ; a runner only ever writes inside its own.
+const ROOT = 'test/audio-tests'
+
 const audioTests = (
   await fs.readdir(
-    'audio-tests',
+    ROOT,
     { withFileTypes: true }
   )
 ).filter(at => {
@@ -35,7 +38,7 @@ function red(str) {
 }
 
 async function runAudioTest() {
-  const listOfMSQInputFiles = await fs.readdir(`audio-tests/msq`)
+  const listOfMSQInputFiles = await fs.readdir(`${ROOT}/msq`)
   const listOfFailedTests = []
   const listOfPassedTests = []
   console.time('Total time spent for audio tests')
@@ -55,7 +58,7 @@ async function runAudioTest() {
 
   for (const msqInputFile of listOfMSQInputFiles) {
     const testName = path.basename(msqInputFile).split('.')[0]
-    const msqInputFileFullPath = `audio-tests/msq/${msqInputFile}`
+    const msqInputFileFullPath = `${ROOT}/msq/${msqInputFile}`
     const text = (await fs.readFile(msqInputFileFullPath, 'utf-8'))
 
     const multiplePagesText = text.split(PAGE_DELIMITER)
@@ -127,14 +130,14 @@ async function runAudioTest() {
         expectedMidiData
       ] = await Promise.all(
         [
-          fs.readFile(`audio-tests/svg/expected/${testName}.svg`, 'utf-8'),
-          fs.readFile(`audio-tests/page-schema/expected/${testName}.json`, 'utf-8'),
-          fs.readFile(`audio-tests/html-highlights/expected/${testName}.html`, 'utf-8'),
-          fs.readFile(`audio-tests/errors/expected/${testName}.json`, 'utf-8'),
-          fs.readFile(`audio-tests/custom-styles/expected/${testName}.json`, 'utf-8'),
-          fs.readFile(`audio-tests/midi-settings/expected/${testName}.json`, 'utf-8'),
-          fs.readFile(`audio-tests/comments/expected/${testName}.json`, 'utf-8'),
-          fs.readFile(`audio-tests/midi/expected/${testName}.mid`, { encoding: null })
+          fs.readFile(`${ROOT}/svg/expected/${testName}.svg`, 'utf-8'),
+          fs.readFile(`${ROOT}/page-schema/expected/${testName}.json`, 'utf-8'),
+          fs.readFile(`${ROOT}/html-highlights/expected/${testName}.html`, 'utf-8'),
+          fs.readFile(`${ROOT}/errors/expected/${testName}.json`, 'utf-8'),
+          fs.readFile(`${ROOT}/custom-styles/expected/${testName}.json`, 'utf-8'),
+          fs.readFile(`${ROOT}/midi-settings/expected/${testName}.json`, 'utf-8'),
+          fs.readFile(`${ROOT}/comments/expected/${testName}.json`, 'utf-8'),
+          fs.readFile(`${ROOT}/midi/expected/${testName}.mid`, { encoding: null })
         ]
       )
 
@@ -210,25 +213,25 @@ async function runAudioTest() {
     } finally {
       await Promise.all(
         [
-          fs.writeFile(`audio-tests/svg/actual/${testName}.svg`, allSvgPages),
-          fs.writeFile(`audio-tests/page-schema/actual/${testName}.json`, stringifiedPageSchema),
-          fs.writeFile(`audio-tests/html-highlights/actual/${testName}.html`, htmlHighlightsForAllPages),
-          fs.writeFile(`audio-tests/errors/actual/${testName}.json`, stringifiedErrors),
-          fs.writeFile(`audio-tests/custom-styles/actual/${testName}.json`, stringifiedCustomStyles),
-          fs.writeFile(`audio-tests/midi-settings/actual/${testName}.json`, stringifiedMidiSettings),
-          fs.writeFile(`audio-tests/comments/actual/${testName}.json`, stringifiedComments),
-          fs.writeFile(`audio-tests/midi/actual/${testName}.mid`, midiData)
+          fs.writeFile(`${ROOT}/svg/actual/${testName}.svg`, allSvgPages),
+          fs.writeFile(`${ROOT}/page-schema/actual/${testName}.json`, stringifiedPageSchema),
+          fs.writeFile(`${ROOT}/html-highlights/actual/${testName}.html`, htmlHighlightsForAllPages),
+          fs.writeFile(`${ROOT}/errors/actual/${testName}.json`, stringifiedErrors),
+          fs.writeFile(`${ROOT}/custom-styles/actual/${testName}.json`, stringifiedCustomStyles),
+          fs.writeFile(`${ROOT}/midi-settings/actual/${testName}.json`, stringifiedMidiSettings),
+          fs.writeFile(`${ROOT}/comments/actual/${testName}.json`, stringifiedComments),
+          fs.writeFile(`${ROOT}/midi/actual/${testName}.mid`, midiData)
         ]
       )
     }
   }
   console.timeEnd(`Total time spent for audio tests`)
   await fs.writeFile(
-    `audio-tests/list-of-failed-tests.json`,
+    `${ROOT}/list-of-failed-tests.json`,
     JSON.stringify(listOfFailedTests)
   )
   await fs.writeFile(
-    `audio-tests/list-of-passed-tests.json`,
+    `${ROOT}/list-of-passed-tests.json`,
     JSON.stringify(listOfPassedTests)
   )
   if (listOfFailedTests.length > 0) {

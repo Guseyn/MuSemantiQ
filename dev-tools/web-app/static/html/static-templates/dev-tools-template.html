@@ -1,11 +1,20 @@
-<header is="e-header">
+<!-- <header is="e-header">
   <span is="e-bold">MuSemantiQ dev tools</span>
-</header>
+</header> -->
 
 <main is="e-main" data-centralized>
   <div is="e-box" data-block-center data-default-main-width data-padding="xl">
-    <div is="e-row" data-justify-content="space-between" data-keep-flex-direction-row-in-mobile>
-      <div is="e-row" data-gap="md" data-keep-flex-direction-row-in-mobile>
+    <div is="e-row" data-justify-content="space-between" data-align-items="end" data-gap="md" data-keep-flex-direction-row-in-mobile>
+      <div is="e-row" data-gap="md" data-align-items="end" data-keep-flex-direction-row-in-mobile>
+        <!--
+        The index is where the tools are listed and said what they are for, so
+        it belongs in the row that names them rather than only in the header,
+        which e-ui hides above 980px.
+        -->
+        <a is="e-link" data-underlined href="/html/index.html"
+           style="font-weight: ${window.location.pathname === '/' || window.location.pathname.endsWith('index.html') ? '700' : '400'}">
+          All tools
+        </a>
         <a is="e-link" data-underlined href="/html/font-viewer.html"
            style="font-weight: ${window.location.pathname.endsWith('font-viewer.html') ? '700' : '400'}">
           Font viewer
@@ -14,15 +23,30 @@
            style="font-weight: ${window.location.pathname.endsWith('test-viewer.html') ? '700' : '400'}">
           Test viewer
         </a>
+        <a is="e-link" data-underlined href="/html/music-xml.html"
+           style="font-weight: ${window.location.pathname.endsWith('music-xml.html') ? '700' : '400'}">
+          MusicXML [beta]
+        </a>
+        <a is="e-link" data-underlined href="/html/font-generator.html"
+           style="font-weight: ${window.location.pathname.endsWith('/font-generator.html') ? '700' : '400'}">
+          Music font generator
+        </a>
+        <a is="e-link" data-underlined href="/html/magenta-sound-font-generator.html"
+           style="font-weight: ${window.location.pathname.endsWith('magenta-sound-font-generator.html') ? '700' : '400'}">
+          Sound font generator
+        </a>
       </div>
       <span is="e-muted" data-font-size="sm">
         working tree · <span data-text="${window.location.host}"></span>
       </span>
     </div>
 
+    <!--
+    Each page places its own content after this rule. It must be `after` and not
+    `inside` the box: `inside` empties the placeholder first, which would take
+    the nav above with it.
+    -->
     <hr is="e-divider">
-
-    <!-- the page's own content lands here -->
   </div>
 </main>
 

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MusicXML · MuSemantiQ dev tools</title>
+    <link rel="preload" href="/html/static-templates/dev-tools-template.html" as="fetch" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/e-ui.css">
+    <link rel="stylesheet" href="/css/dev-tools.css">
+    <script type="importmap">
+      {
+        "imports": {
+          "#ehtml/": "/js/ehtml/",
+          "#ehtml/main": "/js/ehtml/main.js",
+          "#e-ui/": "/js/e-ui/",
+          "#msq/": "/js/msq/web-components/",
+          "#msq-worker/": "/js/msq/worker/"
+        }
+      }
+    </script>
+    <script type="module">
+      import '#e-ui/e-tab.js'
+      import '#e-ui/e-dialog.js'
+      import '#e-ui/e-confirm.js'
+      import '#e-ui/e-toast.js'
+      import '#ehtml/main'
+    </script>
+    <script src="/js/app.js"></script>
+    <style>
+      :root {
+        --e-primary: #222f3e;
+        --e-fg: #222f3e;
+      }
+      textarea[data-source] {
+        width: 100%; min-height: 260px;
+        font-family: var(--e-font-mono); font-size: 12px; line-height: 1.5;
+      }
+      /*
+      The engraving is the point of this tool — a conversion is judged by looking
+      at it — so the score gets a tall box of its own that scrolls rather than
+      stretching the page.
+      */
+      [data-score] {
+        min-height: 50vh; max-height: 78vh;
+        background: #fff; border-radius: var(--e-radius-md);
+        margin-top: var(--e-spacing-sm);
+      }
+      [data-score] img { display: block; max-width: none; }
+      [data-sides] { display: grid; grid-template-columns: 1fr 1fr; gap: var(--e-spacing-md); }
+      @media (max-width: 980px) { [data-sides] { grid-template-columns: 1fr; } }
+      [data-sides] > div { min-width: 0; }
+      pre[data-out] {
+        max-height: 46vh; overflow: auto; margin: 0;
+        white-space: pre; font-size: 11px; line-height: 1.45;
+      }
+      /* MSQ is written to be read, so it wraps rather than scrolling sideways. */
+      pre[data-out][data-wraps] { white-space: pre-wrap; }
+      [data-dropping] { outline: 2px dashed var(--e-primary); outline-offset: 4px; }
+    </style>
+  </head>
+  <body>
+    <template
+      is="e-wrapper"
+      data-src="/html/static-templates/dev-tools-template.html"
+      data-where-to-place="main > div > hr"
+      data-how-to-place="after">
+
+      <h1 is="e-h">MusicXML <span is="e-tag">beta</span></h1>
+      <p is="e-p">
+        <span is="e-muted">
+          Convert a score either way and engrave the result. What a conversion kept
+          is a question about the notes, so the answer is the stave rather than a
+          diff.
+        </span>
+      </p>
+
+      <div is="e-info" data-padding="md" data-margin-top="md">
+        <span is="e-muted" data-font-size="sm">
+          <b is="e-b">Beta.</b> Both directions round-trip the whole test corpus
+          and the Unofficial MusicXML Test Suite, but MusicXML is a large format
+          and this covers what MuSemantiQ itself can express. Read what a
+          conversion says it could not carry over, and judge it by the stave
+          rather than by its having finished.
+        </span>
+      </div>
+
+      <e-tabs id="directions" data-apply-hash-navigation data-margin-top="md">
+
+        <e-tab data-title="MusicXML in">
+          <div is="e-card" data-width="full" data-padding="lg" data-margin-top="md" data-fields>
+            <label>
+              MusicXML
+              <textarea id="xml-in" data-source spellcheck="false"
+                placeholder="Paste a score-partwise document, or drop a .musicxml file anywhere on this page…"></textarea>
+            </label>
+            <div is="e-row" data-gap="sm" data-margin-top="md" data-keep-flex-direction-row-in-mobile>
+              <button id="convert-in" data-primary type="button">Convert and engrave</button>
+              <button id="sample-in" data-primary data-fill="outlined" type="button">Load a sample</button>
+              <div is="e-spacer"></div>
+              <span is="e-muted" data-font-size="sm" id="in-status"></span>
+            </div>
+          </div>
+          <div id="in-result" data-margin-top="lg"></div>
+        </e-tab>
+
+        <e-tab data-title="MusicXML out">
+          <div is="e-card" data-width="full" data-padding="lg" data-margin-top="md" data-fields>
+            <label>
+              MSQ source
+              <textarea id="msq-in" data-source spellcheck="false"
+                placeholder="Write MSQ here, or pick one of the corpus tests below…"></textarea>
+            </label>
+            <div is="e-row" data-gap="sm" data-margin-top="md" data-keep-flex-direction-row-in-mobile>
+              <button id="convert-out" data-primary type="button">Convert and engrave</button>
+              <select id="pick-test" is="searchable-select" data-placeholder="Search the corpus…"></select>
+            </div>
+            <p is="e-p" data-margin-top="sm">
+              <span is="e-muted" data-font-size="sm" id="out-status"></span>
+            </p>
+          </div>
+          <div id="out-result" data-margin-top="lg"></div>
+        </e-tab>
+
+      </e-tabs>
+
+    </template>
+
+    <script type="module" src="/js/music-xml.js"></script>
+  </body>
+</html>

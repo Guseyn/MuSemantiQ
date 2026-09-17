@@ -106,15 +106,6 @@ function rewriteImports(code, map) {
   return rewritten
 }
 
-/*
-Build-time entry points that import Node built-ins, so they must not reach the
-browser. The rest of src/tools is pure and is shared with the font viewer page.
-*/
-const SKIPPED_FILES = new Set([
-  'generate-smufl-js-font.js',
-  'generate-magenta-sound-font.js'
-])
-
 /**
  * Process all files recursively
  */
@@ -130,7 +121,7 @@ function processDirectory(dir, outBaseDir) {
       fs.mkdirSync(outPath, { recursive: true })
       // Recursively process directory
       processDirectory(srcPath, outPath)
-    } else if (entry.isFile() && entry.name.endsWith('.js') && !SKIPPED_FILES.has(entry.name)) {
+    } else if (entry.isFile() && entry.name.endsWith('.js')) {
       // Read file
       let code = fs.readFileSync(srcPath, 'utf-8')
 

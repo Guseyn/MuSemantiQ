@@ -11,9 +11,12 @@ import {
   generateSvgForMultiplePages,
 } from '#msq/api.js'
 
+// Every test tree lives under test/ ; a runner only ever writes inside its own.
+const ROOT = 'test/visual-tests'
+
 const visualTestsForEachFont = (
   await fs.readdir(
-    'visual-tests',
+    ROOT,
     { withFileTypes: true }
   )
 ).filter(vt => {
@@ -36,7 +39,7 @@ function red(str) {
 }
 
 async function runVisualTestForFont(visualTestDirForFont) {
-  const listOfMSQInputFiles = await fs.readdir(`visual-tests/${visualTestDirForFont}/msq`)
+  const listOfMSQInputFiles = await fs.readdir(`${ROOT}/${visualTestDirForFont}/msq`)
   const listOfFailedTests = []
   const listOfPassedTests = []
   console.time('Total time spent for visual tests')
@@ -81,7 +84,7 @@ async function runVisualTestForFont(visualTestDirForFont) {
 
   for (const msqInputFile of listOfMSQInputFiles) {
     const testName = path.basename(msqInputFile).split('.')[0]
-    const msqInputFileFullPath = `visual-tests/${visualTestDirForFont}/msq/${msqInputFile}`
+    const msqInputFileFullPath = `${ROOT}/${visualTestDirForFont}/msq/${msqInputFile}`
 
     const msqText = (await fs.readFile(msqInputFileFullPath, 'utf-8'))
 
@@ -139,13 +142,13 @@ async function runVisualTestForFont(visualTestDirForFont) {
         expectedStringifiedMapOfCharIndexesWithProgressionOfCommandsFromScenarios
       ] = await Promise.all(
         [
-          fs.readFile(`visual-tests/${visualTestDirForFont}/svg/expected/${testName}.svg`, 'utf-8'),
-          fs.readFile(`visual-tests/${visualTestDirForFont}/page-schema/expected/${testName}.json`, 'utf-8'),
-          fs.readFile(`visual-tests/${visualTestDirForFont}/html-highlights/expected/${testName}.html`, 'utf-8'),
-          fs.readFile(`visual-tests/${visualTestDirForFont}/errors/expected/${testName}.json`, 'utf-8'),
-          fs.readFile(`visual-tests/${visualTestDirForFont}/custom-styles/expected/${testName}.json`, 'utf-8'),
-          fs.readFile(`visual-tests/${visualTestDirForFont}/comments/expected/${testName}.json`, 'utf-8'),
-          fs.readFile(`visual-tests/${visualTestDirForFont}/char-progressions/expected/${testName}.json`, 'utf-8')
+          fs.readFile(`${ROOT}/${visualTestDirForFont}/svg/expected/${testName}.svg`, 'utf-8'),
+          fs.readFile(`${ROOT}/${visualTestDirForFont}/page-schema/expected/${testName}.json`, 'utf-8'),
+          fs.readFile(`${ROOT}/${visualTestDirForFont}/html-highlights/expected/${testName}.html`, 'utf-8'),
+          fs.readFile(`${ROOT}/${visualTestDirForFont}/errors/expected/${testName}.json`, 'utf-8'),
+          fs.readFile(`${ROOT}/${visualTestDirForFont}/custom-styles/expected/${testName}.json`, 'utf-8'),
+          fs.readFile(`${ROOT}/${visualTestDirForFont}/comments/expected/${testName}.json`, 'utf-8'),
+          fs.readFile(`${ROOT}/${visualTestDirForFont}/char-progressions/expected/${testName}.json`, 'utf-8')
         ]
       )
 
@@ -211,24 +214,24 @@ async function runVisualTestForFont(visualTestDirForFont) {
     } finally {
       await Promise.all(
         [
-          fs.writeFile(`visual-tests/${visualTestDirForFont}/svg/actual/${testName}.svg`, allSvgPages),
-          fs.writeFile(`visual-tests/${visualTestDirForFont}/page-schema/actual/${testName}.json`, stringifiedPageSchema),
-          fs.writeFile(`visual-tests/${visualTestDirForFont}/html-highlights/actual/${testName}.html`, htmlHighlightsForAllPages),
-          fs.writeFile(`visual-tests/${visualTestDirForFont}/errors/actual/${testName}.json`, stringifiedErrors),
-          fs.writeFile(`visual-tests/${visualTestDirForFont}/custom-styles/actual/${testName}.json`, stringifiedCustomStyles),
-          fs.writeFile(`visual-tests/${visualTestDirForFont}/comments/actual/${testName}.json`, stringifiedComments),
-          fs.writeFile(`visual-tests/${visualTestDirForFont}/char-progressions/actual/${testName}.json`, stringifiedMapOfCharIndexesWithProgressionOfCommandsFromScenarios)
+          fs.writeFile(`${ROOT}/${visualTestDirForFont}/svg/actual/${testName}.svg`, allSvgPages),
+          fs.writeFile(`${ROOT}/${visualTestDirForFont}/page-schema/actual/${testName}.json`, stringifiedPageSchema),
+          fs.writeFile(`${ROOT}/${visualTestDirForFont}/html-highlights/actual/${testName}.html`, htmlHighlightsForAllPages),
+          fs.writeFile(`${ROOT}/${visualTestDirForFont}/errors/actual/${testName}.json`, stringifiedErrors),
+          fs.writeFile(`${ROOT}/${visualTestDirForFont}/custom-styles/actual/${testName}.json`, stringifiedCustomStyles),
+          fs.writeFile(`${ROOT}/${visualTestDirForFont}/comments/actual/${testName}.json`, stringifiedComments),
+          fs.writeFile(`${ROOT}/${visualTestDirForFont}/char-progressions/actual/${testName}.json`, stringifiedMapOfCharIndexesWithProgressionOfCommandsFromScenarios)
         ]
       )
     }
   }
   console.timeEnd('Total time spent for visual tests')
   await fs.writeFile(
-    `visual-tests/${visualTestDirForFont}/list-of-failed-tests.json`,
+    `${ROOT}/${visualTestDirForFont}/list-of-failed-tests.json`,
     JSON.stringify(listOfFailedTests)
   )
   await fs.writeFile(
-    `visual-tests/${visualTestDirForFont}/list-of-passed-tests.json`,
+    `${ROOT}/${visualTestDirForFont}/list-of-passed-tests.json`,
     JSON.stringify(listOfPassedTests)
   )
   if (listOfFailedTests.length > 0) {

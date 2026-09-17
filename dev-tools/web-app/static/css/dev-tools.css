@@ -76,9 +76,78 @@ beside it.
   width: 100%;
 }
 
+/*
+A block of fields is a column with room between them — the same shape e-ui's
+`e-stack` gives, applied wherever the attribute is rather than asking every card
+and form to say it again.
+*/
+[data-fields] {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-spacing-md);
+}
+
 [data-fields] input,
 [data-fields] select,
 [data-fields] textarea,
 [data-fields] [data-combobox] {
   width: 100%;
+}
+
+/*
+A dialog's own content, with room around it.
+
+e-ui gives the dialog `padding: 0` and moves whatever you put in it into a
+wrapper of its own making, so this is where the room has to go.
+*/
+dialog[is="e-dialog"] > div {
+  padding: var(--e-spacing-lg);
+  box-sizing: border-box;
+}
+
+/*
+The close icon: Material's own `close`, taken as a mask rather than as a picture.
+
+The component makes an `<img>` when it is given a source, and an image cannot
+take `currentColor` — so the icon is used to cut the shape out of a block of
+--e-fg instead, which keeps it the same colour as the text beside it.
+*/
+dialog[is="e-dialog"] [is="e-close-icon"]::after {
+  content: "";
+  display: block;
+  width: 100%;
+  height: 100%;
+  background-color: var(--e-fg);
+  -webkit-mask-image: url("/images/close.svg");
+  mask-image: url("/images/close.svg");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: 62%;
+  mask-size: 62%;
+}
+
+/*
+Room around what a details opens onto, whatever it holds.
+
+e-ui pads a `p` and a `div` in there, and these mostly hold a `pre` — which has a
+border and a ground of its own. Padding would go *inside* that border and leave
+the two borders touching, so the space is a margin. The summary keeps its own
+padding; only what it opens onto is moved.
+*/
+details[is="e-details"] > :not(summary) {
+  box-sizing: border-box;
+  margin: var(--e-spacing-sm) var(--e-spacing-md) var(--e-spacing-md);
+  max-width: 100%;
+}
+
+/*
+A `p` or a `div` in there is already padded by e-ui, and has no border of its
+own for that padding to sit inside — so for those the margin above replaces it
+rather than adding to it.
+*/
+details[is="e-details"] > p,
+details[is="e-details"] > div {
+  padding: 0;
 }

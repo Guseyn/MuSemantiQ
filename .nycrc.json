@@ -13,7 +13,6 @@
     "src/drawer/font-urls.js",
 
     "src/drawer/font/**",
-    "src/tools/**",
 
     "src/worker.js",
     "src/utils.js",
