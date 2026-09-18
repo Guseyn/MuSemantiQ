@@ -1,0 +1,15 @@
+measure
+e with demisharp key
+f with demisharp key
+g with demisharp key
+a with demisharp key
+measure
+b with demisharp key, with stem down
+c5 with demisharp key, with stem down
+d5 with demisharp key, with stem down
+e5 with demisharp key, with stem down
+measure
+c with demisharp key
+a5 with demisharp key, with stem down
+chord
+f a with demisharp key c5

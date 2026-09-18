@@ -1,0 +1,5 @@
+measure
+4 rest
+4 b
+4 rest
+4 a

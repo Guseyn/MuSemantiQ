@@ -1,0 +1,15 @@
+measure
+e with sharp key
+f with sharp key
+g with sharp key
+a with sharp key
+measure
+b with sharp key, with stem down
+c5 with sharp key, with stem down
+d5 with sharp key, with stem down
+e5 with sharp key, with stem down
+measure
+c with sharp key
+a5 with sharp key, with stem down
+chord
+f a with sharp key c5

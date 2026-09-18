@@ -1,0 +1,29 @@
+music font is leland
+
+comment: "
+  Where a chord sits changes how it is drawn. First chords whose notes are all
+  on stave lines, then all in the spaces between them, then mixed — each with
+  the stem up and again with the stem down.
+"
+
+measure
+treble clef
+chord
+e g b d5
+
+chord with stem down
+e g b d5
+
+measure
+chord
+f a c5 e5
+
+chord with stem down
+f a c5 e5
+
+measure
+chord
+e f a b
+
+chord with stem down
+g a c5 d5

@@ -1,0 +1,4 @@
+measure
+voice
+1/256 e with stem down, f g a
+b with stem up, c5 d5 e5

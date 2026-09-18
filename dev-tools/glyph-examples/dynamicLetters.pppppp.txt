@@ -1,0 +1,5 @@
+measure
+b with dynamic "pppppp"
+a with dynamic "pppppp"
+d5 with dynamic "pppppp" below, with stem down
+c5 with dynamic "pppppp" below, with stem down

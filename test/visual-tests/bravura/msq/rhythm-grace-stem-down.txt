@@ -1,0 +1,24 @@
+comment: "
+  Grace notes with the stem forced down, a grace chord holding a second, and a
+  grace written long — each drawn smaller than the note it leans on, and each
+  having to find room on the other side of its stem.
+"
+
+measure
+treble clef
+1/8 c5 is grace, with stem down
+1/4 b
+
+1/8 chord is grace, with stem down
+c5 d5 e5
+
+1/4 a
+
+measure
+1/8 chord is grace, with stem up
+c d e
+
+1/4 f
+
+1 a is grace
+1/4 b

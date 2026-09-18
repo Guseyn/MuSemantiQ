@@ -1,0 +1,4 @@
+measure
+stave with octave fifteen up clef
+e f g a
+b c5 d5 e5

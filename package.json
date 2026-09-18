@@ -18,7 +18,7 @@
     "test:all": "npm run test:visual:all && npm run test:audio:all && npm run test:serializer:all",
     "coverage": "c8 npm run test:all",
     "coverage:report": "c8 report --reporter=html",
-    "coverage:check": "c8 check-coverage --statements 86 --branches 74 --functions 70 --lines 86",
+    "coverage:check": "c8 check-coverage --statements 87 --branches 86 --functions 82 --lines 87",
 
     "ehtml:update": "rsync -a --delete ../../my-projects/EHTML/src/ examples/browser/web-app/static/js/ehtml",
     "nodes:update": "rsync -a --delete ../../my-projects/nodes.js/nodes/ examples/browser/nodes/",

@@ -14,6 +14,26 @@ import {
 // Every test tree lives under test/ ; a runner only ever writes inside its own.
 const ROOT = 'test/visual-tests'
 
+/*
+A run can be narrowed to the tests whose name matches, the way the serializer
+runner already allows:
+
+  node scripts/visual-tests.js --only=chord
+
+It writes and compares only those, which is what lets one test be brought up to
+date without walking the whole corpus.
+*/
+const only = process.argv.find((argument) => argument.startsWith('--only='))
+const onlyPattern = only ? only.slice('--only='.length) : null
+/*
+A test is a `.txt` file and nothing else: the folder also collects whatever the
+operating system leaves behind (`.DS_Store`), and a name taken from such a file
+is empty, so it fails against an artifact that was never written for it.
+*/
+const wanted = (file) =>
+  file.endsWith('.txt') && (!onlyPattern || file.includes(onlyPattern))
+
+
 const visualTestsForEachFont = (
   await fs.readdir(
     ROOT,
@@ -26,8 +46,21 @@ const visualTestsForEachFont = (
 const PAGE_DELIMITER = '====next page===='
 const EMPTY_STRING = ''
 
+/*
+Every font is run before anything is thrown, and the failures are counted up
+across them. Throwing on the first font's failures would leave the rest of the
+corpus unrun — so a new test would get its artifacts under bravura and none
+under leland, which is the one state a comparison corpus must never be in.
+*/
+let failedAcrossFonts = 0
 for (const visualTestDirForFont of visualTestsForEachFont) {
-  await runVisualTestForFont(visualTestDirForFont)
+  failedAcrossFonts += await runVisualTestForFont(visualTestDirForFont)
+}
+if (failedAcrossFonts > 0) {
+  throw new Error(
+    `There are (${failedAcrossFonts}) failed visual tests. ` +
+    `Please check https://127.0.0.1:8889/html/test-viewer.html#visual\n\n`
+  )
 }
 
 function green(str) {
@@ -39,7 +72,8 @@ function red(str) {
 }
 
 async function runVisualTestForFont(visualTestDirForFont) {
-  const listOfMSQInputFiles = await fs.readdir(`${ROOT}/${visualTestDirForFont}/msq`)
+  const listOfMSQInputFiles =
+    (await fs.readdir(`${ROOT}/${visualTestDirForFont}/msq`)).filter(wanted)
   const listOfFailedTests = []
   const listOfPassedTests = []
   console.time('Total time spent for visual tests')
@@ -235,10 +269,15 @@ async function runVisualTestForFont(visualTestDirForFont) {
     JSON.stringify(listOfPassedTests)
   )
   if (listOfFailedTests.length > 0) {
-    throw new Error(
-      `There are (${listOfFailedTests.length})  failed visual tests. Please check https://127.0.0.1:8889/html/test-viewer.html#visual\n\n`
+    process.stdout.write(
+      `There are (${listOfFailedTests.length}) failed visual tests for ${visualTestDirForFont}. ` +
+      `Please check https://127.0.0.1:8889/html/test-viewer.html#visual\n\n`
     )
   } else {
-    process.stdout.write(`All visual tests passed. Please check https://127.0.0.1:8889/html/test-viewer.html#visual\n\n`)
+    process.stdout.write(
+      `All visual tests passed for ${visualTestDirForFont}. ` +
+      `Please check https://127.0.0.1:8889/html/test-viewer.html#visual\n\n`
+    )
   }
+  return listOfFailedTests.length
 }

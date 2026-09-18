@@ -1,0 +1,27 @@
+comment: "
+  Three voices on a stave, then four. Each after the first points its stems the
+  other way, and the rests they need to keep out of each other have to stack
+  rather than sit on top of one another.
+"
+
+measure
+treble clef
+voice
+1/4 g a b c5
+voice
+1/4 e f g a
+voice
+1/4 c c c c
+
+measure
+voice
+1/2 c5
+1/2 b
+voice
+1/4 rest
+1/4 g a b
+voice
+1/2 e
+1/2 d
+voice
+1 c

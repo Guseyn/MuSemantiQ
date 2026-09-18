@@ -1,0 +1,20 @@
+comment: "
+  A ghost head is narrower than a normal one, so a chord holding both has to
+  line the two widths up against the same stem — with the stem each way, and
+  once with a second in the chord as well.
+"
+
+measure
+treble clef
+1/4 chord
+c is ghost, e is not ghost, g
+
+1/4 chord with stem down
+c5 is ghost, e5 is not ghost, g5
+
+measure
+1/4 chord
+c is ghost, d is not ghost, f, a is ghost
+
+1/2 chord with stem down
+c5 is not ghost, b is ghost, g

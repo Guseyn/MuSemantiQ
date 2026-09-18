@@ -1,0 +1,15 @@
+measure
+1 e
+1 f
+1 g
+1 a
+measure
+1 b with stem down
+1 c5 with stem down
+1 d5 with stem down
+1 e5 with stem down
+measure
+1 c
+1 a5 with stem down
+chord
+1 f a c5

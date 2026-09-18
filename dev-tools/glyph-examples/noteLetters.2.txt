@@ -1,0 +1,5 @@
+measure
+b with text "2" above
+a with text "2" above
+d5 with text "2" below, with stem down
+c5 with text "2" below, with stem down

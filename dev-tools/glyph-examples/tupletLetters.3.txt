@@ -1,0 +1,5 @@
+measure
+1/8 g beamed, a, b
+1/8 c5 beamed, d5, e5
+tuplet 3 with brackets from first unit to third unit
+tuplet 3 with brackets from fourth unit to 6th unit

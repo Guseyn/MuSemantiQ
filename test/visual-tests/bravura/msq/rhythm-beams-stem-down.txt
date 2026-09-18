@@ -1,0 +1,14 @@
+comment: "
+  Beamed runs with their stems forced down: a falling line, a flat one where the
+  beam stays level, and a pair of leaps wide enough that the beam would cut
+  through a notehead if it were not held back.
+"
+
+measure
+treble clef
+1/16 a5 beamed and stem down, g5, f5, e5, d5, c5, b, a not beamed
+
+measure
+1/8 c5 beamed and stem down, c5, c5, c5 not beamed
+
+1/8 a5 beamed and stem down, b3, a5, b3 not beamed

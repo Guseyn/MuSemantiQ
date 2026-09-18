@@ -23,6 +23,7 @@ import body from '#dev-nodes/body.js'
 import { REPOSITORY_ROOT, respondWith, resolveInside } from './shared.js'
 
 const FONT_ROOT = path.join(REPOSITORY_ROOT, 'src/drawer/font')
+const GLYPH_EXAMPLE_DIRECTORY = path.join(REPOSITORY_ROOT, 'dev-tools/glyph-examples')
 
 export const FAMILIES = {
   music: { directory: path.join(FONT_ROOT, 'music'), extension: '.otf' },
@@ -255,4 +256,46 @@ const uploadFont = endpoint('/dev/fonts/upload', 'POST', async ({ stream }) => {
   })
 })
 
-export default [ listFonts, uploadFont ]
+/**
+ * Rewrite the music a glyph is judged in.
+ *
+ * The examples are files rather than generated strings so that a bad one can be
+ * fixed by writing music — and this is what lets that happen from the viewer
+ * itself, where you can see what the change does, instead of from an editor
+ * with the page reloaded afterwards.
+ *
+ * Only the file name the viewer computed is accepted, and only inside the
+ * examples folder: nothing here should be able to write anywhere else.
+ */
+const saveGlyphExample = endpoint('/dev/glyph-example', 'POST', async ({ stream }) => {
+  let request
+  try {
+    request = JSON.parse((await body(stream, { maxSize: 2 })).toString('utf-8'))
+  } catch (error) {
+    return respondWith(stream, 400, { error: `Could not read the request: ${error.message}` })
+  }
+
+  const file = request.file
+  /*
+  A glyph's file is named after its entry; the two faces are `_text` and
+  `_chord-letters`, the leading underscore marking them as not a glyph.
+  */
+  if (typeof file !== 'string' || !/^[A-Za-z0-9_][A-Za-z0-9 .:_-]*\.txt$/.test(file) || file.includes('..')) {
+    return respondWith(stream, 400, { error: 'Expected { file } naming an example' })
+  }
+  if (typeof request.msq !== 'string' || !request.msq.trim()) {
+    return respondWith(stream, 400, { error: 'An example cannot be empty.' })
+  }
+
+  const at = resolveInside(GLYPH_EXAMPLE_DIRECTORY, file)
+  if (!at) {
+    return respondWith(stream, 400, { error: 'That name does not stay in the examples folder.' })
+  }
+
+  await fs.mkdir(GLYPH_EXAMPLE_DIRECTORY, { recursive: true })
+  await fs.writeFile(at, `${request.msq.trim()}\n`, 'utf-8')
+
+  respondWith(stream, 200, { file, at: path.relative(REPOSITORY_ROOT, at) })
+})
+
+export default [ listFonts, uploadFont, saveGlyphExample ]

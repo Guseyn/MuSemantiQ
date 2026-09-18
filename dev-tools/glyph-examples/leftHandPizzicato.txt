@@ -1,0 +1,11 @@
+measure
+b with left hand pizzicato up, with stem up
+b with left hand pizzicato up, with stem down
+b with left hand pizzicato down, with stem up
+b with left hand pizzicato down, with stem down
+
+measure
+a with left hand pizzicato up, with stem up
+a with left hand pizzicato up, with stem down
+a with left hand pizzicato down, with stem up
+a with left hand pizzicato down, with stem down

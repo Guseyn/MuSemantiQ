@@ -18,6 +18,26 @@ const EMPTY_STRING = ''
 // Every test tree lives under test/ ; a runner only ever writes inside its own.
 const ROOT = 'test/audio-tests'
 
+/*
+A run can be narrowed to the tests whose name matches, the way the serializer
+runner already allows:
+
+  node scripts/audio-tests.js --only=chord
+
+It writes and compares only those, which is what lets one test be brought up to
+date without walking the whole corpus.
+*/
+const only = process.argv.find((argument) => argument.startsWith('--only='))
+const onlyPattern = only ? only.slice('--only='.length) : null
+/*
+A test is a `.txt` file and nothing else: the folder also collects whatever the
+operating system leaves behind (`.DS_Store`), and a name taken from such a file
+is empty, so it fails against an artifact that was never written for it.
+*/
+const wanted = (file) =>
+  file.endsWith('.txt') && (!onlyPattern || file.includes(onlyPattern))
+
+
 const audioTests = (
   await fs.readdir(
     ROOT,
@@ -38,12 +58,42 @@ function red(str) {
 }
 
 async function runAudioTest() {
-  const listOfMSQInputFiles = await fs.readdir(`${ROOT}/msq`)
+  const listOfMSQInputFiles = (await fs.readdir(`${ROOT}/msq`)).filter(wanted)
   const listOfFailedTests = []
   const listOfPassedTests = []
   console.time('Total time spent for audio tests')
 
-  const supportedFontSources = await setupFonts()
+  /*
+  The two fonts that are properly set up, named rather than left to the
+  defaults — which reach for all four, and so made this suite depend on font
+  files no test asks for.
+  */
+  const supportedFontSources = await setupFonts({
+    'chord-letters': {
+      'gentium plus': './src/drawer/font/chord-letters/GentiumPlus-Regular.ttf',
+      'gothic a1': './src/drawer/font/chord-letters/GothicA1-Regular.ttf'
+    },
+    'text': {
+      'noto-serif': {
+        'regular': './src/drawer/font/text/NotoSerif-Regular.ttf',
+        'bold': './src/drawer/font/text/NotoSerif-Bold.ttf'
+      },
+      'noto-sans': {
+        'regular': './src/drawer/font/text/NotoSans-Regular.ttf',
+        'bold': './src/drawer/font/text/NotoSans-Bold.ttf'
+      }
+    },
+    'music': {
+      'bravura': {
+        'font': './src/drawer/font/music/Bravura.otf',
+        'js': '#msq/drawer/font/music-js/bravura.js'
+      },
+      'leland': {
+        'font': './src/drawer/font/music/Leland.otf',
+        'js': '#msq/drawer/font/music-js/leland.js'
+      }
+    }
+  })
 
   const supportedFontNames = {
     'chord-letters': Object.keys(supportedFontSources['chord-letters']),

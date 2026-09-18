@@ -1,0 +1,5 @@
+measure
+b with dynamic "sfz"
+a with dynamic "sfz"
+d5 with dynamic "sfz" below, with stem down
+c5 with dynamic "sfz" below, with stem down

@@ -1,0 +1,25 @@
+music font is leland
+
+comment: "
+  A span that names only the voice it belongs to, leaving the line, the measure
+  and the stave to be understood from where the music has got to.
+"
+
+measure
+treble clef
+voice
+1/4 c d e f
+voice
+1/4 c5 b a g
+
+octave up in voice 2
+from unit 1 to unit 3
+
+measure
+voice
+1/4 g a b c5
+voice
+1/4 e f g a
+
+slur in voice 1
+from unit 1 to unit 4

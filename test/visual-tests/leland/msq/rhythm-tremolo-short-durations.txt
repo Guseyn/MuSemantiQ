@@ -1,0 +1,16 @@
+music font is leland
+
+comment: "
+  A tremolo between two notes short enough that its strokes and the beam they
+  would otherwise be share the same space, and a pair asking for fewer strokes
+  than the duration would give them.
+"
+
+measure
+treble clef
+1/4 f with tremolo with next
+1/4 a with tremolo with next
+
+measure
+1/2 f with tremolo with next with 2 strokes
+1/2 a with tremolo with next with 2 strokes

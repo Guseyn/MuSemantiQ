@@ -198,6 +198,16 @@ export default (autocompleteListView, textarea, divUnderneathTextarea) => {
   let enterOrTabIsUp = true
 
   textarea.addEventListener('keyup', (event) => {
+    /*
+    Switched off in the editor's settings. The list is closed rather than merely
+    left alone, so turning it off while it is open puts it away.
+    */
+    if (textarea.autocompleteIsOff) {
+      if (isAutocompleteListViewOpened(autocompleteListView)) {
+        closeAutocompleteListView(autocompleteListView, textarea)
+      }
+      return
+    }
     const itIsSpaceBarPressed = event.keyCode === 32
     const itIsEnterPressed = event.keyCode === 13
     const itIsTabPressed = event.keyCode === 9

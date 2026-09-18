@@ -1,0 +1,29 @@
+music font is leland
+
+comment: "
+  A chord holding a second cannot put both notes on the same side of the stem,
+  so one of them is displaced. Here a plain second, a three-note cluster, and
+  both again with the stem down, where the displaced note swaps sides.
+"
+
+measure
+treble clef
+chord
+c d
+
+chord
+c d e
+
+measure
+chord with stem down
+c5 d5
+
+chord with stem down
+c5 d5 e5
+
+measure
+chord
+c d f a
+
+chord with stem down
+c d f a

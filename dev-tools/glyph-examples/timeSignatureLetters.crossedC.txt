@@ -1,0 +1,4 @@
+measure
+time signature is crossed c
+e f g a
+b c5 d5 e5

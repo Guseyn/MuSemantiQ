@@ -33,7 +33,7 @@ import os from 'os'
 import path from 'path'
 import readline from 'readline/promises'
 import { execFile } from 'child_process'
-import { fileURLToPath } from 'url'
+import { fileURLToPath, pathToFileURL } from 'url'
 import { promisify } from 'util'
 import { writeMidi } from '#msq/midi/lib/midi-file/index.js'
 
@@ -60,7 +60,7 @@ const DEFAULT_BUILD_DIR = path.join(
 // interact with the generated soundfonts.
 // The number next to each name is its GM program: the value to pass in the
 // `instruments` argument.
-const MIDIJS_PATCH_NAMES = [
+export const MIDIJS_PATCH_NAMES = [
   'Acoustic Grand Piano',    // 0
   'Bright Acoustic Piano',   // 1
   'Electric Grand Piano',    // 2
@@ -279,6 +279,16 @@ function parseInstruments(spec) {
     throw new Error(`No instruments in: '${spec}'`)
   }
 
+  /*
+  Program 0 is always rendered, whether or not it was asked for.
+
+  It is the one the player falls back to — a note that names no program is
+  played as program 0 — and a set without it simply falls silent for anything it
+  does not hold, logging the miss and playing nothing. One more instrument is a
+  few minutes; a set that cannot play a plain note is useless.
+  */
+  programs.add(0)
+
   return [ ...programs ].sort((one, another) => one - another)
 }
 
@@ -297,7 +307,7 @@ async function which(command) {
 /**
  * Turn an instrument name into the folder name used for its samples.
  */
-function instrumentKeyForName(instrument) {
+export function instrumentKeyForName(instrument) {
   return instrument.toLowerCase().replace(/[^a-z0-9 ]/g, '').replace(/ /g, '_')
 }
 
@@ -479,9 +489,54 @@ async function main() {
     os.availableParallelism(),
     (program) => generateAudio(program, { soundfont, buildDir, lame, fluidsynth })
   )
+
+  writeSoundFontIndex(buildDir)
 }
 
-main().catch((error) => {
-  console.error('[generate-magenta-sound-font] Error:', error.message)
-  process.exit(1)
-})
+/**
+ * The index the player reads first.
+ *
+ * `@magenta/music`'s SoundFont player asks for `soundfont.json` at the root of
+ * a set before anything else: it maps a General MIDI program number to the
+ * folder its samples are in, and without it the set cannot be played at all.
+ *
+ * It is written from what is actually on disk rather than from what this run
+ * asked for, so a set built up over several runs — or one whose render was
+ * stopped part way — still names everything it has.
+ */
+export function writeSoundFontIndex(buildDir) {
+  const present = new Set(
+    fs.readdirSync(buildDir, { withFileTypes: true })
+      .filter((entry) => entry.isDirectory())
+      .map((entry) => entry.name)
+  )
+
+  const instruments = {}
+  for (const [ program, name ] of MIDIJS_PATCH_NAMES.entries()) {
+    const key = instrumentKeyForName(name)
+    if (present.has(key)) {
+      instruments[program] = key
+    }
+  }
+
+  fs.writeFileSync(
+    path.join(buildDir, 'soundfont.json'),
+    JSON.stringify({ name: path.basename(buildDir), instruments }, null, 2)
+  )
+  return Object.keys(instruments).length
+}
+
+/*
+Run only when this file is the program, not when something imports it.
+
+`writeSoundFontIndex` below is worth importing on its own — the dev tools use it
+to give an older set the index the player needs — and without this guard that
+import would run the whole command line, fail for want of arguments, and take
+the importing process down with it.
+*/
+if (process.argv[1] && pathToFileURL(process.argv[1]).href === import.meta.url) {
+  main().catch((error) => {
+    console.error('[generate-magenta-sound-font] Error:', error.message)
+    process.exit(1)
+  })
+}

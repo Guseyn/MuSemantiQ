@@ -1,0 +1,15 @@
+measure
+e with flat key
+f with flat key
+g with flat key
+a with flat key
+measure
+b with flat key, with stem down
+c5 with flat key, with stem down
+d5 with flat key, with stem down
+e5 with flat key, with stem down
+measure
+c with flat key
+a5 with flat key, with stem down
+chord
+f a with flat key c5

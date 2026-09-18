@@ -20,6 +20,10 @@ import { spawn } from 'child_process'
 import endpoint from '#dev-nodes/endpoint.js'
 import body from '#dev-nodes/body.js'
 
+import {
+  writeSoundFontIndex, MIDIJS_PATCH_NAMES, instrumentKeyForName
+} from '#tools/magenta/generate-magenta-sound-font.js'
+
 import { REPOSITORY_ROOT, respondWith, resolveInside } from './shared.js'
 
 const MUSIC_FONT_DIRECTORY = path.join(REPOSITORY_ROOT, 'src/drawer/font/music')
@@ -572,6 +576,22 @@ const listSets = endpoint('/dev/magenta/sets', 'GET', async ({ stream }) => {
       .wav beside them while it runs, so counting entries would count those too.
       */
       const at = path.join(SAMPLE_SET_DIRECTORY, entry.name)
+
+      /*
+      The player reads soundfont.json at the root of a set before anything else
+      — it maps a program number to the folder its samples are in, and without
+      it the set cannot be played at all. Sets rendered before the generator
+      started writing one have none, so it is written from what is on disk the
+      first time the set is looked at.
+      */
+      if (!fs.existsSync(path.join(at, 'soundfont.json'))) {
+        try {
+          writeSoundFontIndex(at)
+        } catch {
+          // A set mid-render, or one we cannot write to, is not worth failing over.
+        }
+      }
+
       const instruments = []
       for (const one of (await fsp.readdir(at, { withFileTypes: true })).filter((each) => each.isDirectory())) {
         const samples = await fsp.readdir(path.join(at, one.name))
@@ -591,6 +611,40 @@ const listSets = endpoint('/dev/magenta/sets', 'GET', async ({ stream }) => {
   }
 
   respondWith(stream, 200, { sets: sets.sort((one, other) => one.name.localeCompare(other.name)) })
+})
+
+/*
+General MIDI lays its 128 programs out as sixteen families of eight, and the
+families are what make the list readable — you look for "a flute", not for 73.
+*/
+const GENERAL_MIDI_FAMILIES = [
+  'Piano', 'Chromatic percussion', 'Organ', 'Guitar',
+  'Bass', 'Strings', 'Ensemble', 'Brass',
+  'Reed', 'Pipe', 'Synth lead', 'Synth pad',
+  'Synth effects', 'Ethnic', 'Percussive', 'Sound effects'
+]
+
+/**
+ * Every program the renderer can be asked for, with the folder each one lands
+ * in.
+ *
+ * Read from the renderer's own table rather than written out again here: the
+ * page uses this to say what a number means, and a second copy of 128 names
+ * would be a second copy to be wrong. The folder name is what the player looks
+ * a set up by, so it is worth showing beside the number.
+ */
+const listInstruments = endpoint('/dev/magenta/instruments', 'GET', async ({ stream }) => {
+  const families = GENERAL_MIDI_FAMILIES.map((name) => ({ name, instruments: [] }))
+
+  MIDIJS_PATCH_NAMES.forEach((name, program) => {
+    families[Math.floor(program / 8)].instruments.push({
+      program,
+      name,
+      folder: instrumentKeyForName(name)
+    })
+  })
+
+  respondWith(stream, 200, { count: MIDIJS_PATCH_NAMES.length, families })
 })
 
 /**
@@ -657,5 +711,6 @@ const deleteSet = endpoint('/dev/magenta/delete', 'POST', async ({ stream }) => 
 
 export default [
   generateFont,
-  uploadSoundBank, startRender, stopRender, renderProgress, listSets, deleteSet
+  uploadSoundBank, startRender, stopRender, renderProgress, listSets, deleteSet,
+  listInstruments
 ]

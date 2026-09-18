@@ -1,0 +1,20 @@
+comment: "
+  The voices cross: the one written first dips below the one written second and
+  comes back, so for part of the bar the upper voice is the lower sound and the
+  stems point through each other.
+"
+
+measure
+treble clef
+voice
+1/4 g e c e
+voice
+1/4 e g b g
+
+measure
+voice
+1/2 c
+1/2 a
+voice
+1/2 e
+1/2 d

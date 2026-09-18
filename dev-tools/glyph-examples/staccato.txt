@@ -1,0 +1,11 @@
+measure
+b with staccato up, with stem up
+b with staccato up, with stem down
+b with staccato down, with stem up
+b with staccato down, with stem down
+
+measure
+a with staccato up, with stem up
+a with staccato up, with stem down
+a with staccato down, with stem up
+a with staccato down, with stem down

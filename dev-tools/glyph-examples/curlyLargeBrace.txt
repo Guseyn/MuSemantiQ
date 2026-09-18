@@ -1,0 +1,5 @@
+measure
+brace from first stave to third stave
+stave
+stave
+stave

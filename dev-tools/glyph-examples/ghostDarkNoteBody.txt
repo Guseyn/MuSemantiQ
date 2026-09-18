@@ -1,0 +1,6 @@
+measure
+1/4 b is ghost
+1/4 a is ghost
+measure
+1/4 d5 is ghost, with stem down
+1/4 c5 is ghost, with stem down

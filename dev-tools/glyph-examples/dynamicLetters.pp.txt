@@ -1,0 +1,5 @@
+measure
+b with dynamic "pp"
+a with dynamic "pp"
+d5 with dynamic "pp" below, with stem down
+c5 with dynamic "pp" below, with stem down

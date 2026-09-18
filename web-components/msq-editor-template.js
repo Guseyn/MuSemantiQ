@@ -8,6 +8,7 @@ import { fontNames } from '#msq/utils/fontNames.js'
 import loadFontFace from '#msq/utils/loadFontFace.js'
 import initializeEditor from '#msq/editor/initializeEditor.js'
 import refreshDivUnderneathTextareaWithNewHtml from '#msq/editor/refreshDivUnderneathTextareaWithNewHtml.js'
+import parsedHighlights from '#msq/editor/parsedHighlights.js'
 import '#msq/lib/html-midi-player/player.js'
 
 import utilsPanel from '#msq/css/utilsPanel.js'
@@ -19,6 +20,7 @@ import previewIcon from '#msq/icons/previewIcon.js'
 import readIcon from '#msq/icons/readIcon.js'
 import downloadIcon from '#msq/icons/downloadIcon.js'
 import copyIcon from '#msq/icons/copyIcon.js'
+import settingsIcon from '#msq/icons/settingsIcon.js'
 import doneIcon from '#msq/icons/doneIcon.js'
 
 const layout = /*css*/`
@@ -41,6 +43,11 @@ const layout = /*css*/`
  * opens the SVG in a new tab.
  */
 class MuSemantiQEditor extends MSQTemplateElement {
+  // Which view the settings were opened from, so closing them goes back to it.
+  #wasShowing = 'score'
+  // The room the score takes, measured while it is showing.
+  #viewSize = null
+
   async render() {
     this.fontSourcesReference = this.requiredFontSourcesReference()
     this.msqText = this.inputText
@@ -67,9 +74,33 @@ class MuSemantiQEditor extends MSQTemplateElement {
             <button type="button" data-read-msq aria-label="Edit the MuSemantiQ source">${readIcon}</button>
             <button type="button" data-view-preview hidden aria-label="Render the score">${previewIcon}</button>
             <button type="button" data-copy-msq aria-label="Copy the MuSemantiQ source">${copyIcon}</button>
+            <button type="button" data-settings aria-label="Settings">${settingsIcon}</button>
           </div>
           <div data-svg-container data-scroll tabindex="0" role="group" aria-label="Score"></div>
           <div data-text-container hidden></div>
+          <div data-settings-container hidden role="group" aria-label="Settings">
+            <label>
+              <input type="checkbox" data-setting="autocomplete" checked>
+              <span>Suggest commands as I type</span>
+            </label>
+            <label>
+              <input type="checkbox" data-setting="highlighting" checked>
+              <span>Colour the source</span>
+            </label>
+            <label>
+              <input type="color" data-setting="played-colour">
+              <span>Colour of a note as it sounds</span>
+            </label>
+            <label>
+              <input type="color" data-setting="reference-colour">
+              <span>Colour of the box that links a word to its glyph</span>
+            </label>
+            <label>
+              <span>Sound Font URL</span>
+              <input type="text" data-setting="sound-font" spellcheck="false"
+                placeholder="leave empty for the default soundfont">
+            </label>
+          </div>
         </div>
       `
     })
@@ -80,6 +111,8 @@ class MuSemantiQEditor extends MSQTemplateElement {
     this.textContainer = elm.shadowRoot.querySelector('div[data-text-container]')
     this.readButton = elm.shadowRoot.querySelector('button[data-read-msq]')
     this.previewButton = elm.shadowRoot.querySelector('button[data-view-preview]')
+    this.settingsButton = elm.shadowRoot.querySelector('button[data-settings]')
+    this.settingsContainer = elm.shadowRoot.querySelector('div[data-settings-container]')
 
     this.#applyEditorAppearance()
 
@@ -99,6 +132,7 @@ class MuSemantiQEditor extends MSQTemplateElement {
     })
     this.readButton.addEventListener('click', () => this.#showTextView())
     this.previewButton.addEventListener('click', () => this.#showPreviewView())
+    this.settingsButton.addEventListener('click', () => this.#toggleSettingsView())
 
     this.#mountGenerated(generated)
     this.replaceSelf(elm)
@@ -114,6 +148,8 @@ class MuSemantiQEditor extends MSQTemplateElement {
       readButton: this.readButton
     })
     this.editor.textarea.isRenderedWithLatestInputText = true
+    // The settings act on the editor, so they can only be wired once it exists.
+    this.#wireSettings()
     // The first #mountGenerated ran before the editor existed, so the layer
     // still holds the ref-id-less highlights initializeEditor produced.
     this.#applyRenderedHighlights()
@@ -215,15 +251,26 @@ class MuSemantiQEditor extends MSQTemplateElement {
     midiPlayer.refsOnMappedWithTimeStamps = refsOnMappedWithTimeStamps
     this.midiPlayer = midiPlayer
 
-    attachHighlighterToMidiPlayer({
-      midiPlayer,
-      svgParent: this.svgContainer,
-      customStyles,
-      customHighlightColor: this.getAttribute('data-highlight-color')
-    })
+    this.customStyles = customStyles
+    this.#attachHighlighter()
 
     this.updateErrors(this.host.shadowRoot, errors)
     this.#applyRenderedHighlights()
+  }
+
+  /**
+   * Paint the notes as they sound, and seek by clicking one.
+   *
+   * Separate because the colour is taken once, when the highlighter attaches —
+   * so changing it in the settings means attaching again over the same player.
+   */
+  #attachHighlighter() {
+    attachHighlighterToMidiPlayer({
+      midiPlayer: this.midiPlayer,
+      svgParent: this.svgContainer,
+      customStyles: this.customStyles,
+      customHighlightColor: this.getAttribute('data-highlight-color')
+    })
   }
 
   /**
@@ -249,13 +296,127 @@ class MuSemantiQEditor extends MSQTemplateElement {
     )
   }
 
+  /*
+  The settings sit in a view of their own rather than a panel over the score:
+  the wrapper is sized to whatever is showing, so anything laid on top of it
+  would either be clipped or would stretch the element.
+  */
+  #toggleSettingsView() {
+    if (!this.settingsContainer.hidden) {
+      this.settingsContainer.hidden = true
+      this.#wasShowing === 'text' ? this.#showTextView() : this.#showPreviewView()
+      return
+    }
+
+    this.#wasShowing = this.textContainer.hidden ? 'score' : 'text'
+    this.#sizeLikeTheScore(this.settingsContainer)
+    this.svgContainer.hidden = true
+    this.textContainer.hidden = true
+    if (this.midiPlayer) {
+      this.midiPlayer.hidden = true
+    }
+    this.settingsContainer.hidden = false
+    this.#fillSettings()
+  }
+
+  /*
+  The controls say what is true now, which for the two colours means reading back
+  what the element was given rather than what a picker happens to default to.
+  */
+  #fillSettings() {
+    const at = (name) => this.settingsContainer.querySelector(`[data-setting="${name}"]`)
+    at('autocomplete').checked = !this.editor.textarea.autocompleteIsOff
+    at('highlighting').checked = !this.editor.divUnderneathTextarea.highlightingIsOff
+    at('played-colour').value = this.#playedColour()
+    at('reference-colour').value =
+      getComputedStyle(this.host).getPropertyValue('--navigation-highlight-color').trim() || '#f5cd79'
+    at('sound-font').value = this.getAttribute('data-sound-font') || ''
+  }
+
+  #playedColour() {
+    return this.getAttribute('data-highlight-color') || '#C40233'
+  }
+
+  #wireSettings() {
+    const at = (name) => this.settingsContainer.querySelector(`[data-setting="${name}"]`)
+
+    at('autocomplete').addEventListener('change', (event) => {
+      this.editor.textarea.autocompleteIsOff = !event.target.checked
+    })
+
+    at('highlighting').addEventListener('change', (event) => {
+      this.editor.divUnderneathTextarea.highlightingIsOff = !event.target.checked
+      // Rewrite the layer now, so the change shows without waiting for a keystroke.
+      refreshDivUnderneathTextareaWithNewHtml(
+        this.editor.divUnderneathTextarea,
+        parsedHighlights(this.editor.textarea.value, [], this.editor.textarea.supportedFontNames).html
+      )
+    })
+
+    at('played-colour').addEventListener('change', (event) => {
+      /*
+      The highlighter takes its colour when it is attached and keeps it, so a new
+      colour means attaching again over the same player.
+      */
+      this.setAttribute('data-highlight-color', event.target.value)
+      this.#attachHighlighter()
+    })
+
+    at('reference-colour').addEventListener('change', (event) => {
+      // Live: everything that draws the box reads this property.
+      this.host.style.setProperty('--navigation-highlight-color', event.target.value)
+    })
+
+    at('sound-font').addEventListener('change', (event) => {
+      const soundFont = event.target.value.trim()
+      this.setAttribute('data-sound-font', soundFont)
+      /*
+      The player lists data-sound-font among the attributes it observes, so it
+      reloads its samples itself. Nothing here has to rebuild the score.
+      */
+      if (this.midiPlayer) {
+        this.midiPlayer.setAttribute('data-sound-font', soundFont)
+      }
+    })
+  }
+
+  /**
+   * How much room the score and its player are taking.
+   *
+   * Measured while they are still showing and then remembered: once they are
+   * hidden they measure zero, and a view opened from another view would have
+   * nothing to size itself against.
+   */
+  #rememberScoreSize() {
+    const width = this.svgContainer.offsetWidth
+    if (width > 0) {
+      this.#viewSize = {
+        width,
+        height: this.svgContainer.offsetHeight +
+          (this.midiPlayer && !this.midiPlayer.hidden ? this.midiPlayer.offsetHeight : 0)
+      }
+    }
+    return this.#viewSize
+  }
+
+  /**
+   * Give a view the size the score has, so switching between them does not
+   * change the height of the element or make the page jump.
+   */
+  #sizeLikeTheScore(container) {
+    const size = this.#rememberScoreSize()
+    if (!size) {
+      return
+    }
+    container.style.width = `${size.width}px`
+    container.style.height = `${size.height}px`
+  }
+
   #showTextView() {
     // The wrapper is width:max-content and the text view has no intrinsic
     // width, so without this it collapses the moment the score is hidden.
-    const scoreWidth = this.svgContainer.offsetWidth
-    if (scoreWidth > 0) {
-      this.textContainer.style.width = `${scoreWidth}px`
-    }
+    this.#sizeLikeTheScore(this.textContainer)
+    this.settingsContainer.hidden = true
     this.svgContainer.hidden = true
     this.midiPlayer.hidden = true
     this.textContainer.hidden = false
@@ -285,6 +446,9 @@ class MuSemantiQEditor extends MSQTemplateElement {
     // takes its place.
     const focusWasInside = this.host.shadowRoot.activeElement !== null
 
+    // Either of the other two buttons puts the settings away: they are a view,
+    // not a panel, and only one view shows at a time.
+    this.settingsContainer.hidden = true
     this.textContainer.hidden = true
     this.svgContainer.hidden = false
     this.midiPlayer.hidden = false

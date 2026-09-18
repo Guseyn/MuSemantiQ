@@ -1,0 +1,6 @@
+measure
+1/2 b with trill
+1/2 a with trill
+measure
+1/2 d5 with trill, with stem down
+1/2 c5 with trill, with stem down

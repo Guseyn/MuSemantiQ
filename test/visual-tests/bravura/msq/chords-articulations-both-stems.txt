@@ -1,0 +1,28 @@
+comment: "
+  Articulations on chords: above and below the notes, with the stem pointing
+  each way, and several stacked on one chord.
+"
+
+measure
+treble clef
+1/4 chord with staccato up
+c e g
+
+1/4 chord with staccato down
+c e g
+
+1/4 chord with accent up, with staccato up
+d f a
+
+1/4 chord with accent down, with staccato down
+d f a
+
+measure
+1/4 chord with stem down, with tenuto up
+e g b
+
+1/4 chord with stem down, with marcato down
+e g b
+
+1/2 chord with fermata up
+c e g c5

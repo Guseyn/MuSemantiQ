@@ -1,0 +1,20 @@
+music font is leland
+
+comment: "
+  Single flagged notes with the stem down, at the pitches where the stem's reach
+  changes: on a stave line, in a space, and past the bottom of the stave where
+  there is no stave left to reach.
+"
+
+measure
+treble clef
+1/8 g with stem down
+1/8 e with stem down
+1/8 d with stem down
+1/8 b3 with stem down
+
+measure
+1/16 c5 with stem down
+1/16 a with stem down
+1/16 f with stem down
+1/16 a3 with stem down

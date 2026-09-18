@@ -1,0 +1,39 @@
+music font is leland
+
+comment: "
+  Ties between chords. One with no direction given, so each junction decides for
+  itself; one where the chord holds a second and the tie has to clear the
+  displaced head; one tying into a chord of a different size; and a chord whose
+  tie hangs off the end of the line.
+"
+
+measure
+treble clef
+1/2 chord tied with next
+c e g
+
+1/2 chord
+c e g
+
+measure
+1/2 chord tied with next
+c d f a
+
+1/2 chord
+c d f a
+
+measure
+1/2 chord tied with next up
+c e g c5
+
+1/2 chord
+e g
+
+new line
+
+measure
+1/2 chord is tied after up
+c e g
+
+1/2 chord is tied before up
+c e g

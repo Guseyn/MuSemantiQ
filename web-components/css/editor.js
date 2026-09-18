@@ -29,6 +29,99 @@ export default /*css*/`
     border-top-right-radius: var(--border-radius);
   }
 
+  /*
+  The settings, which stand in for the score while they are open. Sized like the
+  text view so the element does not change shape when you switch to them.
+  */
+  div[data-settings-container] {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 1.15em;
+    /* The score decides how tall the element is; the settings live inside that
+       rather than setting a height of their own, so switching views does not
+       make the page jump. */
+    height: 100%;
+    min-width: 24em;
+    max-width: 100%;
+    overflow: auto;
+    padding: 1.4em;
+    background: var(--surface-bg);
+    color: var(--font-color);
+    font-family: sans-serif;
+    font-size: 1em;
+    line-height: 1.4;
+    border-top-left-radius: var(--border-radius);
+    border-top-right-radius: var(--border-radius);
+  }
+  /*
+  A switch and a swatch both read as one line — the control, then what it does.
+  Only what you type into is a field, with its name above and room for the
+  control below.
+  */
+  div[data-settings-container] label {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.45em;
+    cursor: pointer;
+  }
+  div[data-settings-container] label:has(input[type="checkbox"]),
+  div[data-settings-container] label:has(input[type="color"]) {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.7em;
+  }
+  div[data-settings-container] input[type="checkbox"] {
+    flex: none;
+    width: 1.15em;
+    height: 1.15em;
+    /* A swatch is the wider of the two controls, and the difference is made up
+       here so the words after them start at the same place. */
+    margin: 0 0.45em 0 0;
+    accent-color: var(--navigation-highlight-color);
+    cursor: pointer;
+  }
+  div[data-settings-container] input[type="text"] {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.55em 0.7em;
+    font: inherit;
+    color: inherit;
+    background: var(--surface-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 0.4em;
+  }
+  /*
+  A colour is a swatch rather than a field, so it is drawn as one: a circle of
+  the colour itself. The browser paints the value inside a chrome of its own,
+  which is what the inner rules strip back.
+  */
+  div[data-settings-container] input[type="color"] {
+    -webkit-appearance: none;
+    appearance: none;
+    flex: none;
+    width: 1.6em;
+    height: 1.6em;
+    padding: 0;
+    border: 1px solid var(--border-color);
+    border-radius: 50%;
+    background: none;
+    cursor: pointer;
+    overflow: hidden;
+  }
+  div[data-settings-container] input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 0;
+  }
+  div[data-settings-container] input[type="color"]::-webkit-color-swatch {
+    border: none;
+    border-radius: 50%;
+  }
+  div[data-settings-container] input[type="color"]::-moz-color-swatch {
+    border: none;
+    border-radius: 50%;
+  }
+
   div[data-line-numbers],
   div[data-highlights],
   textarea[data-msq-input] {

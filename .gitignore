@@ -166,6 +166,9 @@ examples/browser/web-app/static/magenta-sound-font/
 #   js/msq/worker/     npm run create:msq:worker
 examples/browser/web-app/static/js/msq/
 
+# The wordmark, linked from the repository root rather than copied.
+examples/browser/web-app/static/images/logo.svg
+
 # Everything under dev-tools/ that a command rebuilds. `npm run dev-tools` runs
 # all of them before starting the server, so a clone needs none of it tracked:
 #
@@ -174,6 +177,7 @@ examples/browser/web-app/static/js/msq/
 #   js/e-ui/, e-ui.css  npm run dev-tools:eui:update   (from ../e-ui)
 #   js/msq/           npm run web-components:update + create:msq:worker
 #   font/             npm run setup:symlinks
+#   images/logo.svg   npm run setup:symlinks
 #
 # Only the app itself — its pages, its api and its config — is tracked.
 dev-tools/nodes/
@@ -183,3 +187,6 @@ dev-tools/web-app/static/js/msq/
 dev-tools/web-app/static/css/e-ui.css
 dev-tools/web-app/static/font/
 dev-tools/web-app/static/magenta-sound-font/
+dev-tools/web-app/static/images/logo.svg
+
+.DS_Store

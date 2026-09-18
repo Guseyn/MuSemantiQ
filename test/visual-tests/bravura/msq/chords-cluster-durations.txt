@@ -1,0 +1,24 @@
+comment: "
+  The same cluster at each of the long durations, where the offset a displaced
+  note takes depends on how wide its head is, and once more as ghost notes.
+"
+
+measure
+treble clef
+1 chord
+c d e
+
+measure
+2 chord
+c d e
+
+measure
+4 chord
+c d e
+
+measure
+1/4 chord is ghost
+c d e
+
+1/4 chord is not ghost
+c d e

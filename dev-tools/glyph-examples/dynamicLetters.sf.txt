@@ -1,0 +1,5 @@
+measure
+b with dynamic "sf"
+a with dynamic "sf"
+d5 with dynamic "sf" below, with stem down
+c5 with dynamic "sf" below, with stem down

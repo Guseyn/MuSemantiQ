@@ -1,0 +1,31 @@
+comment: "
+  Voices running at different rates against each other: a beamed sixteenth run
+  under sustained halves, dotted against undotted, and a triplet against plain
+  quavers — so the two voices meet at different moments in the bar.
+"
+
+measure
+treble clef
+voice
+1/2 c5
+1/2 d5
+voice
+1/16 c beamed, d, e, f, g, a, b, c5, b, a, g, f, e, d, c, b3 not beamed
+
+measure
+voice
+1/4 e5 dotted
+1/8 d5
+1/4 c5 dotted
+1/8 b
+voice
+1/4 g a g a
+
+measure
+voice
+tuplet 3 on first stave, in second voice
+from first unit to third unit
+voice
+1/8 c5 beamed, b, a, g not beamed
+voice
+1/4 e e e

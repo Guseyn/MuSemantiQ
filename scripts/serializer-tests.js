@@ -52,7 +52,37 @@ const red = (text) => `\x1b[31m${text}\x1b[0m`
 const only = process.argv.find((argument) => argument.startsWith('--only='))
 const pattern = only ? only.slice('--only='.length) : null
 
-const supportedFontSources = await setupFonts()
+/*
+The two fonts that are properly set up, named rather than left to the defaults —
+which reach for all four, and so made this suite depend on font files nothing
+here engraves with.
+*/
+const supportedFontSources = await setupFonts({
+  'chord-letters': {
+    'gentium plus': './src/drawer/font/chord-letters/GentiumPlus-Regular.ttf',
+    'gothic a1': './src/drawer/font/chord-letters/GothicA1-Regular.ttf'
+  },
+  'text': {
+    'noto-serif': {
+      'regular': './src/drawer/font/text/NotoSerif-Regular.ttf',
+      'bold': './src/drawer/font/text/NotoSerif-Bold.ttf'
+    },
+    'noto-sans': {
+      'regular': './src/drawer/font/text/NotoSans-Regular.ttf',
+      'bold': './src/drawer/font/text/NotoSans-Bold.ttf'
+    }
+  },
+  'music': {
+    'bravura': {
+      'font': './src/drawer/font/music/Bravura.otf',
+      'js': '#msq/drawer/font/music-js/bravura.js'
+    },
+    'leland': {
+      'font': './src/drawer/font/music/Leland.otf',
+      'js': '#msq/drawer/font/music-js/leland.js'
+    }
+  }
+})
 const supportedFontNames = {
   'chord-letters': Object.keys(supportedFontSources['chord-letters']),
   'music': Object.keys(supportedFontSources['music']),

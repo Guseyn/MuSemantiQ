@@ -1,0 +1,5 @@
+measure
+b with dynamic "sfpp"
+a with dynamic "sfpp"
+d5 with dynamic "sfpp" below, with stem down
+c5 with dynamic "sfpp" below, with stem down

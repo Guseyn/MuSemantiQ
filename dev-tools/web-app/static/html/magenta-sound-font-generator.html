@@ -12,17 +12,25 @@
       "imports": {
         "#ehtml/": "/js/ehtml/",
         "#ehtml/main": "/js/ehtml/main.js",
-        "#e-ui/": "/js/e-ui/"
+        "#e-ui/": "/js/e-ui/",
+        "#msq/": "/js/msq/web-components/",
+        "#msq-worker/": "/js/msq/worker/"
       }
     }
   </script>
   <script type="module">
+    import '#e-ui/e-tab.js'
     import '#e-ui/e-file-upload-template.js'
     import '#e-ui/e-dialog.js'
     import '#e-ui/e-confirm.js'
     import '#e-ui/e-toast.js'
     import '#ehtml/main'
   </script>
+  <!--
+  The test bench engraves and plays, which needs the components and the engine.
+  It is a module of its own so the rest of the page does not wait on it.
+  -->
+  <script type="module" src="/js/sound-font-test.js"></script>
   <script src="/js/app.js"></script>
   <style>
     :root {
@@ -34,6 +42,7 @@
       white-space: pre-wrap; font-size: 11px; line-height: 1.45;
     }
     progress[data-wide] { width: 100%; margin-top: var(--e-spacing-sm); }
+    #sound-font-editor { min-height: 360px; }
     /*
     A button that is mostly its icon: e-ui sizes buttons for words, and a row in
     a table has no room for that.
@@ -62,6 +71,27 @@
     }
     /* A set and the instruments under it read as one block. */
     table[is="e-table"] tr[data-set-row] td { border-top: 1px solid var(--e-divider); }
+
+    /*
+    The instrument reference: sixteen families, eight programs each. The families
+    flow into as many columns as the width allows, and a program is a fixed
+    number column so the names under one another line up.
+    */
+    #instruments-view {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(17em, 1fr));
+      gap: var(--e-spacing-md);
+    }
+    [data-family] > b { display: block; margin-bottom: var(--e-spacing-xs); }
+    [data-program] {
+      display: grid;
+      grid-template-columns: 2.6em 1fr;
+      gap: 0 var(--e-spacing-xs);
+      align-items: baseline;
+    }
+    /* The folder name sits under the instrument, in the column it names. */
+    [data-program] > [is="e-muted"] { grid-column: 2; }
+    [data-program] > code { text-align: right; }
   </style>
 </head>
 <body>
@@ -97,399 +127,403 @@
       </p>
     </div>
 
-    <h2 is="e-h" data-margin-top="lg">1 · The soundbank</h2>
+    <e-tabs id="steps" data-apply-hash-navigation data-margin-top="md">
 
-    <form is="e-form" data-no-style data-width="full" data-margin-top="sm">
-      <div is="e-card" data-width="full" data-padding="lg" data-fields>
-        <template
-          is="e-file-upload"
-          data-name="bank"
-          data-label-text="General MIDI soundbank"
-          data-action-text="Choose an .sf2, or drop one here"
-          data-details-text="Sent as it is. A full bank is often 300 MB and more."
-          data-icon-src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='24' height='24' fill='none' stroke='%2336454F' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='3' width='18' height='18' rx='2'/%3E%3Cpath d='M8 15 V9'/%3E%3Cpath d='M12 18 V6'/%3E%3Cpath d='M16 13 V11'/%3E%3C/svg%3E"
-          data-ignore></template>
+      <e-tab data-title="Upload soundbank">
 
-        <!--
-        The one exchange on this page the form does not make.
-
-        `e-form` reads a chosen file with a FileReader into a base64 data URL and
-        posts it inside JSON. For the .otf next door that is ideal. A General MIDI
-        bank is a thousand times the size: base64 makes ~415 MB of string out of
-        310 MB of file, and JSON.stringify copies it again — so it is handed to
-        the request as a file and streamed through instead. The upload's own
-        progress event drives the bar, the same one e-form would have used.
-
-        `data-ignore` above is what keeps the form's hands off the file. It also
-        means the reading events never fire, and those are what the uploader shows
-        the chosen name from — so the name is put back on the label here.
-        -->
-        <div is="e-row" data-gap="sm" data-margin-top="md" data-keep-flex-direction-row-in-mobile>
-          <button
-            id="upload"
-            data-primary
-            type="button"
-            onclick="uploadTheBank(this)">
-            Upload it
-          </button>
-          <div is="e-spacer"></div>
-          <span is="e-muted" data-font-size="sm" id="upload-says"></span>
-        </div>
-        <progress id="upload-progress" data-wide value="0" max="100" hidden></progress>
-      </div>
-    </form>
-
-    <h2 is="e-h" data-margin-top="lg">2 · The render</h2>
-
-    <form is="e-form" data-no-style data-width="full" data-margin-top="sm">
-      <div is="e-card" data-width="full" data-padding="lg" data-fields>
-        <label>
-          Soundbank
-          <select id="bank" name="file" required
-            data-validation-absence-error-message="Upload a soundbank first"></select>
-        </label>
-        <label>
-          Instruments
-          <input
-            name="instruments"
-            value="0,40,73"
-            placeholder="0-127"
-            required
-            data-validation-pattern="^[0-9]+(-[0-9]+)?(,[0-9]+(-[0-9]+)?)*$"
-            data-validation-absence-error-message="Say which programs to render"
-            data-validation-error-message="Numbers and ranges only, like 0-10,15,20-40"
-            spellcheck="false">
-        </label>
-
-        <div is="e-row" data-gap="sm" data-margin-top="md" data-keep-flex-direction-row-in-mobile>
-          <button
-            data-primary
-            type="button"
-            data-request-url="/dev/magenta/generate"
-            data-request-method="POST"
-            onclick="this.form.submit(this)"
-            data-button-ajax-text="starting…"
-            data-response-name="started"
-            data-actions-on-response="
-              if (started.statusCode === 200) {
-                showToast('The render has started. It keeps going if you close this.')
-                document.getElementById('state').trigger()
-                keepRefreshing('#state', 3)
-                return
-              }
-              showError(started.body.error || `The server answered ${started.statusCode}.`)
-            ">
-            Render it
-          </button>
-          <div is="e-spacer"></div>
-          <span is="e-muted" data-font-size="sm">
-            The numbers are General MIDI programs: 0 a grand piano, 40 a violin,
-            73 a flute.
-          </span>
-        </div>
-      </div>
-    </form>
-
-    <div id="job-view" data-margin-top="md"></div>
-
-    <!--
-    The render's own card, under the button that starts it rather than at the
-    foot of the page: what a click did is the first thing you should be able to
-    see, and a bar you have to go looking for may as well not be there.
-    -->
-    <template
-      is="e-reusable"
-      id="job-template"
-      data-insert-into="#job-view"
-      data-object-name="run">
-      <template is="e-if" data-condition-to-display="${!!run.job}">
-        <div is="e-card" data-width="full" data-padding="lg" data-margin-top="md">
-          <div is="e-row" data-justify-content="space-between" data-keep-flex-direction-row-in-mobile>
-            <b is="e-b" data-text="${run.job.set} · programs ${run.job.instruments}"></b>
-            <span is="e-muted" data-font-size="sm"
-              data-text="${run.job.running ? 'running for ' + minutesAndSeconds(run.job.seconds) : (run.job.stopped ? 'stopped after ' + minutesAndSeconds(run.job.seconds) : (run.job.code === 0 ? 'finished in ' + minutesAndSeconds(run.job.seconds) : 'failed with code ' + run.job.code))}"></span>
-          </div>
+      <form is="e-form" data-no-style data-width="full" data-margin-top="sm">
+        <div is="e-card" data-width="full" data-padding="lg" data-fields>
+          <template
+            is="e-file-upload"
+            data-name="bank"
+            data-label-text="General MIDI soundbank"
+            data-action-text="Choose an .sf2, or drop one here"
+            data-details-text="Sent as it is. A full bank is often 300 MB and more."
+            data-icon-src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='24' height='24' fill='none' stroke='%2336454F' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='3' width='18' height='18' rx='2'/%3E%3Cpath d='M8 15 V9'/%3E%3Cpath d='M12 18 V6'/%3E%3Cpath d='M16 13 V11'/%3E%3C/svg%3E"
+            data-ignore></template>
 
           <!--
-          One line per finished note is what the renderer writes, so notes done
-          against notes asked for is the progress — not a spinner, and not the
-          clock.
+          The one exchange on this page the form does not make.
+
+          `e-form` reads a chosen file with a FileReader into a base64 data URL and
+          posts it inside JSON. For the .otf next door that is ideal. A General MIDI
+          bank is a thousand times the size: base64 makes ~415 MB of string out of
+          310 MB of file, and JSON.stringify copies it again — so it is handed to
+          the request as a file and streamed through instead. The upload's own
+          progress event drives the bar, the same one e-form would have used.
+
+          `data-ignore` above is what keeps the form's hands off the file. It also
+          means the reading events never fire, and those are what the uploader shows
+          the chosen name from — so the name is put back on the label here.
           -->
-          <div is="e-row" data-gap="sm" data-margin-top="sm" data-keep-flex-direction-row-in-mobile>
-            <b is="e-b" data-text="${run.job.percent}%"></b>
-            <span is="e-muted" data-font-size="sm"
-              data-text="${run.job.notesDone} of ${run.job.notesExpected} notes"></span>
-            <span is="e-muted" data-font-size="sm"
-              data-text="${run.job.instrument ? '· ' + run.job.instrument : ''}"></span>
+          <div is="e-row" data-gap="sm" data-margin-top="md" data-keep-flex-direction-row-in-mobile>
+            <button
+              id="upload"
+              data-primary
+              type="button"
+              onclick="uploadTheBank(this)">
+              Upload it
+            </button>
             <div is="e-spacer"></div>
-            <span is="e-muted" data-font-size="sm"
-              data-text="${run.job.secondsLeft ? 'about ' + minutesAndSeconds(run.job.secondsLeft) + ' left' : ''}"></span>
+            <span is="e-muted" data-font-size="sm" id="upload-says"></span>
           </div>
-          <progress data-wide value="${run.job.percent}" max="100"></progress>
+          <progress id="upload-progress" data-wide value="0" max="100" hidden></progress>
+        </div>
+      </form>
+
+
+      <!--
+      Everything on this page is this one request, read again every three seconds
+      while a render is going, and what it answers fills two places: the render's
+      own card above, and the lists below. There is nothing for the server to push
+      — the render is a process writing a log, and the log is what there is to
+      know.
+      -->
+      <!--
+      `data-reusable` is what keeps it in the document. Without it an e-json
+      unwraps itself the moment it has answered — its children take its place and
+      the element is gone — and this one has to be asked again every ten seconds
+      while a render is going.
+      -->
+      <e-json
+        id="state"
+        data-reusable
+        data-src="/dev/magenta/progress"
+        data-response-name="progressed"
+        data-actions-on-response="
+          if (progressed.statusCode !== 200) {
+            showError(progressed.body.error || 'Could not read what is going on.')
+            return
+          }
+          mapToTemplate('#job-template', progressed.body)
+          mapToTemplate('#stand-template', progressed.body)
+          fillBankPicker(progressed.body.banks)
+          noticeWhenRenderEnds(progressed.body.job)
+          if (progressed.body.job && progressed.body.job.running) {
+            keepRefreshing('#state', 3)
+          } else {
+            stopRefreshing('#state')
+          }
+        "></e-json>
+      <!--
+      Outside the e-json on purpose: e-ui gives `e-json` display:none, since it is
+      a request rather than something to look at. An e-json normally unwraps itself
+      and its children escape, but a reusable one stays put — so anything left
+      inside it would never be seen.
+      -->
+      <div id="state-view" data-margin-top="sm"></div>
+
+      <template
+        is="e-reusable"
+        id="stand-template"
+        data-insert-into="#state-view"
+        data-object-name="stand">
+
+        <div is="e-card" data-width="full" data-padding="lg">
+          <b is="e-b">Uploaded soundbanks</b>
+          <ul is="e-list" data-type="bullet" data-margin-top="sm">
+            <template is="e-for-each" data-list-to-iterate="${stand.banks}" data-item-name="bank">
+              <li is="e-list-item">
+                <code is="e-code" data-text="${bank.file}"></code>
+                <span is="e-muted" data-font-size="sm" data-text="— ${readableBytes(bank.bytes)}"></span>
+              </li>
+            </template>
+          </ul>
+          <span is="e-muted" data-font-size="sm"
+            data-text="${stand.banks.length ? '' : 'none yet — upload one above'}"></span>
+
+        </div>
+
+      </template>
+
+      </e-tab>
+
+      <e-tab data-title="Render Magenta SF">
+
+      <form is="e-form" data-no-style data-width="full" data-margin-top="sm">
+        <div is="e-card" data-width="full" data-padding="lg" data-fields>
+          <label>
+            Soundbank
+            <select id="bank" name="file" required
+              data-validation-absence-error-message="Upload a soundbank first"></select>
+          </label>
+          <label>
+            Instruments
+            <input
+              name="instruments"
+              value="0,40,73"
+              placeholder="0-127"
+              required
+              data-validation-pattern="^[0-9]+(-[0-9]+)?(,[0-9]+(-[0-9]+)?)*$"
+              data-validation-absence-error-message="Say which programs to render"
+              data-validation-error-message="Numbers and ranges only, like 0-10,15,20-40"
+              spellcheck="false">
+          </label>
+
+          <!--
+          What the numbers mean, closed until it is wanted: 128 names is a lot
+          to have sitting open above a field you usually type three numbers
+          into. The list comes from the renderer's own table through
+          /dev/magenta/instruments, so it cannot say one thing while the render
+          does another.
+          -->
+          <details is="e-details">
+            <summary>which program is which instrument</summary>
+            <e-json
+              id="instruments"
+              data-reusable
+              data-src="/dev/magenta/instruments"
+              data-response-name="known"
+              data-actions-on-response="
+                if (known.statusCode !== 200) {
+                  showError(known.body.error || 'Could not read the instrument list.')
+                  return
+                }
+                mapToTemplate('#instruments-template', known.body)
+              "></e-json>
+            <!-- Outside the e-json, which e-ui hides. -->
+            <div id="instruments-view"></div>
+          </details>
 
           <div is="e-row" data-gap="sm" data-margin-top="md" data-keep-flex-direction-row-in-mobile>
-            <template is="e-if" data-condition-to-display="${run.job.running}">
-              <!--
-              Its own form, so stopping is the same kind of exchange as starting:
-              the button carries where to send it and what to do with the answer,
-              and the confirm happens before the form is submitted rather than
-              around a request made by hand.
-              -->
-              <form is="e-form" data-no-style>
-                <button
-                  data-primary
-                  data-fill="outlined"
-                  type="button"
-                  data-request-url="/dev/magenta/stop"
-                  data-request-method="POST"
-                  data-button-ajax-text="stopping…"
-                  data-response-name="halted"
-                  onclick="
-                    (async () => {
-                      const confirmed = await confirmAction(
-                        'Stop the render? Every instrument it has finished is kept;' +
-                        ' the one it is in the middle of is not.',
-                        'Stop it', 'Let it run'
-                      )
-                      if (!confirmed) {
+            <button
+              data-primary
+              type="button"
+              data-request-url="/dev/magenta/generate"
+              data-request-method="POST"
+              onclick="this.form.submit(this)"
+              data-button-ajax-text="starting…"
+              data-response-name="started"
+              data-actions-on-response="
+                if (started.statusCode === 200) {
+                  showToast('The render has started. It keeps going if you close this.')
+                  document.getElementById('state').trigger()
+                  keepRefreshing('#state', 3)
+                  return
+                }
+                showError(started.body.error || `The server answered ${started.statusCode}.`)
+              ">
+              Render it
+            </button>
+            <div is="e-spacer"></div>
+            <span is="e-muted" data-font-size="sm">
+              The numbers are General MIDI programs: 0 a grand piano, 40 a violin,
+              73 a flute.
+            </span>
+          </div>
+        </div>
+      </form>
+
+      <!--
+      A family at a time, eight programs each, which is how General MIDI is laid
+      out and how anyone reads it: you find "Pipe" and then the flute, rather
+      than counting to 73. The folder is what a set is named by on disk, so it
+      is worth having beside the number when you go looking at what a render
+      produced.
+      -->
+      <template
+        is="e-reusable"
+        id="instruments-template"
+        data-insert-into="#instruments-view"
+        data-object-name="reference">
+        <template is="e-for-each" data-list-to-iterate="${reference.families}" data-item-name="family">
+          <div data-family>
+            <b is="e-b" data-font-size="sm" data-text="${family.name}"></b>
+            <div data-programs>
+              <template is="e-for-each" data-list-to-iterate="${family.instruments}" data-item-name="instrument">
+                <div data-program>
+                  <code is="e-code" data-text="${instrument.program}"></code>
+                  <span data-font-size="sm" data-text="${instrument.name}"></span>
+                  <span is="e-muted" data-font-size="sm" data-text="${instrument.folder}"></span>
+                </div>
+              </template>
+            </div>
+          </div>
+        </template>
+      </template>
+
+      <div id="job-view" data-margin-top="md"></div>
+
+      <!--
+      The render's own card, under the button that starts it rather than at the
+      foot of the page: what a click did is the first thing you should be able to
+      see, and a bar you have to go looking for may as well not be there.
+      -->
+      <template
+        is="e-reusable"
+        id="job-template"
+        data-insert-into="#job-view"
+        data-object-name="run">
+        <template is="e-if" data-condition-to-display="${!!run.job}">
+          <div is="e-card" data-width="full" data-padding="lg" data-margin-top="md">
+            <div is="e-row" data-justify-content="space-between" data-keep-flex-direction-row-in-mobile>
+              <b is="e-b" data-text="${run.job.set} · programs ${run.job.instruments}"></b>
+              <span is="e-muted" data-font-size="sm"
+                data-text="${run.job.running ? 'running for ' + minutesAndSeconds(run.job.seconds) : (run.job.stopped ? 'stopped after ' + minutesAndSeconds(run.job.seconds) : (run.job.code === 0 ? 'finished in ' + minutesAndSeconds(run.job.seconds) : 'failed with code ' + run.job.code))}"></span>
+            </div>
+
+            <!--
+            One line per finished note is what the renderer writes, so notes done
+            against notes asked for is the progress — not a spinner, and not the
+            clock.
+            -->
+            <div is="e-row" data-gap="sm" data-margin-top="sm" data-keep-flex-direction-row-in-mobile>
+              <b is="e-b" data-text="${run.job.percent}%"></b>
+              <span is="e-muted" data-font-size="sm"
+                data-text="${run.job.notesDone} of ${run.job.notesExpected} notes"></span>
+              <span is="e-muted" data-font-size="sm"
+                data-text="${run.job.instrument ? '· ' + run.job.instrument : ''}"></span>
+              <div is="e-spacer"></div>
+              <span is="e-muted" data-font-size="sm"
+                data-text="${run.job.secondsLeft ? 'about ' + minutesAndSeconds(run.job.secondsLeft) + ' left' : ''}"></span>
+            </div>
+            <progress data-wide value="${run.job.percent}" max="100"></progress>
+
+            <div is="e-row" data-gap="sm" data-margin-top="md" data-keep-flex-direction-row-in-mobile>
+              <template is="e-if" data-condition-to-display="${run.job.running}">
+                <!--
+                Its own form, so stopping is the same kind of exchange as starting:
+                the button carries where to send it and what to do with the answer,
+                and the confirm happens before the form is submitted rather than
+                around a request made by hand.
+                -->
+                <form is="e-form" data-no-style>
+                  <button
+                    data-primary
+                    data-fill="outlined"
+                    type="button"
+                    data-request-url="/dev/magenta/stop"
+                    data-request-method="POST"
+                    data-button-ajax-text="stopping…"
+                    data-response-name="halted"
+                    onclick="
+                      (async () => {
+                        const confirmed = await confirmAction(
+                          'Stop the render? Every instrument it has finished is kept;' +
+                          ' the one it is in the middle of is not.',
+                          'Stop it', 'Let it run'
+                        )
+                        if (!confirmed) {
+                          return
+                        }
+                        this.form.submit(this)
+                      })()
+                    "
+                    data-actions-on-response="
+                      if (halted.statusCode === 200) {
+                        showToast('Stopped.')
+                        document.getElementById('state').trigger()
                         return
                       }
-                      this.form.submit(this)
-                    })()
-                  "
-                  data-actions-on-response="
-                    if (halted.statusCode === 200) {
-                      showToast('Stopped.')
-                      document.getElementById('state').trigger()
-                      return
-                    }
-                    showError(halted.body.error || `The server answered ${halted.statusCode}.`)
-                  ">
-                  Stop rendering
-                </button>
-              </form>
-              <span is="e-muted" data-font-size="sm">
-                What it has finished is kept — whole instruments only.
-              </span>
-            </template>
-            <span is="e-muted" data-font-size="sm"
-              data-text="${run.job.running ? '' : (run.job.linked ? 'Linked into both apps — it is ready to play.' : 'Its log is at ' + run.job.log)}"></span>
-          </div>
-
-          <details is="e-details" data-margin-top="md" open>
-            <summary>the last of the log</summary>
-            <pre is="e-pre" data-log data-text="${(run.job.lines || []).join('\n')}"></pre>
-          </details>
-        </div>
-      </template>
-    </template>
-
-    <h2 is="e-h" data-margin-top="lg">Where things stand</h2>
-
-    <!--
-    Everything on this page is this one request, read again every three seconds
-    while a render is going, and what it answers fills two places: the render's
-    own card above, and the lists below. There is nothing for the server to push
-    — the render is a process writing a log, and the log is what there is to
-    know.
-    -->
-    <!--
-    `data-reusable` is what keeps it in the document. Without it an e-json
-    unwraps itself the moment it has answered — its children take its place and
-    the element is gone — and this one has to be asked again every ten seconds
-    while a render is going.
-    -->
-    <e-json
-      id="state"
-      data-reusable
-      data-src="/dev/magenta/progress"
-      data-response-name="progressed"
-      data-actions-on-response="
-        if (progressed.statusCode !== 200) {
-          showError(progressed.body.error || 'Could not read what is going on.')
-          return
-        }
-        mapToTemplate('#job-template', progressed.body)
-        mapToTemplate('#stand-template', progressed.body)
-        fillBankPicker(progressed.body.banks)
-        noticeWhenRenderEnds(progressed.body.job)
-        if (progressed.body.job && progressed.body.job.running) {
-          keepRefreshing('#state', 3)
-        } else {
-          stopRefreshing('#state')
-        }
-      "></e-json>
-    <!--
-    Outside the e-json on purpose: e-ui gives `e-json` display:none, since it is
-    a request rather than something to look at. An e-json normally unwraps itself
-    and its children escape, but a reusable one stays put — so anything left
-    inside it would never be seen.
-    -->
-    <div id="state-view" data-margin-top="sm"></div>
-
-    <template
-      is="e-reusable"
-      id="stand-template"
-      data-insert-into="#state-view"
-      data-object-name="stand">
-
-      <div is="e-card" data-width="full" data-padding="lg">
-        <b is="e-b">Uploaded soundbanks</b>
-        <ul is="e-list" data-type="bullet" data-margin-top="sm">
-          <template is="e-for-each" data-list-to-iterate="${stand.banks}" data-item-name="bank">
-            <li is="e-list-item">
-              <code is="e-code" data-text="${bank.file}"></code>
-              <span is="e-muted" data-font-size="sm" data-text="— ${readableBytes(bank.bytes)}"></span>
-            </li>
-          </template>
-        </ul>
-        <span is="e-muted" data-font-size="sm"
-          data-text="${stand.banks.length ? '' : 'none yet — upload one above'}"></span>
-
-      </div>
-
-    </template>
-
-    <h2 is="e-h" data-margin-top="lg">Rendered sets</h2>
-    <p is="e-p">
-      <span is="e-muted" data-font-size="sm">
-        What is on disk under <code is="e-code">src/midi/magenta-sound-font</code>,
-        which is what both apps play from. A full set is hours of rendering and
-        about 184 MB — deleting one is not undoable, and the links in both apps
-        go with it.
-      </span>
-    </p>
-
-    <!--
-    Its own request rather than a corner of the progress one: this list changes
-    when something is deleted, which has nothing to do with a render, and asking
-    for it walks every instrument folder — not a thing to do every three seconds
-    while a render is going.
-    -->
-    <e-json
-      id="sets"
-      data-reusable
-      data-src="/dev/magenta/sets"
-      data-response-name="listed"
-      data-actions-on-response="
-        if (listed.statusCode !== 200) {
-          showError(listed.body.error || 'Could not read the rendered sets.')
-          return
-        }
-        mapToTemplate('#sets-template', listed.body)
-      "></e-json>
-    <!-- Outside the e-json, for the same reason as above. -->
-    <div id="sets-view" data-margin-top="sm"></div>
-
-    <template
-      is="e-reusable"
-      id="sets-template"
-      data-insert-into="#sets-view"
-      data-object-name="rendered">
-
-      <div is="e-card" data-width="full" data-padding="lg">
-        <e-scrollable data-show-scrollbar>
-          <table is="e-table">
-            <thead>
-              <tr>
-                <th>Set</th>
-                <th>Instrument</th>
-                <th>Samples</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              <template is="e-if" data-condition-to-display="${!rendered.sets.length}">
-                <tr>
-                  <td colspan="4" data-empty>
-                    <span is="e-muted">Nothing rendered yet.</span>
-                  </td>
-                </tr>
+                      showError(halted.body.error || `The server answered ${halted.statusCode}.`)
+                    ">
+                    Stop rendering
+                  </button>
+                </form>
+                <span is="e-muted" data-font-size="sm">
+                  What it has finished is kept — whole instruments only.
+                </span>
               </template>
-              <template is="e-for-each" data-list-to-iterate="${rendered.sets}" data-item-name="set">
-                <tr data-set-row>
-                  <td>
-                    <code is="e-code" data-text="${set.name}"></code>
-                  </td>
-                  <td colspan="2">
-                    <span is="e-muted" data-font-size="sm"
-                      data-text="${set.count} instrument${set.count === 1 ? '' : 's'}"></span>
-                  </td>
-                  <td>
-                    <!--
-                    A form per row, so which set a button deletes is carried by
-                    the row rather than looked up when it is pressed.
-                    -->
-                    <form is="e-form" data-no-style>
-                      <input type="hidden" name="set" value="${set.name}">
-                      <button
-                        data-primary
-                        data-fill="danger"
-                        data-icon-button
-                        type="button"
-                        aria-label="Delete the whole set"
-                        data-request-url="/dev/magenta/delete"
-                        data-request-method="POST"
-                        data-response-name="removed"
-                        onclick="
-                          (async () => {
-                            const confirmed = await confirmAction(
-                              `Delete the whole ${this.form.set.value} set? Every instrument in it goes,` +
-                              ' and rendering it again takes hours.',
-                              'Delete it', 'Keep it'
-                            )
-                            if (!confirmed) {
-                              return
-                            }
-                            this.form.submit(this)
-                          })()
-                        "
-                        data-actions-on-response="
-                          if (removed.statusCode === 200) {
-                            showToast(`${removed.body.deleted} deleted.`)
-                            document.getElementById('sets').trigger()
-                            return
-                          }
-                          showError(removed.body.error || `The server answered ${removed.statusCode}.`)
-                        ">
-                        <svg viewBox="0 0 24 24" aria-hidden="true">
-                          <path d="M4 7 h16"></path>
-                          <path d="M9.5 7 V5 h5 v2"></path>
-                          <path d="M6 7 l1 13 h10 l1 -13"></path>
-                          <path d="M10 11 v6"></path>
-                          <path d="M14 11 v6"></path>
-                        </svg>
-                        <span>Delete the set</span>
-                      </button>
-                    </form>
-                  </td>
+              <span is="e-muted" data-font-size="sm"
+                data-text="${run.job.running ? '' : (run.job.linked ? 'Linked into both apps — it is ready to play.' : 'Its log is at ' + run.job.log)}"></span>
+            </div>
+
+            <details is="e-details" data-margin-top="md" open>
+              <summary>the last of the log</summary>
+              <pre is="e-pre" data-log data-text="${(run.job.lines || []).join('\n')}"></pre>
+            </details>
+          </div>
+        </template>
+      </template>
+
+      </e-tab>
+
+      <e-tab data-title="Rendered sets">
+      <p is="e-p">
+        <span is="e-muted" data-font-size="sm">
+          What is on disk under <code is="e-code">src/midi/magenta-sound-font</code>,
+          which is what both apps play from. A full set is hours of rendering and
+          about 184 MB — deleting one is not undoable, and the links in both apps
+          go with it.
+        </span>
+      </p>
+
+      <!--
+      Its own request rather than a corner of the progress one: this list changes
+      when something is deleted, which has nothing to do with a render, and asking
+      for it walks every instrument folder — not a thing to do every three seconds
+      while a render is going.
+      -->
+      <e-json
+        id="sets"
+        data-reusable
+        data-src="/dev/magenta/sets"
+        data-response-name="listed"
+        data-actions-on-response="
+          if (listed.statusCode !== 200) {
+            showError(listed.body.error || 'Could not read the rendered sets.')
+            return
+          }
+          mapToTemplate('#sets-template', listed.body)
+        "></e-json>
+      <!-- Outside the e-json, for the same reason as above. -->
+      <div id="sets-view" data-margin-top="sm"></div>
+
+      <template
+        is="e-reusable"
+        id="sets-template"
+        data-insert-into="#sets-view"
+        data-object-name="rendered">
+
+        <div is="e-card" data-width="full" data-padding="lg">
+          <e-scrollable data-show-scrollbar>
+            <table is="e-table">
+              <thead>
+                <tr>
+                  <th>Set</th>
+                  <th>Instrument</th>
+                  <th>Samples</th>
+                  <th></th>
                 </tr>
-                <template is="e-for-each" data-list-to-iterate="${set.instruments}" data-item-name="instrument">
+              </thead>
+              <tbody>
+                <template is="e-if" data-condition-to-display="${!rendered.sets.length}">
                   <tr>
-                    <td></td>
+                    <td colspan="4" data-empty>
+                      <span is="e-muted">Nothing rendered yet.</span>
+                    </td>
+                  </tr>
+                </template>
+                <template is="e-for-each" data-list-to-iterate="${rendered.sets}" data-item-name="set">
+                  <tr data-set-row>
                     <td>
-                      <code is="e-code" data-text="${instrument.name}"></code>
+                      <code is="e-code" data-text="${set.name}"></code>
+                    </td>
+                    <td colspan="2">
+                      <span is="e-muted" data-font-size="sm"
+                        data-text="${set.count} instrument${set.count === 1 ? '' : 's'}"></span>
                     </td>
                     <td>
-                      <span is="e-muted" data-font-size="sm" data-text="${instrument.samples}"></span>
-                    </td>
-                    <td>
+                      <!--
+                      A form per row, so which set a button deletes is carried by
+                      the row rather than looked up when it is pressed.
+                      -->
                       <form is="e-form" data-no-style>
                         <input type="hidden" name="set" value="${set.name}">
-                        <input type="hidden" name="instrument" value="${instrument.name}">
                         <button
                           data-primary
-                          data-fill="outlined"
+                          data-fill="danger"
                           data-icon-button
                           type="button"
-                          aria-label="Delete this instrument"
+                          aria-label="Delete the whole set"
                           data-request-url="/dev/magenta/delete"
                           data-request-method="POST"
                           data-response-name="removed"
                           onclick="
                             (async () => {
                               const confirmed = await confirmAction(
-                                `Delete ${this.form.instrument.value} from ${this.form.set.value}?`,
+                                `Delete the whole ${this.form.set.value} set? Every instrument in it goes,` +
+                                ' and rendering it again takes hours.',
                                 'Delete it', 'Keep it'
                               )
                               if (!confirmed) {
@@ -513,18 +547,109 @@
                             <path d="M10 11 v6"></path>
                             <path d="M14 11 v6"></path>
                           </svg>
+                          <span>Delete the set</span>
                         </button>
                       </form>
                     </td>
                   </tr>
+                  <template is="e-for-each" data-list-to-iterate="${set.instruments}" data-item-name="instrument">
+                    <tr>
+                      <td></td>
+                      <td>
+                        <code is="e-code" data-text="${instrument.name}"></code>
+                      </td>
+                      <td>
+                        <span is="e-muted" data-font-size="sm" data-text="${instrument.samples}"></span>
+                      </td>
+                      <td>
+                        <form is="e-form" data-no-style>
+                          <input type="hidden" name="set" value="${set.name}">
+                          <input type="hidden" name="instrument" value="${instrument.name}">
+                          <button
+                            data-primary
+                            data-fill="outlined"
+                            data-icon-button
+                            type="button"
+                            aria-label="Delete this instrument"
+                            data-request-url="/dev/magenta/delete"
+                            data-request-method="POST"
+                            data-response-name="removed"
+                            onclick="
+                              (async () => {
+                                const confirmed = await confirmAction(
+                                  `Delete ${this.form.instrument.value} from ${this.form.set.value}?`,
+                                  'Delete it', 'Keep it'
+                                )
+                                if (!confirmed) {
+                                  return
+                                }
+                                this.form.submit(this)
+                              })()
+                            "
+                            data-actions-on-response="
+                              if (removed.statusCode === 200) {
+                                showToast(`${removed.body.deleted} deleted.`)
+                                document.getElementById('sets').trigger()
+                                return
+                              }
+                              showError(removed.body.error || `The server answered ${removed.statusCode}.`)
+                            ">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                              <path d="M4 7 h16"></path>
+                              <path d="M9.5 7 V5 h5 v2"></path>
+                              <path d="M6 7 l1 13 h10 l1 -13"></path>
+                              <path d="M10 11 v6"></path>
+                              <path d="M14 11 v6"></path>
+                            </svg>
+                          </button>
+                        </form>
+                      </td>
+                    </tr>
+                  </template>
                 </template>
-              </template>
-            </tbody>
-          </table>
-        </e-scrollable>
-      </div>
+              </tbody>
+            </table>
+          </e-scrollable>
+        </div>
 
-    </template>
+      </template>
+
+      </e-tab>
+
+      <e-tab data-title="Test soundfonts">
+
+        <p is="e-p" data-margin-top="md">
+          <span is="e-muted">
+            A rendered set is only as good as it sounds. Write a passage, pick a
+            set, and play it — the score is engraved and the sound comes from the
+            samples in that folder, at the same path either app would load it
+            from.
+          </span>
+        </p>
+
+        <div is="e-card" data-width="full" data-padding="lg" data-margin-top="md" data-fields>
+          <label>
+            Sound font
+            <select id="test-sound-font"></select>
+          </label>
+          <span is="e-muted" data-font-size="sm" id="test-sound-font-says"></span>
+        </div>
+
+        <div is="e-panel" data-padding="lg" data-margin-top="md">
+          <h2 is="e-h">The passage</h2>
+          <p is="e-p">
+            <span is="e-muted" data-font-size="sm">
+              Edit it and press the read button in the editor to hear the change.
+              A stave sounds as the instrument its title names, so a note is
+              silent if the set does not hold that instrument.
+            </span>
+          </p>
+          <div id="sound-font-editor" data-margin-top="sm"></div>
+        </div>
+
+      </e-tab>
+
+    </e-tabs>
 
   </template>
 

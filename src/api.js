@@ -189,11 +189,14 @@ export async function setupFonts(fontConfig) {
       'leland': {
         'font': './src/drawer/font/music/Leland.otf',
         'js': '#msq/drawer/font/music-js/leland.js'
-      },
-      'petaluma': {
-        'font': './src/drawer/font/music/Petaluma.otf',
-        'js': '#msq/drawer/font/music-js/petaluma.js'
       }
+      /*
+      Only the fonts that have a music-js table are named here, and only bravura
+      and leland do. Petaluma.otf and MuseJazz.otf are in src/drawer/font/music
+      waiting to be traced — naming one before its table exists makes every call
+      to setupFonts() throw on an import that cannot resolve, which takes the
+      whole library down rather than the one font.
+      */
     }
   }
 

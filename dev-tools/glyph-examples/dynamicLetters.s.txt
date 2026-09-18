@@ -1,0 +1,5 @@
+measure
+b with dynamic "s"
+a with dynamic "s"
+d5 with dynamic "s" below, with stem down
+c5 with dynamic "s" below, with stem down

@@ -1,0 +1,5 @@
+measure
+b with dynamic "rf"
+a with dynamic "rf"
+d5 with dynamic "rf" below, with stem down
+c5 with dynamic "rf" below, with stem down

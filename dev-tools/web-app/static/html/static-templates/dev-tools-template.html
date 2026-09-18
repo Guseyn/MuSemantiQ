@@ -4,7 +4,15 @@
 
 <main is="e-main" data-centralized>
   <div is="e-box" data-block-center data-default-main-width data-padding="xl">
-    <div is="e-row" data-justify-content="space-between" data-align-items="end" data-gap="md" data-keep-flex-direction-row-in-mobile>
+    <!--
+    The wordmark, above the row of tools rather than in it: it says what the
+    whole page belongs to, and a logo standing in a list of links reads as one
+    more link. It goes back to the index, which is the one thing every page
+    here wants a way back to.
+    -->
+    <a href="/html/index.html" data-logo aria-label="MuSemantiQ dev tools"></a>
+
+    <div is="e-row" data-justify-content="space-between" data-align-items="end" data-gap="md" data-margin-top="md" data-keep-flex-direction-row-in-mobile>
       <div is="e-row" data-gap="md" data-align-items="end" data-keep-flex-direction-row-in-mobile>
         <!--
         The index is where the tools are listed and said what they are for, so
@@ -23,10 +31,6 @@
            style="font-weight: ${window.location.pathname.endsWith('test-viewer.html') ? '700' : '400'}">
           Test viewer
         </a>
-        <a is="e-link" data-underlined href="/html/music-xml.html"
-           style="font-weight: ${window.location.pathname.endsWith('music-xml.html') ? '700' : '400'}">
-          MusicXML [beta]
-        </a>
         <a is="e-link" data-underlined href="/html/font-generator.html"
            style="font-weight: ${window.location.pathname.endsWith('/font-generator.html') ? '700' : '400'}">
           Music font generator
@@ -34,6 +38,10 @@
         <a is="e-link" data-underlined href="/html/magenta-sound-font-generator.html"
            style="font-weight: ${window.location.pathname.endsWith('magenta-sound-font-generator.html') ? '700' : '400'}">
           Sound font generator
+        </a>
+        <a is="e-link" data-underlined href="/html/music-xml.html"
+           style="font-weight: ${window.location.pathname.endsWith('music-xml.html') ? '700' : '400'}">
+          MusicXML [beta]
         </a>
       </div>
       <span is="e-muted" data-font-size="sm">

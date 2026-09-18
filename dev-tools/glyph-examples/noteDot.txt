@@ -1,0 +1,13 @@
+measure
+1/4 e dotted
+1/4 f dotted
+1/4 g dotted
+1/4 a dotted
+measure
+1/4 b dotted, with stem down
+1/4 c5 dotted, with stem down
+1/4 d5 with two dots, with stem down
+1/4 e5 with two dots, with stem down
+measure
+chord with dot
+f a c5

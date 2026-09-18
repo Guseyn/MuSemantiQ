@@ -1,0 +1,18 @@
+comment: "
+  A beam whose stems change direction part way through. The beam has to span
+  from the stems on one side of it to the stems on the other, which is a
+  different shape from a beam whose notes all point the same way.
+"
+
+measure
+treble clef
+1/8 c beamed with next, with stem up
+1/8 a5 beamed with next, with stem down
+1/8 d beamed with next, with stem up
+1/8 b5 not beamed with next, with stem down
+
+measure
+1/8 g5 beamed with next, with stem down
+1/8 e beamed with next, with stem up
+1/8 f5 beamed with next, with stem down
+1/8 f not beamed with next, with stem up

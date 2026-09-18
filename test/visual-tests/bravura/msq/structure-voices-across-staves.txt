@@ -1,0 +1,32 @@
+comment: "
+  A voice that reaches into the stave below while another stays where it is, so
+  one hand's notes are drawn on both staves at once.
+"
+
+measure
+brace from stave 1 to stave 2
+stave with treble clef
+stave with bass clef
+stave
+voice
+1/4 c5 b a g
+voice
+chord
+c3 on next stave, g3 on next stave, e
+
+chord
+d3 on next stave, a3 on next stave, f
+stave
+1/2 c3
+1/2 g3
+
+measure
+stave
+chord
+e g c5
+
+stave
+voice
+1/4 c3 e3 g3 c
+voice
+1 e3

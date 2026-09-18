@@ -1,0 +1,26 @@
+music font is leland
+
+comment: "
+  Several accidentals in one chord. They cannot all sit in the same column, so
+  they step left in turn — once with plain sharps and flats, once with the
+  doubles, and once with the quarter-tone signs.
+"
+
+measure
+treble clef
+chord
+c sharp e flat g sharp b flat
+
+chord
+c flat e natural g sharp b
+
+measure
+chord
+c double sharp e double flat g double sharp
+
+chord
+d double flat f sharp a double sharp c5
+
+measure
+chord
+c demisharp e demiflat g sesquisharp b sesquiflat

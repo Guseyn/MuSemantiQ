@@ -1,0 +1,6 @@
+measure
+1/2 b with turn inverted
+1/2 a with turn inverted
+measure
+1/2 d5 with turn inverted, with stem down
+1/2 c5 with turn inverted, with stem down

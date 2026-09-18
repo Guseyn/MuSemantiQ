@@ -1,0 +1,30 @@
+music font is leland
+
+comment: "
+  Chords packed in semitones. Every note is a second from the one beside it, so
+  every head has to take a side of the stem and every accidental a column of its
+  own — first rising, then the same falling, then deep enough to cross the whole
+  stave.
+"
+
+measure
+treble clef
+chord
+c c sharp d d sharp e
+
+chord
+e e flat d d flat c
+
+measure
+chord
+g g sharp a a sharp b c5
+
+chord with stem down
+c5 b b flat a a flat g g flat
+
+measure
+chord
+a3 b3 c c sharp d e f f sharp g
+
+chord with stem down
+f5 e5 e5 flat d5 c5 sharp c5 b b flat a

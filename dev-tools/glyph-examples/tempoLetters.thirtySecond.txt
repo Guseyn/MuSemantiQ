@@ -1,0 +1,4 @@
+measure
+tempo is "1/32 = 120"
+e f g a
+b c5 d5 e5

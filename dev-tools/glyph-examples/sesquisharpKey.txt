@@ -1,0 +1,15 @@
+measure
+e with sesquisharp key
+f with sesquisharp key
+g with sesquisharp key
+a with sesquisharp key
+measure
+b with sesquisharp key, with stem down
+c5 with sesquisharp key, with stem down
+d5 with sesquisharp key, with stem down
+e5 with sesquisharp key, with stem down
+measure
+c with sesquisharp key
+a5 with sesquisharp key, with stem down
+chord
+f a with sesquisharp key c5

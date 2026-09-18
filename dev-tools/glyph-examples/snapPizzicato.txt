@@ -1,0 +1,11 @@
+measure
+b with snap pizzicato up, with stem up
+b with snap pizzicato up, with stem down
+b with snap pizzicato down, with stem up
+b with snap pizzicato down, with stem down
+
+measure
+a with snap pizzicato up, with stem up
+a with snap pizzicato up, with stem down
+a with snap pizzicato down, with stem up
+a with snap pizzicato down, with stem down

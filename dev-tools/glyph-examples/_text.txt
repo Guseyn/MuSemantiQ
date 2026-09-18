@@ -1,0 +1,17 @@
+title is "Sonata in the Key of Type"
+composer is "Handgloves & Co."
+right subtitle is "0123456789"
+
+measure
+key signature is d major for each line
+instrument title is "Voice" for stave 1
+treble clef
+tempo is "Andante cantabile"
+1/4 d with lyrics "Whis" followed by dash
+1/4 f sharp with lyrics "pered" followed by dash
+1/4 a with lyrics "ly," with text "dolce" above
+1/4 b with lyrics "then" where underscore starts
+measure
+1/2 a with lyrics "held" where underscore ends
+1/4 g with lyrics "and" followed by dash
+1/4 f sharp with lyrics "gone"

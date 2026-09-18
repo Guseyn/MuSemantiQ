@@ -1,0 +1,29 @@
+music font is leland
+
+comment: "
+  A dot sits in a space, so a note on a line has to push its dot up to the space
+  above while a note already in a space keeps it in place. Here both, in one
+  chord and then apart, including on ledger notes.
+"
+
+measure
+treble clef
+1/2 chord dotted
+e g b d5
+
+1/4 chord dotted
+f a c5 e5
+
+measure
+1/2 chord dotted
+e f g a
+
+1/4 chord with 2 dots
+c5 e5 g5
+
+measure
+1/2 chord dotted
+a3 c e
+
+1/4 chord dotted with stem down
+g5 a5 b5

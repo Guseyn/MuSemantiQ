@@ -1,0 +1,11 @@
+measure
+b with spiccato up, with stem up
+b with spiccato up, with stem down
+b with spiccato down, with stem up
+b with spiccato down, with stem down
+
+measure
+a with spiccato up, with stem up
+a with spiccato up, with stem down
+a with spiccato down, with stem up
+a with spiccato down, with stem down

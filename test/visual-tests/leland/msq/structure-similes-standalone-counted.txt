@@ -1,0 +1,34 @@
+music font is leland
+
+comment: "
+  The standalone simile carrying a count: repeat the bar before this one twice,
+  and later the two bars before it twice.
+"
+
+measure
+treble clef
+1/4 c e g e
+
+measure
+simile of previous measure 2 times
+
+measure
+
+measure
+
+measure
+1/4 d f a f
+
+measure
+1/4 e g b g
+
+measure
+simile of two previous measures 2 times
+
+measure
+
+measure
+
+measure
+
+measure

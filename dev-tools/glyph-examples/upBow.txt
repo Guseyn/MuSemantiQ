@@ -1,0 +1,11 @@
+measure
+b with up bow up, with stem up
+b with up bow up, with stem down
+b with up bow down, with stem up
+b with up bow down, with stem down
+
+measure
+a with up bow up, with stem up
+a with up bow up, with stem down
+a with up bow down, with stem up
+a with up bow down, with stem down

@@ -33,7 +33,6 @@
         --e-primary: #222f3e;
         --e-fg: #222f3e;
       }
-      [data-editor] { min-height: 340px; }
       #points { width: 100%; min-height: 220px; font-family: var(--e-font-mono); font-size: 12px; }
       [data-metrics] { display: flex; flex-wrap: wrap; gap: var(--e-spacing-md); }
       /* The upload sits beside the pickers rather than under them: it is a way
@@ -97,21 +96,39 @@
             the tuning is done by going along it one glyph at a time and seeing
             which ones sit wrong.
             -->
-            <div is="e-row" data-gap="sm" data-margin-top="md" data-keep-flex-direction-row-in-mobile>
+            <div is="e-row" data-gap="sm" data-margin-top="md">
               <button id="previous-glyph" data-primary data-fill="outlined" type="button">
                 ← Previous
               </button>
               <button id="next-glyph" data-primary data-fill="outlined" type="button">
                 Next →
               </button>
-              <span is="e-muted" data-font-size="sm" id="glyph-place"></span>
+              <span
+                is="e-muted"
+                data-font-size="sm"
+                id="glyph-place"
+                data-width="full">
+              </span>
             </div>
           </div>
 
           <div is="e-panel" data-padding="lg" data-margin-top="lg">
             <h2 is="e-h">Engraved example</h2>
             <div id="editor" data-editor></div>
-            <p is="e-p"><span is="e-muted" data-font-size="sm" id="status"></span></p>
+            <p is="e-p" data-margin-top="md"><span is="e-muted" data-font-size="sm" id="status"></span></p>
+
+            <!--
+            The example is a file, and this is where it is edited: open the
+            source in the editor above, change the music, then keep it. What is
+            saved is what the next person sees this glyph in.
+            -->
+            <div is="e-row" data-gap="sm" data-margin-top="md" data-keep-flex-direction-row-in-mobile>
+              <button id="save-example" data-primary data-fill="outlined" type="button">
+                Save this example
+              </button>
+              <div is="e-spacer"></div>
+              <span is="e-muted" data-font-size="sm" id="example-says"></span>
+            </div>
           </div>
 
           <div is="e-panel" data-padding="lg" data-margin-top="lg">
@@ -207,6 +224,14 @@
               </span>
             </p>
             <div id="text-editor" data-editor data-margin-top="sm"></div>
+            <!-- The example is a file; this is where it is written. -->
+            <div is="e-row" data-gap="sm" data-margin-top="md" data-keep-flex-direction-row-in-mobile>
+              <button id="save-text-example" data-primary data-fill="outlined" type="button">
+                Save this example
+              </button>
+              <div is="e-spacer"></div>
+              <span is="e-muted" data-font-size="sm" id="text-example-says"></span>
+            </div>
           </div>
 
         </e-tab>
@@ -284,6 +309,14 @@
               </span>
             </p>
             <div id="chord-editor" data-editor data-margin-top="sm"></div>
+            <!-- The example is a file; this is where it is written. -->
+            <div is="e-row" data-gap="sm" data-margin-top="md" data-keep-flex-direction-row-in-mobile>
+              <button id="save-chord-example" data-primary data-fill="outlined" type="button">
+                Save this example
+              </button>
+              <div is="e-spacer"></div>
+              <span is="e-muted" data-font-size="sm" id="chord-example-says"></span>
+            </div>
           </div>
 
         </e-tab>

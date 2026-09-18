@@ -1,0 +1,5 @@
+measure
+b with pedal "Soft"
+a
+d5
+c5 with release

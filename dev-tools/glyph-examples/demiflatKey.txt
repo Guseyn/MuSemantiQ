@@ -1,0 +1,15 @@
+measure
+e with demiflat key
+f with demiflat key
+g with demiflat key
+a with demiflat key
+measure
+b with demiflat key, with stem down
+c5 with demiflat key, with stem down
+d5 with demiflat key, with stem down
+e5 with demiflat key, with stem down
+measure
+c with demiflat key
+a5 with demiflat key, with stem down
+chord
+f a with demiflat key c5

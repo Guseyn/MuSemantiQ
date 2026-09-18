@@ -1,0 +1,15 @@
+music font is leland
+
+comment: "short"
+
+comment : "a comment whose colon stands apart from the word"
+
+comment is "a comment introduced with the word is"
+
+comment:"a comment written straight onto its colon"
+
+side note: "an aside, which is a comment by another name"
+
+measure
+treble clef
+1/4 c d e f

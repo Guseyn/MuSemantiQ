@@ -1,0 +1,3 @@
+measure
+chord is arpeggiated
+c e g b

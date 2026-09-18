@@ -1,0 +1,4 @@
+measure
+stave with bass clef
+e f g a
+b c4 with stem down, d4 e4

@@ -1,0 +1,5 @@
+measure
+b with dynamic "mf"
+a with dynamic "mf"
+d5 with dynamic "mf" below, with stem down
+c5 with dynamic "mf" below, with stem down

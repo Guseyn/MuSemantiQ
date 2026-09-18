@@ -66,6 +66,27 @@ function testArtifactPath(requestUrl) {
     path.join(REPOSITORY_ROOT, 'does-not-exist')
 }
 
+/*
+The glyph examples the font viewer engraves: one MSQ file per entry in the glyph
+table, kept in dev-tools/glyph-examples so they can be edited as music rather
+than as code. Served from where they live so an edit shows on the next reload.
+*/
+function glyphExamplePath(requestUrl) {
+  const parts = requestUrl
+    .split('?')[0]
+    .split('/')
+    .filter((part) => part !== '')
+    .map((part) => decodeURIComponent(part))
+
+  // `/glyph-examples/<entry>.txt`
+  const [ , ...rest ] = parts
+  if (rest.length !== 1 || !rest[0].endsWith('.txt')) {
+    return path.join(REPOSITORY_ROOT, 'does-not-exist')
+  }
+  return resolveInside(path.join(REPOSITORY_ROOT, 'dev-tools/glyph-examples'), rest[0]) ||
+    path.join(REPOSITORY_ROOT, 'does-not-exist')
+}
+
 server(
   app({
     indexFile: './dev-tools/web-app/static/html/index.html',
@@ -78,12 +99,22 @@ server(
         cacheControl: 'no-store',
         fileNotFound: notFound
       }),
+      src(/^\/glyph-examples\//, {
+        mapper: glyphExamplePath,
+        cacheControl: 'no-store',
+        fileNotFound: notFound
+      }),
       src(/^\/tools\//, {
         mapper: toolModulePath,
         cacheControl: 'no-cache',
         fileNotFound: notFound
       }),
-      src(/^\/((html\/static-templates\/)|css|js|images|font)/, {
+      /*
+      `magenta-sound-font` is a folder of symlinks into src/midi, one per
+      rendered set. The test bench plays through it, so the sample files have to
+      be served from here as well as from the example app.
+      */
+      src(/^\/((html\/static-templates\/)|css|js|images|font|magenta-sound-font)/, {
         baseFolder,
         useGzip: true,
         cacheControl: 'no-cache',

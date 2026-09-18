@@ -1,0 +1,25 @@
+music font is leland
+
+comment: "
+  Chords that reach past the stave, where the notes need ledger lines of their
+  own: above, below, and one chord that does both at once.
+"
+
+measure
+treble clef
+chord
+g5 a5 b5 c6
+
+chord with stem down
+a5 c6 e6
+
+measure
+chord
+a3 b3 c d
+
+chord with stem down
+f3 a3 c e
+
+measure
+chord
+a3 c e g b d5 f5 a5

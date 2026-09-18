@@ -1,0 +1,11 @@
+measure
+b with tenuto up, with stem up
+b with tenuto up, with stem down
+b with tenuto down, with stem up
+b with tenuto down, with stem down
+
+measure
+a with tenuto up, with stem up
+a with tenuto up, with stem down
+a with tenuto down, with stem up
+a with tenuto down, with stem down

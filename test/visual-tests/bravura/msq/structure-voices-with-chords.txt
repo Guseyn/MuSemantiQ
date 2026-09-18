@@ -1,0 +1,41 @@
+comment: "
+  Chords in more than one voice at once: two voices whose chords share a pitch,
+  a chord against a single line, and a semitone cluster meeting another voice
+  in the same bar.
+"
+
+measure
+treble clef
+voice
+chord
+e g c5
+
+chord
+f a d5
+voice
+chord
+c e
+
+chord
+d f
+
+measure
+voice
+1/2 chord
+g b d5
+
+1/2 chord
+a c5 e5
+voice
+1/4 c d e f
+
+measure
+voice
+chord
+c c sharp d d sharp
+
+chord
+e f f sharp g
+voice
+1/2 a5
+1/2 g5

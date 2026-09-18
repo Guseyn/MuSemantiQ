@@ -1,0 +1,11 @@
+measure
+b with fermata up, with stem up
+b with fermata up, with stem down
+b with fermata down, with stem up
+b with fermata down, with stem down
+
+measure
+a with fermata up, with stem up
+a with fermata up, with stem down
+a with fermata down, with stem up
+a with fermata down, with stem down

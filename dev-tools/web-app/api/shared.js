@@ -7,6 +7,7 @@
  */
 
 import path from 'path'
+import { readdirSync, existsSync } from 'fs'
 
 export const REPOSITORY_ROOT = process.cwd()
 
@@ -23,53 +24,81 @@ export const TEST_ROOT = 'test'
  * `msq` is the input rather than a comparison, so it is listed apart from the
  * artifacts: there is only ever one of it and nothing to adopt.
  */
-export const SUITES = [
-  {
-    name: 'visual-tests/bravura',
-    label: 'Visual · Bravura',
-    kind: 'visual',
-    artifacts: [
-      { name: 'svg', extension: 'svg' },
-      { name: 'page-schema', extension: 'json' },
-      { name: 'html-highlights', extension: 'html' },
-      { name: 'errors', extension: 'json' },
-      { name: 'custom-styles', extension: 'json' },
-      { name: 'comments', extension: 'json' },
-      { name: 'char-progressions', extension: 'json' }
-    ]
-  },
-  {
-    name: 'visual-tests/leland',
-    label: 'Visual · Leland',
-    kind: 'visual',
-    artifacts: [
-      { name: 'svg', extension: 'svg' },
-      { name: 'page-schema', extension: 'json' },
-      { name: 'html-highlights', extension: 'html' },
-      { name: 'errors', extension: 'json' },
-      { name: 'custom-styles', extension: 'json' },
-      { name: 'comments', extension: 'json' },
-      { name: 'char-progressions', extension: 'json' }
-    ]
-  },
-  {
-    name: 'audio-tests',
-    label: 'Audio',
-    kind: 'audio',
-    artifacts: [
-      { name: 'svg', extension: 'svg' },
-      { name: 'midi', extension: 'mid' },
-      { name: 'page-schema', extension: 'json' },
-      { name: 'html-highlights', extension: 'html' },
-      { name: 'errors', extension: 'json' },
-      { name: 'custom-styles', extension: 'json' },
-      { name: 'midi-settings', extension: 'json' },
-      { name: 'comments', extension: 'json' }
-    ]
-  }
-]
+/*
+What a suite of each kind keeps. The visual runner writes seven artifacts per
+test and the audio runner eight — the same set whatever font the suite is for.
+*/
+const ARTIFACTS = {
+  visual: [
+    { name: 'svg', extension: 'svg' },
+    { name: 'page-schema', extension: 'json' },
+    { name: 'html-highlights', extension: 'html' },
+    { name: 'errors', extension: 'json' },
+    { name: 'custom-styles', extension: 'json' },
+    { name: 'comments', extension: 'json' },
+    { name: 'char-progressions', extension: 'json' }
+  ],
+  audio: [
+    { name: 'svg', extension: 'svg' },
+    { name: 'midi', extension: 'mid' },
+    { name: 'page-schema', extension: 'json' },
+    { name: 'html-highlights', extension: 'html' },
+    { name: 'errors', extension: 'json' },
+    { name: 'custom-styles', extension: 'json' },
+    { name: 'midi-settings', extension: 'json' },
+    { name: 'comments', extension: 'json' }
+  ]
+}
 
-export const suiteNamed = (name) => SUITES.find((suite) => suite.name === name) || null
+/**
+ * A name for a suite, as a person would say it: `visual-tests/bravura` is
+ * "Visual · Bravura".
+ */
+const labelFor = (name) => name
+  .replace(/-tests/g, '')
+  .split('/')
+  .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+  .join(' · ')
+
+/**
+ * The suites there are, read off the test folders rather than written down.
+ *
+ * The visual runner walks `test/visual-tests/*` and runs the corpus once per
+ * font it finds there, so adding a font is adding a directory — and this has to
+ * find it the same way, or the viewer would show a suite the runner does not
+ * run, or miss one it does.
+ *
+ * Read per request: it is one `readdir` on a dev server, and it means a new
+ * font folder shows up without a restart.
+ */
+export function suites() {
+  const found = []
+
+  const visualRoot = path.join(REPOSITORY_ROOT, TEST_ROOT, 'visual-tests')
+  let fonts = []
+  try {
+    fonts = readdirSync(visualRoot, { withFileTypes: true })
+      .filter((entry) => entry.isDirectory())
+      .map((entry) => entry.name)
+      .sort()
+  } catch {
+    // No visual tests at all.
+  }
+  for (const font of fonts) {
+    const name = `visual-tests/${font}`
+    found.push({ name, label: labelFor(name), kind: 'visual', artifacts: ARTIFACTS.visual })
+  }
+
+  if (existsSync(path.join(REPOSITORY_ROOT, TEST_ROOT, 'audio-tests', 'msq'))) {
+    found.push({
+      name: 'audio-tests', label: 'Audio', kind: 'audio', artifacts: ARTIFACTS.audio
+    })
+  }
+
+  return found
+}
+
+export const suiteNamed = (name) => suites().find((suite) => suite.name === name) || null
 
 /**
  * Where a suite's folders are on disk.

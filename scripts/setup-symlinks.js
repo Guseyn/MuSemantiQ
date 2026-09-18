@@ -66,6 +66,17 @@ for (const staticDir of staticDirs) {
   if (!existsSync(staticDir)) {
     continue
   }
+
+  // The wordmark, which the README shows and both apps put in their header —
+  // linked rather than copied, so there is one logo to change.
+  const imagesDir = join(staticDir, 'images')
+  mkdirSync(imagesDir, { recursive: true })
+  createSymlink(
+    join(imagesDir, 'logo.svg'),
+    join(projectRoot, 'logo.svg'),
+    `${staticDir.replace(projectRoot + '/', '')}/images/logo.svg → logo.svg`
+  )
+
   mkdirSync(fontDir, { recursive: true })
   for (const family of [ 'chord-letters', 'music', 'text' ]) {
     createSymlink(

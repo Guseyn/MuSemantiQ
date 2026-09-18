@@ -134,6 +134,17 @@ const parentOfNodeClosestToDivUnderneathTextareaTextContainerOrDivUnderneathText
 const updateHtmlHighlightsOnCertainLines = (textarea, divUnderneathTextarea, nodesSplittedInLines, firstLineIndex, secondLineIndex, parsedLinesWithHighlights) => {
   const wrapperTemplateReplacement = document.createElement('template')
   wrapperTemplateReplacement.innerHTML = parsedLinesWithHighlights
+  /*
+  This is the path typing takes — a line or two rewritten in place rather than
+  the whole layer — so switching the colouring off has to be honoured here too,
+  or the text would go back to being coloured at the next keystroke. The
+  characters are kept exactly; only the spans around them go, since the layer
+  sits under the textarea and the two must agree character for character.
+  */
+  if (divUnderneathTextarea.highlightingIsOff) {
+    const plain = wrapperTemplateReplacement.content.textContent
+    wrapperTemplateReplacement.content.replaceChildren(document.createTextNode(plain))
+  }
   const wrapperTemplateReplacementContentNode = document.importNode(wrapperTemplateReplacement.content, true)
   let firstNodeOnFirstLine = nodesSplittedInLines[firstLineIndex] ? nodesSplittedInLines[firstLineIndex][0] : null
   if (firstNodeOnFirstLine) {

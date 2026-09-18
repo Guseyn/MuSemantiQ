@@ -1,0 +1,15 @@
+measure
+e with natural key
+f with natural key
+g with natural key
+a with natural key
+measure
+b with natural key, with stem down
+c5 with natural key, with stem down
+d5 with natural key, with stem down
+e5 with natural key, with stem down
+measure
+c with natural key
+a5 with natural key, with stem down
+chord
+f a with natural key c5

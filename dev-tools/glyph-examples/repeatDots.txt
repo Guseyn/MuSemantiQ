@@ -1,0 +1,6 @@
+measure
+starts with double bold barline, with repeat sign at the start
+a b c5 d5
+measure
+ends with double bold barline, with repeat sign at the end
+a b c5 d5

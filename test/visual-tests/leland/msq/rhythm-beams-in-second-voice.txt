@@ -1,0 +1,20 @@
+music font is leland
+
+comment: "
+  A beamed run in the second voice, which points its stems down without being
+  told to, under held notes in the first.
+"
+
+measure
+treble clef
+voice
+1/2 c5
+1/2 d5
+voice
+1/8 c beamed, d, e, f, g, a, b, c5 not beamed
+
+measure
+voice
+1 e5
+voice
+1/16 e beamed, f, g, a, b, c5, d5, e5, d5, c5, b, a, g, f, e, d not beamed

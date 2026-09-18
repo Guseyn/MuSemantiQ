@@ -76,6 +76,21 @@
         </span>
       </p>
 
+
+      <!--
+      What is being looked at, narrowest first: which kind of test, then which
+      suite of that kind, then which test. A tab holds no content of its own —
+      it chooses the suite underneath it, and everything below is redrawn.
+      -->
+      <e-tabs id="suites" data-apply-hash-navigation data-margin-top="md">
+        <e-tab data-title="Visual"></e-tab>
+        <e-tab data-title="Audio"></e-tab>
+      </e-tabs>
+
+      <!-- One button per suite of the chosen kind, read off the test folders:
+           the visual tests run the same corpus once per font. -->
+      <div id="suite-picker"></div>
+
       <div is="e-card" data-width="full" data-padding="md" data-margin-top="md" data-fields>
         <label>
           Test
@@ -83,16 +98,23 @@
         </label>
         <!--
         The corpus is walked as often as it is searched: a whole prefix at a
-        time, looking for the one that came out wrong.
+        time, looking for the one that came out wrong. Editing sits at the end of
+        that row, because it and the deletion act on whichever test the walk has
+        arrived at.
         -->
-        <div is="e-row" data-gap="sm" data-margin-top="sm" data-keep-flex-direction-row-in-mobile>
+        <div is="e-row" data-gap="sm" data-margin-top="sm">
           <button id="previous-test" data-primary data-fill="outlined" type="button">← Previous</button>
           <button id="next-test" data-primary data-fill="outlined" type="button">Next →</button>
           <span is="e-muted" data-font-size="sm" id="test-place"></span>
           <div is="e-spacer"></div>
-          <button id="add-test" data-primary data-fill="outlined" type="button">Add a test</button>
+          <button id="edit-test" data-primary data-fill="outlined" type="button">Edit test</button>
+          <button id="delete-test" data-primary data-fill="danger" type="button">Delete test</button>
         </div>
       </div>
+
+      <!-- After the panel, because it makes a test rather than acting on the
+           one the panel has chosen. -->
+      <button id="add-test" data-primary type="button" data-margin-top="md">Add test</button>
 
       <!--
       Adding a test writes one file per suite of that kind — the same music in
@@ -101,11 +123,14 @@
       so the choice is not offered.
       -->
       <dialog is="e-dialog" id="new-test" data-close-icon="">
-        <h2 is="e-h">A new test</h2>
+        <h2 is="e-h" id="new-test-title">A new test</h2>
         <p is="e-p">
           <span is="e-muted" data-font-size="sm">
-            Only the input is written. The artifacts appear when the suite is next
-            run, and the expected side when you adopt them here.
+            The music is written into every suite of this kind, and the suite is
+            then run over this one test — so what it produces is up to date the
+            moment you save. Only the <code is="e-code">actual</code> side is
+            written; the baseline is what you adopt here, once you have looked at
+            it.
           </span>
         </p>
         <form is="e-form" data-width="full" data-no-style>
@@ -122,32 +147,52 @@
                 data-validation-absence-error-message="Give it a name"
                 data-validation-error-message="Letters, digits, dashes and underscores — and no dots">
             </label>
-            <label>
-              MSQ
-              <textarea
-                id="new-test-msq"
-                name="msq"
-                rows="12"
-                spellcheck="false"
-                required
-                data-validation-absence-error-message="Write some MSQ for it"
-                placeholder="measure&#10;treble clef&#10;1/4 c, d, e, f"></textarea>
-            </label>
+            <!--
+            The music is written in the editor itself, so the score is there to
+            look at while you write it rather than after you have saved. The
+            form still needs a value to send, so the editor's text is copied
+            into the field below on the way out.
+            -->
+            <div>
+              <span is="e-muted" data-font-size="sm">
+                MSQ — press the pencil in the editor to write, and the eye to see
+                what it draws.
+              </span>
+              <div id="new-test-editor" data-margin-top="sm"></div>
+            </div>
+            <input
+              type="hidden"
+              id="new-test-msq"
+              name="msq"
+              required
+              data-validation-absence-error-message="Write some MSQ for it">
             <input type="hidden" id="new-test-kind" name="kind" value="visual">
 
             <div is="e-row" data-gap="sm" data-margin-top="md" data-keep-flex-direction-row-in-mobile>
               <button
                 data-primary
                 type="button"
+                id="write-test"
                 data-request-url="/dev/tests/new"
                 data-request-method="POST"
-                data-button-ajax-text="writing…"
+                data-button-ajax-text="writing and running…"
                 data-response-name="added"
-                onclick="this.form.submit(this)"
+                onclick="
+                  (() => {
+                    // The editor holds the music; the form sends this field.
+                    const written = musicInTheDialog()
+                    if (!written) {
+                      return showError('Write some MSQ for it first.')
+                    }
+                    changeValueOf('#new-test-msq', written)
+                    this.form.submit(this)
+                  })()
+                "
                 data-actions-on-response="
                   if (added.statusCode === 200) {
-                    showToast(`${added.body.test} written into ${added.body.wrote.join(' and ')}.`)
-                    testAdded(added.body.test)
+                    showToast(`${added.body.test} written into ${added.body.wrote.join(' and ')}` +
+                      `${added.body.ran ? ' — it passes.' : ', and it differs from its baseline.'}`)
+                    testWritten(added.body.test)
                     return
                   }
                   showError(added.body.error || `The server answered ${added.statusCode}.`)
@@ -160,11 +205,6 @@
           </div>
         </form>
       </dialog>
-
-      <e-tabs id="suites" data-apply-hash-navigation data-margin-top="md">
-        <e-tab data-title="Visual"></e-tab>
-        <e-tab data-title="Audio"></e-tab>
-      </e-tabs>
 
       <div id="viewer" data-margin-top="lg"></div>
 

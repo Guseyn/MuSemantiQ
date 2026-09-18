@@ -1,0 +1,15 @@
+measure
+e with sesquiflat key
+f with sesquiflat key
+g with sesquiflat key
+a with sesquiflat key
+measure
+b with sesquiflat key, with stem down
+c5 with sesquiflat key, with stem down
+d5 with sesquiflat key, with stem down
+e5 with sesquiflat key, with stem down
+measure
+c with sesquiflat key
+a5 with sesquiflat key, with stem down
+chord
+f a with sesquiflat key c5

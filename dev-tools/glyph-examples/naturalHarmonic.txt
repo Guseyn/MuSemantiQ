@@ -1,0 +1,11 @@
+measure
+b with natural harmonic up, with stem up
+b with natural harmonic up, with stem down
+b with natural harmonic down, with stem up
+b with natural harmonic down, with stem down
+
+measure
+a with natural harmonic up, with stem up
+a with natural harmonic up, with stem down
+a with natural harmonic down, with stem up
+a with natural harmonic down, with stem down

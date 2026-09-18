@@ -1,0 +1,43 @@
+music font is leland
+
+comment: "
+  Spans that name some of where they belong and not the rest: the stave and the
+  voice but not the measure, the measure and the voice but not the stave, and
+  one naming only the stave while the music has already moved to a second line.
+"
+
+measure
+brace from stave 1 to stave 2
+stave with treble clef
+stave with bass clef
+
+measure
+stave
+voice
+1/4 c5 d5 e5 f5
+stave
+1/4 c3 d3 e3 f3
+
+tuplet 3 on second stave, in first voice
+from first unit to third unit
+
+measure
+stave
+1/4 g a b c5
+stave
+1/4 g3 a3 b3 c
+
+glissando in measure 3, in voice 1
+starts at unit 1
+finishes at unit 3
+
+new line
+
+measure
+stave
+1/8 c beamed, d, e, f not beamed
+stave
+1/4 c3 e3
+
+slur on first stave
+from unit 2 to unit 4

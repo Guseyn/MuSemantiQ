@@ -151,3 +151,28 @@ details[is="e-details"] > p,
 details[is="e-details"] > div {
   padding: 0;
 }
+
+/*
+The wordmark at the top of every page.
+
+Taken as a mask rather than as a picture, the way the close icon is: the logo is
+drawn in one flat colour, and cutting its shape out of a block of --e-fg keeps it
+exactly the colour of the interface it sits above, whatever that colour becomes.
+The file is 836.57 x 120, and the ratio is what gives it its height: it takes
+the width it is allowed, up to the cap below, and is as tall as that makes it.
+*/
+[data-logo] {
+  display: block;
+  width: 100%;
+  max-width: 190px;
+  aspect-ratio: 836.57 / 120;
+  background-color: var(--e-fg);
+  -webkit-mask-image: url("/images/logo.svg");
+  mask-image: url("/images/logo.svg");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: left center;
+  mask-position: left center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+}

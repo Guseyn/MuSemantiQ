@@ -1,0 +1,11 @@
+measure
+treble clef
+1/4 c with chord "C"
+1/4 e with chord "Cmaj7"
+1/4 g with chord "C^9"
+1/4 c5 with chord "C^halfdim13"
+measure
+1/4 d with chord "A^flat/C"
+1/4 f with chord "C/F^sharp"
+1/4 a with chord "G7"
+1/4 c5 with chord "E^flatmaj7"

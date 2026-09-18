@@ -1,0 +1,6 @@
+measure
+1/2 b with glissando after up
+1/2 d5
+measure
+1/2 a with glissando after up
+1/2 c5

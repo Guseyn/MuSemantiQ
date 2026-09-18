@@ -1,10 +1,13 @@
 import './searchable-select.js'
+import '#msq/msq-font-loader-template.js'
+import '#msq/msq-editor-template.js'
 import highlightsCss from '#msq/css/highlights.js'
 
 await window.whenPresent('#viewer')
 
 const viewer = document.getElementById('viewer')
 const tabs = document.getElementById('suites')
+const picker = document.getElementById('suite-picker')
 const testSelect = document.getElementById('test')
 const at = (id) => document.getElementById(id)
 
@@ -12,7 +15,19 @@ const index = await (await fetch('/dev/tests')).json()
 const visual = index.suites.filter((suite) => suite.kind === 'visual')
 const audio = index.suites.filter((suite) => suite.kind === 'audio')
 
-const state = { suite: visual[0] ? visual[0].name : null, test: null, artifact: null }
+/*
+The tab is chosen by the hash — `e-tabs` does that itself — so the suite has to
+start from the same place, or the page would open showing Audio with the visual
+corpus in the picker.
+*/
+const openingOnAudio = window.location.hash === '#audio' && audio.length
+const firstOf = (group) => (group[0] ? group[0].name : null)
+
+const state = {
+  suite: openingOnAudio ? firstOf(audio) : firstOf(visual),
+  test: null,
+  artifact: null
+}
 
 const suiteNamed = (name) => index.suites.find((one) => one.name === name)
 
@@ -84,29 +99,155 @@ function stepTest(by) {
  * The suites are fetched once at load, so a new test is invisible until they
  * are asked for again — and the one just written is the one to look at.
  */
-window.testAdded = async function (name) {
-  try {
-    const fresh = await (await fetch('/dev/tests')).json()
-    /*
-    The suites are updated in place rather than replaced: the visual and audio
-    lists hold these very objects, and swapping the array would leave them
-    pointing at the old one.
-    */
-    for (const suite of index.suites) {
-      const again = fresh.suites.find((one) => one.name === suite.name)
-      if (again) {
-        suite.tests = again.tests
-        suite.failed = again.failed
-      }
+async function refreshTheIndex() {
+  const fresh = await (await fetch('/dev/tests')).json()
+  /*
+  The suites are updated in place rather than replaced: the visual and audio
+  lists hold these very objects, and swapping the array would leave them
+  pointing at the old one.
+  */
+  for (const suite of index.suites) {
+    const again = fresh.suites.find((one) => one.name === suite.name)
+    if (again) {
+      suite.tests = again.tests
+      suite.failed = again.failed
     }
+  }
+}
+
+window.testWritten = async function (name) {
+  try {
+    await refreshTheIndex()
     state.test = name
     fillTestSelect()
     render()
     at('new-test').close()
-    at('new-test-msq').value = ''
-    at('new-test-name').value = ''
   } catch (error) {
     window.showError(`Written, but the list could not be read again: ${error.message}`)
+  }
+}
+
+/*
+The editor in the dialog engraves as you write, which means the worker needs the
+fonts. They are registered the first time the dialog is opened rather than on
+load: most visits to this page never write a test.
+*/
+const EDITOR_FONTS = 'testViewerFonts'
+let fontsAreReady = null
+
+function readyTheFonts() {
+  if (!fontsAreReady) {
+    fontsAreReady = (async () => {
+      const config = (await (await fetch('/dev/fonts')).json()).config
+      const loader = document.createElement('template', { is: 'msq-font-loader' })
+      loader.setAttribute('data-font-sources-reference', EDITOR_FONTS)
+      loader.setAttribute('data-font-config', JSON.stringify(config))
+      /*
+      The loader inserts a copy of its content, so the marker has to be findable
+      by attribute — a reference to the node put in would point at the original,
+      which never reaches the document.
+      */
+      const ready = document.createElement('div')
+      ready.setAttribute('data-fonts-ready', '')
+      loader.content.appendChild(ready)
+      at('new-test-editor').replaceChildren(loader)
+
+      await new Promise((resolve) => {
+        new MutationObserver((records, observer) => {
+          if (at('new-test-editor').querySelector('[data-fonts-ready]')) {
+            observer.disconnect()
+            resolve()
+          }
+        }).observe(at('new-test-editor'), { childList: true, subtree: true })
+      })
+    })()
+  }
+  return fontsAreReady
+}
+
+/*
+An msq-editor cannot be re-rendered — it replaces itself with the engraved view
+and guards on having rendered once — so every time the dialog opens it gets a
+fresh one.
+*/
+function engraveInTheDialog(msq) {
+  const template = document.createElement('template', { is: 'msq-editor' })
+  template.setAttribute('data-font-sources', EDITOR_FONTS)
+  template.setAttribute('data-editor-height', '320px')
+  template.innerState = msq
+  at('new-test-editor').replaceChildren(template)
+}
+
+/**
+ * What is in the dialog's editor now.
+ *
+ * Global because the button that saves is an EHTML one, and its `onclick` is
+ * evaluated in global scope.
+ */
+window.musicInTheDialog = function musicInTheDialog() {
+  const host = at('new-test-editor').querySelector('div[data-rendered-by]')
+  const textarea = host && host.shadowRoot.querySelector('textarea[data-msq-input]')
+  return textarea ? textarea.value.trim() : ''
+}
+
+/**
+ * Open the writing dialog, either on a blank test or on one that exists.
+ *
+ * The two differ in three things — the title, where the request goes, and
+ * whether the name can still be chosen — so they are one dialog rather than two
+ * that would drift apart.
+ */
+async function openTheDialog({ editing }) {
+  const kind = suiteNamed(state.suite).kind
+  const suites = kind === 'visual' ? visual : audio
+
+  at('new-test-kind').value = kind
+  at('new-test-title').textContent = editing ? `Edit ${state.test}` : 'A new test'
+  at('new-test-says').textContent =
+    `It will be written into ${suites.map((one) => one.name).join(' and ')}.`
+
+  const button = at('write-test')
+  button.setAttribute('data-request-url', editing ? '/dev/tests/source' : '/dev/tests/new')
+  button.textContent = editing ? 'Save and run it' : 'Write it'
+
+  const name = at('new-test-name')
+  name.readOnly = editing
+  name.value = editing ? state.test : ''
+  at('new-test-msq').value = ''
+
+  let music = 'measure\ntreble clef\n1/4 c, d, e, f'
+
+  if (editing) {
+    /*
+    The source comes from the suite that is showing, without its `music font is`
+    line: that line belongs to the suite rather than to the test, and is written
+    back on save.
+    */
+    try {
+      const source = await (await fetch(
+        `/dev/tests/source?suite=${encodeURIComponent(state.suite)}&test=${encodeURIComponent(state.test)}`
+      )).json()
+      if (source.error) {
+        throw new Error(source.error)
+      }
+      music = source.msq
+    } catch (error) {
+      window.showError(`Could not read the test: ${error.message}`)
+      return
+    }
+  }
+
+  at('new-test').showModal()
+
+  /*
+  The editor measures itself as it renders, so it is built after the dialog is
+  open and has a size — before that it would lay out against nothing.
+  */
+  try {
+    await readyTheFonts()
+    engraveInTheDialog(music)
+  } catch (error) {
+    window.showError(`Could not open the editor: ${error.message}`)
   }
 }
 
@@ -124,51 +265,63 @@ function watchTabs() {
     button.addEventListener('click', () => {
       const group = position === 0 ? visual : audio
       if (group.length && !group.some((one) => one.name === state.suite)) {
-        state.suite = group[0].name
-        state.artifact = null
-        fillTestSelect()
-        render()
+        showSuite(group[0].name)
       }
     })
   })
 }
 
 /**
- * The suite picker, shown only where a tab holds more than one suite — the
- * visual tests have one per font.
+ * One button per suite of the kind the tab has chosen, between the tabs and the
+ * test picker — the visual tests are the same corpus once per font, so which
+ * font is being looked at is a step of its own.
+ *
+ * A kind with a single suite has nothing to choose, so the row is left empty
+ * rather than showing one button that does nothing.
  */
-function suitePicker() {
+function drawSuitePicker() {
   const group = suiteNamed(state.suite).kind === 'visual' ? visual : audio
   if (group.length < 2) {
-    return ''
+    return picker.replaceChildren()
   }
-  return `
-    <div is="e-row" data-gap="sm" data-margin-bottom="md" data-keep-flex-direction-row-in-mobile>
+  picker.innerHTML = `
+    <div is="e-row" data-gap="sm" data-margin-top="md" data-keep-flex-direction-row-in-mobile>
       ${group.map((suite) => `
         <button type="button" data-primary
           ${suite.name === state.suite ? '' : 'data-fill="outlined"'}
           data-pick-suite="${escaped(suite.name)}">${escaped(suite.label)}</button>
       `).join('')}
     </div>`
+
+  picker.querySelectorAll('[data-pick-suite]').forEach((button) => {
+    button.addEventListener('click', () => {
+      showSuite(button.getAttribute('data-pick-suite'))
+    })
+  })
+}
+
+/**
+ * Look at another suite: the picker, the test list and the comparison all
+ * follow from it.
+ */
+function showSuite(name) {
+  if (name === state.suite) {
+    return
+  }
+  state.suite = name
+  state.artifact = null
+  drawSuitePicker()
+  fillTestSelect()
+  render()
 }
 
 function render() {
   viewer.innerHTML = `
-    ${suitePicker()}
     <div id="detail">
       ${state.test
         ? '<p is="e-p"><span is="e-muted">Loading…</span></p>'
         : '<p is="e-p"><span is="e-muted">Pick a test to compare it.</span></p>'}
     </div>`
-
-  viewer.querySelectorAll('[data-pick-suite]').forEach((button) => {
-    button.addEventListener('click', () => {
-      state.suite = button.getAttribute('data-pick-suite')
-      state.artifact = null
-      fillTestSelect()
-      render()
-    })
-  })
 
   if (state.test) {
     renderDetail()
@@ -425,16 +578,72 @@ at('previous-test').addEventListener('click', () => stepTest(-1))
 at('next-test').addEventListener('click', () => stepTest(1))
 
 /*
-Which kind a new test is written for follows the tab you are on: a visual test
-lands in every visual suite, an audio one in the audio suite.
+Which kind is written follows the tab you are on: a visual test lands in every
+visual suite, an audio one in the audio suite.
 */
-at('add-test').addEventListener('click', () => {
+/**
+ * Take a test out of the corpus: its source and every artifact either side of
+ * the comparison, in every suite of its kind.
+ *
+ * It is written into all of them at once and so it goes out of all of them at
+ * once — a corpus where bravura has a test leland does not have has stopped
+ * comparing anything. The walk then carries on at whatever took its place, so
+ * you can clear a run of failures without going back to the picker each time.
+ */
+async function deleteTest() {
+  if (!state.test) {
+    return window.showError('Pick a test to delete first.')
+  }
   const kind = suiteNamed(state.suite).kind
-  at('new-test-kind').value = kind
-  at('new-test-says').textContent = kind === 'visual'
-    ? `It will be written into ${visual.map((one) => one.name).join(' and ')}.`
-    : `It will be written into ${audio.map((one) => one.name).join(' and ')}.`
-  at('new-test').showModal()
+  const group = kind === 'visual' ? visual : audio
+  const going = state.test
+
+  const confirmed = await window.confirmAction(
+    `Delete "${going}" — its source and every artifact — from ${group.map((one) => one.label).join(' and ')}?`,
+    'Delete it', 'Keep it'
+  )
+  if (!confirmed) {
+    return
+  }
+
+  try {
+    const response = await fetch('/dev/tests/delete', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ test: going, kind })
+    })
+    const result = await response.json()
+    if (!response.ok) {
+      throw new Error(result.error || `the server answered ${response.status}`)
+    }
+
+    /*
+    Where the walk lands next: the test after the one that went, by position
+    rather than by name, since the name is no longer in the list.
+    */
+    const was = suiteNamed(state.suite).tests.indexOf(going)
+    await refreshTheIndex()
+    const left = suiteNamed(state.suite).tests
+    state.test = left[Math.min(was, left.length - 1)] || null
+    state.artifact = null
+
+    fillTestSelect()
+    render()
+    window.showToast(`${going} deleted — ${result.removed.length} files.`)
+  } catch (error) {
+    window.showError(`Could not delete it: ${error.message}`)
+  }
+}
+
+at('delete-test').addEventListener('click', deleteTest)
+
+at('add-test').addEventListener('click', () => openTheDialog({ editing: false }))
+at('edit-test').addEventListener('click', () => {
+  if (!state.test) {
+    window.showError('Pick a test to edit first.')
+    return
+  }
+  openTheDialog({ editing: true })
 })
 
 // The midi player is only needed once a midi artifact is looked at, and it pulls
@@ -453,5 +662,6 @@ new MutationObserver(() => {
 }).observe(viewer, { childList: true, subtree: true })
 
 watchTabs()
+drawSuitePicker()
 fillTestSelect()
 render()

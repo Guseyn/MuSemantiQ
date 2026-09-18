@@ -1,0 +1,11 @@
+measure
+b with marcato up, with stem up
+b with marcato up, with stem down
+b with marcato down, with stem up
+b with marcato down, with stem down
+
+measure
+a with marcato up, with stem up
+a with marcato up, with stem down
+a with marcato down, with stem up
+a with marcato down, with stem down
