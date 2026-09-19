@@ -1,4 +1,4 @@
-import fillLineNumbersColumn from '#msq/editor/fillLineNumbersColumn.js'
+import fillLineNumbersColumn from '#msq/web-components/editor/fillLineNumbersColumn.js'
 
 export default (lineNumbersColumn, textarea, divUnderneathTextarea) => {
   textarea.addEventListener('input', () => {

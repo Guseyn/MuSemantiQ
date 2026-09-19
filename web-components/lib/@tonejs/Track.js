@@ -1,9 +1,9 @@
-import { insert } from '#msq/lib/@tonejs/BinarySearch.js'
-import { ControlChange } from '#msq/lib/@tonejs/ControlChange.js'
-import { createControlChanges } from '#msq/lib/@tonejs/ControlChanges.js'
-import { PitchBend } from '#msq/lib/@tonejs/PitchBend.js'
-import { Instrument } from '#msq/lib/@tonejs/Instrument.js'
-import { Note } from '#msq/lib/@tonejs/Note.js'
+import { insert } from '#msq/web-components/lib/@tonejs/BinarySearch.js'
+import { ControlChange } from '#msq/web-components/lib/@tonejs/ControlChange.js'
+import { createControlChanges } from '#msq/web-components/lib/@tonejs/ControlChanges.js'
+import { PitchBend } from '#msq/web-components/lib/@tonejs/PitchBend.js'
+import { Instrument } from '#msq/web-components/lib/@tonejs/Instrument.js'
+import { Note } from '#msq/web-components/lib/@tonejs/Note.js'
 
 const privateHeaderMap = new WeakMap()
 

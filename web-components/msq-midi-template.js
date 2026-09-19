@@ -1,13 +1,13 @@
-import MSQTemplateElement from '#msq/msq-template.js'
-import copyText from '#msq/utils/copyText.js'
-import downloadContent from '#msq/utils/downloadContent.js'
-import overrideMidiPlayerStyles from '#msq/utils/overrideMidiPlayerStyles.js'
-import addUtilsToMidiPlayerControlPanel from '#msq/utils/addUtilsToMidiPlayerControlPanel.js'
-import '#msq/lib/html-midi-player/player.js'
+import MSQTemplateElement from '#msq/web-components/msq-template.js'
+import copyText from '#msq/web-components/utils/copyText.js'
+import downloadContent from '#msq/web-components/utils/downloadContent.js'
+import overrideMidiPlayerStyles from '#msq/web-components/utils/overrideMidiPlayerStyles.js'
+import addUtilsToMidiPlayerControlPanel from '#msq/web-components/utils/addUtilsToMidiPlayerControlPanel.js'
+import '#msq/web-components/lib/html-midi-player/player.js'
 
-import downloadIcon from '#msq/icons/downloadIcon.js'
-import copyIcon from '#msq/icons/copyIcon.js'
-import doneIcon from '#msq/icons/doneIcon.js'
+import downloadIcon from '#msq/web-components/icons/downloadIcon.js'
+import copyIcon from '#msq/web-components/icons/copyIcon.js'
+import doneIcon from '#msq/web-components/icons/doneIcon.js'
 
 /* The player is the only thing in the surface, so it carries the full radius. */
 const playerRadius = /*css*/`

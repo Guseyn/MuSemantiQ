@@ -1,4 +1,13 @@
-import createdElementWithStylesAndAttributes from '#msq/editor/createdElementWithStylesAndAttributes.js'
+import createdElementWithStylesAndAttributes from '#msq/web-components/editor/createdElementWithStylesAndAttributes.js'
+
+/*
+Popover has been in Chromium and Firefox since 2023, and the components are
+customized built-ins, which WebKit does not support at all — so this is close to
+always true. Where it is not, the list falls back to being shown and hidden by
+display, which is what it did before, and is wrong only inside a dialog.
+*/
+const POPOVER_IS_SUPPORTED = typeof HTMLElement !== 'undefined' &&
+  typeof HTMLElement.prototype.showPopover === 'function'
 
 /**
  * The popup is a listbox owned by the textarea, which acts as the combobox.
@@ -12,7 +21,14 @@ export default (textarea) => {
   const autocompleteListView = createdElementWithStylesAndAttributes(
     'div',
     {
-      'display': 'none',
+      /*
+      Hidden to start with — but never inline when it is a popover. The rule that
+      hides a closed popover is a UA one, `[popover]:not(:popover-open)`, and an
+      inline `display` beats it: the list would stay hidden after showPopover().
+      Closed popovers are hidden by the UA anyway, so there is nothing to say
+      here.
+      */
+      ...(POPOVER_IS_SUPPORTED ? {} : { 'display': 'none' }),
       /*
       Positioned against the viewport, not against the editor.
 
@@ -26,7 +42,20 @@ export default (textarea) => {
       'data-autocomplete': '',
       'id': `msq-autocomplete-${crypto.randomUUID()}`,
       'role': 'listbox',
-      'aria-label': 'Completions'
+      'aria-label': 'Completions',
+      /*
+      A popover, which is what keeps `fixed` meaning the viewport.
+
+      An element with a transform is the containing block for its fixed-position
+      descendants, and e-ui centres a dialog with `translate(-50%, -50%)`. Inside
+      one, the coordinates below — measured from the viewport — were being read
+      against the dialog's own box, so the list appeared offset by the dialog's
+      top-left and was then clipped by its `overflow: hidden`. A popover is
+      promoted to the top layer, where the viewport is the containing block again
+      whatever the ancestors do, and where nothing can clip it. It is also
+      promoted after the dialog, so it draws above it.
+      */
+      ...(POPOVER_IS_SUPPORTED ? { 'popover': 'manual' } : {})
     }
   )
   textarea.setAttribute('role', 'combobox')
@@ -63,16 +92,35 @@ export default (textarea) => {
 }
 
 export const isAutocompleteListViewOpened = (autocompleteListView) => {
-  return autocompleteListView.style.display !== 'none'
+  return POPOVER_IS_SUPPORTED
+    ? autocompleteListView.matches(':popover-open')
+    : autocompleteListView.style.display !== 'none'
 }
 
 export const openAutocompleteListView = (autocompleteListView, textarea) => {
-  autocompleteListView.style.display = ''
+  if (POPOVER_IS_SUPPORTED) {
+    /*
+    Showing an open popover throws, and the list is opened on every keystroke
+    that finds completions — so the second one would be an error rather than a
+    no-op.
+    */
+    if (!autocompleteListView.matches(':popover-open')) {
+      autocompleteListView.showPopover()
+    }
+  } else {
+    autocompleteListView.style.display = ''
+  }
   textarea.setAttribute('aria-expanded', 'true')
 }
 
 export const closeAutocompleteListView = (autocompleteListView, textarea) => {
-  autocompleteListView.style.display = 'none'
+  if (POPOVER_IS_SUPPORTED) {
+    if (autocompleteListView.matches(':popover-open')) {
+      autocompleteListView.hidePopover()
+    }
+  } else {
+    autocompleteListView.style.display = 'none'
+  }
   textarea.setAttribute('aria-expanded', 'false')
   textarea.removeAttribute('aria-activedescendant')
 }

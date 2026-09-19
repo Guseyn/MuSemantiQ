@@ -1,16 +1,16 @@
-import textWidthInTextarea from '#msq/editor/textWidthInTextarea.js'
-import createdElementWithStylesAndAttributes from '#msq/editor/createdElementWithStylesAndAttributes.js'
+import textWidthInTextarea from '#msq/web-components/editor/textWidthInTextarea.js'
+import createdElementWithStylesAndAttributes from '#msq/web-components/editor/createdElementWithStylesAndAttributes.js'
 import {
   isAutocompleteListViewOpened,
   openAutocompleteListView,
   closeAutocompleteListView,
   selectOptionInAutocompleteListView
-} from '#msq/editor/createdAutocompleteListView.js'
-import highlightTextareaValueInDivUnderneathItWithoutRefIds from '#msq/editor/highlightTextareaValueInDivUnderneathItWithoutRefIds.js'
-import listsOfPossibleOptionsToCompleteWordByProgressionOfCommandsFromScenariosFor from '#msq/editor/listsOfPossibleOptionsToCompleteWordByProgressionOfCommandsFromScenarios.js'
-import isPrintableKeycode from '#msq/editor/isPrintableKeycode.js'
+} from '#msq/web-components/editor/createdAutocompleteListView.js'
+import highlightTextareaValueInDivUnderneathItWithoutRefIds from '#msq/web-components/editor/highlightTextareaValueInDivUnderneathItWithoutRefIds.js'
+import listsOfPossibleOptionsToCompleteWordByProgressionOfCommandsFromScenariosFor from '#msq/web-components/editor/listsOfPossibleOptionsToCompleteWordByProgressionOfCommandsFromScenarios.js'
+import isPrintableKeycode from '#msq/web-components/editor/isPrintableKeycode.js'
+import theCommandKeyIsHeld from '#msq/web-components/editor/theCommandKeyIsHeld.js'
 
-const isMacOS = navigator.platform.indexOf('Mac') !== -1
 
 const noteNames = [ 'a', 'b', 'c', 'd', 'e', 'f', 'g' ]
 const delimeters = [ ',', ';' ]
@@ -215,7 +215,7 @@ export default (autocompleteListView, textarea, divUnderneathTextarea) => {
     const itIsArrowDownPressed = event.keyCode === 40
     const itIsBackSpacePressed = event.keyCode === 8
     const itIsPrintableKeyPressed = isPrintableKeycode(event.keyCode)
-    const isCmdPressed = ((isMacOS && event.metaKey) || (!isMacOS && event.ctrlKey))
+    const isCmdPressed = theCommandKeyIsHeld(event)
     if (itIsBackSpacePressed && !isAutocompleteListViewOpened(autocompleteListView)) {
       return
     }

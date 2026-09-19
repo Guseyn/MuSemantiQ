@@ -24,6 +24,16 @@ class SearchableSelect extends HTMLSelectElement {
     }
     this.isEnhanced = true
     this.#enhance()
+
+    /*
+    Options can arrive long after this — the pages fill their pickers from a
+    request, and EHTML writes the options straight into the select. The list
+    reads them fresh every time it opens, so searching is right either way; the
+    input showing the current label is not, since it is written once and has no
+    way of knowing the option behind it was replaced. So it is rewritten
+    whenever the options change.
+    */
+    new MutationObserver(() => this.refresh()).observe(this, { childList: true })
   }
 
   /**

@@ -1,4 +1,4 @@
-import textWidthInTextarea from '#msq/editor/textWidthInTextarea.js'
+import textWidthInTextarea from '#msq/web-components/editor/textWidthInTextarea.js'
 
 export default (textarea, textareaLineHeight) => {
   const selectionStartInTextarea = textarea.selectionStart

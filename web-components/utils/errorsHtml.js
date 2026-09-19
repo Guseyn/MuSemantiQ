@@ -1,5 +1,5 @@
-import parsedError from '#msq/utils/parsedError.js'
-import escapedHtml from '#msq/utils/escapedHtml.js'
+import parsedError from '#msq/web-components/utils/parsedError.js'
+import escapedHtml from '#msq/web-components/utils/escapedHtml.js'
 
 /**
  * Returns '' when there is nothing to report, so the caller renders no panel at

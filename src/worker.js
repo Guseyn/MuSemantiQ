@@ -11,6 +11,8 @@ import {
 
 import { base64FromUint8 } from '#msq/utils.js'
 
+import generateUnicodePoints from '#msq/drawer/generateUnicodePoints.js'
+
 const eventHandlers = {
   'fonts.setup': async (event) => {
     const id = event.data.id
@@ -52,6 +54,74 @@ const eventHandlers = {
       }
       self['__UNILANG_FONT_SOURCES_STORAGE__'][fontSourcesReference] = supportedFontSources
       self.postMessage({ id, 'status': 'ok' })
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error)
+      self.postMessage({
+        id,
+        error: errorMessage
+      })
+    }
+  },
+  'glyph.trace': async (event) => {
+    const id = event.data.id
+    if (!id) {
+      self.postMessage({
+        id,
+        error: 'No id provided'
+      })
+      return
+    }
+    const fontSourcesReference = event.data.fontSourcesReference
+    if (!fontSourcesReference) {
+      self.postMessage({
+        id,
+        error: 'No fontSourcesReference provided'
+      })
+      return
+    }
+    if (!self['__UNILANG_FONT_SOURCES_STORAGE__'][fontSourcesReference]) {
+      self.postMessage({
+        id,
+        error: `Font sources cannot be found by reference (${fontSourcesReference})`
+      })
+      return
+    }
+    const characters = event.data.characters
+    if (!characters) {
+      self.postMessage({
+        id,
+        error: 'No characters provided'
+      })
+      return
+    }
+    const supportedFontSources = self['__UNILANG_FONT_SOURCES_STORAGE__'][fontSourcesReference]
+    const musicFontName = event.data.musicFontName
+    const musicFontSource = supportedFontSources['music'][musicFontName]
+    if (!musicFontSource) {
+      self.postMessage({
+        id,
+        error: `Music font (${musicFontName}) is not registered under reference (${fontSourcesReference})`
+      })
+      return
+    }
+
+    try {
+      const missingCharacters = [ ...characters ].filter(
+        (character) => musicFontSource.charToGlyphIndex(character) === 0
+      )
+      if (missingCharacters.length) {
+        self.postMessage({ status: 'ok', id, missingCharacters, points: [] })
+        return
+      }
+
+      const points = generateUnicodePoints(
+        characters,
+        musicFontSource,
+        null,
+        event.data.musicFontSourceSize,
+        event.data.intervalBetweenStaveLines
+      )
+      self.postMessage({ status: 'ok', id, missingCharacters, points })
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error)
       self.postMessage({
@@ -115,7 +185,7 @@ const eventHandlers = {
       errors,
       customStyles
     } = generateIntermediateStructuresForSinglePage({
-      repertoirePageText: inputText,
+      pageText: inputText,
       applyHighlighting: false,
       applyOnlyHighlightingWithoutRefIds: false,
       supportedFontNames
@@ -167,7 +237,7 @@ const eventHandlers = {
       errors,
       midiSettings
     } = generateIntermediateStructuresForSinglePage({
-      repertoirePageText: inputText,
+      pageText: inputText,
       applyHighlighting: false,
       applyOnlyHighlightingWithoutRefIds: false
     })
@@ -247,7 +317,7 @@ const eventHandlers = {
       customStyles,
       midiSettings
     } = generateIntermediateStructuresForSinglePage({
-      repertoirePageText: inputText,
+      pageText: inputText,
       applyHighlighting: true,
       applyOnlyHighlightingWithoutRefIds: false,
       supportedFontNames
@@ -353,7 +423,7 @@ const eventHandlers = {
       midiSettings,
       highlightsHtmlBuffer
     } = generateIntermediateStructuresForSinglePage({
-      repertoirePageText: inputText,
+      pageText: inputText,
       applyHighlighting: true,
       applyOnlyHighlightingWithoutRefIds: false,
       supportedFontNames

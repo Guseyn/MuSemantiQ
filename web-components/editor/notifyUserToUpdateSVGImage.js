@@ -1,4 +1,4 @@
-import showHintMessage from '#msq/editor/showHintMessage.js'
+import showHintMessage from '#msq/web-components/editor/showHintMessage.js'
 
 export default (svgPlaceholder) => {
   showHintMessage(

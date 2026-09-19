@@ -1,4 +1,4 @@
-import { generateIntermediateStructuresForSinglePage } from '../../worker/api.js'
+import { generateIntermediateStructuresForSinglePage } from '#msq/language/api.js'
 
 const NEW_LINE = '\n'
 
@@ -22,7 +22,7 @@ export default function parsedHighlights(text, progressionOfCommandsFromScenario
     mapOfCharIndexesWithProgressionOfCommandsFromScenarios,
     errors
   } = generateIntermediateStructuresForSinglePage({
-    repertoirePageText: text,
+    pageText: text,
     applyHighlighting: true,
     applyOnlyHighlightingWithoutRefIds: true,
     progressionOfCommandsFromScenarios: progressionOfCommandsFromScenarios || [],

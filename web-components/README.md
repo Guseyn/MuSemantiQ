@@ -15,26 +15,34 @@ not tracked — this folder is the only place to edit them.
 
 ## What they expect where they land
 
-A `worker/` folder beside the folder, holding the engine — so `js/msq` is those
-two halves and nothing else:
+Two folders beside this one, so `js/msq` is those three and nothing else:
 
     <app>/static/js/msq/
       web-components/   ← copied from here
-      worker/           ← generated from src/ by npm run create:msq:worker
+      language/         ← src/language, by npm run create:msq:worker
+      worker/           ← all of src/, by the same script
 
-Every reach into the engine is written against the module's own URL rather than
-against a path the app has to provide: from a module one level in, the worker is
-`../../worker/…`. That is how `utils/worker-instance.js` starts it, and how
-`editor/parsedHighlights.js` and the completion lists import the parser. Nothing
-here names an absolute URL, so the pair works at any mount point and neither
-half has to be told where the other landed.
+`worker/` is what the worker runs and nothing on the page imports out of it. It
+is started by URL rather than by specifier — `utils/worker-instance.js` resolves
+`../../worker/worker.js` against its own module URL, so the pair works at any
+mount point and neither half has to be told where the other landed. Everything
+else the page wants from the engine it asks the worker for by message: an
+engraved page, a MIDI file, a traced glyph.
 
-Within the folder, modules import each other through the `#msq/` specifier the
+`language/` is the one exception, and it is a deliberate one. The editor colours
+what is typed by parsing it — on the main thread, between a keystroke and the
+next paint — so the parser cannot live behind a message queue that is also
+carrying engraving work. `editor/parsedHighlights.js` and the completion lists
+import it directly, from `#msq/language/api.js`, which is the parsing half of
+`src/api.js` with none of the drawer, fonts or MIDI attached.
+
+Modules here import each other, and the language, through the specifiers the
 hosting page declares in its import map:
 
-    "#msq/":        "/js/msq/web-components/"
-    "#msq-worker/": "/js/msq/worker/"
+    "#msq/web-components/": "/js/msq/web-components/"
+    "#msq/language/":       "/js/msq/language/"
 
-The second is for a page that wants the engine directly — the font viewer reads
-the glyph tracer out of it. A module worker gets no import map at all, which is
-why `worker/` is a separate tree with its imports already rewritten to real URLs.
+Nothing in `src/language` imports outside itself, so its copy is served exactly
+as authored and those `#msq/language/…` specifiers are resolved by that same
+map. A module worker gets no import map at all, which is why `worker/` is a
+separate tree with its imports already rewritten to real URLs.

@@ -13,7 +13,7 @@
  * surface — see `player.js`.
  */
 
-import { controlsCSS } from '#msq/lib/html-midi-player/assets/controls-css.js'
+import { controlsCSS } from '#msq/web-components/lib/html-midi-player/assets/controls-css.js'
 
 const playIcon = /*html*/`
   <svg width="24" height="24" version="1.1" viewBox="0 0 6.35 6.35" xmlns="http://www.w3.org/2000/svg">

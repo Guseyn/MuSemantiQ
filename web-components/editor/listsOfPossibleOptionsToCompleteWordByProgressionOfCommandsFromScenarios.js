@@ -1,21 +1,21 @@
-import configurableStyleNames from '../../worker/language/parser/scenarios/static-objects/configurableStyleNames.js'
-import pageMetaNames from '../../worker/language/parser/scenarios/static-objects/pageMetaNames.js'
-import openingBarLineNames from '../../worker/language/parser/scenarios/static-objects/openingBarLineNames.js'
-import closingBarLineNames from '../../worker/language/parser/scenarios/static-objects/closingBarLineNames.js'
-import keySignatureNames from '../../worker/language/parser/scenarios/static-objects/keySignatureNames.js'
-import cssColors from '../../worker/language/parser/scenarios/static-objects/cssColors.js'
-import instrumentNames from '../../worker/language/parser/scenarios/static-objects/instrumentNames.js'
-import midiSettingNames from '../../worker/language/parser/scenarios/static-objects/midiSettingNames.js'
+import configurableStyleNames from '#msq/language/parser/scenarios/static-objects/configurableStyleNames.js'
+import pageMetaNames from '#msq/language/parser/scenarios/static-objects/pageMetaNames.js'
+import openingBarLineNames from '#msq/language/parser/scenarios/static-objects/openingBarLineNames.js'
+import closingBarLineNames from '#msq/language/parser/scenarios/static-objects/closingBarLineNames.js'
+import keySignatureNames from '#msq/language/parser/scenarios/static-objects/keySignatureNames.js'
+import cssColors from '#msq/language/parser/scenarios/static-objects/cssColors.js'
+import instrumentNames from '#msq/language/parser/scenarios/static-objects/instrumentNames.js'
+import midiSettingNames from '#msq/language/parser/scenarios/static-objects/midiSettingNames.js'
 const splittedKeySignatureNames = keySignatureNames.join('|').split('|')
 const mainTimeSignatureValues = [ 'c', 'crossed c', '3:4', '4:4', '2:4', '3:8', '9:4', '6:8', '12:8' ]
 const mainRepetitionNotes = [ 'repetition note "D.C. al Fine"', 'repetition note "D.C. al Coda"', 'repetition note "D.S. al Fine"', 'repetition note "D.S. al Coda"', 'repetition note "Fine"', 'repetition note "Coda"' ]
-import clefNames from '../../worker/language/parser/scenarios/static-objects/clefNames.js'
+import clefNames from '#msq/language/parser/scenarios/static-objects/clefNames.js'
 const positionCoordinates = [ 'unit ', 'chord ', 'note ', 'stave ', 'voice ', 'measure ', 'line ' ]
 const mainTupletValues = [ '3', '3:2', '2', '2:3', '5', '5:4', '6', '6:4', '7', '7:4', '9', '9:8', '12', '12:8' ]
-import noteKeyNames from '../../worker/language/parser/scenarios/static-objects/noteKeyNames.js'
+import noteKeyNames from '#msq/language/parser/scenarios/static-objects/noteKeyNames.js'
 const mainNoteKeyNames = [ 'sharp', 'flat', 'natural', 'double sharp', 'double flat', 'demisharp', 'demiflat', 'sesquisharp', 'sesquiflat' ]
-import articulationNames from '../../worker/language/parser/scenarios/static-objects/articulationNames.js'
-import ornamentKeyNames from '../../worker/language/parser/scenarios/static-objects/ornamentKeyNames.js'
+import articulationNames from '#msq/language/parser/scenarios/static-objects/articulationNames.js'
+import ornamentKeyNames from '#msq/language/parser/scenarios/static-objects/ornamentKeyNames.js'
 
 const autoCompletesForStyles = (style, autocompletes = []) => {
   autocompletes.push(`${style} is `)

@@ -62,6 +62,62 @@ const testsIndex = endpoint('/dev/tests', 'GET', async ({ stream }) => {
 })
 
 /**
+ * Whether every artifact of a test matches its baseline.
+ *
+ * The same byte comparison the status endpoint reports, asked as one question —
+ * an artifact with only one side present counts as not matching, which is what
+ * a test that has never been run looks like.
+ */
+async function everythingMatches(suite, test) {
+  for (const artifact of suite.artifacts) {
+    const file = `${test}.${artifact.extension}`
+    const sides = []
+    for (const side of [ 'actual', 'expected' ]) {
+      const at = resolveInside(suiteDirectory(suite), artifact.name, side, file)
+      try {
+        sides.push(at ? await fs.readFile(at) : null)
+      } catch {
+        sides.push(null)
+      }
+    }
+    if (!sides[0] || !sides[1] || Buffer.compare(sides[0], sides[1]) !== 0) {
+      return false
+    }
+  }
+  return true
+}
+
+/**
+ * Take a test out of a suite's failed list and put it in the passed one.
+ *
+ * The runners own these files, and until now only a run could change them — so
+ * a test adopted in the viewer went on being labelled "failing" in the picker
+ * until the whole suite was run again, which is the opposite of what adopting
+ * it just said. The two lists are written in different shapes: a failure
+ * records which artifact gave way, a pass is a name and nothing else.
+ */
+async function recordAsPassing(suite, test) {
+  const at = (file) => path.join(suiteDirectory(suite), file)
+
+  const failed = await readList(suite, 'list-of-failed-tests.json')
+  const passed = await readList(suite, 'list-of-passed-tests.json')
+
+  const stillFailing = failed.filter((one) => one.name !== test)
+  if (stillFailing.length === failed.length && passed.some((one) => one.name === test)) {
+    // Already where it belongs.
+    return
+  }
+
+  await fs.writeFile(at('list-of-failed-tests.json'), JSON.stringify(stillFailing), 'utf-8')
+
+  if (!passed.some((one) => one.name === test)) {
+    passed.push({ name: test })
+    passed.sort((one, other) => one.name.localeCompare(other.name))
+    await fs.writeFile(at('list-of-passed-tests.json'), JSON.stringify(passed), 'utf-8')
+  }
+}
+
+/**
  * How one test's artifacts stand: which sides exist, and whether they match.
  */
 const testStatus = endpoint('/dev/tests/status?suite&test', 'GET', async ({ stream, queries }) => {
@@ -161,7 +217,18 @@ const adopt = endpoint('/dev/tests/adopt', 'POST', async ({ stream }) => {
     }
   }
 
-  respondWith(stream, 200, { suite: suite.name, test: request.test, adopted })
+  /*
+  The picker labels a test from the failed list, so adopting has to keep that
+  list true or the label outlives what it describes. Only when *every* artifact
+  matches — adopting one of seven leaves the test failing, and it should still
+  say so.
+  */
+  const failing = !(await everythingMatches(suite, request.test))
+  if (!failing) {
+    await recordAsPassing(suite, request.test)
+  }
+
+  respondWith(stream, 200, { suite: suite.name, test: request.test, adopted, failing })
 })
 
 /**
@@ -430,6 +497,22 @@ const deleteTest = endpoint('/dev/tests/delete', 'POST', async ({ stream }) => {
 
   if (!removed.length) {
     return respondWith(stream, 404, { error: `No ${test} in any ${kind} suite.` })
+  }
+
+  /*
+  And out of the two lists the runners keep, which otherwise go on naming a test
+  that no longer exists until the suite is next run.
+  */
+  for (const suite of suites().filter((one) => one.kind === kind)) {
+    for (const file of [ 'list-of-failed-tests.json', 'list-of-passed-tests.json' ]) {
+      const listed = await readList(suite, file)
+      const left = listed.filter((one) => one.name !== test)
+      if (left.length !== listed.length) {
+        await fs.writeFile(
+          path.join(suiteDirectory(suite), file), JSON.stringify(left), 'utf-8'
+        )
+      }
+    }
   }
 
   respondWith(stream, 200, { test, kind, removed })

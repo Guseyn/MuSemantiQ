@@ -1,4 +1,4 @@
-import midiPlayerOverride from '#msq/css/midiPlayerOverride.js'
+import midiPlayerOverride from '#msq/web-components/css/midiPlayerOverride.js'
 
 /**
  * <midi-player> is vendored third-party, so the only way to restyle its control

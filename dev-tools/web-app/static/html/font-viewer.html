@@ -13,8 +13,8 @@
           "#ehtml/": "/js/ehtml/",
           "#ehtml/main": "/js/ehtml/main.js",
           "#e-ui/": "/js/e-ui/",
-          "#msq/": "/js/msq/web-components/",
-          "#msq-worker/": "/js/msq/worker/",
+          "#msq/web-components/": "/js/msq/web-components/",
+          "#msq/language/": "/js/msq/language/",
           "#tools/": "/tools/"
         }
       }
@@ -57,6 +57,107 @@
           shows up in it.
         </span>
       </p>
+
+      <e-json
+        id="fonts"
+        data-reusable
+        data-src="/dev/fonts"
+        data-response-name="listed"
+        data-actions-on-response="
+          if (listed.statusCode !== 200) {
+            showError(listed.body.error || `Could not read the fonts: the server answered ${listed.statusCode}.`)
+            // Handed over even so: the script is waiting on this, and nothing
+            // at all would leave the page stuck with no fonts and no reason.
+            window.fontsAnswer = null
+            if (window.fontsRead) { fontsRead(null) }
+            return
+          }
+          mapToTemplate('#music-fonts-template', listed.body)
+          mapToTemplate('#text-music-fonts-template', listed.body)
+          mapToTemplate('#chord-music-fonts-template', listed.body)
+          mapToTemplate('#text-fonts-template', listed.body)
+          mapToTemplate('#chord-fonts-template', listed.body)
+
+          window.fontsAnswer = listed.body
+          if (window.fontsRead) { fontsRead(listed.body) }
+        "></e-json>
+
+      <!--
+      A font is only offered once it has a traced glyph table — `usable` says
+      so. One that has an .otf and no table is a font the Music font generator
+      has work to do on, and engraving with it would draw nothing.
+      -->
+      <template is="e-reusable" id="music-fonts-template"
+        data-insert-into="#font" data-object-name="listing">
+        <template is="e-for-each"
+          data-list-to-iterate="${listing.music.filter((one) => one.usable)}"
+          data-item-name="font">
+          <option data-value="${font.name}" data-text="${font.name}"></option>
+        </template>
+      </template>
+      <template is="e-reusable" id="text-music-fonts-template"
+        data-insert-into="#text-music-font" data-object-name="listing">
+        <template is="e-for-each"
+          data-list-to-iterate="${listing.music.filter((one) => one.usable)}"
+          data-item-name="font">
+          <option data-value="${font.name}" data-text="${font.name}"></option>
+        </template>
+      </template>
+      <template is="e-reusable" id="chord-music-fonts-template"
+        data-insert-into="#chord-music-font" data-object-name="listing">
+        <template is="e-for-each"
+          data-list-to-iterate="${listing.music.filter((one) => one.usable)}"
+          data-item-name="font">
+          <option data-value="${font.name}" data-text="${font.name}"></option>
+        </template>
+      </template>
+      <template is="e-reusable" id="text-fonts-template"
+        data-insert-into="#text-font" data-object-name="listing">
+        <template is="e-for-each"
+          data-list-to-iterate="${listing.text.filter((one) => one.usable)}"
+          data-item-name="font">
+          <option data-value="${font.name}" data-text="${font.name}"></option>
+        </template>
+      </template>
+      <template is="e-reusable" id="chord-fonts-template"
+        data-insert-into="#chord-font" data-object-name="listing">
+        <template is="e-for-each"
+          data-list-to-iterate="${listing['chord-letters'].filter((one) => one.usable)}"
+          data-item-name="font">
+          <option data-value="${font.name}" data-text="${font.name}"></option>
+        </template>
+      </template>
+
+      <!--
+      The glyph entries: what the scaffold declares, plus anything every traced
+      font turns out to hold. Add a glyph to all the music-js fonts by hand and
+      it appears here without the scaffold having to hear about it first.
+      -->
+      <e-json
+        id="entries"
+        data-reusable
+        data-src="/dev/music-js-entries"
+        data-response-name="known"
+        data-actions-on-response="
+          if (known.statusCode !== 200) {
+            showError(known.body.error || `Could not read the glyph entries: the server answered ${known.statusCode}.`)
+            window.entriesAnswer = null
+            if (window.entriesRead) { entriesRead(null) }
+            return
+          }
+          mapToTemplate('#entries-template', known.body)
+          window.entriesAnswer = known.body
+          if (window.entriesRead) { entriesRead(known.body) }
+        "></e-json>
+
+      <template is="e-reusable" id="entries-template"
+        data-insert-into="#entry" data-object-name="offered">
+        <template is="e-for-each" data-list-to-iterate="${offered.entries}" data-item-name="entry">
+          <option
+            data-value="${entry.name}"
+            data-text="${entry.inScaffold ? entry.name : entry.name + ' — in the fonts only'}"></option>
+        </template>
+      </template>
 
       <e-tabs id="families" data-apply-hash-navigation data-margin-top="md">
 

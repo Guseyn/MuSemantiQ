@@ -49,6 +49,28 @@ const audioTests = (
 
 await runAudioTest()
 
+/**
+ * Write a verdict list, keeping what this run did not look at.
+ *
+ * `--only` runs a handful of tests, and writing just their results would throw
+ * away every other test's verdict — so editing one test in the viewer used to
+ * clear the "failing" label from all the rest. Only the tests that actually ran
+ * are replaced; the others keep whatever the last full run said about them. A
+ * run with no `--only` covers the corpus, so the merge is the same as a replace.
+ */
+async function writeVerdicts(at, verdicts, testsThatRan) {
+  let kept = []
+  try {
+    kept = JSON.parse(await fs.readFile(at, 'utf-8'))
+      .filter((one) => one && one.name && !testsThatRan.has(one.name))
+  } catch {
+    // No list yet, or an unreadable one — this run writes the whole of it.
+  }
+  const all = [ ...kept, ...verdicts ]
+  all.sort((one, other) => one.name.localeCompare(other.name))
+  await fs.writeFile(at, JSON.stringify(all))
+}
+
 function green(str) {
   return `\x1b[32m${str}\x1b[0m`
 }
@@ -276,14 +298,11 @@ async function runAudioTest() {
     }
   }
   console.timeEnd(`Total time spent for audio tests`)
-  await fs.writeFile(
-    `${ROOT}/list-of-failed-tests.json`,
-    JSON.stringify(listOfFailedTests)
+  const testsThatRan = new Set(
+    [ ...listOfFailedTests, ...listOfPassedTests ].map((one) => one.name)
   )
-  await fs.writeFile(
-    `${ROOT}/list-of-passed-tests.json`,
-    JSON.stringify(listOfPassedTests)
-  )
+  await writeVerdicts(`${ROOT}/list-of-failed-tests.json`, listOfFailedTests, testsThatRan)
+  await writeVerdicts(`${ROOT}/list-of-passed-tests.json`, listOfPassedTests, testsThatRan)
   if (listOfFailedTests.length > 0) {
     throw new Error(
       `There are (${listOfFailedTests.length})  failed audio tests. Please check https://127.0.0.1:8889/html/test-viewer.html#audio\n\n`

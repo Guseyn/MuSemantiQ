@@ -1,7 +1,7 @@
 import './searchable-select.js'
-import '#msq/msq-font-loader-template.js'
-import '#msq/msq-editor-template.js'
-import highlightsCss from '#msq/css/highlights.js'
+import '#msq/web-components/msq-font-loader-template.js'
+import '#msq/web-components/msq-editor-template.js'
+import highlightsCss from '#msq/web-components/css/highlights.js'
 
 await window.whenPresent('#viewer')
 
@@ -15,19 +15,14 @@ const index = await (await fetch('/dev/tests')).json()
 const visual = index.suites.filter((suite) => suite.kind === 'visual')
 const audio = index.suites.filter((suite) => suite.kind === 'audio')
 
-/*
-The tab is chosen by the hash — `e-tabs` does that itself — so the suite has to
-start from the same place, or the page would open showing Audio with the visual
-corpus in the picker.
-*/
-const openingOnAudio = window.location.hash === '#audio' && audio.length
 const firstOf = (group) => (group[0] ? group[0].name : null)
 
-const state = {
-  suite: openingOnAudio ? firstOf(audio) : firstOf(visual),
-  test: null,
-  artifact: null
-}
+/*
+The visual corpus to begin with. Which tab the page actually opens on is
+e-tabs' decision — it reads the hash — and the suite is moved to match once it
+has made it, at the foot of this file.
+*/
+const state = { suite: firstOf(visual), test: null, artifact: null }
 
 const suiteNamed = (name) => index.suites.find((one) => one.name === name)
 
@@ -256,12 +251,11 @@ The tab a suite belongs to. `e-tabs` builds its nav one microtask after EHTML
 activates it, and offers no event when a tab is chosen, so the buttons it
 generates are what we listen on.
 */
-function watchTabs() {
-  const nav = tabs.querySelector('nav')
-  if (!nav) {
-    return queueMicrotask(watchTabs)
+async function watchTabs() {
+  while (!tabs.querySelector('nav')) {
+    await new Promise((resolve) => setTimeout(resolve))
   }
-  nav.querySelectorAll('button').forEach((button, position) => {
+  tabs.querySelector('nav').querySelectorAll('button').forEach((button, position) => {
     button.addEventListener('click', () => {
       const group = position === 0 ? visual : audio
       if (group.length && !group.some((one) => one.name === state.suite)) {
@@ -269,6 +263,7 @@ function watchTabs() {
       }
     })
   })
+  return tabs
 }
 
 /**
@@ -561,6 +556,20 @@ async function adopt(artifactName) {
       throw new Error(result.error || `the server answered ${response.status}`)
     }
     window.showToast(`Adopted ${result.adopted.join(', ') || 'nothing'} for ${result.test}.`)
+
+    /*
+    The picker's "failing" label comes from the suite's failed list, which the
+    server has just rewritten if this test now matches everywhere. Nothing else
+    about the suite changed, so the label is updated in place rather than by
+    reading the whole index again.
+    */
+    const failing = suiteNamed(state.suite).failed
+    const already = failing.indexOf(result.test)
+    if (result.failing === false && already !== -1) {
+      failing.splice(already, 1)
+      fillTestSelect()
+    }
+
     await renderDetail()
   } catch (error) {
     window.showError(`Could not adopt: ${error.message}`)
@@ -652,7 +661,7 @@ let midiPlayerLoaded = false
 const loadMidiPlayer = async () => {
   if (!midiPlayerLoaded) {
     midiPlayerLoaded = true
-    await import('#msq/lib/html-midi-player/player.js')
+    await import('#msq/web-components/lib/html-midi-player/player.js')
   }
 }
 new MutationObserver(() => {
@@ -661,7 +670,18 @@ new MutationObserver(() => {
   }
 }).observe(viewer, { childList: true, subtree: true })
 
-watchTabs()
+/*
+Which kind of test is showing is the tab's business, and e-tabs works it out
+from the hash and records it as `data-current-tab` — so opening the page at
+`#audio` lands on the audio corpus without anything here reading the hash, or
+knowing how a tab title becomes one.
+*/
+const families = await watchTabs()
+const group = Number(families.getAttribute('data-current-tab')) === 1 ? audio : visual
+if (group.length) {
+  state.suite = firstOf(group)
+}
+
 drawSuitePicker()
 fillTestSelect()
 render()

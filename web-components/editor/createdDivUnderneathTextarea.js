@@ -1,5 +1,5 @@
-import createdElementWithStylesAndAttributes from '#msq/editor/createdElementWithStylesAndAttributes.js'
-import insertElementBeforeSpecifiedOne from '#msq/editor/insertElementBeforeSpecifiedOne.js'
+import createdElementWithStylesAndAttributes from '#msq/web-components/editor/createdElementWithStylesAndAttributes.js'
+import insertElementBeforeSpecifiedOne from '#msq/web-components/editor/insertElementBeforeSpecifiedOne.js'
 
 export default (textarea) => {
   const createdDiv = createdElementWithStylesAndAttributes(

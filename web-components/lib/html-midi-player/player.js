@@ -19,10 +19,10 @@
  * classes on `.controls`.
  */
 
-import * as mm from '#msq/lib/@magenta/music/core.js'
+import * as mm from '#msq/web-components/lib/@magenta/music/core.js'
 
-import { controlsTemplate } from '#msq/lib/html-midi-player/assets/controls-template.js'
-import { formatTime } from '#msq/lib/html-midi-player/utils.js'
+import { controlsTemplate } from '#msq/web-components/lib/html-midi-player/assets/controls-template.js'
+import { formatTime } from '#msq/web-components/lib/html-midi-player/utils.js'
 
 const DEFAULT_SOUNDFONT = 'https://storage.googleapis.com/magentadata/js/soundfonts/sgm_plus'
 
