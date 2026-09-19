@@ -1,7 +1,7 @@
 import './searchable-select.js'
-import '#msq/msq-font-loader-template.js'
-import '#msq/msq-editor-template.js'
-import highlightsCss from '#msq/css/highlights.js'
+import '#msq/web-components/msq-font-loader-template.js'
+import '#msq/web-components/msq-editor-template.js'
+import highlightsCss from '#msq/web-components/css/highlights.js'
 
 await window.whenPresent('#viewer')
 
@@ -661,7 +661,7 @@ let midiPlayerLoaded = false
 const loadMidiPlayer = async () => {
   if (!midiPlayerLoaded) {
     midiPlayerLoaded = true
-    await import('#msq/lib/html-midi-player/player.js')
+    await import('#msq/web-components/lib/html-midi-player/player.js')
   }
 }
 new MutationObserver(() => {

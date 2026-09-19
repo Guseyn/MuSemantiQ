@@ -1,10 +1,10 @@
-import worker from '#msq/utils/worker-instance.js'
-import trimMultilineText from '#msq/utils/trimMultilineText.js'
-import errorsHtml from '#msq/utils/errorsHtml.js'
+import worker from '#msq/web-components/utils/worker-instance.js'
+import trimMultilineText from '#msq/web-components/utils/trimMultilineText.js'
+import errorsHtml from '#msq/web-components/utils/errorsHtml.js'
 
-import tokens from '#msq/css/tokens.js'
-import surface from '#msq/css/surface.js'
-import errorsCss from '#msq/css/errors.js'
+import tokens from '#msq/web-components/css/tokens.js'
+import surface from '#msq/web-components/css/surface.js'
+import errorsCss from '#msq/web-components/css/errors.js'
 
 /**
  * Shared shell for every <template is="msq-*"> element.

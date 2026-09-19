@@ -13,8 +13,8 @@
  * absolute-quantization assertions.
  */
 
-import { NoteSequence } from '#msq/lib/@magenta/music/protobuf.js'
-import * as constants from '#msq/lib/@magenta/music/core/constants.js'
+import { NoteSequence } from '#msq/web-components/lib/@magenta/music/protobuf.js'
+import * as constants from '#msq/web-components/lib/@magenta/music/core/constants.js'
 
 /**
  * Exception for when a sequence has multiple tempos.

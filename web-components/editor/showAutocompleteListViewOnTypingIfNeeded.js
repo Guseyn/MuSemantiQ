@@ -1,15 +1,15 @@
-import textWidthInTextarea from '#msq/editor/textWidthInTextarea.js'
-import createdElementWithStylesAndAttributes from '#msq/editor/createdElementWithStylesAndAttributes.js'
+import textWidthInTextarea from '#msq/web-components/editor/textWidthInTextarea.js'
+import createdElementWithStylesAndAttributes from '#msq/web-components/editor/createdElementWithStylesAndAttributes.js'
 import {
   isAutocompleteListViewOpened,
   openAutocompleteListView,
   closeAutocompleteListView,
   selectOptionInAutocompleteListView
-} from '#msq/editor/createdAutocompleteListView.js'
-import highlightTextareaValueInDivUnderneathItWithoutRefIds from '#msq/editor/highlightTextareaValueInDivUnderneathItWithoutRefIds.js'
-import listsOfPossibleOptionsToCompleteWordByProgressionOfCommandsFromScenariosFor from '#msq/editor/listsOfPossibleOptionsToCompleteWordByProgressionOfCommandsFromScenarios.js'
-import isPrintableKeycode from '#msq/editor/isPrintableKeycode.js'
-import theCommandKeyIsHeld from '#msq/editor/theCommandKeyIsHeld.js'
+} from '#msq/web-components/editor/createdAutocompleteListView.js'
+import highlightTextareaValueInDivUnderneathItWithoutRefIds from '#msq/web-components/editor/highlightTextareaValueInDivUnderneathItWithoutRefIds.js'
+import listsOfPossibleOptionsToCompleteWordByProgressionOfCommandsFromScenariosFor from '#msq/web-components/editor/listsOfPossibleOptionsToCompleteWordByProgressionOfCommandsFromScenarios.js'
+import isPrintableKeycode from '#msq/web-components/editor/isPrintableKeycode.js'
+import theCommandKeyIsHeld from '#msq/web-components/editor/theCommandKeyIsHeld.js'
 
 
 const noteNames = [ 'a', 'b', 'c', 'd', 'e', 'f', 'g' ]

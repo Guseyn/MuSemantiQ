@@ -1,19 +1,19 @@
-import MSQTemplateElement from '#msq/msq-template.js'
-import openContent from '#msq/utils/openContent.js'
-import downloadContent from '#msq/utils/downloadContent.js'
-import copyText from '#msq/utils/copyText.js'
-import attachHighlighterToMidiPlayer from '#msq/utils/attachHighlighterToMidiPlayer.js'
-import overrideMidiPlayerStyles from '#msq/utils/overrideMidiPlayerStyles.js'
-import addUtilsToMidiPlayerControlPanel from '#msq/utils/addUtilsToMidiPlayerControlPanel.js'
-import '#msq/lib/html-midi-player/player.js'
+import MSQTemplateElement from '#msq/web-components/msq-template.js'
+import openContent from '#msq/web-components/utils/openContent.js'
+import downloadContent from '#msq/web-components/utils/downloadContent.js'
+import copyText from '#msq/web-components/utils/copyText.js'
+import attachHighlighterToMidiPlayer from '#msq/web-components/utils/attachHighlighterToMidiPlayer.js'
+import overrideMidiPlayerStyles from '#msq/web-components/utils/overrideMidiPlayerStyles.js'
+import addUtilsToMidiPlayerControlPanel from '#msq/web-components/utils/addUtilsToMidiPlayerControlPanel.js'
+import '#msq/web-components/lib/html-midi-player/player.js'
 
-import utilsPanel from '#msq/css/utilsPanel.js'
-import { svgWithTopRadius } from '#msq/css/svgSurface.js'
+import utilsPanel from '#msq/web-components/css/utilsPanel.js'
+import { svgWithTopRadius } from '#msq/web-components/css/svgSurface.js'
 
-import previewIcon from '#msq/icons/previewIcon.js'
-import downloadIcon from '#msq/icons/downloadIcon.js'
-import copyIcon from '#msq/icons/copyIcon.js'
-import doneIcon from '#msq/icons/doneIcon.js'
+import previewIcon from '#msq/web-components/icons/previewIcon.js'
+import downloadIcon from '#msq/web-components/icons/downloadIcon.js'
+import copyIcon from '#msq/web-components/icons/copyIcon.js'
+import doneIcon from '#msq/web-components/icons/doneIcon.js'
 
 /* The score sits above the player, so only the player's bottom corners round. */
 const playerRadius = /*css*/`

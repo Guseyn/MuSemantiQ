@@ -1,4 +1,4 @@
-import isPrintableKeycode from '#msq/editor/isPrintableKeycode.js'
+import isPrintableKeycode from '#msq/web-components/editor/isPrintableKeycode.js'
 
 export default (textarea) => {
   textarea.weAreTypingInTextarea = false

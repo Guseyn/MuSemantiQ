@@ -1,6 +1,6 @@
-import { writeMidi } from '#msq/lib/midi-file/index.js'
+import { writeMidi } from '#msq/web-components/lib/midi-file/index.js'
 
-import { keySignatureKeys } from '#msq/lib/@tonejs/Header.js'
+import { keySignatureKeys } from '#msq/web-components/lib/@tonejs/Header.js'
 
 /**
  * Flatten an array indefinitely.

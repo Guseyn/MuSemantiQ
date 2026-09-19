@@ -1,4 +1,4 @@
-import highlightTextareaValueInDivUnderneathItWithoutRefIds from '#msq/editor/highlightTextareaValueInDivUnderneathItWithoutRefIds.js'
+import highlightTextareaValueInDivUnderneathItWithoutRefIds from '#msq/web-components/editor/highlightTextareaValueInDivUnderneathItWithoutRefIds.js'
 const NEW_LINE = '\n'
 
 export default (divUnderneathTextarea, textarea) => {

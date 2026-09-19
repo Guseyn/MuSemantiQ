@@ -5,7 +5,7 @@
  * (Apache-2.0), https://github.com/magenta/magenta-js, so callers keep
  * upstream's shape:
  *
- *   import * as mm from '#msq/lib/@magenta/music/core.js'
+ *   import * as mm from '#msq/web-components/lib/@magenta/music/core.js'
  *   const ns = await mm.urlToNoteSequence(url)
  *   const player = new mm.SoundFontPlayer(soundFontURL)
  *
@@ -15,11 +15,11 @@
  * not part of this port.
  */
 
-export * as constants from '#msq/lib/@magenta/music/core/constants.js'
-export * as logging from '#msq/lib/@magenta/music/core/logging.js'
-export * as sequences from '#msq/lib/@magenta/music/core/sequences.js'
+export * as constants from '#msq/web-components/lib/@magenta/music/core/constants.js'
+export * as logging from '#msq/web-components/lib/@magenta/music/core/logging.js'
+export * as sequences from '#msq/web-components/lib/@magenta/music/core/sequences.js'
 
-export * from '#msq/lib/@magenta/music/core/midi_io.js'
-export * from '#msq/lib/@magenta/music/core/player.js'
-export * from '#msq/lib/@magenta/music/core/soundfont.js'
-export { getAudioContext, midiToFrequency, transport } from '#msq/lib/@magenta/music/core/audio.js'
+export * from '#msq/web-components/lib/@magenta/music/core/midi_io.js'
+export * from '#msq/web-components/lib/@magenta/music/core/player.js'
+export * from '#msq/web-components/lib/@magenta/music/core/soundfont.js'
+export { getAudioContext, midiToFrequency, transport } from '#msq/web-components/lib/@magenta/music/core/audio.js'

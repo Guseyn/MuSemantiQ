@@ -7,8 +7,8 @@
  * you pick — the same folder, at the same URL, that either app would load.
  */
 
-import '#msq/msq-font-loader-template.js'
-import '#msq/msq-editor-template.js'
+import '#msq/web-components/msq-font-loader-template.js'
+import '#msq/web-components/msq-editor-template.js'
 
 await window.whenPresent('#sound-font-editor')
 

@@ -1,4 +1,4 @@
-import adjustUnitexareaForUserScreen from '#msq/editor/adjustUnitexareaForUserScreen.js'
+import adjustUnitexareaForUserScreen from '#msq/web-components/editor/adjustUnitexareaForUserScreen.js'
 
 export default (lineNumbersColumn, textarea, divUnderneathTextarea) => {
   const numberOfLines = textarea.value.split('\n').length

@@ -1,10 +1,8 @@
-import '#msq/msq-editor-template.js'
-import opentype from '#msq-worker/drawer/lib/opentype/opentype.js'
-import generateUnicodePoints from '#msq-worker/drawer/generateUnicodePoints.js'
+import '#msq/web-components/msq-editor-template.js'
 import scaffold from '#tools/smufl/scaffold.js'
 import './searchable-select.js'
-import worker from '#msq/utils/worker-instance.js'
-import { registerFontNames } from '#msq/utils/fontNames.js'
+import worker from '#msq/web-components/utils/worker-instance.js'
+import { registerFontNames } from '#msq/web-components/utils/fontNames.js'
 
 // --- what the page's e-json elements hand over ------------------------------
 
@@ -360,18 +358,6 @@ const entryNamed = (name) => glyphs.get(name) ||
   (offeredEntries.find((one) => one.name === name) &&
     { smufl: offeredEntries.find((one) => one.name === name).unicode })
 
-const loadedFonts = new Map()
-async function fontFor(name) {
-  if (!loadedFonts.has(name)) {
-    const face = faceNamed('music', name)
-    if (!face || !face.url) {
-      throw new Error(`no font file for ${name}`)
-    }
-    loadedFonts.set(name, await opentype.load(face.url))
-  }
-  return loadedFonts.get(name)
-}
-
 /**
  * Accepts a literal character or any of U+E050 / e050 / 0xE050.
  */
@@ -426,12 +412,17 @@ async function traceGlyph() {
 
   const interval = Number(elements.interval.value) || 8.5
   const size = Number(elements.size.value) || 4.0
-  const font = await fontFor(elements.font.value)
 
-  const missing = [ ...characters ].filter(
-    (character) => font.charToGlyphIndex(character) === 0
-  )
-  if (missing.length) {
+  const answer = await askWorker({
+    name: 'glyph.trace',
+    fontSourcesReference: currentReference,
+    musicFontName: elements.font.value,
+    characters,
+    musicFontSourceSize: size,
+    intervalBetweenStaveLines: interval
+  })
+
+  if (answer.missingCharacters.length) {
     traced = []
     elements.points.value = ''
     elements.metrics.innerHTML =
@@ -439,7 +430,7 @@ async function traceGlyph() {
     return
   }
 
-  traced = generateUnicodePoints(characters, font, null, size, interval).map(
+  traced = answer.points.map(
     (point) => typeof point === 'string'
       ? point
       : Number((point / interval).toFixed(COORDINATE_DECIMALS))
@@ -943,7 +934,7 @@ music tab previews a correction, and the two are kept apart by name.
 let currentReference = FONT_SOURCES_REFERENCE
 let registrations = 0
 
-function registerWithWorker(reference, config) {
+function askWorker(message) {
   return new Promise((resolve, reject) => {
     const id = crypto.randomUUID()
     const onMessage = (event) => {
@@ -951,12 +942,16 @@ function registerWithWorker(reference, config) {
         return
       }
       worker.removeEventListener('message', onMessage)
-      event.data.error ? reject(new Error(event.data.error)) : resolve()
+      event.data.error ? reject(new Error(event.data.error)) : resolve(event.data)
     }
     worker.addEventListener('message', onMessage)
-    worker.postMessage({
-      id, name: 'fonts.setup', fontConfig: config, fontSourcesReference: reference
-    })
+    worker.postMessage({ id, ...message })
+  })
+}
+
+function registerWithWorker(reference, config) {
+  return askWorker({
+    name: 'fonts.setup', fontConfig: config, fontSourcesReference: reference
   })
 }
 
@@ -1035,7 +1030,6 @@ window.fontsChanged = async function (name) {
   try {
     // What is on disk has changed, so anything cached from it must go.
     fontSources.clear()
-    loadedFonts.clear()
     await loadFaces({ choose: name, askAgain: true })
     renderShownTab()
   } catch (error) {

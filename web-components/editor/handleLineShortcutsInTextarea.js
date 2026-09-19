@@ -1,4 +1,4 @@
-import theCommandKeyIsHeld from '#msq/editor/theCommandKeyIsHeld.js'
+import theCommandKeyIsHeld from '#msq/web-components/editor/theCommandKeyIsHeld.js'
 
 /**
  * Cut, copy and paste a whole line without selecting it first.

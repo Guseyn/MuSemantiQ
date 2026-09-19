@@ -1,4 +1,4 @@
-import createdElementWithStylesAndAttributes from '#msq/editor/createdElementWithStylesAndAttributes.js'
+import createdElementWithStylesAndAttributes from '#msq/web-components/editor/createdElementWithStylesAndAttributes.js'
 
 /*
 Popover has been in Chromium and Firefox since 2023, and the components are

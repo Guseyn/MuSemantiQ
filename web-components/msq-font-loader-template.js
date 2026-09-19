@@ -1,5 +1,5 @@
-import MSQTemplateElement from '#msq/msq-template.js'
-import { registerFontNames } from '#msq/utils/fontNames.js'
+import MSQTemplateElement from '#msq/web-components/msq-template.js'
+import { registerFontNames } from '#msq/web-components/utils/fontNames.js'
 
 /**
  * Loads fonts into the worker, then unwraps its own content.

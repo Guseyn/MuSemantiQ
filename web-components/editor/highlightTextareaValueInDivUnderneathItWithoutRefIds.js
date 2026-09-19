@@ -1,6 +1,6 @@
-import adjustTextareaValueToKeepScrollingAlignedWhenItsValueEndsWithNewline from '#msq/editor/adjustTextareaValueToKeepScrollingAlignedWhenItsValueEndsWithNewline.js'
-import parsedHighlights from '#msq/editor/parsedHighlights.js'
-import refreshDivUnderneathTextareaWithNewHtml from '#msq/editor/refreshDivUnderneathTextareaWithNewHtml.js'
+import adjustTextareaValueToKeepScrollingAlignedWhenItsValueEndsWithNewline from '#msq/web-components/editor/adjustTextareaValueToKeepScrollingAlignedWhenItsValueEndsWithNewline.js'
+import parsedHighlights from '#msq/web-components/editor/parsedHighlights.js'
+import refreshDivUnderneathTextareaWithNewHtml from '#msq/web-components/editor/refreshDivUnderneathTextareaWithNewHtml.js'
 
 const NEW_LINE = '\n'
 const EMPTY_STRING = ''

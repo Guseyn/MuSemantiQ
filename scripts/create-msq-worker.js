@@ -32,8 +32,28 @@ const outDirs = [
   'dev-tools/web-app/static/js/msq/worker'
 ].map((relative) => path.join(projectRoot, relative))
 
+/*
+The page needs the language too — the editor colours what is typed by parsing
+it, on the main thread, between a keystroke and the next paint. So src/language
+is written out a second time, beside the worker rather than inside it:
+
+  js/msq/language/   the parser, for the page
+  js/msq/worker/     the whole engine, for the worker
+
+Nothing in src/language imports outside itself, so this copy needs no rewriting
+at all: its `#msq/language/…` specifiers are resolved by the page's import map.
+That is also why it is a copy and not the worker's — a module worker gets no
+import map, so the worker's tree has to have those specifiers rewritten, and a
+rewritten module is no use to the page.
+*/
+const languageDir = path.join(srcDir, 'language')
+const languageOutDirs = [
+  'examples/browser/web-app/static/js/msq/language',
+  'dev-tools/web-app/static/js/msq/language'
+].map((relative) => path.join(projectRoot, relative))
+
 // Create output directories
-for (const outDir of outDirs) {
+for (const outDir of [ ...outDirs, ...languageOutDirs ]) {
   if (fs.existsSync(outDir)) {
     fs.rmSync(outDir, { recursive: true })
   }
@@ -134,10 +154,31 @@ function processDirectory(dir, outBaseDir) {
   }
 }
 
+/**
+ * Copy a directory of modules as they are, specifiers untouched.
+ */
+function copyDirectory(dir, outBaseDir) {
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const srcPath = path.join(dir, entry.name)
+    const outPath = path.join(outBaseDir, entry.name)
+
+    if (entry.isDirectory()) {
+      fs.mkdirSync(outPath, { recursive: true })
+      copyDirectory(srcPath, outPath)
+    } else if (entry.isFile() && entry.name.endsWith('.js')) {
+      fs.copyFileSync(srcPath, outPath)
+    }
+  }
+}
+
 try {
   for (const outDir of outDirs) {
     processDirectory(srcDir, outDir)
     console.log(`[create-msq-worker] Output: ${outDir}`)
+  }
+  for (const languageOutDir of languageOutDirs) {
+    copyDirectory(languageDir, languageOutDir)
+    console.log(`[create-msq-worker] Output: ${languageOutDir}`)
   }
   console.log(`[create-msq-worker] Successfully processed ${srcDir}`)
 } catch (error) {

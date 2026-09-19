@@ -1,8 +1,8 @@
-import createdRefRectHoveringRefElement from '#msq/editor/createdRefRectHoveringRefElement.js'
-import scoreSvgElement from '#msq/editor/scoreSvgElement.js'
-import notifyUserToUpdateSVGImage from '#msq/editor/notifyUserToUpdateSVGImage.js'
-import showHintMessage from '#msq/editor/showHintMessage.js'
-import theCommandKeyIsHeld from '#msq/editor/theCommandKeyIsHeld.js'
+import createdRefRectHoveringRefElement from '#msq/web-components/editor/createdRefRectHoveringRefElement.js'
+import scoreSvgElement from '#msq/web-components/editor/scoreSvgElement.js'
+import notifyUserToUpdateSVGImage from '#msq/web-components/editor/notifyUserToUpdateSVGImage.js'
+import showHintMessage from '#msq/web-components/editor/showHintMessage.js'
+import theCommandKeyIsHeld from '#msq/web-components/editor/theCommandKeyIsHeld.js'
 
 
 const showHintMessageThatUserShouldRerenderPreviewInOrderToNavigateBetweenTextInDivUnderneathTeextareaToElementsInSvg = (textarea) => {

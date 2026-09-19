@@ -1,7 +1,7 @@
-import createdRefRectHoveringRefElement from '#msq/editor/createdRefRectHoveringRefElement.js'
-import scoreSvgElement from '#msq/editor/scoreSvgElement.js'
-import notifyUserToUpdateSVGImage from '#msq/editor/notifyUserToUpdateSVGImage.js'
-import theCommandKeyIsHeld from '#msq/editor/theCommandKeyIsHeld.js'
+import createdRefRectHoveringRefElement from '#msq/web-components/editor/createdRefRectHoveringRefElement.js'
+import scoreSvgElement from '#msq/web-components/editor/scoreSvgElement.js'
+import notifyUserToUpdateSVGImage from '#msq/web-components/editor/notifyUserToUpdateSVGImage.js'
+import theCommandKeyIsHeld from '#msq/web-components/editor/theCommandKeyIsHeld.js'
 
 export default (divUnderneathTextarea, textarea, lineNumbersColumn, editTabButton) => {
   const svgPlaceholder = textarea.initialParentElement

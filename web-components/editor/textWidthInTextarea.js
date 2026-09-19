@@ -1,4 +1,4 @@
-import canvasFontFromTextarea from '#msq/editor/canvasFontFromTextarea.js'
+import canvasFontFromTextarea from '#msq/web-components/editor/canvasFontFromTextarea.js'
 
 export default (textarea, text) => {
   const canvas = document.createElement('canvas')

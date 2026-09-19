@@ -1,4 +1,4 @@
-import scrollToSelectionInTextarea from '#msq/editor/scrollToSelectionInTextarea.js'
+import scrollToSelectionInTextarea from '#msq/web-components/editor/scrollToSelectionInTextarea.js'
 
 export default (textarea) => {
   const textareaComputedStyle = window.getComputedStyle(textarea)

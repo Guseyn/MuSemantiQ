@@ -105,10 +105,16 @@ requests into an HTTP/2-shaped stream.
 
 ## Generated versus hand-written
 
-Only **`static/js/msq/worker/`** is generated. `create-msq-worker.js` deletes it
-wholesale and rebuilds it by copying every `.js` file from `src/` and rewriting
-the import specifiers — the browser build needs real URLs, because import maps
-do not apply inside module workers, which is why this code generation exists.
+**`static/js/msq/worker/`** and **`static/js/msq/language/`** are generated, both
+by `create-msq-worker.js`, which deletes each wholesale and rebuilds it.
+
+`worker/` is every `.js` file in `src/` with the import specifiers rewritten to
+real URLs — import maps do not apply inside module workers, which is why this
+code generation exists. `language/` is `src/language` copied as it stands, for
+the page rather than the worker: the editor parses on the main thread to colour
+what is typed, and nothing in `src/language` imports outside itself, so its
+`#msq/language/…` specifiers resolve through the page's own import map and need
+no rewriting.
 
 Everything else under `static/js/msq/` is hand-written and belongs in commits.
 
@@ -276,10 +282,12 @@ usual causes:
 
 ## Also worth knowing
 
-The import map in `index.html` is hand-written. The `browser.importmap` field in
-`package.json` is **not** used by this example and still mentions folders that
-have been removed; `worker.importmap` *is* used, but only at build time by
-`create-msq-worker.js`. If you add a folder under `static/js/`, update both the
-import map in `index.html` and the URL pattern in `web-app/worker.js`.
+The import map in `index.html` is hand-written, and the `browser.importmap` field
+in `package.json` is a second copy of it — kept in step by hand, and read by
+`nodes/updateCacheVersionsInUrls.js` to resolve specifiers when it stamps cache
+versions. `worker.importmap` is used only at build time, by
+`create-msq-worker.js`. If you add a folder under `static/js/`, update the import
+map in `index.html`, the `browser.importmap` field, and the URL pattern in
+`web-app/worker.js`.
 
 `static/css/e-ui.css` is left over and referenced by nothing.

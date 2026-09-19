@@ -1,4 +1,4 @@
-import { search } from '#msq/lib/@tonejs/BinarySearch.js'
+import { search } from '#msq/web-components/lib/@tonejs/BinarySearch.js'
 
 const privatePPQMap = new WeakMap()
 

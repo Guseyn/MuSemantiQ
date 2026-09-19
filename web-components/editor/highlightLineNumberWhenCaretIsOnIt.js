@@ -1,4 +1,4 @@
-import highlightLineNumber from '#msq/editor/highlightLineNumber.js'
+import highlightLineNumber from '#msq/web-components/editor/highlightLineNumber.js'
 
 export default (shadowRoot, textarea, lineNumbersColumn) => {
   document.addEventListener('selectionchange', () => {

@@ -1,15 +1,15 @@
-import MSQTemplateElement from '#msq/msq-template.js'
-import openContent from '#msq/utils/openContent.js'
-import downloadContent from '#msq/utils/downloadContent.js'
-import copyText from '#msq/utils/copyText.js'
+import MSQTemplateElement from '#msq/web-components/msq-template.js'
+import openContent from '#msq/web-components/utils/openContent.js'
+import downloadContent from '#msq/web-components/utils/downloadContent.js'
+import copyText from '#msq/web-components/utils/copyText.js'
 
-import utilsPanel from '#msq/css/utilsPanel.js'
-import { svgWithFullRadius } from '#msq/css/svgSurface.js'
+import utilsPanel from '#msq/web-components/css/utilsPanel.js'
+import { svgWithFullRadius } from '#msq/web-components/css/svgSurface.js'
 
-import previewIcon from '#msq/icons/previewIcon.js'
-import downloadIcon from '#msq/icons/downloadIcon.js'
-import copyIcon from '#msq/icons/copyIcon.js'
-import doneIcon from '#msq/icons/doneIcon.js'
+import previewIcon from '#msq/web-components/icons/previewIcon.js'
+import downloadIcon from '#msq/web-components/icons/downloadIcon.js'
+import copyIcon from '#msq/web-components/icons/copyIcon.js'
+import doneIcon from '#msq/web-components/icons/doneIcon.js'
 
 class MuSemantiQSVG extends MSQTemplateElement {
   async render() {

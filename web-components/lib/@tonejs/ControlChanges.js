@@ -1,4 +1,4 @@
-import { controlChangeIds } from '#msq/lib/@tonejs/ControlChange.js';
+import { controlChangeIds } from '#msq/web-components/lib/@tonejs/ControlChange.js';
 
 /**
  * Automatically creates an alias for named control values using Proxies

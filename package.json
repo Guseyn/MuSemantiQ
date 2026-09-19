@@ -57,8 +57,8 @@
   "browser.importmap": {
     "#ehtml/": "/js/ehtml/",
     "#e-ui/": "/js/e-ui/",
-    "#msq/": "/js/msq/web-components/",
-    "#msq-worker/": "/js/msq/worker/"
+    "#msq/web-components/": "/js/msq/web-components/",
+    "#msq/language/": "/js/msq/language/"
   },
   "worker.importmap": {
     "#msq": "/js/msq/worker"
