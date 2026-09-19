@@ -9,8 +9,8 @@ import {
 import highlightTextareaValueInDivUnderneathItWithoutRefIds from '#msq/editor/highlightTextareaValueInDivUnderneathItWithoutRefIds.js'
 import listsOfPossibleOptionsToCompleteWordByProgressionOfCommandsFromScenariosFor from '#msq/editor/listsOfPossibleOptionsToCompleteWordByProgressionOfCommandsFromScenarios.js'
 import isPrintableKeycode from '#msq/editor/isPrintableKeycode.js'
+import theCommandKeyIsHeld from '#msq/editor/theCommandKeyIsHeld.js'
 
-const isMacOS = navigator.platform.indexOf('Mac') !== -1
 
 const noteNames = [ 'a', 'b', 'c', 'd', 'e', 'f', 'g' ]
 const delimeters = [ ',', ';' ]
@@ -215,7 +215,7 @@ export default (autocompleteListView, textarea, divUnderneathTextarea) => {
     const itIsArrowDownPressed = event.keyCode === 40
     const itIsBackSpacePressed = event.keyCode === 8
     const itIsPrintableKeyPressed = isPrintableKeycode(event.keyCode)
-    const isCmdPressed = ((isMacOS && event.metaKey) || (!isMacOS && event.ctrlKey))
+    const isCmdPressed = theCommandKeyIsHeld(event)
     if (itIsBackSpacePressed && !isAutocompleteListViewOpened(autocompleteListView)) {
       return
     }

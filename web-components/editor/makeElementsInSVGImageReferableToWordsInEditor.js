@@ -1,7 +1,7 @@
 import createdRefRectHoveringRefElement from '#msq/editor/createdRefRectHoveringRefElement.js'
 import scoreSvgElement from '#msq/editor/scoreSvgElement.js'
 import notifyUserToUpdateSVGImage from '#msq/editor/notifyUserToUpdateSVGImage.js'
-const isMacOS = navigator.platform.indexOf('Mac') !== -1
+import theCommandKeyIsHeld from '#msq/editor/theCommandKeyIsHeld.js'
 
 export default (divUnderneathTextarea, textarea, lineNumbersColumn, editTabButton) => {
   const svgPlaceholder = textarea.initialParentElement
@@ -57,7 +57,7 @@ export default (divUnderneathTextarea, textarea, lineNumbersColumn, editTabButto
           weAlreadyMadeSVGElementsReferableByCreatingRefRectsHoveringThem = false
         }
         const makeSVGElementsReferableByCreatingRefRectsHoveringThem = (event) => {
-          if ((isMacOS && event.metaKey) || (!isMacOS && event.ctrlKey)) {
+          if (theCommandKeyIsHeld(event)) {
             if (!svgElement) {
               return
             }
@@ -131,7 +131,7 @@ export default (divUnderneathTextarea, textarea, lineNumbersColumn, editTabButto
     processNodeWithItsChildNodes(alreadyRenderedSvg)
   }
   window.addEventListener('keydown', (event) => {
-    if ((isMacOS && event.metaKey) || (!isMacOS && event.ctrlKey)) {
+    if (theCommandKeyIsHeld(event)) {
       // Both of these live inside our shadow root, so neither document nor the
       // host's (empty) light DOM can reach them.
       const refRectHoveringRefElementCreatedByClickingOnWordInEditor =

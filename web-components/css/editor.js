@@ -74,12 +74,12 @@ export default /*css*/`
   }
   div[data-settings-container] input[type="checkbox"] {
     flex: none;
-    width: 1.15em;
-    height: 1.15em;
+    width: 1.5em;
+    height: 1.5em;
     /* A swatch is the wider of the two controls, and the difference is made up
        here so the words after them start at the same place. */
     margin: 0 0.45em 0 0;
-    accent-color: var(--navigation-highlight-color);
+    accent-color: #111;
     cursor: pointer;
   }
   div[data-settings-container] input[type="text"] {
@@ -198,6 +198,19 @@ export default /*css*/`
      from the room it actually has when it opens. */
   div[data-autocomplete] {
     position: fixed;
+    /*
+    What the UA gives a popover, taken back.
+
+    A popover arrives with inset: 0, margin: auto, border: solid and
+    padding: 0.25em. The insets and the auto margin would centre the list in the
+    viewport and ignore the left/top measured from the caret, and the border and
+    padding are not the shape this list has. Only left and top are set from
+    script, so inset has to be cleared here rather than there.
+    */
+    inset: auto;
+    margin: 0;
+    border: none;
+    padding: 0;
     z-index: 100;
     font-family: var(--editor-font-family);
     font-size: var(--editor-font-size);

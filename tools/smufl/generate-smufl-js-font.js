@@ -25,6 +25,7 @@
 
 import fs from 'fs'
 import path from 'path'
+import { fileURLToPath } from 'url'
 import opentype from '#msq/drawer/lib/opentype/opentype.js'
 import generateUnicodePoints from '#msq/drawer/generateUnicodePoints.js'
 import scaffold from '#tools/smufl/scaffold.js'
@@ -53,6 +54,22 @@ function escapedUnicode(characters) {
     (character) => '\\u' + character.codePointAt(0).toString(16).toUpperCase().padStart(4, '0')
   ).join('')}'`
 }
+
+/*
+What stands in for a glyph the font does not have.
+
+Its own "?" where there is one, so the substitute is drawn in the same hand as
+everything around it. A SMuFL font usually has no such thing — Bravura maps 3298
+private-use glyphs and exactly one ASCII character, the space — so the text font
+below is what actually draws it nearly every time. The drawer already does this
+same substitution at draw time, in elements/basic/text.js.
+*/
+const SUBSTITUTE = '?'
+const SUBSTITUTE_FONT = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  '../..',
+  'src/drawer/font/text/NotoSerif-Regular.ttf'
+)
 
 const indentOf = (depth) => ' '.repeat(depth * 2)
 
@@ -164,7 +181,34 @@ function renderNode(node, depth, context) {
 
     if (missing.length) {
       context.missing.push(`${node.name}.${field}: ${unicodeLabel(drawn)}`)
-      parts.push([ `${indentOf(depth + 1)}${field}: []` ])
+      /*
+      A gap is drawn as this font's own question mark rather than left empty.
+
+      An empty point array is worse than an invisible symbol: it joins to a d of
+      nothing, and the bounding box of an empty path comes back as its own
+      initialisers — top Infinity, right -Infinity — which spread into whatever
+      lays the page out and surface much later as a NaN thrown from somewhere
+      unrelated. A "?" is a real path with a real box, and it says on the page
+      which symbol the font was missing.
+
+      Traced through the same call the glyph itself would have used, so it lands
+      in the same coordinate space at the same scale.
+      */
+      if (!context.substituteFont) {
+        // Nothing to draw it with: no "?" in this font and none to borrow.
+        parts.push([ `${indentOf(depth + 1)}${field}: []` ])
+        return
+      }
+
+      const substitute = tracePoints(
+        SUBSTITUTE, context.substituteFont, context.musicFontSourceSize, node.scale
+      )
+      context.substituted++
+      parts.push([
+        `${indentOf(depth + 1)}${field}: [`,
+        ...pointArrayLines(substitute).map((line) => `${indentOf(depth + 2)}${line}`),
+        `${indentOf(depth + 1)}]`
+      ])
       return
     }
 
@@ -197,10 +241,12 @@ function properties(rendered) {
   })
 }
 
-function generate(font, fontPath) {
+function generate(font, fontPath, substituteFont) {
   const sourceSize = scaffold.find((node) => node.name === 'musicFontSourceSize')
   const musicFontSourceSize = sourceSize ? sourceSize.value : 4.0
-  const context = { font, musicFontSourceSize, traced: 0, missing: [] }
+  const context = {
+    font, substituteFont, musicFontSourceSize, traced: 0, substituted: 0, missing: []
+  }
 
   const body = properties([
     [ `${indentOf(2)}musicFontSource` ],
@@ -245,15 +291,36 @@ async function main() {
   }
 
   const font = await opentype.load(fontPath)
-  const { file, traced, missing } = generate(font, fontPath)
+
+  /*
+  What draws the gaps. This font's own "?" if it has one, and otherwise the
+  text font's — a SMuFL font almost never carries ASCII, so it is nearly always
+  the borrowed one that gets used.
+  */
+  let substituteFont = font.charToGlyphIndex(SUBSTITUTE) === 0 ? null : font
+  let borrowed = false
+  if (!substituteFont && fs.existsSync(SUBSTITUTE_FONT)) {
+    substituteFont = await opentype.load(SUBSTITUTE_FONT)
+    borrowed = true
+  }
+
+  const { file, traced, substituted, missing } = generate(font, fontPath, substituteFont)
 
   fs.mkdirSync(path.dirname(outputPath), { recursive: true })
   fs.writeFileSync(outputPath, file, 'utf-8')
 
+  const drawnAs = !substituteFont
+    ? 'written as an empty array — there is no "?" to stand in for it'
+    : borrowed
+      ? `not in this font — drawn as the "?" of ${path.basename(SUBSTITUTE_FONT)}`
+      : 'not in this font — drawn as its own "?"'
   for (const gap of missing) {
-    console.warn(`  ! ${gap} is not in this font — written as an empty array`)
+    console.warn(`  ! ${gap} is ${drawnAs}`)
   }
-  console.log(`${traced} point arrays traced, ${missing.length} empty`)
+  console.log(
+    `${traced} point arrays traced, ${missing.length} missing` +
+    `${substituted ? ` (${substituted} drawn as "?")` : ''}`
+  )
   console.log(`Wrote ${outputPath}`)
 }
 

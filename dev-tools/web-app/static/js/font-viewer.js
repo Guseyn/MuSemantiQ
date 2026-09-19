@@ -6,6 +6,56 @@ import './searchable-select.js'
 import worker from '#msq/utils/worker-instance.js'
 import { registerFontNames } from '#msq/utils/fontNames.js'
 
+// --- what the page's e-json elements hand over ------------------------------
+
+/*
+The page's two requests are made by the <e-json> elements in the markup, which
+also fill every picker from them — the option lists are templates there rather
+than loops here. What the script still needs is the answers themselves: the
+config that registers the faces with the worker, and the entry list the glyph
+walk steps through.
+*/
+/**
+ * Take delivery of what one of the page's e-json elements fetched.
+ *
+ * This module and everything it imports — the scaffold alone is sixteen hundred
+ * lines — is fetched and parsed while those requests are already in flight, so
+ * the answer regularly arrives before there is anything here to receive it.
+ * That is why the page both leaves the body on the window and calls in: this
+ * picks up whichever happened, and there is no order to get wrong.
+ *
+ * `askAgain` re-triggers the request and waits for the answer that follows,
+ * which is how the page re-reads the fonts after one has been uploaded.
+ */
+const handedOver = (name, box) => {
+  const waiting = []
+  let answer = window[box]
+
+  window[name] = (body) => {
+    answer = body
+    while (waiting.length) {
+      waiting.shift()(body)
+    }
+    return body
+  }
+
+  return {
+    next: () => answer !== undefined
+      ? Promise.resolve(answer)
+      : new Promise((resolve) => waiting.push(resolve)),
+    askAgain: (id) => {
+      const asking = new Promise((resolve) => waiting.push(resolve))
+      // So a failure to answer cannot be satisfied by the last answer.
+      answer = undefined
+      document.getElementById(id).trigger()
+      return asking
+    }
+  }
+}
+
+const fontsFromTheServer = handedOver('fontsRead', 'fontsAnswer')
+const entriesFromTheServer = handedOver('entriesRead', 'entriesAnswer')
+
 // --- one entry's yCorrection, as text --------------------------------------------------
 
 /**
@@ -103,7 +153,7 @@ b c5 d5 e5`
  * from the glyph table itself so this and the files agree without a manifest.
  */
 function glyphExampleFile(name) {
-  const clashes = [ ...glyphs.keys() ].some(
+  const clashes = entryNames().some(
     (other) => other !== name && other.toLowerCase() === name.toLowerCase()
   )
   const tail = name.split('.').pop()
@@ -227,38 +277,64 @@ accepts.
 */
 let faces = { music: [], text: [], 'chord-letters': [], config: {} }
 
-async function readFaces() {
-  const response = await fetch('/dev/fonts')
-  if (!response.ok) {
-    throw new Error(`the server answered ${response.status}`)
+
+/**
+ * Wait for a picker EHTML is filling.
+ *
+ * `mapToTemplate` puts the `e-for-each` template into the select, and the
+ * mutation observer expands it into options a microtask later — so the options
+ * are not there the moment the response has been handled, and there is no event
+ * to say when they are.
+ *
+ * What is waited on is the template going, rather than options arriving: a
+ * family with nothing usable in it produces no options at all, and waiting for
+ * one would wait for ever.
+ */
+function whenFilled(picker) {
+  const stillToRun = () => picker.querySelector('template')
+  if (!stillToRun()) {
+    return Promise.resolve(picker)
   }
-  faces = await response.json()
-  return faces
+  return new Promise((resolve) => {
+    const watching = new MutationObserver(() => {
+      if (!stillToRun()) {
+        watching.disconnect()
+        resolve(picker)
+      }
+    })
+    watching.observe(picker, { childList: true, subtree: true })
+  })
 }
 
 /**
- * Fill a picker with names, keeping what was chosen if it is still offered.
+ * Choose an option, keeping what was chosen if it is still offered.
+ *
+ * EHTML empties the select before it refills it, so whatever was showing is
+ * gone by the time this runs — which is why the choice is passed in rather than
+ * read off the element.
  */
-function fillPicker(picker, names, fallback) {
+function keepTheChoice(picker, chosen, fallback) {
   if (!picker) {
     return
   }
-  const chosen = picker.value
-  picker.replaceChildren()
-  for (const name of names) {
-    const option = document.createElement('option')
-    option.value = name
-    option.textContent = name
-    picker.appendChild(option)
-  }
-  picker.value = names.includes(chosen) ? chosen : (names.includes(fallback) ? fallback : names[0] || '')
+  const offered = [ ...picker.options ].map((option) => option.value)
+  picker.value = offered.includes(chosen)
+    ? chosen
+    : (offered.includes(fallback) ? fallback : offered[0] || '')
   picker.refresh()
 }
 
-const usableNames = (family) => faces[family].filter((one) => one.usable).map((one) => one.name)
 const faceNamed = (family, name) => faces[family].find((one) => one.name === name)
 
-// Every glyph the scaffold defines, flattened so nested letter maps are pickable.
+/*
+Every glyph the scaffold defines, flattened so nested letter maps are pickable.
+
+This is where the codepoint, the drawn size and the yOffset defaults come from —
+things the font files do not carry. What is *offered* is a wider list than this:
+the server merges it with whatever every traced font turns out to hold, so a
+glyph added to the fonts by hand is pickable even though the scaffold has never
+heard of it.
+*/
 const glyphs = new Map()
 const collect = (nodes, prefix) => {
   for (const node of nodes) {
@@ -271,13 +347,18 @@ const collect = (nodes, prefix) => {
 }
 collect(scaffold, '')
 
-for (const name of glyphs.keys()) {
-  const option = document.createElement('option')
-  option.value = name
-  option.textContent = name
-  elements.entry.appendChild(option)
-}
-elements.entry.value = 'treble'
+// What the picker offers, in the order it offers it — filled from
+// /dev/music-js-entries by the template in the page.
+let offeredEntries = []
+const entryNames = () => offeredEntries.map((one) => one.name)
+
+/**
+ * What is known about an entry: the scaffold's node where there is one, and
+ * otherwise just the codepoint the fonts agree it draws.
+ */
+const entryNamed = (name) => glyphs.get(name) ||
+  (offeredEntries.find((one) => one.name === name) &&
+    { smufl: offeredEntries.find((one) => one.name === name).unicode })
 
 const loadedFonts = new Map()
 async function fontFor(name) {
@@ -538,7 +619,7 @@ function refresh({ retrace = true } = {}) {
  * three inputs always describe the glyph on screen.
  */
 async function loadEntry() {
-  const glyph = glyphs.get(elements.entry.value)
+  const glyph = entryNamed(elements.entry.value)
   if (!glyph) {
     return
   }
@@ -591,7 +672,7 @@ async function syncCorrectionFromFont() {
  * across unrelated signs.
  */
 async function stepGlyph(by) {
-  const names = [ ...glyphs.keys() ]
+  const names = entryNames()
   const at = names.indexOf(elements.entry.value)
   const next = names[(at + by + names.length) % names.length]
   if (!next) {
@@ -607,7 +688,7 @@ async function stepGlyph(by) {
  * Where in the table you are, so walking it has a sense of distance.
  */
 function showGlyphPlace() {
-  const names = [ ...glyphs.keys() ]
+  const names = entryNames()
   const at = names.indexOf(elements.entry.value)
   elements.glyphPlace.textContent = at === -1
     ? ''
@@ -661,7 +742,7 @@ async function applyUrl() {
     elements.font.value = params.get('font')
     elements.font.refresh()
   }
-  if (params.has('entry') && glyphs.has(params.get('entry'))) {
+  if (params.has('entry') && entryNames().includes(params.get('entry'))) {
     elements.entry.value = params.get('entry')
     elements.entry.refresh()
   }
@@ -885,22 +966,39 @@ function registerWithWorker(reference, config) {
  * Called on load, and after anything is added — which is what makes a face
  * usable the moment it lands rather than after a reload.
  */
-async function loadFaces({ choose = null } = {}) {
-  await readFaces()
+async function loadFaces({ choose = null, askAgain = false } = {}) {
+  /*
+  What is showing now, before the pickers are emptied: EHTML refills a select by
+  clearing it, so a choice not written down here is gone by the time the new
+  options arrive. A face just added is the one you want to look at, so it wins
+  over what was showing.
+  */
+  const wasChosen = {
+    font: choose || elements.font.value,
+    textMusicFont: elements.textMusicFont.value,
+    chordMusicFont: elements.chordMusicFont.value,
+    textFont: choose || elements.textFont.value,
+    chordFont: choose || elements.chordFont.value
+  }
 
-  const music = usableNames('music')
-  fillPicker(elements.font, music, 'bravura')
-  fillPicker(elements.textMusicFont, music, 'bravura')
-  fillPicker(elements.chordMusicFont, music, 'bravura')
-  fillPicker(elements.textFont, usableNames('text'), 'noto-serif')
-  fillPicker(elements.chordFont, usableNames('chord-letters'), 'gentium plus')
+  const answered = askAgain
+    ? await fontsFromTheServer.askAgain('fonts')
+    : await fontsFromTheServer.next()
+  if (!answered) {
+    throw new Error('the fonts could not be read')
+  }
+  faces = answered
 
-  // A face just added is the one you want to look at.
-  for (const picker of [ elements.font, elements.textFont, elements.chordFont ]) {
-    if (choose && [ ...picker.options ].some((option) => option.value === choose)) {
-      picker.value = choose
-      picker.refresh()
-    }
+  const pickers = [
+    [ elements.font, wasChosen.font, 'bravura' ],
+    [ elements.textMusicFont, wasChosen.textMusicFont, 'bravura' ],
+    [ elements.chordMusicFont, wasChosen.chordMusicFont, 'bravura' ],
+    [ elements.textFont, wasChosen.textFont, 'noto-serif' ],
+    [ elements.chordFont, wasChosen.chordFont, 'gentium plus' ]
+  ]
+  await Promise.all(pickers.map(([ picker ]) => whenFilled(picker)))
+  for (const [ picker, chosen, fallback ] of pickers) {
+    keepTheChoice(picker, chosen, fallback)
   }
 
   const reference = registrations === 0
@@ -912,6 +1010,24 @@ async function loadFaces({ choose = null } = {}) {
   currentReference = reference
 }
 
+/**
+ * The glyph entries the picker offers, and the default to open on.
+ */
+async function loadEntries() {
+  const answered = await entriesFromTheServer.next()
+  if (!answered) {
+    throw new Error('the glyph entries could not be read')
+  }
+  offeredEntries = answered.entries || []
+  await whenFilled(elements.entry)
+  /*
+  A select with options selects its first one, so there is nothing to keep here
+  — the page opens on the treble clef, which is the glyph worth seeing first,
+  and the url overrides that a moment later if it names one.
+  */
+  keepTheChoice(elements.entry, null, 'treble')
+}
+
 /*
 Called from the upload forms, which are EHTML and know nothing of any of this.
 */
@@ -920,7 +1036,7 @@ window.fontsChanged = async function (name) {
     // What is on disk has changed, so anything cached from it must go.
     fontSources.clear()
     loadedFonts.clear()
-    await loadFaces({ choose: name })
+    await loadFaces({ choose: name, askAgain: true })
     renderShownTab()
   } catch (error) {
     window.showError(`Could not read the fonts again: ${error.message}`)
@@ -995,8 +1111,30 @@ Nothing can be engraved until the worker has the fonts, and the fonts are not
 known until the server has been asked. So the order is: read the faces, register
 them, then draw whichever tab is showing.
 */
+/*
+An e-json parses every answer as JSON and throws where it cannot — which is what
+a server that does not know a route looks like, since an unknown one answers
+`405 Not Allowed` in plain text. That throw happens inside EHTML, so the actions
+that would have handed a failure over here never run, and waiting on them would
+be waiting for ever. A page showing nothing and saying nothing is the worst of
+the outcomes, so the wait is bounded and says what it was waiting for.
+*/
+const orGiveUp = (waiting, what) => Promise.race([
+  waiting,
+  new Promise((resolve, reject) => setTimeout(
+    () => reject(new Error(
+      `nothing came back for ${what} — if the dev server has been running since` +
+      ' before this page changed, restart it'
+    )),
+    10000
+  ))
+])
+
 try {
-  await loadFaces()
+  await Promise.all([
+    orGiveUp(loadFaces(), 'the fonts'),
+    orGiveUp(loadEntries(), 'the glyph entries')
+  ])
   watchTabs()
   /*
   The hash decides which tab e-tabs opens on, so the page has to draw that one

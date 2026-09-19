@@ -15,6 +15,8 @@ import fs from 'fs/promises'
 import endpoint from '#dev-nodes/endpoint.js'
 import body from '#dev-nodes/body.js'
 
+import scaffold from '#tools/smufl/scaffold.js'
+
 import { MUSIC_JS_DIRECTORY, respondWith, resolveInside } from './shared.js'
 
 const POINT_FIELDS = [
@@ -111,6 +113,158 @@ function pointArrayLines(points) {
   flush()
   return lines.map((line, index) => index === lines.length - 1 ? line : `${line},`)
 }
+
+/**
+ * The codepoints a `unicode:` literal stands for.
+ *
+ * The committed fonts hold the character itself, which is invisible in an
+ * editor; the generator writes `\uXXXX` escapes, which are readable. Both are
+ * the same string once JavaScript has parsed them, but this reads the file as
+ * text — so the escapes have to be turned back into characters here.
+ */
+const readCodepoints = (literal) =>
+  literal.replace(
+    /\\u([0-9a-fA-F]{4})/g,
+    (whole, hex) => String.fromCharCode(parseInt(hex, 16))
+  )
+
+/**
+ * Every entry a music-js font holds, as the dotted path it is addressed by.
+ *
+ * The same walk `locate` does, asked the other way round: instead of looking
+ * for one path, collect every path that has a point field under it. These files
+ * are generated, so one property per line holds — and reading 17 000 lines is
+ * still far cheaper than shipping them to the page to be scanned there.
+ */
+function entriesIn(lines) {
+  const stack = []
+  const found = new Map()
+
+  for (const line of lines) {
+    const closing = line.match(/^(\s*)\}/)
+    if (closing) {
+      while (stack.length && stack[stack.length - 1].indent >= closing[1].length) {
+        stack.pop()
+      }
+    }
+
+    const opening = line.match(/^(\s*)(?:'([^']*)'|([A-Za-z0-9_]+)): \{\s*$/)
+    if (opening) {
+      const indent = opening[1].length
+      while (stack.length && stack[stack.length - 1].indent >= indent) {
+        stack.pop()
+      }
+      stack.push({ indent, name: opening[2] === undefined ? opening[3] : opening[2] })
+      continue
+    }
+
+    if (!stack.length) {
+      continue
+    }
+    const path = stack.map((frame) => frame.name).join('.')
+
+    const unicode = line.match(/^\s*unicode: '([^']*)'/)
+    if (unicode && !found.has(path)) {
+      found.set(path, { name: path, unicode: readCodepoints(unicode[1]) })
+    }
+
+    const field = line.match(/^\s*([A-Za-z]+): \[/)
+    if (field && POINT_FIELDS.includes(field[1])) {
+      found.set(path, found.get(path) || { name: path, unicode: '' })
+    }
+  }
+
+  return found
+}
+
+/**
+ * The glyphs the scaffold declares, flattened to the paths they are written at.
+ */
+function entriesInTheScaffold(nodes, prefix, into) {
+  for (const node of nodes) {
+    if (node.kind === 'glyph') {
+      into.set(prefix + node.name, node.smufl || '')
+    } else if (node.kind === 'group') {
+      entriesInTheScaffold(node.entries, `${prefix}${node.name}.`, into)
+    }
+  }
+  return into
+}
+
+/**
+ * The glyphs the font viewer should offer.
+ *
+ * Two sources, because they answer different halves of the question. The
+ * scaffold says what a font *ought* to hold, and is what the generator works
+ * from — drop it and a glyph added there would vanish from the picker until
+ * every font had been regenerated, which is the wrong way round. The fonts
+ * themselves say what is actually there, which is how a glyph added by hand
+ * gets picked up at all.
+ *
+ * A font-only glyph is offered only when *every* font has it: offering one that
+ * a font does not hold is offering a blank, and the viewer's whole job is
+ * comparing the same glyph across fonts.
+ */
+const listEntries = endpoint('/dev/music-js-entries', 'GET', async ({ stream }) => {
+  let files = []
+  try {
+    files = (await fs.readdir(MUSIC_JS_DIRECTORY))
+      .filter((file) => file.endsWith('.js'))
+      .sort()
+  } catch {
+    // No traced fonts at all.
+  }
+
+  let shared = null
+  const fonts = []
+
+  for (const file of files) {
+    const found = entriesIn((await fs.readFile(
+      resolveInside(MUSIC_JS_DIRECTORY, file), 'utf-8'
+    )).split('\n'))
+
+    fonts.push(file.replace(/\.js$/, ''))
+    if (shared === null) {
+      shared = found
+      continue
+    }
+    for (const name of [ ...shared.keys() ]) {
+      if (!found.has(name)) {
+        shared.delete(name)
+      }
+    }
+  }
+
+  const declared = entriesInTheScaffold(scaffold, '', new Map())
+  const offered = new Map()
+
+  for (const [ name, smufl ] of declared) {
+    offered.set(name, { name, unicode: smufl, inScaffold: true })
+  }
+  for (const entry of (shared ? shared.values() : [])) {
+    if (!offered.has(entry.name)) {
+      offered.set(entry.name, { ...entry, inScaffold: false })
+    }
+  }
+
+  /*
+  The scaffold's order, which is the order the font files are written in, so
+  walking the list with the arrows goes through a family at a time rather than
+  alphabetically across unrelated signs. What only the fonts have has no place
+  in that order, so it goes on the end.
+  */
+  const fromTheFonts = [ ...offered.values() ]
+    .filter((entry) => !entry.inScaffold)
+    .sort((one, other) => one.name.localeCompare(other.name))
+
+  respondWith(stream, 200, {
+    fonts,
+    entries: [
+      ...[ ...declared.keys() ].map((name) => offered.get(name)),
+      ...fromTheFonts
+    ]
+  })
+})
 
 const fontFileFor = (font) =>
   typeof font === 'string' && /^[a-z0-9-]+$/.test(font)
@@ -275,4 +429,4 @@ const applyGlyph = endpoint('/dev/font-glyph', 'POST', async ({ stream }) => {
   })
 })
 
-export default [ fontSource, previewGlyph, applyGlyph ]
+export default [ fontSource, listEntries, previewGlyph, applyGlyph ]

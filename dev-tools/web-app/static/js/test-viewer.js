@@ -561,6 +561,20 @@ async function adopt(artifactName) {
       throw new Error(result.error || `the server answered ${response.status}`)
     }
     window.showToast(`Adopted ${result.adopted.join(', ') || 'nothing'} for ${result.test}.`)
+
+    /*
+    The picker's "failing" label comes from the suite's failed list, which the
+    server has just rewritten if this test now matches everywhere. Nothing else
+    about the suite changed, so the label is updated in place rather than by
+    reading the whole index again.
+    */
+    const failing = suiteNamed(state.suite).failed
+    const already = failing.indexOf(result.test)
+    if (result.failing === false && already !== -1) {
+      failing.splice(already, 1)
+      fillTestSelect()
+    }
+
     await renderDetail()
   } catch (error) {
     window.showError(`Could not adopt: ${error.message}`)

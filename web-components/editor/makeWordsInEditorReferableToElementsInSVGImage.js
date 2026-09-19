@@ -2,8 +2,8 @@ import createdRefRectHoveringRefElement from '#msq/editor/createdRefRectHovering
 import scoreSvgElement from '#msq/editor/scoreSvgElement.js'
 import notifyUserToUpdateSVGImage from '#msq/editor/notifyUserToUpdateSVGImage.js'
 import showHintMessage from '#msq/editor/showHintMessage.js'
+import theCommandKeyIsHeld from '#msq/editor/theCommandKeyIsHeld.js'
 
-const isMacOS = navigator.platform.indexOf('Mac') !== -1
 
 const showHintMessageThatUserShouldRerenderPreviewInOrderToNavigateBetweenTextInDivUnderneathTeextareaToElementsInSvg = (textarea) => {
   showHintMessage(
@@ -55,7 +55,7 @@ export default (divUnderneathTextarea, textarea, renderPreviewTabButton) => {
   }
   let eventsWereAttachedToDivUnderneathTextarea = false
   divUnderneathTextarea.addEventListener('mousemove', (event) => {
-    if ((isMacOS && event.metaKey) || (!isMacOS && event.ctrlKey)) {
+    if (theCommandKeyIsHeld(event)) {
       if (textarea.selectionStart === textarea.selectionEnd) {
         divUnderneathTextarea.style.zIndex = '2'
         if (event.target.tagName.toLowerCase() === 'span') {
@@ -96,7 +96,7 @@ export default (divUnderneathTextarea, textarea, renderPreviewTabButton) => {
     }
   })
   window.addEventListener('keydown', (event) => {
-    if ((isMacOS && event.metaKey) || (!isMacOS && event.ctrlKey)) {
+    if (theCommandKeyIsHeld(event)) {
       if (textarea.selectionStart === textarea.selectionEnd) {
         divUnderneathTextarea.style.zIndex = '2'
       } else {
