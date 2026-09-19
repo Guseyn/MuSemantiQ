@@ -58,15 +58,6 @@
         </span>
       </p>
 
-      <!--
-      Every picker on this page is filled from one of two requests, and the
-      templates below say what an option looks like rather than a loop in the
-      script building one.
-
-      Both destinations sit outside their e-json on purpose: e-ui gives an
-      e-json `display: none`, and a reusable one never unwraps itself, so
-      anything left inside would be filled and never seen.
-      -->
       <e-json
         id="fonts"
         data-reusable
@@ -86,12 +77,7 @@
           mapToTemplate('#chord-music-fonts-template', listed.body)
           mapToTemplate('#text-fonts-template', listed.body)
           mapToTemplate('#chord-fonts-template', listed.body)
-          /*
-          Left on the window as well as called in: font-viewer.js is a module,
-          and the browser resolves its whole import graph before running any of
-          it — so this answer often arrives first, with nothing there yet to
-          hand it to. The script picks up whichever came.
-          */
+
           window.fontsAnswer = listed.body
           if (window.fontsRead) { fontsRead(listed.body) }
         "></e-json>

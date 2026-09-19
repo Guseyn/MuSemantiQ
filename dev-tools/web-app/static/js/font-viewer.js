@@ -1068,18 +1068,23 @@ function renderShownTab({ force = true } = {}) {
 /*
 `e-tabs` builds its nav one microtask after EHTML activates it and offers no
 event when a tab is chosen, so the buttons it generates are what we listen on.
+
+It is also what decides which tab opens, and it records that on itself — so
+this waits for the nav and then hands the element back, rather than anything
+here working out the answer a second time.
 */
-function watchTabs() {
-  const nav = control('families').querySelector('nav')
-  if (!nav) {
-    return queueMicrotask(watchTabs)
+async function watchTabs() {
+  const families = control('families')
+  while (!families.querySelector('nav')) {
+    await new Promise((resolve) => setTimeout(resolve))
   }
-  nav.querySelectorAll('button').forEach((button, position) => {
+  families.querySelector('nav').querySelectorAll('button').forEach((button, position) => {
     button.addEventListener('click', () => {
       shownTab = position
       renderShownTab({ force: false })
     })
   })
+  return families
 }
 
 /*
@@ -1135,18 +1140,14 @@ try {
     orGiveUp(loadFaces(), 'the fonts'),
     orGiveUp(loadEntries(), 'the glyph entries')
   ])
-  watchTabs()
   /*
-  The hash decides which tab e-tabs opens on, so the page has to draw that one
-  rather than assuming the first. The hash of a tab is its title lowercased with
-  the spaces hyphenated, which is e-tabs' own rule — read off the tabs rather
-  than written down, so renaming one cannot put this out of step.
+  Which tab is open, as e-tabs itself decided — from the hash where the page
+  carries one, and the first otherwise. It writes that on the element as
+  `data-current-tab`, so the page has only to read its answer; working the
+  title-to-hash rule out again here would be a second copy of it to go stale.
   */
-  const hashes = [ ...control('families').querySelectorAll('e-tab') ].map((tab) =>
-    '#' + encodeURIComponent((tab.getAttribute('data-title') || '').toLowerCase().replaceAll(/\s+/g, '-'))
-  )
-  const opened = hashes.indexOf(location.hash)
-  shownTab = opened === -1 ? 0 : opened
+  const families = await watchTabs()
+  shownTab = Number(families.getAttribute('data-current-tab')) || 0
   rendered.add(shownTab)
   shownTab === 0 ? applyUrl() : renderShownTab()
 } catch (error) {

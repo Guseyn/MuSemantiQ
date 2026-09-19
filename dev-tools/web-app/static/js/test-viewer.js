@@ -15,19 +15,14 @@ const index = await (await fetch('/dev/tests')).json()
 const visual = index.suites.filter((suite) => suite.kind === 'visual')
 const audio = index.suites.filter((suite) => suite.kind === 'audio')
 
-/*
-The tab is chosen by the hash — `e-tabs` does that itself — so the suite has to
-start from the same place, or the page would open showing Audio with the visual
-corpus in the picker.
-*/
-const openingOnAudio = window.location.hash === '#audio' && audio.length
 const firstOf = (group) => (group[0] ? group[0].name : null)
 
-const state = {
-  suite: openingOnAudio ? firstOf(audio) : firstOf(visual),
-  test: null,
-  artifact: null
-}
+/*
+The visual corpus to begin with. Which tab the page actually opens on is
+e-tabs' decision — it reads the hash — and the suite is moved to match once it
+has made it, at the foot of this file.
+*/
+const state = { suite: firstOf(visual), test: null, artifact: null }
 
 const suiteNamed = (name) => index.suites.find((one) => one.name === name)
 
@@ -256,12 +251,11 @@ The tab a suite belongs to. `e-tabs` builds its nav one microtask after EHTML
 activates it, and offers no event when a tab is chosen, so the buttons it
 generates are what we listen on.
 */
-function watchTabs() {
-  const nav = tabs.querySelector('nav')
-  if (!nav) {
-    return queueMicrotask(watchTabs)
+async function watchTabs() {
+  while (!tabs.querySelector('nav')) {
+    await new Promise((resolve) => setTimeout(resolve))
   }
-  nav.querySelectorAll('button').forEach((button, position) => {
+  tabs.querySelector('nav').querySelectorAll('button').forEach((button, position) => {
     button.addEventListener('click', () => {
       const group = position === 0 ? visual : audio
       if (group.length && !group.some((one) => one.name === state.suite)) {
@@ -269,6 +263,7 @@ function watchTabs() {
       }
     })
   })
+  return tabs
 }
 
 /**
@@ -675,7 +670,18 @@ new MutationObserver(() => {
   }
 }).observe(viewer, { childList: true, subtree: true })
 
-watchTabs()
+/*
+Which kind of test is showing is the tab's business, and e-tabs works it out
+from the hash and records it as `data-current-tab` — so opening the page at
+`#audio` lands on the audio corpus without anything here reading the hash, or
+knowing how a tab title becomes one.
+*/
+const families = await watchTabs()
+const group = Number(families.getAttribute('data-current-tab')) === 1 ? audio : visual
+if (group.length) {
+  state.suite = firstOf(group)
+}
+
 drawSuitePicker()
 fillTestSelect()
 render()

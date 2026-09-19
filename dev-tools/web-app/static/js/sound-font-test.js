@@ -187,12 +187,12 @@ async function startTheBench() {
 `e-tabs` builds its nav one microtask after EHTML activates it and offers no
 event when a tab is chosen, so the buttons it generates are what we listen on.
 */
-function watchTabs() {
-  const nav = at('steps') && at('steps').querySelector('nav')
-  if (!nav) {
-    return queueMicrotask(watchTabs)
+async function watchTabs() {
+  while (!(at('steps') && at('steps').querySelector('nav'))) {
+    await new Promise((resolve) => setTimeout(resolve))
   }
-  const buttons = [ ...nav.querySelectorAll('button') ]
+  const steps = at('steps')
+  const buttons = [ ...steps.querySelector('nav').querySelectorAll('button') ]
   const bench = buttons.length - 1
   buttons.forEach((button, position) => {
     button.addEventListener('click', () => {
@@ -201,8 +201,12 @@ function watchTabs() {
       }
     })
   })
-  // Opened straight onto the bench by its hash.
-  if (location.hash === '#test-soundfonts') {
+  /*
+  Opened straight onto the bench. Which tab that is comes from e-tabs, which
+  reads the hash and records the answer — naming the hash here would be a copy
+  of the tab's title, spelled its way, to keep in step by hand.
+  */
+  if (Number(steps.getAttribute('data-current-tab')) === bench) {
     startTheBench()
   }
 }
