@@ -7,7 +7,8 @@ const __dirname = resolve(fileURLToPath(import.meta.url), '..')
 const projectRoot = resolve(__dirname, '..')
 const staticDirs = [
   join(projectRoot, 'examples/browser/web-app/static'),
-  join(projectRoot, 'dev-tools/web-app/static')
+  join(projectRoot, 'dev-tools/web-app/static'),
+  join(projectRoot, 'docs/web-app/static')
 ]
 const srcDir = join(projectRoot, 'src')
 

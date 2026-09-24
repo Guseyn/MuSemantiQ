@@ -30,6 +30,14 @@
     "dev-tools:vendor": "npm run dev-tools:nodes:update && npm run dev-tools:ehtml:update && npm run dev-tools:eui:update",
     "dev-tools": "npm run dev-tools:vendor && npm run setup:symlinks && npm run create:msq:worker && npm run web-components:update && node dev-tools/web-app/main.js",
 
+    "docs:ehtml:update": "rsync -a --delete ../../my-projects/EHTML/src/ docs/web-app/static/js/ehtml/",
+    "docs:nodes:update": "rsync -a --delete ../../my-projects/nodes.js/nodes/ docs/nodes/",
+    "docs:eui:update": "rsync -a --delete ../../my-projects/e-ui/static/js/e-ui/ docs/web-app/static/js/e-ui/ && cp -rf ../../my-projects/e-ui/static/css/e-ui.css docs/web-app/static/css/e-ui.css",
+    "docs:vendor": "npm run docs:nodes:update && npm run docs:ehtml:update && npm run docs:eui:update",
+    "docs:check": "node scripts/check-docs-examples.js",
+    "docs:art": "node scripts/generate-landing-art.js",
+    "docs": "npm run docs:vendor && npm run setup:symlinks && npm run create:msq:worker && npm run web-components:update && npm run docs:check && node docs/web-app/main.js",
+
     "examples:browser": "npm run setup:symlinks && npm run create:msq:worker && npm run web-components:update && node examples/browser/web-app/main.js",
     "examples:cli": "node examples/cli/msq.js"
   },
@@ -52,7 +60,8 @@
     "#tools/*": "./tools/*",
 
     "#nodes/*": "./examples/browser/nodes/*",
-    "#dev-nodes/*": "./dev-tools/nodes/*"
+    "#dev-nodes/*": "./dev-tools/nodes/*",
+    "#docs-nodes/*": "./docs/nodes/*"
   },
   "browser.importmap": {
     "#ehtml/": "/js/ehtml/",

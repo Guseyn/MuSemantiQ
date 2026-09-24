@@ -1,0 +1,935 @@
+/*
+The landing page.
+
+Self-contained: e-ui is a design system for tools and this is not a tool, so the
+page carries its own small set of tokens instead of overriding someone else's.
+
+Two ideas hold it together.
+
+The first is the stave. Five hairlines are the one shape this project is about,
+so they are the shape the page is built from — drawn across the opening screen,
+ruling the number of every screen after it, standing as the barline the section
+rail hangs on, and closing the page at the end.
+
+The second is that the page reads as engraving does: a serif for what is set,
+a monospace for what is typed. Those two faces against each other are the whole
+product in miniature, which is why there is no third one and no colour doing
+the work instead.
+
+Nothing here is a gradient. Depth comes from rules, spacing and one accent.
+*/
+
+:root {
+  /* Ink and paper, warm rather than blue. */
+  --paper: #fbfaf7;
+  --surface: #ffffff;
+  --ink: #14161a;
+  --ink-soft: #5f6672;
+  --ink-faint: #9aa0aa;
+  --rule: #e4e1d9;
+  --rule-strong: #cfcabd;
+
+  /*
+  One accent, and it is the colour a note turns while it is sounding. The page
+  borrows it rather than inventing a brand colour that means nothing.
+  */
+  --accent: #c40233;
+
+  --serif: ui-serif, "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --sans: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, system-ui, sans-serif;
+  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+
+  --ease: cubic-bezier(0.22, 0.61, 0.24, 1);
+  --screen-pad: clamp(1.25rem, 5vw, 5rem);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  /*
+  One screen at a time. `always` is what stops a fast flick from skipping a
+  screen, which is the whole point of laying the page out this way.
+  */
+  scroll-snap-type: y mandatory;
+  scrollbar-width: none;
+
+  /*
+  Deliberately no `scroll-behavior: smooth`. Against mandatory snapping it
+  fights fragment navigation: arriving at /#features animates through every
+  screen in between and can be left stranded half way, on a screen nobody
+  asked for. Landing at a fragment is a jump, which snapping handles cleanly;
+  moving between screens from the rail is smoothed in landing.js, where it can
+  be asked for one move at a time.
+  */
+}
+
+html::-webkit-scrollbar {
+  display: none;
+}
+
+body {
+  margin: 0;
+  background-color: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: clamp(1rem, 0.95rem + 0.2vw, 1.0625rem);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── A screen ────────────────────────────────────────────────────────── */
+
+[data-screen] {
+  position: relative;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  min-height: 100svh;
+  padding: clamp(4rem, 10vh, 7rem) var(--screen-pad) clamp(3rem, 8vh, 5rem);
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+
+  /*
+  --vis is the share of the screen that is on screen, written by landing.js.
+  Tying opacity to it is what makes one screen hand over to the next rather
+  than the two of them simply being adjacent.
+  */
+  opacity: clamp(0.08, calc(var(--vis, 1) * 1.45), 1);
+  transition: opacity 0.35s linear;
+}
+
+[data-inner] {
+  width: 100%;
+  max-width: 34rem;
+}
+
+[data-inner][data-wide] {
+  max-width: 54rem;
+}
+
+[data-inner][data-widest] {
+  max-width: 68rem;
+}
+
+/*
+The screen number, set the way a measure number is: small, in the margin,
+above a rule that runs the width of the text.
+*/
+[data-screen]::before {
+  content: attr(data-number);
+  position: absolute;
+  top: clamp(1.75rem, 5vh, 3rem);
+  left: var(--screen-pad);
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.18em;
+  color: var(--ink-faint);
+}
+
+[data-screen]::after {
+  content: "";
+  position: absolute;
+  top: calc(clamp(1.75rem, 5vh, 3rem) + 1.35rem);
+  left: var(--screen-pad);
+  width: 2.25rem;
+  height: 1px;
+  background-color: var(--rule-strong);
+}
+
+/* ── Type ────────────────────────────────────────────────────────────── */
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  font-family: var(--serif);
+  font-weight: 400;
+  letter-spacing: -0.015em;
+}
+
+h1 {
+  font-size: clamp(2rem, 4.4vw, 3.25rem);
+  line-height: 1.1;
+}
+
+h2 {
+  margin-bottom: 1.25rem;
+  font-size: clamp(1.75rem, 3.6vw, 2.75rem);
+  line-height: 1.15;
+}
+
+h3 {
+  margin-bottom: 0.4rem;
+  font-size: 1.0625rem;
+  font-family: var(--sans);
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+code {
+  font-family: var(--mono);
+  font-size: 0.875em;
+  padding: 0.1em 0.35em;
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  background-color: var(--surface);
+}
+
+/* ── The opening screen ──────────────────────────────────────────────── */
+
+[data-hero] {
+  text-align: center;
+}
+
+[data-logo] {
+  display: block;
+  width: 100%;
+  max-width: 190px;
+  margin: 0 auto 2.5rem;
+  aspect-ratio: 836.57 / 120;
+  background-color: var(--ink);
+  -webkit-mask: url('/images/logo.svg') no-repeat center / contain;
+  mask: url('/images/logo.svg') no-repeat center / contain;
+}
+
+[data-lede] {
+  max-width: 34rem;
+  margin: 0 auto 2.25rem;
+}
+
+/*
+The engraved phrase.
+
+Really engraved — the same pipeline the product runs, written out by
+scripts/generate-landing-art.js and put in place by landing.js.
+
+It arrives in two gestures at once: a wipe travelling left to right across the
+whole drawing, and the stave filling in behind it a line at a time. Between
+them they need to know the name of exactly one thing, the stave lines, which
+the generator numbers itself.
+*/
+[data-phrase] {
+  width: min(28rem, 78%);
+  margin: 2.75rem auto;
+  color: var(--ink);
+
+  /*
+  The clip goes here and not on the <svg> inside. Percentages in inset()
+  resolve against the element's reference box, and for an SVG element which
+  box that is depends on how it is laid out; a plain div has one box and no
+  argument about it. Hidden is a sliver off the left edge; drawn is everything,
+  with negative insets so a stem or a beam reaching past the viewBox stays
+  whole.
+  */
+  clip-path: inset(-15% 100% -15% -15%);
+  transition: clip-path 0.9s var(--ease);
+}
+
+[data-phrase][data-drawn="true"] {
+  clip-path: inset(-15% -15% -15% -15%);
+}
+
+[data-phrase] svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+/*
+The stave fills in behind the wipe, one line at a time from the top — which is
+the part the wipe alone could not say, since it reveals a whole column of the
+drawing at once.
+
+Nothing here reaches for a notehead, a stem or a beam. Those are the engine's
+own groups and it arranges them differently depending on the music: the stem of
+a beamed note is not inside the note, it is filed with the beams. Animating
+them by name meant a notehead arriving separately from its own stem, and meant
+the animation quietly changing shape whenever the music did. The wipe carries
+all of it and needs to know none of it.
+*/
+[data-phrase] [data-stave-line] {
+  opacity: 0;
+  transition: opacity 0.35s var(--ease) var(--d, 0ms);
+}
+
+[data-phrase][data-drawn="true"] [data-stave-line] {
+  opacity: 1;
+}
+
+/*
+The closing phrase is the opening one answered: same music, quieter, and it
+waits for its own screen rather than for the page.
+*/
+[data-closing] {
+  width: 100%;
+  margin: 2.5rem 0 1.75rem;
+  color: var(--ink-faint);
+}
+
+/* ── Buttons and links ───────────────────────────────────────────────── */
+
+[data-actions] {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  align-items: center;
+  margin: 0;
+}
+
+[data-hero] [data-actions] {
+  justify-content: center;
+}
+
+[data-button] {
+  padding: 0.7rem 1.4rem;
+  border: 1px solid var(--ink);
+  border-radius: 2px;
+  background-color: var(--ink);
+  color: var(--paper);
+  font-size: 0.9375rem;
+  text-decoration: none;
+  transition: background-color 0.25s var(--ease), color 0.25s var(--ease);
+}
+
+[data-button]:hover,
+[data-button]:focus-visible {
+  background-color: transparent;
+  color: var(--ink);
+}
+
+[data-link] {
+  padding-bottom: 2px;
+  border-bottom: 1px solid var(--rule-strong);
+  color: var(--ink);
+  font-size: 0.9375rem;
+  text-decoration: none;
+  transition: border-color 0.25s var(--ease), color 0.25s var(--ease);
+}
+
+[data-link]:hover,
+[data-link]:focus-visible {
+  border-bottom-color: var(--accent);
+  color: var(--accent);
+}
+
+/* ── Cards ───────────────────────────────────────────────────────────── */
+
+/* ── The feature carousel ────────────────────────────────────────────── */
+
+/*
+One feature at a time. The card is most of the width with the next just showing
+at the edge, so it is obvious there is more without a label saying so, and the
+buttons move the row by exactly one card.
+
+The viewport is masked rather than clipped: a card leaves by fading out at the
+edge instead of being sliced down the middle. The mask is on a wrapper and not
+on the scroller itself, because a mask creates a containing block and the
+sticky-free scroll position is easier to reason about when the two are separate
+elements.
+*/
+[data-carousel] {
+  margin-top: 2rem;
+}
+
+[data-carousel-viewport] {
+  margin: 0 calc(var(--screen-pad) * -1);
+  padding: 0 var(--screen-pad);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -webkit-mask: linear-gradient(
+    to right,
+    transparent 0,
+    #000 calc(var(--screen-pad) * 0.9),
+    #000 calc(100% - var(--screen-pad) * 0.9),
+    transparent 100%
+  );
+  mask: linear-gradient(
+    to right,
+    transparent 0,
+    #000 calc(var(--screen-pad) * 0.9),
+    #000 calc(100% - var(--screen-pad) * 0.9),
+    transparent 100%
+  );
+}
+
+[data-carousel-viewport]::-webkit-scrollbar {
+  display: none;
+}
+
+[data-cards] {
+  display: flex;
+  gap: 1.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/*
+82% of the viewport, always. A rem cap here would let two cards share a wide
+screen, which is the thing this layout exists to avoid: one feature is read at
+a time, and the sliver of the next is what says there are more.
+*/
+[data-card] {
+  flex: 0 0 82%;
+  display: flex;
+  flex-direction: column;
+  padding: 2rem 1.85rem;
+  border: 1px solid var(--rule);
+  background-color: var(--surface);
+  scroll-snap-align: center;
+}
+
+/* So cards of unequal length still close at the same depth. */
+[data-card] [data-to-write] {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+[data-carousel-controls] {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1.5rem;
+}
+
+[data-carousel-controls] button {
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  border: 1px solid var(--rule-strong);
+  border-radius: 50%;
+  background-color: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  transition: border-color 0.25s var(--ease), color 0.25s var(--ease);
+}
+
+[data-carousel-controls] button:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+[data-carousel-controls] button:disabled {
+  color: var(--ink-faint);
+  border-color: var(--rule);
+  cursor: default;
+}
+
+[data-carousel-controls] svg {
+  width: 1rem;
+  height: 1rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+[data-carousel-count] {
+  min-width: 4rem;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--ink-faint);
+  text-align: center;
+}
+
+[data-art] {
+  width: 3.25rem;
+  height: 3.25rem;
+  margin-bottom: 1.1rem;
+  color: var(--ink-soft);
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ── The pipeline diagram ────────────────────────────────────────────── */
+
+[data-flow-layout] {
+  display: grid;
+  grid-template-columns: minmax(0, 15rem) minmax(0, 1fr);
+  gap: clamp(1.5rem, 4vw, 3.5rem);
+  margin-top: 1.75rem;
+  /* The prose sits against the middle of the diagram rather than its top. */
+  align-items: center;
+}
+
+[data-flow] {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* The arrow between one stage and the next. */
+[data-flow] li + li::before {
+  content: "";
+  display: block;
+  justify-self: center;
+  width: 1px;
+  height: 1.35rem;
+  background-color: var(--rule-strong);
+}
+
+[data-flow] li {
+  display: grid;
+  opacity: 0;
+  transform: translateY(8px);
+  transition:
+    opacity 0.5s var(--ease) var(--d, 0ms),
+    transform 0.5s var(--ease) var(--d, 0ms);
+}
+
+[data-screen][data-visible="true"] [data-flow] li {
+  opacity: 1;
+  transform: none;
+}
+
+[data-stage-button] {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  width: 100%;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid var(--rule-strong);
+  border-radius: 2px;
+  background-color: var(--surface);
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 0.8125rem;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.25s var(--ease), color 0.25s var(--ease);
+}
+
+[data-stage-button]:hover,
+[data-stage-button][aria-current="true"] {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+[data-stage-art] {
+  flex: 0 0 auto;
+  width: 1.4rem;
+  height: 1.4rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/*
+The four outputs are one stage, not four more. They share the single arrow down
+from the schema, and a bracket down their left says they are branches of it
+rather than a queue.
+*/
+[data-outputs] {
+  position: relative;
+  gap: 0.4rem;
+  padding-left: 1.25rem;
+}
+
+[data-outputs]::after {
+  content: "";
+  position: absolute;
+  top: 1.1rem;
+  bottom: 1.1rem;
+  left: 0.4rem;
+  width: 1px;
+  background-color: var(--rule-strong);
+}
+
+/* ── The notes beside the diagram ────────────────────────────────────── */
+
+[data-flow-notes] {
+  display: grid;
+}
+
+/*
+Every note is stacked in the same cell and only the current one is shown, so
+the column does not change height as the reader moves down the diagram.
+*/
+[data-flow-notes] > div {
+  grid-area: 1 / 1;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.3s var(--ease), transform 0.3s var(--ease);
+  pointer-events: none;
+}
+
+[data-flow-notes] > div[data-current="true"] {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+
+[data-flow-notes] h3 {
+  font-family: var(--mono);
+  font-size: 0.8125rem;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+/* ── Output blocks ───────────────────────────────────────────────────── */
+
+[data-blocks] {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: 1.25rem;
+  margin: 1.75rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+[data-block] {
+  display: flex;
+  flex-direction: column;
+  padding: 1.35rem 1.2rem;
+  border: 1px solid var(--rule);
+  background-color: var(--surface);
+}
+
+[data-block] [data-art] {
+  width: 2.5rem;
+  height: 2.5rem;
+  margin-bottom: 0.9rem;
+}
+
+[data-block] [data-to-write] {
+  flex: 1;
+  margin-bottom: 0;
+  font-size: 0.8125rem;
+}
+
+/* ── The element list ────────────────────────────────────────────────── */
+
+[data-elements] {
+  display: grid;
+  gap: 1px;
+  margin: 1.75rem 0 0;
+  padding: 0;
+  list-style: none;
+  border: 1px solid var(--rule);
+  background-color: var(--rule);
+}
+
+[data-elements] li {
+  display: grid;
+  grid-template-columns: minmax(0, 11rem) minmax(0, 1fr);
+  gap: 1rem;
+  align-items: center;
+  padding: 0.7rem 1rem;
+  background-color: var(--surface);
+}
+
+[data-elements] code {
+  border: none;
+  background: none;
+  padding: 0;
+  color: var(--accent);
+}
+
+[data-elements] [data-to-write] {
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  font-size: 0.8125rem;
+}
+
+/* ── Code ────────────────────────────────────────────────────────────── */
+
+[data-columns] {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+  gap: clamp(1.5rem, 4vw, 3rem);
+  margin-top: 1.75rem;
+}
+
+[data-column] h3 {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 0.85rem;
+}
+
+[data-code] {
+  margin: 0 0 1rem;
+  padding: 1.1rem 1.2rem;
+  overflow-x: auto;
+  border: 1px solid var(--rule);
+  background-color: var(--surface);
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  line-height: 1.7;
+  white-space: pre;
+}
+
+[data-code] code {
+  padding: 0;
+  border: none;
+  background: none;
+  font-size: inherit;
+}
+
+/* ── A score on the page ─────────────────────────────────────────────── */
+
+/*
+No frame. The components draw their own surface and their own toolbar, and a
+box around that is a second border around a thing that already has one.
+*/
+[data-figure] {
+  margin-top: 2rem;
+  overflow-x: auto;
+}
+
+/* A score meant to hold the full width of the screen rather than the column. */
+[data-figure][data-full] {
+  margin-inline: calc(var(--screen-pad) * -0.5);
+}
+
+[data-figure][data-full] > * {
+  width: 100%;
+}
+
+/* ── The section rail ────────────────────────────────────────────────── */
+
+/*
+A barline down the right edge with a notehead per screen. It is the page's
+table of contents and its progress indicator at once.
+*/
+[data-rail] {
+  position: fixed;
+  top: 50%;
+  right: clamp(0.85rem, 2.5vw, 1.75rem);
+  z-index: 50;
+  display: grid;
+  gap: 0.85rem;
+  translate: 0 -50%;
+}
+
+[data-rail]::before {
+  content: "";
+  position: absolute;
+  top: -0.5rem;
+  bottom: -0.5rem;
+  left: 50%;
+  width: 1px;
+  translate: -50% 0;
+  background-color: var(--rule-strong);
+}
+
+/*
+The marker is a quaver, and a real one: the same glyph the engine draws, taken
+straight out of an engraved page by scripts/generate-landing-art.js. It is
+masked rather than drawn so a single background-color carries it from grey to
+the red a note turns while it is sounding.
+
+The aspect ratio is the glyph's own — 21.23 by 36.87 — so it is never squashed.
+*/
+[data-rail] a {
+  position: relative;
+  display: block;
+  width: 11px;
+  height: calc(11px * 36.87 / 21.23);
+  background-color: var(--ink-faint);
+  -webkit-mask: url('/images/note.svg') no-repeat center / contain;
+  mask: url('/images/note.svg') no-repeat center / contain;
+  transition: background-color 0.3s var(--ease), scale 0.3s var(--ease);
+}
+
+[data-rail] a:hover,
+[data-rail] a:focus-visible {
+  background-color: var(--ink);
+}
+
+[data-rail] a[aria-current="true"] {
+  background-color: var(--accent);
+  scale: 1.18;
+}
+
+/* The screen's name, shown on hover rather than crowding the rail. */
+[data-rail] a::after {
+  content: attr(data-label);
+  position: absolute;
+  top: 50%;
+  right: calc(100% + 0.75rem);
+  padding: 0.2rem 0.5rem;
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  background-color: var(--surface);
+  color: var(--ink-soft);
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  white-space: nowrap;
+  translate: 0 -50%;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s var(--ease);
+}
+
+[data-rail] a:hover::after,
+[data-rail] a:focus-visible::after {
+  opacity: 1;
+}
+
+/* ── The scroll hint ─────────────────────────────────────────────────── */
+
+[data-scroll-hint] {
+  position: absolute;
+  bottom: clamp(1.5rem, 5vh, 2.75rem);
+  left: 50%;
+  translate: -50% 0;
+  display: grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 2.5rem;
+  transition: opacity 0.4s var(--ease);
+}
+
+[data-scroll-hint] span {
+  display: block;
+  width: 1px;
+  height: 1.75rem;
+  background-color: var(--rule-strong);
+  transform-origin: top center;
+  animation: hint 2.4s var(--ease) infinite;
+}
+
+@keyframes hint {
+  0%   { transform: scaleY(0); opacity: 0; }
+  35%  { transform: scaleY(1); opacity: 1; }
+  70%  { transform: scaleY(1); opacity: 1; }
+  100% { transform: scaleY(1) translateY(1.75rem); opacity: 0; }
+}
+
+/* Once the reader has scrolled it has done its job. */
+body[data-scrolled="true"] [data-scroll-hint] {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ── Reveal ──────────────────────────────────────────────────────────── */
+
+/*
+Set up only once landing.js confirms it is running, so that with no JavaScript
+the page is simply a page rather than a column of invisible sections.
+*/
+body[data-enhanced="true"] [data-reveal] {
+  opacity: 0;
+  transform: translateY(14px);
+  transition:
+    opacity 0.7s var(--ease) var(--d, 0ms),
+    transform 0.7s var(--ease) var(--d, 0ms);
+}
+
+body[data-enhanced="true"] [data-screen][data-visible="true"] [data-reveal] {
+  opacity: 1;
+  transform: none;
+}
+
+/* ── Authoring notes ─────────────────────────────────────────────────── */
+
+/*
+The prose is not written and the page says so rather than pretending. Quiet
+enough to read past, marked clearly enough not to be mistaken for copy.
+*/
+[data-to-write] {
+  position: relative;
+  margin: 0 0 1.5rem;
+  padding: 0.85rem 1rem 0.85rem 1.15rem;
+  border: 1px dashed var(--rule-strong);
+  background-color: var(--surface);
+  color: var(--ink-soft);
+  font-size: 0.875rem;
+  line-height: 1.6;
+  text-align: left;
+}
+
+[data-hero] [data-to-write] {
+  text-align: center;
+}
+
+/* ── Footer ──────────────────────────────────────────────────────────── */
+
+[data-footer] {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  justify-content: center;
+}
+
+/* ── Narrow screens ──────────────────────────────────────────────────── */
+
+@media (max-width: 40rem) {
+  [data-rail] a::after {
+    display: none;
+  }
+
+  [data-cards] {
+    grid-template-columns: 1fr;
+  }
+
+  [data-screen]::before,
+  [data-screen]::after {
+    left: 1rem;
+  }
+}
+
+/* ── Reduced motion ──────────────────────────────────────────────────── */
+
+/*
+Everything above is decoration on top of a page that already works. Asked for
+less movement, it is all removed rather than shortened — including the snapping,
+which is itself motion the reader did not ask for.
+*/
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-snap-type: none;
+    scroll-behavior: auto;
+  }
+
+  [data-screen] {
+    opacity: 1;
+  }
+
+  /* The phrase is simply there: no wipe, and nothing written on afterwards. */
+  [data-phrase] {
+    clip-path: none;
+    transition: none;
+  }
+
+  [data-phrase] [data-stave-line] {
+    opacity: 1;
+    transition: none;
+  }
+
+  [data-scroll-hint] span {
+    animation: none;
+  }
+
+  body[data-enhanced="true"] [data-reveal] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}

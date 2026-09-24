@@ -1,0 +1,233 @@
+/*
+What e-ui does not cover for a documentation site: a sidebar that is a table of
+contents rather than an icon rail, markdown typography, and the authoring notes.
+e-ui.css is loaded first and everything here is an override of it.
+*/
+
+:root {
+  /*
+  e-sidebar opens to 20rem and collapses to a 4.5rem rail. A table of contents
+  is not usable as a rail, so the two widths are the same: app.js holds it open,
+  and this makes the state it would collapse to no narrower.
+  */
+  --e-sidebar-collapsed: 19rem;
+  --e-sidebar-expanded: 19rem;
+
+  --docs-note-bg: #fdf6e3;
+  --docs-note-border: #b58900;
+  --docs-note-fg: #6b5424;
+}
+
+/* ── Sidebar as a table of contents ─────────────────────────────────── */
+
+e-sidebar {
+  padding-top: var(--e-spacing-md);
+}
+
+e-sidebar header {
+  padding: var(--e-spacing-md) var(--e-spacing-sm);
+}
+
+e-sidebar header [data-logo] {
+  display: block;
+  aspect-ratio: 836.57 / 120;
+  max-width: 150px;
+  background-color: var(--e-fg);
+  -webkit-mask: url('/images/logo.svg') no-repeat center / contain;
+  mask: url('/images/logo.svg') no-repeat center / contain;
+}
+
+/*
+The nav is a list, not a row of icons: left aligned, tight, and scrolling on its
+own so the header and footer stay put.
+*/
+e-sidebar nav {
+  align-items: stretch;
+  gap: 0;
+  overflow-y: auto;
+  padding-right: var(--e-spacing-xs);
+}
+
+e-sidebar nav [data-section] {
+  display: block;
+  margin-top: var(--e-spacing-md);
+  padding: var(--e-spacing-xs) var(--e-spacing-sm);
+  font-size: var(--e-font-size-xs);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--e-muted);
+}
+
+e-sidebar nav [data-group] {
+  display: block;
+  margin-top: var(--e-spacing-sm);
+  padding: 0 var(--e-spacing-sm) 0 var(--e-spacing-md);
+  font-size: var(--e-font-size-2xs);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--e-muted);
+  opacity: 0.8;
+}
+
+/*
+These links carry no icon, which is what e-ui centres them around, so the
+padding and the alignment are set here rather than inherited.
+*/
+e-sidebar nav a {
+  display: block;
+  width: 100%;
+  justify-content: flex-start;
+  padding: 0.3rem var(--e-spacing-sm) 0.3rem var(--e-spacing-lg);
+  border-radius: var(--e-radius-sm);
+  font-size: var(--e-font-size-sm);
+  line-height: 1.45;
+  color: var(--e-fg);
+  text-decoration: none;
+}
+
+e-sidebar nav a > span {
+  display: inline;
+}
+
+e-sidebar nav a:hover {
+  background-color: var(--e-primary-transparent-accent-bg);
+}
+
+e-sidebar nav a[data-selected="true"] {
+  font-weight: 700;
+  color: var(--e-primary);
+  background-color: var(--e-primary-transparent-accent-bg);
+}
+
+e-sidebar footer {
+  gap: var(--e-spacing-md);
+  padding: var(--e-spacing-md) var(--e-spacing-sm);
+  font-size: var(--e-font-size-sm);
+}
+
+/* ── The page itself ────────────────────────────────────────────────── */
+
+main[is="e-main"] {
+  padding: var(--e-spacing-xl) var(--e-spacing-lg) var(--e-spacing-3xl);
+}
+
+[data-content] {
+  max-width: 48rem;
+  margin: 0 auto;
+}
+
+[data-content] h1 {
+  margin: 0 0 var(--e-spacing-lg);
+  font-size: var(--e-font-h1);
+  line-height: 1.15;
+}
+
+[data-content] h2 {
+  margin: var(--e-spacing-2xl) 0 var(--e-spacing-sm);
+  font-size: var(--e-font-h3);
+}
+
+[data-content] h3 {
+  margin: var(--e-spacing-xl) 0 var(--e-spacing-xs);
+  font-size: var(--e-font-h5);
+}
+
+[data-content] p,
+[data-content] li {
+  line-height: 1.65;
+}
+
+[data-content] code {
+  padding: 0.1em 0.35em;
+  border-radius: var(--e-radius-sm);
+  background-color: var(--e-primary-transparent-accent-bg);
+  font-family: var(--e-font-mono);
+  font-size: 0.9em;
+}
+
+[data-content] pre {
+  overflow-x: auto;
+  padding: var(--e-spacing-md);
+  border-radius: var(--e-radius-md);
+  background-color: var(--e-surface-bg);
+  border: 1px solid var(--e-border);
+}
+
+[data-content] pre code {
+  padding: 0;
+  background: none;
+}
+
+[data-content] table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: var(--e-spacing-md) 0;
+}
+
+[data-content] th,
+[data-content] td {
+  padding: var(--e-spacing-xs) var(--e-spacing-sm);
+  border-bottom: 1px solid var(--e-divider);
+  text-align: left;
+}
+
+/*
+An engraved score is wider than the prose column often enough that it has to be
+allowed to scroll on its own rather than widening the page.
+*/
+[data-content] [data-rendered-by] {
+  overflow-x: auto;
+  margin: var(--e-spacing-lg) 0;
+}
+
+/* ── Authoring notes ────────────────────────────────────────────────── */
+
+/*
+Every unwritten section says so, on the page, so the gaps are visible while
+reading rather than only while grepping. `grep -rc "TO WRITE" md/` is the
+progress meter. When a section is written its blockquote goes, and the styling
+goes with it.
+*/
+[data-content] blockquote {
+  margin: var(--e-spacing-md) 0;
+  padding: var(--e-spacing-sm) var(--e-spacing-md);
+  border-left: 3px solid var(--docs-note-border);
+  border-radius: 0 var(--e-radius-sm) var(--e-radius-sm) 0;
+  background-color: var(--docs-note-bg);
+  color: var(--docs-note-fg);
+}
+
+[data-content] blockquote p:first-child {
+  margin-top: 0;
+}
+
+[data-content] blockquote ul {
+  margin: var(--e-spacing-xs) 0 0;
+  padding-left: var(--e-spacing-lg);
+}
+
+[data-content] blockquote code {
+  background-color: rgba(181, 137, 0, 0.16);
+}
+
+/* ── Narrow screens ─────────────────────────────────────────────────── */
+
+@media (max-width: 980px) {
+  main[is="e-main"] {
+    padding: var(--e-spacing-lg) var(--e-spacing-md) var(--e-spacing-2xl);
+  }
+
+  [data-overlay] {
+    position: fixed;
+    inset: 0;
+    z-index: 99;
+    display: none;
+    background-color: rgba(0, 0, 0, 0.35);
+  }
+
+  body:has(e-sidebar[data-state="open"]) [data-overlay] {
+    display: block;
+  }
+}

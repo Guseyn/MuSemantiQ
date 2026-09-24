@@ -1,0 +1,26 @@
+{
+  "chord-letters": {
+    "gentium plus": "/font/chord-letters/GentiumPlus-Regular.ttf",
+    "gothic a1": "/font/chord-letters/GothicA1-Regular.ttf"
+  },
+  "text": {
+    "noto-serif": {
+      "regular": "/font/text/NotoSerif-Regular.ttf",
+      "bold": "/font/text/NotoSerif-Bold.ttf"
+    },
+    "noto-sans": {
+      "regular": "/font/text/NotoSans-Regular.ttf",
+      "bold": "/font/text/NotoSans-Bold.ttf"
+    }
+  },
+  "music": {
+    "bravura": {
+      "font": "/font/music/Bravura.otf",
+      "js": "/js/msq/worker/drawer/font/music-js/bravura.js"
+    },
+    "leland": {
+      "font": "/font/music/Leland.otf",
+      "js": "/js/msq/worker/drawer/font/music-js/leland.js"
+    }
+  }
+}

@@ -25,7 +25,8 @@ const sourceDir = path.join(projectRoot, 'web-components')
 
 const outDirs = [
   'examples/browser/web-app/static/js/msq/web-components',
-  'dev-tools/web-app/static/js/msq/web-components'
+  'dev-tools/web-app/static/js/msq/web-components',
+  'docs/web-app/static/js/msq/web-components'
 ].map((relative) => path.join(projectRoot, relative))
 
 // What documents the folder rather than being part of it.

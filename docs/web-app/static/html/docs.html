@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>MuSemantiQ documentation</title>
+    <meta
+      name="description"
+      content="Documentation for MuSemantiQ: the MSQ language, the JavaScript API, the web components and the tools."
+    >
+    <link rel="stylesheet" href="/css/e-ui.css">
+    <link rel="stylesheet" href="/css/docs.css">
+
+    <script type="importmap">
+      {
+        "imports": {
+          "#ehtml/": "/js/ehtml/",
+          "#ehtml/main": "/js/ehtml/main.js",
+          "#e-ui/": "/js/e-ui/",
+          "#msq/web-components/": "/js/msq/web-components/",
+          "#msq/language/": "/js/msq/language/"
+        }
+      }
+    </script>
+
+    <!--
+      Before anything else, and not a module: it decides how the sidebar opens,
+      and e-sidebar reads that decision the moment EHTML activates it.
+    -->
+    <script src="/js/app.js"></script>
+
+    <script type="module">
+      /*
+      The msq elements are plain custom elements driven by connectedCallback, so
+      defining them here is enough for any that markdown inserts later.
+
+      '#ehtml/main' goes last. Every e-ui component waits for the
+      'ehtml:activated' event and does nothing at all until EHTML dispatches it.
+      */
+      import '#msq/web-components/msq-font-loader-template.js'
+      import '#msq/web-components/msq-svg-template.js'
+      import '#msq/web-components/msq-midi-template.js'
+      import '#msq/web-components/msq-svg-midi-template.js'
+      import '#msq/web-components/msq-editor-template.js'
+
+      import '#e-ui/e-sidebar.js'
+      import '#ehtml/main'
+    </script>
+  </head>
+
+  <body>
+    <e-sidebar
+      data-side="left"
+      data-mobile-header="[data-mobile-header]"
+      data-mobile-menu-icon="/images/menu.svg"
+      data-mobile-body-overlay="[data-overlay]"
+      data-show-scrollbar
+    >
+      <!--
+        All three of header, nav and footer have to be here: e-sidebar observes
+        the first and the last without checking they exist.
+      -->
+      <header>
+        <a href="/" data-logo aria-label="MuSemantiQ"></a>
+      </header>
+
+      <!-- Filled from the sitemap by docs.js. -->
+      <nav aria-label="Documentation"></nav>
+
+      <footer>
+        <a is="e-link" href="/">Home</a>
+        <a is="e-link" href="https://github.com/Guseyn/MuSemantiQ">GitHub</a>
+      </footer>
+    </e-sidebar>
+
+    <main is="e-main">
+      <div data-mobile-header></div>
+      <div data-overlay></div>
+
+      <!--
+        The font loader is rendered here, once. It replaces itself with its own
+        content, so what ends up in this element is the readiness marker and
+        nothing else — every example on every page finds the fonts by name.
+      -->
+      <div data-fonts hidden></div>
+
+      <article data-content>
+        <noscript>
+          <h1>MuSemantiQ documentation</h1>
+          <p>
+            The documentation is assembled in the browser, so JavaScript has to
+            be enabled to read it.
+          </p>
+        </noscript>
+      </article>
+    </main>
+
+    <script type="module" src="/js/docs.js"></script>
+  </body>
+</html>

@@ -189,4 +189,24 @@ dev-tools/web-app/static/font/
 dev-tools/web-app/static/magenta-sound-font/
 dev-tools/web-app/static/images/logo.svg
 
+# The same story under docs/. `npm run docs` rebuilds all of it before starting,
+# so a clone needs none of it tracked:
+#
+#   nodes/            npm run docs:nodes:update   (from ../nodes.js)
+#   js/ehtml/         npm run docs:ehtml:update   (from ../EHTML)
+#   js/e-ui/, e-ui.css  npm run docs:eui:update   (from ../e-ui)
+#   js/msq/           npm run web-components:update + create:msq:worker
+#   font/             npm run setup:symlinks
+#   images/logo.svg   npm run setup:symlinks
+#
+# The pages, the markdown, the sitemap and the config are the app, and are tracked.
+docs/nodes/
+docs/web-app/static/js/ehtml/
+docs/web-app/static/js/e-ui/
+docs/web-app/static/js/msq/
+docs/web-app/static/css/e-ui.css
+docs/web-app/static/font/
+docs/web-app/static/magenta-sound-font/
+docs/web-app/static/images/logo.svg
+
 .DS_Store
