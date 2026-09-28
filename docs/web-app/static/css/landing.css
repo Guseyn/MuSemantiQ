@@ -8,8 +8,7 @@ Two ideas hold it together.
 
 The first is the stave. Five hairlines are the one shape this project is about,
 so they are the shape the page is built from — drawn across the opening screen,
-ruling the number of every screen after it, standing as the barline the section
-rail hangs on, and closing the page at the end.
+ruling the number of every screen after it, and closing the page at the end.
 
 The second is that the page reads as engraving does: a serif for what is set,
 a monospace for what is typed. Those two faces against each other are the whole
@@ -372,6 +371,23 @@ elements.
 }
 
 /*
+Room after the last card to scroll it into the middle, the way every other card
+sits.
+
+The viewport's right padding cannot give that room. The cards overflow this
+list, not the viewport, and a scroller adds its end padding after its child's
+box, which is only as wide as the viewport, and not after the cards spilling
+out of it. So the row stopped with the last card flush against the right edge,
+half of it inside the fade. This spacer is the rest of the row: gap plus spacer
+is half of what the card leaves free (9% of the list) plus the viewport's
+padding.
+*/
+[data-cards]::after {
+  content: "";
+  flex: 0 0 calc(9% + var(--screen-pad) - 1.5rem);
+}
+
+/*
 82% of the viewport, always. A rem cap here would let two cards share a wide
 screen, which is the thing this layout exists to avoid: one feature is read at
 a time, and the sliver of the next is what says there are more.
@@ -617,40 +633,50 @@ the column does not change height as the reader moves down the diagram.
   font-size: 0.8125rem;
 }
 
-/* ── The element list ────────────────────────────────────────────────── */
+/* ── The element examples ────────────────────────────────────────────── */
 
-[data-elements] {
-  display: grid;
-  gap: 1px;
-  margin: 1.75rem 0 0;
+/*
+The feature carousel again, with each card holding a running element instead of
+a drawing. The title is the element's own name, set as code in the accent,
+because that name is what the reader will type.
+*/
+[data-examples] [data-card] {
+  padding: 1.5rem 1.5rem 1.75rem;
+}
+
+[data-examples] h3 code {
   padding: 0;
-  list-style: none;
-  border: 1px solid var(--rule);
-  background-color: var(--rule);
-}
-
-[data-elements] li {
-  display: grid;
-  grid-template-columns: minmax(0, 11rem) minmax(0, 1fr);
-  gap: 1rem;
-  align-items: center;
-  padding: 0.7rem 1rem;
-  background-color: var(--surface);
-}
-
-[data-elements] code {
   border: none;
   background: none;
-  padding: 0;
   color: var(--accent);
+  font-size: 0.9375rem;
 }
 
-[data-elements] [data-to-write] {
+/*
+The note sits at its own height here, rather than stretching to close every card
+at the same depth: the element under it is what should line up from card to
+card.
+*/
+[data-examples] [data-card] [data-to-write] {
+  flex: none;
+  margin-bottom: 1.25rem;
+}
+
+/*
+A score wider than its card scrolls inside the card rather than stretching the
+card, which would throw off the one-card-at-a-time row.
+*/
+[data-example] {
+  min-width: 0;
+  overflow-x: auto;
+}
+
+[data-example] > * {
+  width: 100%;
+}
+
+[data-example][data-code] {
   margin: 0;
-  padding: 0;
-  border: none;
-  background: none;
-  font-size: 0.8125rem;
 }
 
 /* ── Code ────────────────────────────────────────────────────────────── */
@@ -702,20 +728,11 @@ box around that is a second border around a thing that already has one.
   overflow-x: auto;
 }
 
-/* A score meant to hold the full width of the screen rather than the column. */
-[data-figure][data-full] {
-  margin-inline: calc(var(--screen-pad) * -0.5);
-}
-
-[data-figure][data-full] > * {
-  width: 100%;
-}
-
 /* ── The section rail ────────────────────────────────────────────────── */
 
 /*
-A barline down the right edge with a notehead per screen. It is the page's
-table of contents and its progress indicator at once.
+A column of notes down the right edge, one per screen. It is the page's table
+of contents and its progress indicator at once.
 */
 [data-rail] {
   position: fixed;
@@ -725,17 +742,6 @@ table of contents and its progress indicator at once.
   display: grid;
   gap: 0.85rem;
   translate: 0 -50%;
-}
-
-[data-rail]::before {
-  content: "";
-  position: absolute;
-  top: -0.5rem;
-  bottom: -0.5rem;
-  left: 50%;
-  width: 1px;
-  translate: -50% 0;
-  background-color: var(--rule-strong);
 }
 
 /*

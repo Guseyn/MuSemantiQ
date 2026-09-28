@@ -25,6 +25,14 @@
       }
     </script>
     <script type="module">
+      /*
+      Safari does not implement customized built-in elements — <template is="…">,
+      which is what every msq element is — so this polyfill goes first, before
+      anything defines one. The page does not load EHTML, which is what brings it
+      elsewhere, so it comes from web-components/lib.
+      */
+      import '#msq/web-components/lib/custom-elements-polyfill.js'
+
       import '#msq/web-components/msq-font-loader-template.js'
       import '#msq/web-components/msq-svg-template.js'
       import '#msq/web-components/msq-midi-template.js'
@@ -538,7 +546,73 @@
             then write the music as the content of an element.
           </p>
 
-          <div data-figure data-full data-reveal style="--d: 120ms">
+          <!--
+            Every element there is, one per card, each showing itself: a title,
+            a line on what it is for, and the element running. It is the same
+            carousel as "What you get" (landing.js wires any [data-carousel]),
+            so it scrolls by trackpad, touch and keyboard, and the buttons move
+            it one card at a time.
+
+            All of them play the same short air, so what changes from card to
+            card is the element and not the music.
+          -->
+          <div data-carousel data-examples data-reveal style="--d: 120ms">
+            <div data-carousel-viewport>
+              <ul data-cards>
+                <li data-card>
+                  <h3><code>msq-svg</code></h3>
+                  <p data-to-write>TO WRITE — the score, and nothing else.</p>
+                  <div data-example>
+<template
+  is="msq-svg"
+  data-font-sources="msqFontSources"
+>
+title is "Air"
+left subtitle is "traditional"
+
+measure
+treble clef
+key signature is g major for each line
+time signature is 4:4 for each line
+1/8 g beamed, a, b, c5 not beamed
+1/4 d5
+1/4 b with dynamic "mp"
+
+measure
+1/8 c5 beamed, b, a, g not beamed
+1/2 g with fermata
+
+slur from first unit to fourth unit
+</template>
+                  </div>
+                </li>
+
+                <li data-card>
+                  <h3><code>msq-midi</code></h3>
+                  <p data-to-write>TO WRITE — playback only; needs no fonts.</p>
+                  <div data-example>
+<template is="msq-midi">
+measure
+treble clef
+key signature is g major for each line
+time signature is 4:4 for each line
+1/8 g beamed, a, b, c5 not beamed
+1/4 d5
+1/4 b with dynamic "mp"
+
+measure
+1/8 c5 beamed, b, a, g not beamed
+1/2 g with fermata
+
+slur from first unit to fourth unit
+</template>
+                  </div>
+                </li>
+
+                <li data-card>
+                  <h3><code>msq-svg-midi</code></h3>
+                  <p data-to-write>TO WRITE — both, notes lighting as they sound.</p>
+                  <div data-example>
 <template
   is="msq-svg-midi"
   data-font-sources="msqFontSources"
@@ -560,16 +634,72 @@ measure
 
 slur from first unit to fourth unit
 </template>
-          </div>
+                  </div>
+                </li>
 
-          <!-- Every element there is, and what each is for. -->
-          <ul data-elements data-reveal style="--d: 200ms">
-            <li><code>msq-svg</code><span data-to-write>TO WRITE — the score, and nothing else.</span></li>
-            <li><code>msq-midi</code><span data-to-write>TO WRITE — playback only; needs no fonts.</span></li>
-            <li><code>msq-svg-midi</code><span data-to-write>TO WRITE — both, notes lighting as they sound.</span></li>
-            <li><code>msq-editor</code><span data-to-write>TO WRITE — editable, highlighted, navigable.</span></li>
-            <li><code>msq-font-loader</code><span data-to-write>TO WRITE — wraps them; registers the fonts once.</span></li>
-          </ul>
+                <li data-card>
+                  <h3><code>msq-editor</code></h3>
+                  <p data-to-write>TO WRITE — editable, highlighted, navigable.</p>
+                  <div data-example>
+<template
+  is="msq-editor"
+  data-font-sources="msqFontSources"
+  data-editor-height="200px"
+>
+title is "Air"
+left subtitle is "traditional"
+
+measure
+treble clef
+key signature is g major for each line
+time signature is 4:4 for each line
+1/8 g beamed, a, b, c5 not beamed
+1/4 d5
+1/4 b with dynamic "mp"
+
+measure
+1/8 c5 beamed, b, a, g not beamed
+1/2 g with fermata
+
+slur from first unit to fourth unit
+</template>
+                  </div>
+                </li>
+
+                <li data-card>
+                  <h3><code>msq-font-loader</code></h3>
+                  <p data-to-write>TO WRITE — wraps them; registers the fonts once.</p>
+                  <!--
+                    The one element with nothing to show: it draws nothing
+                    itself. This whole page is inside one, so what it looks like
+                    running is every other card; what it looks like written is
+                    this.
+                  -->
+                  <pre data-code data-example><code>&lt;template
+  is="msq-font-loader"
+  data-font-sources-reference="fonts"
+  data-font-config-src="/fonts.json"
+&gt;
+  &lt;template is="msq-svg" data-font-sources="fonts"&gt;
+    measure
+    treble clef
+    c d e f
+  &lt;/template&gt;
+&lt;/template&gt;</code></pre>
+                </li>
+              </ul>
+            </div>
+
+            <div data-carousel-controls>
+              <button type="button" data-carousel-prev aria-label="Previous">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+              </button>
+              <span data-carousel-count aria-live="polite"></span>
+              <button type="button" data-carousel-next aria-label="Next">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+              </button>
+            </div>
+          </div>
         </div>
       </section>
 

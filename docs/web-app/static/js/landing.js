@@ -256,7 +256,17 @@ function wireFlow(layout) {
 const rail = document.querySelector('[data-rail]')
 const known = new Set()
 
+/*
+Kept rather than read back off the dots, because the dots do not last: the rail
+is rebuilt when the font loader puts the rest of the screens in, and the first
+screen has usually been marked current by then. Its ratio does not change, so
+the observer never reports it again, and without this the rebuilt rail would
+show no screen as current until the reader scrolled.
+*/
+let currentId = null
+
 function current(id) {
+  currentId = id
   for (const dot of rail.children) {
     if (dot.getAttribute('href') === `#${id}`) {
       dot.setAttribute('aria-current', 'true')
@@ -304,6 +314,10 @@ function take() {
     dots.appendChild(dot)
   }
   rail.replaceChildren(dots)
+
+  if (currentId) {
+    current(currentId)
+  }
 }
 
 take()
