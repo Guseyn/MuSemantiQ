@@ -153,12 +153,26 @@ class MuSemantiQEditor extends MSQTemplateElement {
     // The first #mountGenerated ran before the editor existed, so the layer
     // still holds the ref-id-less highlights initializeEditor produced.
     this.#applyRenderedHighlights()
+
+    /*
+    data-opens-with="text" opens on the source rather than the score, for pages
+    that teach the language: what you type comes first, what it engraves is one
+    click away. It is decided here, after the score has been laid out, because
+    the text view takes its size from the score. Focus stays where it is — a
+    page of examples must not scroll to whichever one opened last.
+    */
+    if (this.getAttribute('data-opens-with') === 'text') {
+      this.#showTextView({ focus: false })
+      this.#fitTextViewToText()
+    }
   }
 
   /**
    * Editor appearance comes from custom properties rather than the stylesheet,
    * so a page can set it per element:
    *
+   *   data-opens-with          "score" (the default) or "text": which view
+   *                            the element shows first
    *   data-editor-height       e.g. "420px"
    *   data-editor-font-family  a CSS stack; must be monospace, or the highlight
    *                            layer stops lining up with the textarea above it
@@ -412,7 +426,7 @@ class MuSemantiQEditor extends MSQTemplateElement {
     container.style.height = `${size.height}px`
   }
 
-  #showTextView() {
+  #showTextView({ focus = true } = {}) {
     // The wrapper is width:max-content and the text view has no intrinsic
     // width, so without this it collapses the moment the score is hidden.
     this.#sizeLikeTheScore(this.textContainer)
@@ -424,7 +438,24 @@ class MuSemantiQEditor extends MSQTemplateElement {
     this.previewButton.hidden = false
     // The textarea was laid out while hidden, so it measured zero width.
     this.editor.adjustForScreen()
-    this.editor.textarea.focus()
+    if (focus) {
+      this.editor.textarea.focus()
+    }
+  }
+
+  /*
+  Opened on the text, the element would otherwise take the score's height, and a
+  two-line example would sit in a box the size of its engraving. So it is fitted
+  to the text instead. Collapsing the container first is what makes scrollHeight
+  report the text rather than the box it currently fills.
+  */
+  #fitTextViewToText() {
+    const textarea = this.editor.textarea
+    this.textContainer.style.height = '0px'
+    const textHeight = textarea.scrollHeight
+    const lineHeight = parseFloat(getComputedStyle(textarea).lineHeight) || 20
+    this.textContainer.style.height = `${Math.max(textHeight, lineHeight * 2) + lineHeight}px`
+    this.editor.adjustForScreen()
   }
 
   async #showPreviewView() {

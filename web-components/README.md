@@ -7,10 +7,11 @@ They are written once here and **copied** into every app that shows a score:
 
     web-components/  ──►  examples/browser/web-app/static/js/msq/web-components/
                      ──►  dev-tools/web-app/static/js/msq/web-components/
+                     ──►  docs/web-app/static/js/msq/web-components/
 
-by `npm run web-components:update`, which `npm run examples:browser` and
-`npm run dev-tools` both run before starting. `npm run watch:web-components`
-keeps both copies in step while you work. The copies are generated, so they are
+by `npm run web-components:update`, which `npm run examples:browser`,
+`npm run dev-tools` and `npm run docs` all run before starting.
+`npm run watch:web-components` keeps the copies in step while you work. The copies are generated, so they are
 not tracked — this folder is the only place to edit them.
 
 ## What they expect where they land
@@ -46,3 +47,22 @@ Nothing in `src/language` imports outside itself, so its copy is served exactly
 as authored and those `#msq/language/…` specifiers are resolved by that same
 map. A module worker gets no import map at all, which is why `worker/` is a
 separate tree with its imports already rewritten to real URLs.
+
+## Safari
+
+Every element here is a customized built-in — `<template is="msq-*">` — and
+WebKit has never implemented those. `lib/custom-elements-polyfill.js` is
+Andrea Giammarchi's polyfill (ISC), a verbatim copy of the one EHTML carries,
+so it travels with the components into every app. It patches
+`customElements.define`, so a page has to import it before any component
+defines itself:
+
+    import '#msq/web-components/lib/custom-elements-polyfill.js'
+
+    import '#msq/web-components/msq-font-loader-template.js'
+    import '#msq/web-components/msq-svg-template.js'
+
+A page that also loads EHTML imports EHTML's copy instead, by the URL EHTML's
+own `main.js` uses — `#ehtml/third-party/custom-elements-polyfill.js` — so it
+is evaluated once. The polyfill has no guard against running twice, so two
+copies must never both load on one page.
