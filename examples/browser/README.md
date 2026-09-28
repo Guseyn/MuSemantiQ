@@ -7,11 +7,13 @@ text, engraved as SVG and played back as MIDI, entirely in the browser.
 npm run examples:browser
 ```
 
-Then open **https://127.0.0.1:8888** in Chrome, Edge or Firefox.
+Then open **https://127.0.0.1:8888** in Chrome, Edge, Firefox or Safari.
 
-> **Not Safari.** The components are *customized built-in elements*
-> (`<template is="msq-svg">`), which WebKit has never implemented. The page says
-> so, but it will simply not render there.
+> **Safari needs a polyfill.** The components are *customized built-in elements*
+> (`<template is="msq-svg">`), which WebKit has never implemented. So the page
+> imports `#msq/web-components/lib/custom-elements-polyfill.js` before any
+> component, and with it the page renders in WebKit too. That has been checked
+> with Playwright's WebKit, not yet in Safari itself on a Mac or an iPhone.
 
 > The certificate is self-signed, so the browser will warn once. And there is a
 > pause of about five seconds before the server announces itself — that is a
@@ -34,10 +36,14 @@ examples/browser/
         ├── css/        e-ui.css (unused by this example)
         ├── font/       three symlinks into src/drawer/font/
         ├── midi/       a couple of sample .mid files
-        └── js/msq/     the browser build of MuSemantiQ
+        └── js/msq/     the browser build of MuSemantiQ (generated, not tracked)
+            ├── web-components/   copied from web-components/
+            ├── language/         src/language, for the editor on the page
+            └── worker/           all of src/, imports rewritten to real URLs
 ```
 
-Inside `static/js/msq/`:
+Inside `static/js/msq/web-components/` (a copy of the top-level
+`web-components/`, so edit it there):
 
 | Path | What it is |
 | --- | --- |
@@ -46,16 +52,18 @@ Inside `static/js/msq/`:
 | `editor/` | The editor's DOM work: highlighting, line numbers, autocomplete, caret and scroll syncing, score ↔ source navigation |
 | `icons/` | Inline SVG icons for the toolbars |
 | `utils/` | Worker plumbing, clipboard, downloads, error formatting |
-| `lib/` | Vendored third-party code: the MIDI player, Tone.js writers, Magenta audio |
-| `worker/` | **Generated from `src/` — do not edit** |
+| `lib/` | Vendored third-party code: the MIDI player, Tone.js writers, Magenta audio, and the custom elements polyfill for Safari |
 
 ## Running it
 
-`npm run examples:browser` does three things in order:
+`npm run examples:browser` does four things in order:
 
 1. `setup:symlinks` — recreates the three font symlinks under `static/font/`
-2. `create:msq:worker` — regenerates `static/js/msq/worker/` from `src/`
-3. starts `web-app/main.js`
+2. `create:msq:worker` — regenerates `static/js/msq/worker/` and
+   `static/js/msq/language/` from `src/`
+3. `web-components:update` — copies `web-components/` to
+   `static/js/msq/web-components/`
+4. starts `web-app/main.js`
 
 Run it from the repository root; the paths in `main.js` and `env/local.json` are
 relative to the working directory. `ENV` chooses which file under `web-app/env/`
@@ -78,6 +86,7 @@ mkcert localhost 127.0.0.1 ::1
 | `npm run setup:symlinks` | Points `static/font/{chord-letters,music,text}` at `src/drawer/font/*` | Runs on `npm install`. Run it by hand if the fonts 404 — for example after unpacking a zip, which does not preserve symlinks |
 | `npm run create:msq:worker` | Deletes `static/js/msq/worker/` and rebuilds it from `src/`, rewriting `#msq/...` imports to real URLs | After any change under `src/`. Part of `examples:browser` already |
 | `npm run watch:src` | The same, then rebuilds on every change under `src/` | In a second terminal while working on `src/`, so the browser only needs a reload |
+| `npm run web-components:update` | Copies `web-components/` to `static/js/msq/web-components/` | After any change under `web-components/`. Part of `examples:browser` already; `npm run watch:web-components` keeps it in step |
 
 ## What `nodes` is
 
@@ -116,12 +125,13 @@ what is typed, and nothing in `src/language` imports outside itself, so its
 `#msq/language/…` specifiers resolve through the page's own import map and need
 no rewriting.
 
-Everything else under `static/js/msq/` is hand-written and belongs in commits.
+**`static/js/msq/web-components/`** is a copy of the top-level `web-components/`
+folder, made by `npm run web-components:update`.
 
-**The generated tree is committed too.** Nothing in this folder is gitignored,
-so a change under `src/` shows up as hundreds of modified files, and editing
-something under `worker/` looks like a real change right until the next build
-silently reverts it. Change `src/` and regenerate.
+**None of `static/js/msq/` is committed.** Each of its three folders has one
+source, so the whole folder is gitignored, and an edit made there is silently
+reverted by the next build. Change `src/` or `web-components/` and run the
+scripts again.
 
 The font symlinks are committed as symlinks, so a normal clone gets them; the
 `setup:symlinks` script exists to repair them.
@@ -134,18 +144,29 @@ open shadow root, so page CSS cannot reach inside except through the custom
 properties defined in `css/tokens.js` (`--surface-bg`, `--border-radius`,
 `--editor-height`, and so on) set on the host element.
 
-Import what you use, and give the page an import map pointing `#msq/` at the
-served folder:
+Give the page an import map with the components and the language (the editor
+parses on the page), import the custom elements polyfill first, so that Safari
+upgrades the components too, and then import what you use:
 
 ```html
 <script type="importmap">
-  { "imports": { "#msq/": "/js/msq/" } }
+  {
+    "imports": {
+      "#msq/web-components/": "/js/msq/web-components/",
+      "#msq/language/": "/js/msq/language/"
+    }
+  }
 </script>
 <script type="module">
-  import '#msq/msq-font-loader-template.js'
-  import '#msq/msq-svg-template.js'
+  import '#msq/web-components/lib/custom-elements-polyfill.js'
+
+  import '#msq/web-components/msq-font-loader-template.js'
+  import '#msq/web-components/msq-svg-template.js'
 </script>
 ```
+
+The polyfill patches `customElements.define`, so it only helps if it runs
+before any component defines itself.
 
 ### `msq-font-loader`
 
@@ -233,6 +254,8 @@ The score with a player beneath it; notes light up as they sound.
 Switch between the score and the source with the toolbar, edit with syntax
 highlighting and completion, then re-render. Hold Cmd or Ctrl to jump between a
 word in the source and the mark it drew. Beyond the common attributes it takes
+`data-opens-with` (`"score"`, the default, or `"text"` to open on the source,
+fitted to the height of the text, without taking the focus),
 `data-editor-height`, `data-editor-font-family` (must be monospace, or the
 highlight layer stops lining up), `data-editor-font-size`,
 `data-editor-font-src`, and `data-navigation-highlight-color`.
@@ -278,12 +301,13 @@ usual causes:
 - a component that engraves placed **outside** the `msq-font-loader`
 - `data-font-sources` not matching the loader's `data-font-sources-reference`
 - missing font symlinks, so the font requests 404 — run `npm run setup:symlinks`
-- Safari
+- Safari, with the polyfill missing or imported after the components
 
 ## Also worth knowing
 
 The import map in `index.html` is hand-written, and the `browser.importmap` field
-in `package.json` is a second copy of it — kept in step by hand, and read by
+in `package.json` holds its entries too, along with the other apps' `#ehtml/`
+and `#e-ui/` — kept in step by hand, and read by
 `nodes/updateCacheVersionsInUrls.js` to resolve specifiers when it stamps cache
 versions. `worker.importmap` is used only at build time, by
 `create-msq-worker.js`. If you add a folder under `static/js/`, update the import

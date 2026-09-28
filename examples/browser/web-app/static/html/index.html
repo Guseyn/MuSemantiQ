@@ -17,6 +17,14 @@
       }
     </script>
     <script type="module">
+      /*
+      Safari does not implement customized built-in elements — <template is="…">,
+      which is what every msq element is — so this polyfill goes first, before
+      anything defines one. The page does not load EHTML, which is what brings it
+      elsewhere, so it comes from web-components/lib.
+      */
+      import '#msq/web-components/lib/custom-elements-polyfill.js'
+
       import '#msq/web-components/msq-font-loader-template.js'
       import '#msq/web-components/msq-svg-template.js'
       import '#msq/web-components/msq-midi-template.js'
@@ -52,10 +60,6 @@
         </p>
       </noscript>
 
-      <p>
-        The components are customized built-in elements, which WebKit does not
-        support. Use a Chromium-based browser or Firefox.
-      </p>
     </header>
 
     <main>

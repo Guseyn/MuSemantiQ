@@ -19,6 +19,15 @@
     }
   </script>
   <script type="module">
+    /*
+    Safari does not implement customized built-in elements — <template is="…">,
+    which the msq, e-ui and EHTML elements all are — so this polyfill goes first,
+    before anything defines one. EHTML imports it too, but only once main.js
+    runs, after the elements above it are defined. It is the same URL, so it
+    still runs once: it has no guard against being run twice.
+    */
+    import '#ehtml/third-party/custom-elements-polyfill.js'
+
     import '#e-ui/e-tab.js'
     import '#e-ui/e-file-upload-template.js'
     import '#e-ui/e-dialog.js'
