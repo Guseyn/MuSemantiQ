@@ -31,6 +31,15 @@
 
     <script type="module">
       /*
+      Safari does not implement customized built-in elements — <template is="…">,
+      which the msq, e-ui and EHTML elements all are — so this polyfill goes first,
+      before anything defines one. EHTML imports it too, but only once main.js
+      runs, after the elements above it are defined. It is the same URL, so it
+      still runs once: it has no guard against being run twice.
+      */
+      import '#ehtml/third-party/custom-elements-polyfill.js'
+
+      /*
       The msq elements are plain custom elements driven by connectedCallback, so
       defining them here is enough for any that markdown inserts later.
 
@@ -44,16 +53,35 @@
       import '#msq/web-components/msq-editor-template.js'
 
       import '#e-ui/e-sidebar.js'
+      import '#e-ui/e-kbd.js'
       import '#ehtml/main'
     </script>
   </head>
 
   <body>
+    <!--
+      Used on narrow screens while the sidebar is open: it dims the page, and a
+      click on it closes the sidebar (e-sidebar finds it by data-mobile-body-overlay).
+    -->
+    <div is="overlay"></div>
+
+    <!--
+      The mobile header. e-ui shows it only below 981px and moves main down to
+      make room for it, and e-sidebar puts its menu button in here. It has to be
+      the element right before e-sidebar for that offset to apply.
+    -->
+    <header is="e-header">
+      <a href="/" data-logo>
+        <img src="/images/logo.svg" alt="MuSemantiQ">
+      </a>
+      <a is="e-link" href="https://github.com/Guseyn/MuSemantiQ">GitHub</a>
+    </header>
+
     <e-sidebar
       data-side="left"
-      data-mobile-header="[data-mobile-header]"
+      data-mobile-header='header[is="e-header"]'
       data-mobile-menu-icon="/images/menu.svg"
-      data-mobile-body-overlay="[data-overlay]"
+      data-mobile-body-overlay="div[is='overlay']"
       data-show-scrollbar
     >
       <!--
@@ -61,22 +89,98 @@
         the first and the last without checking they exist.
       -->
       <header>
-        <a href="/" data-logo aria-label="MuSemantiQ"></a>
+        <a href="/" data-logo data-hide-on-sidebar-closed>
+          <img src="/images/logo.svg" alt="MuSemantiQ">
+        </a>
+        <button
+          is="e-with-icon"
+          type="button"
+          aria-label="Expand sidebar"
+          data-hide-on-sidebar-open
+          onclick="document.querySelector('e-sidebar').open()"
+        >
+          <img alt="" aria-hidden="true" src="/images/menu.svg">
+        </button>
       </header>
 
-      <!-- Filled from the sitemap by docs.js. -->
-      <nav aria-label="Documentation"></nav>
+      <kbd
+        is="e-kbd"
+        data-absolute
+        aria-label="Toggle sidebar open or closed. Shortcut: Shift S"
+        aria-keyshortcuts="Shift+S"
+        data-action="
+          const sidebar = document.querySelector('e-sidebar')
+          if (sidebar.getAttribute('data-state') === 'open') {
+            sidebar.close()
+          } else {
+            sidebar.open()
+          }
+        "
+      >
+        ⇧ + S
+      </kbd>
+
+      <nav aria-label="Documentation">
+        <!-- Filled from the sitemap by docs.js. -->
+        <div data-toc></div>
+
+        <hr is="e-divider" data-hide-on-sidebar-closed data-hide-in-mobile>
+        <div is="e-info" data-hide-on-sidebar-closed data-hide-in-mobile>
+          <div is="e-stack" data-gap="xs">
+            <div is="e-row" data-gap="md" data-keep-flex-direction-row-in-mobile>
+              <kbd
+                is="e-kbd"
+                aria-label="Pin sidebar closed. Shortcut: Shift P"
+                aria-keyshortcuts="Shift+P"
+                data-action="
+                  document.querySelector('e-sidebar').close()
+                  localStorage.setItem('sidebarIsPinned', 'true')
+                "
+              >
+                ⇧ + P
+              </kbd>
+              <span data-font-size="xs">Pin Sidebar (Keep It Closed)</span>
+            </div>
+            <div is="e-row" data-gap="md" data-keep-flex-direction-row-in-mobile>
+              <kbd
+                is="e-kbd"
+                aria-label="Unpin sidebar. Shortcut: Shift U"
+                aria-keyshortcuts="Shift+U"
+                data-action="
+                  document.querySelector('e-sidebar').open()
+                  localStorage.removeItem('sidebarIsPinned')
+                "
+              >
+                ⇧ + U
+              </kbd>
+              <span data-font-size="xs">Unpin Sidebar</span>
+            </div>
+          </div>
+        </div>
+      </nav>
 
       <footer>
-        <a is="e-link" href="/">Home</a>
-        <a is="e-link" href="https://github.com/Guseyn/MuSemantiQ">GitHub</a>
+        <div is="e-row" data-keep-flex-direction-row-in-mobile data-hide-on-sidebar-closed>
+          <span data-font-size="sm">
+            Created by <a is="e-link" href="https://guseyn.com">Guseyn</a>
+          </span>
+          <div is="e-stack" data-gap="3xs">
+            <button
+              is="e-with-icon"
+              type="button"
+              aria-label="Collapse sidebar"
+              data-height="md"
+              onclick="document.querySelector('e-sidebar').close()"
+            >
+              <img alt="" aria-hidden="true" src="/images/sidebar/collapse.svg">
+            </button>
+            <kbd is="e-kbd" aria-hidden="true">⇧ + S</kbd>
+          </div>
+        </div>
       </footer>
     </e-sidebar>
 
     <main is="e-main">
-      <div data-mobile-header></div>
-      <div data-overlay></div>
-
       <!--
         The font loader is rendered here, once. It replaces itself with its own
         content, so what ends up in this element is the readiness marker and

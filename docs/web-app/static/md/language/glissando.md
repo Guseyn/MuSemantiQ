@@ -1,13 +1,73 @@
 # Glissando
 
-> **TO WRITE**
-> - the two forms: an attribute on a unit, and a standalone span
-> - `as wave` and `as line`
-> - that it can run between staves
-> - that the `before`/`after` and `measure N` forms are how it reaches across a barline
+A glissando is a slide from one sound to another. For different cases you can write it in two ways: as an attribute of a unit, or as a separate command that connects two units.
+
+## 1. Glissando as a unit attribute
+
+If a glissando needs to go out of a unit and finish after the measure, you just need to type `with glissando`:
 
 <div>
-<template is="msq-svg" data-font-sources="msqFontSources">
+<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+measure
+treble clef
+a with glissando
+</template>
+</div>
+
+You can set a direction, and also explicitly say that the glissando finishes after the measure:
+
+<div>
+<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+measure
+treble clef
+a with glissando after up
+</template>
+</div>
+
+In a similar way, you can say that a glissando comes into a unit from before the measure:
+
+<div>
+<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+measure
+treble clef
+a with glissando before up
+</template>
+</div>
+
+You can also specify the number of the measure that a glissando finishes after or starts before. It's important to mention that those measures cannot be empty:
+
+<div>
+<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+measure
+stave
+1/4 a with glissando after measure 2
+stave
+1/16 a beamed b c d a b c d not beamed
+measure
+stave
+stave
+1/16 a beamed b c d a b c d
+
+new line
+stave
+stave
+1/16 a beamed b c d a b c d not beamed
+measure
+stave
+1/4 a with glissando before measure 1
+stave
+1/16 a beamed b c d a b c d
+</template>
+</div>
+
+As you can see, `before` and `after` with a measure number are how a glissando reaches across the end of a page line: the measure numbers are counted within the page line where the unit is.
+
+## 2. Glissando as a separate command
+
+In order to connect two units, you use `glissando` as a separate command, after the music, like a [slur](/docs/language/slurs):
+
+<div>
+<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
 measure
 treble clef
 1/4 c5
@@ -16,3 +76,139 @@ treble clef
 glissando from first unit to second unit
 </template>
 </div>
+
+Let's take a look at glissandos between notes and chords in different measures:
+
+<div>
+<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+measure
+treble clef
+a a5 1/16 a beamed b c d a b c d
+measure
+1/4 chord
+c e g
+chord
+c5 e5 g5
+
+1/16 a beamed b c d a b c d
+
+glissando in first measure from first unit to second unit
+glissando in second measure from unit 1 to unit 2
+</template>
+</div>
+
+Like slurs, glissandos are cross-measure elements:
+
+<div>
+<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+measure
+treble clef
+c
+measure
+c5
+
+glissando starts at first note in first measure
+and finishes at first note in second measure
+</template>
+</div>
+
+A glissando can also connect units on different staves:
+
+<div>
+<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+measure
+stave with treble clef
+a
+stave with bass clef
+rest
+measure
+stave
+rest
+stave
+a2
+
+glissando
+from first unit in first measure on first stave
+to first unit in second measure on second stave
+</template>
+</div>
+
+You can also declare glissandos that start before a unit or finish after a unit:
+
+<div>
+<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+measure
+stave with treble clef
+a
+stave with bass clef
+a2
+measure
+
+glissando up starts before first unit on first stave
+glissando down finishes after first unit on second stave
+</template>
+</div>
+
+By default, a glissando is drawn as a wave. But you can explicitly say that it's a `wave` or a `line`:
+
+<div>
+<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+measure
+stave with treble clef
+a
+stave with bass clef
+rest
+measure
+stave
+rest
+stave
+a2
+
+measure
+stave
+a
+stave
+rest
+measure
+stave
+rest
+stave
+a2
+
+glissando as line
+from first unit in first measure on first stave
+to first unit in second measure on second stave
+
+glissando as wave
+from first unit in third measure on first stave
+to first unit in fourth measure on second stave
+</template>
+</div>
+
+You can also write `as waves` and `as lines`.
+
+The unit coordinates for glissandos work in the same way as for [slurs](/docs/language/slurs), you have to remember the following rules:
+
+1. If a `line` is not specified after the `glissando` key word, it applies to the last line declared before it.
+2. If you don't specify `measure`, `stave` and `voice`, it assumes that you mean the first measure, the first stave and the first voice.
+3. Along with a `unit` coordinate you can specify only `measure` and `stave` (like `first note in first measure, in second stave`). You cannot set `voice` along with a unit, only right after the `glissando` key word, for the whole glissando, because a glissando is not a cross-voice element. And you cannot set `line` along with a unit, because each glissando, or each part of a glissando, is declared for the line where it is located.
+4. If you specified `measure` and `stave` for the first unit, and they don't change for the second one, you don't need to repeat them.
+
+The key word `glissando` can also be written as `gliss` or `gliss.`, both as a command and in `with glissando`:
+
+<div>
+<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+measure
+treble clef
+1/4 c with gliss after
+measure
+1/4 e
+1/4 c5
+
+gliss. in second measure from first unit to second unit
+</template>
+</div>
+
+Both kinds of glissando are also heard: the MIDI player plays a glissando as a quick run of notes, and for a glissando on a single unit it follows the direction you set.
+
+Read next: [Tremolo](/docs/language/tremolo)

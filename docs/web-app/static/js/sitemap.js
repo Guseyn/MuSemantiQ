@@ -14,6 +14,12 @@ not introduced. Moving a page up or down re-checks every example under it.
 A page is { slug, title }, optionally opening a new `group` heading in the
 sidebar. Its markdown lives at /md/<section.slug>/<page.slug>.md and its URL is
 /docs/<section.slug>/<page.slug>.
+
+A section may also carry `links`: { title, href, icon } entries the sidebar
+lists after its pages. They leave the site, so they are not pages — allPages
+never sees them, and neither do the router and the lint.
+
+Each section's sidebar icon is /images/sidebar/<section.slug>.svg.
 */
 
 export const sitemap = [
@@ -202,6 +208,9 @@ export const sitemap = [
       { slug: 'faq', title: 'FAQ and limitations' },
       { slug: 'license', title: 'License' },
       { slug: 'changelog', title: 'Changelog' }
+    ],
+    links: [
+      { title: 'GitHub', href: 'https://github.com/Guseyn/MuSemantiQ', icon: '/images/sidebar/github.svg' }
     ]
   }
 ]

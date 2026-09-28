@@ -15,7 +15,8 @@ Checks every MSQ example in the documentation, three ways.
    throws, it accumulates — so an empty `errors` array is the only pass signal.
 
 3. The order.  Every example is gradual: it may only use concepts that its own
-   page or an earlier one introduces. The parser reports which of its 578 named
+   page or an earlier one introduces (a page marked `preview` is exempt). The
+   parser reports which of its 578 named
    scenarios fired, docs/concepts.js says which page introduces each, and the
    sitemap's order says which pages count as earlier. Nothing here is a
    hand-kept list of keywords.
@@ -198,6 +199,14 @@ function checkFile(absolutePath, relativePath, ref) {
   const pageIndex = pageIndexByRef.get(ref)
 
   /*
+  The getting-started pages come before the language is taught, yet they have to
+  show a score — a tour that only describes music is no tour. A page that is a
+  preview of what follows says so, anywhere in it, and is then exempt from the
+  order and nothing else: its examples must still be wrapped and still parse.
+  */
+  const isPreview = /<!--\s*check-docs-examples:\s*preview\s*-->/.test(text)
+
+  /*
   Render the page the way the browser will, and check every example came
   through unchanged. This is what the <div> wrapper is for, and it is the one
   failure that is otherwise silent: the score still draws, just not the score
@@ -247,7 +256,7 @@ function checkFile(absolutePath, relativePath, ref) {
       )
     }
 
-    for (const name of used) {
+    for (const name of isPreview ? [] : used) {
       const introducer = introducedBy(name)
       if (!introducer) {
         continue

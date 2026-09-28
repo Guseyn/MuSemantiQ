@@ -6,11 +6,9 @@ e-ui.css is loaded first and everything here is an override of it.
 
 :root {
   /*
-  e-sidebar opens to 20rem and collapses to a 4.5rem rail. A table of contents
-  is not usable as a rail, so the two widths are the same: app.js holds it open,
-  and this makes the state it would collapse to no narrower.
+  Open, the sidebar is a table of contents and needs a little less than e-ui's
+  20rem; collapsed, it stays e-ui's icon rail of section icons.
   */
-  --e-sidebar-collapsed: 19rem;
   --e-sidebar-expanded: 19rem;
 
   --docs-note-bg: #fdf6e3;
@@ -18,23 +16,56 @@ e-ui.css is loaded first and everything here is an override of it.
   --docs-note-fg: #6b5424;
 }
 
+/*
+The reading text is set in Noto Serif, the face the engine engraves titles and
+lyrics in, so the prose and the scores between it look like one page. It is the
+file the drawer already uses, served from /font/text; there is no italic, so the
+browser slants the regular.
+*/
+@font-face {
+  font-family: 'Noto Serif';
+  src: url('/font/text/NotoSerif-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Noto Serif';
+  src: url('/font/text/NotoSerif-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-display: swap;
+}
+
 /* ── Sidebar as a table of contents ─────────────────────────────────── */
 
-e-sidebar {
-  padding-top: var(--e-spacing-md);
-}
-
+/*
+e-ui positions the sidebar header absolutely over the top of the nav, and
+e-sidebar pads the nav by its height, so it needs no padding of its own here.
+It comes before the nav, though, so without a z-index the links scrolled under
+it paint over it and it reads as transparent; the footer has the same problem.
+The logo is a wordmark about seven times wider than it is tall: sized by its
+width, it would otherwise be held to e-ui's img height and come out tiny.
+*/
 e-sidebar header {
-  padding: var(--e-spacing-md) var(--e-spacing-sm);
+  z-index: 1;
+  justify-content: flex-start;
+  padding: var(--e-spacing-md) var(--e-spacing-lg);
 }
 
-e-sidebar header [data-logo] {
+[data-logo] {
+  display: flex;
+  align-items: center;
+}
+
+[data-logo] img {
   display: block;
-  aspect-ratio: 836.57 / 120;
-  max-width: 150px;
-  background-color: var(--e-fg);
-  -webkit-mask: url('/images/logo.svg') no-repeat center / contain;
-  mask: url('/images/logo.svg') no-repeat center / contain;
+  width: 160px;
+  max-width: 100%;
+  height: auto;
+}
+
+e-sidebar[data-state="open"] header [data-logo] img {
+  max-height: none;
 }
 
 /*
@@ -48,10 +79,25 @@ e-sidebar nav {
   padding-right: var(--e-spacing-xs);
 }
 
-e-sidebar nav [data-section] {
-  display: block;
-  margin-top: var(--e-spacing-md);
-  padding: var(--e-spacing-xs) var(--e-spacing-sm);
+/*
+Sections are e-details. e-ui draws those as bordered cards with a padded body,
+which is right in a page and too heavy in a list, so here they are flat: the
+summary is the section heading and the chevron is kept.
+*/
+e-sidebar nav details[is="e-details"] {
+  flex-shrink: 0;
+  border: none;
+  border-radius: 0;
+  background: none;
+}
+
+e-sidebar nav details[is="e-details"] > summary {
+  display: flex;
+  align-items: center;
+  gap: var(--e-spacing-sm);
+  margin-top: var(--e-spacing-xs);
+  padding: var(--e-spacing-sm) var(--e-spacing-xl) var(--e-spacing-sm) var(--e-spacing-sm);
+  border-radius: var(--e-radius-sm);
   font-size: var(--e-font-size-xs);
   font-weight: 700;
   letter-spacing: 0.06em;
@@ -59,16 +105,52 @@ e-sidebar nav [data-section] {
   color: var(--e-muted);
 }
 
-e-sidebar nav [data-group] {
-  display: block;
-  margin-top: var(--e-spacing-sm);
-  padding: 0 var(--e-spacing-sm) 0 var(--e-spacing-md);
-  font-size: var(--e-font-size-2xs);
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--e-muted);
-  opacity: 0.8;
+e-sidebar nav details[is="e-details"] > summary > img,
+e-sidebar nav a[data-external] > img {
+  width: var(--e-img-3xs);
+  height: var(--e-img-3xs);
+  flex-shrink: 0;
+}
+
+e-sidebar nav details[is="e-details"][data-current] > summary {
+  color: var(--e-primary);
+}
+
+e-sidebar nav details[is="e-details"] > summary:hover {
+  background-color: var(--e-primary-transparent-accent-bg);
+}
+
+e-sidebar nav details[is="e-details"] > summary::after {
+  right: var(--e-spacing-sm);
+  font-size: var(--e-font-size-lg);
+}
+
+e-sidebar nav details[is="e-details"] > div {
+  padding: 0 0 var(--e-spacing-sm);
+  overflow: visible;
+}
+
+/*
+Groups are e-details nested in a section's e-details, so the section rules above
+reach them too; these set them apart as the level below: regular weight, not uppercase,
+indented, and in the text colour rather than muted.
+*/
+e-sidebar nav details[is="e-details"][data-group] > summary {
+  margin-top: 0;
+  padding-left: var(--e-spacing-md);
+  font-size: var(--e-font-size-sm);
+  font-weight: 400;
+  letter-spacing: normal;
+  text-transform: none;
+  color: var(--e-fg);
+}
+
+e-sidebar nav details[is="e-details"][data-group] > div {
+  padding-bottom: var(--e-spacing-xs);
+}
+
+e-sidebar nav details[is="e-details"][data-group] a {
+  padding-left: calc(var(--e-spacing-lg) + var(--e-spacing-sm));
 }
 
 /*
@@ -91,6 +173,12 @@ e-sidebar nav a > span {
   display: inline;
 }
 
+e-sidebar nav a[data-external] {
+  display: flex;
+  align-items: center;
+  gap: var(--e-spacing-sm);
+}
+
 e-sidebar nav a:hover {
   background-color: var(--e-primary-transparent-accent-bg);
 }
@@ -101,10 +189,71 @@ e-sidebar nav a[data-selected="true"] {
   background-color: var(--e-primary-transparent-accent-bg);
 }
 
+/*
+The ⇧ + S hint sits in the sidebar's top corner, over the header, which is
+itself raised over the nav.
+*/
+e-sidebar > kbd[is="e-kbd"][data-absolute] {
+  z-index: 2;
+}
+
+e-sidebar nav [is="e-info"] {
+  flex-shrink: 0;
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: var(--e-spacing-sm);
+}
+
+/*
+e-ui's hover box is meant for the nav's links, but its rule is written for every
+link in the sidebar, so the logo and the footer's link would get it too.
+*/
+e-sidebar header a,
+e-sidebar header a:hover,
+e-sidebar footer a,
+e-sidebar footer a:hover {
+  border: none;
+  background: none;
+}
+
+e-sidebar footer a:hover {
+  text-decoration: underline;
+}
+
 e-sidebar footer {
-  gap: var(--e-spacing-md);
-  padding: var(--e-spacing-md) var(--e-spacing-sm);
-  font-size: var(--e-font-size-sm);
+  z-index: 1;
+  padding: var(--e-spacing-sm) var(--e-spacing-md) var(--e-spacing-sm) var(--e-spacing-lg);
+}
+
+e-sidebar footer [is="e-row"] {
+  width: 100%;
+}
+
+/*
+Collapsed, the sidebar is e-ui's icon rail: the menu button in place of the
+logo, one icon per section, and nothing else. The footer only holds what the
+open sidebar shows, so it goes too rather than leaving an empty bar.
+*/
+e-sidebar[data-state="closed"] header {
+  justify-content: center;
+  padding: var(--e-spacing-md) 0;
+}
+
+e-sidebar[data-state="closed"] nav details[is="e-details"] > summary {
+  justify-content: center;
+  padding: var(--e-spacing-sm);
+}
+
+e-sidebar[data-state="closed"] nav details[is="e-details"] > summary > span,
+e-sidebar[data-state="closed"] nav details[is="e-details"] > summary::after,
+e-sidebar[data-state="closed"] nav details[is="e-details"] > div,
+e-sidebar[data-state="closed"] footer,
+e-sidebar[data-state="closed"] > kbd[is="e-kbd"] {
+  display: none;
+}
+
+e-sidebar[data-state="closed"] nav details[is="e-details"][data-current] > summary {
+  background-color: var(--e-primary-transparent-accent-bg);
 }
 
 /* ── The page itself ────────────────────────────────────────────────── */
@@ -116,6 +265,7 @@ main[is="e-main"] {
 [data-content] {
   max-width: 48rem;
   margin: 0 auto;
+  font-family: 'Noto Serif', Georgia, 'Times New Roman', serif;
 }
 
 [data-content] h1 {
@@ -138,6 +288,16 @@ main[is="e-main"] {
 [data-content] li {
   line-height: 1.65;
 }
+
+/* e-ui resets lists for its own components; prose needs its markers back. */
+[data-content] ul,
+[data-content] ol {
+  margin: var(--e-spacing-sm) 0;
+  padding-left: var(--e-spacing-xl);
+}
+
+[data-content] ul { list-style: disc; }
+[data-content] ol { list-style: decimal; }
 
 [data-content] code {
   padding: 0.1em 0.35em;
@@ -219,15 +379,19 @@ goes with it.
     padding: var(--e-spacing-lg) var(--e-spacing-md) var(--e-spacing-2xl);
   }
 
-  [data-overlay] {
-    position: fixed;
-    inset: 0;
-    z-index: 99;
-    display: none;
-    background-color: rgba(0, 0, 0, 0.35);
+  /*
+  The mobile header holds e-sidebar's menu button, then the logo, then GitHub.
+  The logo sits next to the button rather than in the middle of the bar.
+  */
+  header[is="e-header"] {
+    gap: var(--e-spacing-md);
   }
 
-  body:has(e-sidebar[data-state="open"]) [data-overlay] {
-    display: block;
+  header[is="e-header"] [data-logo] {
+    margin-right: auto;
+  }
+
+  header[is="e-header"] [data-logo] img {
+    width: 130px;
   }
 }

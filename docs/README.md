@@ -57,15 +57,20 @@ introduced. Moving a page re-checks every example under it.
 
 ## Examples
 
-Write the music as a `<template is="msq-svg">`, and **wrap it in a `<div>`**:
+Write the music as a `<template is="msq-editor">` that opens on its text, and
+**wrap it in a `<div>`**:
 
     <div>
-    <template is="msq-svg" data-font-sources="msqFontSources">
+    <template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
     measure
     treble clef
     c d e f
     </template>
     </div>
+
+The reader sees what is written first, and the score is one click away, on
+**Render the score**. The components section is the exception: each of its
+pages shows the element it is about.
 
 The wrapper is load-bearing, and what it prevents is silent. `<template>` is
 not one of showdown's block tags, so without the `<div>` the markdown pass gets
@@ -98,6 +103,14 @@ feature says the documentation has not caught up with it.
 The one page that must show input that does not parse marks itself:
 
     <!-- check-docs-examples: allow-errors -->
+
+A page that shows what is coming, before the pages that introduce it, marks
+itself too, and is then exempt from the fourth rule only — its examples are
+still held to the first three:
+
+    <!-- check-docs-examples: preview -->
+
+`what-it-is` and `your-first-page` in getting-started are the two that do.
 
 ## Still to write
 

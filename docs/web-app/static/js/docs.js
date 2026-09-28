@@ -73,40 +73,107 @@ function readyTheFonts() {
 
 // ── The sidebar ──────────────────────────────────────────────────────────
 
+/*
+Each section is a collapsible e-details, so the sidebar opens as a short list of
+every section rather than one long column that hides the later ones below the
+fold, and so is each group inside a section. Only the section and the group
+holding the page being read are opened (see markCurrent); whatever the reader
+opens by hand stays open.
+
+Collapsed, the sidebar is e-ui's icon rail and only the section icons show.
+*/
 function buildSidebar() {
-  const nav = document.querySelector('e-sidebar nav')
+  const toc = document.querySelector('e-sidebar nav [data-toc]')
   const fragment = document.createDocumentFragment()
 
   for (const section of sitemap) {
-    const heading = document.createElement('span')
-    heading.setAttribute('data-section', '')
-    heading.textContent = section.title
-    fragment.appendChild(heading)
+    const details = document.createElement('details', { is: 'e-details' })
+    details.setAttribute('is', 'e-details')
+    details.setAttribute('data-section', section.slug)
 
+    const summary = document.createElement('summary')
+    summary.setAttribute('title', section.title)
+    summary.append(icon(`/images/sidebar/${section.slug}.svg`), label(section.title))
+    details.appendChild(summary)
+
+    // A group is an e-details of its own inside the section, and every page
+    // after it belongs to it until the next group begins.
+    const pages = document.createElement('div')
+    let into = pages
     for (const page of section.pages) {
       if (page.group) {
-        const group = document.createElement('span')
+        const group = document.createElement('details', { is: 'e-details' })
+        group.setAttribute('is', 'e-details')
         group.setAttribute('data-group', '')
-        group.textContent = page.group
-        fragment.appendChild(group)
+        const groupSummary = document.createElement('summary')
+        groupSummary.textContent = page.group
+        group.appendChild(groupSummary)
+        into = document.createElement('div')
+        group.appendChild(into)
+        pages.appendChild(group)
       }
       const link = document.createElement('a')
       link.href = `/docs/${section.slug}/${page.slug}`
       link.setAttribute('data-page', `${section.slug}/${page.slug}`)
-      const label = document.createElement('span')
-      label.textContent = page.title
-      link.appendChild(label)
-      fragment.appendChild(link)
+      link.appendChild(label(page.title))
+      into.appendChild(link)
     }
+    for (const external of section.links || []) {
+      const link = document.createElement('a')
+      link.href = external.href
+      link.target = '_blank'
+      link.rel = 'noopener'
+      link.setAttribute('data-external', '')
+      link.append(icon(external.icon), label(external.title))
+      pages.appendChild(link)
+    }
+    details.appendChild(pages)
+    fragment.appendChild(details)
   }
 
-  nav.replaceChildren(fragment)
+  toc.replaceChildren(fragment)
+
+  /*
+  On the rail a section is only an icon, and toggling it would open a list
+  nobody can see. So there a click opens the sidebar on that section instead.
+  */
+  toc.addEventListener('click', (event) => {
+    const summary = event.target.closest('details[data-section] > summary')
+    const sidebar = document.querySelector('e-sidebar')
+    if (!summary || sidebar.getAttribute('data-state') === 'open') {
+      return
+    }
+    event.preventDefault()
+    summary.parentElement.open = true
+    sidebar.open()
+  })
+}
+
+function icon(src) {
+  const img = document.createElement('img')
+  img.src = src
+  img.alt = ''
+  img.setAttribute('aria-hidden', 'true')
+  return img
+}
+
+function label(text) {
+  const span = document.createElement('span')
+  span.textContent = text
+  return span
 }
 
 function markCurrent(page) {
-  for (const link of document.querySelectorAll('e-sidebar nav a')) {
+  for (const section of document.querySelectorAll('e-sidebar nav details[data-section]')) {
+    section.toggleAttribute('data-current', section.getAttribute('data-section') === page.section)
+  }
+  for (const link of document.querySelectorAll('e-sidebar nav a[data-page]')) {
     if (link.getAttribute('data-page') === page.ref) {
       link.setAttribute('data-selected', 'true')
+      // The page's group and its section both, however deep it sits.
+      for (let details = link.closest('details'); details; details = details.parentElement.closest('details')) {
+        details.open = true
+      }
     } else {
       link.removeAttribute('data-selected')
     }
