@@ -8,7 +8,7 @@ All you need is **Node 22** or newer. `package.json` asks for it in `engines`, a
 
 There are no runtime npm dependencies. The third-party code the engine needs (opentype.js, svgpath, @tonejs/midi, midi-file) is vendored into the repository, and the only thing `npm install` downloads is **c8**, which is used for test coverage.
 
-**Important note:** `npm run dev-tools` and `npm run docs` need three more things: my libraries **nodes**, **EHTML** and **e-ui**, cloned beside each other. Those two scripts copy them in with `rsync` from `../../my-projects/nodes.js`, `../../my-projects/EHTML` and `../../my-projects/e-ui`, relative to the repository, and they fail if the folders are not there. The browser example and the CLI do not need them, because the example app's copy of nodes is committed.
+**Important note:** `npm run dev-tools` and `npm run docs` need three more things: my libraries **nodes**, **EHTML** and **e-ui**, cloned beside each other. Those two scripts copy them in with `rsync` from `../../my-projects/nodes.js`, `../../my-projects/EHTML` and `../../my-projects/e-ui`, relative to the repository, and they fail if the folders are not there. So in practice the repository and the three libraries have to sit side by side in a folder called `my-projects`. The browser example and the CLI do not need them, because the example app's copy of nodes is committed.
 
 ## 2. Clone and install
 
@@ -36,7 +36,7 @@ The browser example, a page with every web component on it:
 npm run examples:browser
 ```
 
-It links the fonts, generates the worker copy of `src/` into the app, copies the web components in, and starts the server at **https://127.0.0.1:8888**.
+It runs `setup:symlinks` to link the shared files, `create:msq:worker` to generate the worker copy of `src/` into the app, and `web-components:update` to copy the web components in, and then it starts the server at **https://127.0.0.1:8888**.
 
 The command line:
 
@@ -58,7 +58,7 @@ The dev tools, which are the test viewer, the font viewer and font generator, th
 npm run dev-tools
 ```
 
-It vendors nodes, EHTML and e-ui first (see the note above), then starts at **https://127.0.0.1:8889**. This documentation runs the same way, with `npm run docs`, at **https://127.0.0.1:8890**.
+It vendors nodes, EHTML and e-ui first (see the note above), then does the same three steps as the browser example, and starts at **https://127.0.0.1:8889**. This documentation runs the same way, with `npm run docs`, at **https://127.0.0.1:8890**, with one more step before its server starts: `npm run docs:check`, which parses every example in these pages and stops if one of them has errors or uses something a later page introduces.
 
 ## 4. The certificate
 
@@ -70,7 +70,7 @@ If you would rather not see the warning, you can make a certificate of your own 
 
 ## 5. Which browser
 
-The web components are **customized built-in elements**: each one is a `<template>` that becomes the component through its `is` attribute. Chromium-based browsers and Firefox support that natively. Safari and every other WebKit browser do not, so every page here imports a polyfill for them before anything else, and the browser example, the dev tools and this documentation all render in WebKit as well.
+The web components are **customized built-in elements**: each one is a `<template>` that becomes the component through its `is` attribute. Chromium-based browsers and Firefox support that natively. Safari and every other WebKit browser do not, so the components load a polyfill for them themselves, before any of them is defined. You don't import anything for it, and the browser example, the dev tools and this documentation all render in WebKit as well.
 
 **Side note:** they have been checked in WebKit through Playwright, but not yet in Safari itself on a Mac or an iPhone. More about that you can read in [Browser support](/docs/components/browser-support).
 

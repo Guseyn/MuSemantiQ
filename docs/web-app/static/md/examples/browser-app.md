@@ -51,7 +51,7 @@ Not all of it is written by hand. Everything under `static/js/msq/` is generated
 
 ## 3. The four examples
 
-The page imports the custom elements polyfill first, so that Safari upgrades the components too, and then all five components. It wraps everything in one `msq-font-loader` with an inline config: **Gentium Plus** for chord letters, **Noto Serif** for text, and **Bravura** and **Leland** for music, registered as `msqFontSources`.
+The page imports all five components, and nothing else: they bring the polyfill that Safari needs themselves. It wraps everything in one `msq-font-loader` with an inline config: **Gentium Plus** for chord letters, **Noto Serif** for text, and **Bravura** and **Leland** for music, registered as `msqFontSources`.
 
 The first three examples play the same six notes, so you can compare what each component does with the same music:
 
@@ -73,6 +73,6 @@ As you may notice, the editor's music names no music font, so it is engraved in 
 
 ## 4. The reference for embedding
 
-Everything the page needs is in `static/html/index.html`: an import map with two entries, one module script with the polyfill and five imports, and one loader. There is no framework, no bundler and no other script. So when you want to put the components on a page of your own, this file is the one to start from, and [Embedding in your own app](/docs/examples/embedding) walks through what to take from it.
+Everything the page needs is in `static/html/index.html`: an import map with two entries, one module script with five imports, and one loader. There is no framework, no bundler and no other script. So when you want to put the components on a page of your own, this file is the one to start from, and [Embedding in your own app](/docs/examples/embedding) walks through what to take from it.
 
 Read next: [CLI](/docs/examples/cli)

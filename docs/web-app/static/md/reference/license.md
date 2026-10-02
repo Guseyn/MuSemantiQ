@@ -58,7 +58,7 @@ The repository carries third-party code and fonts that keep their own licenses:
 
 The dev tools and this documentation also copy in my own libraries nodes, EHTML and e-ui, which are under the MIT license. The only copies of them committed to the repository are the browser example's nodes and its `e-ui.css`.
 
-The custom elements polyfill by Andrea Giammarchi (WebReflection) is under the ISC license. EHTML carries it, and a copy of it is also in `web-components/lib/custom-elements-polyfill.js`, so it is shipped to every app together with the components.
+The custom elements polyfill by Andrea Giammarchi (WebReflection) is under the ISC license. EHTML carries it, and a copy of it is also in `web-components/lib/custom-elements-polyfill.js`, so it is shipped to every app together with the components, which load it themselves when the browser needs it.
 
 ## 5. The full text
 

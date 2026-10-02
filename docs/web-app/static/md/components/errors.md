@@ -51,7 +51,7 @@ It's important to mention the difference between the two groups of rows. A mista
 
 Work through this list from the top, and stop at the first thing that is wrong:
 
-1. **The browser.** Safari does not upgrade these elements on its own. If the page is fine in Chromium or Firefox but empty in Safari, the polyfill is missing, or it is imported after the components; see [Browser support](/docs/components/browser-support).
+1. **The browser.** Safari does not upgrade these elements on its own. The components load a polyfill for it themselves, from `lib/custom-elements-polyfill.js` next to them. If the page is fine in Chromium or Firefox but empty in Safari, look for a failed request for that file, and on a page that also loads EHTML, check that EHTML's copy of the polyfill is imported before the components; see [Browser support](/docs/components/browser-support).
 2. **The console.** Every setup mistake says what it is there. Read the first error, not the last.
 3. **The network tab.** Look for a failed request for `worker.js`, for a font file under `/font/`, or for a glyph table under `/js/msq/worker/drawer/font/music-js/`. In this repository, `npm run setup:symlinks` puts the fonts back, and `npm run create:msq:worker` rebuilds the worker tree.
 4. **The import map.** It has to come before the module scripts that import the components.

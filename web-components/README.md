@@ -54,15 +54,26 @@ Every element here is a customized built-in — `<template is="msq-*">` — and
 WebKit has never implemented those. `lib/custom-elements-polyfill.js` is
 Andrea Giammarchi's polyfill (ISC), a verbatim copy of the one EHTML carries,
 so it travels with the components into every app. It patches
-`customElements.define`, so a page has to import it before any component
-defines itself:
-
-    import '#msq/web-components/lib/custom-elements-polyfill.js'
+`customElements.define`, so it only helps if it runs before any component
+defines itself. That is why the components load it themselves: `msq-template.js`
+first imports `utils/polyfillCustomizedBuiltIns.js`, and every element imports
+`msq-template.js` before it calls `customElements.define`. A page only imports
+the components:
 
     import '#msq/web-components/msq-font-loader-template.js'
     import '#msq/web-components/msq-svg-template.js'
 
-A page that also loads EHTML imports EHTML's copy instead, by the URL EHTML's
-own `main.js` uses — `#ehtml/third-party/custom-elements-polyfill.js` — so it
-is evaluated once. The polyfill has no guard against running twice, so two
-copies must never both load on one page.
+The polyfill has no guard against running twice, and in WebKit a second run
+wraps `customElements.define` again over the first. So
+`polyfillCustomizedBuiltIns.js` imports it only while `define` is still native
+code; once any copy has run, it is not. In Chromium and Firefox `define` stays
+native, and the polyfill finds nothing to do there.
+
+A page that also loads EHTML still imports EHTML's copy first, by the URL
+EHTML's own `main.js` uses — `#ehtml/third-party/custom-elements-polyfill.js`.
+`main.js` imports it with no check, so if the components' copy ran first,
+EHTML's would run over it. Imported first, it runs once: the components see a
+define that is no longer native and skip theirs, and the module cache stops
+`main.js` from running it again. It also has to be in place before the e-ui
+customized built-ins (`e-dialog`, …) define themselves, which happens before
+`#ehtml/main` is imported.

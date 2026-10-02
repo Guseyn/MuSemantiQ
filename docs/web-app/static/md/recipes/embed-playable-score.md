@@ -57,8 +57,6 @@ The glyph table that goes with Bravura is already in the worker tree, at `/js/ms
       }
     </script>
     <script type="module">
-      import '#msq/web-components/lib/custom-elements-polyfill.js'
-
       import '#msq/web-components/msq-font-loader-template.js'
       import '#msq/web-components/msq-svg-midi-template.js'
     </script>
@@ -95,9 +93,9 @@ The glyph table that goes with Bravura is already in the worker tree, at `/js/ms
 </html>
 ```
 
-That is all a page needs: the import map, the polyfill and the two components, the loader, and the score inside it. The loader loads the fonts once, in the worker, and then its children take its place, which is also what keeps the score from asking for an engraving before the fonts are there. If you add an `msq-editor`, add `"#msq/language/": "/js/msq/language/"` to the import map as well, because the editor parses what you type on the page.
+That is all a page needs: the import map, the two components, the loader, and the score inside it. The loader loads the fonts once, in the worker, and then its children take its place, which is also what keeps the score from asking for an engraving before the fonts are there. If you add an `msq-editor`, add `"#msq/language/": "/js/msq/language/"` to the import map as well, because the editor parses what you type on the page.
 
-It's important to mention that the polyfill comes first. The components are customized built-in elements, which WebKit does not support, and the polyfill only helps Safari if it is there before any component defines itself. More about that you can read in [Browser support](/docs/components/browser-support).
+**Side note:** there is no polyfill to import for Safari. The components are customized built-in elements, which WebKit does not support, so they load the polyfill for it themselves, from their own `lib/` folder, before any of them is defined. More about that you can read in [Browser support](/docs/components/browser-support).
 
 ## 4. Choosing and serving a soundfont
 
@@ -128,7 +126,7 @@ A set holds only the instruments you rendered, so choose it for the music you wi
 1. the `msq-svg-midi` is outside the `msq-font-loader`, or its `data-font-sources` does not match the loader's `data-font-sources-reference`
 2. a font URL, or the `js` of a music font, answers 404
 3. the trees are not at `/js/msq/`, so the worker fails on its first import
-4. the browser is Safari, and the polyfill is missing or imported after the components
+4. the browser is Safari, and `lib/custom-elements-polyfill.js` is missing from the components' folder, so they cannot load it
 
 **It draws, but it is silent.** The score is there and the player moves, but you hear nothing. Magenta's player skips a note whose instrument is not in the set, with only a line in the console, so either the set does not hold the instrument the stave names, or the `data-sound-font` URL does not reach a folder with a `soundfont.json` in it. Open the URL of `soundfont.json` in the browser: if it is not there, neither is anything else.
 

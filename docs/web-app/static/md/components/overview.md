@@ -63,8 +63,6 @@ A page needs the modules of the components it uses, and an import map, because t
   }
 </script>
 <script type="module">
-  import '#msq/web-components/lib/custom-elements-polyfill.js'
-
   import '#msq/web-components/msq-font-loader-template.js'
   import '#msq/web-components/msq-svg-template.js'
 </script>
@@ -72,7 +70,7 @@ A page needs the modules of the components it uses, and an import map, because t
 
 The first entry is the components themselves. The second one is the language, which only the editor loads on the page, but it is resolved through the same map, so it has to be there. The worker is not in the map at all: a module worker gets no import map, so the components start it by URL, from `../../worker/worker.js` relative to their own folder. You just need to import the modules of the components you use, and every one of them brings along what it needs.
 
-The first import is not a component. It is the polyfill that lets Safari upgrade them, and it has to come before them. More about that you can read in [Browser support](/docs/components/browser-support).
+That includes Safari: the components load the polyfill that lets WebKit upgrade them by themselves, before any of them is defined. More about that you can read in [Browser support](/docs/components/browser-support).
 
 ## 4. A component renders once
 

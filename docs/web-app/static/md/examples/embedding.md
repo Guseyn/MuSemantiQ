@@ -7,10 +7,10 @@ The components need no build step and no framework, so putting them into your ow
 A host page needs three things, in this order:
 
 1. **the import map**, with the two entries the components import through;
-2. **the imports**: first the custom elements polyfill, so that Safari upgrades the components too (see [Browser support](/docs/components/browser-support)), then the components you use;
+2. **the imports** of the components you use;
 3. **a font loader**, with the components that engrave inside it.
 
-That's all. Everything else (the worker, the player, the parser for the editor) is loaded by the components themselves.
+That's all. Everything else (the worker, the player, the parser for the editor, and the polyfill that lets Safari upgrade them) is loaded by the components themselves. More about the polyfill you can read in [Browser support](/docs/components/browser-support).
 
 ## 2. Serving the three trees
 
@@ -54,8 +54,6 @@ Let's put all of it together. This page assumes the three trees under `/js/msq/`
       }
     </script>
     <script type="module">
-      import '#msq/web-components/lib/custom-elements-polyfill.js'
-
       import '#msq/web-components/msq-font-loader-template.js'
       import '#msq/web-components/msq-svg-template.js'
       import '#msq/web-components/msq-svg-midi-template.js'

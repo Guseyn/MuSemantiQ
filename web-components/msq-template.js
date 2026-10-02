@@ -1,3 +1,7 @@
+// First, before anything can define an element: WebKit needs the polyfill for
+// customized built-ins in place by then (see the file for why it is guarded).
+import '#msq/web-components/utils/polyfillCustomizedBuiltIns.js'
+
 import worker from '#msq/web-components/utils/worker-instance.js'
 import trimMultilineText from '#msq/web-components/utils/trimMultilineText.js'
 import errorsHtml from '#msq/web-components/utils/errorsHtml.js'

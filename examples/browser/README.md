@@ -9,11 +9,12 @@ npm run examples:browser
 
 Then open **https://127.0.0.1:8888** in Chrome, Edge, Firefox or Safari.
 
-> **Safari needs a polyfill.** The components are *customized built-in elements*
-> (`<template is="msq-svg">`), which WebKit has never implemented. So the page
-> imports `#msq/web-components/lib/custom-elements-polyfill.js` before any
-> component, and with it the page renders in WebKit too. That has been checked
-> with Playwright's WebKit, not yet in Safari itself on a Mac or an iPhone.
+> **Safari needs a polyfill, and the components bring it.** They are
+> *customized built-in elements* (`<template is="msq-svg">`), which WebKit has
+> never implemented, so `msq-template.js`, which every component imports before
+> it defines itself, first loads `lib/custom-elements-polyfill.js`. The page does
+> not import it. That has been checked with Playwright's WebKit, not yet in
+> Safari itself on a Mac or an iPhone.
 
 > The certificate is self-signed, so the browser will warn once. And there is a
 > pause of about five seconds before the server announces itself — that is a
@@ -51,7 +52,7 @@ Inside `static/js/msq/web-components/` (a copy of the top-level
 | `css/` | Stylesheets as JS strings, injected into each shadow root |
 | `editor/` | The editor's DOM work: highlighting, line numbers, autocomplete, caret and scroll syncing, score ↔ source navigation |
 | `icons/` | Inline SVG icons for the toolbars |
-| `utils/` | Worker plumbing, clipboard, downloads, error formatting |
+| `utils/` | Worker plumbing, clipboard, downloads, error formatting, and loading the Safari polyfill |
 | `lib/` | Vendored third-party code: the MIDI player, Tone.js writers, Magenta audio, and the custom elements polyfill for Safari |
 
 ## Running it
@@ -145,8 +146,7 @@ properties defined in `css/tokens.js` (`--surface-bg`, `--border-radius`,
 `--editor-height`, and so on) set on the host element.
 
 Give the page an import map with the components and the language (the editor
-parses on the page), import the custom elements polyfill first, so that Safari
-upgrades the components too, and then import what you use:
+parses on the page), and import what you use:
 
 ```html
 <script type="importmap">
@@ -158,15 +158,13 @@ upgrades the components too, and then import what you use:
   }
 </script>
 <script type="module">
-  import '#msq/web-components/lib/custom-elements-polyfill.js'
-
   import '#msq/web-components/msq-font-loader-template.js'
   import '#msq/web-components/msq-svg-template.js'
 </script>
 ```
 
-The polyfill patches `customElements.define`, so it only helps if it runs
-before any component defines itself.
+There is no polyfill to import for Safari: the components load it themselves,
+before any of them is defined (see `web-components/README.md`).
 
 ### `msq-font-loader`
 
@@ -301,7 +299,8 @@ usual causes:
 - a component that engraves placed **outside** the `msq-font-loader`
 - `data-font-sources` not matching the loader's `data-font-sources-reference`
 - missing font symlinks, so the font requests 404 — run `npm run setup:symlinks`
-- Safari, with the polyfill missing or imported after the components
+- Safari, with `lib/custom-elements-polyfill.js` missing from the components'
+  copy, so they cannot load it — run `npm run web-components:update`
 
 ## Also worth knowing
 
