@@ -11,9 +11,11 @@ e-ui.css is loaded first and everything here is an override of it.
   */
   --e-sidebar-expanded: 19rem;
 
-  --docs-note-bg: #fdf6e3;
+  --e-primary: #ee5253;
+
+  --docs-note-bg: #f8f8f8;
   --docs-note-border: #b58900;
-  --docs-note-fg: #6b5424;
+  --docs-note-fg: #212121;
 }
 
 /*
@@ -112,7 +114,7 @@ e-sidebar nav a[data-external] > img {
   flex-shrink: 0;
 }
 
-e-sidebar nav details[is="e-details"][data-current] > summary {
+e-sidebar nav details[is="e-details"][data-current="true"] > summary {
   color: var(--e-primary);
 }
 
@@ -252,7 +254,7 @@ e-sidebar[data-state="closed"] > kbd[is="e-kbd"] {
   display: none;
 }
 
-e-sidebar[data-state="closed"] nav details[is="e-details"][data-current] > summary {
+e-sidebar[data-state="closed"] nav details[is="e-details"][data-current="true"] > summary {
   background-color: var(--e-primary-transparent-accent-bg);
 }
 

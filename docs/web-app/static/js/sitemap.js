@@ -11,9 +11,12 @@ the reference material it came from: it is in the order the language is learnt,
 because every example is gradual — no page shows a concept an earlier page has
 not introduced. Moving a page up or down re-checks every example under it.
 
-A page is { slug, title }, optionally opening a new `group` heading in the
-sidebar. Its markdown lives at /md/<section.slug>/<page.slug>.md and its URL is
-/docs/<section.slug>/<page.slug>.
+A section lists its `pages`, or, when it is long, `groups` of them: { title,
+pages }, each a collapsible heading in the sidebar. A page is { slug, title }.
+Its markdown lives at /md/<section.slug>/<page.slug>.md and its URL is
+/docs/<section.slug>/<page.slug>. The nesting is there because the sidebar is
+an e-for-each over this list, and a template can only follow a shape, not work
+one out.
 
 A section may also carry `links`: { title, href, icon } entries the sidebar
 lists after its pages. They leave the site, so they are not pages — allPages
@@ -36,77 +39,114 @@ export const sitemap = [
   {
     slug: 'language',
     title: 'MSQ language',
-    pages: [
-      { group: 'Notes on a page', slug: 'first-notes', title: 'Your first notes' },
-      { slug: 'octaves', title: 'Octaves' },
-      { slug: 'durations', title: 'Durations' },
-      { slug: 'dots', title: 'Dots' },
-      { slug: 'rests', title: 'Rests' },
-      { slug: 'accidentals', title: 'Accidentals' },
-      { slug: 'comments', title: 'Comments' },
-
-      { group: 'Grouping notes', slug: 'chords', title: 'Chords' },
-      { slug: 'beams', title: 'Beams' },
-      { slug: 'stems', title: 'Stems' },
-      { slug: 'ties', title: 'Ties' },
-      { slug: 'tuplets', title: 'Tuplets' },
-
-      { group: 'The page', slug: 'measures', title: 'Measures' },
-      { slug: 'clefs', title: 'Clefs' },
-      { slug: 'key-signatures', title: 'Key signatures' },
-      { slug: 'time-signatures', title: 'Time signatures' },
-      { slug: 'staves', title: 'Staves' },
-      { slug: 'voices', title: 'Voices' },
-      { slug: 'page-lines', title: 'Page lines' },
-      { slug: 'titles-and-page-meta', title: 'Titles and page meta' },
-
-      { group: 'Marks on units', slug: 'articulations', title: 'Articulations' },
-      { slug: 'ornaments', title: 'Ornaments' },
-      { slug: 'dynamics', title: 'Dynamics' },
-      { slug: 'text-labels', title: 'Text labels' },
-      { slug: 'grace-units', title: 'Grace units' },
-      { slug: 'ghost-units', title: 'Ghost units' },
-      { slug: 'parentheses', title: 'Parentheses' },
-      { slug: 'breath-marks', title: 'Breath marks' },
-      { slug: 'arpeggiated-chords', title: 'Arpeggiated chords' },
-      { slug: 'chord-letters', title: 'Chord letters' },
-      { slug: 'lyrics', title: 'Lyrics' },
-      { slug: 'mid-measure-clefs', title: 'Mid-measure clefs' },
-      { slug: 'mid-measure-key-signatures', title: 'Mid-measure key signatures' },
-      { slug: 'centralized-units', title: 'Centralized units' },
-      { slug: 'adjusting-units', title: 'Adjusting units' },
-
-      { group: 'Spans', slug: 'slurs', title: 'Slurs' },
-      { slug: 'crescendo-and-diminuendo', title: 'Crescendo and diminuendo' },
-      { slug: 'octave-signs', title: 'Octave signs' },
-      { slug: 'glissando', title: 'Glissando' },
-      { slug: 'tremolo', title: 'Tremolo' },
-      { slug: 'pedal-marks', title: 'Pedal marks' },
-
-      { group: 'Measure furniture', slug: 'barlines', title: 'Barlines' },
-      { slug: 'repeat-signs', title: 'Repeat signs' },
-      { slug: 'volta-brackets', title: 'Volta brackets' },
-      { slug: 'sign', title: 'Sign (segno)' },
-      { slug: 'coda', title: 'Coda' },
-      { slug: 'repetition-instructions', title: 'Repetition instructions' },
-      { slug: 'fermata-over-barline', title: 'Fermata over barline' },
-      { slug: 'tempo-and-metronome-marks', title: 'Tempo and metronome marks' },
-      { slug: 'measure-numbers', title: 'Measure numbers' },
-      { slug: 'instrument-titles', title: 'Instrument titles' },
-      { slug: 'cross-stave-connections', title: 'Cross-stave connections' },
-      { slug: 'cross-stave-chords', title: 'Cross-stave chords' },
-      { slug: 'similes', title: 'Similes' },
-
-      { group: 'Layout and styles', slug: 'unit-spacing', title: 'Unit spacing' },
-      { slug: 'colours', title: 'Colours' },
-      { slug: 'fonts', title: 'Fonts' },
-      { slug: 'page-format', title: 'Page format' },
-      { slug: 'style-reference', title: 'The full style reference' },
-
-      { group: 'Operational', slug: 'handling-errors', title: 'Handling errors' },
-      { slug: 'midi-settings', title: 'MIDI settings' },
-
-      { group: 'Reference', slug: 'command-index', title: 'Command index' }
+    groups: [
+      {
+        title: 'Notes on a page',
+        pages: [
+          { slug: 'first-notes', title: 'Your first notes' },
+          { slug: 'octaves', title: 'Octaves' },
+          { slug: 'durations', title: 'Durations' },
+          { slug: 'dots', title: 'Dots' },
+          { slug: 'rests', title: 'Rests' },
+          { slug: 'accidentals', title: 'Accidentals' },
+          { slug: 'comments', title: 'Comments' }
+        ]
+      },
+      {
+        title: 'Grouping notes',
+        pages: [
+          { slug: 'chords', title: 'Chords' },
+          { slug: 'beams', title: 'Beams' },
+          { slug: 'stems', title: 'Stems' },
+          { slug: 'ties', title: 'Ties' },
+          { slug: 'tuplets', title: 'Tuplets' }
+        ]
+      },
+      {
+        title: 'The page',
+        pages: [
+          { slug: 'measures', title: 'Measures' },
+          { slug: 'clefs', title: 'Clefs' },
+          { slug: 'key-signatures', title: 'Key signatures' },
+          { slug: 'time-signatures', title: 'Time signatures' },
+          { slug: 'staves', title: 'Staves' },
+          { slug: 'voices', title: 'Voices' },
+          { slug: 'page-lines', title: 'Page lines' },
+          { slug: 'titles-and-page-meta', title: 'Titles and page meta' }
+        ]
+      },
+      {
+        title: 'Marks on units',
+        pages: [
+          { slug: 'articulations', title: 'Articulations' },
+          { slug: 'ornaments', title: 'Ornaments' },
+          { slug: 'dynamics', title: 'Dynamics' },
+          { slug: 'text-labels', title: 'Text labels' },
+          { slug: 'grace-units', title: 'Grace units' },
+          { slug: 'ghost-units', title: 'Ghost units' },
+          { slug: 'parentheses', title: 'Parentheses' },
+          { slug: 'breath-marks', title: 'Breath marks' },
+          { slug: 'arpeggiated-chords', title: 'Arpeggiated chords' },
+          { slug: 'chord-letters', title: 'Chord letters' },
+          { slug: 'lyrics', title: 'Lyrics' },
+          { slug: 'mid-measure-clefs', title: 'Mid-measure clefs' },
+          { slug: 'mid-measure-key-signatures', title: 'Mid-measure key signatures' },
+          { slug: 'centralized-units', title: 'Centralized units' },
+          { slug: 'adjusting-units', title: 'Adjusting units' }
+        ]
+      },
+      {
+        title: 'Spans',
+        pages: [
+          { slug: 'slurs', title: 'Slurs' },
+          { slug: 'crescendo-and-diminuendo', title: 'Crescendo and diminuendo' },
+          { slug: 'octave-signs', title: 'Octave signs' },
+          { slug: 'glissando', title: 'Glissando' },
+          { slug: 'tremolo', title: 'Tremolo' },
+          { slug: 'pedal-marks', title: 'Pedal marks' }
+        ]
+      },
+      {
+        title: 'Measure furniture',
+        pages: [
+          { slug: 'barlines', title: 'Barlines' },
+          { slug: 'repeat-signs', title: 'Repeat signs' },
+          { slug: 'volta-brackets', title: 'Volta brackets' },
+          { slug: 'sign', title: 'Sign (segno)' },
+          { slug: 'coda', title: 'Coda' },
+          { slug: 'repetition-instructions', title: 'Repetition instructions' },
+          { slug: 'fermata-over-barline', title: 'Fermata over barline' },
+          { slug: 'tempo-and-metronome-marks', title: 'Tempo and metronome marks' },
+          { slug: 'measure-numbers', title: 'Measure numbers' },
+          { slug: 'instrument-titles', title: 'Instrument titles' },
+          { slug: 'cross-stave-connections', title: 'Cross-stave connections' },
+          { slug: 'cross-stave-chords', title: 'Cross-stave chords' },
+          { slug: 'similes', title: 'Similes' }
+        ]
+      },
+      {
+        title: 'Layout and styles',
+        pages: [
+          { slug: 'unit-spacing', title: 'Unit spacing' },
+          { slug: 'colours', title: 'Colours' },
+          { slug: 'fonts', title: 'Fonts' },
+          { slug: 'page-format', title: 'Page format' },
+          { slug: 'style-reference', title: 'The full style reference' }
+        ]
+      },
+      {
+        title: 'Operational',
+        pages: [
+          { slug: 'handling-errors', title: 'Handling errors' },
+          { slug: 'midi-settings', title: 'MIDI settings' }
+        ]
+      },
+      {
+        title: 'Reference',
+        pages: [
+          { slug: 'command-index', title: 'Command index' }
+        ]
+      }
     ]
   },
   {
@@ -219,9 +259,11 @@ export const sitemap = [
 export function allPages() {
   const flat = []
   for (const section of sitemap) {
-    for (const page of section.pages) {
+    const groups = section.groups || [{ title: null, pages: section.pages }]
+    for (const group of groups) for (const page of group.pages) {
       flat.push({
         ...page,
+        group: group.title,
         section: section.slug,
         sectionTitle: section.title,
         url: `/docs/${section.slug}/${page.slug}`,

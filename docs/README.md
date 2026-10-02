@@ -17,7 +17,7 @@ shell, and a markdown file fetched into it per page.
         html/index.html    the landing page
         html/docs.html     the documentation shell
         js/sitemap.js      the documentation, as data
-        js/docs.js         the router, the sidebar, the fonts
+        js/docs.js         the sitemap and the current page, for the templates
         js/app.js          holds the sidebar open; classic, and first
         md/                every page, one .md file
     concepts.js            scenario name -> the page that introduces it

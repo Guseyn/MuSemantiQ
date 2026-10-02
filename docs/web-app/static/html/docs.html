@@ -54,6 +54,8 @@
 
       import '#e-ui/e-sidebar.js'
       import '#e-ui/e-kbd.js'
+      // The sitemap and the page the URL names, for the templates below.
+      import '/js/docs.js'
       import '#ehtml/main'
     </script>
   </head>
@@ -121,8 +123,76 @@
       </kbd>
 
       <nav aria-label="Documentation">
-        <!-- Filled from the sitemap by docs.js. -->
-        <div data-toc></div>
+        <!--
+          The sitemap, rendered. Each section is a collapsible e-details, so the
+          sidebar opens as a short list of every section rather than one long
+          column that hides the later ones below the fold, and so is each group
+          inside a section. Collapsed, the sidebar is e-ui's icon rail and only
+          the section icons show.
+
+          Icons are data-src, not src: an img with src starts loading the moment
+          a clone lands in the document, before EHTML has filled in ${...}.
+        -->
+        <div data-toc>
+          <template is="e-for-each" data-list-to-iterate="${sitemap}" data-item-name="section">
+            <details
+              is="e-details"
+              data-section="${section.slug}"
+              data-current="${currentPage !== null && currentPage.section === section.slug}"
+            >
+              <!--
+                On the rail a section is only an icon, and toggling it would open
+                a list nobody can see. So there a click opens the sidebar on that
+                section instead.
+              -->
+              <summary
+                title="${section.title}"
+                onclick="
+                  const sidebar = document.querySelector('e-sidebar')
+                  if (sidebar.getAttribute('data-state') !== 'open') {
+                    event.preventDefault()
+                    this.parentElement.open = true
+                    sidebar.open()
+                  }
+                "
+              >
+                <img data-src="/images/sidebar/${section.slug}.svg" alt="" aria-hidden="true">
+                <span data-text="${section.title}"></span>
+              </summary>
+              <div>
+                <template is="e-for-each" data-list-to-iterate="${section.pages || []}" data-item-name="page">
+                  <a
+                    href="/docs/${section.slug}/${page.slug}"
+                    data-selected="${currentPage !== null && currentPage.ref === section.slug + '/' + page.slug}"
+                  ><span data-text="${page.title}"></span></a>
+                </template>
+                <template is="e-for-each" data-list-to-iterate="${section.groups || []}" data-item-name="group">
+                  <details
+                    is="e-details"
+                    data-group
+                    data-current="${currentPage !== null && currentPage.section === section.slug && currentPage.group === group.title}"
+                  >
+                    <summary data-text="${group.title}"></summary>
+                    <div>
+                      <template is="e-for-each" data-list-to-iterate="${group.pages}" data-item-name="page">
+                        <a
+                          href="/docs/${section.slug}/${page.slug}"
+                          data-selected="${currentPage !== null && currentPage.ref === section.slug + '/' + page.slug}"
+                        ><span data-text="${page.title}"></span></a>
+                      </template>
+                    </div>
+                  </details>
+                </template>
+                <template is="e-for-each" data-list-to-iterate="${section.links || []}" data-item-name="link">
+                  <a href="${link.href}" target="_blank" rel="noopener" data-external>
+                    <img data-src="${link.icon}" alt="" aria-hidden="true">
+                    <span data-text="${link.title}"></span>
+                  </a>
+                </template>
+              </div>
+            </details>
+          </template>
+        </div>
 
         <hr is="e-divider" data-hide-on-sidebar-closed data-hide-in-mobile>
         <div is="e-info" data-hide-on-sidebar-closed data-hide-in-mobile>
@@ -181,13 +251,6 @@
     </e-sidebar>
 
     <main is="e-main">
-      <!--
-        The font loader is rendered here, once. It replaces itself with its own
-        content, so what ends up in this element is the readiness marker and
-        nothing else — every example on every page finds the fonts by name.
-      -->
-      <div data-fonts hidden></div>
-
       <article data-content>
         <noscript>
           <h1>MuSemantiQ documentation</h1>
@@ -196,9 +259,43 @@
             be enabled to read it.
           </p>
         </noscript>
+
+        <template is="e-if" data-condition-to-display="${currentPage === null}">
+          <div>
+            <h1>No such page</h1>
+            <p>Nothing in the documentation answers to this address.</p>
+          </div>
+        </template>
+
+        <!--
+          The font loader unwraps its content only once the worker has the fonts,
+          so the markdown, and every example in it, waits for them for free and
+          finds them by name.
+
+          e-markdown has no error path: whatever body comes back is rendered. So
+          the /md mount answers a missing page with a markdown file of its own,
+          which says it has not been written yet (see docs/web-app/worker.js).
+
+          The section and the group of the page open once the page starts
+          loading; by then the sidebar above has been rendered.
+        -->
+        <template is="e-if" data-condition-to-display="${currentPage !== null}">
+          <template
+            is="msq-font-loader"
+            data-font-sources-reference="msqFontSources"
+            data-font-config-src="/js/font-config.json"
+          >
+            <e-markdown
+              data-src="${currentPage.md}"
+              data-actions-on-progress-start="
+                document
+                  .querySelectorAll('e-sidebar nav details[data-current=true]')
+                  .forEach((details) => { details.open = true })
+              "
+            ></e-markdown>
+          </template>
+        </template>
       </article>
     </main>
-
-    <script type="module" src="/js/docs.js"></script>
   </body>
 </html>

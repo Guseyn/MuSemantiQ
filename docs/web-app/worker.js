@@ -49,11 +49,21 @@ server(
         fileNotFound: notFound
       }),
       /*
-      `md` is the documentation itself, fetched by the shell one page at a time.
-      It is served as text/plain — `nodes` has no mime entry for .md — which is
-      what fetch() wants anyway.
+      `md` is the documentation itself, fetched by the shell's e-markdown one
+      page at a time. It is served as text/plain — `nodes` has no mime entry
+      for .md — which is what e-markdown wants anyway.
+
+      A page the sitemap lists but nobody has written yet gets a markdown file
+      of its own rather than the 404 page: e-markdown renders whatever body
+      comes back, whatever the status, so that body has to read as a page.
       */
-      src(/^\/(css|js|images|md|font|magenta-sound-font)/, {
+      src(/^\/md/, {
+        baseFolder,
+        useGzip: true,
+        cacheControl: 'no-cache',
+        fileNotFound: path.join(baseFolder, 'md', 'not-written-yet.md')
+      }),
+      src(/^\/(css|js|images|font|magenta-sound-font)/, {
         baseFolder,
         useGzip: true,
         cacheControl: 'no-cache',
