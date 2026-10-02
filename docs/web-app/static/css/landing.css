@@ -698,6 +698,10 @@ card, which would throw off the one-card-at-a-time row.
   margin-bottom: 0.85rem;
 }
 
+/*
+The box is a div, and the <pre> inside it is whatever e-markdown made of
+md/landing/*.md, so the box is styled here and the pre only loses its margin.
+*/
 [data-code] {
   margin: 0 0 1rem;
   padding: 1.1rem 1.2rem;
@@ -707,6 +711,10 @@ card, which would throw off the one-card-at-a-time row.
   font-family: var(--mono);
   font-size: 0.75rem;
   line-height: 1.7;
+}
+
+[data-code] pre {
+  margin: 0;
   white-space: pre;
 }
 
@@ -715,6 +723,31 @@ card, which would throw off the one-card-at-a-time row.
   border: none;
   background: none;
   font-size: inherit;
+}
+
+/*
+Highlighting, in the page's own ink: markup recedes, what the reader changes
+(names, values) stands out, and the accent is kept for strings, which in these
+examples are the parts that are theirs.
+*/
+[data-code] .hljs-tag,
+[data-code] .hljs-comment {
+  color: var(--ink-faint);
+}
+
+[data-code] .hljs-name,
+[data-code] .hljs-built_in,
+[data-code] .hljs-keyword {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+[data-code] .hljs-attr {
+  color: var(--ink-soft);
+}
+
+[data-code] .hljs-string {
+  color: var(--accent);
 }
 
 /* ── A score on the page ─────────────────────────────────────────────── */

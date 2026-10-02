@@ -19,6 +19,8 @@
     <script type="importmap">
       {
         "imports": {
+          "#ehtml/": "/js/ehtml/",
+          "#ehtml/main": "/js/ehtml/main.js",
           "#msq/web-components/": "/js/msq/web-components/",
           "#msq/language/": "/js/msq/language/"
         }
@@ -26,18 +28,31 @@
     </script>
     <script type="module">
       /*
-      Safari does not implement customized built-in elements — <template is="…">,
-      which is what every msq element is — so this polyfill goes first, before
-      anything defines one. The page does not load EHTML, which is what brings it
-      elsewhere, so it comes from web-components/lib.
+      EHTML's polyfill first. The msq elements carry their own and skip it when
+      one has already run, but EHTML's has no such guard, so if the msq copy
+      ran first, EHTML's would wrap customElements.define a second time in
+      Safari.
       */
-      import '#msq/web-components/lib/custom-elements-polyfill.js'
+      import '#ehtml/third-party/custom-elements-polyfill.js'
 
       import '#msq/web-components/msq-font-loader-template.js'
       import '#msq/web-components/msq-svg-template.js'
       import '#msq/web-components/msq-midi-template.js'
       import '#msq/web-components/msq-svg-midi-template.js'
       import '#msq/web-components/msq-editor-template.js'
+
+      /*
+      EHTML is here for e-markdown alone: the code on this page is markdown in
+      md/landing/, so it is written the way it reads and comes out highlighted.
+      The extension is a global because e-markdown takes it through
+      data-internal-state, which is evaluated as an expression. Those
+      e-markdowns are inside the font loader, so they are not activated until
+      long after this has run.
+      */
+      import showdownHighlight from '#ehtml/showdown/extensions/highlight.js'
+      import '#ehtml/main'
+
+      window.showdownHighlight = showdownHighlight
     </script>
   </head>
 
@@ -90,721 +105,706 @@
       data-font-sources-reference="msqFontSources"
       data-font-config-src="/js/font-config.json"
     >
-    <main data-screens>
+      <main data-screens>
 
-      <!-- ── 02 ───────────────────────────────────────────────────────── -->
-      <section data-screen id="see" data-number="02" data-label="See it">
-        <div data-inner data-wide>
-          <h2 data-reveal>You write the words. It writes the music.</h2>
-          <p data-to-write data-reveal style="--d: 80ms">
-            TO WRITE — one or two sentences pointing at what to try: change a
-            note name, change a duration, watch the score follow. Say that this
-            editor is the real thing, not a picture of one.
-          </p>
+        <!-- ── 02 ───────────────────────────────────────────────────────── -->
+        <section data-screen id="see" data-number="02" data-label="See it">
+          <div data-inner data-wide>
+            <h2 data-reveal>You write the words. It writes the music.</h2>
+            <p data-to-write data-reveal style="--d: 80ms">
+              TO WRITE — one or two sentences pointing at what to try: change a
+              note name, change a duration, watch the score follow. Say that this
+              editor is the real thing, not a picture of one.
+            </p>
 
-          <div data-figure data-reveal style="--d: 160ms">
-            <template
-              is="msq-editor"
-              data-font-sources="msqFontSources"
-              data-editor-height="240px"
-            >
-              page top padding is 5
-              page lines top offset is 18
-              interval between staves is 14.5
+            <div data-figure data-reveal style="--d: 160ms">
+              <template
+                is="msq-editor"
+                data-font-sources="msqFontSources"
+                data-editor-height="240px"
+              >
+                page top padding is 5
+                page lines top offset is 18
+                interval between staves is 14.5
 
-              page line width is 728
-              font size is 6
+                page line width is 728
+                font size is 6
 
-              page lines top offset is 8
+                page lines top offset is 8
 
-              title is "Prelude Op. 28 No. 16"
-              subtitle is ""Hades""
-              right subtitle is "F.F. Chopin"
+                title is "Prelude Op. 28 No. 16"
+                subtitle is ""Hades""
+                right subtitle is "F.F. Chopin"
 
-              fermata duration is 1
+                fermata duration is 1
 
-              measure 
-              ends with double barline
-              ends with fermata
+                measure 
+                ends with double barline
+                ends with fermata
 
-              brace from first stave to second stave for each line
-              instrument "Piano" between first stave and second stave for each line
-              key signature is d flat major for each line
-              time signature is crossed c
+                brace from first stave to second stave for each line
+                instrument "Piano" between first stave and second stave for each line
+                key signature is d flat major for each line
+                time signature is crossed c
 
-              stave with treble clef
+                stave with treble clef
 
-              chord with accent, stem down, with dynamic "f" down
-              g5 a4 with natural key e
+                chord with accent, stem down, with dynamic "f" down
+                g5 a4 with natural key e
 
-              chord with accent, stem down
-              f5 a4 e
+                chord with accent, stem down
+                f5 a4 e
 
-              chord with accent down, stem up
-              e5 with natural key a4 e with flat key
+                chord with accent down, stem up
+                e5 with natural key a4 e with flat key
 
-              chord with accent down, stem up
-              e5 with flat key a4 e
+                chord with accent down, stem up
+                e5 with flat key a4 e
 
-              chord with accent down, stem up
-              d5 a4 e
+                chord with accent down, stem up
+                d5 a4 e
 
-              chord with accent down, stem up
-              c5 a4 e
+                chord with accent down, stem up
+                c5 a4 e
 
-              stave with bass clef
+                stave with bass clef
 
-              chord
-              f1 f
+                chord
+                f1 f
 
-              chord stem down
-              c4 f3 c3
+                chord stem down
+                c4 f3 c3
 
-              chord stem down
-              c4 f3 c3
+                chord stem down
+                c4 f3 c3
 
-              chord stem down
-              c4 f3 c3
+                chord stem down
+                c4 f3 c3
 
-              chord, stem down
-              c4 f3 c3
+                chord, stem down
+                c4 f3 c3
 
-              chord stem down
-              c4 f3 c3
+                chord stem down
+                c4 f3 c3
 
-              slur in first measure from first chord to 6th chord
-              with right point 0.5 up
-              with roundness 3
+                slur in first measure from first chord to 6th chord
+                with right point 0.5 up
+                with roundness 3
 
-              measure
-              tempo mark is "Presto con fuoco" 2 down
-              stave
-              1/16 f5 beamed, stem down
-              e5
-              c5
-              d5 not beamed
+                measure
+                tempo mark is "Presto con fuoco" 2 down
+                stave
+                1/16 f5 beamed, stem down
+                e5
+                c5
+                d5 not beamed
 
-              f beamed, stem up
-              a4 with n key
-              b4
-              c5 not beamed
+                f beamed, stem up
+                a4 with n key
+                b4
+                c5 not beamed
 
-              d5 beamed, stem down
-              e5
-              f5
-              g5 with natural key not beamed
+                d5 beamed, stem down
+                e5
+                f5
+                g5 with natural key not beamed
 
-              a5, beamed
-              b5 with natural key
-              c6
-              d6 not beamed
-              stave
+                a5, beamed
+                b5 with natural key
+                c6
+                d6 not beamed
+                stave
 
-              1/8 b2
-              with pedal 
-              beamed
-              chord not beamed
-              d4 f3
-              rest with release
-              f2 stem up
+                1/8 b2
+                with pedal 
+                beamed
+                chord not beamed
+                d4 f3
+                rest with release
+                f2 stem up
 
-              1/8 b2 with stem down
-              with pedal 
-              beamed
-              chord not beamed
-              d4 f3
-              rest with release
-              f2 stem up
+                1/8 b2 with stem down
+                with pedal 
+                beamed
+                chord not beamed
+                d4 f3
+                rest with release
+                f2 stem up
 
-              slur in second measure from first unit and finishes after 16th unit
-              with roundness 1
+                slur in second measure from first unit and finishes after 16th unit
+                with roundness 1
 
-              crescendo in second measure from first unit to 16th unit below stave 2 down
+                crescendo in second measure from first unit to 16th unit below stave 2 down
 
-              slur in second measure on second stave from first unit to second unit, with left point 0.35 up, with right point 0 down, with roundness 10
-              slur in second measure on second stave from 5th unit to 6th unit, with left point 0.35 up, with right point 0 down, with roundness 10
+                slur in second measure on second stave from first unit to second unit, with left point 0.35 up, with right point 0 down, with roundness 10
+                slur in second measure on second stave from 5th unit to 6th unit, with left point 0.35 up, with right point 0 down, with roundness 10
 
-              tuplet 3 in first measure on first stave from first chord to 3rd chord down
-              tuplet 3 in first measure on first stave from 4th chord to 6th chord down
-              tuplet 3 in first measure on second stave from first chord to 3rd chord up
-              tuplet 3 in first measure on second stave from 4th chord to 6th chord up
-            </template>
-          </div>
-        </div>
-      </section>
-
-      <!-- ── 03 ───────────────────────────────────────────────────────── -->
-      <section data-screen id="features" data-number="03" data-label="What you get">
-        <div data-inner data-wide>
-          <h2 data-reveal>What you get</h2>
-
-          <!--
-            One feature at a time, with the next one just showing at the edge so
-            it is clear there is more. The row is the thing that scrolls; the
-            buttons move it by exactly one card, and the edges are masked so a
-            card leaves by fading rather than by being cut off.
-
-            The drawings are placeholders. Each says what its card is about in
-            the page's own hairline vocabulary; replace them as the prose lands.
-          -->
-          <div data-carousel data-reveal style="--d: 80ms">
-            <div data-carousel-viewport>
-              <ul data-cards>
-                <li data-card>
-                  <!--
-                    Deterministic: the four-point spark that has come to mean
-                    "generated", struck through. It reads at a glance, which a
-                    little diagram of a neural net does not.
-                  -->
-                  <svg data-art viewBox="0 0 64 64" aria-hidden="true">
-                    <path d="M32 13l4.5 14.5L51 32l-14.5 4.5L32 51l-4.5-14.5L13 32l14.5-4.5z"/>
-                    <path d="M13 51L51 13"/>
-                  </svg>
-                  <h3>Deterministic</h3>
-                  <p data-to-write>
-                    TO WRITE — the same input gives the same output, every time,
-                    on every machine. It is a parser and an engraver, not a
-                    model: no inference cost, no network call, and nothing
-                    invented that you did not write. A score is a text file, so
-                    it diffs and merges and lives in version control. Make the
-                    contrast without naming competitors.
-                  </p>
-                </li>
-
-                <li data-card>
-                  <!-- Free: a lock standing open. -->
-                  <svg data-art viewBox="0 0 64 64" aria-hidden="true">
-                    <rect x="14" y="30" width="36" height="24" rx="2"/>
-                    <path d="M24 30v-8a8 8 0 0 1 16 0"/>
-                    <path d="M32 39v6"/>
-                  </svg>
-                  <h3>Free</h3>
-                  <p data-to-write>
-                    TO WRITE — the licence in one sentence, what it asks for,
-                    and a link to the full text.
-                  </p>
-                </li>
-
-                <li data-card>
-                  <!-- Extendable: three blocks and a dashed slot for the next. -->
-                  <svg data-art viewBox="0 0 64 64" aria-hidden="true">
-                    <rect x="10" y="22" width="16" height="16"/>
-                    <rect x="30" y="22" width="16" height="16"/>
-                    <rect x="10" y="42" width="16" height="16"/>
-                    <rect x="30" y="42" width="16" height="16" stroke-dasharray="3 3"/>
-                    <path d="M38 47v6M35 50h6"/>
-                  </svg>
-                  <h3>Extendable</h3>
-                  <p data-to-write>
-                    TO WRITE — your own fonts, your own tools, and an open page
-                    schema that other programs can read and write.
-                  </p>
-                </li>
-
-                <li data-card>
-                  <!-- Customizable: every knob is a written command. -->
-                  <svg data-art viewBox="0 0 64 64" aria-hidden="true">
-                    <path d="M12 22h40M12 32h40M12 42h40"/>
-                    <circle cx="24" cy="22" r="4"/>
-                    <circle cx="40" cy="32" r="4"/>
-                    <circle cx="19" cy="42" r="4"/>
-                  </svg>
-                  <h3>Customizable</h3>
-                  <p data-to-write>
-                    TO WRITE — every style knob is a written command, so how a
-                    score looks is part of the document rather than a setting
-                    kept somewhere else.
-                  </p>
-                </li>
-
-                <li data-card>
-                  <!-- Navigable: words on the left, a note on the right, both ways. -->
-                  <svg data-art viewBox="0 0 64 64" aria-hidden="true">
-                    <path d="M8 22h16M8 28h12M8 34h16M8 40h10"/>
-                    <ellipse cx="46" cy="40" rx="6" ry="4.5" transform="rotate(-20 46 40)"/>
-                    <path d="M52 39V20"/>
-                    <path d="M26 50h24M26 50l4-3M26 50l4 3M50 50l-4-3M50 50l-4 3"/>
-                  </svg>
-                  <h3>Navigable</h3>
-                  <p data-to-write>
-                    TO WRITE — the score and the source are linked both ways.
-                    Say what Cmd/Ctrl-clicking a note does, and why that matters
-                    in a long piece.
-                  </p>
-                </li>
-              </ul>
-            </div>
-
-            <div data-carousel-controls>
-              <button type="button" data-carousel-prev aria-label="Previous">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
-              </button>
-              <span data-carousel-count aria-live="polite"></span>
-              <button type="button" data-carousel-next aria-label="Next">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
-              </button>
+                tuplet 3 in first measure on first stave from first chord to 3rd chord down
+                tuplet 3 in first measure on first stave from 4th chord to 6th chord down
+                tuplet 3 in first measure on second stave from first chord to 3rd chord up
+                tuplet 3 in first measure on second stave from 4th chord to 6th chord up
+              </template>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <!-- ── 04 ───────────────────────────────────────────────────────── -->
-      <section data-screen id="how" data-number="04" data-label="How it works">
-        <div data-inner data-widest>
-          <h2 data-reveal>How it works</h2>
+        <!-- ── 03 ───────────────────────────────────────────────────────── -->
+        <section data-screen id="features" data-number="03" data-label="What you get">
+          <div data-inner data-wide>
+            <h2 data-reveal>What you get</h2>
 
-          <!--
-            The pipeline down the left, what each stage means down the right.
-            Pointing at a stage lights its note, so the diagram and the prose
-            are one thing rather than two lists to be matched up by eye.
-          -->
-          <div data-flow-layout>
-            <ol data-flow aria-label="The pipeline">
-              <li data-stage="words">
-                <button type="button" data-stage-button>
-                  <svg data-stage-art viewBox="0 0 48 48" aria-hidden="true">
-                    <path d="M10 14h28M10 22h20M10 30h28M10 38h14"/>
-                  </svg>
-                  <span>Words</span>
-                </button>
-              </li>
-              <li data-stage="parser">
-                <button type="button" data-stage-button>
-                  <svg data-stage-art viewBox="0 0 48 48" aria-hidden="true">
-                    <path d="M8 10h32L28 26v12l-8 4V26z"/>
-                  </svg>
-                  <span>Parser</span>
-                </button>
-              </li>
-              <li data-stage="schema">
-                <button type="button" data-stage-button>
-                  <svg data-stage-art viewBox="0 0 48 48" aria-hidden="true">
-                    <path d="M18 8c-5 0-6 3-6 7s0 7-5 9c5 2 5 5 5 9s1 7 6 7"/>
-                    <path d="M30 8c5 0 6 3 6 7s0 7 5 9c-5 2-5 5-5 9s-1 7-6 7"/>
-                  </svg>
-                  <span>Page schema</span>
-                </button>
-              </li>
-              <li data-stage="outputs" data-outputs>
-                <button type="button" data-stage-button data-output="svg">
-                  <svg data-stage-art viewBox="0 0 48 48" aria-hidden="true">
-                    <rect x="9" y="7" width="30" height="34" rx="2"/>
-                    <path d="M15 21h18M15 26h18"/>
-                    <ellipse cx="20" cy="30" rx="4" ry="3"/>
-                    <path d="M24 29V17"/>
-                  </svg>
-                  <span>SVG</span>
-                </button>
-                <button type="button" data-stage-button data-output="midi">
-                  <svg data-stage-art viewBox="0 0 48 48" aria-hidden="true">
-                    <rect x="7" y="14" width="34" height="20" rx="2"/>
-                    <path d="M16 14v13M24 14v13M32 14v13"/>
-                  </svg>
-                  <span>MIDI</span>
-                </button>
-                <button type="button" data-stage-button data-output="musicxml">
-                  <svg data-stage-art viewBox="0 0 48 48" aria-hidden="true">
-                    <path d="M18 16l-8 8 8 8M30 16l8 8-8 8M27 12l-6 24"/>
-                  </svg>
-                  <span>MusicXML</span>
-                </button>
-                <button type="button" data-stage-button data-output="highlights">
-                  <svg data-stage-art viewBox="0 0 48 48" aria-hidden="true">
-                    <path d="M10 14h28M10 30h28M10 38h18"/>
-                    <rect x="10" y="19" width="20" height="6" rx="1"/>
-                  </svg>
-                  <span>Editor highlights</span>
-                </button>
-              </li>
-            </ol>
+            <!--
+              One feature at a time, with the next one just showing at the edge so
+              it is clear there is more. The row is the thing that scrolls; the
+              buttons move it by exactly one card, and the edges are masked so a
+              card leaves by fading rather than by being cut off.
 
-            <div data-flow-notes>
-              <div data-note-for="words">
-                <h3>Words</h3>
-                <p data-to-write>
-                  TO WRITE — what the source is: plain text, line oriented, and
-                  readable as English. Say that a bare list of note names is
-                  already a valid document.
-                </p>
+              The drawings are placeholders. Each says what its card is about in
+              the page's own hairline vocabulary; replace them as the prose lands.
+            -->
+            <div data-carousel data-reveal style="--d: 80ms">
+              <div data-carousel-viewport>
+                <ul data-cards>
+                  <li data-card>
+                    <!--
+                      Deterministic: the four-point spark that has come to mean
+                      "generated", struck through. It reads at a glance, which a
+                      little diagram of a neural net does not.
+                    -->
+                    <svg data-art viewBox="0 0 64 64" aria-hidden="true">
+                      <path d="M32 13l4.5 14.5L51 32l-14.5 4.5L32 51l-4.5-14.5L13 32l14.5-4.5z"/>
+                      <path d="M13 51L51 13"/>
+                    </svg>
+                    <h3>Deterministic</h3>
+                    <p data-to-write>
+                      TO WRITE — the same input gives the same output, every time,
+                      on every machine. It is a parser and an engraver, not a
+                      model: no inference cost, no network call, and nothing
+                      invented that you did not write. A score is a text file, so
+                      it diffs and merges and lives in version control. Make the
+                      contrast without naming competitors.
+                    </p>
+                  </li>
+
+                  <li data-card>
+                    <!-- Free: a lock standing open. -->
+                    <svg data-art viewBox="0 0 64 64" aria-hidden="true">
+                      <rect x="14" y="30" width="36" height="24" rx="2"/>
+                      <path d="M24 30v-8a8 8 0 0 1 16 0"/>
+                      <path d="M32 39v6"/>
+                    </svg>
+                    <h3>Free</h3>
+                    <p data-to-write>
+                      TO WRITE — the licence in one sentence, what it asks for,
+                      and a link to the full text.
+                    </p>
+                  </li>
+
+                  <li data-card>
+                    <!-- Extendable: three blocks and a dashed slot for the next. -->
+                    <svg data-art viewBox="0 0 64 64" aria-hidden="true">
+                      <rect x="10" y="22" width="16" height="16"/>
+                      <rect x="30" y="22" width="16" height="16"/>
+                      <rect x="10" y="42" width="16" height="16"/>
+                      <rect x="30" y="42" width="16" height="16" stroke-dasharray="3 3"/>
+                      <path d="M38 47v6M35 50h6"/>
+                    </svg>
+                    <h3>Extendable</h3>
+                    <p data-to-write>
+                      TO WRITE — your own fonts, your own tools, and an open page
+                      schema that other programs can read and write.
+                    </p>
+                  </li>
+
+                  <li data-card>
+                    <!-- Customizable: every knob is a written command. -->
+                    <svg data-art viewBox="0 0 64 64" aria-hidden="true">
+                      <path d="M12 22h40M12 32h40M12 42h40"/>
+                      <circle cx="24" cy="22" r="4"/>
+                      <circle cx="40" cy="32" r="4"/>
+                      <circle cx="19" cy="42" r="4"/>
+                    </svg>
+                    <h3>Customizable</h3>
+                    <p data-to-write>
+                      TO WRITE — every style knob is a written command, so how a
+                      score looks is part of the document rather than a setting
+                      kept somewhere else.
+                    </p>
+                  </li>
+
+                  <li data-card>
+                    <!-- Navigable: words on the left, a note on the right, both ways. -->
+                    <svg data-art viewBox="0 0 64 64" aria-hidden="true">
+                      <path d="M8 22h16M8 28h12M8 34h16M8 40h10"/>
+                      <ellipse cx="46" cy="40" rx="6" ry="4.5" transform="rotate(-20 46 40)"/>
+                      <path d="M52 39V20"/>
+                      <path d="M26 50h24M26 50l4-3M26 50l4 3M50 50l-4-3M50 50l-4 3"/>
+                    </svg>
+                    <h3>Navigable</h3>
+                    <p data-to-write>
+                      TO WRITE — the score and the source are linked both ways.
+                      Say what Cmd/Ctrl-clicking a note does, and why that matters
+                      in a long piece.
+                    </p>
+                  </li>
+                </ul>
               </div>
-              <div data-note-for="parser">
-                <h3>Parser</h3>
-                <p data-to-write>
-                  TO WRITE — that it recognises commands rather than matching a
-                  grammar, that it never throws, and that anything it does not
-                  understand is reported with its line number instead of
-                  stopping the page.
-                </p>
+
+              <div data-carousel-controls>
+                <button type="button" data-carousel-prev aria-label="Previous">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+                </button>
+                <span data-carousel-count aria-live="polite"></span>
+                <button type="button" data-carousel-next aria-label="Next">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+                </button>
               </div>
-              <div data-note-for="schema">
-                <h3>Page schema</h3>
-                <p data-to-write>
-                  TO WRITE — the pivot. Say that everything downstream reads
-                  this and nothing downstream reads the text, so it is the
-                  thing to write a tool against. One line on its shape:
-                  measures, staves, voices, units.
-                </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ── 04 ───────────────────────────────────────────────────────── -->
+        <section data-screen id="how" data-number="04" data-label="How it works">
+          <div data-inner data-widest>
+            <h2 data-reveal>How it works</h2>
+
+            <!--
+              The pipeline down the left, what each stage means down the right.
+              Pointing at a stage lights its note, so the diagram and the prose
+              are one thing rather than two lists to be matched up by eye.
+            -->
+            <div data-flow-layout>
+              <ol data-flow aria-label="The pipeline">
+                <li data-stage="words">
+                  <button type="button" data-stage-button>
+                    <svg data-stage-art viewBox="0 0 48 48" aria-hidden="true">
+                      <path d="M10 14h28M10 22h20M10 30h28M10 38h14"/>
+                    </svg>
+                    <span>Words</span>
+                  </button>
+                </li>
+                <li data-stage="parser">
+                  <button type="button" data-stage-button>
+                    <svg data-stage-art viewBox="0 0 48 48" aria-hidden="true">
+                      <path d="M8 10h32L28 26v12l-8 4V26z"/>
+                    </svg>
+                    <span>Parser</span>
+                  </button>
+                </li>
+                <li data-stage="schema">
+                  <button type="button" data-stage-button>
+                    <svg data-stage-art viewBox="0 0 48 48" aria-hidden="true">
+                      <path d="M18 8c-5 0-6 3-6 7s0 7-5 9c5 2 5 5 5 9s1 7 6 7"/>
+                      <path d="M30 8c5 0 6 3 6 7s0 7 5 9c-5 2-5 5-5 9s-1 7-6 7"/>
+                    </svg>
+                    <span>Page schema</span>
+                  </button>
+                </li>
+                <li data-stage="outputs" data-outputs>
+                  <button type="button" data-stage-button data-output="svg">
+                    <svg data-stage-art viewBox="0 0 48 48" aria-hidden="true">
+                      <rect x="9" y="7" width="30" height="34" rx="2"/>
+                      <path d="M15 21h18M15 26h18"/>
+                      <ellipse cx="20" cy="30" rx="4" ry="3"/>
+                      <path d="M24 29V17"/>
+                    </svg>
+                    <span>SVG</span>
+                  </button>
+                  <button type="button" data-stage-button data-output="midi">
+                    <svg data-stage-art viewBox="0 0 48 48" aria-hidden="true">
+                      <rect x="7" y="14" width="34" height="20" rx="2"/>
+                      <path d="M16 14v13M24 14v13M32 14v13"/>
+                    </svg>
+                    <span>MIDI</span>
+                  </button>
+                  <button type="button" data-stage-button data-output="musicxml">
+                    <svg data-stage-art viewBox="0 0 48 48" aria-hidden="true">
+                      <path d="M18 16l-8 8 8 8M30 16l8 8-8 8M27 12l-6 24"/>
+                    </svg>
+                    <span>MusicXML</span>
+                  </button>
+                  <button type="button" data-stage-button data-output="highlights">
+                    <svg data-stage-art viewBox="0 0 48 48" aria-hidden="true">
+                      <path d="M10 14h28M10 30h28M10 38h18"/>
+                      <rect x="10" y="19" width="20" height="6" rx="1"/>
+                    </svg>
+                    <span>Editor highlights</span>
+                  </button>
+                </li>
+              </ol>
+
+              <div data-flow-notes>
+                <div data-note-for="words">
+                  <h3>Words</h3>
+                  <p data-to-write>
+                    TO WRITE — what the source is: plain text, line oriented, and
+                    readable as English. Say that a bare list of note names is
+                    already a valid document.
+                  </p>
+                </div>
+                <div data-note-for="parser">
+                  <h3>Parser</h3>
+                  <p data-to-write>
+                    TO WRITE — that it recognises commands rather than matching a
+                    grammar, that it never throws, and that anything it does not
+                    understand is reported with its line number instead of
+                    stopping the page.
+                  </p>
+                </div>
+                <div data-note-for="schema">
+                  <h3>Page schema</h3>
+                  <p data-to-write>
+                    TO WRITE — the pivot. Say that everything downstream reads
+                    this and nothing downstream reads the text, so it is the
+                    thing to write a tool against. One line on its shape:
+                    measures, staves, voices, units.
+                  </p>
+                </div>
+                <div data-note-for="svg">
+                  <h3>SVG</h3>
+                  <p data-to-write>
+                    TO WRITE — one image per page, engraved rather than laid out:
+                    say what the drawer decides for you.
+                  </p>
+                </div>
+                <div data-note-for="midi">
+                  <h3>MIDI</h3>
+                  <p data-to-write>
+                    TO WRITE — one performance for the whole document. What is
+                    honoured — repeats, tempo, dynamics, ornaments — and what is
+                    not.
+                  </p>
+                </div>
+                <div data-note-for="musicxml">
+                  <h3>MusicXML</h3>
+                  <p data-to-write>
+                    TO WRITE — both directions, and an honest sentence on what is
+                    lost each way. Say that what cannot be imported is named in a
+                    report rather than quietly dropped.
+                  </p>
+                </div>
+                <div data-note-for="highlights">
+                  <h3>Editor highlights</h3>
+                  <p data-to-write>
+                    TO WRITE — the same parse, rendered as coloured HTML with a
+                    reference id on every element. That is what links a note in
+                    the score back to the word that drew it.
+                  </p>
+                </div>
               </div>
-              <div data-note-for="svg">
+            </div>
+          </div>
+        </section>
+
+        <!-- ── 05 ───────────────────────────────────────────────────────── -->
+        <section data-screen id="outputs" data-number="05" data-label="Outputs">
+          <div data-inner data-widest>
+            <h2 data-reveal>What it produces</h2>
+            <p data-to-write data-reveal style="--d: 60ms">
+              TO WRITE — one line above the blocks saying that all of these come
+              from the same parse, and which of them are lossless.
+            </p>
+
+            <ul data-blocks>
+              <li data-block data-reveal style="--d: 120ms">
+                <svg data-art viewBox="0 0 64 64" aria-hidden="true">
+                  <rect x="12" y="8" width="40" height="48" rx="2"/>
+                  <path d="M20 26h24M20 32h24"/>
+                  <ellipse cx="27" cy="38" rx="5" ry="3.5"/>
+                  <path d="M32 37V21"/>
+                </svg>
                 <h3>SVG</h3>
-                <p data-to-write>
-                  TO WRITE — one image per page, engraved rather than laid out:
-                  say what the drawer decides for you.
-                </p>
-              </div>
-              <div data-note-for="midi">
+                <p data-to-write>TO WRITE — one per page. What it is good for.</p>
+              </li>
+              <li data-block data-reveal style="--d: 170ms">
+                <svg data-art viewBox="0 0 64 64" aria-hidden="true">
+                  <rect x="8" y="20" width="48" height="26" rx="2"/>
+                  <path d="M20 20v17M30 20v17M40 20v17"/>
+                </svg>
                 <h3>MIDI</h3>
-                <p data-to-write>
-                  TO WRITE — one performance for the whole document. What is
-                  honoured — repeats, tempo, dynamics, ornaments — and what is
-                  not.
-                </p>
-              </div>
-              <div data-note-for="musicxml">
+                <p data-to-write>TO WRITE — one per document, not per page.</p>
+              </li>
+              <li data-block data-reveal style="--d: 220ms">
+                <svg data-art viewBox="0 0 64 64" aria-hidden="true">
+                  <path d="M24 20l-10 12 10 12M40 20l10 12-10 12M36 14l-8 36"/>
+                </svg>
                 <h3>MusicXML</h3>
-                <p data-to-write>
-                  TO WRITE — both directions, and an honest sentence on what is
-                  lost each way. Say that what cannot be imported is named in a
-                  report rather than quietly dropped.
-                </p>
-              </div>
-              <div data-note-for="highlights">
+                <p data-to-write>TO WRITE — in and out, and what survives.</p>
+              </li>
+              <li data-block data-reveal style="--d: 270ms">
+                <svg data-art viewBox="0 0 64 64" aria-hidden="true">
+                  <path d="M18 14c-6 0-7 4-7 9s0 8-6 9c6 1 6 4 6 9s1 9 7 9"/>
+                  <path d="M46 14c6 0 7 4 7 9s0 8 6 9c-6 1-6 4-6 9s-1 9-7 9"/>
+                  <path d="M26 32h12"/>
+                </svg>
+                <h3>Page schema</h3>
+                <p data-to-write>TO WRITE — the JSON everything else reads.</p>
+              </li>
+              <li data-block data-reveal style="--d: 320ms">
+                <svg data-art viewBox="0 0 64 64" aria-hidden="true">
+                  <path d="M12 18h40M12 44h40M12 52h26"/>
+                  <rect x="12" y="26" width="28" height="9" rx="1.5"/>
+                </svg>
                 <h3>Editor highlights</h3>
+                <p data-to-write>TO WRITE — coloured HTML with reference ids.</p>
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- ── 06 ───────────────────────────────────────────────────────── -->
+        <section data-screen id="embed" data-number="06" data-label="Embed it">
+          <div data-inner data-widest>
+            <h2 data-reveal>Put it in your own page</h2>
+            <p data-to-write data-reveal style="--d: 60ms">
+              TO WRITE — that this is the whole of it: register the fonts once,
+              then write the music as the content of an element.
+            </p>
+
+            <!--
+              Every element there is, one per card, each showing itself: a title,
+              a line on what it is for, and the element running. It is the same
+              carousel as "What you get" (landing.js wires any [data-carousel]),
+              so it scrolls by trackpad, touch and keyboard, and the buttons move
+              it one card at a time.
+
+              All of them play the same short air, so what changes from card to
+              card is the element and not the music.
+            -->
+            <div data-carousel data-examples data-reveal style="--d: 120ms">
+              <div data-carousel-viewport>
+                <ul data-cards>
+                  <li data-card>
+                    <h3><code>msq-svg</code></h3>
+                    <p data-to-write>TO WRITE — the score, and nothing else.</p>
+                    <div data-example>
+                      <template
+                        is="msq-svg"
+                        data-font-sources="msqFontSources"
+                      >
+                        title is "Air"
+                        left subtitle is "traditional"
+
+                        measure
+                        treble clef
+                        key signature is g major for each line
+                        time signature is 4:4 for each line
+                        1/8 g beamed, a, b, c5 not beamed
+                        1/4 d5
+                        1/4 b with dynamic "mp"
+
+                        measure
+                        1/8 c5 beamed, b, a, g not beamed
+                        1/2 g with fermata
+
+                        slur from first unit to fourth unit
+                      </template>
+                    </div>
+                  </li>
+
+                  <li data-card>
+                    <h3><code>msq-midi</code></h3>
+                    <p data-to-write>TO WRITE — playback only; needs no fonts.</p>
+                    <div data-example>
+                      <template is="msq-midi">
+                        measure
+                        treble clef
+                        key signature is g major for each line
+                        time signature is 4:4 for each line
+                        1/8 g beamed, a, b, c5 not beamed
+                        1/4 d5
+                        1/4 b with dynamic "mp"
+
+                        measure
+                        1/8 c5 beamed, b, a, g not beamed
+                        1/2 g with fermata
+
+                        slur from first unit to fourth unit
+                      </template>
+                    </div>
+                  </li>
+
+                  <li data-card>
+                    <h3><code>msq-svg-midi</code></h3>
+                    <p data-to-write>TO WRITE — both, notes lighting as they sound.</p>
+                    <div data-example>
+                      <template
+                        is="msq-svg-midi"
+                        data-font-sources="msqFontSources"
+                      >
+                        title is "Air"
+                        left subtitle is "traditional"
+
+                        measure
+                        treble clef
+                        key signature is g major for each line
+                        time signature is 4:4 for each line
+                        1/8 g beamed, a, b, c5 not beamed
+                        1/4 d5
+                        1/4 b with dynamic "mp"
+
+                        measure
+                        1/8 c5 beamed, b, a, g not beamed
+                        1/2 g with fermata
+
+                        slur from first unit to fourth unit
+                      </template>
+                    </div>
+                  </li>
+
+                  <li data-card>
+                    <h3><code>msq-editor</code></h3>
+                    <p data-to-write>TO WRITE — editable, highlighted, navigable.</p>
+                    <div data-example>
+                      <template
+                        is="msq-editor"
+                        data-font-sources="msqFontSources"
+                        data-editor-height="200px"
+                      >
+                        title is "Air"
+                        left subtitle is "traditional"
+
+                        measure
+                        treble clef
+                        key signature is g major for each line
+                        time signature is 4:4 for each line
+                        1/8 g beamed, a, b, c5 not beamed
+                        1/4 d5
+                        1/4 b with dynamic "mp"
+
+                        measure
+                        1/8 c5 beamed, b, a, g not beamed
+                        1/2 g with fermata
+
+                        slur from first unit to fourth unit
+                      </template>
+                    </div>
+                  </li>
+
+                  <li data-card>
+                    <h3><code>msq-font-loader</code></h3>
+                    <p data-to-write>TO WRITE — wraps them; registers the fonts once.</p>
+                    <!--
+                      The one element with nothing to show: it draws nothing
+                      itself. This whole page is inside one, so what it looks like
+                      running is every other card; what it looks like written is
+                      this.
+                    -->
+                    <div data-code data-example>
+                      <e-markdown
+                        data-src="/md/landing/font-loader.md"
+                        data-internal-state="${{ extensions: [ showdownHighlight({ auto_detection: false }) ] }}"
+                      ></e-markdown>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+
+              <div data-carousel-controls>
+                <button type="button" data-carousel-prev aria-label="Previous">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+                </button>
+                <span data-carousel-count aria-live="polite"></span>
+                <button type="button" data-carousel-next aria-label="Next">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ── 07 ───────────────────────────────────────────────────────── -->
+        <section data-screen id="quick-start" data-number="07" data-label="Quick start">
+          <div data-inner data-widest>
+            <h2 data-reveal>Quick start</h2>
+
+            <div data-columns>
+              <div data-column data-reveal style="--d: 80ms">
+                <h3>From the command line</h3>
+                <div data-code>
+                  <e-markdown
+                    data-src="/md/landing/command-line.md"
+                    data-internal-state="${{ extensions: [ showdownHighlight({ auto_detection: false }) ] }}"
+                  ></e-markdown>
+                </div>
                 <p data-to-write>
-                  TO WRITE — the same parse, rendered as coloured HTML with a
-                  reference id on every element. That is what links a note in
-                  the score back to the word that drew it.
+                  TO WRITE — what each command does, that Node 22 is the only
+                  requirement, and where the outputs land.
+                </p>
+              </div>
+
+              <div data-column data-reveal style="--d: 160ms">
+                <h3>In a page</h3>
+                <div data-code>
+                  <e-markdown
+                    data-src="/md/landing/in-a-page.md"
+                    data-internal-state="${{ extensions: [ showdownHighlight({ auto_detection: false }) ] }}"
+                  ></e-markdown>
+                </div>
+                <p data-to-write>
+                  TO WRITE — the three files a host page serves, and the import
+                  map behind the specifiers. Link to the components docs.
                 </p>
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <!-- ── 05 ───────────────────────────────────────────────────────── -->
-      <section data-screen id="outputs" data-number="05" data-label="Outputs">
-        <div data-inner data-widest>
-          <h2 data-reveal>What it produces</h2>
-          <p data-to-write data-reveal style="--d: 60ms">
-            TO WRITE — one line above the blocks saying that all of these come
-            from the same parse, and which of them are lossless.
-          </p>
-
-          <ul data-blocks>
-            <li data-block data-reveal style="--d: 120ms">
-              <svg data-art viewBox="0 0 64 64" aria-hidden="true">
-                <rect x="12" y="8" width="40" height="48" rx="2"/>
-                <path d="M20 26h24M20 32h24"/>
-                <ellipse cx="27" cy="38" rx="5" ry="3.5"/>
-                <path d="M32 37V21"/>
-              </svg>
-              <h3>SVG</h3>
-              <p data-to-write>TO WRITE — one per page. What it is good for.</p>
-            </li>
-            <li data-block data-reveal style="--d: 170ms">
-              <svg data-art viewBox="0 0 64 64" aria-hidden="true">
-                <rect x="8" y="20" width="48" height="26" rx="2"/>
-                <path d="M20 20v17M30 20v17M40 20v17"/>
-              </svg>
-              <h3>MIDI</h3>
-              <p data-to-write>TO WRITE — one per document, not per page.</p>
-            </li>
-            <li data-block data-reveal style="--d: 220ms">
-              <svg data-art viewBox="0 0 64 64" aria-hidden="true">
-                <path d="M24 20l-10 12 10 12M40 20l10 12-10 12M36 14l-8 36"/>
-              </svg>
-              <h3>MusicXML</h3>
-              <p data-to-write>TO WRITE — in and out, and what survives.</p>
-            </li>
-            <li data-block data-reveal style="--d: 270ms">
-              <svg data-art viewBox="0 0 64 64" aria-hidden="true">
-                <path d="M18 14c-6 0-7 4-7 9s0 8-6 9c6 1 6 4 6 9s1 9 7 9"/>
-                <path d="M46 14c6 0 7 4 7 9s0 8 6 9c-6 1-6 4-6 9s-1 9-7 9"/>
-                <path d="M26 32h12"/>
-              </svg>
-              <h3>Page schema</h3>
-              <p data-to-write>TO WRITE — the JSON everything else reads.</p>
-            </li>
-            <li data-block data-reveal style="--d: 320ms">
-              <svg data-art viewBox="0 0 64 64" aria-hidden="true">
-                <path d="M12 18h40M12 44h40M12 52h26"/>
-                <rect x="12" y="26" width="28" height="9" rx="1.5"/>
-              </svg>
-              <h3>Editor highlights</h3>
-              <p data-to-write>TO WRITE — coloured HTML with reference ids.</p>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <!-- ── 06 ───────────────────────────────────────────────────────── -->
-      <section data-screen id="embed" data-number="06" data-label="Embed it">
-        <div data-inner data-widest>
-          <h2 data-reveal>Put it in your own page</h2>
-          <p data-to-write data-reveal style="--d: 60ms">
-            TO WRITE — that this is the whole of it: register the fonts once,
-            then write the music as the content of an element.
-          </p>
-
-          <!--
-            Every element there is, one per card, each showing itself: a title,
-            a line on what it is for, and the element running. It is the same
-            carousel as "What you get" (landing.js wires any [data-carousel]),
-            so it scrolls by trackpad, touch and keyboard, and the buttons move
-            it one card at a time.
-
-            All of them play the same short air, so what changes from card to
-            card is the element and not the music.
-          -->
-          <div data-carousel data-examples data-reveal style="--d: 120ms">
-            <div data-carousel-viewport>
-              <ul data-cards>
-                <li data-card>
-                  <h3><code>msq-svg</code></h3>
-                  <p data-to-write>TO WRITE — the score, and nothing else.</p>
-                  <div data-example>
-<template
-  is="msq-svg"
-  data-font-sources="msqFontSources"
->
-title is "Air"
-left subtitle is "traditional"
-
-measure
-treble clef
-key signature is g major for each line
-time signature is 4:4 for each line
-1/8 g beamed, a, b, c5 not beamed
-1/4 d5
-1/4 b with dynamic "mp"
-
-measure
-1/8 c5 beamed, b, a, g not beamed
-1/2 g with fermata
-
-slur from first unit to fourth unit
-</template>
-                  </div>
-                </li>
-
-                <li data-card>
-                  <h3><code>msq-midi</code></h3>
-                  <p data-to-write>TO WRITE — playback only; needs no fonts.</p>
-                  <div data-example>
-<template is="msq-midi">
-measure
-treble clef
-key signature is g major for each line
-time signature is 4:4 for each line
-1/8 g beamed, a, b, c5 not beamed
-1/4 d5
-1/4 b with dynamic "mp"
-
-measure
-1/8 c5 beamed, b, a, g not beamed
-1/2 g with fermata
-
-slur from first unit to fourth unit
-</template>
-                  </div>
-                </li>
-
-                <li data-card>
-                  <h3><code>msq-svg-midi</code></h3>
-                  <p data-to-write>TO WRITE — both, notes lighting as they sound.</p>
-                  <div data-example>
-<template
-  is="msq-svg-midi"
-  data-font-sources="msqFontSources"
->
-title is "Air"
-left subtitle is "traditional"
-
-measure
-treble clef
-key signature is g major for each line
-time signature is 4:4 for each line
-1/8 g beamed, a, b, c5 not beamed
-1/4 d5
-1/4 b with dynamic "mp"
-
-measure
-1/8 c5 beamed, b, a, g not beamed
-1/2 g with fermata
-
-slur from first unit to fourth unit
-</template>
-                  </div>
-                </li>
-
-                <li data-card>
-                  <h3><code>msq-editor</code></h3>
-                  <p data-to-write>TO WRITE — editable, highlighted, navigable.</p>
-                  <div data-example>
-<template
-  is="msq-editor"
-  data-font-sources="msqFontSources"
-  data-editor-height="200px"
->
-title is "Air"
-left subtitle is "traditional"
-
-measure
-treble clef
-key signature is g major for each line
-time signature is 4:4 for each line
-1/8 g beamed, a, b, c5 not beamed
-1/4 d5
-1/4 b with dynamic "mp"
-
-measure
-1/8 c5 beamed, b, a, g not beamed
-1/2 g with fermata
-
-slur from first unit to fourth unit
-</template>
-                  </div>
-                </li>
-
-                <li data-card>
-                  <h3><code>msq-font-loader</code></h3>
-                  <p data-to-write>TO WRITE — wraps them; registers the fonts once.</p>
-                  <!--
-                    The one element with nothing to show: it draws nothing
-                    itself. This whole page is inside one, so what it looks like
-                    running is every other card; what it looks like written is
-                    this.
-                  -->
-                  <pre data-code data-example><code>&lt;template
-  is="msq-font-loader"
-  data-font-sources-reference="fonts"
-  data-font-config-src="/fonts.json"
-&gt;
-  &lt;template is="msq-svg" data-font-sources="fonts"&gt;
-    measure
-    treble clef
-    c d e f
-  &lt;/template&gt;
-&lt;/template&gt;</code></pre>
-                </li>
-              </ul>
-            </div>
-
-            <div data-carousel-controls>
-              <button type="button" data-carousel-prev aria-label="Previous">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
-              </button>
-              <span data-carousel-count aria-live="polite"></span>
-              <button type="button" data-carousel-next aria-label="Next">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
-              </button>
-            </div>
+        <!-- ── 08 ───────────────────────────────────────────────────────── -->
+        <section data-screen id="who" data-number="08" data-label="Who it is for">
+          <div data-inner>
+            <h2 data-reveal>Who it is for</h2>
+            <p data-to-write data-reveal style="--d: 80ms">
+              TO WRITE — engravers, composers, teachers, people who
+              version-control their scores, and people building music tools. One
+              line each, and be concrete about what each of them gets.
+            </p>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <!-- ── 07 ───────────────────────────────────────────────────────── -->
-      <section data-screen id="quick-start" data-number="07" data-label="Quick start">
-        <div data-inner data-widest>
-          <h2 data-reveal>Quick start</h2>
-
-          <div data-columns>
-            <div data-column data-reveal style="--d: 80ms">
-              <h3>From the command line</h3>
-              <pre data-code><code>git clone https://github.com/Guseyn/MuSemantiQ
-cd MuSemantiQ
-npm install
-
-npm run examples:cli -- \
-  --input piece.msq \
-  --svg --midi \
-  --out ./out</code></pre>
-              <p data-to-write>
-                TO WRITE — what each command does, that Node 22 is the only
-                requirement, and where the outputs land.
-              </p>
-            </div>
-
-            <div data-column data-reveal style="--d: 160ms">
-              <h3>In a page</h3>
-              <pre data-code><code>&lt;template
-  is="msq-font-loader"
-  data-font-sources-reference="fonts"
-  data-font-config-src="/fonts.json"
-&gt;
-  &lt;template
-    is="msq-svg-midi"
-    data-font-sources="fonts"
-  &gt;
-    measure
-    treble clef
-    c d e f
-  &lt;/template&gt;
-&lt;/template&gt;</code></pre>
-              <p data-to-write>
-                TO WRITE — the three files a host page serves, and the import
-                map behind the specifiers. Link to the components docs.
-              </p>
-            </div>
+        <!-- ── 09 ───────────────────────────────────────────────────────── -->
+        <section data-screen id="dev-tools" data-number="09" data-label="Dev tools">
+          <div data-inner>
+            <h2 data-reveal>Dev tools</h2>
+            <p data-to-write data-reveal style="--d: 80ms">
+              TO WRITE — what the dev tools are: a second local app for the work
+              around the music rather than the music itself. Name the five — the
+              font viewer, the font generator, the soundfont generator, the
+              MusicXML tool and the test viewer — in a line each. Say plainly that
+              they run locally against a working tree, and are started with
+              <code>npm run dev-tools</code>; the link below only resolves once
+              they are running.
+            </p>
+            <p data-actions data-reveal style="--d: 160ms">
+              <a data-button href="https://127.0.0.1:8889">Open the dev tools</a>
+              <a data-link href="/docs/dev-tools/overview">What they do</a>
+            </p>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <!-- ── 08 ───────────────────────────────────────────────────────── -->
-      <section data-screen id="who" data-number="08" data-label="Who it is for">
-        <div data-inner>
-          <h2 data-reveal>Who it is for</h2>
-          <p data-to-write data-reveal style="--d: 80ms">
-            TO WRITE — engravers, composers, teachers, people who
-            version-control their scores, and people building music tools. One
-            line each, and be concrete about what each of them gets.
-          </p>
-        </div>
-      </section>
+        <!-- ── 10 ───────────────────────────────────────────────────────── -->
+        <section data-screen id="status" data-number="10" data-label="Status">
+          <div data-inner>
+            <h2 data-reveal>Status</h2>
+            <p data-to-write data-reveal style="--d: 80ms">
+              TO WRITE — how finished this is and what is still moving. The
+              licence, and the browser caveat: the components are customized
+              built-in elements, so Chromium or Firefox unless the polyfill is
+              loaded.
+            </p>
 
-      <!-- ── 09 ───────────────────────────────────────────────────────── -->
-      <section data-screen id="dev-tools" data-number="09" data-label="Dev tools">
-        <div data-inner>
-          <h2 data-reveal>Dev tools</h2>
-          <p data-to-write data-reveal style="--d: 80ms">
-            TO WRITE — what the dev tools are: a second local app for the work
-            around the music rather than the music itself. Name the five — the
-            font viewer, the font generator, the soundfont generator, the
-            MusicXML tool and the test viewer — in a line each. Say plainly that
-            they run locally against a working tree, and are started with
-            <code>npm run dev-tools</code>; the link below only resolves once
-            they are running.
-          </p>
-          <p data-actions data-reveal style="--d: 160ms">
-            <a data-button href="https://127.0.0.1:8889">Open the dev tools</a>
-            <a data-link href="/docs/dev-tools/overview">What they do</a>
-          </p>
-        </div>
-      </section>
+            <div data-stave data-phrase data-closing aria-hidden="true"></div>
 
-      <!-- ── 10 ───────────────────────────────────────────────────────── -->
-      <section data-screen id="status" data-number="10" data-label="Status">
-        <div data-inner>
-          <h2 data-reveal>Status</h2>
-          <p data-to-write data-reveal style="--d: 80ms">
-            TO WRITE — how finished this is and what is still moving. The
-            licence, and the browser caveat: the components are customized
-            built-in elements, so Chromium or Firefox unless the polyfill is
-            loaded.
-          </p>
+            <footer data-footer data-reveal style="--d: 200ms">
+              <a data-link href="/docs">Docs</a>
+              <a data-link href="https://github.com/Guseyn/MuSemantiQ">GitHub</a>
+              <a data-link href="/docs/reference/license">License</a>
+              <a data-link href="https://127.0.0.1:8889">Dev tools</a>
+            </footer>
+          </div>
+        </section>
 
-          <div data-stave data-phrase data-closing aria-hidden="true"></div>
-
-          <footer data-footer data-reveal style="--d: 200ms">
-            <a data-link href="/docs">Docs</a>
-            <a data-link href="https://github.com/Guseyn/MuSemantiQ">GitHub</a>
-            <a data-link href="/docs/reference/license">License</a>
-            <a data-link href="https://127.0.0.1:8889">Dev tools</a>
-          </footer>
-        </div>
-      </section>
-
-    </main>
+      </main>
     </template>
 
     <script type="module" src="/js/landing.js"></script>
