@@ -7,5 +7,12 @@
   "webroot": "web-app",
   "proxy": {
     "port": 80
+  },
+  "eDev": {
+    "routesFile": "docs/web-app/worker.js",
+    "staticFolder": "docs/web-app/static",
+    "indexPage": "html/index.html",
+    "notFoundPage": "html/404.html",
+    "pageUrls": { "/docs": "html/docs.html" }
   }
 }

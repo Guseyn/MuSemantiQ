@@ -195,6 +195,7 @@ dev-tools/web-app/static/images/logo.svg
 #   nodes/            npm run docs:nodes:update   (from ../nodes.js)
 #   js/ehtml/         npm run docs:ehtml:update   (from ../EHTML)
 #   js/e-ui/, e-ui.css  npm run docs:eui:update   (from ../e-ui)
+#   js/e-dev/, api/e-dev/  npm run docs:e-dev:update  (from ../e-pages, the e-dev repo)
 #   js/msq/           npm run web-components:update + create:msq:worker
 #   font/             npm run setup:symlinks
 #   images/logo.svg   npm run setup:symlinks
@@ -203,6 +204,8 @@ dev-tools/web-app/static/images/logo.svg
 docs/nodes/
 docs/web-app/static/js/ehtml/
 docs/web-app/static/js/e-ui/
+docs/web-app/static/js/e-dev/
+docs/web-app/api/e-dev/
 docs/web-app/static/js/msq/
 docs/web-app/static/css/e-ui.css
 docs/web-app/static/font/

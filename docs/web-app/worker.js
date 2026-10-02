@@ -1,3 +1,4 @@
+import fs from 'fs'
 import path from 'path'
 
 import server from '#docs-nodes/server.js'
@@ -23,9 +24,23 @@ function docsShellPath() {
   return docsShell
 }
 
+/*
+e-dev: open a page with ?dev=true and Alt + click any element to open its line
+in the editor. Its endpoints serve html with source locations and start the
+editor, so they exist only locally (they also refuse anyone but localhost).
+The copy is vendored by docs:e-dev:update and gitignored, so a checkout
+without it still serves the docs, just without dev mode. Its settings are
+`eDev` in env/local.json.
+*/
+const eDevRoutes = './docs/web-app/api/e-dev/routes.js'
+const eDevApi = process.env.ENV === 'local' && fs.existsSync(eDevRoutes)
+  ? (await import(path.resolve(eDevRoutes))).default(runtime.config)
+  : []
+
 server(
   app({
     indexFile: './docs/web-app/static/html/index.html',
+    api: eDevApi,
     static: [
       src(/^\/docs/, {
         mapper: docsShellPath,

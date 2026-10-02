@@ -33,10 +33,11 @@
     "docs:ehtml:update": "rsync -a --delete ../../my-projects/EHTML/src/ docs/web-app/static/js/ehtml/",
     "docs:nodes:update": "rsync -a --delete ../../my-projects/nodes.js/nodes/ docs/nodes/",
     "docs:eui:update": "rsync -a --delete ../../my-projects/e-ui/static/js/e-ui/ docs/web-app/static/js/e-ui/ && cp -rf ../../my-projects/e-ui/static/css/e-ui.css docs/web-app/static/css/e-ui.css",
-    "docs:vendor": "npm run docs:nodes:update && npm run docs:ehtml:update && npm run docs:eui:update",
+    "docs:e-dev:update": "rsync -a --delete ../../my-projects/e-pages/web-app/static/js/e-dev/ docs/web-app/static/js/e-dev/ && rsync -a --delete ../../my-projects/e-pages/web-app/api/e-dev/ docs/web-app/api/e-dev/ && find docs/web-app/api/e-dev -name '*.js' -exec perl -pi -e 's|#nodes/|#docs-nodes/|g' {} +",
+    "docs:vendor": "npm run docs:nodes:update && npm run docs:ehtml:update && npm run docs:eui:update && npm run docs:e-dev:update",
     "docs:check": "node scripts/check-docs-examples.js",
     "docs:art": "node scripts/generate-landing-art.js",
-    "docs": "npm run docs:vendor && npm run setup:symlinks && npm run create:msq:worker && npm run web-components:update && npm run docs:check && node docs/web-app/main.js",
+    "docs": "npm run setup:symlinks && npm run create:msq:worker && npm run web-components:update && npm run docs:check && node docs/web-app/main.js",
 
     "examples:browser": "npm run setup:symlinks && npm run create:msq:worker && npm run web-components:update && node examples/browser/web-app/main.js",
     "examples:cli": "node examples/cli/msq.js"
