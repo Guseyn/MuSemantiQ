@@ -72,6 +72,11 @@ e-sidebar[data-state="open"] header [data-logo] img {
   max-height: none;
 }
 
+a {
+  text-decoration: underline;
+  color: var(--e-primary);
+}
+
 /*
 The nav is a list, not a row of icons: left aligned, tight, and scrolling on its
 own so the header and footer stay put.
@@ -490,4 +495,8 @@ goes with it.
   header[is="e-header"] [data-logo] img {
     width: 130px;
   }
+}
+
+p + p {
+  margin-top: var(--e-spacing-sm);
 }

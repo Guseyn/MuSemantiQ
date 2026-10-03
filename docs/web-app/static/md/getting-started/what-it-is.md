@@ -1,24 +1,21 @@
 # What MuSemantiQ is
 
-<!-- check-docs-examples: preview -->
+<span is="e-primary">M</span>u<span is="e-primary">S</span>emanti<span is="e-primary">Q</span> (<span is="e-primary">M</span>usic <span is="e-primary">S</span>emantic <span is="e-primary">Q</span>uery) is a semantic music engine and powerful toolkit that translates words to music. You write music as words, in a text language called **MSQ**, and MuSemantiQ engraves it as sheet music and plays it back.
 
-MuSemantiQ is a semantic music engine. You write music as words, in a text language called **MSQ**, and MuSemantiQ engraves it as sheet music and plays it back.
-
-Let's start with the smallest piece of MSQ there is:
+Below, you can see very basic example:
 
 <div>
 <template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
-c d e f
+treble clef
+c d e f g
 </template>
 </div>
 
-These four letters are already a whole page: one measure, one stave, four quarter notes from middle C upwards. You describe what the music is — a measure, a clef, a chord with an accent, a slur from the first unit to the fourth — and the engine works out where everything goes on the page and how it sounds.
-
 ## 1. What it is not
 
-It is not a score editor where you drag notes with a mouse. There are no panels and no palettes: the text is the score, and the drawing always follows the text.
+- It is not a score editor where you drag notes with a mouse. There are no panels and no palettes: the text is the score, and the drawing always follows the text.
 
-It is also not a model that guesses. The parser reads the text by fixed rules, the same text always gives the same page, byte for byte, and whatever it cannot read it reports as an error on its line instead of making something up. It's very important to let a user see errors or inaccuracies, so the engine never throws them away and never fixes them silently.
+- It is also not some LLM that guesses. The parser reads the text by fixed rules, the same text always gives the same page, byte for byte, and whatever it cannot read it reports as an error on its line instead of making something up. It's very important to let a user see errors or inaccuracies, so the engine never throws them away and never fixes them silently.
 
 ## 2. What comes out
 
@@ -29,17 +26,26 @@ From one piece of MSQ you can get:
 | **SVG** | the engraved score |
 | **MIDI** | the performance, one continuous file for the whole document |
 | **Page schema** | the parsed page as JSON: measures, staves, voices and units, everything the drawer and the MIDI engine read |
-| **MusicXML** | through the MusicXML tools in `tools/musicxml`, which convert a page both ways |
-
-There is one more output that you mostly see rather than ask for: the highlighted source. Every word of the text is linked to the elements it drew and to the moment it sounds, so in the editor you can Cmd-click (Ctrl-click on other systems) a note in the score to find the word that wrote it, and the other way round.
+| **HTML highlights** | for adnvanced usage, if you want to build an editor for MSQ. It supports command highlighting in the text.<br> It also can include links to the elements in **SVG**, so in the editor you can `Cmd-click` (`Ctrl-click` on other systems) a note in the score to find the word that wrote it, and the other way round |
+| **MusicXML** (beta) | through the MusicXML tools in `tools/musicxml`, which convert a page both ways |
 
 ## 3. Who it is for
 
-It is for musicians who would rather type than click, and for developers who want sheet music inside their own pages and programs without a desktop application in between. There are three ways in:
+- Musicians who want an easy access to their sheet music on any device
+- Composers who prefer to write and work in the flow state rather than being drawn in the complexity of hundreds of elements in regular software
+- Publishers and Book Writers who also want flexibility to create offline and online books
+- Programmers in music domain who want to build programs and tools based on MSQ
+
+## 4. What does it provide
 
 1. **The web components.** `<template is="msq-svg">`, `msq-midi`, `msq-svg-midi` and `msq-editor` turn MSQ written inside a page into a score, a player or an editor. The examples on this site are exactly that. More about them you can read in [Web components](/docs/components/overview).
 2. **The API.** `src/api.js` is plain JavaScript modules that run in Node and in a browser worker: set up the fonts, parse a page, then generate SVG or MIDI from it. See [Low-level API](/docs/api/overview).
 3. **The CLI.** `npm run examples:cli` turns a file, or a folder of files, into SVG and MIDI from the command line. See [CLI](/docs/examples/cli).
+4. **Dev Tools**. 
+  - You can view and generate glyphs using any music font
+  - You can integrate any Sound Font
+  - Add/Check tests
+  - Transalte to/from MusicXML (beta)
 
 It runs on Node 22 or newer and in modern browsers, with no build step and no runtime npm dependencies.
 

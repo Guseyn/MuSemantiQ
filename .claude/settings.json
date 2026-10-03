@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(git status *)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git show *)",
+      "Bash(git blame *)",
+      "Bash(git branch --show-current)",
+      "Bash(git branch --list *)"
+    ],
+    "deny": [
+      "Bash(git push *)",
+      "Bash(npm publish *)",
+
+      "Read(.env)",
+      "Read(.env.*)",
+      "Read(**/*.pem)",
+
+      "Edit(examples/browser/web-app/static/js/msq/**)",
+      "Edit(dev-tools/web-app/static/js/msq/**)",
+      "Edit(docs/web-app/static/js/msq/**)",
+
+      "Edit(dev-tools/web-app/static/js/ehtml/**)",
+      "Edit(docs/web-app/static/js/ehtml/**)",
+      "Edit(examples/browser/web-app/static/js/ehtml/**)",
+
+      "Edit(dev-tools/web-app/static/js/e-ui/**)",
+      "Edit(docs/web-app/static/js/e-ui/**)",
+      "Edit(examples/browser/web-app/static/js/e-ui/**)",
+      "Edit(dev-tools/web-app/static/css/e-ui.css)",
+      "Edit(docs/web-app/static/css/e-ui.css)",
+      "Edit(examples/browser/web-app/static/css/e-ui.css)",
+
+      "Edit(dev-tools/nodes/**)",
+      "Edit(docs/nodes/**)",
+      "Edit(examples/browser/nodes/**)"
+    ]
+  }
+}

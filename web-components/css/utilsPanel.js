@@ -24,6 +24,14 @@ export default /*css*/`
     opacity: 1;
     pointer-events: auto;
   }
+  /* A touch screen has no hover, and a tap that only revealed the toolbar
+     would be a tap that did nothing. So there the icons are always shown. */
+  @media (hover: none) {
+    div[data-utils] {
+      opacity: 1;
+      pointer-events: auto;
+    }
+  }
   div[data-utils] button {
     text-align: center;
     background: rgba(204, 204, 204, 0);
