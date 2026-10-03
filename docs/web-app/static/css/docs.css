@@ -11,9 +11,11 @@ e-ui.css is loaded first and everything here is an override of it.
   */
   --e-sidebar-expanded: 19rem;
 
+  --e-bg: #fbfaf7;
+  --e-surface-bg: var(--e-bg);
   --e-primary: #ee5253;
 
-  --docs-note-bg: #f8f8f8;
+  --docs-note-bg: #fdfdfd;
   --docs-note-border: #b58900;
   --docs-note-fg: #212121;
 }

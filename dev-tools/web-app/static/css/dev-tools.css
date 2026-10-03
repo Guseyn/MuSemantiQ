@@ -9,6 +9,9 @@ nothing about because it is a MuSemantiQ component.
 :root {
   /* These are tools, not typography. */
   --e-font-typography: var(--e-font-interface);
+  --e-bg: #fbfaf7;
+  --e-surface-bg: var(--e-bg);
+  --e-primary: var(--e-fg);
 }
 
 /*
