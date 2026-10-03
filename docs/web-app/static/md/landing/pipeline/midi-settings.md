@@ -1,0 +1,5 @@
+```json
+{
+  "defaultInstrument": "guitar"
+}
+```

@@ -398,6 +398,7 @@ a time, and the sliver of the next is what says there are more.
   flex-direction: column;
   padding: 2rem 1.85rem;
   border: 1px solid var(--rule);
+  border-radius: 1.25rem;
   background-color: var(--surface);
   scroll-snap-align: center;
 }
@@ -478,8 +479,8 @@ a time, and the sliver of the next is what says there are more.
   grid-template-columns: minmax(0, 15rem) minmax(0, 1fr);
   gap: clamp(1.5rem, 4vw, 3.5rem);
   margin-top: 1.75rem;
-  /* The prose sits against the middle of the diagram rather than its top. */
-  align-items: center;
+  /* Each note opens with its prose against the top of the diagram, its artefact under it. */
+  align-items: start;
 }
 
 [data-flow] {
@@ -537,42 +538,79 @@ a time, and the sliver of the next is what says there are more.
   color: var(--accent);
 }
 
+/* Material Symbols, which are drawn as filled shapes, in the button's colour */
 [data-stage-art] {
   flex: 0 0 auto;
   width: 1.4rem;
   height: 1.4rem;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+  fill: currentColor;
 }
 
 /*
-The four outputs are one stage, not four more. They share the single arrow down
-from the schema, and a bracket down their left says they are branches of it
-rather than a queue.
+The intermediate structures are one stage, and so are the outputs: each group
+shares the single arrow into it, and a bracket down its left says its members
+are branches of one step rather than a queue. Their buttons are smaller, so the
+whole pipeline still fits on one screen.
 */
-[data-outputs] {
+[data-branches] {
   position: relative;
-  gap: 0.4rem;
+  gap: 0.3rem;
   padding-left: 1.25rem;
 }
 
-[data-outputs]::after {
+/*
+The bracket runs from the middle of the first button to the middle of the last,
+so it starts below the group's label rather than through it. 4.4rem is the
+arrow in, the label and the gap above the first button, plus half of it.
+*/
+[data-branches]::after {
   content: "";
   position: absolute;
-  top: 1.1rem;
-  bottom: 1.1rem;
+  top: 4.4rem;
+  bottom: 1rem;
   left: 0.4rem;
   width: 1px;
   background-color: var(--rule-strong);
 }
 
+/*
+The arrow into a group is centred in the group's content, which the bracket's
+padding pushes right; moving it back by half that padding puts it on the same
+line as every other arrow.
+*/
+[data-branches]::before {
+  transform: translateX(-0.625rem);
+}
+
+[data-branches-label] {
+  margin: 0.15rem 0 0.2rem -1.25rem;
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+[data-branches] [data-stage-button] {
+  padding: 0.4rem 0.75rem;
+  font-size: 0.75rem;
+}
+
+[data-branches] [data-stage-art] {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
 /* ── The notes beside the diagram ────────────────────────────────────── */
 
+/*
+One column that may shrink below its content: a long line of code or a wide
+picture scrolls or scales inside the note instead of widening the screen.
+*/
 [data-flow-notes] {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  min-width: 0;
 }
 
 /*
@@ -602,6 +640,62 @@ the column does not change height as the reader moves down the diagram.
   color: var(--ink-faint);
 }
 
+/*
+What the step really made: code, a picture, or the coloured source. It is
+capped in height and scrolls inside, so the longest of them (the page styles)
+does not set the height of every note.
+*/
+[data-artifact] {
+  margin: 1rem 0 0;
+}
+
+[data-artifact][data-code] code {
+  max-height: min(19rem, 38vh);
+  overflow: auto;
+}
+
+/* Under the piano roll, the timing maps get less room, so the note fits the screen. */
+[data-note-for="midi"] [data-artifact][data-code] code {
+  max-height: min(9rem, 18vh);
+}
+
+[data-artifact][data-picture] {
+  padding: 1rem;
+  border: 1px solid var(--rule);
+  background-color: var(--surface);
+}
+
+[data-artifact][data-picture] img {
+  display: block;
+  max-width: 100%;
+  max-height: min(13rem, 26vh);
+  margin: 0 auto;
+}
+
+[data-artifact][data-picture] figcaption {
+  margin-top: 0.75rem;
+  font-size: 0.8125rem;
+}
+
+[data-highlights-box] pre {
+  margin: 0;
+  padding: 1.1rem 1.2rem;
+  border: 1px solid var(--rule);
+  background-color: var(--surface);
+  font-family: var(--mono);
+  font-size: 0.875rem;
+  line-height: 1.8;
+  white-space: pre-wrap;
+  /* The two colours the editor's own stylesheet leaves to its host */
+  --muted-font-color: var(--ink-faint);
+  --editor-font-color: var(--ink);
+}
+
+/* This one is the result, not code to take away, so it has no "copy" link. */
+[data-highlights-box] pre::before {
+  content: none;
+}
+
 /* ── Output blocks ───────────────────────────────────────────────────── */
 
 [data-blocks] {
@@ -619,6 +713,41 @@ the column does not change height as the reader moves down the diagram.
   padding: 1.35rem 1.2rem;
   border: 1px solid var(--rule);
   background-color: var(--surface);
+}
+
+/*
+The feature icons are the one place the page uses more colour than its accent:
+five features, five tones, so they read as different things at a glance. Each
+is drawn in its tone on a soft tile of the same colour, and the shapes marked
+data-fill take a tint of it (data-solid ones the tone itself), so an icon is
+two-tone rather than an outline. The tones are borrowed where the product has
+one: crimson is a note while it sounds, amber the editor's navigation box.
+*/
+[data-art][data-tone="crimson"] { --tone: #c40233; }
+[data-art][data-tone="green"]   { --tone: #2e8b57; }
+[data-art][data-tone="teal"]    { --tone: #1f7a8c; }
+[data-art][data-tone="violet"]  { --tone: #6d5bd0; }
+[data-art][data-tone="amber"]   { --tone: #c98a0b; }
+
+[data-art][data-tone] {
+  box-sizing: border-box;
+  width: 3.75rem;
+  height: 3.75rem;
+  padding: 0.3rem;
+  border-radius: 1rem;
+  color: var(--tone);
+  /* The tile takes room from the drawing, so its lines are drawn heavier */
+  stroke-width: 2.75;
+  background-color: color-mix(in srgb, var(--tone) 11%, var(--surface));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tone) 18%, transparent);
+}
+
+[data-art][data-tone] [data-fill] {
+  fill: color-mix(in srgb, var(--tone) 28%, transparent);
+}
+
+[data-art][data-tone] [data-solid] {
+  fill: var(--tone);
 }
 
 [data-block] [data-art] {
@@ -792,6 +921,230 @@ examples are the parts that are theirs.
 
 [data-code] .hljs-string {
   color: var(--accent);
+}
+
+/* JSON and MusicXML, for the pipeline's structures */
+[data-code] .hljs-number,
+[data-code] .hljs-literal {
+  color: #1f7a8c;
+}
+
+[data-code] .hljs-meta {
+  color: var(--ink-faint);
+}
+
+/* ── The toolkit ─────────────────────────────────────────────────────── */
+
+/*
+One part of the toolkit at a time (landing-tabs). The tabs are a row of words
+with the chosen one underlined in the accent; the web components have tabs of
+their own inside, smaller, as pills of code.
+*/
+[data-tabs] {
+  margin-top: 1.5rem;
+}
+
+[data-tab-list] {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.5rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+[data-tab] {
+  padding: 0.6rem 0 0.7rem;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  background: none;
+  color: var(--ink-soft);
+  font-family: var(--sans);
+  font-size: 0.9375rem;
+  cursor: pointer;
+  transition: color 0.2s var(--ease), border-color 0.2s var(--ease);
+}
+
+[data-tab]:hover {
+  color: var(--ink);
+}
+
+[data-tab][aria-selected="true"] {
+  border-bottom-color: var(--accent);
+  color: var(--ink);
+}
+
+[data-tab-panel] {
+  padding-top: 1.25rem;
+}
+
+[data-tab-panel] > p:first-child {
+  max-width: 46rem;
+  margin-bottom: 1.25rem;
+  color: var(--ink-soft);
+}
+
+[data-subtabs] {
+  margin-top: 0;
+}
+
+[data-subtabs] > [data-tab-list] {
+  gap: 0.4rem;
+  border-bottom: none;
+}
+
+[data-subtabs] [data-tab] {
+  padding: 0.3rem 0.7rem;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  margin: 0;
+}
+
+[data-subtabs] [data-tab] code {
+  padding: 0;
+  border: none;
+  background: none;
+}
+
+[data-subtabs] [data-tab][aria-selected="true"] {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Code on the left, what it makes on the right; one above the other when narrow. */
+[data-split] {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(1rem, 3vw, 2rem);
+  align-items: start;
+}
+
+[data-split] [data-code] code {
+  max-height: min(22rem, 45vh);
+  overflow: auto;
+}
+
+[data-live] {
+  min-width: 0;
+  overflow-x: auto;
+}
+
+[data-live] > p {
+  margin-top: 0.75rem;
+  font-size: 0.875rem;
+  color: var(--ink-soft);
+}
+
+[data-live][data-picture] {
+  margin: 0;
+  padding: 1rem;
+  border: 1px solid var(--rule);
+  background-color: var(--surface);
+}
+
+[data-live][data-picture] img {
+  display: block;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+[data-live][data-picture] figcaption {
+  margin-top: 0.75rem;
+  font-size: 0.8125rem;
+  color: var(--ink-soft);
+}
+
+[data-markdown-result] {
+  padding: 1rem 1.2rem;
+  border: 1px solid var(--rule);
+  background-color: var(--surface);
+}
+
+[data-messages] {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+}
+
+[data-messages] th,
+[data-messages] td {
+  padding: 0.5rem 0.6rem;
+  border-bottom: 1px solid var(--rule);
+  text-align: left;
+  vertical-align: top;
+}
+
+[data-messages] th {
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+[data-messages] td:first-child {
+  white-space: nowrap;
+}
+
+[data-tools] {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+  gap: 1rem;
+  margin: 0 0 1.25rem;
+  padding: 0;
+  list-style: none;
+}
+
+[data-tool] {
+  display: flex;
+  gap: 0.9rem;
+  align-items: flex-start;
+  padding: 1rem;
+  border: 1px solid var(--rule);
+  background-color: var(--surface);
+}
+
+[data-tool] [data-art][data-tone] {
+  flex: none;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 0.75rem;
+}
+
+[data-tool] h4 {
+  margin: 0 0 0.3rem;
+  font-size: 0.9375rem;
+}
+
+[data-tool] p {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--ink-soft);
+}
+
+[data-tools-start] {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--ink-soft);
+}
+
+@media (max-width: 900px) {
+  [data-split] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ── Who it is for ───────────────────────────────────────────────────── */
+
+[data-audience] [data-art][data-tone] {
+  width: 3.25rem;
+  height: 3.25rem;
+}
+
+[data-audience] p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--ink-soft);
 }
 
 /* ── A score on the page ─────────────────────────────────────────────── */

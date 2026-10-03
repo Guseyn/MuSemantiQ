@@ -1,0 +1,5 @@
+```json
+{
+  "pageLineMaxWidth": "300"
+}
+```

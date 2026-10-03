@@ -37,6 +37,7 @@
     "docs:vendor": "npm run docs:nodes:update && npm run docs:ehtml:update && npm run docs:eui:update && npm run docs:e-dev:update",
     "docs:check": "node scripts/check-docs-examples.js",
     "docs:art": "node scripts/generate-landing-art.js",
+    "docs:pipeline": "node scripts/generate-landing-pipeline.js",
     "docs": "npm run setup:symlinks && npm run create:msq:worker && npm run web-components:update && npm run docs:check && node docs/web-app/main.js",
 
     "browser-app": "npm run setup:symlinks && npm run create:msq:worker && npm run web-components:update && node browser-app/web-app/main.js",

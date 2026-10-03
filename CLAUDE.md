@@ -16,6 +16,7 @@ npm run dev-tools        # https://127.0.0.1:8889 — test viewer, font generato
 npm run browser-app # https://127.0.0.1:8888
 npm run docs             # https://127.0.0.1:8890 — landing page + documentation (runs docs:check first)
 npm run docs:check       # validate every example in docs/web-app/static/md
+npm run docs:pipeline    # re-engrave the landing page's "How it works" artefacts (committed)
 npm run cli-app -- --input score.txt --svg --midi
 ```
 

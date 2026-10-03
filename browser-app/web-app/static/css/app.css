@@ -1,0 +1,93 @@
+/*
+Just enough layout for the examples: a readable column of prose, and each
+example as its code beside the element it makes, one above the other on a
+narrow screen. The components bring their own look.
+*/
+:root {
+  --paper: #fbfaf7;
+  --surface: #ffffff;
+  --ink: #14161a;
+  --ink-soft: #5f6672;
+  --rule: #e4e1d9;
+  --accent: #c40233;
+  color-scheme: light;
+}
+
+body {
+  margin: 0;
+  padding: clamp(1.25rem, 4vw, 3rem);
+  background-color: var(--paper);
+  color: var(--ink);
+  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  line-height: 1.6;
+}
+
+header,
+main {
+  max-width: 76rem;
+  margin: 0 auto;
+}
+
+header p,
+main > p,
+section > p {
+  max-width: 46rem;
+  color: var(--ink-soft);
+}
+
+h1 {
+  margin: 0 0 0.5rem;
+}
+
+h2 {
+  margin: 3rem 0 0.5rem;
+  font-size: 1.25rem;
+}
+
+nav ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.25rem;
+  padding: 0;
+  list-style: none;
+}
+
+a {
+  color: var(--accent);
+}
+
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.9em;
+}
+
+[data-split] {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+  gap: 1.5rem;
+  align-items: start;
+  margin-top: 1rem;
+}
+
+[data-code] {
+  margin: 0;
+  max-height: 32rem;
+  overflow: auto;
+  padding: 1rem 1.2rem;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  background-color: var(--surface);
+  font-size: 0.8125rem;
+  line-height: 1.6;
+}
+
+[data-live] {
+  min-width: 0;
+  overflow-x: auto;
+}
+
+@media (max-width: 900px) {
+  [data-split] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
