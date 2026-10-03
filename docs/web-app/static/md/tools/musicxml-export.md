@@ -63,8 +63,7 @@ Beyond those, some things are left out without a report entry:
 
 Let's examine the following page. It is in G major, on a bass clef, and none of its notes says its octave except the last one:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 stretch units by 1.2 times in line 1
 
 measure
@@ -74,8 +73,7 @@ stave with bass clef
 f with natural key
 f
 1/4 c4
-</template>
-</div>
+```
 
 The report says what was left behind:
 

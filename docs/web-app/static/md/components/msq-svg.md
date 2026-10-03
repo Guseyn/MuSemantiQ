@@ -12,13 +12,11 @@ Let's start with a simple example:
 </template>
 ```
 
-<div>
-<template is="msq-svg" data-font-sources="msqFontSources">
+```msq-svg
 measure
 treble clef
 c d e f
-</template>
-</div>
+```
 
 ## 1. The attributes
 
@@ -81,8 +79,7 @@ Let's take a look at something a bit longer, with a downloaded file name of its 
 </template>
 ```
 
-<div>
-<template is="msq-svg" data-font-sources="msqFontSources" data-file-name="a-short-piece">
+```msq-svg file-name=a-short-piece
 title is "A Short Piece"
 right subtitle is "Anonymous"
 
@@ -102,8 +99,7 @@ measure
 
 measure
 1/2 g dotted
-</template>
-</div>
+```
 
 As you can see, the title and the subtitle are part of the music rather than attributes of the element. Press the download button on this score, and the file is called `a-short-piece.svg`.
 

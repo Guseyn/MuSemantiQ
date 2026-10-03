@@ -95,8 +95,7 @@ So a MusicXML file can be imported to a schema, serialized to MSQ, and edited as
 
 Let's take one small page:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 title is "Schema"
 
 measure
@@ -107,8 +106,7 @@ time signature is 4:4
 1/4 rest
 chord
 c e g5
-</template>
-</div>
+```
 
 And this is the page schema it produces:
 

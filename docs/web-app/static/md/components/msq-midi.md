@@ -14,13 +14,11 @@ Let's start with a simple example:
 </template>
 ```
 
-<div>
-<template is="msq-midi">
+```msq-midi
 measure
 treble clef
 c d e f
-</template>
-</div>
+```
 
 ## 1. The attributes
 
@@ -95,8 +93,7 @@ Let's hear something with a tempo and an instrument of its own. The instrument a
 </template>
 ```
 
-<div>
-<template is="msq-midi" data-file-name="a-short-tune">
+```msq-midi file-name=a-short-tune
 default instrument is flute
 default tempo is "1/4 = 96"
 
@@ -107,8 +104,7 @@ time signature is 3:4
 
 measure
 1/2 c5 dotted
-</template>
-</div>
+```
 
 As you can see, the music is written exactly as it would be for a score. You can take the same text and give it to `msq-svg` or `msq-svg-midi` without changing a word.
 

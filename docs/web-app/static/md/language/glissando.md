@@ -6,38 +6,31 @@ A glissando is a slide from one sound to another. For different cases you can wr
 
 If a glissando needs to go out of a unit and finish after the measure, you just need to type `with glissando`:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 treble clef
 a with glissando
-</template>
-</div>
+```
 
 You can set a direction, and also explicitly say that the glissando finishes after the measure:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 treble clef
 a with glissando after up
-</template>
-</div>
+```
 
 In a similar way, you can say that a glissando comes into a unit from before the measure:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 treble clef
 a with glissando before up
-</template>
-</div>
+```
 
 You can also specify the number of the measure that a glissando finishes after or starts before. It's important to mention that those measures cannot be empty:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 stave
 1/4 a with glissando after measure 2
@@ -57,8 +50,7 @@ stave
 1/4 a with glissando before measure 1
 stave
 1/16 a beamed b c d a b c d
-</template>
-</div>
+```
 
 As you can see, `before` and `after` with a measure number are how a glissando reaches across the end of a page line: the measure numbers are counted within the page line where the unit is.
 
@@ -66,21 +58,18 @@ As you can see, `before` and `after` with a measure number are how a glissando r
 
 In order to connect two units, you use `glissando` as a separate command, after the music, like a [slur](/docs/language/slurs):
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 treble clef
 1/4 c5
 1/4 c
 
 glissando from first unit to second unit
-</template>
-</div>
+```
 
 Let's take a look at glissandos between notes and chords in different measures:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 treble clef
 a a5 1/16 a beamed b c d a b c d
@@ -94,13 +83,11 @@ c5 e5 g5
 
 glissando in first measure from first unit to second unit
 glissando in second measure from unit 1 to unit 2
-</template>
-</div>
+```
 
 Like slurs, glissandos are cross-measure elements:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 treble clef
 c
@@ -109,13 +96,11 @@ c5
 
 glissando starts at first note in first measure
 and finishes at first note in second measure
-</template>
-</div>
+```
 
 A glissando can also connect units on different staves:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 stave with treble clef
 a
@@ -130,13 +115,11 @@ a2
 glissando
 from first unit in first measure on first stave
 to first unit in second measure on second stave
-</template>
-</div>
+```
 
 You can also declare glissandos that start before a unit or finish after a unit:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 stave with treble clef
 a
@@ -146,13 +129,11 @@ measure
 
 glissando up starts before first unit on first stave
 glissando down finishes after first unit on second stave
-</template>
-</div>
+```
 
 By default, a glissando is drawn as a wave. But you can explicitly say that it's a `wave` or a `line`:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 stave with treble clef
 a
@@ -182,8 +163,7 @@ to first unit in second measure on second stave
 glissando as wave
 from first unit in third measure on first stave
 to first unit in fourth measure on second stave
-</template>
-</div>
+```
 
 You can also write `as waves` and `as lines`.
 
@@ -196,8 +176,7 @@ The unit coordinates for glissandos work in the same way as for [slurs](/docs/la
 
 The key word `glissando` can also be written as `gliss` or `gliss.`, both as a command and in `with glissando`:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 treble clef
 1/4 c with gliss after
@@ -206,8 +185,7 @@ measure
 1/4 c5
 
 gliss. in second measure from first unit to second unit
-</template>
-</div>
+```
 
 Both kinds of glissando are also heard: the MIDI player plays a glissando as a quick run of notes, and for a glissando on a single unit it follows the direction you set.
 

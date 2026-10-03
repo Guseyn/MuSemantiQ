@@ -4,15 +4,13 @@ A dynamic mark is an attribute of a unit. You write it with `with dynamic`, and 
 
 Let's start with a simple example:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 1/4 c with dynamic "p"
 d
 e with dynamic "mf"
 f
 g with dynamic "ff" below stave
-</template>
-</div>
+```
 
 It's important to mention that the quotes are required: `with dynamic p` is not recognised. Either double or single quotes will do.
 
@@ -27,8 +25,7 @@ The music font has a drawn glyph for each of these values, so they look the way 
 | accents | **fp**, **fz**, **sf**, **sfp**, **sfpp**, **sfz**, **sfzp**, **sffz**, **rf**, **rfz**, **pf** |
 | single letters | **p**, **m**, **f**, **r**, **s**, **z** |
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 1/4 a with dynamic "ppp"
 a with dynamic "pp"
 a with dynamic "p"
@@ -41,95 +38,80 @@ a with dynamic "fp"
 a with dynamic "sf"
 a with dynamic "sfz"
 a with dynamic "rfz"
-</template>
-</div>
+```
 
 Anything else in the quotes is still drawn, just as plain text in the dynamics font rather than as a glyph:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 1/2 a with dynamic "poco f"
 a
 1/4 a a a a
-</template>
-</div>
+```
 
 ## 2. Direction
 
 By default, a dynamic mark is above the stave. But you can easily change that with `up` and `down`:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 a with dynamic "p" up
 a with dynamic "mp" down
 a with dynamic "mf" up
 a with dynamic "f" down
-</template>
-</div>
+```
 
 You can use different phrasing to set a direction — `above` and `below`, `over` and `under`, or `is down`:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 a with dynamic "p" above
 a with dynamic "mp" below
 a with dynamic "mf" over
 a with dynamic "f" under
 a with dynamic "ff" is down
-</template>
-</div>
+```
 
 A dynamic mark is always outside the stave, whichever way you choose. So `above stave` and `below stave` do not change anything here, but you can use them to emphasise it:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 a with dynamic "p" above stave
 a with dynamic "mp" below stave
 a with dynamic "mf" above stave
 a with dynamic "f" below stave
-</template>
-</div>
+```
 
 ## 3. Vertical correction
 
 The vertical position of a dynamic mark is always adjusted, so it does not intersect other elements. But you can still correct it: `1 up` moves it one interval between stave lines up, and `1 down` moves it one interval down:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 a with dynamic "p" above stave 1 up
 a with dynamic "mp" below stave 1 down
 a with dynamic "mf" above stave 1 up
 a with dynamic "f" below stave 1 down
-</template>
-</div>
+```
 
 ## 4. Chords
 
 A chord takes a dynamic mark on its `chord` line:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 1/2 chord with dynamic "p"
 c e g
 
 chord with dynamic "f" below
 c e g c5
 
-</template>
-</div>
+```
 
 ## 5. Dynamics in playback
 
 A dynamic mark sets how loud the music is played, from its unit onwards, until the next dynamic mark:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 1/4 c with dynamic "pp"
 d e f
 g with dynamic "ff"
 a b c5
-</template>
-</div>
+```
 
 These are the MIDI velocities each value is played with, out of **127**. A unit before any dynamic mark is played at **100**:
 

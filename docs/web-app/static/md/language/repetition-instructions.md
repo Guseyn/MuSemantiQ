@@ -2,21 +2,18 @@
 
 Repetition instructions are the words that tell a performer where to go next: "D.C. al Fine", "D.S. al Coda", "Fine" and others. Each measure can have one, and you declare it with `repetition note`:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 treble clef
 c d e f
 repetition note "D.C. al Fine"
-</template>
-</div>
+```
 
 You can also write `repetition mark` or `repetition instruction`, and put `is` before the text if it reads better: `repetition instruction is "Fine"`.
 
 The text is free, the language does not constrain what you write in the quotes. Let's take a look at how instructions combine with a [sign](/docs/language/sign) and [codas](/docs/language/coda):
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 treble clef
 sign
@@ -37,13 +34,11 @@ repetition note "CODA"
 measure
 closes with double bold barline
 c d e
-</template>
-</div>
+```
 
 Like codas and signs, a repetition instruction is at the start of the measure by default, and you can explicitly declare its position:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 treble clef
 repetition note "Start" at the start of the measure
@@ -51,19 +46,16 @@ c d e f
 measure
 repetition note "End" at the end of the measure
 g a b c5
-</template>
-</div>
+```
 
 As for codas and signs, the vertical position of repetition instructions is always adjusted. But you can always correct it:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 treble clef
 repetition note "Repetition note" 2 up
 c d e f
-</template>
-</div>
+```
 
 Here we moved the repetition instruction up by two intervals between stave lines.
 
@@ -84,8 +76,7 @@ Any other text, like "CODA" in the example above, is only drawn.
 
 Here, after the last measure, the music goes back to the beginning and ends at "Fine":
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 treble clef
 c d e f
@@ -99,7 +90,6 @@ measure
 closes with double bold barline
 f e d c
 repetition note "D.C. al Fine" at the end of the measure
-</template>
-</div>
+```
 
 Read next: [Fermata over barline](/docs/language/fermata-over-barline)

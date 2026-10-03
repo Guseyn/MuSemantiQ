@@ -115,4 +115,20 @@ for (const staticDir of staticDirs) {
   }
 }
 
+/*
+The showdown extensions that turn ```msq-svg (and the other elements') fences
+into msq elements. Only the documentation renders markdown, so only it gets
+them, linked rather than copied so there is one copy to change.
+*/
+const docsStaticDir = join(projectRoot, 'docs/web-app/static')
+if (existsSync(docsStaticDir)) {
+  const docsJsDir = join(docsStaticDir, 'js')
+  mkdirSync(docsJsDir, { recursive: true })
+  createSymlink(
+    join(docsJsDir, 'showdown-extensions'),
+    join(projectRoot, 'showdown-extensions'),
+    'docs/web-app/static/js/showdown-extensions → showdown-extensions'
+  )
+}
+
 console.log('\n✓ All symlinks created successfully!')

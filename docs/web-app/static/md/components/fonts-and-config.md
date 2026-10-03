@@ -45,8 +45,7 @@ As you can see, there are three families, and in each of them a font is listed u
 
 The names are what the music uses to pick a font, so they are written exactly as the music writes them:
 
-<div>
-<template is="msq-svg" data-font-sources="msqFontSources">
+```msq-svg
 music font is leland
 text font is noto-sans
 
@@ -55,8 +54,7 @@ title is "In Leland, with Noto Sans"
 measure
 treble clef
 c d e f
-</template>
-</div>
+```
 
 When the music names no music font, the first one in the config is used, so the order of `music` matters. More about choosing fonts from the music you can read in [Fonts](/docs/language/fonts).
 
@@ -105,15 +103,13 @@ The loader fetches it with a plain `fetch()`. It can be a static file, as it is 
 The fonts the music may name are the ones in the config, and nothing else. If the music names one that is not there, the parser does not recognise the command, reports it as an error, and draws the score with the default font:
 
 <!-- check-docs-examples: allow-errors -->
-<div>
-<template is="msq-svg" data-font-sources="msqFontSources">
+```msq-svg
 music font is petaluma
 
 measure
 treble clef
 c d e f
-</template>
-</div>
+```
 
 As you can see, **Petaluma** is not in the config of this site, so the score is engraved in **Bravura**, and the errors panel says that the command `petaluma` is not recognizable or applicable on the line 1.
 

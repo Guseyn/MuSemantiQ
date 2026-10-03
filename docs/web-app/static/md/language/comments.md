@@ -4,43 +4,35 @@ It's possible to add comments to the music. They don't get rendered, they are ju
 
 Let's start with a simple example:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 comment: "This melody is just a draft."
 c d e f
-</template>
-</div>
+```
 
 ## 1. How to write a comment
 
 A comment starts with `comment` and its text goes in double quotes. You can use `side note` instead of `comment`, they mean the same thing:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 side note: "The same as a comment."
 c d e f
-</template>
-</div>
+```
 
 The colon is optional. You can also write `is` instead of it, or nothing at all:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 comment "no colon"
 c d
 comment is "with is"
 e f
-</template>
-</div>
+```
 
 You can use only double quotes for comments, unlike for other text in MSQ. It's done this way, so you can use single quotes inside of a comment:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 comment: "It's fine to write 'quotes' here."
 c d e f
-</template>
-</div>
+```
 
 It's important to mention that `comment` and `side note` are written in lowercase, like every other key word in MSQ.
 
@@ -48,37 +40,31 @@ It's important to mention that `comment` and `side note` are written in lowercas
 
 A comment may run over as many lines as you need. It lasts until the closing double quote:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 comment: "
   A comment is not drawn.
   It travels with the music.
 "
 
 c d e f
-</template>
-</div>
+```
 
 ## 3. Where a comment can be
 
 A comment can sit on a line of its own anywhere on the page, including between two lines of units:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 1/8 c d e f
 comment: "the second half goes down"
 g f e d
-</template>
-</div>
+```
 
 A comment can also finish a line of units:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 1/4 c d e f comment: "up"
 g f e d comment: "and down"
-</template>
-</div>
+```
 
 But a comment always ends its line. Anything you write after the closing quote on the same line is not recognised, so the next units have to start on a new line.
 

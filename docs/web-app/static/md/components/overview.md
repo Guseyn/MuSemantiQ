@@ -28,13 +28,11 @@ Every component is a customized built-in `<template>` element: a `<template>` wi
 
 And as a result you get:
 
-<div>
-<template is="msq-svg" data-font-sources="msqFontSources">
+```msq-svg
 measure
 treble clef
 c d e f
-</template>
-</div>
+```
 
 A `<template>` is a good home for the music, because the browser never renders its content and never runs anything in it. It's important to mention that every line of the text is trimmed before it is parsed, so you can indent the music together with your HTML.
 

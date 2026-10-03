@@ -2,13 +2,11 @@
 
 By default, the duration of a note is a quarter. You can easily change it by putting the duration before the note name, separated by a space:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 1/2 c
 1/4 d e
 1/8 f g a b
-</template>
-</div>
+```
 
 The duration is a separate word, so the space is required: `1/2c` is not recognised. And it always goes before the note, never after it.
 
@@ -16,8 +14,7 @@ The duration is a separate word, so the space is required: `1/2c` is not recogni
 
 A duration is written as a whole number or a fraction. Let's take a look at the short ones first:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 1/4 a
 1/8 a
 1/16 a
@@ -25,19 +22,16 @@ A duration is written as a whole number or a fraction. Let's take a look at the 
 1/64 a
 1/128 a
 1/256 a
-</template>
-</div>
+```
 
 And the long ones:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 1/2 a
 1 a
 2 a
 4 a
-</template>
-</div>
+```
 
 In the table below you can see all the durations that are supported at the moment:
 
@@ -61,34 +55,28 @@ Any other number, like `3` or `1/3`, is not a duration. Uneven durations are mad
 
 If you want to change the duration for a sequence of notes, you just need to specify it one time before the first note in that sequence. Every note after it keeps that duration until another one is given:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 1/4 a a a
 1/8 a a a
 1/2 a a
 1/8 a a a
-</template>
-</div>
+```
 
 As you can see, the duration doesn't care about lines of the text: it carries on through them until you change it. So the first note on a line doesn't need a duration if it's the same as the one before:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 1/8 c d e f
 g a b c5
 1/4 c5 b a g
-</template>
-</div>
+```
 
 Only the notes before the first duration on a page take the default quarter:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 c d
 1/2 e
 f
-</template>
-</div>
+```
 
 It's important to mention that the last duration is remembered for each stave and each voice separately. So a duration in one voice never leaks into another. More about that you can read in [Staves](/docs/language/staves) and [Voices](/docs/language/voices).
 

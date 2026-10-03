@@ -6,36 +6,31 @@ Pedal marks are quite unique in how they are structured. They can be attached to
 
 Let's start with the simple pair, `with pedal` on one unit and `with release` on another:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 treble clef
 1/4 c with pedal
 d
 e
 f with release
-</template>
-</div>
+```
 
 By default, the text of a pedal mark is **Ped.**, but you can set your own:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 treble clef
 a with pedal
 b
 c with pedal "P"
 d
-</template>
-</div>
+```
 
 You can also write `with sustain pedal` instead of `with pedal`, and `with pedal release` instead of `with release`.
 
 You can choose the stave that a pedal mark is drawn under:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 stave with treble clef
 a with pedal under second stave
@@ -47,21 +42,18 @@ rest
 rest
 rest
 rest
-</template>
-</div>
+```
 
 As you can see, each pedal mark is configured separately. It was designed in this way intentionally, and we will get to the point in the next section. Instead of `under` you can write `below`, and the stave can be written as `second stave` or `stave 2`.
 
 The vertical position of pedal marks is always adjusted, so they don't intersect other elements. But you still can correct it:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 treble clef
 a with pedal 2 down
 b
-</template>
-</div>
+```
 
 Here we moved the pedal mark down by two intervals between stave lines.
 
@@ -69,8 +61,7 @@ Here we moved the pedal mark down by two intervals between stave lines.
 
 Now, let's see how you can create more complex pedal structures. First of all, a pedal and its release on a grand staff:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 stave with treble clef
 a with pedal
@@ -82,13 +73,11 @@ a2
 b2
 a2
 c3
-</template>
-</div>
+```
 
 If you want an opening bracket instead of the text, use `opens with bracket`:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 stave with treble clef
 a with pedal opens with bracket below second stave
@@ -104,15 +93,13 @@ a2
 e3
 a2
 c3
-</template>
-</div>
+```
 
 As you can see, we also specified the stave under which we want the pedal marks. You can write `starts with bracket` or `begins with bracket` as well.
 
 You can use a closing bracket instead of the release mark, with `with release bracket`:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 stave with treble clef
 a with pedal opens with bracket below second stave
@@ -128,13 +115,11 @@ a2
 e3
 a2
 c3
-</template>
-</div>
+```
 
 You can use variable peaks along the way, for a half release of the pedal:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 stave with treble clef
 a with pedal opens with bracket below second stave
@@ -152,13 +137,11 @@ e3
 a2
 a2
 c3
-</template>
-</div>
+```
 
 You can also put a text on top of a variable peak:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 stave with treble clef
 a with pedal opens with bracket below second stave
@@ -176,13 +159,11 @@ e3
 a2
 a2
 c3
-</template>
-</div>
+```
 
 Each time you use the key word `pedal`, a new pedal structure starts. Let's take a look at the following example:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 treble clef
 1/4 e with pedal
@@ -199,13 +180,11 @@ measure
 1/8 a
 1/4 e with variable peak
 1/8 a with release
-</template>
-</div>
+```
 
 As you can see, all the marks are right under the units where they are declared. You can easily change that with the `before` and `after` key words, so the marks are drawn before or after their units:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 treble clef
 1/4 e with pedal before
@@ -222,13 +201,11 @@ measure
 1/8 a
 1/4 e with variable peak after
 1/8 a with release after
-</template>
-</div>
+```
 
 You can also put the release at the end of the measure:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 treble clef
 1/4 e with pedal before
@@ -245,13 +222,11 @@ measure
 1/8 a
 1/4 e with variable peak after
 1/8 a with release at the end of measure
-</template>
-</div>
+```
 
 Or you can say that the release is after the measure:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 treble clef
 1/4 e with pedal before
@@ -268,13 +243,11 @@ measure
 1/8 a
 1/4 e with variable peak after
 1/8 a with release after measure
-</template>
-</div>
+```
 
 The vertical correction on the `pedal` moves the whole pedal structure:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 treble clef
 1/4 e with pedal 2 down before
@@ -291,13 +264,11 @@ measure
 1/8 a
 1/4 e with variable peak after
 1/8 a with release after measure
-</template>
-</div>
+```
 
 And as it's been shown before, the stave you set on the `pedal` is where the whole pedal structure is positioned:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 stave with treble clef
 1/4 e with pedal before under second stave
@@ -331,15 +302,13 @@ stave
 1/8 rest
 1/4 rest
 1/8 rest
-</template>
-</div>
+```
 
 ## 3. Pedal marks on several staves and voices
 
 If there are several instruments with pedals, you can create pedal structures for several staves. By default, a structure is positioned under the stave where its marks are declared, but you can still specify a stave for it, like in the example above:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 stave
 1/4 e with pedal under first stave
@@ -388,13 +357,11 @@ stave
 1/8 rest
 1/4 rest
 1/8 rest
-</template>
-</div>
+```
 
 For pedal structures on several staves, it's recommended to keep them where they are declared, to avoid any confusion:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 stave
 1/4 e with pedal
@@ -428,13 +395,11 @@ stave
 1/8 a
 1/4 e with variable peak
 1/8 a with release
-</template>
-</div>
+```
 
 A pedal structure can be built from marks in different voices:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 treble clef
 voice
@@ -455,13 +420,11 @@ voice
 1/4 c with variable peak
 1/4 c
 1/4 c with variable peak
-</template>
-</div>
+```
 
 As it's been told before, each `pedal` key word starts a new pedal structure, and without it the other pedal marks are not drawn:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 treble clef
 voice
@@ -482,15 +445,13 @@ voice
 1/4 c with variable peak
 1/4 c
 1/4 c with variable peak
-</template>
-</div>
+```
 
 It's very important to let a user see errors or inaccuracies visually.
 
 A pedal structure can also be built from marks in different voices and on different staves:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 stave
 voice
@@ -530,8 +491,7 @@ voice
 1/4 c
 1/4 c
 1/4 c
-</template>
-</div>
+```
 
 A pedal is also heard: from the `pedal` to its release, the MIDI player holds the sustain pedal down.
 

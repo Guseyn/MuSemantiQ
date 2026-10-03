@@ -4,15 +4,13 @@ The size of a page, the space around the music on it and between its parts are a
 
 Let's start with a simple example:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 page line width is 500
 
 measure
 treble clef
 c d e f
-</template>
-</div>
+```
 
 Every style is written the same way: its name, `is`, and a value, all on one line. The value is written as it is, without quotes: `page line width is 500`, not `page line width is "500"`. A number is just a number, without units like `px`. A style can be written anywhere on the page, and it applies to the whole page, but it reads best at the top.
 
@@ -24,15 +22,13 @@ Every style is written the same way: its name, `is`, and a value, all on one lin
 
 All the other sizes are based on one number: the `interval between stave lines` (not to be mistaken for the `interval between staves`). By default it is **8.5**, and `font size` is another name for it:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 font size is 12
 
 measure
 treble clef
 c d e f
-</template>
-</div>
+```
 
 As you can see, everything got bigger: the stave, the notes, the spaces between them. The only thing that stays the same is the width of the page line. Now, when you set other sizes, you need to keep in mind that the numbers you give are multiplied by the `interval between stave lines`. For example, by default `interval between staves` is **13**. But it's not just **13** pixels, it's **13** intervals between stave lines. So if you increase or decrease the font size, all the other intervals and elements are increased or decreased in proportion.
 
@@ -40,8 +36,7 @@ As you can see, everything got bigger: the stave, the notes, the spaces between 
 
 Let's change the `interval between staves` and the `interval between lines`, which is the space between page lines:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 interval between staves is 8
 interval between lines is 8
 
@@ -56,8 +51,7 @@ stave
 g a b c5
 stave
 g3 a3 b3 c
-</template>
-</div>
+```
 
 By default the interval between staves is **13**, and the interval between lines is **10**.
 
@@ -65,8 +59,7 @@ By default the interval between staves is **13**, and the interval between lines
 
 A page has paddings around the music. The left and right paddings are always equal, and that's why the style has such a name:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 page left and right paddings is 4
 page top padding is 4
 page bottom padding is 6
@@ -74,8 +67,7 @@ page bottom padding is 6
 measure
 treble clef
 c d e f
-</template>
-</div>
+```
 
 By default the left and right paddings are **8**, and the top and bottom paddings are **9**.
 
@@ -83,8 +75,7 @@ By default the left and right paddings are **8**, and the top and bottom padding
 
 If you want to change the distance between the titles and the first page line, you can set `page lines top offset`, **10** by default. It only matters when the page has a title or a subtitle:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 page lines top offset is 4
 
 title is "Title"
@@ -92,13 +83,11 @@ title is "Title"
 measure
 treble clef
 c d e f
-</template>
-</div>
+```
 
 The titles themselves have top offsets too. Each one is the distance from whatever is above it: the top padding for the title, the title for the subtitle, the subtitle for the left and right subtitles:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 title top offset is 3
 subtitle top offset is 3
 left and right subtitles top offset is 3
@@ -111,13 +100,11 @@ right subtitle is "Right subtitle"
 measure
 treble clef
 c d e f
-</template>
-</div>
+```
 
 By default they are **0**, **1.5** and **4**. The page number sits at the bottom of the page, and you can set how far from the bottom edge it is, **3** by default:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 page number bottom offset is 8
 
 page number is "4"
@@ -125,13 +112,11 @@ page number is "4"
 measure
 treble clef
 c d e f
-</template>
-</div>
+```
 
 As you remember from [Fonts](/docs/language/fonts), the titles, the page number and instrument titles have their own font sizes:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 title font size is 8
 subtitle font size is 5
 left subtitle font size is 4
@@ -149,37 +134,32 @@ measure
 instrument title is "Violin" for stave 1
 treble clef
 c d e f
-</template>
-</div>
+```
 
 ## 6. Empty measure width
 
 A measure is never narrower than `empty measure width`, and a measure without units is exactly that wide. By default it is **10**, but you can change it:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 empty measure width is 20
 
 measure
 measure
 measure
 measure
-</template>
-</div>
+```
 
 ## 7. Page height
 
 By default a page is as tall as its music: it ends at the bottom padding below the last page line. You can set a fixed `page height` instead, in pixels, like the page line width:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 page height is 400
 
 measure
 treble clef
 c d e f
-</template>
-</div>
+```
 
 A fixed height doesn't grow with the music, so it's worth setting only when every page of a score has to be the same height.
 
@@ -187,15 +167,13 @@ A fixed height doesn't grow with the music, so it's worth setting only when ever
 
 If you want to print a score on paper of a certain size, you can set `page format`:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 page format is a4
 
 measure
 treble clef
 c d e f
-</template>
-</div>
+```
 
 There are four formats supported at the moment, and each one is the size of the paper in inches, at **96** pixels per inch, the way CSS counts them:
 
@@ -214,16 +192,14 @@ The page format is calculated pretty roughly, because the size a page is printed
 
 As you remember from [Colours](/docs/language/colours), a page has a border that is transparent by default. When you give it a colour, you can also make it thicker than its default **0.05**:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 page border width is 1.1
 page border color is #454545
 
 measure
 treble clef
 c d e f
-</template>
-</div>
+```
 
 ## 10. Zero and the defaults
 

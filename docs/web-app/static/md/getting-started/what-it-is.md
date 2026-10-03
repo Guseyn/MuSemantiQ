@@ -4,12 +4,10 @@
 
 Below, you can see very basic example:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 treble clef
 c d e f g
-</template>
-</div>
+```
 
 ## 1. What it is not
 

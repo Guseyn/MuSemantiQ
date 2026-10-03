@@ -63,31 +63,35 @@ introduced. Moving a page re-checks every example under it.
 
 ## Examples
 
-Write the music as a `<template is="msq-editor">` that opens on its text, and
-**wrap it in a `<div>`**:
+Write the music as a fenced block named after the element, here an editor that
+opens on its text:
 
-    <div>
-    <template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+    ```msq-editor opens-with=text
     measure
     treble clef
     c d e f
-    </template>
-    </div>
+    ```
 
 The reader sees what is written first, and the score is one click away, on
 **Render the score**. The components section is the exception: each of its
 pages shows the element it is about.
 
-The wrapper is load-bearing, and what it prevents is silent. `<template>` is
-not one of showdown's block tags, so without the `<div>` the markdown pass gets
-into the music: a blank line splits it into paragraphs, `<br>` lands between
-every line, and a line starting `-` or `#` becomes a list or a heading. The
-score still draws — it is just not the score that was written. `div` **is** a
-block tag, and showdown re-emits a matched block byte for byte.
+The extensions in `showdown-extensions/` (linked into `static/js/` by
+`npm run setup:symlinks`, and given to the shell's `e-markdown`) turn the fence
+into `<template is="msq-editor" data-font-sources="msqFontSources"
+data-opens-with="text">`. Words after the element's name are its attributes,
+without `data-`: `file-name=a-short-piece`, `editor-height=320px`. The fonts are
+the docs' default, so they are not written. `msq-svg`, `msq-midi` and
+`msq-svg-midi` are written the same way.
 
-So: the `<div>` at column 0, on its own line, above and below. Nothing in its
-attributes may contain the word `markdown`, which makes showdown re-parse the
-contents of the element it is on.
+The music in a fence never goes through markdown: the extensions take it out
+before showdown parses anything and put the element back after. That matters,
+and what it prevents is silent: markdown would split the music at blank lines,
+put `<br>` between lines, and turn a line starting `-` or `#` into a list or a
+heading. The score would still draw, just not the score that was written.
+
+A `<template>` wrapped in a `<div>` at column 0 also survives, and the check
+still accepts it, but a fence is how examples are written here.
 
 ## The check
 
@@ -95,7 +99,7 @@ contents of the element it is on.
 
 Runs as part of `npm run docs`, and holds every example to four things:
 
-1. it is wrapped, at column 0;
+1. it is fenced, or else wrapped in a `<div>` at column 0;
 2. **it survives the markdown pass** — each page is rendered with the very
    converter the browser will use and the music compared with what was written;
 3. it parses, with no errors;

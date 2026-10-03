@@ -15,24 +15,20 @@ MSQ has no command for a page break, so the API does not split anything. `multip
 
 The convention the repository uses is a line that reads `====next page====`. Let's take two pages. The first one:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 treble clef
 repeat sign at the start
 c d e f
-</template>
-</div>
+```
 
 and the second one:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 repeat sign at the end
 g a b c5
-</template>
-</div>
+```
 
 In one file they are written one after another, with `====next page====` on its own line between them.
 

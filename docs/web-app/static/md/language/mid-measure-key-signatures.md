@@ -4,47 +4,40 @@ A mid-measure key signature is essentially a key signature before a unit. It let
 
 Let's start with a simple example:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 treble clef
 1/4 c d
 e with key signature g major before
 f
-</template>
-</div>
+```
 
 All you need is to write `with key signature <key signature> before` after the unit. The names are the same as in [Key signatures](/docs/language/key-signatures), and a minor name works as well as a major one:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 key signature is f sharp major
 treble clef
 1/4 f g
 a with key signature e minor before
 b
-</template>
-</div>
+```
 
 The words `key signature` can be left out, so `with g major before` means the same thing:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 treble clef
 1/4 c d
 e with g major before
 f
-</template>
-</div>
+```
 
 As you may notice, a mid-measure key signature is always drawn together with a small clef in front of it. If you don't specify a mid-measure clef, it's the clef that the stave already has. If you never declared a clef for the stave, it's treble.
 
 A chord takes a mid-measure key signature on its `chord` line:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 treble clef
 1/4 c d
@@ -52,15 +45,13 @@ chord with key signature e minor before
 e g b
 
 f
-</template>
-</div>
+```
 
 ## 1. What a mid-measure key signature changes
 
 A key signature applies to all staves, so a mid-measure key signature is drawn on every stave of the measure, even though you write it on one unit only:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 stave with treble clef
 1/4 c d
@@ -68,28 +59,24 @@ e with key signature a major before
 f
 stave with bass clef
 1/4 c3 d3 e3 f3
-</template>
-</div>
+```
 
 Units in other voices and on other staves adjust their horizontal position when a mid-measure key signature is added, so that the synchronization of units does not get ruined.
 
 It's important to mention how it works with [accidentals](/docs/language/accidentals). An accidental lasts until the end of its measure, but only until the mid-measure key signature: from that point on, the new key decides. In the example below the first two notes are **F sharp**, and the last one is **F natural**, because the key of **C major** came after the sharp:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 treble clef
 1/4 f sharp
 f
 g with key signature c major before
 f
-</template>
-</div>
+```
 
 When you declared the key signature `for each line` or `for lines below`, a mid-measure key signature replaces it for all the following page lines:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 key signature is f sharp major for each line
 treble clef
@@ -99,15 +86,13 @@ b
 
 new line
 c5 d5 e5 f5
-</template>
-</div>
+```
 
 ## 2. Changing clef and key signature at once
 
 As you remember from [Mid-measure clefs](/docs/language/mid-measure-clefs), you can change the clef and the key signature with one command. You can also write them as two commands on the same unit, separated by a comma:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 stave with treble clef
 voice
@@ -127,8 +112,7 @@ voice
 1/4 c3
 c3
 c3
-</template>
-</div>
+```
 
 ## 3. When to use it
 

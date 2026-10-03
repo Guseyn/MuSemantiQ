@@ -70,14 +70,13 @@ rules"), no space before a parenthesis ("notes(or other elements)"), typos
 ## Examples
 
 Every claim a reader could try is shown, not described. Examples are editors
-that open on their text, wrapped in a `<div>` at column 0 (see the README for
-why), so the reader sees what is written first and the score one click away:
+that open on their text, written as a fence named after the element (see the
+README for how that becomes the element), so the reader sees what is written
+first and the score one click away:
 
-    <div>
-    <template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+    ```msq-editor opens-with=text
     c d e f
-    </template>
-    </div>
+    ```
 
 The one exception is the components section, where each page shows the element
 it is about.

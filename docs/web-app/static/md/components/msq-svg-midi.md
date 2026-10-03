@@ -12,13 +12,11 @@ Let's start with a simple example. Press play:
 </template>
 ```
 
-<div>
-<template is="msq-svg-midi" data-font-sources="msqFontSources">
+```msq-svg-midi
 measure
 treble clef
 c d e f
-</template>
-</div>
+```
 
 It works the other way too. Click a note head or a rest in the score, and the player jumps to it.
 
@@ -47,13 +45,11 @@ By default, a sounding note turns red. But you can easily change that:
 </template>
 ```
 
-<div>
-<template is="msq-svg-midi" data-font-sources="msqFontSources" data-highlight-color="#1f7a8c">
+```msq-svg-midi highlight-color=#1f7a8c
 measure
 treble clef
 c d e f
-</template>
-</div>
+```
 
 When a note stops sounding, it goes back to the font colour of the score (the one set with the [colour styles](/docs/language/colours)), or to **#121212** when the music sets none.
 
@@ -88,8 +84,7 @@ Let's take a look at two staves, so you can see a chord and a bass line light up
 </template>
 ```
 
-<div>
-<template is="msq-svg-midi" data-font-sources="msqFontSources" data-file-name="two-staves">
+```msq-svg-midi file-name=two-staves
 default tempo is "1/4 = 84"
 
 measure
@@ -108,8 +103,7 @@ stave
 stave
 1 chord
 c3 g3
-</template>
-</div>
+```
 
 As you may notice, both notes of a chord are highlighted at once, because they start at the same moment.
 

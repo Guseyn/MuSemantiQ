@@ -21,11 +21,9 @@ That writes `first-page.svg` and `first-page.mid` into the current folder. The o
 
 Let's start with a single line of note letters:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 c d e f
-</template>
-</div>
+```
 
 That is already a valid page. You get one measure on one stave with four quarter notes, **C D E F**, starting from middle C. You don't need to write a measure, a stave or a clef, because the engine creates what you leave out.
 
@@ -35,15 +33,13 @@ As you may notice, nothing is drawn at the start of the stave. There is no clef 
 
 To split the music into measures, you just need to write `measure` on its own line before each one:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 c d e f
 
 measure
 g a b c5
-</template>
-</div>
+```
 
 `measure` must be the first word on its line. The `5` in `c5` is an octave number: it is the C above the one the first measure starts from.
 
@@ -51,16 +47,14 @@ g a b c5
 
 A clef goes on its own line, inside the measure where it starts:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 treble clef
 c d e f
 
 measure
 g a b c5
-</template>
-</div>
+```
 
 It's important to mention that the clef applies from there on, so the second measure does not need its own.
 
@@ -68,8 +62,7 @@ It's important to mention that the clef applies from there on, so the second mea
 
 A time signature is written with a colon between the two numbers:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 treble clef
 time signature is 4:4
@@ -77,8 +70,7 @@ c d e f
 
 measure
 g a b c5
-</template>
-</div>
+```
 
 As you can see, you get two measures of four quarter notes under a treble clef and **4/4**.
 

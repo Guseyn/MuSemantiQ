@@ -80,7 +80,7 @@ Lives in `../e-pages` (GitHub `Guseyn/e-dev`). Open a docs page with `?dev=true`
 
 ## Documentation site
 
-`docs/web-app/static/js/sitemap.js` is the only place pages are declared; content is `static/md/<section>/<page>.md`. Examples are `<template is="msq-svg">` blocks that **must be wrapped in a `<div>` at column 0** (otherwise showdown rewrites the music). Examples must be **gradual**: `docs:check` asks the parser which named scenarios each example used and fails if a scenario is introduced (per `docs/concepts.js`) on a later page in sitemap order. A page that must show unparseable input marks itself `<!-- check-docs-examples: allow-errors -->`. Prose is written by the maintainer; pages hold `> **TO WRITE**` placeholders — see `docs/README.md`.
+`docs/web-app/static/js/sitemap.js` is the only place pages are declared; content is `static/md/<section>/<page>.md`. Examples are fenced blocks named after the element, ```` ```msq-editor opens-with=text ```` (attributes without `data-`; the fonts are the default), which the showdown extensions in `showdown-extensions/` (symlinked into docs by `setup:symlinks`) turn into `<template is="msq-…">` with the music kept out of markdown. A `<template>` wrapped in a `<div>` at column 0 also survives and is still checked. Examples must be **gradual**: `docs:check` asks the parser which named scenarios each example used and fails if a scenario is introduced (per `docs/concepts.js`) on a later page in sitemap order. A page that must show unparseable input marks itself `<!-- check-docs-examples: allow-errors -->`. Prose is written by the maintainer; pages hold `> **TO WRITE**` placeholders — see `docs/README.md`.
 
 ## Conventions
 

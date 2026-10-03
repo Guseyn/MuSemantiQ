@@ -4,37 +4,31 @@ A page has four colours you can set: the background, the font, the stave lines a
 
 Let's start with the background:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 background color is lavenderblush
 
 measure
 treble clef
 c d e f
-</template>
-</div>
+```
 
 By default the background is **#FDF5E6**. A colour can be written in three ways: as a CSS colour name like **lavenderblush**, as a hex value, or with `rgb()`. So both of the following give you the same page as the one above:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 background color is #FFF0F5
 
 measure
 treble clef
 c d e f
-</template>
-</div>
+```
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 background color is rgb(255, 240, 245)
 
 measure
 treble clef
 c d e f
-</template>
-</div>
+```
 
 A hex value can have **3**, **4**, **6** or **8** digits, so it can carry transparency, and `rgba()` works as well, with the alpha as the fourth number. It's important to mention that a colour name has to be written in lower case, the way CSS lists them: **lavenderblush** works, **LavenderBlush** does not.
 
@@ -42,8 +36,7 @@ A hex value can have **3**, **4**, **6** or **8** digits, so it can carry transp
 
 In the same way you can set `font color` and `stave lines color`:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 background color is lavenderblush
 stave lines color is #2A2922
 font color is rgb(40, 40, 60)
@@ -51,8 +44,7 @@ font color is rgb(40, 40, 60)
 measure
 treble clef
 c d e f
-</template>
-</div>
+```
 
 The font colour is not only the colour of the text. It is the colour of everything drawn on the page except the stave lines: note heads, stems, beams, clefs, barlines, slurs, and every title and label. By default it is **#121212**. The stave lines have a colour of their own, **#343434** by default, so you can make them lighter than the music on top of them.
 
@@ -60,15 +52,13 @@ The font colour is not only the colour of the text. It is the colour of everythi
 
 By default the page has no border: its colour is transparent. As soon as you give it a colour, it is drawn:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 page border color is #414A4C
 
 measure
 treble clef
 c d e f
-</template>
-</div>
+```
 
 How thick the border is, is a size rather than a colour, so it is explained in [Page format](/docs/language/page-format).
 
@@ -83,8 +73,7 @@ You can write both `color` and `colour`, and some of the names have a shorter or
 | `stave lines color` | `stave lines colour`, `staff lines color`, `staff lines colour` |
 | `page border color` | `page border colour`, `border color`, `border colour` |
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 bg colour is honeydew
 staff lines colour is #7A7A7A
 border colour is darkslategray
@@ -92,8 +81,7 @@ border colour is darkslategray
 measure
 treble clef
 c d e f
-</template>
-</div>
+```
 
 ## 4. Where to write them
 

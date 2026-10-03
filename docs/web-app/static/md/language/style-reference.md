@@ -4,8 +4,7 @@ This page gathers every style of a page in one place. Each of them is explained,
 
 As you remember from [Page format](/docs/language/page-format), every style is written the same way, on a line of its own: the name, `is`, and a value without quotes. Styles apply to the whole page, wherever they are written:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 background color is ivory
 font size is 7
 page line width is 700
@@ -21,8 +20,7 @@ treble clef
 c d e f
 measure
 measure
-</template>
-</div>
+```
 
 ## 1. Colours
 

@@ -11,7 +11,9 @@ src/              the engine
 web-components/   the <template is="msq-*"> elements and the editor
 tools/            SMuFL font generation, MusicXML import and export, Magenta sound fonts
 scripts/          the test runners, the copy and link scripts, the watchers, the docs check
-examples/         the browser app and the CLI
+browser-app/      the browser app: the components on a page, with their code
+cli-app/          the command line
+showdown-extensions/  ```msq-* fences in markdown, turned into the elements
 dev-tools/        the dev tools app
 docs/             the landing page and this documentation
 test/             the visual, audio and serializer suites

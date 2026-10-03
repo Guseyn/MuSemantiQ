@@ -12,13 +12,11 @@ Let's start with a simple example. Hover over the score and press the second but
 </template>
 ```
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources">
+```msq-editor
 measure
 treble clef
 c d e f
-</template>
-</div>
+```
 
 Change something in the source, then press the same place in the toolbar again: the score is rendered from what you wrote, and so is the player.
 
@@ -53,13 +51,11 @@ By default, the editor opens on the score. But you can easily make it open on th
 </template>
 ```
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 treble clef
 c d e f
-</template>
-</div>
+```
 
 As you can see, the source view is as tall as its text rather than as the score, so a short example stays short. The score is still rendered when the element starts, and pressing **Render** shows it with its player. It's important to mention that the element does not take the focus when it opens on the source, so a page with many of them does not scroll to whichever one opened last. That is how every example outside this section of the documentation is written.
 
@@ -85,8 +81,7 @@ Let's take a look at an editor with a height and a font size of its own:
 </template>
 ```
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-editor-height="320px" data-editor-font-size="0.9em" data-file-name="editor-example">
+```msq-editor editor-height=320px editor-font-size=0.9em file-name=editor-example
 title is "Edit Me"
 
 measure
@@ -96,8 +91,7 @@ time signature is 3:4
 
 measure
 1/2 c5 dotted
-</template>
-</div>
+```
 
 ## 2. The custom properties
 

@@ -67,6 +67,14 @@
       */
       import showdownHighlight from '#ehtml/showdown/extensions/highlight.js'
       window.showdownHighlight = showdownHighlight
+
+      /*
+      ```msq-svg, ```msq-midi, ```msq-svg-midi and ```msq-editor fences become
+      those elements, with the fonts the loader below registers. A global for
+      the same reason as the highlighting.
+      */
+      import msqExtensions from '/js/showdown-extensions/msqExtensions.js'
+      window.msqExtensions = msqExtensions
     </script>
   </head>
 
@@ -300,7 +308,7 @@
           >
             <e-markdown
               data-src="${currentPage.md}"
-              data-internal-state="${{ extensions: [ showdownHighlight({ auto_detection: false }) ] }}"
+              data-internal-state="${{ extensions: [ msqExtensions({ fontSources: 'msqFontSources' }), showdownHighlight({ auto_detection: false }) ] }}"
               data-actions-on-progress-start="
                 document
                   .querySelectorAll('e-sidebar nav details[data-current=true]')

@@ -4,15 +4,13 @@ Each measure consists of staves. Until now every example had just one, and MSQ c
 
 Let's start with a simple example:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 stave with treble clef
 c d e f
 stave with bass clef
 c3 d3 e3 f3
-</template>
-</div>
+```
 
 As you can see, each `stave` opens a new stave in the current measure, and everything written after it, until the next `stave`, goes on that stave.
 
@@ -20,8 +18,7 @@ As you can see, each `stave` opens a new stave in the current measure, and every
 
 `stave` must be the first word on its line, and it takes nothing else on that line except, optionally, a clef. You can declare a stave with a clef in one command, as above, or declare the stave and put the clef on the next line, the way you did on [Clefs](/docs/language/clefs):
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 stave
 treble clef
@@ -29,32 +26,27 @@ c5 b a g
 stave
 bass clef
 c3 b2 a2 g2
-</template>
-</div>
+```
 
 Both forms produce the same thing. The combined form `stave with … clef` accepts every clef from [Clefs](/docs/language/clefs), including the octave ones:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 stave with treble clef
 stave with alto clef
 stave with bass clef
 stave with octave down clef
-</template>
-</div>
+```
 
 If you prefer the American spelling, `staff` is accepted everywhere `stave` is:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 staff with treble clef
 e f g a
 staff with bass clef
 e3 f3 g3 a3
-</template>
-</div>
+```
 
 **Side note:** A second clef in the same measure also opens a new stave, because one stave cannot start with two clefs. So `treble clef` followed later by `bass clef` gives you two staves even without the word `stave`. It works, but writing `stave` makes the structure much easier to read.
 
@@ -62,8 +54,7 @@ e3 f3 g3 a3
 
 It's important to mention that staves belong to a measure, not to the whole page. Every measure declares its own staves, so a grand staff repeats `stave` in every measure:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 stave with treble clef
 c d e f
@@ -81,15 +72,13 @@ stave
 1 c5
 stave
 1 c3
-</template>
-</div>
+```
 
 As you may notice, the clefs are written only in the first measure. A stave remembers the clef of the stave with the same number in the previous measures, so the second stave is still read in bass clef in the second and the third measure.
 
 If a measure has notes but no `stave`, it has only one stave, and the others disappear from that measure:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 stave with treble clef
 c d e f
@@ -98,13 +87,11 @@ c3 d3 e3 f3
 
 measure
 g a b c5
-</template>
-</div>
+```
 
 The only exception is a measure with nothing in it at all. An empty measure is drawn with as many staves as the measure before it:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 stave with treble clef
 c d e f
@@ -112,15 +99,13 @@ stave with bass clef
 c3 d3 e3 f3
 
 measure
-</template>
-</div>
+```
 
 ## 3. As many staves as you need
 
 You can declare as many staves in a measure as you need, and a stave may stay empty in some measures:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 stave with treble clef
 stave with alto clef
@@ -141,8 +126,7 @@ stave
 1 rest
 stave
 1 g3
-</template>
-</div>
+```
 
 The staves in the first measure have clefs and nothing else. That is enough to set up the system, and the measures after it only need to say which stave the music goes on.
 

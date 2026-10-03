@@ -2,8 +2,7 @@
 
 Measure numbers are a setting of the whole page. You turn them on with the `measure numbers` command, and say which measures get a number:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure numbers for all measures
 
 measure
@@ -12,15 +11,13 @@ c d e f
 
 measure
 g a b c5
-</template>
-</div>
+```
 
 As you may notice, the first measure on the page never gets a number.
 
 There are four scopes: all measures, first measures, last measures, and first and last measures. `measure numbers` on its own means all measures. Let's see them one by one, on a page with several lines. This is how you set measure numbers to all measures:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure numbers for all measures
 
 measure
@@ -36,13 +33,11 @@ measure
 c d e f
 measure
 g a b c5
-</template>
-</div>
+```
 
 This is how you set a measure number only to the first measure on each line:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure numbers for first measures
 
 measure
@@ -62,13 +57,11 @@ new line
 c5 b a g
 measure
 f e d c
-</template>
-</div>
+```
 
 This is how you set a measure number only to the last measure on each line:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure numbers for last measures
 
 measure
@@ -84,13 +77,11 @@ measure
 c d e f
 measure
 g a b c5
-</template>
-</div>
+```
 
 And this is how you set measure numbers to the first and the last measures on each line:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure numbers for first and last measures
 
 measure
@@ -106,8 +97,7 @@ measure
 c d e f
 measure
 g a b c5
-</template>
-</div>
+```
 
 You can also write `first last`, `first & last` or `first&last`.
 
@@ -117,8 +107,7 @@ Numbering only the first measure of each line is the most common choice in print
 
 By default, measure numbers are above the measures. But you can easily change that:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure numbers for all measures below measures
 
 measure
@@ -134,8 +123,7 @@ measure
 c d e f
 measure
 g a b c5
-</template>
-</div>
+```
 
 Instead of `below measures` you can write `below`, `under`, or `down`, and `above`, `over` or `up` for the default position.
 

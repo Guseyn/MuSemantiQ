@@ -5,15 +5,13 @@ Sooner or later you'll type something that MuSemantiQ doesn't understand. It nev
 Let's start with a simple example, a clef that doesn't exist:
 
 <!-- check-docs-examples: allow-errors -->
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 treble clef
 c d e f
 
 stave with fancy clef
-</template>
-</div>
+```
 
 As you can see, the first stave is drawn as usual, and so is the second one: `stave` is a command MuSemantiQ knows. Only `with fancy clef` is not, so the second stave has no clef, and the rest of the line is reported. It's very important to let a user see errors and inaccuracies visually, rather than get an empty page or nothing at all.
 
@@ -32,14 +30,12 @@ The quoted part is exactly the text the parser couldn't use, so in the raw strin
 The sentence says "not recognizable **or applicable**" for a reason. A command can be perfectly correct and still be in a place where it means nothing. As you remember from [Fermata over barline](/docs/language/fermata-over-barline), `ends with fermata` belongs to a measure, so it has to come right after `measure`. Written after the units, it has nothing to attach to:
 
 <!-- check-docs-examples: allow-errors -->
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 treble clef
 c d e f
 ends with fermata
-</template>
-</div>
+```
 
 ```text
 command 'ends with fermata' is not recognizable or applicable on the line 4
@@ -54,14 +50,12 @@ There are only a few kinds of errors, and most of them you'll recognise at once.
 **A command that is not recognizable.** It's a typo, or a word that doesn't exist, or a value that is not supported:
 
 <!-- check-docs-examples: allow-errors -->
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 treble clef
 c d e f
 g with staccatto
-</template>
-</div>
+```
 
 ```text
 command 'with staccatto' is not recognizable or applicable on the line 4
@@ -72,15 +66,13 @@ As you may notice, the note `g` is still drawn. Only the part of the line that w
 **A unit that doesn't exist.** This is a logical error: every word is correct, but a span names a unit that is not there. Let's take a look at the following example:
 
 <!-- check-docs-examples: allow-errors -->
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 treble clef
 a b a b a
 
 slur from unit 1 to unit 6
-</template>
-</div>
+```
 
 We want the slur to end at the sixth unit, but there are only five notes. So the slur has nowhere to end, and it runs to the end of the line, and you get:
 
@@ -91,8 +83,7 @@ unit after command 'to' is not found on the line 5
 The same happens with a measure that doesn't exist, in a command that names measures, like a volta bracket:
 
 <!-- check-docs-examples: allow-errors -->
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 treble clef
 a b c5
@@ -100,8 +91,7 @@ measure
 a b c5
 
 volta with text "1." from first measure to 5th measure
-</template>
-</div>
+```
 
 ```text
 measure after command 'to' is not found on the line 7
@@ -110,15 +100,13 @@ measure after command 'to' is not found on the line 7
 **An endpoint with no position.** A span needs to know where it starts and where it finishes, and when the number is missing, it cannot find out:
 
 <!-- check-docs-examples: allow-errors -->
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 treble clef
 1/8 a beamed, b, c5 not beamed
 
 slur starts before unit
-</template>
-</div>
+```
 
 For this one you get two errors, because the line is wrong in two ways. The word `unit` without a number is not a position, so it is not recognizable. And `starts before` is left without a position:
 

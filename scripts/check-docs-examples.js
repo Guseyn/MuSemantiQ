@@ -3,13 +3,15 @@
 /*
 Checks every MSQ example in the documentation, three ways.
 
-1. The wrapper.  `<template>` is not one of showdown's block tags, so a bare
-   `<template is="msq-editor">` in a .md file is not protected from the markdown
-   pass: blank lines split it into paragraphs, and lines starting `-`, `#` or
-   `1.` are eaten. `div` IS a block tag, and showdown re-emits a matched block
-   byte for byte. So the wrapper is load-bearing, and the failure it prevents is
-   silent — the example still renders, just wrong. That is why this is a build
-   error and not a style note.
+1. The wrapper.  Examples are written as ```msq-editor fences, whose music the
+   extensions in showdown-extensions/ keep out of markdown altogether. A
+   `<template is="msq-editor">` written as HTML is another matter: `<template>`
+   is not one of showdown's block tags, so a bare one is not protected from the
+   markdown pass — blank lines split it into paragraphs, and lines starting
+   `-`, `#` or `1.` are eaten. `div` IS a block tag, and showdown re-emits a
+   matched block byte for byte. So for those the wrapper is load-bearing, and
+   the failure it prevents is silent — the example still renders, just wrong.
+   That is why this is a build error and not a style note.
 
 2. The music.  Every example is parsed. The parser is fault tolerant — it never
    throws, it accumulates — so an empty `errors` array is the only pass signal.
@@ -36,6 +38,7 @@ import parserScenarios from '#msq/language/parser/scenarios/parserScenarios.js'
 
 import { allPages } from '../docs/web-app/static/js/sitemap.js'
 import { introducedBy } from '../docs/concepts.js'
+import msqExtensions from '../showdown-extensions/msqExtensions.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const projectRoot = path.resolve(__dirname, '..')
@@ -61,7 +64,8 @@ if (fs.existsSync(showdownPath)) {
     emoji: true,
     moreStyling: true,
     github: true,
-    extensions: []
+    // The same extensions the docs shell gives its e-markdown
+    extensions: [ msqExtensions({ fontSources: 'msqFontSources' }) ]
   })
 }
 
@@ -121,12 +125,55 @@ function templateBlocks(text) {
     .sort((left, right) => left.startIndex - right.startIndex)
 }
 
+/*
+Examples can also be written as fences named after the element, which the
+extensions in showdown-extensions/ turn into the element:
+
+  ```msq-editor opens-with=text
+  c d e f
+  ```
+
+The music in them never goes through markdown, so they need no wrapper. They
+are found with the same pattern the extensions use: the element's exact name,
+so that msq-svg does not take msq-svg-midi's fences.
+*/
+const MSQ_FENCE = /^(`{3,}|~{3,})[ \t]*(msq-svg-midi|msq-svg|msq-midi|msq-editor)(?=[ \t]|$)[^\n]*\n([\s\S]*?)\n?\1[ \t]*$/gm
+
+function msqFencesIn(text) {
+  return [ ...text.matchAll(MSQ_FENCE) ].map((match) => ({
+    tag: match[2],
+    music: match[3],
+    startIndex: match.index
+  }))
+}
+
+// What a browser reads back out of the escaped music an extension wrote
+function unescapedHtml(text) {
+  return text.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&amp;/g, '&')
+}
+
+/*
+The page that documents error reporting has to show input that does not
+parse. It says so, just above the example, and is then held to the opposite
+rule.
+*/
+function allowsErrors(lines, startLine) {
+  return /<!--\s*check-docs-examples:\s*allow-errors\s*-->/.test(
+    lines.slice(Math.max(0, startLine - 4), startLine - 1).join('\n')
+  )
+}
+
 /**
  * Every msq example in one markdown file, with the wrapper checked.
  */
 function examplesIn(text, relativePath) {
   const found = []
   const lines = text.split('\n')
+
+  for (const fence of msqFencesIn(text)) {
+    const startLine = lineOf(text, fence.startIndex)
+    found.push({ source: fence.music, line: startLine, tag: fence.tag, allowErrors: allowsErrors(lines, startLine) })
+  }
 
   /*
   A page that documents the components shows this markup as markup, inside a
@@ -166,17 +213,9 @@ function examplesIn(text, relativePath) {
       )
     }
 
-    /*
-    The page that documents error reporting has to show input that does not
-    parse. It says so, per example, and is then held to the opposite rule.
-    */
-    const allowErrors = /<!--\s*check-docs-examples:\s*allow-errors\s*-->/.test(
-      lines.slice(Math.max(0, startLine - 4), startLine - 1).join('\n')
-    )
-
-    found.push({ source: block.source, line: startLine, tag: block.tag, allowErrors })
+    found.push({ source: block.source, line: startLine, tag: block.tag, allowErrors: allowsErrors(lines, startLine) })
   }
-  return found
+  return found.sort((left, right) => left.line - right.line)
 }
 
 /** The named scenarios that fired for one MSQ source. */
@@ -214,7 +253,11 @@ function checkFile(absolutePath, relativePath, ref) {
   */
   if (converter) {
     const rendered = converter.makeHtml(text)
-    const before = templateBlocks(text)
+    // A fenced example comes out as its element with the music between two newlines, escaped
+    const before = [
+      ...templateBlocks(text).map((block) => ({ startIndex: block.startIndex, source: block.source, fenced: false })),
+      ...msqFencesIn(text).map((fence) => ({ startIndex: fence.startIndex, source: `\n${fence.music}\n`, fenced: true }))
+    ].sort((left, right) => left.startIndex - right.startIndex)
     const after = templateBlocks(rendered)
     if (before.length !== after.length) {
       report(
@@ -223,12 +266,13 @@ function checkFile(absolutePath, relativePath, ref) {
       )
     } else {
       before.forEach((block, index) => {
-        if (after[index].source !== block.source) {
+        const came = block.fenced ? unescapedHtml(after[index].source) : after[index].source
+        if (came !== block.source) {
           report(
             relativePath, lineOf(text, block.startIndex),
             'the markdown pass rewrote this example. Compare what was written with what came out:\n' +
             `      written:  ${JSON.stringify(block.source.slice(0, 70))}\n` +
-            `      rendered: ${JSON.stringify(after[index].source.slice(0, 70))}`
+            `      rendered: ${JSON.stringify(came.slice(0, 70))}`
           )
         }
       })

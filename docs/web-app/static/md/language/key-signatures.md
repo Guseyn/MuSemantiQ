@@ -4,25 +4,21 @@ A key signature is the set of sharps or flats drawn after the clef. In MSQ it be
 
 Let's start with a simple example:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 treble clef
 key signature is e flat major
 e f g a
-</template>
-</div>
+```
 
 The word `is` is optional, so `key signature e flat major` works just as well:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 treble clef
 key signature e flat major
 e f g a
-</template>
-</div>
+```
 
 ## 1. Names of keys
 
@@ -48,8 +44,7 @@ Every key can be named by its major or by its relative minor, and both give the 
 
 Here is the sharp side, one measure per key:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 treble clef
 key signature is g major
@@ -66,13 +61,11 @@ a b c5
 measure
 key signature is e major
 e f g
-</template>
-</div>
+```
 
 And the same keys named by their minors:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 treble clef
 key signature is e minor
@@ -89,13 +82,11 @@ f g a
 measure
 key signature is c sharp minor
 c d e
-</template>
-</div>
+```
 
 And the flat side:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 treble clef
 key signature is f major
@@ -112,15 +103,13 @@ a b c5
 measure
 key signature is d flat major
 d e f
-</template>
-</div>
+```
 
 ## 2. It belongs to the measure
 
 A key signature is drawn at the start of the measure where you declare it, and the clef is drawn again in front of it, even if the clef was declared in an earlier measure:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 treble clef
 1/4 c d e f
@@ -128,21 +117,18 @@ treble clef
 measure
 key signature is d major
 1/4 d e f g
-</template>
-</div>
+```
 
 It is not drawn again in the next measures, but it keeps affecting how the notes sound until the next key signature. Since it belongs to the measure, a measure has only one key signature: if you write a second one without `measure` in between, a new measure is created for it:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 treble clef
 key signature is g major
 1/4 g a b c5
 key signature is b flat major
 1/4 b c5 d5 e5
-</template>
-</div>
+```
 
 A key signature applies to every stave of its measure. You will see that on the [Staves](/docs/language/staves) page.
 
@@ -150,8 +136,7 @@ A key signature applies to every stave of its measure. You will see that on the 
 
 When the music moves from a key with sharps or flats back to a key without them, the old sharps or flats are cancelled with naturals. You write it as a transition, `X to c major` (or `X to a minor`):
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 treble clef
 key signature is e flat major
@@ -168,13 +153,11 @@ a b c5
 measure
 key signature is a major to a minor
 f g a
-</template>
-</div>
+```
 
 It's important to mention that a transition can only lead to **c major** or **a minor**, because that is the one case where the old signs have to be cancelled with naturals. To go from one key with sharps or flats to another, you simply declare the new key:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 treble clef
 key signature is d major
@@ -183,15 +166,13 @@ d e f
 measure
 key signature is b flat major
 b c5 d5
-</template>
-</div>
+```
 
 ## 4. For each line
 
 A printed score restates the key signature at the start of every line. In MSQ you ask for it with `for each line`:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 treble clef
 key signature is d major for each line
@@ -199,15 +180,13 @@ key signature is d major for each line
 
 measure
 1/4 a b c5 d5
-</template>
-</div>
+```
 
 Without it a key signature is drawn only in its own measure, and a new line of music would start without it. That is why a key signature usually wants `for each line`.
 
 You can also write `for lines below`. It works exactly the same, but it reads better when the key signature changes in the middle of a page, because it says the key holds for the lines that follow rather than for all of them:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 treble clef
 key signature is d sharp minor for lines below
@@ -216,8 +195,7 @@ key signature is d sharp minor for lines below
 measure
 key signature is d minor for lines below
 1/4 d e f g
-</template>
-</div>
+```
 
 A new key signature always replaces the one that was restated. If you declare it without `for each line` or `for lines below`, the restating stops, and the lines after it start without a key signature.
 

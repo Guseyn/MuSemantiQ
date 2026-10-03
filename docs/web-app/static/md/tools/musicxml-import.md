@@ -122,8 +122,7 @@ The report it produces:
 
 And the page, written back as MSQ by the serializer, and engraved:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 default instrument is flute
 
 measure
@@ -144,8 +143,7 @@ measure
 stave
 treble clef
 1 d5, with fermata up
-</template>
-</div>
+```
 
 As you can see, the slur was paired into `slur from unit 1 to unit 3`, the part name became both the instrument title and the default instrument, and the second measure restates its clef because it begins a page line. The schleifer is gone, and the page break is now only a line break, and both of those are in the report.
 

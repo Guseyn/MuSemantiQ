@@ -8,21 +8,18 @@ It's important to mention that MIDI settings change only what you hear, and neve
 
 By default a page is played on a piano. You can set `default instrument` for the whole page without mentioning an instrument anywhere in the score:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 default instrument is guitar
 
 measure
 treble clef
 c d e f
 g a b c5
-</template>
-</div>
+```
 
 As you remember from [Instrument titles](/docs/language/instrument-titles), a stave can have an instrument title. When the title is a name MuSemantiQ knows, the stave is played on that instrument, and it wins over the default one. So in the following example the first stave is played on a flute, and the second one on the default instrument, a cello:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 default instrument is cello
 
 measure
@@ -31,8 +28,7 @@ stave with treble clef
 1/2 c5 e5
 stave with bass clef
 1/2 c3 g2
-</template>
-</div>
+```
 
 An instrument title is found by its whole name, in any case, and if that is not a name MuSemantiQ knows, by its first word. So a stave titled "Violin I" is played on a violin. The value of `default instrument` has to be one of the names exactly, in lower case.
 
@@ -172,47 +168,40 @@ The names follow the General MIDI list of instruments, and many of them have sho
 
 By default a page is played at **120** quarter notes per minute. You can set `default tempo`:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 default tempo is "1/4 = 60"
 
 measure
 treble clef
 c d e f
 g a b c5
-</template>
-</div>
+```
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 default tempo is "1/4 = 200"
 
 measure
 treble clef
 c d e f
 g a b c5
-</template>
-</div>
+```
 
 Unlike a style, the value of `default tempo` is written in quotes, because it is the same text a tempo mark takes, and it is understood the same way. As you remember from [Tempo and metronome marks](/docs/language/tempo-and-metronome-marks), that text can be a duration and a number, like **"1/4 = 76"** or **"1/2 = 60"**, a tempo word, like **"Andante"**, or both. A word on its own gives the tempo that word usually means:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 default tempo is "Andante"
 
 measure
 treble clef
 c d e f
 g a b c5
-</template>
-</div>
+```
 
 The difference is that a tempo mark is drawn, and the default tempo is not. That's what the default tempo is for: a score that has to be played at a certain speed, but that you don't want to put a metronome mark on.
 
 When the first measure has a tempo mark of its own, the default tempo is not used at all: what is written on the page wins. And a tempo mark further on changes the tempo from its measure, whatever the default was:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 default tempo is "1/4 = 60"
 
 measure
@@ -222,26 +211,22 @@ c d e f
 measure
 tempo is "1/4 = 120"
 c d e f
-</template>
-</div>
+```
 
 ## 3. Fermata duration
 
 A fermata holds the music: the unit under it sounds longer, and everything after it comes later. By default a fermata on a unit adds **2** seconds, and a fermata over a barline adds **2.5** seconds. You can set how many **seconds** a fermata adds with `fermata duration`, and it works both for the fermata articulation and for the fermata at the end of a measure:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 fermata duration is 0.5
 
 measure
 treble clef
 1/4 c with fermata
 d e f
-</template>
-</div>
+```
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 fermata duration is 4
 
 measure
@@ -251,8 +236,7 @@ c d e f
 
 measure
 g a b c5
-</template>
-</div>
+```
 
 The number can have a fraction, and it can be **0**, in which case a fermata is drawn but doesn't hold the music at all.
 

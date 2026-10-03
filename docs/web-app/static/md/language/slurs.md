@@ -6,32 +6,27 @@ A slur does not belong to a measure, because it can connect units from different
 
 Let's start with basics:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 treble clef
 1/4 c d e f
 
 slur from first unit to fourth unit
-</template>
-</div>
+```
 
 You can write a position as a word or as a number, before or after the key word: `first unit`, `1st unit` and `unit 1` are the same thing. Words work for numbers from **1** to **10** (`first` … `tenth`, `one` … `ten`), because it keeps highlighting in the editor fast, and that is where most positions are anyway. For bigger numbers you can write `11th` or `unit 11`. The key words `unit`, `note` and `chord` are also the same thing here, and rests are counted as units too:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 treble clef
 1/4 c rest e f
 
 slur from note 1 to 4th note
-</template>
-</div>
+```
 
 A slur takes its units from the last page line declared before it. That is how you can put slurs on several lines:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 treble clef
 a d f g
@@ -42,13 +37,11 @@ new line
 a d f g
 
 slur from first unit to fourth unit
-</template>
-</div>
+```
 
 As you see, each slur applies to the last line declared before the slur. But you can also declare all the slurs after all the lines, and name the line:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 treble clef
 a d f g
@@ -58,13 +51,11 @@ a d f g
 
 slur on first line from first unit to fourth unit
 slur on second line from first unit to fourth unit
-</template>
-</div>
+```
 
 Let's see how you can put slurs in different measures:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 treble clef
 a d f g
@@ -80,15 +71,13 @@ slur on first line, in first measure from first unit to fourth unit
 slur on first line, in second measure from first unit to fourth unit
 slur on second line, in first measure from first unit to fourth unit
 slur on second line, in second measure from first unit to fourth unit
-</template>
-</div>
+```
 
 It's important to mention that measures are numbered within their page line. On the second line, `first measure` is the first measure of that line, not the first measure of the page.
 
 In the same way, you can put slurs in different staves:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 stave with treble clef
 a5 d5 f5 g5
@@ -97,13 +86,11 @@ a2 d3 f3 g3
 
 slur in first stave from first unit to fourth unit
 slur in second stave from first unit to fourth unit
-</template>
-</div>
+```
 
 A slur connects units only in the same voice, so you name the voice for the whole slur:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 treble clef
 voice
@@ -113,15 +100,13 @@ a d f g
 
 slur in first voice from first note to fourth unit
 slur in second voice from first note to fourth unit down
-</template>
-</div>
+```
 
 As you can see, you can control the direction of a slur with the `up` and `down` key words.
 
 A slur is a cross-measure element:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 treble clef
 a d f g
@@ -129,13 +114,11 @@ measure
 a d f g
 
 slur from first note in first measure to fourth unit in second measure
-</template>
-</div>
+```
 
 A slur is also a cross-stave element:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 stave with treble clef
 a d f g
@@ -151,13 +134,11 @@ slur
 starts above first note in first measure in first stave
 changes stave at first note in second measure in second stave
 and finishes at fourth unit in second measure in second stave
-</template>
-</div>
+```
 
 It's important to mention the exact unit where a slur changes its stave, because otherwise the slur misjudges which units are under it, and it would intersect or ignore some of them. Here is the same slur without `changes stave`:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 stave with treble clef
 a d f g
@@ -172,15 +153,13 @@ stave
 slur
 starts above first note in first measure in first stave
 and finishes at fourth unit in second measure in second stave
-</template>
-</div>
+```
 
 As you may notice, a slur can be written over several lines, and you can join its parts with commas or `and`. Cross-stave slurs work and look better when they are s-shaped, more about that below, in the section about s-shaped slurs.
 
 If a slur needs to start before a unit or finish after a unit, you just say so:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 treble clef
 a d f g
@@ -193,8 +172,7 @@ a d f g
 measure
 
 slur starts before first unit and finishes at 4th unit
-</template>
-</div>
+```
 
 This is how a slur reaches across the end of a page line: its part on the first line `finishes after` a unit, and its part on the next line `starts before` one.
 
@@ -207,8 +185,7 @@ The endpoints can be written in different ways, so you can choose what reads bet
 
 You can set a direction for a slur with `up` and `down`, or you can say that a slur starts or finishes `above` or `below` a certain unit:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 treble clef
 a d f g
@@ -224,8 +201,7 @@ new line
 a d f g
 
 slur up starts at first unit and finishes at 4th unit
-</template>
-</div>
+```
 
 If you mention several directions for a simple slur, the last one wins over all the others.
 
@@ -244,8 +220,7 @@ The words `stave` and `staff` are the same thing everywhere in a slur.
 
 You can configure how rounded a slur is. A number from **1** to **10** after `roundness` (or `convex`) sets the roundness of a slur:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 treble clef
 a b c5 d5 e5
@@ -257,13 +232,11 @@ a b c5 d5 e5
 slur in first measure from first note to note 5 with roundness 1
 slur in second measure from first note to note 5 with roundness 7
 slur in third measure from first note to note 5 with roundness 10
-</template>
-</div>
+```
 
 You can also correct the vertical position of the left and the right points of a slur:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 treble clef
 c with stem down, d, e, c, f, g
@@ -275,27 +248,23 @@ slur in first measure from first unit to 6th unit
 slur in second measure from first unit to 6th unit
 with left point 1 up
 with right point 1 up
-</template>
-</div>
+```
 
 In the second measure we moved both points of the slur up by one interval between stave lines.
 
 A slur adjusts itself, so it does not intersect notes and chords under it:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 treble clef
 c d3 c
 
 slur from unit 1 to unit 3
-</template>
-</div>
+```
 
 For the right point of a slur, you can also say where it is attached: to the note head, or to the middle of the stem. It is especially useful for slurs that start from [grace notes](/docs/language/grace-units):
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 treble clef
 1/8 a is grace
@@ -321,8 +290,7 @@ with right point attached to middle of stem
 
 slur up from seventh note to eighth note
 with right point attached to note head
-</template>
-</div>
+```
 
 As you may notice, `note head` and `note body` are the same thing.
 
@@ -330,8 +298,7 @@ As you may notice, `note head` and `note body` are the same thing.
 
 If you need a cross-stave slur, it's highly recommended to make it s-shaped with `with s-shape`:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 stave with treble clef
 1/8 a beamed, d, f, g
@@ -345,13 +312,11 @@ starts above first note in first stave
 changes stave below second unit in second stave
 and finishes at unit 5
 with s-shape
-</template>
-</div>
+```
 
 You can also write `with s shape` or `with sshape`. An s-shaped slur can change its direction on the same stave too, with `goes through`:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 treble clef
 1/16 a beamed and stem up, b, c5, f not beamed,
@@ -365,8 +330,7 @@ starts below first note
 goes through 5th note
 goes through 9th note
 finishes at 12th note
-</template>
-</div>
+```
 
 `goes through` marks a unit where the slur changes its direction. As you can see, everything that works for simple slurs works for s-shaped slurs as well.
 

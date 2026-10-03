@@ -7,8 +7,7 @@ There are two kinds of things that can go wrong with a component, and they look 
 The parser never stops at a mistake. It reports what it could not read, carries on, and the score and the playback are made from everything it did understand. What it could not read is listed in a panel at the bottom of the element itself:
 
 <!-- check-docs-examples: allow-errors -->
-<div>
-<template is="msq-svg" data-font-sources="msqFontSources">
+```msq-svg
 measure
 treble clef
 c d e f
@@ -16,8 +15,7 @@ c d e f
 measure
 c with fancy accent
 d e f
-</template>
-</div>
+```
 
 As you can see, the panel says how many errors there are, and then gives a row to each: its number, the line it came from, and the message. When a message does not say which line it came from, the line column shows a dash. The panel only appears when there is something to report.
 

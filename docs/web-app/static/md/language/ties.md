@@ -2,14 +2,12 @@
 
 A tie joins two notes of the same pitch into one sound: the second note is not played again, it just makes the first one longer. You can connect notes with ties as follows:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 1/4 c is tied with next
 c
 1/2 d is tied with next
 1/8 d
-</template>
-</div>
+```
 
 You can omit `is`, and write just `tied with next`.
 
@@ -17,8 +15,7 @@ You can omit `is`, and write just `tied with next`.
 
 The direction of a tie depends on the stem directions and on the positions of the tied notes:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 a with stem up, tied with next
 a
 
@@ -30,38 +27,32 @@ a with stem down
 
 a with stem down, tied with next
 a with stem up
-</template>
-</div>
+```
 
 But you can force the direction of a tie with `up` or `down` right after it:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 a with stem down, tied with next up
 a with stem up
 
 a with stem down, tied with next down
 a with stem up
-</template>
-</div>
+```
 
 You can also write `above` or `over` instead of `up`, and `below` or `under` instead of `down`:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 1/4 c5 tied with next above
 c5
 e tied with next below
 e
-</template>
-</div>
+```
 
 ## 2. Roundness of a tie
 
 You can also control the roundness, or convexity, of a tie. All you need is to specify a number from **1** to **10** with `with roundness`. The bigger the number, the more a tie is rounded:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 1/2 a tied with next, with roundness 1
 1/8 a
 
@@ -70,8 +61,7 @@ You can also control the roundness, or convexity, of a tie. All you need is to s
 
 1/2 a tied with next, with roundness 10
 1/8 a
-</template>
-</div>
+```
 
 `with convex` works the same way as `with roundness`. By default, if you don't specify the number, the roundness varies depending on the distance between the tied units.
 
@@ -79,8 +69,7 @@ You can also control the roundness, or convexity, of a tie. All you need is to s
 
 The same way you tie chords:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 1/2 chord tied with next
 c e g b
 1/4 chord
@@ -91,13 +80,11 @@ c d e f g
 1/4 chord
 c d e f g
 
-</template>
-</div>
+```
 
 As you can see above, a chord without whole tones and a chord with whole tones are connected differently. Let's try to change the direction of the ties:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 1/2 chord tied with next up
 c e g b
 1/4 chord
@@ -108,22 +95,19 @@ c d e f g
 1/4 chord
 c d e f g
 
-</template>
-</div>
+```
 
 For chords without whole tones we change the direction of all the ties. In the chord with whole tones, the top tie stays directed upwards and the bottom tie downwards, to avoid intersections between notes and ties.
 
 If a note in a chord is tied, then the whole chord is tied with what follows:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 chord
 c e is tied with next, g
 chord
 c e g
 
-</template>
-</div>
+```
 
 ## 4. What a tie connects to
 
@@ -131,8 +115,7 @@ It's worth to note that a tie doesn't connect notes, it rather connects position
 
 So a tied chord can be connected to separate notes, and separate tied notes to a chord:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 1/4 chord tied with next up
 c e g
 
@@ -147,49 +130,40 @@ c e g
 1/4 chord
 c e g
 
-</template>
-</div>
+```
 
 And a tie can skip the units that have nothing on its position:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 1/2 c is tied with next
 1/8 e g
 1/4 c
-</template>
-</div>
+```
 
 If a tie cannot connect to any note, it will be drawn till the end of the line:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 1/4 c d e is tied with next
 f
-</template>
-</div>
+```
 
 ## 5. Ties before and after
 
 A tie can also come from before a unit, or go on after it, without a second note. You write it as `is tied before` or `is tied after`. `is` can be omitted here too:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 1/2 a is tied before
 1/4 b c5
 d5 is tied after
-</template>
-</div>
+```
 
 The direction and the roundness work for them in the same way:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 1/2 a tied before up
 1/4 b c5
 d5 tied after down, with roundness 3
-</template>
-</div>
+```
 
 It's the way to write a tie that comes from the previous line of the page, or goes on to the next one.
 

@@ -2,45 +2,38 @@
 
 An instrument title is the name written at the left of a stave. Like a clef or a barline, it's set in a measure, and in order to add a title to a certain stave, you use the following command:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 instrument title is "Piano" for stave 1
 stave with treble clef
 c d e f
 stave with bass clef
 c3 d3 e3 f3
-</template>
-</div>
+```
 
 You can also just write `instrument` instead of `instrument title`, and you can omit `is`. The stave can be written as `stave 1` or `first stave`, and if you don't mention it at all, the title goes to the first stave:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 instrument "Guitar"
 treble clef
 c d e f
-</template>
-</div>
+```
 
 This is how you add one title for several staves, like the two staves of a grand staff:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 instrument "Piano" between first stave and second stave
 stave with treble clef
 c d e f
 stave with bass clef
 c3 d3 e3 f3
-</template>
-</div>
+```
 
 By default, a title is drawn only on the line where you declare it. In order to apply it to each line, just add `for each line`:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 instrument "Piano" between first stave and second stave for each line
 stave with treble clef
@@ -49,13 +42,11 @@ stave with bass clef
 c3 d3 e3 f3
 new line
 new line
-</template>
-</div>
+```
 
 The first line usually differs from the rest: conventionally, it has the full name of an instrument, and the following lines have a short one, so the music on them has more space. That's why `for lines below` exists. It works in the same way as `for each line`, but it reads better when you declare a title on a later line that applies from there on:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 instrument title is "Violin" for stave 1
 treble clef
@@ -67,13 +58,11 @@ g a b c5
 
 new line
 c5 b a g
-</template>
-</div>
+```
 
 You can also change the setup of instruments in the middle of a page, the new titles replace the previous ones from that line on:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 instrument "Piano" between first stave and second stave for each line
 stave
@@ -86,18 +75,15 @@ stave
 stave
 stave
 new line
-</template>
-</div>
+```
 
 If you set an instrument for staves that are missing, it will still be drawn:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 measure
 instrument "Piano" between first stave and second stave
 stave
-</template>
-</div>
+```
 
 It's very important to let a user see errors or inaccuracies visually.
 

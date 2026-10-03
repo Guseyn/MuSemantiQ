@@ -6,8 +6,7 @@ A page is drawn with three fonts: a music font, a text font and a font for chord
 
 The music font draws everything that is music: note heads, flags, rests, clefs, accidentals, articulations, ornaments, braces. There are two music fonts on this site: **Bravura**, which is the default, and **Leland**:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 music font is leland
 
 measure
@@ -17,13 +16,11 @@ time signature is 3:4
 1/8 d beamed, f, a not beamed
 1/8 rest
 1/4 d5 with staccato
-</template>
-</div>
+```
 
 Compare it with the same music in **Bravura**:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 music font is bravura
 
 measure
@@ -33,15 +30,13 @@ time signature is 3:4
 1/8 d beamed, f, a not beamed
 1/8 rest
 1/4 d5 with staccato
-</template>
-</div>
+```
 
 ## 2. Text font
 
 The text font draws every word on the page: the title and subtitles, lyrics, text labels, tempo marks, instrument titles, measure numbers. There are two text fonts on this site: **noto-serif**, which is the default, and **noto-sans**:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 text font is noto-serif
 
 title is "Title"
@@ -52,11 +47,9 @@ right subtitle is "Right subtitle"
 measure
 treble clef
 c d e f
-</template>
-</div>
+```
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 text font is noto-sans
 
 title is "Title"
@@ -67,8 +60,7 @@ right subtitle is "Right subtitle"
 measure
 treble clef
 c d e f
-</template>
-</div>
+```
 
 A text font comes in two weights, regular and bold. You don't choose the weight: the bold one is used where the notation asks for it, for example in tempo marks and in the number over a multi-measure rest.
 
@@ -76,8 +68,7 @@ A text font comes in two weights, regular and bold. You don't choose the weight:
 
 Chord letters have a font of their own, because they need figures that a text font does not draw well. There are two of them on this site: **gentium plus**, which is the default, and **gothic a1**:
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 chord letters font is gentium plus
 
 measure
@@ -86,11 +77,9 @@ treble clef
 1/4 e with chord "Cmaj13"
 1/4 g with chord "C13sharp5"
 1/4 c5 with chord "C/F^sharp"
-</template>
-</div>
+```
 
-<div>
-<template is="msq-editor" data-font-sources="msqFontSources" data-opens-with="text">
+```msq-editor opens-with=text
 chord letters font is gothic a1
 
 measure
@@ -99,8 +88,7 @@ treble clef
 1/4 e with chord "Cmaj13"
 1/4 g with chord "C13sharp5"
 1/4 c5 with chord "C/F^sharp"
-</template>
-</div>
+```
 
 ## 4. Where the names come from
 
