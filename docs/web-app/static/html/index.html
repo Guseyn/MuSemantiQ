@@ -41,9 +41,6 @@
       import '#msq/web-components/msq-svg-midi-template.js'
       import '#msq/web-components/msq-editor-template.js'
 
-      // Every code block's "copy" link (its ::before).
-      import '/js/copyCode.js'
-
       /*
       EHTML is here for e-markdown alone: the code on this page is markdown in
       md/landing/, so it is written the way it reads and comes out highlighted.
@@ -52,6 +49,21 @@
       e-markdowns are inside the font loader, so they are not activated until
       long after this has run.
       */
+      /*
+      The page's own movement: screens that cross-fade and rise into place,
+      the rail, the engraved phrase, the carousels and the pipeline diagram.
+      Each is an element of its own, declared in js/landing/.
+      */
+      import '/js/landing/landing-screen.js'
+      import '/js/landing/landing-rail.js'
+      import '/js/landing/landing-phrase.js'
+      import '/js/landing/landing-carousel.js'
+      import '/js/landing/landing-flow.js'
+      import '/js/landing/landing-scroll-hint.js'
+
+      // Every code block's "copy" link (its ::before).
+      import '/js/copyCode.js'
+
       import showdownHighlight from '#ehtml/showdown/extensions/highlight.js'
       import '#ehtml/main'
 
@@ -60,11 +72,11 @@
   </head>
 
   <body>
-    <!-- Built from the screens by landing.js, so there is one list to change. -->
-    <nav data-rail aria-label="Sections"></nav>
+    <!-- Built from the screens by landing-rail, so there is one list to change. -->
+    <nav is="landing-rail" data-rail aria-label="Sections"></nav>
 
     <!-- ── 01 ─────────────────────────────────────────────────────────── -->
-    <section data-screen id="start" data-number="01" data-label="Start">
+    <section is="landing-screen" data-screen id="start" data-number="01" data-label="Start">
       <div data-inner data-hero>
         <a href="/" data-logo aria-label="MuSemantiQ" data-reveal></a>
 
@@ -77,9 +89,11 @@
           and animated into place: the stave rules itself, then the notes
           arrive, then the beams join them. A page about writing music with
           words should not be decorated with a picture of music, so this is
-          not one — see scripts/generate-landing-art.js. Filled by landing.js.
+          not one — see scripts/generate-landing-art.js. Drawn by landing-phrase.
         -->
-        <div data-stave data-phrase aria-hidden="true"></div>
+        <div is="landing-phrase" data-stave data-phrase aria-hidden="true">
+          <e-svg data-src="/images/phrase.svg"></e-svg>
+        </div>
 
         <p data-lede data-to-write data-reveal style="--d: 200ms">
           TO WRITE — one sentence saying what it is, in the reader's terms
@@ -93,7 +107,7 @@
         </p>
       </div>
 
-      <a data-scroll-hint href="#see" aria-label="Scroll to the example">
+      <a is="landing-scroll-hint" data-scroll-hint href="#see" aria-label="Scroll to the example">
         <span></span>
       </a>
     </section>
@@ -111,7 +125,7 @@
       <main data-screens>
 
         <!-- ── 02 ───────────────────────────────────────────────────────── -->
-        <section data-screen id="see" data-number="02" data-label="See it">
+        <section is="landing-screen" data-screen id="see" data-number="02" data-label="See it">
           <div data-inner data-wide>
             <h2 data-reveal>You write the words. It writes the music.</h2>
             <p data-to-write data-reveal style="--d: 80ms">
@@ -252,7 +266,7 @@
         </section>
 
         <!-- ── 03 ───────────────────────────────────────────────────────── -->
-        <section data-screen id="features" data-number="03" data-label="What you get">
+        <section is="landing-screen" data-screen id="features" data-number="03" data-label="What you get">
           <div data-inner data-wide>
             <h2 data-reveal>What you get</h2>
 
@@ -265,7 +279,7 @@
               The drawings are placeholders. Each says what its card is about in
               the page's own hairline vocabulary; replace them as the prose lands.
             -->
-            <div data-carousel data-reveal style="--d: 80ms">
+            <div is="landing-carousel" data-carousel data-reveal style="--d: 80ms">
               <div data-carousel-viewport>
                 <ul data-cards>
                   <li data-card>
@@ -367,7 +381,7 @@
         </section>
 
         <!-- ── 04 ───────────────────────────────────────────────────────── -->
-        <section data-screen id="how" data-number="04" data-label="How it works">
+        <section is="landing-screen" data-screen id="how" data-number="04" data-label="How it works">
           <div data-inner data-widest>
             <h2 data-reveal>How it works</h2>
 
@@ -376,7 +390,7 @@
               Pointing at a stage lights its note, so the diagram and the prose
               are one thing rather than two lists to be matched up by eye.
             -->
-            <div data-flow-layout>
+            <div is="landing-flow" data-flow-layout>
               <ol data-flow aria-label="The pipeline">
                 <li data-stage="words">
                   <button type="button" data-stage-button>
@@ -500,7 +514,7 @@
         </section>
 
         <!-- ── 05 ───────────────────────────────────────────────────────── -->
-        <section data-screen id="outputs" data-number="05" data-label="Outputs">
+        <section is="landing-screen" data-screen id="outputs" data-number="05" data-label="Outputs">
           <div data-inner data-widest>
             <h2 data-reveal>What it produces</h2>
             <p data-to-write data-reveal style="--d: 60ms">
@@ -556,7 +570,7 @@
         </section>
 
         <!-- ── 06 ───────────────────────────────────────────────────────── -->
-        <section data-screen id="embed" data-number="06" data-label="Embed it">
+        <section is="landing-screen" data-screen id="embed" data-number="06" data-label="Embed it">
           <div data-inner data-widest>
             <h2 data-reveal>Put it in your own page</h2>
             <p data-to-write data-reveal style="--d: 60ms">
@@ -567,14 +581,14 @@
             <!--
               Every element there is, one per card, each showing itself: a title,
               a line on what it is for, and the element running. It is the same
-              carousel as "What you get" (landing.js wires any [data-carousel]),
+              carousel as "What you get" (landing-carousel),
               so it scrolls by trackpad, touch and keyboard, and the buttons move
               it one card at a time.
 
               All of them play the same short air, so what changes from card to
               card is the element and not the music.
             -->
-            <div data-carousel data-examples data-reveal style="--d: 120ms">
+            <div is="landing-carousel" data-carousel data-examples data-reveal style="--d: 120ms">
               <div data-carousel-viewport>
                 <ul data-cards>
                   <li data-card>
@@ -717,7 +731,7 @@
         </section>
 
         <!-- ── 07 ───────────────────────────────────────────────────────── -->
-        <section data-screen id="quick-start" data-number="07" data-label="Quick start">
+        <section is="landing-screen" data-screen id="quick-start" data-number="07" data-label="Quick start">
           <div data-inner data-widest>
             <h2 data-reveal>Quick start</h2>
 
@@ -754,7 +768,7 @@
         </section>
 
         <!-- ── 08 ───────────────────────────────────────────────────────── -->
-        <section data-screen id="who" data-number="08" data-label="Who it is for">
+        <section is="landing-screen" data-screen id="who" data-number="08" data-label="Who it is for">
           <div data-inner>
             <h2 data-reveal>Who it is for</h2>
             <p data-to-write data-reveal style="--d: 80ms">
@@ -766,7 +780,7 @@
         </section>
 
         <!-- ── 09 ───────────────────────────────────────────────────────── -->
-        <section data-screen id="dev-tools" data-number="09" data-label="Dev tools">
+        <section is="landing-screen" data-screen id="dev-tools" data-number="09" data-label="Dev tools">
           <div data-inner>
             <h2 data-reveal>Dev tools</h2>
             <p data-to-write data-reveal style="--d: 80ms">
@@ -786,7 +800,7 @@
         </section>
 
         <!-- ── 10 ───────────────────────────────────────────────────────── -->
-        <section data-screen id="status" data-number="10" data-label="Status">
+        <section is="landing-screen" data-screen id="status" data-number="10" data-label="Status">
           <div data-inner>
             <h2 data-reveal>Status</h2>
             <p data-to-write data-reveal style="--d: 80ms">
@@ -796,7 +810,9 @@
               loaded.
             </p>
 
-            <div data-stave data-phrase data-closing aria-hidden="true"></div>
+            <div is="landing-phrase" data-stave data-phrase data-closing aria-hidden="true">
+              <e-svg data-src="/images/phrase.svg"></e-svg>
+            </div>
 
             <footer data-footer data-reveal style="--d: 200ms">
               <a data-link href="/docs">Docs</a>
@@ -810,6 +826,5 @@
       </main>
     </template>
 
-    <script type="module" src="/js/landing.js"></script>
   </body>
 </html>

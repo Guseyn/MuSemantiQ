@@ -61,7 +61,7 @@ html {
   fights fragment navigation: arriving at /#features animates through every
   screen in between and can be left stranded half way, on a screen nobody
   asked for. Landing at a fragment is a jump, which snapping handles cleanly;
-  moving between screens from the rail is smoothed in landing.js, where it can
+  moving between screens from the rail is smoothed in js/landing/, where it can
   be asked for one move at a time.
   */
 }
@@ -93,7 +93,7 @@ body {
   scroll-snap-stop: always;
 
   /*
-  --vis is the share of the screen that is on screen, written by landing.js.
+  --vis is the share of the screen that is on screen, written by landing-screen.
   Tying opacity to it is what makes one screen hand over to the next rather
   than the two of them simply being adjacent.
   */
@@ -204,7 +204,7 @@ code {
 The engraved phrase.
 
 Really engraved — the same pipeline the product runs, written out by
-scripts/generate-landing-art.js and put in place by landing.js.
+scripts/generate-landing-art.js and put in place by landing-phrase.
 
 It arrives in two gestures at once: a wipe travelling left to right across the
 whole drawing, and the stave filling in behind it a line at a time. Between
@@ -905,8 +905,8 @@ The aspect ratio is the glyph's own — 21.23 by 36.87 — so it is never squash
   100% { transform: scaleY(1) translateY(1.75rem); opacity: 0; }
 }
 
-/* Once the reader has scrolled it has done its job. */
-body[data-scrolled="true"] [data-scroll-hint] {
+/* Once the reader has scrolled it has done its job (landing-scroll-hint marks it). */
+[data-scroll-hint][data-scrolled="true"] {
   opacity: 0;
   pointer-events: none;
 }
@@ -914,10 +914,10 @@ body[data-scrolled="true"] [data-scroll-hint] {
 /* ── Reveal ──────────────────────────────────────────────────────────── */
 
 /*
-Set up only once landing.js confirms it is running, so that with no JavaScript
+Set up only once landing-screen marks its screen, so that with no JavaScript
 the page is simply a page rather than a column of invisible sections.
 */
-body[data-enhanced="true"] [data-reveal] {
+[data-screen][data-enhanced="true"] [data-reveal] {
   opacity: 0;
   transform: translateY(14px);
   transition:
@@ -925,7 +925,7 @@ body[data-enhanced="true"] [data-reveal] {
     transform 0.7s var(--ease) var(--d, 0ms);
 }
 
-body[data-enhanced="true"] [data-screen][data-visible="true"] [data-reveal] {
+[data-screen][data-enhanced="true"][data-visible="true"] [data-reveal] {
   opacity: 1;
   transform: none;
 }
@@ -1010,7 +1010,7 @@ which is itself motion the reader did not ask for.
     animation: none;
   }
 
-  body[data-enhanced="true"] [data-reveal] {
+  [data-screen][data-enhanced="true"] [data-reveal] {
     opacity: 1;
     transform: none;
     transition: none;

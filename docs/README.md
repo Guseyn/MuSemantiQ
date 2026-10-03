@@ -19,6 +19,9 @@ shell, and a markdown file fetched into it per page.
         js/sitemap.js      the documentation, as data
         js/docs.js         the sitemap and the current page, for the templates
         js/app.js          holds the sidebar open; classic, and first
+        js/landing/        the landing page's elements: landing-screen, -rail,
+                           -phrase, -carousel, -flow, -scroll-hint
+        md/landing/        the landing page's code samples
         md/                every page, one .md file
     concepts.js            scenario name -> the page that introduces it
 
@@ -29,7 +32,10 @@ tracked — `npm run docs` rebuilds all of it before starting.
 
 `static/html/index.html`, twelve full-viewport screens that snap one at a time.
 It carries its own `landing.css` and does not load e-ui: e-ui is a design system
-for tools, and this is not a tool.
+for tools, and this is not a tool. Its movement is a handful of customized
+built-in elements in `static/js/landing/` (`<section is="landing-screen">`,
+`<nav is="landing-rail">`, …), which keep the `data-*` hooks the stylesheet
+uses and talk to each other through `landing:screen-*` events.
 
 Its two pieces of artwork are engraved by the engine rather than drawn:
 
