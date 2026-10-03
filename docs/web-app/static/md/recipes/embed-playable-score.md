@@ -11,7 +11,7 @@ npm run create:msq:worker
 npm run web-components:update
 ```
 
-Now `examples/browser/web-app/static/js/msq/` holds:
+Now `browser-app/web-app/static/js/msq/` holds:
 
 ```text
 js/msq/
@@ -23,7 +23,7 @@ js/msq/
 Copy that folder into your own static folder, so your server answers it at **`/js/msq/`**:
 
 ```bash
-cp -R examples/browser/web-app/static/js/msq/ /path/to/your/static/js/msq/
+cp -R browser-app/web-app/static/js/msq/ /path/to/your/static/js/msq/
 ```
 
 It's important to mention that `/js/msq/` is not a suggestion. A module worker gets no import map, so every import in `worker/` has been rewritten to an absolute URL, `/js/msq/worker/…`, from the `worker.importmap` field of `package.json`. Serve the trees anywhere else and the worker cannot load a single module.

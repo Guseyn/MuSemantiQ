@@ -30,7 +30,7 @@ You have to remember the following rules:
 3. `language/` can be anywhere, as long as the import map points `#msq/language/` at it.
 4. The `.js` files must be served with a JavaScript content type, because the browser refuses to run a module or a module worker otherwise.
 
-The scripts of this repository write these trees only into its own three apps. The simplest way to get them for yours is to run `npm run create:msq:worker` and `npm run web-components:update`, and copy `examples/browser/web-app/static/js/msq/` into your static folder as `js/msq/`. Or take them from the sources: `web-components/` and `language/` are copied as they are, from `web-components/` and `src/language/`, and only `worker/` has to be generated. Copy them again whenever you update MuSemantiQ.
+The scripts of this repository write these trees only into its own three apps. The simplest way to get them for yours is to run `npm run create:msq:worker` and `npm run web-components:update`, and copy `browser-app/web-app/static/js/msq/` into your static folder as `js/msq/`. Or take them from the sources: `web-components/` and `language/` are copied as they are, from `web-components/` and `src/language/`, and only `worker/` has to be generated. Copy them again whenever you update MuSemantiQ.
 
 You also need the fonts. The font files are in `src/drawer/font/chord-letters`, `src/drawer/font/music` and `src/drawer/font/text`; serve them wherever you like, and write those URLs into your font config. The glyph tables for the music fonts are already inside the worker tree, at `/js/msq/worker/drawer/font/music-js/`. More about the config you can read in [Fonts and font config](/docs/components/fonts-and-config).
 

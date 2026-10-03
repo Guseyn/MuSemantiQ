@@ -3,13 +3,13 @@
 The CLI turns MSQ text into files from the command line: SVG scores, a MIDI file, and if you want, the page schema and the highlighted source. It uses nothing but Node's standard library and MuSemantiQ itself, and it needs Node **22** or newer.
 
 ```
-npm run examples:cli
+npm run cli-app
 ```
 
-Running `node examples/cli/msq.js` directly works too. With `npm run`, the flags go after `--`, which tells npm they are for the script and not for npm:
+Running `node cli-app/msq.js` directly works too. With `npm run`, the flags go after `--`, which tells npm they are for the script and not for npm:
 
 ```
-npm run examples:cli -- --input score.txt --out build --svg --midi
+npm run cli-app -- --input score.txt --out build --svg --midi
 ```
 
 ## 1. Two ways to use it
@@ -27,7 +27,7 @@ The arrow keys move between the choices, **Enter** chooses, **Tab** completes pa
 **Flags.** Everything the questions ask, and a bit more, can be given as flags, which is what you want in a script. With neither `--input` nor `--text`, the text is read from standard input:
 
 ```
-cat score.txt | node examples/cli/msq.js --midi --out build
+cat score.txt | node cli-app/msq.js --midi --out build
 ```
 
 ## 2. The flags

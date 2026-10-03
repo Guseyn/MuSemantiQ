@@ -20,9 +20,9 @@
     "coverage:report": "c8 report --reporter=html",
     "coverage:check": "c8 check-coverage --statements 87 --branches 86 --functions 82 --lines 87",
 
-    "ehtml:update": "rsync -a --delete ../../my-projects/EHTML/src/ examples/browser/web-app/static/js/ehtml",
-    "nodes:update": "rsync -a --delete ../../my-projects/nodes.js/nodes/ examples/browser/nodes/",
-    "eui:update": "rsync -a --delete ../../my-projects/e-ui/static/js/e-ui/ examples/browser/web-app/static/js/e-ui/ && cp -rf ../../my-projects/e-ui/static/css/e-ui.css examples/browser/web-app/static/css/e-ui.css",
+    "ehtml:update": "rsync -a --delete ../../my-projects/EHTML/src/ browser-app/web-app/static/js/ehtml",
+    "nodes:update": "rsync -a --delete ../../my-projects/nodes.js/nodes/ browser-app/nodes/",
+    "eui:update": "rsync -a --delete ../../my-projects/e-ui/static/js/e-ui/ browser-app/web-app/static/js/e-ui/ && cp -rf ../../my-projects/e-ui/static/css/e-ui.css browser-app/web-app/static/css/e-ui.css",
 
     "dev-tools:ehtml:update": "rsync -a --delete ../../my-projects/EHTML/src/ dev-tools/web-app/static/js/ehtml/",
     "dev-tools:nodes:update": "rsync -a --delete ../../my-projects/nodes.js/nodes/ dev-tools/nodes/",
@@ -39,8 +39,8 @@
     "docs:art": "node scripts/generate-landing-art.js",
     "docs": "npm run setup:symlinks && npm run create:msq:worker && npm run web-components:update && npm run docs:check && node docs/web-app/main.js",
 
-    "examples:browser": "npm run setup:symlinks && npm run create:msq:worker && npm run web-components:update && node examples/browser/web-app/main.js",
-    "examples:cli": "node examples/cli/msq.js"
+    "browser-app": "npm run setup:symlinks && npm run create:msq:worker && npm run web-components:update && node browser-app/web-app/main.js",
+    "cli-app": "node cli-app/msq.js"
   },
   "repository": {
     "type": "git",
@@ -60,7 +60,7 @@
 
     "#tools/*": "./tools/*",
 
-    "#nodes/*": "./examples/browser/nodes/*",
+    "#nodes/*": "./browser-app/nodes/*",
     "#dev-nodes/*": "./dev-tools/nodes/*",
     "#docs-nodes/*": "./docs/nodes/*"
   },

@@ -29,16 +29,16 @@ From one piece of MSQ you can get:
 
 ## 3. Who it is for
 
-- Musicians who want an easy access to their sheet music on any device
-- Composers who prefer to write and work in the flow state rather than being drawn in the complexity of hundreds of elements in regular software
-- Publishers and Book Writers who also want flexibility to create offline and online books
-- Programmers in music domain who want to build programs and tools based on MSQ
+- Musicians who want easy access to their sheet music on any device
+- Composers who would rather write in a state of flow than get lost among the hundreds of elements in conventional notation software
+- Publishers and authors who want the flexibility to create books for both print and the web
+- Programmers in the music domain who want to build programs and tools on top of MSQ
 
 ## 4. What does it provide
 
 1. **The web components.** `<template is="msq-svg">`, `msq-midi`, `msq-svg-midi` and `msq-editor` turn MSQ written inside a page into a score, a player or an editor. The examples on this site are exactly that. More about them you can read in [Web components](/docs/components/overview).
 2. **The API.** `src/api.js` is plain JavaScript modules that run in Node and in a browser worker: set up the fonts, parse a page, then generate SVG or MIDI from it. See [Low-level API](/docs/api/overview).
-3. **The CLI.** `npm run examples:cli` turns a file, or a folder of files, into SVG and MIDI from the command line. See [CLI](/docs/examples/cli).
+3. **The CLI.** `npm run cli-app` turns a file, or a folder of files, into SVG and MIDI from the command line. See [CLI](/docs/examples/cli).
 4. **Dev Tools**. 
   - You can view and generate glyphs using any music font
   - You can integrate any Sound Font

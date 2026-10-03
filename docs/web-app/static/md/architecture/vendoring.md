@@ -10,9 +10,9 @@ There are two kinds, and they are kept in different ways.
 
 | Library | What it is | Where it lands |
 | --- | --- | --- |
-| **nodes** | the HTTP/2 server every app runs on | `examples/browser/nodes/`, `dev-tools/nodes/`, `docs/nodes/` |
+| **nodes** | the HTTP/2 server every app runs on | `browser-app/nodes/`, `dev-tools/nodes/`, `docs/nodes/` |
 | **EHTML** | custom elements for fetching, templating and actions, plus showdown, the markdown converter these docs render with | `dev-tools/web-app/static/js/ehtml/`, `docs/web-app/static/js/ehtml/` |
-| **e-ui** | the design system: `e-ui.css` and elements like `e-tabs` and `e-dialog` | `static/js/e-ui/` and `static/css/e-ui.css` of the dev tools and the docs, and `examples/browser/web-app/static/css/e-ui.css` |
+| **e-ui** | the design system: `e-ui.css` and elements like `e-tabs` and `e-dialog` | `static/js/e-ui/` and `static/css/e-ui.css` of the dev tools and the docs, and `browser-app/web-app/static/css/e-ui.css` |
 
 **Third-party libraries** were copied in once, by hand, and are committed:
 
@@ -32,14 +32,14 @@ Each sibling library has one npm script per app that uses it:
 
 | Script | Command |
 | --- | --- |
-| `nodes:update` | `rsync -a --delete ../../my-projects/nodes.js/nodes/ examples/browser/nodes/` |
+| `nodes:update` | `rsync -a --delete ../../my-projects/nodes.js/nodes/ browser-app/nodes/` |
 | `dev-tools:nodes:update` | `rsync -a --delete ../../my-projects/nodes.js/nodes/ dev-tools/nodes/` |
 | `docs:nodes:update` | `rsync -a --delete ../../my-projects/nodes.js/nodes/ docs/nodes/` |
 | `dev-tools:ehtml:update` | `rsync -a --delete ../../my-projects/EHTML/src/ dev-tools/web-app/static/js/ehtml/` |
 | `docs:ehtml:update` | `rsync -a --delete ../../my-projects/EHTML/src/ docs/web-app/static/js/ehtml/` |
 | `eui:update`, `dev-tools:eui:update`, `docs:eui:update` | `rsync -a --delete` of `../../my-projects/e-ui/static/js/e-ui/`, then `cp -rf` of `e-ui.css` |
 
-`dev-tools:vendor` and `docs:vendor` run all three for their app, and `npm run dev-tools` and `npm run docs` run those before starting. So both of those apps need the sibling checkouts, `nodes.js`, `EHTML` and `e-ui`, in the same parent folder as this repository, and fail to start without them. The paths are written as `../../my-projects/…`, so at the moment that parent folder also has to be called `my-projects`. The examples app does not: its copies are committed, and `npm run examples:browser` never vendors anything.
+`dev-tools:vendor` and `docs:vendor` run all three for their app, and `npm run dev-tools` and `npm run docs` run those before starting. So both of those apps need the sibling checkouts, `nodes.js`, `EHTML` and `e-ui`, in the same parent folder as this repository, and fail to start without them. The paths are written as `../../my-projects/…`, so at the moment that parent folder also has to be called `my-projects`. The examples app does not: its copies are committed, and `npm run browser-app` never vendors anything.
 
 It's important to mention that `rsync --delete` makes the copy an exact mirror of the source: anything in the target that the source does not have is deleted. That is on purpose, because a file removed upstream would otherwise stay importable here, and the copy would quietly stop being the same code. But it also means that a change made to a vendored copy is wiped on the next run.
 

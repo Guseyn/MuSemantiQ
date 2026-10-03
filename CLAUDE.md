@@ -13,10 +13,10 @@ node scripts/visual-tests.js --only=chord  # run only tests whose name contains 
 npm run coverage && npm run coverage:check # c8; thresholds: statements 87, branches 86, functions 82, lines 87
 
 npm run dev-tools        # https://127.0.0.1:8889 — test viewer, font generator/viewer, MusicXML, sound-font tools
-npm run examples:browser # https://127.0.0.1:8888
+npm run browser-app # https://127.0.0.1:8888
 npm run docs             # https://127.0.0.1:8890 — landing page + documentation (runs docs:check first)
 npm run docs:check       # validate every example in docs/web-app/static/md
-npm run examples:cli -- --input score.txt --svg --midi
+npm run cli-app -- --input score.txt --svg --midi
 ```
 
 `dev-tools` first rsyncs nodes, EHTML and e-ui from sibling checkouts (see [Sibling libraries](#sibling-libraries-nodes-ehtml-e-ui)) and fails if those are missing. `docs` expects them already copied: run `npm run docs:vendor` first (it also copies e-dev).
@@ -50,11 +50,11 @@ Every run writes `actual/` for every test, pass or fail, and merges verdicts int
 
 ## Sibling libraries: nodes, EHTML, e-ui
 
-All three are the maintainer's own zero-dependency, no-build libraries, living in sibling repos under `../../my-projects/` (`nodes.js`, `EHTML`, `e-ui`). They are copied in with `rsync -a --delete` by the `*:vendor` / `*:update` scripts, so **a local edit to a copy is wiped on the next run — fix bugs upstream in the sibling repo, then re-vendor**. The dev-tools and docs copies are gitignored. The examples app's copies (`examples/browser/nodes/`, `static/css/e-ui.css`) are committed and refreshed only by `nodes:update` / `eui:update`, which `examples:browser` does not run.
+All three are the maintainer's own zero-dependency, no-build libraries, living in sibling repos under `../../my-projects/` (`nodes.js`, `EHTML`, `e-ui`). They are copied in with `rsync -a --delete` by the `*:vendor` / `*:update` scripts, so **a local edit to a copy is wiped on the next run — fix bugs upstream in the sibling repo, then re-vendor**. The dev-tools and docs copies are gitignored. The browser app's copies (`browser-app/nodes/`, `static/css/e-ui.css`) are committed and refreshed only by `nodes:update` / `eui:update`, which `browser-app` does not run.
 
 ### nodes (server)
 
-HTTP/2 backend framework built on Node's `cluster`. Every app (`examples/browser`, `dev-tools`, `docs`) has the same layout under `web-app/`:
+HTTP/2 backend framework built on Node's `cluster`. Every app (`browser-app`, `dev-tools`, `docs`) has the same layout under `web-app/`:
 
 - `main.js` reads `env/${ENV:-local}.json` (port, host, TLS key/cert) and calls `cluster(primary, worker)({ config, numberOfWorkers })`
 - `primary.js` holds primary-process setup (usually empty)

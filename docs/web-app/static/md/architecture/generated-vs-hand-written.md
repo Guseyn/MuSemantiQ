@@ -4,7 +4,7 @@ Since there is [no build](/docs/architecture/no-build), a lot of what the apps s
 
 ## 1. Generated
 
-These are written by a command, and every app's npm script runs that command before starting. `<app>` is each of `examples/browser`, `dev-tools` and `docs`:
+These are written by a command, and every app's npm script runs that command before starting. `<app>` is each of `browser-app`, `dev-tools` and `docs`:
 
 | Directory | Written by | From |
 | --- | --- | --- |
@@ -29,7 +29,7 @@ These are copies of code that lives somewhere else. Some come from my own siblin
 
 | Directory | Script | From |
 | --- | --- | --- |
-| `examples/browser/nodes/` | `npm run nodes:update` | `../nodes.js/nodes/` |
+| `browser-app/nodes/` | `npm run nodes:update` | `../nodes.js/nodes/` |
 | `dev-tools/nodes/`, `docs/nodes/` | `npm run dev-tools:nodes:update`, `npm run docs:nodes:update` | `../nodes.js/nodes/` |
 | `dev-tools/web-app/static/js/ehtml/`, `docs/web-app/static/js/ehtml/` | `npm run dev-tools:ehtml:update`, `npm run docs:ehtml:update` | `../EHTML/src/` |
 | `dev-tools/web-app/static/js/e-ui/`, `docs/web-app/static/js/e-ui/`, and `static/css/e-ui.css` in both | `npm run dev-tools:eui:update`, `npm run docs:eui:update` | `../e-ui/static/` |
@@ -42,7 +42,7 @@ Everything else is written by hand, and it is the only place to make a change:
 
 1. `src/`, the engine: the language, the drawer and the MIDI engine, plus `api.js` and `worker.js`;
 2. `web-components/`, the `msq-*` elements and the editor;
-3. `tools/`, `scripts/` and `examples/cli/`;
+3. `tools/`, `scripts/` and `cli-app/`;
 4. each app's `web-app/`, apart from the generated and vendored folders above: its pages, scripts, styles, API and config;
 5. `test/`, the `.txt` inputs and the `expected/` artifacts under each suite;
 6. `docs/web-app/static/md/` and `docs/web-app/static/js/sitemap.js`, the documentation itself.
@@ -81,7 +81,7 @@ dev-tools/web-app/static/magenta-sound-font/
 dev-tools/web-app/static/images/logo.svg
 ```
 
-`docs/` has the same block. The examples app is the exception: only its `static/js/msq/`, its logo link and its sound fonts are ignored, while its `nodes/`, its `static/css/e-ui.css` and its font links are committed. So the examples app starts from a clone with nothing but `npm run examples:browser`, which does not vendor anything, and it needs no sibling repositories at all.
+`docs/` has the same block. The examples app is the exception: only its `static/js/msq/`, its logo link and its sound fonts are ignored, while its `nodes/`, its `static/css/e-ui.css` and its font links are committed. So the examples app starts from a clone with nothing but `npm run browser-app`, which does not vendor anything, and it needs no sibling repositories at all.
 
 So if a directory is in `.gitignore`, it is generated or vendored, and you should not edit it. If it is tracked, it is either the source or a vendored copy that is committed on purpose.
 

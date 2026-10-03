@@ -5,11 +5,11 @@ the styles, the icons, the small utilities and the vendored player libraries.
 
 They are written once here and **copied** into every app that shows a score:
 
-    web-components/  ──►  examples/browser/web-app/static/js/msq/web-components/
+    web-components/  ──►  browser-app/web-app/static/js/msq/web-components/
                      ──►  dev-tools/web-app/static/js/msq/web-components/
                      ──►  docs/web-app/static/js/msq/web-components/
 
-by `npm run web-components:update`, which `npm run examples:browser`,
+by `npm run web-components:update`, which `npm run browser-app`,
 `npm run dev-tools` and `npm run docs` all run before starting.
 `npm run watch:web-components` keeps the copies in step while you work. The copies are generated, so they are
 not tracked — this folder is the only place to edit them.

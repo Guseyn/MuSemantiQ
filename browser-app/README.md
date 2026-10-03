@@ -4,7 +4,7 @@ A small web app demonstrating the MuSemantiQ web components: music written as
 text, engraved as SVG and played back as MIDI, entirely in the browser.
 
 ```
-npm run examples:browser
+npm run browser-app
 ```
 
 Then open **https://127.0.0.1:8888** in Chrome, Edge, Firefox or Safari.
@@ -23,7 +23,7 @@ Then open **https://127.0.0.1:8888** in Chrome, Edge, Firefox or Safari.
 ## Folder structure
 
 ```
-examples/browser/
+browser-app/
 ├── nodes/          vendored HTTP/2 server library (see below)
 └── web-app/
     ├── main.js         reads env/<ENV>.json, starts the cluster
@@ -57,7 +57,7 @@ Inside `static/js/msq/web-components/` (a copy of the top-level
 
 ## Running it
 
-`npm run examples:browser` does four things in order:
+`npm run browser-app` does four things in order:
 
 1. `setup:symlinks` — recreates the three font symlinks under `static/font/`
 2. `create:msq:worker` — regenerates `static/js/msq/worker/` and
@@ -85,13 +85,13 @@ mkcert localhost 127.0.0.1 ::1
 | Script | What it does | When you need it |
 | --- | --- | --- |
 | `npm run setup:symlinks` | Points `static/font/{chord-letters,music,text}` at `src/drawer/font/*` | Runs on `npm install`. Run it by hand if the fonts 404 — for example after unpacking a zip, which does not preserve symlinks |
-| `npm run create:msq:worker` | Deletes `static/js/msq/worker/` and rebuilds it from `src/`, rewriting `#msq/...` imports to real URLs | After any change under `src/`. Part of `examples:browser` already |
+| `npm run create:msq:worker` | Deletes `static/js/msq/worker/` and rebuilds it from `src/`, rewriting `#msq/...` imports to real URLs | After any change under `src/`. Part of `browser-app` already |
 | `npm run watch:src` | The same, then rebuilds on every change under `src/` | In a second terminal while working on `src/`, so the browser only needs a reload |
-| `npm run web-components:update` | Copies `web-components/` to `static/js/msq/web-components/` | After any change under `web-components/`. Part of `examples:browser` already; `npm run watch:web-components` keeps it in step |
+| `npm run web-components:update` | Copies `web-components/` to `static/js/msq/web-components/` | After any change under `web-components/`. Part of `browser-app` already; `npm run watch:web-components` keeps it in step |
 
 ## What `nodes` is
 
-`examples/browser/nodes/` is a vendored copy of
+`browser-app/nodes/` is a vendored copy of
 [Guseyn/nodes.js](https://github.com/Guseyn/nodes.js), a procedural web
 framework. It is not an npm dependency: it is reached through the `#nodes/*`
 subpath import declared in the root `package.json`, and refreshed with

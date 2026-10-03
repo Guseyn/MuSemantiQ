@@ -3,7 +3,7 @@ through. It is expected to exist; its contents are not tracked.
 
 Both static folders reach it by a symlink, the way they reach the fonts:
 
-  examples/browser/web-app/static/magenta-sound-font  →  here
+  browser-app/web-app/static/magenta-sound-font  →  here
   dev-tools/web-app/static/magenta-sound-font         →  here
 
 so a set rendered once is played by every app, and `npm run setup:symlinks`
@@ -21,7 +21,7 @@ To regenerate (needs fluidsynth and lame on PATH — `brew install fluidsynth
 lame` on macOS), from the repository root:
 
   node tools/magenta/generate-magenta-sound-font.js \
-    examples/browser/web-app/static/sf/SGM.sf2
+    browser-app/web-app/static/sf/SGM.sf2
 
 That writes SGM/ here. Pass an instruments range to build a subset, e.g.
 '0-10,15,20,30-40' — a full set takes a long time to render.

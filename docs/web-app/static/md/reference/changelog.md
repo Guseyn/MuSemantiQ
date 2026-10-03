@@ -41,7 +41,7 @@ Anything that breaks existing documents or existing pages is marked **Breaking**
 
 ### 2026-09-09 to 2026-09-12
 
-- The CLI, `npm run examples:cli`.
+- The CLI, `npm run cli-app`.
 - The SMuFL to music-js font generator and the Magenta sound font builder, ported to Node.
 - The editor's font autocomplete comes from the fonts that are actually registered.
 - The font viewer.

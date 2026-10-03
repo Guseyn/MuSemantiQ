@@ -1,7 +1,7 @@
 # docs
 
 The landing page and the documentation site. A third app beside
-`examples/browser` and `dev-tools`, on the same stack: the vendored `nodes`
+`browser-app` and `dev-tools`, on the same stack: the vendored `nodes`
 server, EHTML and e-ui on the page, native import maps, no bundler.
 
     npm run docs        →  https://127.0.0.1:8890

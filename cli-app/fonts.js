@@ -11,8 +11,8 @@ import path from 'node:path'
 import { setupFonts } from '#msq/api.js'
 import { InputOutputError } from './lib/errors.js'
 
-/* examples/cli -> repository root */
-const REPO_ROOT = path.resolve(import.meta.dirname, '..', '..')
+/* cli-app -> repository root */
+const REPO_ROOT = path.resolve(import.meta.dirname, '..')
 const FONT_DIR = path.join(REPO_ROOT, 'src', 'drawer', 'font')
 
 const fontPath = (...parts) => path.join(FONT_DIR, ...parts)

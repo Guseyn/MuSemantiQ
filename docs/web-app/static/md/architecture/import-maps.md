@@ -15,7 +15,7 @@ This is every specifier in use, and what it resolves to in each of the three env
 | `#msq/utils.js` | — | — | `/js/msq/worker/utils.js` |
 | `#msq/web-components/*` | — | `/js/msq/web-components/*` | — |
 | `#tools/*` | `./tools/*` | — | — |
-| `#nodes/*` | `./examples/browser/nodes/*` | — | — |
+| `#nodes/*` | `./browser-app/nodes/*` | — | — |
 | `#dev-nodes/*` | `./dev-tools/nodes/*` | — | — |
 | `#docs-nodes/*` | `./docs/nodes/*` | — | — |
 | `#ehtml/`, `#ehtml/main`, `#e-ui/` | — | the dev-tools and docs pages | — |
@@ -67,7 +67,7 @@ A new specifier has to be taught to every environment that will import it. You h
 
 1. **`imports` in `package.json`**, for Node. This is enough for the tests, the CLI and the tools.
 2. **`worker.importmap`**, if the worker will import it and it is not under `#msq/`. Anything under `#msq/` is already covered by the one prefix.
-3. **the import map of every HTML page** that will import it: `examples/browser/web-app/static/html/index.html`, the pages under `dev-tools/web-app/static/html/`, and `docs/web-app/static/html/index.html` and `docs.html`.
+3. **the import map of every HTML page** that will import it: `browser-app/web-app/static/html/index.html`, the pages under `dev-tools/web-app/static/html/`, and `docs/web-app/static/html/index.html` and `docs.html`.
 4. **`browser.importmap`**, to keep the copy honest.
 5. **the static mounts** in the app's `web-app/worker.js`, if the URL is under a folder the server does not serve yet. The examples app, for instance, only serves the folders its `src` regular expression names.
 

@@ -8,11 +8,11 @@ A page of MSQ is plain text, one command after another. Let's write one, one ste
 
 You have two places to try it:
 
-1. **The editor on this site.** The second screen of the [home page](/#see) is a real `msq-editor`, not a picture of one. It opens on the score. The button labelled **Edit the MuSemantiQ source** switches it to the text, where you can clear what is there and type your own, and the button labelled **Render the score** draws it again. The browser example (`npm run examples:browser`, see [Install and run](/docs/getting-started/install-and-run)) has one as well.
+1. **The editor on this site.** The second screen of the [home page](/#see) is a real `msq-editor`, not a picture of one. It opens on the score. The button labelled **Edit the MuSemantiQ source** switches it to the text, where you can clear what is there and type your own, and the button labelled **Render the score** draws it again. The browser example (`npm run browser-app`, see [Install and run](/docs/getting-started/install-and-run)) has one as well.
 2. **A file, through the CLI.** Save the text as, say, `first-page.txt` in the repository folder and run:
 
 ```bash
-npm run examples:cli -- --input first-page.txt --svg --midi
+npm run cli-app -- --input first-page.txt --svg --midi
 ```
 
 That writes `first-page.svg` and `first-page.mid` into the current folder. The output files are named after the input file, and `--out build` puts them into a `build` folder instead.

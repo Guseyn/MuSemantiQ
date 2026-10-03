@@ -33,7 +33,7 @@ There are three commands to start with.
 The browser example, a page with every web component on it:
 
 ```bash
-npm run examples:browser
+npm run browser-app
 ```
 
 It runs `setup:symlinks` to link the shared files, `create:msq:worker` to generate the worker copy of `src/` into the app, and `web-components:update` to copy the web components in, and then it starts the server at **https://127.0.0.1:8888**.
@@ -41,16 +41,16 @@ It runs `setup:symlinks` to link the shared files, `create:msq:worker` to genera
 The command line:
 
 ```bash
-npm run examples:cli
+npm run cli-app
 ```
 
 With no flags it asks you a few questions: what to generate, where the input is, which fonts, and where to write the output. To skip the questions, pass flags after `--`, which tells npm the flags are for the script and not for npm itself:
 
 ```bash
-npm run examples:cli -- --input score.txt --out build --svg --midi
+npm run cli-app -- --input score.txt --out build --svg --midi
 ```
 
-Running `node examples/cli/msq.js` directly works too, and needs no `--`. All the options are described in [CLI](/docs/examples/cli).
+Running `node cli-app/msq.js` directly works too, and needs no `--`. All the options are described in [CLI](/docs/examples/cli).
 
 The dev tools, which are the test viewer, the font viewer and font generator, the MusicXML tool and the sound font generator:
 
@@ -62,7 +62,7 @@ It vendors nodes, EHTML and e-ui first (see the note above), then does the same 
 
 ## 4. The certificate
 
-The browser apps are served over **HTTP/2**, and browsers only speak HTTP/2 over TLS, so they are **https** even on your own machine. The certificate they use is committed in `examples/browser/web-app/ssl/`. It is a local development certificate made with **mkcert**, and it is signed by a certificate authority that exists only on my machine, so your browser does not trust it.
+The browser apps are served over **HTTP/2**, and browsers only speak HTTP/2 over TLS, so they are **https** even on your own machine. The certificate they use is committed in `browser-app/web-app/ssl/`. It is a local development certificate made with **mkcert**, and it is signed by a certificate authority that exists only on my machine, so your browser does not trust it.
 
 The first time you open one of the apps, the browser says the connection is not private (Chrome) or warns of a potential security risk (Firefox). That is expected. Open the advanced details and choose to proceed to **127.0.0.1**. The server only listens on **127.0.0.1**, so nothing outside your machine can reach it.
 

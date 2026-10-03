@@ -89,7 +89,7 @@ The text and chord-letter fonts stay the defaults, because the config does not n
 ```
 
 ```bash
-node examples/cli/msq.js --input score.txt --fonts config/fonts.json --out build
+node cli-app/msq.js --input score.txt --fonts config/fonts.json --out build
 ```
 
 Relative font paths are resolved against the config file, so `config/fonts.json` reaches `src/` with `../`. The `#msq/…` specifiers are left as they are, because they are resolved by the repository's own `package.json`.

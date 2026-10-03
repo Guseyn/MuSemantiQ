@@ -7,7 +7,7 @@ The browser app is one page that shows the four components that draw something, 
 From the root of the repository:
 
 ```
-npm run examples:browser
+npm run browser-app
 ```
 
 Then open **https://127.0.0.1:8888** in Chrome, Edge, Firefox or Safari. The certificate is a self-signed development one, so the browser warns about it once.
@@ -17,14 +17,14 @@ The script does four things in this order:
 1. `npm run setup:symlinks` links the fonts and the rendered sound fonts into `static/`;
 2. `npm run create:msq:worker` writes the worker tree and the language tree into `static/js/msq/`;
 3. `npm run web-components:update` copies the components into `static/js/msq/web-components/`;
-4. `node examples/browser/web-app/main.js` starts the server.
+4. `node browser-app/web-app/main.js` starts the server.
 
 It has to be run from the root of the repository, because the paths in `main.js` and in `env/local.json` are relative to the working directory. `ENV` chooses which file under `env/` is read, and it is `local` by default, which is the only one there.
 
 ## 2. The folder
 
 ```
-examples/browser/
+browser-app/
   nodes/              the HTTP/2 server library, vendored
   web-app/
     main.js           reads env/<ENV>.json and starts the cluster
@@ -47,7 +47,7 @@ examples/browser/
 
 Not all of it is written by hand. Everything under `static/js/msq/` is generated: `web-components/` is a copy of the top-level `web-components/` folder, `language/` is a copy of `src/language/`, and `worker/` is all of `src/` with its imports rewritten to real URLs. None of it is tracked, so change the originals and run the script again (or keep `npm run watch:src` and `npm run watch:web-components` running while you work). The same goes for `magenta-sound-font/`, `images/logo.svg` and the contents of `sf/`. The font links are the exception: they are committed as links, so a fresh clone has them, and `npm run setup:symlinks` is there to repair them.
 
-`nodes/` is committed too, but it is a copy of a sibling repository, refreshed with `npm run nodes:update` (which `examples:browser` does not run). A local change to it is lost on the next refresh. `dev-api.js` writes a traced glyph back into a music-js table, and nothing on the example page uses it.
+`nodes/` is committed too, but it is a copy of a sibling repository, refreshed with `npm run nodes:update` (which `browser-app` does not run). A local change to it is lost on the next refresh. `dev-api.js` writes a traced glyph back into a music-js table, and nothing on the example page uses it.
 
 ## 3. The four examples
 

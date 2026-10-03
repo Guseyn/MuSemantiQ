@@ -56,11 +56,11 @@ web-app/
 
 | App | Where | Port | What it is |
 | --- | --- | --- | --- |
-| the browser example | `examples/browser/` | **8888** | the smallest page that engraves and plays a score |
+| the browser example | `browser-app/` | **8888** | the smallest page that engraves and plays a score |
 | the dev tools | `dev-tools/` | **8889** | the test viewer, the font viewer and generator, the MusicXML tool, the sound-font tools; its endpoints are in `web-app/api/` |
 | the documentation | `docs/` | **8890** | the landing page and these pages; `docs/concepts.js` is what the docs check reads |
 
-What they share is everything under `static/js/msq/`, which is the engine and the components, generated into each of them, plus the fonts, linked into `static/font/`. What each has of its own is its pages and its own copy of `nodes`, under `nodes/`, imported through its own specifier: `#nodes/*`, `#dev-nodes/*` or `#docs-nodes/*`. The CLI, `examples/cli/`, is not a server at all: it calls `src/api.js` directly from Node.
+What they share is everything under `static/js/msq/`, which is the engine and the components, generated into each of them, plus the fonts, linked into `static/font/`. What each has of its own is its pages and its own copy of `nodes`, under `nodes/`, imported through its own specifier: `#nodes/*`, `#dev-nodes/*` or `#docs-nodes/*`. The CLI, `cli-app/`, is not a server at all: it calls `src/api.js` directly from Node.
 
 ## 5. The tests
 

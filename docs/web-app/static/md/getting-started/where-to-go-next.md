@@ -18,8 +18,8 @@ If you want to engrave or perform from your own code, read [Low-level API](/docs
 
 There are a few places with complete, working examples:
 
-- `examples/browser` is a page with every component on it. Run it with `npm run examples:browser`, and read about it in [Browser app](/docs/examples/browser-app).
-- `examples/cli` is the command line, described in [CLI](/docs/examples/cli).
+- `browser-app` is a page with every component on it. Run it with `npm run browser-app`, and read about it in [Browser app](/docs/examples/browser-app).
+- `cli-app` is the command line, described in [CLI](/docs/examples/cli).
 - [Recipes](/docs/recipes/svg-in-node) are short, complete answers to specific tasks, like engraving to SVG in Node or embedding a playable score.
 - The test corpora in `test/visual-tests` and `test/audio-tests` hold almost two hundred MSQ files each, together with the SVG and MIDI they must produce. The [test viewer](/docs/dev-tools/test-viewer) in the dev tools shows them side by side.
 

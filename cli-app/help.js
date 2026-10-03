@@ -5,7 +5,7 @@ import { readFile } from 'node:fs/promises'
 import path from 'node:path'
 import { heading, muted, accent, bold } from './lib/colors.js'
 
-const REPO_ROOT = path.resolve(import.meta.dirname, '..', '..')
+const REPO_ROOT = path.resolve(import.meta.dirname, '..')
 
 export async function version() {
   const manifest = JSON.parse(await readFile(path.join(REPO_ROOT, 'package.json'), 'utf8'))

@@ -28,7 +28,7 @@ real URLs. They get the same tree, written twice, so the watcher keeps both in
 step without knowing there is more than one.
 */
 const outDirs = [
-  'examples/browser/web-app/static/js/msq/worker',
+  'browser-app/web-app/static/js/msq/worker',
   'dev-tools/web-app/static/js/msq/worker',
   'docs/web-app/static/js/msq/worker'
 ].map((relative) => path.join(projectRoot, relative))
@@ -49,7 +49,7 @@ rewritten module is no use to the page.
 */
 const languageDir = path.join(srcDir, 'language')
 const languageOutDirs = [
-  'examples/browser/web-app/static/js/msq/language',
+  'browser-app/web-app/static/js/msq/language',
   'dev-tools/web-app/static/js/msq/language',
   'docs/web-app/static/js/msq/language'
 ].map((relative) => path.join(projectRoot, relative))

@@ -147,8 +147,8 @@ vite.config.ts.timestamp-*
 # to track and are reproducible, so only their .gitinfo notes are kept. The
 # rendered sets live beside the code that plays them and reach each app through
 # a symlink, the way the fonts do.
-examples/browser/web-app/static/sf/*
-!examples/browser/web-app/static/sf/.gitinfo
+browser-app/web-app/static/sf/*
+!browser-app/web-app/static/sf/.gitinfo
 src/midi/sound-banks/*
 !src/midi/sound-banks/.gitinfo
 src/midi/magenta-sound-font/*
@@ -156,7 +156,7 @@ src/midi/magenta-sound-font/*
 
 # What a generator wrote while it ran, kept so a failed render can be read back.
 .generator-logs/
-examples/browser/web-app/static/magenta-sound-font/
+browser-app/web-app/static/magenta-sound-font/
 
 # Each app's static/js/msq is assembled rather than written: the components are
 # copied from web-components/ and the engine beside them is generated from src/.
@@ -164,10 +164,10 @@ examples/browser/web-app/static/magenta-sound-font/
 #
 #   js/msq/            npm run web-components:update
 #   js/msq/worker/     npm run create:msq:worker
-examples/browser/web-app/static/js/msq/
+browser-app/web-app/static/js/msq/
 
 # The wordmark, linked from the repository root rather than copied.
-examples/browser/web-app/static/images/logo.svg
+browser-app/web-app/static/images/logo.svg
 
 # Everything under dev-tools/ that a command rebuilds. `npm run dev-tools` runs
 # all of them before starting the server, so a clone needs none of it tracked:

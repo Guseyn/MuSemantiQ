@@ -5,13 +5,13 @@ process.env.ENV = process.env.ENV || 'local'
 
 const config = JSON.parse(
   fs.readFileSync(
-    `./examples/browser/web-app/env/${process.env.ENV}.json`
+    `./browser-app/web-app/env/${process.env.ENV}.json`
   )
 )
 
 cluster(
-  'examples/browser/web-app/primary.js',
-  'examples/browser/web-app/worker.js'
+  'browser-app/web-app/primary.js',
+  'browser-app/web-app/worker.js'
 )({
   config
 })

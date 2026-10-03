@@ -18,7 +18,7 @@ Three scripts do the part of a build that the browser really needs, which is put
 | `scripts/copy-web-components.js` | `npm run web-components:update` | copies `web-components/` into each app's `static/js/msq/web-components/`, and deletes anything there that is no longer in the source |
 | `scripts/setup-symlinks.js` | `npm run setup:symlinks` | links each app's `static/font/` to `src/drawer/font/`, its `images/logo.svg` to the logo, and every rendered sound bank into `static/magenta-sound-font/` |
 
-None of them transforms code, except for the one rewrite of import specifiers. They copy and they link. `npm run examples:browser`, `npm run dev-tools` and `npm run docs` run all three before starting the server, and `setup:symlinks` also runs on `npm install`.
+None of them transforms code, except for the one rewrite of import specifiers. They copy and they link. `npm run browser-app`, `npm run dev-tools` and `npm run docs` run all three before starting the server, and `setup:symlinks` also runs on `npm install`.
 
 While working, two watchers keep the copies current: `npm run watch:src` reruns `create-msq-worker.js` when a `.js` file under `src/` changes, and `npm run watch:web-components` does the same for the components.
 

@@ -20,7 +20,7 @@ in=${1:?give the folder of scores}
 out=${2:-build}
 
 for file in "$in"/*.txt; do
-  node examples/cli/msq.js --input "$file" --out "$out" --svg --midi --quiet
+  node cli-app/msq.js --input "$file" --out "$out" --svg --midi --quiet
   code=$?
   if [ "$code" -ne 0 ]; then
     echo "stopped at $file: exit code $code" >&2
@@ -35,7 +35,7 @@ And run it:
 sh render-folder.sh scores build
 ```
 
-It runs `examples/cli/msq.js` by a path relative to the root of the clone, so run it from there. The CLI itself finds its fonts by absolute paths, so the scores and the output can be anywhere.
+It runs `cli-app/msq.js` by a path relative to the root of the clone, so run it from there. The CLI itself finds its fonts by absolute paths, so the scores and the output can be anywhere.
 
 ## 3. Naming the outputs
 
@@ -63,7 +63,7 @@ A one-page score is `<name>.svg`. A score with several pages is `<name>.page-N.s
 If you would rather have a folder per score, give each run its own `--out`:
 
 ```bash
-node examples/cli/msq.js --input "$file" --out "$out/$(basename "$file" .txt)" --svg --midi --quiet
+node cli-app/msq.js --input "$file" --out "$out/$(basename "$file" .txt)" --svg --midi --quiet
 ```
 
 ## 4. Checking exit codes

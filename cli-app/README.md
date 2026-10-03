@@ -5,17 +5,17 @@ from the command line. No dependencies — everything here is Node's standard
 library and MuSemantiQ itself.
 
 ```
-npm run examples:cli
+npm run cli-app
 ```
 
 That asks a few questions. To skip them, pass flags — note the `--`, which tells
 npm the flags are for the script and not for npm:
 
 ```
-npm run examples:cli -- --input score.txt --out build --svg --midi
+npm run cli-app -- --input score.txt --out build --svg --midi
 ```
 
-Running `node examples/cli/msq.js` directly works too, and avoids the `--`.
+Running `node cli-app/msq.js` directly works too, and avoids the `--`.
 
 ## Two ways to use it
 
@@ -49,7 +49,7 @@ With no format requested you get a score. With neither `--input` nor `--text`,
 text is read from standard input:
 
 ```
-cat score.txt | node examples/cli/msq.js --midi --out build
+cat score.txt | node cli-app/msq.js --midi --out build
 ```
 
 ## Pages
