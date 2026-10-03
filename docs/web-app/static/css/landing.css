@@ -677,6 +677,7 @@ card, which would throw off the one-card-at-a-time row.
 
 [data-example][data-code] {
   margin: 0;
+  overflow-x: visible;
 }
 
 /* ── Code ────────────────────────────────────────────────────────────── */
@@ -705,7 +706,6 @@ md/landing/*.md, so the box is styled here and the pre only loses its margin.
 [data-code] {
   margin: 0 0 1rem;
   padding: 1.1rem 1.2rem;
-  overflow-x: auto;
   border: 1px solid var(--rule);
   background-color: var(--surface);
   font-family: var(--mono);
@@ -714,15 +714,59 @@ md/landing/*.md, so the box is styled here and the pre only loses its margin.
 }
 
 [data-code] pre {
+  position: relative;
   margin: 0;
   white-space: pre;
 }
 
+/*
+The "copy" link, which is the block's own ::before. It sits in the corner of
+the box, out in its padding, so it never covers code. js/copyCode.js finds
+clicks on it from this box, which is why it is placed by top and right, and
+border-box.
+*/
+[data-code] pre::before {
+  content: "copy";
+  position: absolute;
+  top: -0.85rem;
+  right: -0.95rem;
+  box-sizing: border-box;
+  padding: 0.1em 0.45em;
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  line-height: 1.5;
+  color: var(--ink-faint);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+[data-code] pre:hover::before {
+  color: var(--accent);
+}
+
+[data-code] pre[data-copied="true"]::before {
+  content: "copied";
+  color: var(--accent);
+  text-decoration: none;
+}
+
+/*
+The code scrolls sideways, not the box or the block: the "copy" link is placed
+against the block, and inside a scroller it would scroll away with the code.
+The scrollbar is hidden; a trackpad, shift + wheel or a finger still scroll it.
+*/
 [data-code] code {
+  display: block;
+  overflow-x: auto;
   padding: 0;
   border: none;
   background: none;
   font-size: inherit;
+  scrollbar-width: none;
+}
+
+[data-code] code::-webkit-scrollbar {
+  display: none;
 }
 
 /*

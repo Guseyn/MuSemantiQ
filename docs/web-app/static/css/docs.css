@@ -311,17 +311,109 @@ main[is="e-main"] {
   font-size: 0.9em;
 }
 
+/*
+Room after every code block, the same as a score gets, so the prose that
+follows starts a new thought instead of hanging off the code.
+*/
 [data-content] pre {
-  overflow-x: auto;
+  margin-bottom: var(--e-spacing-lg);
   padding: var(--e-spacing-md);
   border-radius: var(--e-radius-md);
   background-color: var(--e-surface-bg);
   border: 1px solid var(--e-border);
 }
 
+/*
+The code scrolls sideways, not the block. The block holds the "copy" link
+(below), and a link inside a scroller would scroll away with the code. The
+scrollbar is hidden: a trackpad, shift + wheel or a finger still scroll it, and
+the block stays a clean box.
+*/
 [data-content] pre code {
+  display: block;
+  overflow-x: auto;
   padding: 0;
   background: none;
+  scrollbar-width: none;
+}
+
+[data-content] pre code::-webkit-scrollbar {
+  display: none;
+}
+
+/*
+The "copy" link of every code block, which is the block's own ::before, so the
+markdown needs nothing added to it. js/copyCode.js finds clicks on it from this
+box, which is why it is absolutely placed by top and right, and border-box.
+*/
+[data-content] pre {
+  position: relative;
+}
+
+[data-content] pre::before {
+  content: "copy";
+  position: absolute;
+  top: var(--e-spacing-xs);
+  right: var(--e-spacing-xs);
+  box-sizing: border-box;
+  padding: 0.15em 0.5em;
+  font-size: var(--e-font-size-xs);
+  line-height: 1.4;
+  color: var(--e-primary);
+  text-decoration: underline;
+  cursor: pointer;
+  opacity: 0.7;
+}
+
+[data-content] pre:hover::before {
+  opacity: 1;
+}
+
+[data-content] pre[data-copied="true"]::before {
+  content: "copied";
+  color: var(--e-success);
+  text-decoration: none;
+  opacity: 1;
+}
+
+/*
+Highlighting, in e-ui's own colours: markup and comments recede, names and
+keywords carry the weight, strings take the primary colour and literals the
+success one.
+*/
+[data-content] .hljs-comment,
+[data-content] .hljs-tag,
+[data-content] .hljs-meta {
+  color: color-mix(in srgb, var(--e-muted), transparent 30%);
+}
+
+[data-content] .hljs-name,
+[data-content] .hljs-keyword,
+[data-content] .hljs-built_in,
+[data-content] .hljs-selector-tag {
+  color: var(--e-fg);
+  font-weight: 600;
+}
+
+[data-content] .hljs-attr,
+[data-content] .hljs-attribute,
+[data-content] .hljs-variable,
+[data-content] .hljs-property {
+  color: var(--e-muted);
+}
+
+[data-content] .hljs-string,
+[data-content] .hljs-regexp {
+  color: var(--e-primary);
+}
+
+[data-content] .hljs-number,
+[data-content] .hljs-literal {
+  color: var(--e-success);
+}
+
+[data-content] .hljs-title {
+  color: var(--e-info);
 }
 
 [data-content] table {

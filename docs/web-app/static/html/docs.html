@@ -56,7 +56,17 @@
       import '#e-ui/e-kbd.js'
       // The sitemap and the page the URL names, for the templates below.
       import '/js/docs.js'
+      // Every code block's "copy" link (its ::before).
+      import '/js/copyCode.js'
       import '#ehtml/main'
+
+      /*
+      e-markdown takes extensions through data-internal-state, which is an
+      expression, so this one is a global. The e-markdown that uses it is inside
+      the font loader and is activated long after this has run.
+      */
+      import showdownHighlight from '#ehtml/showdown/extensions/highlight.js'
+      window.showdownHighlight = showdownHighlight
     </script>
   </head>
 
@@ -276,6 +286,9 @@
           the /md mount answers a missing page with a markdown file of its own,
           which says it has not been written yet (see docs/web-app/worker.js).
 
+          Code is highlighted only where the fence names its language: an
+          unlabelled fence is usually MSQ, which highlight.js would guess wrong.
+
           The section and the group of the page open once the page starts
           loading; by then the sidebar above has been rendered.
         -->
@@ -287,6 +300,7 @@
           >
             <e-markdown
               data-src="${currentPage.md}"
+              data-internal-state="${{ extensions: [ showdownHighlight({ auto_detection: false }) ] }}"
               data-actions-on-progress-start="
                 document
                   .querySelectorAll('e-sidebar nav details[data-current=true]')
