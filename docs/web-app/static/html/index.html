@@ -304,7 +304,14 @@
                     </svg>
                     <h3>Deterministic</h3>
                     <p>
-                      It's not AI, and it's not an LLM. The language is deterministic: one input, one exact output.
+                      On each input, there is one exact output:
+                      <ul>
+                        <li>No AI</li>
+                        <li>No Large Language Models</li>
+                        <li>No Machine Learning</li>
+                        <li>You can see errors in input</li>
+                        <li>Structured, intuitive, powerful and elegant language</li>
+                      </ul>
                     </p>
                   </li>
 
@@ -317,7 +324,49 @@
                     </svg>
                     <h3>Free</h3>
                     <p>
-                      Everything is open source; just don't forget to mention what powers your tool. The language, the drawing engine, the MIDI generator, the MIDI player, the editor and the Showdown extensions are all free.
+                      The whole toolkit is opensourced:
+                      <ul>
+                        <li>
+                          Lanaguage and parser
+                        </li>
+                        <li>
+                          Powerful SVG rendering engine (drawer)
+                        </li>
+                        <li>
+                          Midi Generator
+                        </li>
+                        <li>
+                          Low level API
+                        </li>
+                        <li>
+                          Native web components:
+                          <ul>
+                            <li>SVG viewer</li>
+                            <li>Midi Player</li>
+                            <li>Editor with autocompletion, language highlighting, navigation between the score and text</li>
+                          </ul>
+                        </li>
+                        <li>
+                          Showdown extensions for Markdown
+                        </li>
+                        <li>
+                          CLI app
+                        </li>
+                        <li>
+                          Dev tools:
+                          <ul>
+                            <li>
+                              Music Font Generator (using <a data-link href="https://www.w3.org/2021/03/smufl14/">SMuFL</a>)
+                            </li>
+                            <li>
+                              Sound Font Generator (for <a data-link href="https://github.com/magenta/magenta-js">Magenta</a>)
+                            </li>
+                            <li>
+                              <a data-link href="https://www.musicxml.com/">MusicXML Support (beta)</a>
+                            </li>
+                          </ul>
+                        </li>
+                      </ul>
                     </p>
                   </li>
 
@@ -338,7 +387,21 @@
                     </svg>
                     <h3>Extendable</h3>
                     <p>
-                      Add your own fonts, generate your own sound fonts, embed scores in your web pages, and build programs on top of it. Nothing is locked away.
+                      You can extend the toolkit:
+                      <ul>
+                        <li>
+                          Add/adjust your own fonts
+                        </li>
+                        <li>
+                          Generate your own sound fonts
+                        </li>
+                        <li>
+                          Embed scores in your web pages
+                        </li>
+                        <li>
+                          Build programs on top of MSQ
+                        </li>
+                      </ul>
                     </p>
                   </li>
 
@@ -352,7 +415,21 @@
                     </svg>
                     <h3>Customizable</h3>
                     <p>
-                      Every style is a line of text: colours, fonts, spacing, the size of the page. How a score looks is written in the score itself, so it goes wherever the score goes, and nothing hides in a settings menu.
+                      You have control over pretty much everything:
+                      <ul>
+                        <li>
+                          How the page looks: size, background and foreground colors
+                        </li>
+                        <li>
+                          Over other 40 different style properties
+                        </li>
+                        <li>
+                          Pick/generate any graphical fonts for music glyphs, text and chord letters
+                        </li>
+                        <li>
+                          Pick/generate any soundfont you want
+                        </li>
+                      </ul>
                     </p>
                   </li>
 
@@ -371,7 +448,8 @@
                     </svg>
                     <h3>Navigable</h3>
                     <p>
-                      The words and the score are linked both ways. Hold ⌘ or Ctrl and click a word to see what it drew, or click a note to find the words that drew it. In a long piece, you never have to search for the line you want to change.
+                      You score is connected to its text description. You will never get lost, you never have to search for the line you want to change. Hold <b>⌘</b> or <b>Ctrl</b> and <b>click</b> a word to see what it drew, or click a note to find the words that drew it.<br>
+                      Similarly, you have connection between notes in your score and the MIDI player's progress bar.
                     </p>
                   </li>
                 </ul>
@@ -686,11 +764,11 @@
                 </p>
                 <div is="landing-tabs" data-tabs data-subtabs>
                   <div data-tab-list aria-label="The web components">
+                    <button type="button" data-tab="msq-font-loader"><code>msq-font-loader</code></button>
                     <button type="button" data-tab="msq-svg"><code>msq-svg</code></button>
                     <button type="button" data-tab="msq-midi"><code>msq-midi</code></button>
                     <button type="button" data-tab="msq-svg-midi"><code>msq-svg-midi</code></button>
                     <button type="button" data-tab="msq-editor"><code>msq-editor</code></button>
-                    <button type="button" data-tab="msq-font-loader"><code>msq-font-loader</code></button>
                   </div>
                   <div data-tab-panel="msq-svg">
                     <p>The score, and nothing else.</p>
@@ -934,13 +1012,7 @@
         <!-- ── 07 ───────────────────────────────────────────────────────── -->
         <section is="landing-screen" data-screen id="status" data-number="07" data-label="Status">
           <div data-inner>
-            <h2 data-reveal>Status</h2>
-            <p data-to-write data-reveal style="--d: 80ms">
-              TO WRITE — how finished this is and what is still moving. The
-              licence, and the browser caveat: the components are customized
-              built-in elements, so Chromium or Firefox unless the polyfill is
-              loaded.
-            </p>
+            <h2 data-reveal>Links</h2>
 
             <div is="landing-phrase" data-stave data-phrase data-closing aria-hidden="true">
               <e-svg data-src="/images/phrase.svg"></e-svg>

@@ -8,6 +8,11 @@ import {
   generateMidiForSinglePage
 } from './src/api.js'
 
+// JSON config
+// In Node.js, it's optional and we use default one
+// In browser, it's required
+// More info in docs
+const fontConfig = ...
 const supportedFontSources = await setupFonts(fontConfig)
 
 const { pageSchema, customStyles, midiSettings, errors } =

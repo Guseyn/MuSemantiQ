@@ -15,6 +15,10 @@ function ask(name, payload) {
   })
 }
 
+// JSON config
+// When using worker in browser, it's required to declare it
+// More info in the docs
+const fontConfig = ...
 await ask('fonts.setup', { fontConfig, fontSourcesReference: 'fonts' })
 
 const { svg, errors } = await ask('svg.generate', {
