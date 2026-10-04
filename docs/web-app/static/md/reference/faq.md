@@ -6,7 +6,7 @@ The questions that come up, with straight answers. The limitations are here too,
 
 ### Do I need to install anything besides Node?
 
-For the browser example and the CLI, no: Node 22 or newer is enough, and `npm install` only downloads **c8** for test coverage. The dev tools and this documentation also need my libraries nodes, EHTML and e-ui cloned beside the repository. See [Install and run](/docs/getting-started/install-and-run).
+For the browser example and the CLI, no: Node 22 or newer is enough, and `npm install` only downloads **c8** for test coverage. The dev tools and this documentation also need my libraries nodes, EHTML and e-ui cloned beside the repository. See [Full setup](/docs/getting-started/full-setup).
 
 ### Can I install it from npm as a dependency?
 

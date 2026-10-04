@@ -26,7 +26,7 @@ function runBuild() {
   console.log(`[watch-msq-src] ${timestamp} - Rebuilding worker environment...`)
 
   const child = spawn('node', [
-    path.join(__dirname, 'create-msq-worker.js')
+    path.join(__dirname, 'copy-msq-into-apps.js')
   ], {
     stdio: 'inherit',
     cwd: projectRoot

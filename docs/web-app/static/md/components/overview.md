@@ -12,7 +12,7 @@ There are five of them:
 | `msq-svg-midi` | The score with a player under it, notes highlighting as they sound | Fonts | A parse, an engraving and a MIDI file, plus the samples |
 | `msq-editor` | The score, the player and the source you can edit | Fonts | All of the above, and the parser on the page itself for highlighting |
 
-All the heavy work (parsing, engraving, MIDI) happens in one shared web worker, so the page itself stays responsive. The editor is the one exception: it parses what you type on the main thread to colour it, because that has to happen between a keystroke and the next paint. More about that you can read in [The worker](/docs/architecture/the-worker).
+All the heavy work (parsing, engraving, MIDI) happens in one shared web worker, so the page itself stays responsive. The editor is the one exception: it parses what you type on the main thread to colour it, because that has to happen between a keystroke and the next paint. More about that you can read in [Worker](/docs/worker/overview).
 
 ## 1. The music is the text content
 

@@ -50,4 +50,4 @@ This documentation and the dev tools do it this way. The browser example and the
 
 Plainly: nothing here runs in a browser automatically. The test suites (visual, audio and serializer) run in Node and compare what the engine produces with committed files, so the SVG and the MIDI that the components show are tested, byte for byte. The components themselves are not. What they get is the use of the example app, the dev tools and this documentation, in Chromium and Firefox, and a check of all three in WebKit through Playwright, the engine Safari is built on. Safari itself, on a Mac or an iPhone, has not been tried at the moment, so if you need it, try it first.
 
-Read next: [Browser app](/docs/examples/browser-app)
+Read next: [Showdown extensions](/docs/showdown/overview)

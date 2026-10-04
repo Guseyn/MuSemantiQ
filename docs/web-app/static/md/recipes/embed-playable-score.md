@@ -7,7 +7,7 @@ This recipe puts a score you can hear on a page of your own: the engraving, a pl
 The components are not served from `src/` or `web-components/`. They are served from three generated folders, and the build scripts write them into the browser example:
 
 ```bash
-npm run create:msq:worker
+npm run msq:apps:update
 npm run web-components:update
 ```
 

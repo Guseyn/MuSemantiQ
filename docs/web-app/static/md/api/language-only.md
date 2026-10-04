@@ -143,4 +143,4 @@ page 2: command 'is 4/4' is not recognizable or applicable on the line 3
 
 The exit code is **1**, so the script can stop a CI job or a pre-commit hook. Nothing here loads a font, draws an SVG or builds a MIDI file.
 
-Read next: [The worker](/docs/architecture/the-worker)
+Read next: [Worker](/docs/worker/overview)

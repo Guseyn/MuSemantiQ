@@ -57,6 +57,6 @@ This is why the split matters: `src/api.js` imports the drawer, opentype.js and 
 
 In **Node** you import `#msq/api.js` and call the functions directly. The `#msq/…` specifiers are subpath imports declared in `package.json`, so they resolve for any module inside the repository. `setupFonts()` with no arguments loads the fonts from `src/drawer/font/`, relative to the current working directory, so run your script from the repository root.
 
-In the **browser** the same functions run inside a module worker, `src/worker.js`, which the web components talk to by message. You do not call `src/api.js` from the page. The page gets two things only: the components, and the language, which it imports as `#msq/language/api.js` for highlighting on the main thread. The browser also has no default fonts, so `setupFonts` needs a full font config with URLs. More about that in [setupFonts](/docs/api/setup-fonts) and [The worker](/docs/architecture/the-worker).
+In the **browser** the same functions run inside a module worker, `src/worker.js`, which the web components talk to by message. You do not call `src/api.js` from the page. The page gets two things only: the components, and the language, which it imports as `#msq/language/api.js` for highlighting on the main thread. The browser also has no default fonts, so `setupFonts` needs a full font config with URLs. More about that in [setupFonts](/docs/api/setup-fonts) and [Worker](/docs/worker/overview).
 
 Read next: [setupFonts](/docs/api/setup-fonts)

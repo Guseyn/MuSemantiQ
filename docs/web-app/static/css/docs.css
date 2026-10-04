@@ -421,17 +421,31 @@ success one.
   color: var(--e-info);
 }
 
-[data-content] table {
-  width: 100%;
-  border-collapse: collapse;
+/*
+Tables are e-ui's e-table (js/eTableExtension.js), each in a <div data-table>
+that scrolls on its own when the table is wider than the column. e-table keeps
+every cell on one line, which suits a list of records; here cells are prose,
+so they wrap.
+
+The rounded border goes on the wrapper rather than the table: a table with
+border-collapse cannot round its own border, and the wrapper already clips
+what scrolls. It is the border e-ui gives a table in a form's e-scrollable.
+The last row's divider would sit right on top of it, so it goes.
+*/
+[data-content] [data-table] {
+  overflow-x: auto;
   margin: var(--e-spacing-md) 0;
+  border: 1px solid var(--e-border);
+  border-radius: var(--e-radius-md);
 }
 
-[data-content] th,
-[data-content] td {
-  padding: var(--e-spacing-xs) var(--e-spacing-sm);
-  border-bottom: 1px solid var(--e-divider);
-  text-align: left;
+[data-content] table[is="e-table"] > tbody > tr:last-child {
+  border-bottom: none;
+}
+
+[data-content] table[is="e-table"] > tbody > tr > td {
+  white-space: normal;
+  vertical-align: top;
 }
 
 /*
@@ -441,6 +455,33 @@ allowed to scroll on its own rather than widening the page.
 [data-content] [data-rendered-by] {
   overflow-x: auto;
   margin: var(--e-spacing-lg) 0;
+}
+
+/* ── Contents ───────────────────────────────────────────────────────── */
+
+/*
+<nav is="docs-contents"> (js/docs-contents.js). Its title is a ::before rather
+than a heading, so it does not list itself.
+*/
+[data-content] nav[is="docs-contents"] {
+  margin: var(--e-spacing-lg) 0;
+  padding: var(--e-spacing-sm) var(--e-spacing-md);
+  border-left: 3px solid var(--e-primary-transparent-accent-bg);
+}
+
+[data-content] nav[is="docs-contents"]::before {
+  content: 'Contents';
+  display: block;
+  margin-bottom: var(--e-spacing-xs);
+  font-weight: bold;
+}
+
+[data-content] nav[is="docs-contents"] ol {
+  margin: 0;
+}
+
+[data-content] nav[is="docs-contents"] ol ol {
+  list-style: lower-alpha;
 }
 
 /* ── Authoring notes ────────────────────────────────────────────────── */

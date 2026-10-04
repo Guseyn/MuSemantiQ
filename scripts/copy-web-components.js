@@ -11,7 +11,7 @@
  * two halves and nothing else:
  *
  *   js/msq/web-components/   from here
- *   js/msq/worker/           from src/, by create-msq-worker.js
+ *   js/msq/worker/           from src/, by copy-msq-into-apps.js
  */
 
 import fs from 'fs'

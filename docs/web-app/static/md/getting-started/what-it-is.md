@@ -1,5 +1,7 @@
 # What MuSemantiQ is
 
+<!-- check-docs-examples: preview -->
+
 <span is="e-primary">M</span>u<span is="e-primary">S</span>emanti<span is="e-primary">Q</span> (<span is="e-primary">M</span>usic <span is="e-primary">S</span>emantic <span is="e-primary">Q</span>uery) is a semantic music engine and powerful toolkit that translates words to music. You write music as words, in a text language called **MSQ**, and MuSemantiQ engraves it as sheet music and plays it back.
 
 Below, you can see very basic example:
@@ -48,4 +50,4 @@ From one piece of MSQ you can get:
 
 It runs on Node 22 or newer and in modern browsers, with no build step and no runtime npm dependencies.
 
-Read next: [Install and run](/docs/getting-started/install-and-run)
+Read next: [Full setup](/docs/getting-started/full-setup)

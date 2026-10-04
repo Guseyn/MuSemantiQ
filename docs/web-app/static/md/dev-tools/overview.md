@@ -12,9 +12,9 @@ npm run dev-tools
 
 It does five things in order:
 
-1. `dev-tools:vendor` copies **nodes**, **EHTML** and **e-ui** in from their sibling checkouts (see [Install and run](/docs/getting-started/install-and-run)), and fails if they are not there
+1. `dev-tools:vendor` copies **nodes**, **EHTML** and **e-ui** in from their sibling checkouts (see [Full setup](/docs/getting-started/full-setup)), and fails if they are not there
 2. `setup:symlinks` links the fonts and the rendered sound fonts into `dev-tools/web-app/static/`
-3. `create:msq:worker` writes the worker copy of `src/` into `static/js/msq/worker/`
+3. `msq:apps:update` writes the worker copy of `src/` into `static/js/msq/worker/`
 4. `web-components:update` copies `web-components/` into `static/js/msq/web-components/`
 5. `node dev-tools/web-app/main.js` starts the server
 

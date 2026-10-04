@@ -163,7 +163,7 @@ browser-app/web-app/static/magenta-sound-font/
 # Both halves have one source, so neither copy is tracked.
 #
 #   js/msq/            npm run web-components:update
-#   js/msq/worker/     npm run create:msq:worker
+#   js/msq/worker/     npm run msq:apps:update
 browser-app/web-app/static/js/msq/
 
 # The wordmark, linked from the repository root rather than copied.
@@ -175,7 +175,7 @@ browser-app/web-app/static/images/logo.svg
 #   nodes/            npm run dev-tools:nodes:update   (from ../nodes.js)
 #   js/ehtml/         npm run dev-tools:ehtml:update   (from ../EHTML)
 #   js/e-ui/, e-ui.css  npm run dev-tools:eui:update   (from ../e-ui)
-#   js/msq/           npm run web-components:update + create:msq:worker
+#   js/msq/           npm run web-components:update + msq:apps:update
 #   font/             npm run setup:symlinks
 #   images/logo.svg   npm run setup:symlinks
 #
@@ -196,7 +196,7 @@ dev-tools/web-app/static/images/logo.svg
 #   js/ehtml/         npm run docs:ehtml:update   (from ../EHTML)
 #   js/e-ui/, e-ui.css  npm run docs:eui:update   (from ../e-ui)
 #   js/e-dev/, api/e-dev/  npm run docs:e-dev:update  (from ../e-pages, the e-dev repo)
-#   js/msq/           npm run web-components:update + create:msq:worker
+#   js/msq/           npm run web-components:update + msq:apps:update
 #   font/             npm run setup:symlinks
 #   images/logo.svg   npm run setup:symlinks
 #   js/showdown-extensions/  npm run setup:symlinks  (links to showdown-extensions/)

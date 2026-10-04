@@ -1,6 +1,6 @@
-# The worker
+# Overview
 
-In the browser, the engine runs in a module worker. `src/worker.js` wraps the [low-level API](/docs/api/overview) in a small message protocol, and the web components are the only thing that talks to it.
+In the browser, the engine runs in a module worker. `src/worker.js` wraps the [low-level API](/docs/api/overview) in a small message protocol. The web components talk to it, and so can your own code: you just need to post the messages below.
 
 ## 1. Why a worker at all
 
@@ -87,6 +87,12 @@ A reference can be registered only once: a second `fonts.setup` with the same re
 
 The worker cannot run `src/` as it is. `src/` imports everything through `#msq/…` specifiers, and in the browser those are resolved by an import map. **A module worker gets no import map**: the page's map does not apply inside it, and a worker cannot declare one of its own.
 
-So `scripts/create-msq-worker.js` writes a copy of the whole of `src/` into each app's `static/js/msq/worker/`, with every `#msq/…` specifier rewritten to a real URL under `/js/msq/worker/`. That copy is what `worker-instance.js` starts. How the rewriting works, and why the language gets a second, unrewritten copy, is the subject of [Import maps and specifiers](/docs/architecture/import-maps).
+So `scripts/create-msq-worker.js` writes a copy of the whole of `src/` into the folder you give it, with every `#msq/…` specifier rewritten to a relative path:
 
-Read next: [No build](/docs/architecture/no-build)
+```sh
+node ../MuSemantiQ/scripts/create-msq-worker.js -o static/js/msq/worker
+```
+
+The copy has the same layout as `src/`, so a module's path to another module is the same in both, and the folder works wherever you serve it from. That copy is what you start with `new Worker('/js/msq/worker/worker.js', { type: 'module' })`, and what `worker-instance.js` starts for the components. The whole setup is described in [Full setup](/docs/getting-started/full-setup).
+
+Read next: [Web components](/docs/components/overview)

@@ -1,5 +1,5 @@
 ```js
-// The worker is the same API, built for the browser by `npm run create:msq:worker`
+// The worker is the same API, built for the browser by `npm run create:msq:worker -- -o js/msq/worker`
 const worker = new Worker('/js/msq/worker/worker.js', { type: 'module' })
 
 // Every request carries an id, and its answer comes back with the same id

@@ -31,8 +31,7 @@ export const sitemap = [
     title: 'Getting started',
     pages: [
       { slug: 'what-it-is', title: 'What MuSemantiQ is' },
-      { slug: 'install-and-run', title: 'Install and run' },
-      { slug: 'your-first-page', title: 'Your first page' },
+      { slug: 'full-setup', title: 'Full setup' },
       { slug: 'where-to-go-next', title: 'Where to go next' }
     ]
   },
@@ -163,15 +162,10 @@ export const sitemap = [
     ]
   },
   {
-    slug: 'architecture',
-    title: 'Architecture',
+    slug: 'worker',
+    title: 'Worker',
     pages: [
-      { slug: 'the-worker', title: 'The worker' },
-      { slug: 'no-build', title: 'No build' },
-      { slug: 'import-maps', title: 'Import maps and specifiers' },
-      { slug: 'generated-vs-hand-written', title: 'Generated versus hand-written' },
-      { slug: 'repository-layout', title: 'Repository layout' },
-      { slug: 'vendoring', title: 'Vendoring' }
+      { slug: 'overview', title: 'Overview' }
     ]
   },
   {
@@ -190,12 +184,36 @@ export const sitemap = [
     ]
   },
   {
+    slug: 'showdown',
+    title: 'Showdown extensions',
+    pages: [
+      { slug: 'overview', title: 'Overview' }
+    ]
+  },
+  {
+    slug: 'ehtml',
+    title: 'With EHTML',
+    pages: [
+      { slug: 'overview', title: 'Overview' }
+    ]
+  },
+  {
     slug: 'examples',
     title: 'Example apps',
     pages: [
       { slug: 'browser-app', title: 'Browser app' },
       { slug: 'cli', title: 'CLI' },
       { slug: 'embedding', title: 'Embedding in your own app' }
+    ]
+  },
+  {
+    slug: 'tools',
+    title: 'Tools, natively',
+    pages: [
+      { slug: 'smufl-font-generator', title: 'SMuFL to music-js font' },
+      { slug: 'magenta-soundfont-builder', title: 'Magenta soundfont builder' },
+      { slug: 'musicxml-import', title: 'MusicXML import' },
+      { slug: 'musicxml-export', title: 'MusicXML export' }
     ]
   },
   {
@@ -208,16 +226,6 @@ export const sitemap = [
       { slug: 'soundfont-generator', title: 'Magenta soundfont generator' },
       { slug: 'musicxml-tool', title: 'MusicXML tool' },
       { slug: 'test-viewer', title: 'Test viewer' }
-    ]
-  },
-  {
-    slug: 'tools',
-    title: 'Tools, natively',
-    pages: [
-      { slug: 'smufl-font-generator', title: 'SMuFL to music-js font' },
-      { slug: 'magenta-soundfont-builder', title: 'Magenta soundfont builder' },
-      { slug: 'musicxml-import', title: 'MusicXML import' },
-      { slug: 'musicxml-export', title: 'MusicXML export' }
     ]
   },
   {

@@ -7,6 +7,7 @@
   "scripts": {
     "postinstall": "node scripts/setup-symlinks.js",
     "setup:symlinks": "node scripts/setup-symlinks.js",
+    "msq:apps:update": "node scripts/copy-msq-into-apps.js",
     "create:msq:worker": "node scripts/create-msq-worker.js",
     "web-components:update": "node scripts/copy-web-components.js",
     "watch:src": "node scripts/watch-msq-src.js",
@@ -28,7 +29,7 @@
     "dev-tools:nodes:update": "rsync -a --delete ../../my-projects/nodes.js/nodes/ dev-tools/nodes/",
     "dev-tools:eui:update": "rsync -a --delete ../../my-projects/e-ui/static/js/e-ui/ dev-tools/web-app/static/js/e-ui/ && cp -rf ../../my-projects/e-ui/static/css/e-ui.css dev-tools/web-app/static/css/e-ui.css",
     "dev-tools:vendor": "npm run dev-tools:nodes:update && npm run dev-tools:ehtml:update && npm run dev-tools:eui:update",
-    "dev-tools": "npm run dev-tools:vendor && npm run setup:symlinks && npm run create:msq:worker && npm run web-components:update && node dev-tools/web-app/main.js",
+    "dev-tools": "npm run dev-tools:vendor && npm run setup:symlinks && npm run msq:apps:update && npm run web-components:update && node dev-tools/web-app/main.js",
 
     "docs:ehtml:update": "rsync -a --delete ../../my-projects/EHTML/src/ docs/web-app/static/js/ehtml/",
     "docs:nodes:update": "rsync -a --delete ../../my-projects/nodes.js/nodes/ docs/nodes/",
@@ -38,9 +39,9 @@
     "docs:check": "node scripts/check-docs-examples.js",
     "docs:art": "node scripts/generate-landing-art.js",
     "docs:pipeline": "node scripts/generate-landing-pipeline.js",
-    "docs": "npm run setup:symlinks && npm run create:msq:worker && npm run web-components:update && npm run docs:check && node docs/web-app/main.js",
+    "docs": "npm run setup:symlinks && npm run msq:apps:update && npm run web-components:update && npm run docs:check && node docs/web-app/main.js",
 
-    "browser-app": "npm run setup:symlinks && npm run create:msq:worker && npm run web-components:update && node browser-app/web-app/main.js",
+    "browser-app": "npm run setup:symlinks && npm run msq:apps:update && npm run web-components:update && node browser-app/web-app/main.js",
     "cli-app": "node cli-app/msq.js"
   },
   "repository": {

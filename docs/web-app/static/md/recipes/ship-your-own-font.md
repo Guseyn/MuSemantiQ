@@ -97,7 +97,7 @@ Relative font paths are resolved against the config file, so `config/fonts.json`
 **In the browser**, the table has to be in the worker tree first, so rebuild it:
 
 ```bash
-npm run create:msq:worker
+npm run msq:apps:update
 ```
 
 and then name the font in the loader's config, with the `js` at its URL in that tree:

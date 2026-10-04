@@ -41,7 +41,7 @@ These are the common ones, each with what you see and what the console says:
 | A second loader uses a reference that is already registered | Everything inside the second loader is missing | `Font sources are already registered under reference (…)` |
 | The element has no music in it | The component is missing | `No inputText provided` |
 | The import map is missing, or does not name `#msq/web-components/` and `#msq/language/` | Nothing on the page renders | The browser's error that it cannot resolve the `#msq/...` specifier |
-| The worker tree was never generated (`npm run create:msq:worker`) | Nothing renders, and nothing ever will | A failed request for `/js/msq/worker/worker.js`. No rejection follows, because the worker never answers |
+| The worker tree was never generated (`npm run msq:apps:update`) | Nothing renders, and nothing ever will | A failed request for `/js/msq/worker/worker.js`. No rejection follows, because the worker never answers |
 
 It's important to mention the difference between the two groups of rows. A mistake on one component takes only that component away. A mistake on the loader takes away everything inside it, because the loader only puts its content on the page after the fonts are ready, and the fonts are never ready.
 
@@ -51,7 +51,7 @@ Work through this list from the top, and stop at the first thing that is wrong:
 
 1. **The browser.** Safari does not upgrade these elements on its own. The components load a polyfill for it themselves, from `lib/custom-elements-polyfill.js` next to them. If the page is fine in Chromium or Firefox but empty in Safari, look for a failed request for that file, and on a page that also loads EHTML, check that EHTML's copy of the polyfill is imported before the components; see [Browser support](/docs/components/browser-support).
 2. **The console.** Every setup mistake says what it is there. Read the first error, not the last.
-3. **The network tab.** Look for a failed request for `worker.js`, for a font file under `/font/`, or for a glyph table under `/js/msq/worker/drawer/font/music-js/`. In this repository, `npm run setup:symlinks` puts the fonts back, and `npm run create:msq:worker` rebuilds the worker tree.
+3. **The network tab.** Look for a failed request for `worker.js`, for a font file under `/font/`, or for a glyph table under `/js/msq/worker/drawer/font/music-js/`. In this repository, `npm run setup:symlinks` puts the fonts back, and `npm run msq:apps:update` rebuilds the worker tree.
 4. **The import map.** It has to come before the module scripts that import the components.
 5. **The reference.** Every `data-font-sources` must match a `data-font-sources-reference` exactly.
 6. **The placement.** A component that engraves must either be inside the loader, or be inserted after the loader has finished (see [msq-font-loader](/docs/components/msq-font-loader)).

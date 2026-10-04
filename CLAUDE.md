@@ -18,6 +18,7 @@ npm run docs             # https://127.0.0.1:8890 — landing page + documentati
 npm run docs:check       # validate every example in docs/web-app/static/md
 npm run docs:pipeline    # re-engrave the landing page's "How it works" artefacts (committed)
 npm run cli-app -- --input score.txt --svg --midi
+npm run create:msq:worker -- -o static/js/msq/worker  # only the worker, relative imports, any mount point
 ```
 
 `dev-tools` first rsyncs nodes, EHTML and e-ui from sibling checkouts (see [Sibling libraries](#sibling-libraries-nodes-ehtml-e-ui)) and fails if those are missing. `docs` expects them already copied: run `npm run docs:vendor` first (it also copies e-dev).
@@ -45,7 +46,7 @@ Every run writes `actual/` for every test, pass or fail, and merges verdicts int
 
 **MIDI (`src/midi/`)** — `midi.js` walks `measuresParams` into time frames and returns MIDI bytes plus `timeStampsMappedWithRefsOn` / `refsOnMappedWithTimeStamps` for score ↔ playback sync.
 
-**Browser delivery** — `src/worker.js` exposes the API over `postMessage` (`fonts.setup`, …). Module workers get no import map, so `scripts/create-msq-worker.js` writes a copy of `src/` with `#msq` specifiers rewritten (via `worker.importmap` in `package.json`) into each app's `static/js/msq/worker/`, plus an unmodified `src/language` copy into `static/js/msq/language/` for main-thread parsing. `web-components/` (`<template is="msq-*">`, the editor) is copied into each app by `web-components:update`. All of these copies, fonts (symlinked by `setup:symlinks`) and vendored libs are gitignored — edit only `src/` and `web-components/`; `watch:src` / `watch:web-components` keep copies current.
+**Browser delivery** — `src/worker.js` exposes the API over `postMessage` (`fonts.setup`, …). Module workers get no import map, so `scripts/copy-msq-into-apps.js` writes a copy of `src/` with `#msq` specifiers rewritten (via `worker.importmap` in `package.json`) into each app's `static/js/msq/worker/`, plus an unmodified `src/language` copy into `static/js/msq/language/` for main-thread parsing. `web-components/` (`<template is="msq-*">`, the editor) is copied into each app by `web-components:update`. All of these copies, fonts (symlinked by `setup:symlinks`) and vendored libs are gitignored — edit only `src/` and `web-components/`; `watch:src` / `watch:web-components` keep copies current.
 
 **Tools (`tools/`)** — SMuFL → music-js font generation, MusicXML import/export, Magenta sound-font rendering; used by dev-tools, not shipped in the worker.
 

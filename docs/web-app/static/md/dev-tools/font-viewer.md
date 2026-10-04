@@ -45,7 +45,7 @@ As a result you see a changed size, interval or yCorrection on the stave straigh
 
 It's important to mention three things that follow from writing a table:
 
-1. The viewer reads and writes the source file in `src/`, but the browser apps load a copy of it from `static/js/msq/worker/`. Run `npm run create:msq:worker` (or keep `npm run watch:src` running) before you look at the change anywhere else.
+1. The viewer reads and writes the source file in `src/`, but the browser apps load a copy of it from `static/js/msq/worker/`. Run `npm run msq:apps:update` (or keep `npm run watch:src` running) before you look at the change anywhere else.
 2. A changed glyph changes every SVG engraved with that font, so the visual suite for that font will fail until you adopt the new baselines. More about that you can read in [Baselines](/docs/testing/baselines).
 3. The music-js files are generated, and the endpoint finds an entry by walking their lines, one property per line. Keep that formatting if you edit a table by hand, or the viewer will not find the entry.
 

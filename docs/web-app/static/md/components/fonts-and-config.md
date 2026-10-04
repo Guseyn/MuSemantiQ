@@ -80,7 +80,7 @@ src/drawer/font/
   music-js/        bravura.js, leland.js
 ```
 
-The apps never copy them. `npm run setup:symlinks` (which also runs on `npm install`) links `static/font/chord-letters`, `static/font/music` and `static/font/text` of every app (the examples app, the dev tools and this documentation) to those folders, so each app serves them under `/font/...`. The glyph tables are served from a different place: they are part of `src/`, so they reach the page inside the worker tree that `npm run create:msq:worker` writes, under `/js/msq/worker/drawer/font/music-js/`.
+The apps never copy them. `npm run setup:symlinks` (which also runs on `npm install`) links `static/font/chord-letters`, `static/font/music` and `static/font/text` of every app (the examples app, the dev tools and this documentation) to those folders, so each app serves them under `/font/...`. The glyph tables are served from a different place: they are part of `src/`, so they reach the page inside the worker tree that `npm run msq:apps:update` writes, under `/js/msq/worker/drawer/font/music-js/`.
 
 ## 4. A config served by URL
 

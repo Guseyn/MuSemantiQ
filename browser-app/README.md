@@ -60,7 +60,7 @@ Inside `static/js/msq/web-components/` (a copy of the top-level
 `npm run browser-app` does four things in order:
 
 1. `setup:symlinks` — recreates the three font symlinks under `static/font/`
-2. `create:msq:worker` — regenerates `static/js/msq/worker/` and
+2. `msq:apps:update` — regenerates `static/js/msq/worker/` and
    `static/js/msq/language/` from `src/`
 3. `web-components:update` — copies `web-components/` to
    `static/js/msq/web-components/`
@@ -85,7 +85,7 @@ mkcert localhost 127.0.0.1 ::1
 | Script | What it does | When you need it |
 | --- | --- | --- |
 | `npm run setup:symlinks` | Points `static/font/{chord-letters,music,text}` at `src/drawer/font/*` | Runs on `npm install`. Run it by hand if the fonts 404 — for example after unpacking a zip, which does not preserve symlinks |
-| `npm run create:msq:worker` | Deletes `static/js/msq/worker/` and rebuilds it from `src/`, rewriting `#msq/...` imports to real URLs | After any change under `src/`. Part of `browser-app` already |
+| `npm run msq:apps:update` | Deletes `static/js/msq/worker/` and rebuilds it from `src/`, rewriting `#msq/...` imports to real URLs | After any change under `src/`. Part of `browser-app` already |
 | `npm run watch:src` | The same, then rebuilds on every change under `src/` | In a second terminal while working on `src/`, so the browser only needs a reload |
 | `npm run web-components:update` | Copies `web-components/` to `static/js/msq/web-components/` | After any change under `web-components/`. Part of `browser-app` already; `npm run watch:web-components` keeps it in step |
 
@@ -116,7 +116,7 @@ requests into an HTTP/2-shaped stream.
 ## Generated versus hand-written
 
 **`static/js/msq/worker/`** and **`static/js/msq/language/`** are generated, both
-by `create-msq-worker.js`, which deletes each wholesale and rebuilds it.
+by `copy-msq-into-apps.js`, which deletes each wholesale and rebuilds it.
 
 `worker/` is every `.js` file in `src/` with the import specifiers rewritten to
 real URLs — import maps do not apply inside module workers, which is why this
@@ -309,7 +309,7 @@ in `package.json` holds its entries too, along with the other apps' `#ehtml/`
 and `#e-ui/` — kept in step by hand, and read by
 `nodes/updateCacheVersionsInUrls.js` to resolve specifiers when it stamps cache
 versions. `worker.importmap` is used only at build time, by
-`create-msq-worker.js`. If you add a folder under `static/js/`, update the import
+`copy-msq-into-apps.js`. If you add a folder under `static/js/`, update the import
 map in `index.html`, the `browser.importmap` field, and the URL pattern in
 `web-app/worker.js`.
 

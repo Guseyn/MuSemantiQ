@@ -141,4 +141,4 @@ As you can see, every `f` became **F2**, because the clef is a bass clef. The fi
 
 The divisions are **768** per quarter note because that number has to divide every value a page can write, down to a 256th, and still land on whole numbers inside triplets and their dots. 768 is 64 × 12, which does both.
 
-Read next: [The three suites](/docs/testing/the-suites)
+Read next: [Dev tools](/docs/dev-tools/overview)

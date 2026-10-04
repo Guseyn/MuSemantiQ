@@ -58,6 +58,8 @@
       import '/js/docs.js'
       // Every code block's "copy" link (its ::before).
       import '/js/copyCode.js'
+      // <nav is="docs-contents">, a page's contents built from its headings.
+      import '/js/docs-contents.js'
       import '#ehtml/main'
 
       /*
@@ -75,6 +77,10 @@
       */
       import msqExtensions from '/js/showdown-extensions/msqExtensions.js'
       window.msqExtensions = msqExtensions
+
+      // Every markdown table as e-ui's <table is="e-table">. A global as well.
+      import eTableExtension from '/js/eTableExtension.js'
+      window.eTableExtension = eTableExtension
     </script>
   </head>
 
@@ -308,7 +314,7 @@
           >
             <e-markdown
               data-src="${currentPage.md}"
-              data-internal-state="${{ extensions: [ msqExtensions({ fontSources: 'msqFontSources' }), showdownHighlight({ auto_detection: false }) ] }}"
+              data-internal-state="${{ extensions: [ msqExtensions({ fontSources: 'msqFontSources' }), showdownHighlight({ auto_detection: false }), eTableExtension() ] }}"
               data-actions-on-progress-start="
                 document
                   .querySelectorAll('e-sidebar nav details[data-current=true]')

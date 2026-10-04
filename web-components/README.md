@@ -20,7 +20,7 @@ Two folders beside this one, so `js/msq` is those three and nothing else:
 
     <app>/static/js/msq/
       web-components/   ← copied from here
-      language/         ← src/language, by npm run create:msq:worker
+      language/         ← src/language, by npm run msq:apps:update
       worker/           ← all of src/, by the same script
 
 `worker/` is what the worker runs and nothing on the page imports out of it. It

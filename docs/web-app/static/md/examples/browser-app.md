@@ -15,7 +15,7 @@ Then open **https://127.0.0.1:8888** in Chrome, Edge, Firefox or Safari. The cer
 The script does four things in this order:
 
 1. `npm run setup:symlinks` links the fonts and the rendered sound fonts into `static/`;
-2. `npm run create:msq:worker` writes the worker tree and the language tree into `static/js/msq/`;
+2. `npm run msq:apps:update` writes the worker tree and the language tree into `static/js/msq/`;
 3. `npm run web-components:update` copies the components into `static/js/msq/web-components/`;
 4. `node browser-app/web-app/main.js` starts the server.
 

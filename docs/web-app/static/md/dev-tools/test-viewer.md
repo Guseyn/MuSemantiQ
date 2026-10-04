@@ -59,4 +59,4 @@ Adopting is hiding a regression when the diff is bigger than the change, or some
 
 A diff you did not intend is a regression, whatever it looks like. Adopting it makes it the baseline, and from then on the suite defends it.
 
-Read next: [SMuFL to music-js font](/docs/tools/smufl-font-generator)
+Read next: [The three suites](/docs/testing/the-suites)

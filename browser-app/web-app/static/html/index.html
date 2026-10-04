@@ -65,7 +65,35 @@
         <code>msqFontSources</code> that the other components point at.
       </p>
 
-      <pre data-code><code data-snippet-of="msq-font-loader"></code></pre>
+      <pre data-code><code>&lt;template
+  is="msq-font-loader"
+  data-font-sources-reference="msqFontSources"
+  data-font-config='
+    {
+      "chord-letters": {
+        "gentium plus": "/font/chord-letters/GentiumPlus-Regular.ttf"
+      },
+      "text": {
+        "noto-serif": {
+          "regular": "/font/text/NotoSerif-Regular.ttf",
+          "bold":    "/font/text/NotoSerif-Bold.ttf"
+        }
+      },
+      "music": {
+        "bravura": {
+          "font": "/font/music/Bravura.otf",
+          "js":   "/js/msq/worker/drawer/font/music-js/bravura.js"
+        },
+        "leland": {
+          "font": "/font/music/Leland.otf",
+          "js":   "/js/msq/worker/drawer/font/music-js/leland.js"
+        }
+      }
+    }
+  '
+&gt;
+  &lt;!-- the elements --&gt;
+&lt;/template&gt;</code></pre>
 
       <template
         is="msq-font-loader"
@@ -104,7 +132,17 @@
             the MuSemantiQ source behind it.
           </p>
           <div data-split>
-            <pre data-code><code data-snippet-of="msq-svg"></code></pre>
+            <pre data-code><code>&lt;template
+  is="msq-svg"
+  data-font-sources="msqFontSources"
+&gt;
+  a with accent
+  a
+  a with accent
+  a
+  a with accent
+  a
+&lt;/template&gt;</code></pre>
             <div data-live>
               <template
                 is="msq-svg"
@@ -131,7 +169,16 @@
             it takes no <code>data-font-sources</code>.
           </p>
           <div data-split>
-            <pre data-code><code data-snippet-of="msq-midi"></code></pre>
+            <pre data-code><code>&lt;template
+  is="msq-midi"
+&gt;
+  a with accent
+  a
+  a with accent
+  a
+  a with accent
+  a
+&lt;/template&gt;</code></pre>
             <div data-live>
               <template
                 is="msq-midi"
@@ -156,7 +203,17 @@
             highlighted in the score as they sound.
           </p>
           <div data-split>
-            <pre data-code><code data-snippet-of="msq-svg-midi"></code></pre>
+            <pre data-code><code>&lt;template
+  is="msq-svg-midi"
+  data-font-sources="msqFontSources"
+&gt;
+  a with accent
+  a
+  a with accent
+  a
+  a with accent
+  a
+&lt;/template&gt;</code></pre>
             <div data-live>
               <template
                 is="msq-svg-midi"
@@ -189,7 +246,15 @@
             the loader above registered.
           </p>
           <div data-split>
-            <pre data-code><code data-snippet-of="msq-editor"></code></pre>
+            <pre data-code><code>&lt;template
+  is="msq-editor"
+  data-font-sources="msqFontSources"
+&gt;
+  page number is "1/4"
+  page line width is 940
+  font size is 7.0
+  ...
+&lt;/template&gt;</code></pre>
             <div data-live>
               <template
                 is="msq-editor"
@@ -526,11 +591,5 @@
         — released under the Credited Source License (CSL) v1.0.
       </p>
     </footer>
-    <!--
-      Classic, not a module, and last: it runs while the page is still being
-      read, before the components (modules) upgrade anything, so it can copy
-      every element's markup into the code beside it.
-    -->
-    <script src="/js/snippets.js"></script>
   </body>
 </html>

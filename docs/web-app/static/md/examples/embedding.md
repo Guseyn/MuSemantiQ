@@ -25,12 +25,12 @@ The components expect to find three folders next to each other under `/js/msq/`:
 
 You have to remember the following rules:
 
-1. `worker/` must be served at exactly `/js/msq/worker/`. A module worker gets no import map, so `npm run create:msq:worker` rewrites every import in it to a real URL, and that URL comes from `worker.importmap` in `package.json`: `/js/msq/worker`. To serve it anywhere else, change that value and generate the tree again.
+1. `worker/` must be served at exactly `/js/msq/worker/`. A module worker gets no import map, so `npm run msq:apps:update` rewrites every import in it to a real URL, and that URL comes from `worker.importmap` in `package.json`: `/js/msq/worker`. To serve it anywhere else, change that value and generate the tree again.
 2. `web-components/` and `worker/` must be siblings, because the components start the worker from `../../worker/worker.js`, relative to their own files.
 3. `language/` can be anywhere, as long as the import map points `#msq/language/` at it.
 4. The `.js` files must be served with a JavaScript content type, because the browser refuses to run a module or a module worker otherwise.
 
-The scripts of this repository write these trees only into its own three apps. The simplest way to get them for yours is to run `npm run create:msq:worker` and `npm run web-components:update`, and copy `browser-app/web-app/static/js/msq/` into your static folder as `js/msq/`. Or take them from the sources: `web-components/` and `language/` are copied as they are, from `web-components/` and `src/language/`, and only `worker/` has to be generated. Copy them again whenever you update MuSemantiQ.
+The scripts of this repository write these trees only into its own three apps. The simplest way to get them for yours is to run `npm run msq:apps:update` and `npm run web-components:update`, and copy `browser-app/web-app/static/js/msq/` into your static folder as `js/msq/`. Or take them from the sources: `web-components/` and `language/` are copied as they are, from `web-components/` and `src/language/`, and only `worker/` has to be generated. Copy them again whenever you update MuSemantiQ.
 
 You also need the fonts. The font files are in `src/drawer/font/chord-letters`, `src/drawer/font/music` and `src/drawer/font/text`; serve them wherever you like, and write those URLs into your font config. The glyph tables for the music fonts are already inside the worker tree, at `/js/msq/worker/drawer/font/music-js/`. More about the config you can read in [Fonts and font config](/docs/components/fonts-and-config).
 
@@ -114,4 +114,4 @@ function showMusic(container, music) {
 
 This is exactly what the dev tools do every time they show new music.
 
-Read next: [Overview](/docs/dev-tools/overview)
+Read next: [SMuFL to music-js font](/docs/tools/smufl-font-generator)
