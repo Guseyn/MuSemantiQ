@@ -51,7 +51,7 @@ cat score.txt | node cli-app/msq.js --midi --out build
 
 Colours are turned off by themselves when the output is not a terminal or when `NO_COLOR` is set, and `FORCE_COLOR` turns them on whatever else is true. A flag with a value can be written as `--flag value` or as `--flag=value`. You cannot give both `--input` and `--text`. `--out` can also name a file, but only when the run writes exactly one file.
 
-Without `--fonts`, you get **Bravura** and **Leland** for music, **Noto Serif** and **Noto Sans** for text, and **Gentium Plus** and **Gothic A1** for chord letters. A config file replaces a whole family at a time, so a file with only `music` in it keeps the built-in text and chord-letter fonts. Relative paths in it are resolved against the config file, not the current folder. The config is the same shape as in [Fonts and font config](/docs/components/fonts-and-config), except that here the paths are files on disk and the `js` entry can stay a `#msq/...` specifier:
+Without `--fonts`, you get **Bravura** and **Leland** for music, **Noto Serif** and **Noto Sans** for text, and **Gentium Plus** and **Gothic A1** for chord letters. A config file replaces a whole family at a time, so a file with only `music` in it keeps the built-in text and chord-letter fonts. Relative paths in it are resolved against the config file, not the current folder. The config is the same shape as in [Fonts and font config](/docs/components/overview#1-msq-font-loader), except that here the paths are files on disk and the `js` entry can stay a `#msq/...` specifier:
 
 ```json
 {

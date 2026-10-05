@@ -76,6 +76,6 @@ It's very important to let a user see errors or inaccuracies visually, and a cho
 
 ## 4. Stems in the serializer
 
-When a page is turned back into text by the serializer, every note and chord gets its stem direction written out, even where you didn't write one. The parser infers a stem direction when the text is silent, and saying it explicitly is what makes a page schema turn into text and back without any change. More about that you can read in [The page schema](/docs/api/page-schema).
+When a page is turned back into text by the serializer, every note and chord gets its stem direction written out, even where you didn't write one. The parser infers a stem direction when the text is silent, and saying it explicitly is what makes a page schema turn into text and back without any change. More about that you can read in [The page schema](/docs/api/overview).
 
 Read next: [Ties](/docs/language/ties)

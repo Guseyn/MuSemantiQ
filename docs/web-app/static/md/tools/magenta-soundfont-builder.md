@@ -100,6 +100,6 @@ Then point a component at the set by its URL:
 </template>
 ```
 
-An empty `data-sound-font`, or none at all, means Magenta's own set, fetched from `storage.googleapis.com`. More about that you can read in [msq-midi](/docs/components/msq-midi).
+An empty `data-sound-font`, or none at all, means Magenta's own set, fetched from `storage.googleapis.com`. More about that you can read in [msq-midi](/docs/components/overview#3-msq-midi).
 
 Read next: [MusicXML import](/docs/tools/musicxml-import)

@@ -96,7 +96,7 @@ The names above are not a part of the language. A page can only name a font that
 
 The names are not case sensitive: `music font is Leland` works as well as `music font is leland`.
 
-How to register fonts, both in the browser and in Node, you can read in [Fonts and font config](/docs/components/fonts-and-config) and [setupFonts](/docs/api/setup-fonts).
+How to register fonts, both in the browser and in Node, you can read in [Fonts and font config](/docs/components/overview#1-msq-font-loader) and [setupFonts](/docs/api/overview#1-setupfonts).
 
 ## 5. Why a music font is two files
 

@@ -135,6 +135,6 @@ const { pageSchema, errors } = generateIntermediateStructuresForSinglePage({
 // errors is an array of strings, and it is empty when everything is understood
 ```
 
-For several pages, `generateIntermediateStructuresForMultiplePages` returns `errorsForEachPage`, one array for each page. More about that you can read in [Validation](/docs/api/validation).
+For several pages, `generateIntermediateStructuresForMultiplePages` returns `errorsForEachPage`, one array for each page. More about that you can read in [Validation](/docs/api/overview#10-ispageschemavalid).
 
 Read next: [MIDI settings](/docs/language/midi-settings)

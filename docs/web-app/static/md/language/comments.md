@@ -70,6 +70,6 @@ But a comment always ends its line. Anything you write after the closing quote o
 
 ## 4. Comments are kept
 
-Comments are not thrown away when the text is parsed: the parser keeps each comment together with the lines it was written on. So when a page is turned back into text by the serializer, every comment is put back on the line where it was, as `comment: "..."`. More about the serializer you can read in [The page schema](/docs/api/page-schema).
+Comments are not thrown away when the text is parsed: the parser keeps each comment together with the lines it was written on. So when a page is turned back into text by the serializer, every comment is put back on the line where it was, as `comment: "..."`. More about the serializer you can read in [The page schema](/docs/api/overview).
 
 Read next: [Chords](/docs/language/chords)

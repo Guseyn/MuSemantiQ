@@ -54,6 +54,8 @@
 
       import '#e-ui/e-sidebar.js'
       import '#e-ui/e-kbd.js'
+      // The tabs some pages write in their markdown
+      import '#e-ui/e-tab.js'
       // The sitemap and the page the URL names, for the templates below.
       import '/js/docs.js'
       // Every code block's "copy" link (its ::before).
@@ -81,6 +83,9 @@
       // Every markdown table as e-ui's <table is="e-table">. A global as well.
       import eTableExtension from '/js/eTableExtension.js'
       window.eTableExtension = eTableExtension
+      // <e-tabs>, <e-tab> and <details is="e-details"> written in a page's markdown
+      import eBlocksExtension from '/js/eBlocksExtension.js'
+      window.eBlocksExtension = eBlocksExtension
     </script>
   </head>
 
@@ -148,73 +153,92 @@
 
       <nav aria-label="Documentation">
         <!--
-          The sitemap, rendered. Each section is a collapsible e-details, so the
-          sidebar opens as a short list of every section rather than one long
-          column that hides the later ones below the fold, and so is each group
-          inside a section. Collapsed, the sidebar is e-ui's icon rail and only
-          the section icons show.
+          The sitemap, rendered. Each section of several pages is a collapsible
+          e-details, so the sidebar opens as a short list of every section rather
+          than one long column that hides the later ones below the fold, and so
+          is each group inside a section. Collapsed, the sidebar is e-ui's icon
+          rail and only the section icons show.
 
           Icons are data-src, not src: an img with src starts loading the moment
           a clone lands in the document, before EHTML has filled in ${...}.
         -->
         <div data-toc>
           <template is="e-for-each" data-list-to-iterate="${sitemap}" data-item-name="section">
-            <details
-              is="e-details"
-              data-section="${section.slug}"
-              data-current="${currentPage !== null && currentPage.section === section.slug}"
-            >
-              <!--
-                On the rail a section is only an icon, and toggling it would open
-                a list nobody can see. So there a click opens the sidebar on that
-                section instead.
-              -->
-              <summary
+            <!--
+              A section of one page is that page, so it is a link rather than a
+              details with a single entry to open. It keeps the section's icon
+              and heading, so the sidebar and the rail read the same either way.
+            -->
+            <template is="e-if" data-condition-to-display="${section.pages !== undefined && section.pages.length === 1}">
+              <a
+                href="/docs/${section.slug}/${section.pages[0].slug}"
                 title="${section.title}"
-                onclick="
-                  const sidebar = document.querySelector('e-sidebar')
-                  if (sidebar.getAttribute('data-state') !== 'open') {
-                    event.preventDefault()
-                    this.parentElement.open = true
-                    sidebar.open()
-                  }
-                "
+                data-section-link
+                data-section="${section.slug}"
+                data-selected="${currentPage !== null && currentPage.section === section.slug}"
               >
                 <img data-src="/images/sidebar/${section.slug}.svg" alt="" aria-hidden="true">
                 <span data-text="${section.title}"></span>
-              </summary>
-              <div>
-                <template is="e-for-each" data-list-to-iterate="${section.pages || []}" data-item-name="page">
-                  <a
-                    href="/docs/${section.slug}/${page.slug}"
-                    data-selected="${currentPage !== null && currentPage.ref === section.slug + '/' + page.slug}"
-                  ><span data-text="${page.title}"></span></a>
-                </template>
-                <template is="e-for-each" data-list-to-iterate="${section.groups || []}" data-item-name="group">
-                  <details
-                    is="e-details"
-                    data-group
-                    data-current="${currentPage !== null && currentPage.section === section.slug && currentPage.group === group.title}"
-                  >
-                    <summary data-text="${group.title}"></summary>
-                    <div>
-                      <template is="e-for-each" data-list-to-iterate="${group.pages}" data-item-name="page">
-                        <a
-                          href="/docs/${section.slug}/${page.slug}"
-                          data-selected="${currentPage !== null && currentPage.ref === section.slug + '/' + page.slug}"
-                        ><span data-text="${page.title}"></span></a>
-                      </template>
-                    </div>
-                  </details>
-                </template>
-                <template is="e-for-each" data-list-to-iterate="${section.links || []}" data-item-name="link">
-                  <a href="${link.href}" target="_blank" rel="noopener" data-external>
-                    <img data-src="${link.icon}" alt="" aria-hidden="true">
-                    <span data-text="${link.title}"></span>
-                  </a>
-                </template>
-              </div>
-            </details>
+              </a>
+            </template>
+            <template is="e-if" data-condition-to-display="${section.pages === undefined || section.pages.length !== 1}">
+              <details
+                is="e-details"
+                data-section="${section.slug}"
+                data-current="${currentPage !== null && currentPage.section === section.slug}"
+              >
+                <!--
+                  On the rail a section is only an icon, and toggling it would open
+                  a list nobody can see. So there a click opens the sidebar on that
+                  section instead.
+                -->
+                <summary
+                  title="${section.title}"
+                  onclick="
+                    const sidebar = document.querySelector('e-sidebar')
+                    if (sidebar.getAttribute('data-state') !== 'open') {
+                      event.preventDefault()
+                      this.parentElement.open = true
+                      sidebar.open()
+                    }
+                  "
+                >
+                  <img data-src="/images/sidebar/${section.slug}.svg" alt="" aria-hidden="true">
+                  <span data-text="${section.title}"></span>
+                </summary>
+                <div>
+                  <template is="e-for-each" data-list-to-iterate="${section.pages || []}" data-item-name="page">
+                    <a
+                      href="/docs/${section.slug}/${page.slug}"
+                      data-selected="${currentPage !== null && currentPage.ref === section.slug + '/' + page.slug}"
+                    ><span data-text="${page.title}"></span></a>
+                  </template>
+                  <template is="e-for-each" data-list-to-iterate="${section.groups || []}" data-item-name="group">
+                    <details
+                      is="e-details"
+                      data-group
+                      data-current="${currentPage !== null && currentPage.section === section.slug && currentPage.group === group.title}"
+                    >
+                      <summary data-text="${group.title}"></summary>
+                      <div>
+                        <template is="e-for-each" data-list-to-iterate="${group.pages}" data-item-name="page">
+                          <a
+                            href="/docs/${section.slug}/${page.slug}"
+                            data-selected="${currentPage !== null && currentPage.ref === section.slug + '/' + page.slug}"
+                          ><span data-text="${page.title}"></span></a>
+                        </template>
+                      </div>
+                    </details>
+                  </template>
+                  <template is="e-for-each" data-list-to-iterate="${section.links || []}" data-item-name="link">
+                    <a href="${link.href}" target="_blank" rel="noopener" data-external>
+                      <img data-src="${link.icon}" alt="" aria-hidden="true">
+                      <span data-text="${link.title}"></span>
+                    </a>
+                  </template>
+                </div>
+              </details>
+            </template>
           </template>
         </div>
 
@@ -314,7 +338,7 @@
           >
             <e-markdown
               data-src="${currentPage.md}"
-              data-internal-state="${{ extensions: [ msqExtensions({ fontSources: 'msqFontSources' }), showdownHighlight({ auto_detection: false }), eTableExtension() ] }}"
+              data-internal-state="${{ extensions: [ msqExtensions({ fontSources: 'msqFontSources' }), showdownHighlight({ auto_detection: false }), eTableExtension(), eBlocksExtension() ] }}"
               data-actions-on-progress-start="
                 document
                   .querySelectorAll('e-sidebar nav details[data-current=true]')

@@ -18,6 +18,10 @@ Its markdown lives at /md/<section.slug>/<page.slug>.md and its URL is
 an e-for-each over this list, and a template can only follow a shape, not work
 one out.
 
+A section of exactly one page is that page: the sidebar shows it as a single
+link, with the section's icon and title, rather than a heading to open. Its page
+keeps a slug, so its URL is still /docs/<section.slug>/<page.slug>.
+
 A section may also carry `links`: { title, href, icon } entries the sidebar
 lists after its pages. They leave the site, so they are not pages — allPages
 never sees them, and neither do the router and the lint.
@@ -152,49 +156,35 @@ export const sitemap = [
     slug: 'api',
     title: 'Low-level API',
     pages: [
-      { slug: 'overview', title: 'Overview' },
-      { slug: 'setup-fonts', title: 'setupFonts' },
-      { slug: 'single-page', title: 'A single page' },
-      { slug: 'multiple-pages', title: 'Multiple pages' },
-      { slug: 'validation', title: 'Validation' },
-      { slug: 'page-schema', title: 'The page schema' },
-      { slug: 'language-only', title: 'Using the language alone' }
+      { slug: 'overview', title: 'Low-level API' }
     ]
   },
   {
     slug: 'worker',
     title: 'Worker',
     pages: [
-      { slug: 'overview', title: 'Overview' }
+      { slug: 'overview', title: 'Worker' }
     ]
   },
   {
     slug: 'components',
     title: 'Web components',
     pages: [
-      { slug: 'overview', title: 'Overview' },
-      { slug: 'msq-font-loader', title: 'msq-font-loader' },
-      { slug: 'msq-svg', title: 'msq-svg' },
-      { slug: 'msq-midi', title: 'msq-midi' },
-      { slug: 'msq-svg-midi', title: 'msq-svg-midi' },
-      { slug: 'msq-editor', title: 'msq-editor' },
-      { slug: 'fonts-and-config', title: 'Fonts and font config' },
-      { slug: 'errors', title: 'Errors and troubleshooting' },
-      { slug: 'browser-support', title: 'Browser support' }
+      { slug: 'overview', title: 'Web components' }
     ]
   },
   {
     slug: 'showdown',
     title: 'Showdown extensions',
     pages: [
-      { slug: 'overview', title: 'Overview' }
+      { slug: 'overview', title: 'Showdown extensions' }
     ]
   },
   {
     slug: 'ehtml',
     title: 'With EHTML',
     pages: [
-      { slug: 'overview', title: 'Overview' }
+      { slug: 'overview', title: 'With EHTML' }
     ]
   },
   {

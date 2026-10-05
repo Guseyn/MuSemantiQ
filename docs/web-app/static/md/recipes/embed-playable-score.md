@@ -1,6 +1,6 @@
 # Embed a playable score
 
-This recipe puts a score you can hear on a page of your own: the engraving, a player under it, and each note highlighted as it sounds. It uses [msq-svg-midi](/docs/components/msq-svg-midi) inside an [msq-font-loader](/docs/components/msq-font-loader). How the pieces fit together in general is in [Embedding in your own app](/docs/examples/embedding).
+This recipe puts a score you can hear on a page of your own: the engraving, a player under it, and each note highlighted as it sounds. It uses [msq-svg-midi](/docs/components/overview#4-msq-svg-midi) inside an [msq-font-loader](/docs/components/overview#1-msq-font-loader). How the pieces fit together in general is in [Embedding in your own app](/docs/examples/embedding).
 
 ## 1. Build the three trees
 
@@ -95,7 +95,7 @@ The glyph table that goes with Bravura is already in the worker tree, at `/js/ms
 
 That is all a page needs: the import map, the two components, the loader, and the score inside it. The loader loads the fonts once, in the worker, and then its children take its place, which is also what keeps the score from asking for an engraving before the fonts are there. If you add an `msq-editor`, add `"#msq/language/": "/js/msq/language/"` to the import map as well, because the editor parses what you type on the page.
 
-**Side note:** there is no polyfill to import for Safari. The components are customized built-in elements, which WebKit does not support, so they load the polyfill for it themselves, from their own `lib/` folder, before any of them is defined. More about that you can read in [Browser support](/docs/components/browser-support).
+**Side note:** there is no polyfill to import for Safari. The components are customized built-in elements, which WebKit does not support, so they load the polyfill for it themselves, from their own `lib/` folder, before any of them is defined. More about that you can read in [Browser support](/docs/components/overview).
 
 ## 4. Choosing and serving a soundfont
 
@@ -130,7 +130,7 @@ A set holds only the instruments you rendered, so choose it for the music you wi
 
 **It draws, but it is silent.** The score is there and the player moves, but you hear nothing. Magenta's player skips a note whose instrument is not in the set, with only a line in the console, so either the set does not hold the instrument the stave names, or the `data-sound-font` URL does not reach a folder with a `soundfont.json` in it. Open the URL of `soundfont.json` in the browser: if it is not there, neither is anything else.
 
-Mistakes in the music itself are a different matter. Those do not stop the component; they are listed in a panel at the bottom of it, with the line each one came from. More about that you can read in [Errors and troubleshooting](/docs/components/errors).
+Mistakes in the music itself are a different matter. Those do not stop the component; they are listed in a panel at the bottom of it, with the line each one came from. More about that you can read in [Errors and troubleshooting](/docs/components/overview).
 
 ## 6. If the first paint feels slow
 

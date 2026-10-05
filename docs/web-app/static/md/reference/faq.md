@@ -22,7 +22,7 @@ Yes. The same text with the same fonts gives the same SVG and the same MIDI, byt
 
 ### Which music fonts can I use?
 
-**Bravura** and **Leland**. A music font needs a music-js table as well as its outline file, and at the moment only those two have one. The repository also has the `.otf` files of **Petaluma** and **MuseJazz**, but no tables for them. A new table is generated from any SMuFL font with the font generator, and what it makes is a starting point that still has to be tuned by eye. See [Fonts and font config](/docs/components/fonts-and-config) and [SMuFL to music-js font](/docs/tools/smufl-font-generator).
+**Bravura** and **Leland**. A music font needs a music-js table as well as its outline file, and at the moment only those two have one. The repository also has the `.otf` files of **Petaluma** and **MuseJazz**, but no tables for them. A new table is generated from any SMuFL font with the font generator, and what it makes is a starting point that still has to be tuned by eye. See [Fonts and font config](/docs/components/overview#1-msq-font-loader) and [SMuFL to music-js font](/docs/tools/smufl-font-generator).
 
 ### What does playback sound like, and does it need the internet?
 
@@ -30,7 +30,7 @@ When a component is not given a sound font, the player loads the default Magenta
 
 ### How do I write several pages?
 
-The language has no page break, so a document of several pages is split before it is parsed. The CLI and the tests split at a line reading `====next page====`, and the CLI can also take a folder with one file per page. The CLI writes one SVG per page and one MIDI file for the whole document, because music does not stop at a page boundary. See [Multiple pages](/docs/api/multiple-pages).
+The language has no page break, so a document of several pages is split before it is parsed. The CLI and the tests split at a line reading `====next page====`, and the CLI can also take a folder with one file per page. The CLI writes one SVG per page and one MIDI file for the whole document, because music does not stop at a page boundary. See [Multiple pages](/docs/api/overview).
 
 ### Can I bring in scores I already have?
 
@@ -45,7 +45,7 @@ No, pull requests are not accepted. You can fork the project and change it under
 These are the things MuSemantiQ does not do at the moment. You have to remember the following:
 
 1. **No PDF or PNG output.** The engine draws SVG and nothing else, and the CLI writes SVG, MIDI, the page schema and the highlighted source. To get a PDF you print the SVG, from a browser for example.
-2. **Safari through a polyfill.** The components are customized built-in elements, which WebKit does not implement. Chromium-based browsers and Firefox work natively, and in Safari the components load a polyfill that ships with them, so you don't have to do anything for it. The browser example, the dev tools and this documentation have been checked in WebKit, but not yet in Safari itself. See [Browser support](/docs/components/browser-support).
+2. **Safari through a polyfill.** The components are customized built-in elements, which WebKit does not implement. Chromium-based browsers and Firefox work natively, and in Safari the components load a polyfill that ships with them, so you don't have to do anything for it. The browser example, the dev tools and this documentation have been checked in WebKit, but not yet in Safari itself. See [Browser support](/docs/components/overview).
 3. **No check that a measure adds up.** A time signature is drawn, not enforced, so MSQ will not tell you that a measure is over-full or short. You can put as many units into a measure as you want, which lets you write the music first and fix the rhythm after. See [Time signatures](/docs/language/time-signatures).
 4. **No automatic line breaks.** Measures stay on the page line you wrote them on. If you never write `new line`, the line, and the page with it, just grow wider. See [Page lines](/docs/language/page-lines) and [Unit spacing](/docs/language/unit-spacing).
 5. **Two music fonts.** Only Bravura and Leland have music-js tables, as described above.

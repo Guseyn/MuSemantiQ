@@ -199,6 +199,39 @@ e-sidebar nav a[data-selected="true"] {
 }
 
 /*
+A section of one page is a link, drawn as a section heading: the same icon,
+size and spacing as a summary, without the chevron, since there is nothing to
+open.
+*/
+e-sidebar nav a[data-section-link] {
+  display: flex;
+  align-items: center;
+  gap: var(--e-spacing-sm);
+  flex-shrink: 0;
+  margin-top: var(--e-spacing-xs);
+  padding: var(--e-spacing-sm) var(--e-spacing-xl) var(--e-spacing-sm) var(--e-spacing-sm);
+  font-size: var(--e-font-size-xs);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--e-muted);
+}
+
+e-sidebar nav a[data-section-link] > img {
+  width: var(--e-img-3xs);
+  height: var(--e-img-3xs);
+  flex-shrink: 0;
+}
+
+e-sidebar nav a[data-section-link]:hover {
+  background-color: var(--e-primary-transparent-accent-bg);
+}
+
+e-sidebar nav a[data-section-link][data-selected="true"] {
+  color: var(--e-primary);
+}
+
+/*
 The ⇧ + S hint sits in the sidebar's top corner, over the header, which is
 itself raised over the nav.
 */
@@ -248,12 +281,14 @@ e-sidebar[data-state="closed"] header {
   padding: var(--e-spacing-md) 0;
 }
 
-e-sidebar[data-state="closed"] nav details[is="e-details"] > summary {
+e-sidebar[data-state="closed"] nav details[is="e-details"] > summary,
+e-sidebar[data-state="closed"] nav a[data-section-link] {
   justify-content: center;
   padding: var(--e-spacing-sm);
 }
 
 e-sidebar[data-state="closed"] nav details[is="e-details"] > summary > span,
+e-sidebar[data-state="closed"] nav a[data-section-link] > span,
 e-sidebar[data-state="closed"] nav details[is="e-details"] > summary::after,
 e-sidebar[data-state="closed"] nav details[is="e-details"] > div,
 e-sidebar[data-state="closed"] footer,
@@ -261,7 +296,8 @@ e-sidebar[data-state="closed"] > kbd[is="e-kbd"] {
   display: none;
 }
 
-e-sidebar[data-state="closed"] nav details[is="e-details"][data-current="true"] > summary {
+e-sidebar[data-state="closed"] nav details[is="e-details"][data-current="true"] > summary,
+e-sidebar[data-state="closed"] nav a[data-section-link][data-selected="true"] {
   background-color: var(--e-primary-transparent-accent-bg);
 }
 
@@ -291,6 +327,33 @@ main[is="e-main"] {
 [data-content] h3 {
   margin: var(--e-spacing-xl) 0 var(--e-spacing-xs);
   font-size: var(--e-font-h5);
+}
+
+/*
+Every page ends with "Read next: [the next page](…)", and nothing comes after
+it, so the last paragraph with a link is that line. It is set apart from the
+page above it.
+*/
+[data-content] > p:last-child:has(> a) {
+  margin-top: var(--e-spacing-lg);
+}
+
+/*
+The entries of a reference (a function, a message, an element) are written as
+<h3 is="e-h">: e-ui's interface heading, at the size between a section heading
+and the text, so each entry reads as a title of its own.
+*/
+[data-content] h3[is="e-h"] {
+  margin: var(--e-spacing-2xl) 0 var(--e-spacing-sm);
+  font-size: var(--e-font-h4);
+}
+
+/*
+e-ui draws e-details edge to edge, which is right for a list of them and too
+tight for the ones a page stacks: Purpose, Arguments, Returns.
+*/
+[data-content] details[is="e-details"] {
+  margin: var(--e-spacing-sm) 0;
 }
 
 [data-content] p,

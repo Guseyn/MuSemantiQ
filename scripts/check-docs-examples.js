@@ -152,6 +152,11 @@ function unescapedHtml(text) {
   return text.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&amp;/g, '&')
 }
 
+// Every fenced block with each character but newlines replaced by a space, so indexes and lines still match
+function withCodeBlocksBlanked(text) {
+  return text.replace(/^```[\s\S]*?^```/gm, (fence) => fence.replace(/[^\n]/g, ' '))
+}
+
 /*
 The page that documents error reporting has to show input that does not
 parse. It says so, just above the example, and is then held to the opposite
@@ -181,7 +186,7 @@ function examplesIn(text, relativePath) {
   first — every character replaced by a space, so that every index and line
   number still refers to the real place in the file.
   */
-  const scanned = text.replace(/^```[\s\S]*?^```/gm, (fence) => fence.replace(/[^\n]/g, ' '))
+  const scanned = withCodeBlocksBlanked(text)
 
   for (const block of templateBlocks(scanned)) {
     const startLine = lineOf(scanned, block.startIndex)
@@ -254,8 +259,9 @@ function checkFile(absolutePath, relativePath, ref) {
   if (converter) {
     const rendered = converter.makeHtml(text)
     // A fenced example comes out as its element with the music between two newlines, escaped
+    // Markup shown in a code block is text, and comes out escaped, so it is not counted (see examplesIn)
     const before = [
-      ...templateBlocks(text).map((block) => ({ startIndex: block.startIndex, source: block.source, fenced: false })),
+      ...templateBlocks(withCodeBlocksBlanked(text)).map((block) => ({ startIndex: block.startIndex, source: text.slice(block.contentStart, block.closeIndex), fenced: false })),
       ...msqFencesIn(text).map((fence) => ({ startIndex: fence.startIndex, source: `\n${fence.music}\n`, fenced: true }))
     ].sort((left, right) => left.startIndex - right.startIndex)
     const after = templateBlocks(rendered)

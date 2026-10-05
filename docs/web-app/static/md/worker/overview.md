@@ -1,98 +1,392 @@
-# Overview
+# Worker
 
-In the browser, the engine runs in a module worker. `src/worker.js` wraps the [low-level API](/docs/api/overview) in a small message protocol. The web components talk to it, and so can your own code: you just need to post the messages below.
+<nav is="docs-contents"></nav>
 
-## 1. Why a worker at all
+> **TO WRITE**
+> - what the worker is: `src/worker.js`, the low-level API behind a small message protocol, in a module worker
+> - why a worker at all: engraving is real work, and on the main thread the page would freeze while it happens
 
-Engraving is real work. Parsing a page, laying it out and writing the SVG takes long enough to notice, and the fonts it needs are megabytes of parsed OpenType data. On the main thread that would freeze the page every time a score is drawn: typing in the editor would stutter, and a page with many examples would not scroll until all of them were done.
+## Setup and a full example
 
-In a worker it costs the page nothing. The components send the text, carry on, and replace themselves with the score when it arrives. The fonts are loaded and parsed once, inside the worker, and stay there.
+<details is="e-details">
+<summary>Setup</summary>
 
-## 2. The protocol
-
-Every message is an object with a `name`, an `id`, and the fields that handler needs. There are six handlers:
-
-| Name | Takes | Replies with |
-| --- | --- | --- |
-| `fonts.setup` | `fontConfig`, `fontSourcesReference` | `status: 'ok'` |
-| `glyph.trace` | `fontSourcesReference`, `musicFontName`, `characters`, `musicFontSourceSize`, `intervalBetweenStaveLines` | `points`, `missingCharacters` |
-| `svg.generate` | `fontSourcesReference`, `inputText` | `svg`, `svgDataSrc`, `errors` |
-| `midi.generate` | `inputText` | `midiDataSrc`, `errors` |
-| `svg.midi.generate` | `fontSourcesReference`, `inputText` | `svg`, `svgDataSrc`, `midiDataSrc`, `timeStampsMappedWithRefsOn`, `refsOnMappedWithTimeStamps`, `customStyles`, `errors` |
-| `svg.midi.text.generate` | `fontSourcesReference`, `inputText` | the same, plus `highlightsHtmlBuffer` |
-
-1. `fonts.setup` calls `setupFonts(fontConfig)` and keeps the result. `msq-font-loader` sends it.
-2. `glyph.trace` traces characters out of a loaded music font, for the font viewer in the dev tools. Characters the font does not have come back in `missingCharacters`, with no points.
-3. `svg.generate` parses and engraves one page. `msq-svg` sends it.
-4. `midi.generate` parses and performs one page. It is the only one that needs no fonts, so it takes no reference. `msq-midi` sends it.
-5. `svg.midi.generate` does both, and adds the maps between ref ids and time stamps. `msq-svg-midi` sends it.
-6. `svg.midi.text.generate` does both as well and also returns the highlighted source with ref ids. `msq-editor` sends it when the preview is drawn.
-
-The SVG comes back twice: as markup in `svg`, and as a `data:image/svg+xml;base64,…` URL in `svgDataSrc`. The MIDI comes back only as a base64 data URL, `midiDataSrc`, which a player can take as its source.
-
-Every successful reply has `status: 'ok'` and the `id` it answers. A failure is `{ id, error }`, with a message such as `No inputText provided` or `Font sources cannot be found by reference (…)`. A message with a name the worker does not know throws inside the worker, and nobody gets a reply.
-
-## 3. One worker for the whole page
-
-There is one worker per page, not one per component. `web-components/utils/worker-instance.js` creates it when the module is first imported:
-
-```js
-const worker = new Worker(
-  new URL('../../worker/worker.js', import.meta.url),
-  { type: 'module' }
-)
-
-export default worker
-```
-
-A module is evaluated once, so every component that imports this gets the same worker. The URL is resolved against the module's own URL, which is what lets the components and the worker tree move together to any mount point.
-
-Since every component posts to the same worker and listens to the same `message` event, replies have to be matched to senders. Each component gets an id from `crypto.randomUUID()` when it is created, sends it with every request, and ignores any reply that carries a different one. This is `requestFromWorker` in `web-components/msq-template.js`:
-
-```js
-requestFromWorker({ name, ...payload }) {
-  return new Promise((resolve, reject) => {
-    const messageHandler = (event) => {
-      if (event.data.id !== this.id) {
-        return
-      }
-      worker.removeEventListener('message', messageHandler)
-      if (event.data.status === 'ok') {
-        resolve(event.data)
-        return
-      }
-      reject(new Error(event.data.error || `worker failed to handle "${name}"`))
-    }
-    worker.addEventListener('message', messageHandler)
-    worker.postMessage({ id: this.id, name, ...payload })
-  })
-}
-```
-
-As you can see, failures are matched on the id too, so an error for one component never reaches another.
-
-## 4. Fonts, by reference
-
-The loaded fonts live in one object inside the worker, keyed by a reference string:
-
-```js
-self['__UNILANG_FONT_SOURCES_STORAGE__'] = {}
-```
-
-The reference is the `data-font-sources-reference` of an `msq-font-loader`, and every component that engraves names it in `data-font-sources`. That is what `data-font-sources="msqFontSources"` means on every example in these docs. A page can have several loaders with different fonts under different references, and each component picks one.
-
-A reference can be registered only once: a second `fonts.setup` with the same reference replies with `Font sources are already registered under reference (…)`. And nothing is ever removed, so the fonts live as long as the worker, which is as long as the page.
-
-## 5. Why the worker tree is generated
-
-The worker cannot run `src/` as it is. `src/` imports everything through `#msq/…` specifiers, and in the browser those are resolved by an import map. **A module worker gets no import map**: the page's map does not apply inside it, and a worker cannot declare one of its own.
-
-So `scripts/create-msq-worker.js` writes a copy of the whole of `src/` into the folder you give it, with every `#msq/…` specifier rewritten to a relative path:
+First, download MuSemantiQ next to your project:
 
 ```sh
+curl -L https://github.com/Guseyn/MuSemantiQ/archive/refs/heads/main.zip -o MuSemantiQ.zip
+unzip MuSemantiQ.zip
+mv MuSemantiQ-main MuSemantiQ
+```
+
+Then generate the worker. The script copies the whole `src` and rewrites every `#msq/…` import to a relative path, because a module worker gets no import map:
+
+```sh
+cd your-project
+mkdir -p static/js/msq
 node ../MuSemantiQ/scripts/create-msq-worker.js -o static/js/msq/worker
 ```
 
-The copy has the same layout as `src/`, so a module's path to another module is the same in both, and the folder works wherever you serve it from. That copy is what you start with `new Worker('/js/msq/worker/worker.js', { type: 'module' })`, and what `worker-instance.js` starts for the components. The whole setup is described in [Full setup](/docs/getting-started/full-setup).
+The worker holds only `.js` files, so copy the font files separately. The glyph tables are already in the worker, under `drawer/font/music-js/`:
+
+```sh
+rsync -a --delete --exclude music-js ../MuSemantiQ/src/drawer/font/ static/font
+```
+
+</details>
+
+> **TO WRITE**
+> - the full example: a page that starts the worker, loads the fonts, and asks for a score and its MIDI
+> - `request`: one message out, one reply back, matched by `id`
+
+```html
+<!-- static/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>A Short Piece</title>
+  </head>
+  <body>
+    <div id="score"></div>
+    <a id="midi" download="score.mid">Download MIDI</a>
+    <ul id="errors"></ul>
+
+    <script type="module">
+      const worker = new Worker('/js/msq/worker/worker.js', { type: 'module' })
+
+      function request(name, payload) {
+        const id = crypto.randomUUID()
+        return new Promise((resolve, reject) => {
+          const onMessage = (event) => {
+            if (event.data.id !== id) {
+              return
+            }
+            worker.removeEventListener('message', onMessage)
+            if (event.data.status === 'ok') {
+              resolve(event.data)
+            } else {
+              reject(new Error(event.data.error))
+            }
+          }
+          worker.addEventListener('message', onMessage)
+          worker.postMessage({ id, name, ...payload })
+        })
+      }
+
+      await request('fonts.setup', {
+        fontSourcesReference: 'myFonts',
+        fontConfig: {
+          'chord-letters': {
+            'gentium plus': '/font/chord-letters/GentiumPlus-Regular.ttf'
+          },
+          'text': {
+            'noto-serif': {
+              'regular': '/font/text/NotoSerif-Regular.ttf',
+              'bold': '/font/text/NotoSerif-Bold.ttf'
+            }
+          },
+          'music': {
+            'bravura': {
+              'font': '/font/music/Bravura.otf',
+              'js': '/js/msq/worker/drawer/font/music-js/bravura.js'
+            }
+          }
+        }
+      })
+
+      const { svg, midiDataSrc, errors } = await request('svg.midi.generate', {
+        fontSourcesReference: 'myFonts',
+        inputText: `
+          title is "A Short Piece"
+
+          measure
+          treble clef
+          c d e f
+        `
+      })
+
+      document.querySelector('#score').innerHTML = svg
+      document.querySelector('#midi').href = midiDataSrc
+      for (const error of errors) {
+        const item = document.createElement('li')
+        item.textContent = error
+        document.querySelector('#errors').appendChild(item)
+      }
+    </script>
+  </body>
+</html>
+```
+
+> **TO WRITE**
+> - serving `static/` with any static server, and opening the page
+
+```sh
+cd static
+python3 -m http.server 8080
+```
+
+## Messages
+
+> **TO WRITE**
+> - every message is an object with a `name`, an `id` and the fields of that message; every reply carries the same `id`, and `status: 'ok'` when it worked
+> - a failure is `{ id, error }`; a message with a name the worker does not know throws inside the worker, and nobody gets a reply
+
+<h3 is="e-h" id="1-fontssetup">1. fonts.setup</h3>
+
+```js
+worker.postMessage({ id, name: 'fonts.setup', fontConfig, fontSourcesReference })
+```
+
+<details is="e-details">
+<summary>Purpose</summary>
+
+Loads the fonts once, inside the worker, and keeps them under a name that every later message refers to. A name can be registered only once, and the fonts stay until the page is closed.
+
+</details>
+
+<details is="e-details">
+<summary>Fields</summary>
+
+`id`: any string that is unique among the messages waiting for a reply.
+
+```js
+crypto.randomUUID()
+```
+
+`fontConfig`: the fonts by name, as in [setupFonts](/docs/api/overview#1-setupfonts), with every entry a URL and all three categories given.
+
+```js
+{
+  'chord-letters': { 'gentium plus': '/font/chord-letters/GentiumPlus-Regular.ttf' },
+  'text': { 'noto-serif': { regular: '/font/text/NotoSerif-Regular.ttf', bold: '/font/text/NotoSerif-Bold.ttf' } },
+  'music': { 'bravura': { font: '/font/music/Bravura.otf', js: '/js/msq/worker/drawer/font/music-js/bravura.js' } }
+}
+```
+
+`fontSourcesReference`: the name the fonts are kept under.
+
+```js
+'myFonts'
+```
+
+</details>
+
+<details is="e-details">
+<summary>Reply</summary>
+
+- `id`: the id of the message.
+- `status`: **ok** once every font has loaded.
+- `error`, instead of `status`: why not, for example `Font sources are already registered under reference (myFonts)`.
+
+</details>
+
+<h3 is="e-h" id="2-svggenerate">2. svg.generate</h3>
+
+```js
+worker.postMessage({ id, name: 'svg.generate', fontSourcesReference, inputText })
+```
+
+<details is="e-details">
+<summary>Purpose</summary>
+
+Parses and engraves one page. Nothing is played, so nothing is heard, which is sometimes exactly what you want.
+
+</details>
+
+<details is="e-details">
+<summary>Fields</summary>
+
+`fontSourcesReference`: the name a `fonts.setup` registered the fonts under.
+
+```js
+'myFonts'
+```
+
+`inputText`: the MSQ text of one page; every line is parsed as it is, indented or not.
+
+```js
+'measure\ntreble clef\nc d e f'
+```
+
+</details>
+
+<details is="e-details">
+<summary>Reply</summary>
+
+- `svg`: the score, as SVG markup.
+- `svgDataSrc`: the same score as a `data:image/svg+xml;base64,…` URL, for an `<img>` or a download link.
+- `errors`: one string per line the parser could not use; the score is drawn from the rest.
+
+</details>
+
+<h3 is="e-h" id="3-midigenerate">3. midi.generate</h3>
+
+```js
+worker.postMessage({ id, name: 'midi.generate', inputText })
+```
+
+<details is="e-details">
+<summary>Purpose</summary>
+
+Parses and performs one page. It is the only message that needs no fonts, so it takes no reference and can be sent before `fonts.setup`.
+
+</details>
+
+<details is="e-details">
+<summary>Fields</summary>
+
+`inputText`: the MSQ text of one page.
+
+```js
+'default tempo is "1/4 = 96"\nmeasure\ntreble clef\nc d e f'
+```
+
+</details>
+
+<details is="e-details">
+<summary>Reply</summary>
+
+- `midiDataSrc`: the MIDI file as a base64 data URL, which a player or a download link can take as it is.
+- `errors`: one string per line the parser could not use.
+
+</details>
+
+<h3 is="e-h" id="4-svgmidigenerate">4. svg.midi.generate</h3>
+
+```js
+worker.postMessage({ id, name: 'svg.midi.generate', fontSourcesReference, inputText })
+```
+
+<details is="e-details">
+<summary>Purpose</summary>
+
+Engraves and performs one page from a single parse, and links the two, so a score can follow its own playback.
+
+</details>
+
+<details is="e-details">
+<summary>Fields</summary>
+
+`fontSourcesReference`: the name a `fonts.setup` registered the fonts under.
+
+```js
+'myFonts'
+```
+
+`inputText`: the MSQ text of one page.
+
+```js
+'measure\ntreble clef\nc d e f'
+```
+
+</details>
+
+<details is="e-details">
+<summary>Reply</summary>
+
+- `svg`: the score, as SVG markup, with a `ref-ids` attribute on every drawn element.
+- `svgDataSrc`: the same score as a base64 data URL.
+- `midiDataSrc`: the MIDI file as a base64 data URL.
+- `timeStampsMappedWithRefsOn`: for each moment in seconds, the ref ids that start sounding then, and for how long.
+- `refsOnMappedWithTimeStamps`: for each ref id, the moment it starts, under page index **0**.
+- `customStyles`: the style commands of the page, as written, for example to read its colours.
+- `errors`: one string per line the parser could not use.
+
+</details>
+
+<h3 is="e-h" id="5-svgmiditextgenerate">5. svg.midi.text.generate</h3>
+
+```js
+worker.postMessage({ id, name: 'svg.midi.text.generate', fontSourcesReference, inputText })
+```
+
+<details is="e-details">
+<summary>Purpose</summary>
+
+Everything `svg.midi.generate` does, plus the source text highlighted with the same ref ids, so the text, the score and the playback all point at each other. This is what the editor sends.
+
+</details>
+
+<details is="e-details">
+<summary>Fields</summary>
+
+`fontSourcesReference`: the name a `fonts.setup` registered the fonts under.
+
+```js
+'myFonts'
+```
+
+`inputText`: the MSQ text of one page.
+
+```js
+'measure\ntreble clef\nc d e f'
+```
+
+</details>
+
+<details is="e-details">
+<summary>Reply</summary>
+
+- `svg`, `svgDataSrc`, `midiDataSrc`, `timeStampsMappedWithRefsOn`, `refsOnMappedWithTimeStamps`, `customStyles`, `errors`: the same as in `svg.midi.generate`.
+- `highlightsHtmlBuffer`: the source as an array of HTML fragments, every token in a `<span>` with a `ref-id`; `join('')` it before use.
+
+</details>
+
+<h3 is="e-h" id="6-glyphtrace">6. glyph.trace</h3>
+
+```js
+worker.postMessage({ id, name: 'glyph.trace', fontSourcesReference, musicFontName, characters, musicFontSourceSize, intervalBetweenStaveLines })
+```
+
+<details is="e-details">
+<summary>Purpose</summary>
+
+Traces characters of a loaded music font into path points. The font viewer in the dev tools uses it, and you probably won't, but it's there.
+
+</details>
+
+<details is="e-details">
+<summary>Fields</summary>
+
+`fontSourcesReference`: the name a `fonts.setup` registered the fonts under.
+
+```js
+'myFonts'
+```
+
+`musicFontName`: a music font loaded under that name.
+
+```js
+'bravura'
+```
+
+`characters`: the characters to trace, usually SMuFL code points.
+
+```js
+''
+```
+
+`musicFontSourceSize`: the font size in intervals between stave lines; the engine uses **4**.
+
+```js
+4
+```
+
+`intervalBetweenStaveLines`: the interval between stave lines, in SVG units.
+
+```js
+8.5
+```
+
+</details>
+
+<details is="e-details">
+<summary>Reply</summary>
+
+- `points`: the outline as a flat list of SVG path commands and their coordinates, moved to the top left corner.
+- `missingCharacters`: the characters the font does not have; when there are any, `points` is empty.
+
+</details>
 
 Read next: [Web components](/docs/components/overview)

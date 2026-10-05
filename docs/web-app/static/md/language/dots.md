@@ -50,7 +50,7 @@ f dotted
 1/8 g
 ```
 
-It's important to mention that the dot doesn't change the duration you wrote, it's stored beside it. There is no single word for "dotted quarter" in MSQ: in the [page schema](/docs/api/page-schema) the unit keeps its duration, **1/4**, and the number of its dots, **1**, as two separate things. That is also why a dot doesn't affect the duration that the next notes take:
+It's important to mention that the dot doesn't change the duration you wrote, it's stored beside it. There is no single word for "dotted quarter" in MSQ: in the [page schema](/docs/api/overview) the unit keeps its duration, **1/4**, and the number of its dots, **1**, as two separate things. That is also why a dot doesn't affect the duration that the next notes take:
 
 ```msq-editor opens-with=text
 1/2 c dotted

@@ -108,6 +108,25 @@ heading. The score would still draw, just not the score that was written.
 A `<template>` wrapped in a `<div>` at column 0 also survives, and the check
 still accepts it, but a fence is how examples are written here.
 
+## Tabs and details
+
+A page can use e-ui's `<e-tabs>` / `<e-tab data-title="…">` and
+`<details is="e-details">` with markdown inside them. Write each of those tags,
+and the `<summary>`, on a line of its own between blank lines, and the content
+as plain markdown:
+
+    <details is="e-details">
+    <summary>Setup</summary>
+
+    …markdown, fences included…
+
+    </details>
+
+`static/js/eBlocksExtension.js` takes off the paragraphs showdown wraps those
+lines in, and gives the details its body `<div>`. Don't write that `<div>`
+yourself, and don't use `markdown="1"`: showdown parses such a block in a nested
+pass that runs the msq extensions again and loses the examples.
+
 ## The check
 
     npm run docs:check

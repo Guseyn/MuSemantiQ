@@ -54,9 +54,34 @@ rsync -a --delete ../MuSemantiQ/src/ msq/
 ```
 This allows the imports to resolve properly in your project.
 
-**Important note:** `setupFonts()` without a config looks for the fonts in `./src/drawer/font/`, which exists only in `MuSemantiQ` itself. In your project, pass it a font config with the paths in `./msq/drawer/font/` (see [setupFonts](/docs/api/setup-fonts)).
+**Important note:** `setupFonts()` without a config looks for the fonts in `./src/drawer/font/`, which exists only in `MuSemantiQ` itself. In your project, pass it a font config with the paths in `./msq/drawer/font/` (see [setupFonts](/docs/api/overview#1-setupfonts)).
 
 3. Follow [Low-Level API](/docs/api/overview).
+
+## In browser, without Worker
+
+**Important note:** this is not the recommended way. Everything runs on the main thread, so the page freezes while the fonts load and while a score is engraved. Use it only when a worker is not an option.
+
+1. Copy `src` from `MuSemantiQ` into your static `js` folder:
+```sh
+cd your-project
+mkdir -p static/js/msq
+rsync -a --delete ../MuSemantiQ/src/ static/js/msq/src
+```
+
+2. Add an import map to your page, before any module script:
+```html
+<script type="importmap">
+  {
+    "imports": {
+      "#msq/": "/js/msq/src/"
+    }
+  }
+</script>
+```
+This is what lets the `#msq/…` imports inside `src` resolve in the browser. The fonts are in the copy too, under `/js/msq/src/drawer/font/`.
+
+3. Follow [Low-Level API](/docs/api/overview), the **Browser** tab.
 
 ## In browser via Worker
 

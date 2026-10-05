@@ -1,55 +1,51 @@
-# Overview
+# Web components
 
-The web components are how MuSemantiQ gets onto a page. You write the music as text inside an element, and the element turns it into a score, a player, or an editor.
+<nav is="docs-contents"></nav>
 
-There are five of them:
+> **TO WRITE**
+> - what the web components are: MSQ written inside an element becomes a score, a player or an editor
+> - every one is a `<template>` with an `is` attribute, and all the heavy work happens in one shared worker
 
-| Component | What it draws | What it needs | What it costs |
-| --- | --- | --- | --- |
-| `msq-font-loader` | Nothing. It registers fonts, then puts its own content on the page | A font config | Fetches every font in the config, once |
-| `msq-svg` | An engraved score with a small toolbar | Fonts | One parse and one engraving |
-| `msq-midi` | A MIDI player | No fonts | One parse and one MIDI file, plus the sound font samples |
-| `msq-svg-midi` | The score with a player under it, notes highlighting as they sound | Fonts | A parse, an engraving and a MIDI file, plus the samples |
-| `msq-editor` | The score, the player and the source you can edit | Fonts | All of the above, and the parser on the page itself for highlighting |
+## Setup and a full example
 
-All the heavy work (parsing, engraving, MIDI) happens in one shared web worker, so the page itself stays responsive. The editor is the one exception: it parses what you type on the main thread to colour it, because that has to happen between a keystroke and the next paint. More about that you can read in [Worker](/docs/worker/overview).
+<details is="e-details">
+<summary>Setup</summary>
 
-## 1. The music is the text content
+First, download MuSemantiQ next to your project:
 
-Every component is a customized built-in `<template>` element: a `<template>` with an `is` attribute. Its text content is the music:
-
-```html
-<template is='msq-svg' data-font-sources='msqFontSources'>
-  measure
-  treble clef
-  c d e f
-</template>
+```sh
+curl -L https://github.com/Guseyn/MuSemantiQ/archive/refs/heads/main.zip -o MuSemantiQ.zip
+unzip MuSemantiQ.zip
+mv MuSemantiQ-main MuSemantiQ
 ```
 
-And as a result you get:
+Then generate the worker, which the components talk to:
 
-```msq-svg
-measure
-treble clef
-c d e f
+```sh
+cd your-project
+mkdir -p static/js/msq
+node ../MuSemantiQ/scripts/create-msq-worker.js -o static/js/msq/worker
 ```
 
-A `<template>` is a good home for the music, because the browser never renders its content and never runs anything in it. It's important to mention that every line of the text is trimmed before it is parsed, so you can indent the music together with your HTML.
+Copy `web-components` next to the worker. The components start it from `../../worker/worker.js`, relative to their own folder, so the two folders have to stay side by side:
 
-## 2. Each component replaces itself
-
-When a component is upgraded, it sends its text to the worker, builds a `<div>` with an open shadow root out of the answer, and replaces itself with that `<div>`. The `<template>` is gone from the page after that. The `<div>` carries a `data-rendered-by` attribute naming what drew it, for example `data-rendered-by='template[is="msq-svg"]'`, so you can still find it:
-
-```js
-const score = document.querySelector('div[data-rendered-by=\'template[is="msq-svg"]\']')
-const svg = score.shadowRoot.querySelector('svg')
+```sh
+rsync -a --delete ../MuSemantiQ/web-components/ static/js/msq/web-components
 ```
 
-Because everything is inside a shadow root, the styles of your page cannot leak into the score. The only way in is through CSS custom properties set on that `<div>` (see [msq-editor](/docs/components/msq-editor) for the full list).
+Copy `language` next to them as well. The editor parses on the page itself, to colour what you type:
 
-## 3. The imports and an import map
+```sh
+rsync -a --delete ../MuSemantiQ/src/language/ static/js/msq/language
+```
 
-A page needs the modules of the components it uses, and an import map, because the components import each other through `#msq/...` specifiers rather than relative paths:
+Copy the font files. The glyph tables are already in the worker, under `drawer/font/music-js/`:
+
+```sh
+rsync -a --delete --exclude music-js ../MuSemantiQ/src/drawer/font/ static/font
+```
+
+Finally, add an import map to your page, because the components import each other and the language through `#msq/…` specifiers:
 
 ```html
 <script type="importmap">
@@ -60,27 +56,469 @@ A page needs the modules of the components it uses, and an import map, because t
     }
   }
 </script>
-<script type="module">
-  import '#msq/web-components/msq-font-loader-template.js'
-  import '#msq/web-components/msq-svg-template.js'
-</script>
 ```
 
-The first entry is the components themselves. The second one is the language, which only the editor loads on the page, but it is resolved through the same map, so it has to be there. The worker is not in the map at all: a module worker gets no import map, so the components start it by URL, from `../../worker/worker.js` relative to their own folder. You just need to import the modules of the components you use, and every one of them brings along what it needs.
+</details>
 
-That includes Safari: the components load the polyfill that lets WebKit upgrade them by themselves, before any of them is defined. More about that you can read in [Browser support](/docs/components/browser-support).
+> **TO WRITE**
+> - the full example: a page with a font loader and an editor inside it
+> - the font config it points at, served as a file, `static/js/font-config.json`
 
-## 4. A component renders once
+```json
+{
+  "chord-letters": {
+    "gentium plus": "/font/chord-letters/GentiumPlus-Regular.ttf"
+  },
+  "text": {
+    "noto-serif": {
+      "regular": "/font/text/NotoSerif-Regular.ttf",
+      "bold": "/font/text/NotoSerif-Bold.ttf"
+    }
+  },
+  "music": {
+    "bravura": {
+      "font": "/font/music/Bravura.otf",
+      "js": "/js/msq/worker/drawer/font/music-js/bravura.js"
+    }
+  }
+}
+```
 
-A component renders exactly once, when it is connected to the page. You cannot give it new music afterwards and ask it to draw again, mostly because there is nothing left to ask: it has already replaced itself with its result. So changing the music means building a fresh element and putting it where the old one was:
+```html
+<!-- static/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>A Short Piece</title>
+    <script type="importmap">
+      {
+        "imports": {
+          "#msq/web-components/": "/js/msq/web-components/",
+          "#msq/language/": "/js/msq/language/"
+        }
+      }
+    </script>
+    <script type="module">
+      import '#msq/web-components/msq-font-loader-template.js'
+      import '#msq/web-components/msq-editor-template.js'
+    </script>
+  </head>
+  <body>
+    <template
+      is="msq-font-loader"
+      data-font-sources-reference="myFonts"
+      data-font-config-src="/js/font-config.json"
+    >
+      <template is="msq-editor" data-font-sources="myFonts" data-file-name="a-short-piece">
+        title is "A Short Piece"
+
+        measure
+        treble clef
+        c d e f
+      </template>
+    </template>
+  </body>
+</html>
+```
+
+> **TO WRITE**
+> - serving `static/` with any static server, and opening the page
+
+```sh
+cd static
+python3 -m http.server 8080
+```
+
+> **TO WRITE**
+> - what you get
+
+```msq-editor file-name=a-short-piece
+title is "A Short Piece"
+
+measure
+treble clef
+c d e f
+```
+
+## Elements
+
+> **TO WRITE**
+> - each element renders once: it sends its text to the worker and replaces itself with a `<div data-rendered-by>` that holds the result in an open shadow root
+> - a mistake in the music is listed in a panel inside the element; a mistake in the setup leaves the element invisible and goes to the console
+
+<h3 is="e-h" id="1-msq-font-loader">1. msq-font-loader</h3>
+
+```html
+<template is="msq-font-loader" data-font-sources-reference data-font-config data-font-config-src>
+  …elements that need the fonts…
+</template>
+```
+
+<details is="e-details">
+<summary>Purpose</summary>
+
+Loads the fonts into the worker under a name, then puts its own content on the page. It draws nothing itself; its whole job is to make the others wait.
+
+</details>
+
+<details is="e-details">
+<summary>Attributes</summary>
+
+`data-font-sources-reference`: the name the fonts are registered under; required, and a name can be registered only once per page.
+
+```html
+data-font-sources-reference="myFonts"
+```
+
+`data-font-config`: the font config, inline, as JSON; give this or `data-font-config-src`, not both.
+
+```html
+data-font-config='{ "chord-letters": {…}, "text": {…}, "music": {…} }'
+```
+
+`data-font-config-src`: a URL the font config is fetched from, which must answer successfully with JSON.
+
+```html
+data-font-config-src="/js/font-config.json"
+```
+
+</details>
+
+<details is="e-details">
+<summary>Renders</summary>
+
+- its own content, as a copy, once every font has loaded; until then nothing inside it starts, because the content of a `<template>` is inert.
+
+</details>
+
+<h3 is="e-h" id="2-msq-svg">2. msq-svg</h3>
+
+```html
+<template is="msq-svg" data-font-sources data-file-name>
+  …MSQ…
+</template>
+```
+
+<details is="e-details">
+<summary>Purpose</summary>
+
+Engraves the music as an SVG score, and nothing else. It is the cheapest of the components that engrave, since it loads no player and no sound font.
+
+</details>
+
+<details is="e-details">
+<summary>Attributes</summary>
+
+`data-font-sources`: the name a `msq-font-loader` registered its fonts under; required.
+
+```html
+data-font-sources="myFonts"
+```
+
+`data-file-name`: the name of the downloaded file, without the extension; a random id by default.
+
+```html
+data-file-name="a-short-piece"
+```
+
+</details>
+
+<details is="e-details">
+<summary>Renders</summary>
+
+- the score.
+- a toolbar, on hover or focus: download the SVG, open it in a new tab, copy the MSQ.
+- an errors panel under the score, only when the parser had something to report.
+
+</details>
+
+<h3 is="e-h" id="3-msq-midi">3. msq-midi</h3>
+
+```html
+<template is="msq-midi" data-sound-font data-file-name>
+  …MSQ…
+</template>
+```
+
+<details is="e-details">
+<summary>Purpose</summary>
+
+Turns the music into a MIDI file and gives you a player for it. It draws no score, so it is the one component that needs no fonts and no loader.
+
+</details>
+
+<details is="e-details">
+<summary>Attributes</summary>
+
+`data-sound-font`: the URL of a Magenta-format sound font; empty means Magenta's own, from `storage.googleapis.com`.
+
+```html
+data-sound-font="/magenta-sound-font/FluidR3_GM"
+```
+
+`data-file-name`: the name of the downloaded MIDI file, without the extension; a random id by default.
+
+```html
+data-file-name="a-short-tune"
+```
+
+</details>
+
+<details is="e-details">
+<summary>Renders</summary>
+
+- a player: play and stop, the elapsed and the total time, and a seek bar; only one player on a page plays at a time.
+- two buttons beside it: download the MIDI file, copy the MSQ.
+- an errors panel, only when the parser had something to report.
+
+</details>
+
+<h3 is="e-h" id="4-msq-svg-midi">4. msq-svg-midi</h3>
+
+```html
+<template is="msq-svg-midi" data-font-sources data-highlight-color data-sound-font data-file-name>
+  …MSQ…
+</template>
+```
+
+<details is="e-details">
+<summary>Purpose</summary>
+
+The score with a player under it, each note highlighted while it sounds. Click a note in the score and the player jumps to it.
+
+</details>
+
+<details is="e-details">
+<summary>Attributes</summary>
+
+`data-font-sources`: the name a `msq-font-loader` registered its fonts under; required.
+
+```html
+data-font-sources="myFonts"
+```
+
+`data-highlight-color`: the colour of a note while it sounds; **#C40233** by default.
+
+```html
+data-highlight-color="#1f7a8c"
+```
+
+`data-sound-font`: the URL of a Magenta-format sound font, as in `msq-midi`.
+
+```html
+data-sound-font="/magenta-sound-font/FluidR3_GM"
+```
+
+`data-file-name`: the name of both downloaded files, without the extension; a random id by default.
+
+```html
+data-file-name="two-staves"
+```
+
+</details>
+
+<details is="e-details">
+<summary>Renders</summary>
+
+- the score, with the same toolbar as `msq-svg`.
+- the player, with the same buttons as `msq-midi`.
+- an errors panel, only when the parser had something to report.
+
+</details>
+
+<h3 is="e-h" id="5-msq-editor">5. msq-editor</h3>
+
+```html
+<template
+  is="msq-editor"
+  data-font-sources
+  data-opens-with
+  data-file-name
+  data-highlight-color
+  data-sound-font
+  data-editor-height
+  data-editor-font-family
+  data-editor-font-size
+  data-editor-font-src
+  data-navigation-highlight-color
+>
+  …MSQ…
+</template>
+```
+
+<details is="e-details">
+<summary>Purpose</summary>
+
+The score, the player and the source you can edit and render again, in one element. It is the only one that parses on the page itself, to colour what you type between a keystroke and the next paint.
+
+</details>
+
+<details is="e-details">
+<summary>Attributes</summary>
+
+`data-font-sources`: the name a `msq-font-loader` registered its fonts under; required.
+
+```html
+data-font-sources="myFonts"
+```
+
+`data-opens-with`: which view shows first, **score** or **text**; **score** by default.
+
+```html
+data-opens-with="text"
+```
+
+`data-file-name`: the name of the downloaded SVG and MIDI files, without the extension; a random id by default.
+
+```html
+data-file-name="editor-example"
+```
+
+`data-highlight-color`: the colour of a note while it sounds; **#C40233** by default.
+
+```html
+data-highlight-color="#1f7a8c"
+```
+
+`data-sound-font`: the URL of a Magenta-format sound font, as in `msq-midi`.
+
+```html
+data-sound-font="/magenta-sound-font/FluidR3_GM"
+```
+
+`data-editor-height`: the height the source view falls back to; **270px** by default, and an editor that opens on the text fits its text instead.
+
+```html
+data-editor-height="320px"
+```
+
+`data-editor-font-family`: the font of the source, which must be monospace, or the colours drift away from the letters.
+
+```html
+data-editor-font-family="'JetBrains Mono', monospace"
+```
+
+`data-editor-font-size`: the size of that font; **1em** by default.
+
+```html
+data-editor-font-size="0.9em"
+```
+
+`data-editor-font-src`: the URL of a font file for the first family in `data-editor-font-family`.
+
+```html
+data-editor-font-src="/font/JetBrainsMono-Regular.ttf"
+```
+
+`data-navigation-highlight-color`: the colour of the box that links a word in the source to what it drew; **#f5cd79** by default.
+
+```html
+data-navigation-highlight-color="#f5cd79"
+```
+
+</details>
+
+<details is="e-details">
+<summary>Renders</summary>
+
+- the score, the player and the errors panel, as in `msq-svg-midi`.
+- the source view, with line numbers, colours and suggestions as you type.
+- a toolbar: download the SVG, edit or render, copy the MSQ, and the settings of this one element.
+- the links between the two views: hold **⌘** or **Ctrl** and click a word to see what it drew, or click a glyph to see the words that drew it.
+
+</details>
+
+<h3 is="e-h" id="6-innerstate">6. innerState</h3>
+
+```js
+template.innerState = 'measure\ntreble clef\nc d e f'
+```
+
+<details is="e-details">
+<summary>Purpose</summary>
+
+Gives an element its music from script instead of as its content, so nothing in the music is parsed as HTML on the way. Set it before the element is inserted, since an element renders once, when it is connected.
+
+</details>
+
+<details is="e-details">
+<summary>Value</summary>
+
+`innerState`: the MSQ text; it is read before the text content.
 
 ```js
 const template = document.createElement('template', { is: 'msq-svg' })
-template.setAttribute('data-font-sources', 'msqFontSources')
+template.setAttribute('data-font-sources', 'myFonts')
 template.innerState = 'measure\ntreble clef\nc d e f'
 container.replaceChildren(template)
 ```
 
-`innerState` is how you give an element its music from script instead of as content. It is read before the text content, so it has to be set before the element is inserted. This is exactly what the dev tools and this documentation do every time they show new music.
+</details>
 
-Read next: [msq-font-loader](/docs/components/msq-font-loader)
+<details is="e-details">
+<summary>Result</summary>
+
+- the same element as if the music had been written inside it; to show different music, build a fresh one.
+
+</details>
+
+<h3 is="e-h" id="7-custom-properties">7. Custom properties</h3>
+
+```css
+div[data-rendered-by='template[is="msq-editor"]'] {
+  --surface-bg: #fbfaf7;
+  --border-radius: 0.5em;
+}
+```
+
+<details is="e-details">
+<summary>Purpose</summary>
+
+Styles a rendered element from your own CSS. The element lives in a shadow root, so your page's styles cannot leak in, and custom properties are the one door left open.
+
+</details>
+
+<details is="e-details">
+<summary>Properties</summary>
+
+`--border-color`, `--border-radius`, `--surface-bg`: the border, the corners and the background of the element; **#c0c0c0**, **1em** and **#fff** by default.
+
+```css
+--border-color: #c0c0c0; --border-radius: 1em; --surface-bg: #fff;
+```
+
+`--font-color`, `--muted-font-color`: the text of the settings and the errors panel, and the quieter text such as line numbers; **#121212** and **#4c5866** by default.
+
+```css
+--font-color: #121212; --muted-font-color: #4c5866;
+```
+
+`--error-color`, `--error-bg`: the heading and the background of the errors panel; **#c40233** and **#fdf3f5** by default.
+
+```css
+--error-color: #c40233; --error-bg: #fdf3f5;
+```
+
+`--editor-font-family`, `--editor-font-size`, `--editor-line-height`, `--editor-font-color`, `--editor-height`: the source view of `msq-editor`; an attribute that sets the same thing wins over your CSS.
+
+```css
+--editor-font-size: 1em; --editor-line-height: 1.4em; --editor-font-color: #1f2d3a; --editor-height: 270px;
+```
+
+`--navigation-highlight-color`: the box that links a word to what it drew; **#f5cd79** by default.
+
+```css
+--navigation-highlight-color: #f5cd79;
+```
+
+</details>
+
+<details is="e-details">
+<summary>Result</summary>
+
+- the rendered element in your colours; the score itself is coloured from the music, with the [colour styles](/docs/language/colours).
+
+</details>
+
+Read next: [Showdown extensions](/docs/showdown/overview)

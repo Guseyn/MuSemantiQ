@@ -1,6 +1,6 @@
 # Engrave to SVG in Node
 
-This recipe is a script that reads an MSQ file, engraves every page of it, and writes one SVG per page. It uses the low-level API directly, the same calls the test runners make, described in [Multiple pages](/docs/api/multiple-pages).
+This recipe is a script that reads an MSQ file, engraves every page of it, and writes one SVG per page. It uses the low-level API directly, the same calls the test runners make, described in [Multiple pages](/docs/api/overview).
 
 ## 1. The script
 
@@ -104,7 +104,7 @@ It's important to mention where the script lives. `#msq/api.js` is a specifier f
 
 In Node, `setupFonts()` with no argument loads the fonts the repository ships: **Bravura** and **Leland** for music, **Noto Serif** and **Noto Sans** for text, **Gentium Plus** and **Gothic A1** for chord letters. Their paths are relative, `./src/drawer/font/…`, and they are resolved against the working directory, which is why the script is run from the root of the clone. Run it from anywhere else and the first font fails to load.
 
-You can pass a config of your own instead. It replaces a whole family at a time: give it `music` and the default text and chord-letter fonts stay. The shape is described in [setupFonts](/docs/api/setup-fonts).
+You can pass a config of your own instead. It replaces a whole family at a time: give it `music` and the default text and chord-letter fonts stay. The shape is described in [setupFonts](/docs/api/overview#1-setupfonts).
 
 Two things come out of it, and both are needed. `supportedFontSources` is what the drawer engraves with. `supportedFontNames` is what the parser checks `music font is …`, `text font is …` and `chord letters font is …` against, so a name you did not register is an error in the music rather than a font that silently falls back.
 

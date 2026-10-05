@@ -10,7 +10,7 @@ A host page needs three things, in this order:
 2. **the imports** of the components you use;
 3. **a font loader**, with the components that engrave inside it.
 
-That's all. Everything else (the worker, the player, the parser for the editor, and the polyfill that lets Safari upgrade them) is loaded by the components themselves. More about the polyfill you can read in [Browser support](/docs/components/browser-support).
+That's all. Everything else (the worker, the player, the parser for the editor, and the polyfill that lets Safari upgrade them) is loaded by the components themselves. More about the polyfill you can read in [Browser support](/docs/components/overview).
 
 ## 2. Serving the three trees
 
@@ -32,7 +32,7 @@ You have to remember the following rules:
 
 The scripts of this repository write these trees only into its own three apps. The simplest way to get them for yours is to run `npm run msq:apps:update` and `npm run web-components:update`, and copy `browser-app/web-app/static/js/msq/` into your static folder as `js/msq/`. Or take them from the sources: `web-components/` and `language/` are copied as they are, from `web-components/` and `src/language/`, and only `worker/` has to be generated. Copy them again whenever you update MuSemantiQ.
 
-You also need the fonts. The font files are in `src/drawer/font/chord-letters`, `src/drawer/font/music` and `src/drawer/font/text`; serve them wherever you like, and write those URLs into your font config. The glyph tables for the music fonts are already inside the worker tree, at `/js/msq/worker/drawer/font/music-js/`. More about the config you can read in [Fonts and font config](/docs/components/fonts-and-config).
+You also need the fonts. The font files are in `src/drawer/font/chord-letters`, `src/drawer/font/music` and `src/drawer/font/text`; serve them wherever you like, and write those URLs into your font config. The glyph tables for the music fonts are already inside the worker tree, at `/js/msq/worker/drawer/font/music-js/`. More about the config you can read in [Fonts and font config](/docs/components/overview#1-msq-font-loader).
 
 ## 3. A copy-paste starting point
 
@@ -98,7 +98,7 @@ Everything you put inside the loader appears when the fonts are ready: scores, p
 A framework that renders the page from its own state (React, Vue, Svelte and the others) expects the nodes it created to stay where it put them. A component does not: it removes its `<template>` and puts a `<div>` in its place. So don't let the framework render the `<template>` itself. Instead:
 
 1. Let the framework render an **empty container** and never render any children into it.
-2. **Register the fonts once**, for the whole life of the page, with the marker pattern from [msq-font-loader](/docs/components/msq-font-loader), and wait for it before showing any music.
+2. **Register the fonts once**, for the whole life of the page, with the marker pattern from [msq-font-loader](/docs/components/overview#1-msq-font-loader), and wait for it before showing any music.
 3. **Create the component from script**, give it the music with `innerState`, and put it into the container:
 
 ```js

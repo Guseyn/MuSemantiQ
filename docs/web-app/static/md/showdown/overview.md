@@ -1,93 +1,387 @@
-# Overview
+# Showdown extensions
 
-The showdown extensions let you write the web components in markdown. A fenced block named after a component becomes that component, with the music inside it. Every example in these docs is written this way.
+<nav is="docs-contents"></nav>
 
-## 1. A fence named after the component
+> **TO WRITE**
+> - what the extensions do: a fenced block named after a component becomes that component, with the music inside it
+> - the music never goes through markdown, so blank lines and lines starting with `-` or `#` reach the component as written
+> - they do not import showdown, so they work with whichever copy you have, in the browser and in Node.js
 
-Let's start with a simple example. In markdown, you write:
+## Setup and a full example
+
+<e-tabs data-apply-hash-navigation>
+
+<e-tab data-title="Node.js">
+
+<details is="e-details">
+<summary>Setup</summary>
+
+First, download MuSemantiQ and EHTML next to your project. EHTML carries showdown as an ES module, so you don't need to download it separately:
+
+```sh
+curl -L https://github.com/Guseyn/MuSemantiQ/archive/refs/heads/main.zip -o MuSemantiQ.zip
+unzip MuSemantiQ.zip
+mv MuSemantiQ-main MuSemantiQ
+curl -L https://github.com/Guseyn/EHTML/archive/refs/heads/master.zip -o EHTML.zip
+unzip EHTML.zip
+mv EHTML-master EHTML
+```
+
+Then copy the extensions and showdown into your project:
+
+```sh
+cd your-project
+mkdir msq
+rsync -a --delete ../MuSemantiQ/showdown-extensions/ msq/showdown-extensions
+rsync -a --delete ../EHTML/src/showdown/ showdown
+```
+
+Finally, mark the package as a module in your `package.json`, because the extensions are ES modules:
+
+```json
+{
+  "type": "module"
+}
+```
+
+</details>
+
+> **TO WRITE**
+> - the full example: a script that turns a markdown file into HTML, with the components already in it, for example to send the page from your server
+
+```js
+// render.js
+import fs from 'fs'
+import * as showdown from './showdown/showdown.js'
+import msqExtensions from './msq/showdown-extensions/msqExtensions.js'
+
+const converter = new showdown.Converter({
+  extensions: [ msqExtensions({ fontSources: 'myFonts' }) ]
+})
+
+const markdown = fs.readFileSync('page.md', 'utf-8')
+const html = converter.makeHtml(markdown)
+
+fs.writeFileSync('page.html', html)
+console.log(html)
+```
+
+> **TO WRITE**
+> - the markdown it reads, `page.md`
 
 ````markdown
- ```msq-svg
+ # A Short Piece
+
+ Here it is:
+
+ ```msq-svg-midi file-name=a-short-piece
  measure
  treble clef
  c d e f
  ```
 ````
 
-And as a result you get:
+> **TO WRITE**
+> - running it
 
-```msq-svg
-measure
-treble clef
-c d e f
+```sh
+node render.js
 ```
 
-There is one extension for every component that draws something: `msq-svg`, `msq-midi`, `msq-svg-midi` and `msq-editor`. The fence above becomes the same element you would write in HTML yourself:
+> **TO WRITE**
+> - what you get: the fence is now the element, and the page that serves it needs the [web components](/docs/components/overview) and a font loader with the same reference
 
 ```html
-<template is='msq-svg' data-font-sources='msqFontSources'>
+<h1 id="ashortpiece">A Short Piece</h1>
+<p>Here it is:</p>
+<template is="msq-svg-midi" data-font-sources="myFonts" data-file-name="a-short-piece">
 measure
 treble clef
 c d e f
 </template>
 ```
 
-It's important to mention that the music never goes through markdown. Blank lines would split it into paragraphs, and lines that start with `-`, `#` or `1.` would be eaten, so the extensions take every such fence out before showdown parses anything and put the element back after it is done. Any other fence, including one named `html` that only shows the markup, is left to showdown.
+</e-tab>
 
-## 2. Attributes on the fence line
+<e-tab data-title="Browser">
 
-The words after the name of the component are its attributes: `key=value`, `key="value with spaces"`, or a bare `key` for an empty one. You don't need to write `data-`, because it's added for you:
+<details is="e-details">
+<summary>Setup</summary>
+
+First, download MuSemantiQ and EHTML next to your project. EHTML carries showdown as an ES module, so you don't need to download it separately:
+
+```sh
+curl -L https://github.com/Guseyn/MuSemantiQ/archive/refs/heads/main.zip -o MuSemantiQ.zip
+unzip MuSemantiQ.zip
+mv MuSemantiQ-main MuSemantiQ
+curl -L https://github.com/Guseyn/EHTML/archive/refs/heads/master.zip -o EHTML.zip
+unzip EHTML.zip
+mv EHTML-master EHTML
+```
+
+Then set up the web components: the worker, the components, the language and the fonts. More about each step you can read in [Web components](/docs/components/overview):
+
+```sh
+cd your-project
+mkdir -p static/js/msq
+node ../MuSemantiQ/scripts/create-msq-worker.js -o static/js/msq/worker
+rsync -a --delete ../MuSemantiQ/web-components/ static/js/msq/web-components
+rsync -a --delete ../MuSemantiQ/src/language/ static/js/msq/language
+rsync -a --delete --exclude music-js ../MuSemantiQ/src/drawer/font/ static/font
+```
+
+Copy the extensions next to them, and showdown:
+
+```sh
+rsync -a --delete ../MuSemantiQ/showdown-extensions/ static/js/msq/showdown-extensions
+rsync -a --delete ../EHTML/src/showdown/ static/js/showdown
+```
+
+Finally, create the font config, `static/js/font-config.json`. It's the same one the web components use:
+
+```json
+{
+  "chord-letters": {
+    "gentium plus": "/font/chord-letters/GentiumPlus-Regular.ttf"
+  },
+  "text": {
+    "noto-serif": {
+      "regular": "/font/text/NotoSerif-Regular.ttf",
+      "bold": "/font/text/NotoSerif-Bold.ttf"
+    }
+  },
+  "music": {
+    "bravura": {
+      "font": "/font/music/Bravura.otf",
+      "js": "/js/msq/worker/drawer/font/music-js/bravura.js"
+    }
+  }
+}
+```
+
+</details>
+
+> **TO WRITE**
+> - the full example: a page that fetches a markdown file, converts it, and puts the result inside a font loader, so every score waits for its fonts
+
+```html
+<!-- static/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>A Short Piece</title>
+    <script type="importmap">
+      {
+        "imports": {
+          "#msq/web-components/": "/js/msq/web-components/",
+          "#msq/language/": "/js/msq/language/"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <article></article>
+
+    <script type="module">
+      import '#msq/web-components/msq-font-loader-template.js'
+      import '#msq/web-components/msq-svg-midi-template.js'
+
+      import * as showdown from '/js/showdown/showdown.js'
+      import msqExtensions from '/js/msq/showdown-extensions/msqExtensions.js'
+
+      const converter = new showdown.Converter({
+        extensions: [ msqExtensions({ fontSources: 'myFonts' }) ]
+      })
+
+      const markdown = await (await fetch('/md/page.md')).text()
+
+      const loader = document.createElement('template', { is: 'msq-font-loader' })
+      loader.setAttribute('data-font-sources-reference', 'myFonts')
+      loader.setAttribute('data-font-config-src', '/js/font-config.json')
+      loader.innerHTML = converter.makeHtml(markdown)
+      document.querySelector('article').appendChild(loader)
+    </script>
+  </body>
+</html>
+```
+
+> **TO WRITE**
+> - the markdown it fetches, `static/md/page.md`
 
 ````markdown
- ```msq-editor opens-with=text file-name="a short piece"
+ # A Short Piece
+
+ Here it is:
+
+ ```msq-svg-midi file-name=a-short-piece
  measure
  treble clef
  c d e f
  ```
 ````
 
-And as a result you get:
+> **TO WRITE**
+> - serving `static/` with any static server, and opening the page
 
-```msq-editor opens-with=text file-name="a short piece"
+```sh
+cd static
+python3 -m http.server 8080
+```
+
+> **TO WRITE**
+> - what you get
+
+```msq-svg-midi file-name=a-short-piece
 measure
 treble clef
 c d e f
 ```
 
-## 3. Using them with showdown
+</e-tab>
 
-The extensions don't import showdown. They are plain objects that showdown calls, so you can give them to whichever copy of showdown you have, for example the one EHTML carries:
+</e-tabs>
 
-```js
-import * as showdown from '/js/ehtml/showdown/showdown.js'
-import msqExtensions from '/js/msq/showdown-extensions/msqExtensions.js'
+## Extensions
 
-const converter = new showdown.Converter({
-  extensions: [ msqExtensions({ fontSources: 'msqFontSources' }) ]
-})
-const html = converter.makeHtml(markdown)
-```
+> **TO WRITE**
+> - every extension is a function that takes the default attributes and returns what showdown expects in `extensions`
 
-`msqExtensions` gives you all four at once. If you need only some of them, you can simply import them one by one: `msqSvg.js`, `msqMidi.js`, `msqSvgMidi.js` and `msqEditor.js`, from the same folder.
-
-The options are the default attributes of every element the extensions write, and a fence can override them. `fontSources` becomes `data-font-sources`, the reference that an `msq-font-loader` registered its fonts under. `msq-midi` needs no fonts, so it is given no `fontSources`.
-
-## 4. The fonts come first
-
-In the HTML that showdown returns, the music is still only `<template>` elements, and they turn into components once they are on the page. Every one of them except `msq-midi` needs its fonts to be loaded already, so the simplest way is to put the HTML inside an `msq-font-loader`, which shows its content only when the fonts are ready:
+<h3 is="e-h" id="1-msqextensions">1. msqExtensions</h3>
 
 ```js
-const loader = document.createElement('template', { is: 'msq-font-loader' })
-loader.setAttribute('data-font-sources-reference', 'msqFontSources')
-loader.setAttribute('data-font-config-src', '/js/font-config.json')
-loader.innerHTML = converter.makeHtml(markdown)
-document.querySelector('article').appendChild(loader)
+import msqExtensions from './msq/showdown-extensions/msqExtensions.js'
+
+msqExtensions({ fontSources, ...attributes })
 ```
 
-The page also needs the modules of the components and their import map. More about that you can read in [Web components](/docs/components/overview).
+<details is="e-details">
+<summary>Purpose</summary>
 
-## 5. In Node.js
+All four extensions at once: `msq-svg`, `msq-midi`, `msq-svg-midi` and `msq-editor` fences all become their elements. Most pages want this one and nothing else.
 
-Since the extensions only produce HTML, they work in Node.js as well, for example to render markdown on the server and send the page with the elements already in it. `scripts/check-docs-examples.js` does exactly that: it renders every page of these docs with the same extensions, and checks that every example came through unchanged.
+</details>
+
+<details is="e-details">
+<summary>Arguments</summary>
+
+`fontSources`: the name a `msq-font-loader` registered its fonts under, written as `data-font-sources` on every element except `msq-midi`, which does not need fonts.
+
+```js
+{ fontSources: 'myFonts' }
+```
+
+`...attributes`: any other default attribute of every element, named without `data-` and in camel case if you like.
+
+```js
+{ fontSources: 'myFonts', soundFont: '/magenta-sound-font/FluidR3_GM' }
+```
+
+</details>
+
+<details is="e-details">
+<summary>Returns</summary>
+
+An array of showdown extensions:
+
+- two per element: a `lang` one that takes the fences out before showdown parses anything, and an `output` one that puts the elements back after.
+
+</details>
+
+<h3 is="e-h" id="2-msqsvg-msqmidi-msqsvgmidi-msqeditor">2. msqSvg, msqMidi, msqSvgMidi, msqEditor</h3>
+
+```js
+import msqSvg from './msq/showdown-extensions/msqSvg.js'
+import msqMidi from './msq/showdown-extensions/msqMidi.js'
+import msqSvgMidi from './msq/showdown-extensions/msqSvgMidi.js'
+import msqEditor from './msq/showdown-extensions/msqEditor.js'
+
+msqSvg({ fontSources, ...attributes })
+msqMidi({ ...attributes })
+msqSvgMidi({ fontSources, ...attributes })
+msqEditor({ fontSources, ...attributes })
+```
+
+<details is="e-details">
+<summary>Purpose</summary>
+
+One element each, for a page that should turn only some fences into components and leave the rest alone.
+
+</details>
+
+<details is="e-details">
+<summary>Arguments</summary>
+
+`fontSources`: the name a `msq-font-loader` registered its fonts under; `msqMidi` has none.
+
+```js
+{ fontSources: 'myFonts' }
+```
+
+`...attributes`: any other default attribute of that element.
+
+```js
+{ fontSources: 'myFonts', opensWith: 'text' }
+```
+
+</details>
+
+<details is="e-details">
+<summary>Returns</summary>
+
+An array of showdown extensions:
+
+- the same `lang` and `output` pair as above, for that element only; a `msq-svg` fence is never mistaken for `msq-svg-midi`.
+
+</details>
+
+<h3 is="e-h" id="3-the-fence">3. The fence</h3>
+
+````markdown
+ ```msq-editor opens-with=text file-name="a short piece" data-editor-height=320px
+ measure
+ treble clef
+ c d e f
+ ```
+````
+
+<details is="e-details">
+<summary>Purpose</summary>
+
+How a component is written in markdown: the name of the element after the backticks, its attributes after the name, the music inside.
+
+</details>
+
+<details is="e-details">
+<summary>Parts</summary>
+
+`msq-editor`: the element; `msq-svg`, `msq-midi`, `msq-svg-midi` or `msq-editor`, and any other name is left to showdown as a plain code block.
+
+```text
+msq-svg | msq-midi | msq-svg-midi | msq-editor
+```
+
+`opens-with=text`: an attribute, `key=value`, `key="value with spaces"` or a bare `key`, with `data-` added unless it is already there.
+
+```text
+opens-with=text  →  data-opens-with="text"
+```
+
+The music: exactly what is between the fences, escaped for HTML and nothing else.
+
+```text
+measure
+treble clef
+c d e f
+```
+
+</details>
+
+<details is="e-details">
+<summary>Becomes</summary>
+
+- one `<template is="…">` with the defaults of the extension, overridden by the attributes of the fence, and the music as its content.
+
+</details>
 
 Read next: [With EHTML](/docs/ehtml/overview)
