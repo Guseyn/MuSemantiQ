@@ -2,9 +2,38 @@
 
 <nav is="docs-contents"></nav>
 
+## How it works
+
+1. **Plain ES modules.** Every file in `src` is a standard module with `import` and `export`, so Node.js and browsers load it as it is.
+2. **Import maps.** Inside `src`, modules import each other as `#msq/…`. In Node.js the `imports` of your `package.json` resolve that, and in the browser an import map does.
+3. **No build.** No bundler, no transpiler, no `npm install`. You copy `src` and use it.
+4. **The same API for the browser and Node.js.** The same functions, the same arguments, the same results. Only the font config differs: file paths in Node.js, URLs in the browser.
+
 > **TO WRITE**
-> - what the low-level API is: `src/api.js`, plain ES modules, what the worker, the components, the CLI and the tests are built on
-> - the pipeline: fonts, then parsing, then styles, then SVG and MIDI
+> - the pipeline: the fonts are loaded once, then each page is parsed, styled, drawn and performed
+
+```mermaid
+flowchart LR
+  fontConfig["font config"] --> supportedFontSources
+  pageText["MSQ text"] --> pageSchema
+  pageText --> customStyles
+  pageText --> midiSettings
+  customStyles --> pageStyles
+  supportedFontSources --> pageStyles
+  pageSchema --> svg["SVG"]
+  pageStyles --> svg
+  pageSchema --> midi["MIDI"]
+  midiSettings --> midi
+```
+
+> **TO WRITE**
+> - one `#msq/…` import, resolved two ways: by `package.json` in Node.js, by the import map in the browser
+
+```mermaid
+flowchart LR
+  import["import … from '#msq/api.js'"] -- Node.js --> packageJson["package.json imports"] --> nodeFile["./msq/api.js"]
+  import -- Browser --> importMap["import map"] --> browserFile["/js/msq/src/api.js"]
+```
 
 ## Setup and a full example
 
@@ -18,16 +47,22 @@
 First, download MuSemantiQ next to your project:
 
 ```sh
+# download the main branch as a zip
 curl -L https://github.com/Guseyn/MuSemantiQ/archive/refs/heads/main.zip -o MuSemantiQ.zip
+# unpack it
 unzip MuSemantiQ.zip
+# name the folder MuSemantiQ
 mv MuSemantiQ-main MuSemantiQ
 ```
 
 Then copy `src` from `MuSemantiQ` into your project, as the `msq` folder:
 
 ```sh
+# go to your project
 cd your-project
+# make the folder for MSQ
 mkdir msq
+# copy src into it, the fonts included
 rsync -a --delete ../MuSemantiQ/src/ msq/
 ```
 
@@ -48,12 +83,14 @@ Finally, add the imports to your `package.json` and mark the package as a module
 </details>
 
 > **TO WRITE**
-> - the full example: a script that reads a file of several pages and writes one SVG and one MIDI file
+> - the full example: a script that reads one MSQ file per page and writes one SVG and one MIDI file
 > - why it passes a font config: the defaults point into `./src/drawer/font/`, which exists only in `MuSemantiQ` itself
 
 ```js
 // render.js
+// fs reads the pages and writes the results
 import fs from 'fs'
+// the whole pipeline, from your copy of src
 import {
   setupFonts,
   generateIntermediateStructuresForMultiplePages,
@@ -62,6 +99,7 @@ import {
   generateMidiForMultiplePages
 } from '#msq/api.js'
 
+// the fonts, as paths into your copy
 const fontConfig = {
   'chord-letters': {
     'gentium plus': './msq/drawer/font/chord-letters/GentiumPlus-Regular.ttf'
@@ -80,11 +118,15 @@ const fontConfig = {
   }
 }
 
-const text = fs.readFileSync('score.txt', 'utf-8')
-const multiplePagesText = text.split('====next page====')
+// one file per page, in the order of their names: 1.txt, 2.txt, …, 10.txt
+const multiplePagesText = fs.readdirSync('pages')
+  .sort((left, right) => left.localeCompare(right, undefined, { numeric: true }))
+  .map((fileName) => fs.readFileSync(`pages/${fileName}`, 'utf-8'))
 
+// load the fonts once; the only async call
 const supportedFontSources = await setupFonts(fontConfig)
 
+// parse every page; a mistake is reported, never thrown
 const {
   pageSchemaForEachPage,
   errorsForEachPage,
@@ -92,33 +134,39 @@ const {
   midiSettingsForEachPage
 } = generateIntermediateStructuresForMultiplePages({ multiplePagesText })
 
+// print what the parser could not use, page by page
 errorsForEachPage.forEach((errors, pageIndex) => {
   errors.forEach((error) => console.error(`page ${pageIndex + 1}: ${error.trim()}`))
 })
 
+// merge the styles of each page with the defaults and the loaded fonts
 const pageStylesForEachPage = generateStylesForMultiplePages({
   customStylesForEachPage,
   supportedFontSources
 })
 
+// draw every page into one SVG, one under another
 const svg = generateSvgForMultiplePages({
   pageSchemaForEachPage,
   pageStylesForEachPage
 })
 
+// perform every page as one piece
 const midi = generateMidiForMultiplePages({
   pageSchemaForEachPage,
   midiSettingsForEachPage
 })
 
+// write both files
 fs.writeFileSync('score.svg', svg)
 fs.writeFileSync('score.mid', midi.data)
 
+// when each note starts, in seconds, page by page
 console.log(midi.refsOnMappedWithTimeStamps)
 ```
 
 > **TO WRITE**
-> - the file it reads, `score.txt`: two pages split by `====next page====`
+> - the first page it reads, `pages/1.txt`
 
 ```text
 default tempo is "1/4 = 76"
@@ -128,7 +176,12 @@ title is "A Short Piece"
 measure
 treble clef
 c d e f
-====next page====
+```
+
+> **TO WRITE**
+> - the second page, `pages/2.txt`
+
+```text
 measure
 g a b c5
 ```
@@ -137,6 +190,7 @@ g a b c5
 > - running it from the root of your project
 
 ```sh
+# run the script from the root of your project
 node render.js
 ```
 
@@ -172,22 +226,29 @@ node render.js
 First, download MuSemantiQ next to your project:
 
 ```sh
+# download the main branch as a zip
 curl -L https://github.com/Guseyn/MuSemantiQ/archive/refs/heads/main.zip -o MuSemantiQ.zip
+# unpack it
 unzip MuSemantiQ.zip
+# name the folder MuSemantiQ
 mv MuSemantiQ-main MuSemantiQ
 ```
 
 Then copy `src` from `MuSemantiQ` into your static `js` folder. The fonts come with it, under `drawer/font/`:
 
 ```sh
+# go to your project
 cd your-project
+# make the folder for MSQ in your static js folder
 mkdir -p static/js/msq
+# copy src into it, the fonts included
 rsync -a --delete ../MuSemantiQ/src/ static/js/msq/src
 ```
 
 Finally, add an import map to your page, before any module script, so that the `#msq/…` imports inside `src` resolve in the browser:
 
 ```html
+<!-- every #msq/… import goes to your copy of src -->
 <script type="importmap">
   {
     "imports": {
@@ -210,6 +271,7 @@ Finally, add an import map to your page, before any module script, so that the `
   <head>
     <meta charset="utf-8">
     <title>A Short Piece</title>
+    <!-- every #msq/… import goes to your copy of src -->
     <script type="importmap">
       {
         "imports": {
@@ -219,10 +281,13 @@ Finally, add an import map to your page, before any module script, so that the `
     </script>
   </head>
   <body>
+    <!-- where the score goes -->
     <div id="score"></div>
+    <!-- the MIDI, as a download -->
     <a id="midi" download="score.mid">Download MIDI</a>
 
     <script type="module">
+      // the whole pipeline, from your copy of src
       import {
         setupFonts,
         generateIntermediateStructuresForSinglePage,
@@ -231,6 +296,7 @@ Finally, add an import map to your page, before any module script, so that the `
         generateMidiForSinglePage
       } from '#msq/api.js'
 
+      // the fonts, as URLs into your copy
       const fontConfig = {
         'chord-letters': {
           'gentium plus': '/js/msq/src/drawer/font/chord-letters/GentiumPlus-Regular.ttf'
@@ -249,6 +315,7 @@ Finally, add an import map to your page, before any module script, so that the `
         }
       }
 
+      // the music of one page
       const pageText = `
         title is "A Short Piece"
 
@@ -257,8 +324,10 @@ Finally, add an import map to your page, before any module script, so that the `
         c d e f
       `
 
+      // load the fonts once; the only async call
       const supportedFontSources = await setupFonts(fontConfig)
 
+      // parse the page; a mistake is reported, never thrown
       const {
         pageSchema,
         errors,
@@ -266,26 +335,32 @@ Finally, add an import map to your page, before any module script, so that the `
         midiSettings
       } = generateIntermediateStructuresForSinglePage({ pageText })
 
+      // show what the parser could not use
       if (errors.length > 0) {
         console.error(errors)
       }
 
+      // merge the styles of the page with the defaults and the loaded fonts
       const pageStyles = generateStylesForSinglePage({
         customStyles,
         supportedFontSources
       })
 
+      // draw the page into the div
       document.querySelector('#score').innerHTML = generateSvgForSinglePage({
         pageSchema,
         pageStyles
       })
 
+      // number the measures, which the MIDI ref ids are made of
       pageSchema.measuresParams.forEach((measureParams, measureIndex) => {
         measureParams.pageIndex = 0
         measureParams.measureIndexOnPage = measureIndex
       })
+      // perform the page
       const midi = generateMidiForSinglePage({ pageSchema, midiSettings })
 
+      // offer the MIDI file through the link
       const midiBlob = new Blob([ midi.data ], { type: 'audio/midi' })
       document.querySelector('#midi').href = URL.createObjectURL(midiBlob)
     </script>
@@ -297,6 +372,7 @@ Finally, add an import map to your page, before any module script, so that the `
 > - serving `static/` with any static server, and opening the page
 
 ```sh
+# serve static/ with any static server
 cd static
 python3 -m http.server 8080
 ```
@@ -307,7 +383,7 @@ python3 -m http.server 8080
 
 ## Functions
 
-<h3 is="e-h" id="1-setupfonts">1. setupFonts</h3>
+### 1. setupFonts
 
 ```js
 async function setupFonts(fontConfig)
@@ -347,7 +423,7 @@ A promise of `supportedFontSources`, the same tree with every file loaded:
 
 </details>
 
-<h3 is="e-h" id="2-generateintermediatestructuresforsinglepage">2. generateIntermediateStructuresForSinglePage</h3>
+### 2. generateIntermediateStructuresForSinglePage
 
 ```js
 // also in '#msq/language/api.js', which loads no drawer and no fonts
@@ -417,7 +493,7 @@ One object:
 
 </details>
 
-<h3 is="e-h" id="3-generateintermediatestructuresformultiplepages">3. generateIntermediateStructuresForMultiplePages</h3>
+### 3. generateIntermediateStructuresForMultiplePages
 
 ```js
 // also in '#msq/language/api.js'
@@ -465,7 +541,7 @@ One object, with one array entry per page:
 
 </details>
 
-<h3 is="e-h" id="4-generatestylesforsinglepage">4. generateStylesForSinglePage</h3>
+### 4. generateStylesForSinglePage
 
 ```js
 function generateStylesForSinglePage({
@@ -507,7 +583,7 @@ Merges a page's custom styles with the defaults and picks its fonts out of the l
 
 </details>
 
-<h3 is="e-h" id="5-generatestylesformultiplepages">5. generateStylesForMultiplePages</h3>
+### 5. generateStylesForMultiplePages
 
 ```js
 function generateStylesForMultiplePages({
@@ -549,7 +625,7 @@ function generateStylesForMultiplePages({
 
 </details>
 
-<h3 is="e-h" id="6-generatesvgforsinglepage">6. generateSvgForSinglePage</h3>
+### 6. generateSvgForSinglePage
 
 ```js
 function generateSvgForSinglePage({
@@ -599,7 +675,7 @@ The SVG:
 
 </details>
 
-<h3 is="e-h" id="7-generatesvgformultiplepages">7. generateSvgForMultiplePages</h3>
+### 7. generateSvgForMultiplePages
 
 ```js
 function generateSvgForMultiplePages({
@@ -656,7 +732,7 @@ The SVG:
 
 </details>
 
-<h3 is="e-h" id="8-generatemidiforsinglepage">8. generateMidiForSinglePage</h3>
+### 8. generateMidiForSinglePage
 
 ```js
 function generateMidiForSinglePage({
@@ -700,7 +776,7 @@ One object; a page with no measures gives an empty `Buffer` instead:
 
 </details>
 
-<h3 is="e-h" id="9-generatemidiformultiplepages">9. generateMidiForMultiplePages</h3>
+### 9. generateMidiForMultiplePages
 
 ```js
 function generateMidiForMultiplePages({
@@ -744,7 +820,7 @@ The same object as the single-page form, for the whole document:
 
 </details>
 
-<h3 is="e-h" id="10-ispageschemavalid">10. isPageSchemaValid</h3>
+### 10. isPageSchemaValid
 
 ```js
 function isPageSchemaValid(pageSchema)
@@ -778,7 +854,7 @@ The result object of the JSON schema validator, which, despite the name of the f
 
 </details>
 
-<h3 is="e-h" id="11-areallpageschemasvalid">11. areAllPageSchemasValid</h3>
+### 11. areAllPageSchemasValid
 
 ```js
 function areAllPageSchemasValid(pageSchemas)
@@ -787,7 +863,7 @@ function areAllPageSchemasValid(pageSchemas)
 <details is="e-details">
 <summary>Purpose</summary>
 
-Meant to check every page at once, but at the moment it returns **true** for any array, which is optimistic. Until that is fixed, use `pageSchemas.every((pageSchema) => isPageSchemaValid(pageSchema).valid)`.
+Checks every page at once, with the same rules as `isPageSchemaValid`. Handy in tests, where one answer for the whole document is all you want.
 
 </details>
 
@@ -807,7 +883,7 @@ Meant to check every page at once, but at the moment it returns **true** for any
 
 A boolean:
 
-- **true**, at the moment always.
+- **true** when every page schema is valid, **false** as soon as one is not.
 
 </details>
 

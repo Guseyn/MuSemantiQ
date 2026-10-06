@@ -14,29 +14,43 @@
 First, download MuSemantiQ and EHTML next to your project. EHTML carries showdown as an ES module, so you don't need to download it separately:
 
 ```sh
+# download MuSemantiQ as a zip
 curl -L https://github.com/Guseyn/MuSemantiQ/archive/refs/heads/main.zip -o MuSemantiQ.zip
+# unpack it
 unzip MuSemantiQ.zip
+# name the folder MuSemantiQ
 mv MuSemantiQ-main MuSemantiQ
+# download EHTML as a zip
 curl -L https://github.com/Guseyn/EHTML/archive/refs/heads/master.zip -o EHTML.zip
+# unpack it
 unzip EHTML.zip
+# name the folder EHTML
 mv EHTML-master EHTML
 ```
 
 Then set up the web components and the extensions: the worker, the components, the language, the fonts and `showdown-extensions`:
 
 ```sh
+# go to your project
 cd your-project
+# make the folder for MSQ in your static js folder
 mkdir -p static/js/msq
+# generate the worker: src, with every #msq/… import made relative
 node ../MuSemantiQ/scripts/create-msq-worker.js -o static/js/msq/worker
+# copy the components next to the worker
 rsync -a --delete ../MuSemantiQ/web-components/ static/js/msq/web-components
+# copy the language, which the editor parses with on the page
 rsync -a --delete ../MuSemantiQ/src/language/ static/js/msq/language
+# copy the font files; the glyph tables are already in the worker
 rsync -a --delete --exclude music-js ../MuSemantiQ/src/drawer/font/ static/font
+# copy the showdown extensions next to the components
 rsync -a --delete ../MuSemantiQ/showdown-extensions/ static/js/msq/showdown-extensions
 ```
 
 Copy EHTML into your static `js` folder. It already carries showdown, in `static/js/ehtml/showdown/`:
 
 ```sh
+# copy EHTML, showdown included
 rsync -a --delete ../EHTML/src/ static/js/ehtml
 ```
 
@@ -74,6 +88,7 @@ Finally, create the font config, `static/js/font-config.json`, the same one the 
   <head>
     <meta charset="utf-8">
     <title>A Short Piece</title>
+    <!-- one import map for EHTML and the components -->
     <script type="importmap">
       {
         "imports": {
@@ -85,26 +100,32 @@ Finally, create the font config, `static/js/font-config.json`, the same one the 
       }
     </script>
     <script type="module">
+      // first: the polyfill, before anything defines an element
       import '#ehtml/third-party/custom-elements-polyfill.js'
 
+      // the elements the markdown may use
       import '#msq/web-components/msq-font-loader-template.js'
       import '#msq/web-components/msq-svg-template.js'
       import '#msq/web-components/msq-midi-template.js'
       import '#msq/web-components/msq-svg-midi-template.js'
       import '#msq/web-components/msq-editor-template.js'
 
+      // the extensions, as a global, for data-internal-state
       import msqExtensions from '/js/msq/showdown-extensions/msqExtensions.js'
       window.msqExtensions = msqExtensions
 
+      // last: EHTML activates the page
       import '#ehtml/main'
     </script>
   </head>
   <body>
+    <!-- load the fonts under the name myFonts, then show what is inside -->
     <template
       is="msq-font-loader"
       data-font-sources-reference="myFonts"
       data-font-config-src="/js/font-config.json"
     >
+      <!-- fetch the markdown and render it with the extensions -->
       <e-markdown
         data-src="/md/page.md"
         data-internal-state="${{ extensions: [ msqExtensions({ fontSources: 'myFonts' }) ] }}"
@@ -133,6 +154,7 @@ Finally, create the font config, `static/js/font-config.json`, the same one the 
 > - serving `static/` with any static server, and opening the page
 
 ```sh
+# serve static/ with any static server
 cd static
 python3 -m http.server 8080
 ```
@@ -151,7 +173,7 @@ c d e f
 > **TO WRITE**
 > - EHTML activates the page once `#ehtml/main` runs, and anything inserted later, such as the content of the font loader, is activated as it lands
 
-<h3 is="e-h" id="1-emarkdown">1. e-markdown</h3>
+### 1. e-markdown
 
 ```html
 <e-markdown data-src data-internal-state data-actions-on-progress-start data-actions-on-progress-end></e-markdown>
@@ -195,7 +217,7 @@ data-actions-on-progress-end="document.title = document.querySelector('h1').text
 
 </details>
 
-<h3 is="e-h" id="2-the-imports">2. The imports</h3>
+### 2. The imports
 
 ```html
 <script type="module">
@@ -251,7 +273,7 @@ import '#ehtml/main'
 
 </details>
 
-<h3 is="e-h" id="3-showdownhighlight">3. showdownHighlight</h3>
+### 3. showdownHighlight
 
 ```js
 import showdownHighlight from '#ehtml/showdown/extensions/highlight.js'

@@ -1330,7 +1330,8 @@ export function isPageSchemaValid(pageSchema) {
  * ---------------------------------------------------------------------------
  */
 export function areAllPageSchemasValid(pageSchemas) {
-  return pageSchemas.every(pageSchema => validatedPageSchema(pageSchema))
+  // The validator returns a result object, which is always truthy; the answer is its `valid`
+  return pageSchemas.every(pageSchema => validatedPageSchema(pageSchema).valid)
 }
 
 // ⟅━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━⟆

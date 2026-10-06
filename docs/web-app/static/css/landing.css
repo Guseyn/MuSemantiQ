@@ -850,7 +850,7 @@ md/landing/*.md, so the box is styled here and the pre only loses its margin.
 
 /*
 The "copy" link, which is the block's own ::before. It sits in the corner of
-the box, out in its padding, so it never covers code. js/copyCode.js finds
+the box, out in its padding, so it never covers code. js/docs/copy-code.js finds
 clicks on it from this box, which is why it is placed by top and right, and
 border-box.
 */

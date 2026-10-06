@@ -481,16 +481,18 @@ const pageSchema = {
                             customNumberOfTremoloStrokes: { type: 'number', greaterThanOrEqualTo: 1, lessThanOrEqualTo: 3, isPositiveInteger: true }
                           }
                         },
+                        // A simile mark is named by its refId, which the parser always writes, not by a key
                         simileMark: {
                           type: 'object',
                           properties: {
                             key: { type: 'string', isNotEmpty: true },
+                            refId: { type: 'string', isNotEmpty: true },
                             count: { type: 'number', isPositiveInteger: true, greaterThan: 0 },
                             numberOfBeats: { type: 'number', isPositiveInteger: true, greaterThan: 0 },
                             yCorrection: { type: 'number' },
                             finish: { type: 'boolean' }
                           },
-                          required: [ 'key' ]
+                          required: [ 'refId' ]
                         },
                         dynamicChangeMark: {
                           type: 'object',
@@ -503,7 +505,8 @@ const pageSchema = {
                             yCorrection: { type: 'number' },
                             finish: true
                           },
-                          required: [ 'key', 'type' ]
+                          // The unit that finishes a crescendo or diminuendo carries only its key; the type is on the one that starts it
+                          required: [ 'key' ]
                         },
                         relatedChordLetter: {
                           type: 'object',

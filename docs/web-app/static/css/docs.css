@@ -15,6 +15,9 @@ e-ui.css is loaded first and everything here is an override of it.
   --e-surface-bg: var(--e-bg);
   --e-primary: #ee5253;
 
+  /* Code blocks and e-details: white cards on the warm page */
+  --docs-block-bg: #ffffff;
+
   --docs-note-bg: #fdfdfd;
   --docs-note-border: #b58900;
   --docs-note-fg: #212121;
@@ -339,13 +342,77 @@ page above it.
 }
 
 /*
-The entries of a reference (a function, a message, an element) are written as
-<h3 is="e-h">: e-ui's interface heading, at the size between a section heading
-and the text, so each entry reads as a title of its own.
+Every heading is e-ui's e-h (js/docs/e-heading-extension.js): its interface
+font and weight, at the sizes the docs set above. An h3, which is what the
+entries of a reference (a function, a message, an element) are, is a title of
+its own, at the size between a section heading and the text.
 */
 [data-content] h3[is="e-h"] {
   margin: var(--e-spacing-2xl) 0 var(--e-spacing-sm);
   font-size: var(--e-font-h4);
+}
+
+/*
+The share link in front of a heading's text (js/docs/e-h.js copies it): the
+size of the text, in the muted colour until it is pointed at, and a check mark
+in the docs' red for a moment after a copy.
+*/
+[data-content] [is="e-h"]:has(> a[data-share]) {
+  display: flex;
+  align-items: center;
+  gap: var(--e-spacing-xs);
+}
+
+[data-content] [is="e-h"] > a[data-share] {
+  display: inline-flex;
+  flex-shrink: 0;
+  padding: 0.15em;
+  border-radius: var(--e-radius-sm);
+  color: var(--e-muted);
+}
+
+[data-content] [is="e-h"] > a[data-share] > svg {
+  width: 0.8em;
+  height: 0.8em;
+  fill: currentColor;
+}
+
+[data-content] [is="e-h"] > a[data-share]:hover,
+[data-content] [is="e-h"] > a[data-share][data-copied="true"] {
+  color: var(--e-primary);
+  background-color: var(--e-primary-transparent-accent-bg);
+}
+
+/*
+A diagram (js/docs/docs-diagram.js) is a white card like a code block. Until
+it is drawn its Mermaid source is hidden, and if it cannot be drawn the source
+is shown as it is, so the page still says what the diagram would have.
+*/
+[data-content] docs-diagram {
+  display: block;
+  margin-bottom: var(--e-spacing-lg);
+  padding: var(--e-spacing-md);
+  border: 1px solid var(--e-border);
+  border-radius: var(--e-radius-md);
+  background-color: var(--docs-block-bg);
+  overflow-x: auto;
+  text-align: center;
+}
+
+[data-content] docs-diagram:not([data-drawn]):not([data-broken]) {
+  color: transparent;
+  min-height: 6rem;
+}
+
+[data-content] docs-diagram[data-broken] {
+  white-space: pre;
+  text-align: left;
+  font-family: var(--e-font-mono);
+}
+
+[data-content] docs-diagram > svg {
+  max-width: 100%;
+  height: auto;
 }
 
 /*
@@ -354,6 +421,7 @@ tight for the ones a page stacks: Purpose, Arguments, Returns.
 */
 [data-content] details[is="e-details"] {
   margin: var(--e-spacing-sm) 0;
+  background-color: var(--docs-block-bg);
 }
 
 [data-content] p,
@@ -387,7 +455,7 @@ follows starts a new thought instead of hanging off the code.
   margin-bottom: var(--e-spacing-lg);
   padding: var(--e-spacing-md);
   border-radius: var(--e-radius-md);
-  background-color: var(--e-surface-bg);
+  background-color: var(--docs-block-bg);
   border: 1px solid var(--e-border);
 }
 
@@ -411,7 +479,7 @@ the block stays a clean box.
 
 /*
 The "copy" link of every code block, which is the block's own ::before, so the
-markdown needs nothing added to it. js/copyCode.js finds clicks on it from this
+markdown needs nothing added to it. js/docs/copy-code.js finds clicks on it from this
 box, which is why it is absolutely placed by top and right, and border-box.
 */
 [data-content] pre {
@@ -485,7 +553,7 @@ success one.
 }
 
 /*
-Tables are e-ui's e-table (js/eTableExtension.js), each in a <div data-table>
+Tables are e-ui's e-table (js/docs/e-table-extension.js), each in a <div data-table>
 that scrolls on its own when the table is wider than the column. e-table keeps
 every cell on one line, which suits a list of records; here cells are prose,
 so they wrap.
@@ -523,7 +591,7 @@ allowed to scroll on its own rather than widening the page.
 /* ── Contents ───────────────────────────────────────────────────────── */
 
 /*
-<nav is="docs-contents"> (js/docs-contents.js). Its title is a ::before rather
+<nav is="docs-contents"> (js/docs/docs-contents.js). Its title is a ::before rather
 than a heading, so it does not list itself.
 */
 [data-content] nav[is="docs-contents"] {

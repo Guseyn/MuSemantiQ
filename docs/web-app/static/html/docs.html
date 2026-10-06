@@ -18,7 +18,9 @@
           "#ehtml/main": "/js/ehtml/main.js",
           "#e-ui/": "/js/e-ui/",
           "#msq/web-components/": "/js/msq/web-components/",
-          "#msq/language/": "/js/msq/language/"
+          "#msq/language/": "/js/msq/language/",
+          "#docs/": "/js/docs/",
+          "#mermaid": "/js/docs/lib/mermaid/mermaid.esm.mjs"
         }
       }
     </script>
@@ -27,7 +29,7 @@
       Before anything else, and not a module: it decides how the sidebar opens,
       and e-sidebar reads that decision the moment EHTML activates it.
     -->
-    <script src="/js/app.js"></script>
+    <script src="/js/docs/app.js"></script>
 
     <script type="module">
       /*
@@ -56,12 +58,15 @@
       import '#e-ui/e-kbd.js'
       // The tabs some pages write in their markdown
       import '#e-ui/e-tab.js'
+      // A click on a heading's share link copies its address; the diagrams of ```mermaid fences
+      import '#docs/e-h.js'
+      import '#docs/docs-diagram.js'
       // The sitemap and the page the URL names, for the templates below.
-      import '/js/docs.js'
+      import '#docs/docs.js'
       // Every code block's "copy" link (its ::before).
-      import '/js/copyCode.js'
+      import '#docs/copy-code.js'
       // <nav is="docs-contents">, a page's contents built from its headings.
-      import '/js/docs-contents.js'
+      import '#docs/docs-contents.js'
       import '#ehtml/main'
 
       /*
@@ -81,11 +86,17 @@
       window.msqExtensions = msqExtensions
 
       // Every markdown table as e-ui's <table is="e-table">. A global as well.
-      import eTableExtension from '/js/eTableExtension.js'
+      import eTableExtension from '#docs/e-table-extension.js'
       window.eTableExtension = eTableExtension
       // <e-tabs>, <e-tab> and <details is="e-details"> written in a page's markdown
-      import eBlocksExtension from '/js/eBlocksExtension.js'
+      import eBlocksExtension from '#docs/e-blocks-extension.js'
       window.eBlocksExtension = eBlocksExtension
+      // ```mermaid fences as <docs-diagram>
+      import diagramExtension from '#docs/diagram-extension.js'
+      window.diagramExtension = diagramExtension
+      // Every heading as <h… is="e-h">, with its share link
+      import eHeadingExtension from '#docs/e-heading-extension.js'
+      window.eHeadingExtension = eHeadingExtension
     </script>
   </head>
 
@@ -338,7 +349,7 @@
           >
             <e-markdown
               data-src="${currentPage.md}"
-              data-internal-state="${{ extensions: [ msqExtensions({ fontSources: 'msqFontSources' }), showdownHighlight({ auto_detection: false }), eTableExtension(), eBlocksExtension() ] }}"
+              data-internal-state="${{ extensions: [ msqExtensions({ fontSources: 'msqFontSources' }), showdownHighlight({ auto_detection: false }), eTableExtension(), eBlocksExtension(), diagramExtension(), eHeadingExtension() ] }}"
               data-actions-on-progress-start="
                 document
                   .querySelectorAll('e-sidebar nav details[data-current=true]')

@@ -36,7 +36,7 @@ import url, { fileURLToPath } from 'url'
 import { generateIntermediateStructuresForSinglePage } from '#msq/language/api.js'
 import parserScenarios from '#msq/language/parser/scenarios/parserScenarios.js'
 
-import { allPages } from '../docs/web-app/static/js/sitemap.js'
+import { allPages } from '../docs/web-app/static/js/docs/sitemap.js'
 import { introducedBy } from '../docs/concepts.js'
 import msqExtensions from '../showdown-extensions/msqExtensions.js'
 

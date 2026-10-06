@@ -14,22 +14,29 @@
 First, download MuSemantiQ next to your project:
 
 ```sh
+# download MuSemantiQ as a zip
 curl -L https://github.com/Guseyn/MuSemantiQ/archive/refs/heads/main.zip -o MuSemantiQ.zip
+# unpack it
 unzip MuSemantiQ.zip
+# name the folder MuSemantiQ
 mv MuSemantiQ-main MuSemantiQ
 ```
 
 Then generate the worker. The script copies the whole `src` and rewrites every `#msq/…` import to a relative path, because a module worker gets no import map:
 
 ```sh
+# go to your project
 cd your-project
+# make the folder for MSQ in your static js folder
 mkdir -p static/js/msq
+# generate the worker: src, with every #msq/… import made relative
 node ../MuSemantiQ/scripts/create-msq-worker.js -o static/js/msq/worker
 ```
 
 The worker holds only `.js` files, so copy the font files separately. The glyph tables are already in the worker, under `drawer/font/music-js/`:
 
 ```sh
+# copy the font files; the glyph tables are already in the worker
 rsync -a --delete --exclude music-js ../MuSemantiQ/src/drawer/font/ static/font
 ```
 
@@ -48,13 +55,18 @@ rsync -a --delete --exclude music-js ../MuSemantiQ/src/drawer/font/ static/font
     <title>A Short Piece</title>
   </head>
   <body>
+    <!-- where the score goes -->
     <div id="score"></div>
+    <!-- the MIDI, as a download -->
     <a id="midi" download="score.mid">Download MIDI</a>
+    <!-- what the parser could not use -->
     <ul id="errors"></ul>
 
     <script type="module">
+      // start the worker
       const worker = new Worker('/js/msq/worker/worker.js', { type: 'module' })
 
+      // send one message, and wait for the reply with the same id
       function request(name, payload) {
         const id = crypto.randomUUID()
         return new Promise((resolve, reject) => {
@@ -74,6 +86,7 @@ rsync -a --delete --exclude music-js ../MuSemantiQ/src/drawer/font/ static/font
         })
       }
 
+      // load the fonts into the worker, under the name myFonts
       await request('fonts.setup', {
         fontSourcesReference: 'myFonts',
         fontConfig: {
@@ -95,6 +108,7 @@ rsync -a --delete --exclude music-js ../MuSemantiQ/src/drawer/font/ static/font
         }
       })
 
+      // engrave and perform one page with those fonts
       const { svg, midiDataSrc, errors } = await request('svg.midi.generate', {
         fontSourcesReference: 'myFonts',
         inputText: `
@@ -106,6 +120,7 @@ rsync -a --delete --exclude music-js ../MuSemantiQ/src/drawer/font/ static/font
         `
       })
 
+      // show the score, link the MIDI and list the errors
       document.querySelector('#score').innerHTML = svg
       document.querySelector('#midi').href = midiDataSrc
       for (const error of errors) {
@@ -122,6 +137,7 @@ rsync -a --delete --exclude music-js ../MuSemantiQ/src/drawer/font/ static/font
 > - serving `static/` with any static server, and opening the page
 
 ```sh
+# serve static/ with any static server
 cd static
 python3 -m http.server 8080
 ```
@@ -132,7 +148,7 @@ python3 -m http.server 8080
 > - every message is an object with a `name`, an `id` and the fields of that message; every reply carries the same `id`, and `status: 'ok'` when it worked
 > - a failure is `{ id, error }`; a message with a name the worker does not know throws inside the worker, and nobody gets a reply
 
-<h3 is="e-h" id="1-fontssetup">1. fonts.setup</h3>
+### 1. fonts.setup
 
 ```js
 worker.postMessage({ id, name: 'fonts.setup', fontConfig, fontSourcesReference })
@@ -181,7 +197,7 @@ crypto.randomUUID()
 
 </details>
 
-<h3 is="e-h" id="2-svggenerate">2. svg.generate</h3>
+### 2. svg.generate
 
 ```js
 worker.postMessage({ id, name: 'svg.generate', fontSourcesReference, inputText })
@@ -220,7 +236,7 @@ Parses and engraves one page. Nothing is played, so nothing is heard, which is s
 
 </details>
 
-<h3 is="e-h" id="3-midigenerate">3. midi.generate</h3>
+### 3. midi.generate
 
 ```js
 worker.postMessage({ id, name: 'midi.generate', inputText })
@@ -252,7 +268,7 @@ Parses and performs one page. It is the only message that needs no fonts, so it 
 
 </details>
 
-<h3 is="e-h" id="4-svgmidigenerate">4. svg.midi.generate</h3>
+### 4. svg.midi.generate
 
 ```js
 worker.postMessage({ id, name: 'svg.midi.generate', fontSourcesReference, inputText })
@@ -295,7 +311,7 @@ Engraves and performs one page from a single parse, and links the two, so a scor
 
 </details>
 
-<h3 is="e-h" id="5-svgmiditextgenerate">5. svg.midi.text.generate</h3>
+### 5. svg.midi.text.generate
 
 ```js
 worker.postMessage({ id, name: 'svg.midi.text.generate', fontSourcesReference, inputText })
@@ -333,7 +349,7 @@ Everything `svg.midi.generate` does, plus the source text highlighted with the s
 
 </details>
 
-<h3 is="e-h" id="6-glyphtrace">6. glyph.trace</h3>
+### 6. glyph.trace
 
 ```js
 worker.postMessage({ id, name: 'glyph.trace', fontSourcesReference, musicFontName, characters, musicFontSourceSize, intervalBetweenStaveLines })

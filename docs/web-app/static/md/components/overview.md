@@ -14,40 +14,50 @@
 First, download MuSemantiQ next to your project:
 
 ```sh
+# download MuSemantiQ as a zip
 curl -L https://github.com/Guseyn/MuSemantiQ/archive/refs/heads/main.zip -o MuSemantiQ.zip
+# unpack it
 unzip MuSemantiQ.zip
+# name the folder MuSemantiQ
 mv MuSemantiQ-main MuSemantiQ
 ```
 
 Then generate the worker, which the components talk to:
 
 ```sh
+# go to your project
 cd your-project
+# make the folder for MSQ in your static js folder
 mkdir -p static/js/msq
+# generate the worker: src, with every #msq/… import made relative
 node ../MuSemantiQ/scripts/create-msq-worker.js -o static/js/msq/worker
 ```
 
 Copy `web-components` next to the worker. The components start it from `../../worker/worker.js`, relative to their own folder, so the two folders have to stay side by side:
 
 ```sh
+# copy the components next to the worker
 rsync -a --delete ../MuSemantiQ/web-components/ static/js/msq/web-components
 ```
 
 Copy `language` next to them as well. The editor parses on the page itself, to colour what you type:
 
 ```sh
+# copy the language, which the editor parses with on the page
 rsync -a --delete ../MuSemantiQ/src/language/ static/js/msq/language
 ```
 
 Copy the font files. The glyph tables are already in the worker, under `drawer/font/music-js/`:
 
 ```sh
+# copy the font files; the glyph tables are already in the worker
 rsync -a --delete --exclude music-js ../MuSemantiQ/src/drawer/font/ static/font
 ```
 
 Finally, add an import map to your page, because the components import each other and the language through `#msq/…` specifiers:
 
 ```html
+<!-- the #msq/… specifiers the components import each other through -->
 <script type="importmap">
   {
     "imports": {
@@ -91,6 +101,7 @@ Finally, add an import map to your page, because the components import each othe
   <head>
     <meta charset="utf-8">
     <title>A Short Piece</title>
+    <!-- the #msq/… specifiers the components import each other through -->
     <script type="importmap">
       {
         "imports": {
@@ -99,17 +110,20 @@ Finally, add an import map to your page, because the components import each othe
         }
       }
     </script>
+    <!-- define the elements this page uses -->
     <script type="module">
       import '#msq/web-components/msq-font-loader-template.js'
       import '#msq/web-components/msq-editor-template.js'
     </script>
   </head>
   <body>
+    <!-- load the fonts under the name myFonts, then show what is inside -->
     <template
       is="msq-font-loader"
       data-font-sources-reference="myFonts"
       data-font-config-src="/js/font-config.json"
     >
+      <!-- an editor that waits for those fonts -->
       <template is="msq-editor" data-font-sources="myFonts" data-file-name="a-short-piece">
         title is "A Short Piece"
 
@@ -126,6 +140,7 @@ Finally, add an import map to your page, because the components import each othe
 > - serving `static/` with any static server, and opening the page
 
 ```sh
+# serve static/ with any static server
 cd static
 python3 -m http.server 8080
 ```
@@ -147,7 +162,7 @@ c d e f
 > - each element renders once: it sends its text to the worker and replaces itself with a `<div data-rendered-by>` that holds the result in an open shadow root
 > - a mistake in the music is listed in a panel inside the element; a mistake in the setup leaves the element invisible and goes to the console
 
-<h3 is="e-h" id="1-msq-font-loader">1. msq-font-loader</h3>
+### 1. msq-font-loader
 
 ```html
 <template is="msq-font-loader" data-font-sources-reference data-font-config data-font-config-src>
@@ -192,7 +207,7 @@ data-font-config-src="/js/font-config.json"
 
 </details>
 
-<h3 is="e-h" id="2-msq-svg">2. msq-svg</h3>
+### 2. msq-svg
 
 ```html
 <template is="msq-svg" data-font-sources data-file-name>
@@ -233,7 +248,7 @@ data-file-name="a-short-piece"
 
 </details>
 
-<h3 is="e-h" id="3-msq-midi">3. msq-midi</h3>
+### 3. msq-midi
 
 ```html
 <template is="msq-midi" data-sound-font data-file-name>
@@ -274,7 +289,7 @@ data-file-name="a-short-tune"
 
 </details>
 
-<h3 is="e-h" id="4-msq-svg-midi">4. msq-svg-midi</h3>
+### 4. msq-svg-midi
 
 ```html
 <template is="msq-svg-midi" data-font-sources data-highlight-color data-sound-font data-file-name>
@@ -327,7 +342,7 @@ data-file-name="two-staves"
 
 </details>
 
-<h3 is="e-h" id="5-msq-editor">5. msq-editor</h3>
+### 5. msq-editor
 
 ```html
 <template
@@ -429,7 +444,7 @@ data-navigation-highlight-color="#f5cd79"
 
 </details>
 
-<h3 is="e-h" id="6-innerstate">6. innerState</h3>
+### 6. innerState
 
 ```js
 template.innerState = 'measure\ntreble clef\nc d e f'
@@ -463,7 +478,7 @@ container.replaceChildren(template)
 
 </details>
 
-<h3 is="e-h" id="7-custom-properties">7. Custom properties</h3>
+### 7. Custom properties
 
 ```css
 div[data-rendered-by='template[is="msq-editor"]'] {

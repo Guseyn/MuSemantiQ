@@ -8,7 +8,7 @@ There is no router: every link is a page load, and every /docs/... URL is this
 same shell (see docs/web-app/worker.js).
 */
 
-import { sitemap, pageByPath } from '/js/sitemap.js'
+import { sitemap, pageByPath } from '#docs/sitemap.js'
 
 const currentPage = pageByPath(window.location.pathname)
 

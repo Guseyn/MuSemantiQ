@@ -19,20 +19,30 @@
 First, download MuSemantiQ and EHTML next to your project. EHTML carries showdown as an ES module, so you don't need to download it separately:
 
 ```sh
+# download MuSemantiQ as a zip
 curl -L https://github.com/Guseyn/MuSemantiQ/archive/refs/heads/main.zip -o MuSemantiQ.zip
+# unpack it
 unzip MuSemantiQ.zip
+# name the folder MuSemantiQ
 mv MuSemantiQ-main MuSemantiQ
+# download EHTML as a zip
 curl -L https://github.com/Guseyn/EHTML/archive/refs/heads/master.zip -o EHTML.zip
+# unpack it
 unzip EHTML.zip
+# name the folder EHTML
 mv EHTML-master EHTML
 ```
 
 Then copy the extensions and showdown into your project:
 
 ```sh
+# go to your project
 cd your-project
+# make the folder for MSQ
 mkdir msq
+# copy the showdown extensions
 rsync -a --delete ../MuSemantiQ/showdown-extensions/ msq/showdown-extensions
+# copy showdown out of EHTML
 rsync -a --delete ../EHTML/src/showdown/ showdown
 ```
 
@@ -52,16 +62,22 @@ Finally, mark the package as a module in your `package.json`, because the extens
 ```js
 // render.js
 import fs from 'fs'
+// showdown, copied out of EHTML
 import * as showdown from './showdown/showdown.js'
+// the four msq extensions
 import msqExtensions from './msq/showdown-extensions/msqExtensions.js'
 
+// a converter that turns msq fences into elements, with the fonts named myFonts
 const converter = new showdown.Converter({
   extensions: [ msqExtensions({ fontSources: 'myFonts' }) ]
 })
 
+// read the markdown
 const markdown = fs.readFileSync('page.md', 'utf-8')
+// convert it
 const html = converter.makeHtml(markdown)
 
+// write the HTML, and print it
 fs.writeFileSync('page.html', html)
 console.log(html)
 ```
@@ -85,6 +101,7 @@ console.log(html)
 > - running it
 
 ```sh
+# run the script from the root of your project
 node render.js
 ```
 
@@ -111,29 +128,43 @@ c d e f
 First, download MuSemantiQ and EHTML next to your project. EHTML carries showdown as an ES module, so you don't need to download it separately:
 
 ```sh
+# download MuSemantiQ as a zip
 curl -L https://github.com/Guseyn/MuSemantiQ/archive/refs/heads/main.zip -o MuSemantiQ.zip
+# unpack it
 unzip MuSemantiQ.zip
+# name the folder MuSemantiQ
 mv MuSemantiQ-main MuSemantiQ
+# download EHTML as a zip
 curl -L https://github.com/Guseyn/EHTML/archive/refs/heads/master.zip -o EHTML.zip
+# unpack it
 unzip EHTML.zip
+# name the folder EHTML
 mv EHTML-master EHTML
 ```
 
 Then set up the web components: the worker, the components, the language and the fonts. More about each step you can read in [Web components](/docs/components/overview):
 
 ```sh
+# go to your project
 cd your-project
+# make the folder for MSQ in your static js folder
 mkdir -p static/js/msq
+# generate the worker: src, with every #msq/… import made relative
 node ../MuSemantiQ/scripts/create-msq-worker.js -o static/js/msq/worker
+# copy the components next to the worker
 rsync -a --delete ../MuSemantiQ/web-components/ static/js/msq/web-components
+# copy the language, which the editor parses with on the page
 rsync -a --delete ../MuSemantiQ/src/language/ static/js/msq/language
+# copy the font files; the glyph tables are already in the worker
 rsync -a --delete --exclude music-js ../MuSemantiQ/src/drawer/font/ static/font
 ```
 
 Copy the extensions next to them, and showdown:
 
 ```sh
+# copy the showdown extensions next to the components
 rsync -a --delete ../MuSemantiQ/showdown-extensions/ static/js/msq/showdown-extensions
+# copy showdown out of EHTML
 rsync -a --delete ../EHTML/src/showdown/ static/js/showdown
 ```
 
@@ -171,6 +202,7 @@ Finally, create the font config, `static/js/font-config.json`. It's the same one
   <head>
     <meta charset="utf-8">
     <title>A Short Piece</title>
+    <!-- the #msq/… specifiers the components import each other through -->
     <script type="importmap">
       {
         "imports": {
@@ -181,25 +213,33 @@ Finally, create the font config, `static/js/font-config.json`. It's the same one
     </script>
   </head>
   <body>
+    <!-- where the page goes -->
     <article></article>
 
     <script type="module">
+      // the elements the markdown uses
       import '#msq/web-components/msq-font-loader-template.js'
       import '#msq/web-components/msq-svg-midi-template.js'
 
+      // showdown and the msq extensions
       import * as showdown from '/js/showdown/showdown.js'
       import msqExtensions from '/js/msq/showdown-extensions/msqExtensions.js'
 
+      // a converter that turns msq fences into elements, with the fonts named myFonts
       const converter = new showdown.Converter({
         extensions: [ msqExtensions({ fontSources: 'myFonts' }) ]
       })
 
+      // fetch the markdown
       const markdown = await (await fetch('/md/page.md')).text()
 
+      // a font loader, so every score waits for the fonts
       const loader = document.createElement('template', { is: 'msq-font-loader' })
       loader.setAttribute('data-font-sources-reference', 'myFonts')
       loader.setAttribute('data-font-config-src', '/js/font-config.json')
+      // the converted markdown goes inside it
       loader.innerHTML = converter.makeHtml(markdown)
+      // put it on the page
       document.querySelector('article').appendChild(loader)
     </script>
   </body>
@@ -225,6 +265,7 @@ Finally, create the font config, `static/js/font-config.json`. It's the same one
 > - serving `static/` with any static server, and opening the page
 
 ```sh
+# serve static/ with any static server
 cd static
 python3 -m http.server 8080
 ```
@@ -247,7 +288,7 @@ c d e f
 > **TO WRITE**
 > - every extension is a function that takes the default attributes and returns what showdown expects in `extensions`
 
-<h3 is="e-h" id="1-msqextensions">1. msqExtensions</h3>
+### 1. msqExtensions
 
 ```js
 import msqExtensions from './msq/showdown-extensions/msqExtensions.js'
@@ -288,7 +329,7 @@ An array of showdown extensions:
 
 </details>
 
-<h3 is="e-h" id="2-msqsvg-msqmidi-msqsvgmidi-msqeditor">2. msqSvg, msqMidi, msqSvgMidi, msqEditor</h3>
+### 2. msqSvg, msqMidi, msqSvgMidi, msqEditor
 
 ```js
 import msqSvg from './msq/showdown-extensions/msqSvg.js'
@@ -335,7 +376,7 @@ An array of showdown extensions:
 
 </details>
 
-<h3 is="e-h" id="3-the-fence">3. The fence</h3>
+### 3. The fence
 
 ````markdown
  ```msq-editor opens-with=text file-name="a short piece" data-editor-height=320px

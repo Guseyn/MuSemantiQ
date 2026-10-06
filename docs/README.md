@@ -16,9 +16,14 @@ shell, and a markdown file fetched into it per page.
       static/
         html/index.html    the landing page
         html/docs.html     the documentation shell
-        js/sitemap.js      the documentation, as data
-        js/docs.js         the sitemap and the current page, for the templates
-        js/app.js          holds the sidebar open; classic, and first
+        js/docs/           everything the documentation shell runs:
+          sitemap.js       the documentation, as data
+          docs.js          the sitemap and the current page, for the templates
+          app.js           holds the sidebar open; classic, and first
+          e-h.js           copies a heading's address when its share link is clicked
+          docs-diagram.js  the diagrams, drawn by the vendored mermaid in lib/
+          *-extension.js   the docs' own showdown extensions
+          copy-code.js, docs-contents.js
         js/landing/        the landing page's elements: landing-screen, -rail,
                            -phrase, -carousel, -flow, -scroll-hint
         md/landing/        the landing page's code samples
@@ -68,7 +73,7 @@ web components and markdown run live beside it.
 
 ## Writing a page
 
-`static/js/sitemap.js` is the only place a page is declared. Add it there and
+`static/js/docs/sitemap.js` is the only place a page is declared. Add it there and
 create `static/md/<section>/<page>.md`; the sidebar and the router both follow.
 
 **Order is meaning.** The language section is in the order the language is
@@ -122,7 +127,7 @@ as plain markdown:
 
     </details>
 
-`static/js/eBlocksExtension.js` takes off the paragraphs showdown wraps those
+`static/js/docs/e-blocks-extension.js` takes off the paragraphs showdown wraps those
 lines in, and gives the details its body `<div>`. Don't write that `<div>`
 yourself, and don't use `markdown="1"`: showdown parses such a block in a nested
 pass that runs the msq extensions again and loses the examples.
