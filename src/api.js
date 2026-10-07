@@ -445,9 +445,41 @@ Every path must be a valid URL, not a local filesystem path.
 }
 
 /**
+ * ⟅━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━⟆
+ *            2. supportedFontNamesFrom
+ * ⟅━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━⟆
+ */
+/**
+ * The names of the fonts `setupFonts()` loaded, in the shape the parser takes
+ * as `supportedFontNames`: it checks `music font is …`, `text font is …` and
+ * `chord letters font is …` against them.
+ *
+ * Text fonts are keyed twice in the sources, under `regular` and `bold`, so
+ * `Object.keys(supportedFontSources.text)` would give `['regular', 'bold']`
+ * and every text font would be rejected as an error in the music. The names
+ * are the union of both, and `music-js` is left out: it holds the same music
+ * fonts as `music`, as glyph tables.
+ *
+ * @param {SupportedFonts} supportedFontSources  what setupFonts() returned
+ * @returns {{ 'chord-letters': string[], music: string[], text: string[] }}
+ */
+export function supportedFontNamesFrom(supportedFontSources) {
+  return {
+    'chord-letters': Object.keys(supportedFontSources['chord-letters']),
+    'music': Object.keys(supportedFontSources['music']),
+    'text': [
+      ...new Set([
+        ...Object.keys(supportedFontSources['text']['regular']),
+        ...Object.keys(supportedFontSources['text']['bold'])
+      ])
+    ]
+  }
+}
+
+/**
  * ⟅━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━⟆
- *               2. generateIntermediateStructuresForSinglePage
- *               6. generateIntermediateStructuresForMultiplePages
+ *               3. generateIntermediateStructuresForSinglePage
+ *               7. generateIntermediateStructuresForMultiplePages
  * ⟅━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━⟆
  *
  * These two only parse, so they live in #msq/language/api.js and are
@@ -462,7 +494,7 @@ export {
 
 /**
  * ⟅━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━⟆
- *                  3. generateStylesForSinglePage
+ *                  4. generateStylesForSinglePage
  * ⟅━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━⟆
  * /
 /**
@@ -626,7 +658,7 @@ export function generateStylesForSinglePage({
 
 /**
  * ⟅━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━⟆
- *                        4. generateSvgForSinglePage
+ *                        5. generateSvgForSinglePage
  * ⟅━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━⟆
  **/
 /**
@@ -713,7 +745,7 @@ export function generateSvgForSinglePage({
 
 /**
  * ⟅━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━⟆
- *                          5. generateMidiForSinglePage
+ *                          6. generateMidiForSinglePage
  * ⟅━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━⟆
  */
 /*
@@ -832,7 +864,7 @@ export function generateMidiForSinglePage({
 
 /**
  * ⟅━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━⟆
- *                  7. generateStylesForMultiplePages
+ *                  8. generateStylesForMultiplePages
  * ⟅━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━⟆
  */
 /**
@@ -952,7 +984,7 @@ export function generateStylesForMultiplePages({
 
 /**
  * ⟅━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━⟆
- *                        8. generateSvgForMultiplePages
+ *                        9. generateSvgForMultiplePages
  * ⟅━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━⟆
  */
 /**
@@ -1077,7 +1109,7 @@ export function generateSvgForMultiplePages({
 
 /**
  * ⟅━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━⟆
- *                       9. generateMidiForMultiplePages
+ *                       10. generateMidiForMultiplePages
  * ⟅━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━⟆
  */
 /*
@@ -1210,7 +1242,7 @@ export function generateMidiForMultiplePages({
 
 /**
  * ⟅━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━⟆
- *                           10. isPageSchemaValid
+ *                           11. isPageSchemaValid
  * ⟅━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━⟆
  */
 /**
@@ -1261,12 +1293,13 @@ export function generateMidiForMultiplePages({
  * ---------------------------------------------------------------------------
  */
 export function isPageSchemaValid(pageSchema) {
-  return validatedPageSchema(pageSchema)
+  // The validator returns a result object, which is always truthy; the answer is its `valid`
+  return validatedPageSchema(pageSchema).valid
 }
 
 /**
  * ⟅━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━⟆
- *                       11. areAllPageSchemasValid
+ *                       12. areAllPageSchemasValid
  * ⟅━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━⟆
  */
 /**

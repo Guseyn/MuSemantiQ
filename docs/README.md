@@ -71,6 +71,16 @@ engine.
 "Powerful toolkit" shows its code from `static/md/landing/toolkit/`, and its
 web components and markdown run live beside it.
 
+The Node.js example on the Low-level API page links to the files it says you
+will get:
+
+    npm run docs:api-example
+
+runs `scripts/generate-api-example.js`, which reads the example's two pages from
+`static/md/api/overview.md` and writes `static/images/api/score.svg` and
+`score.mid`. They are committed; rerun it after changing those pages or the
+engine.
+
 ## Writing a page
 
 `static/js/docs/sitemap.js` is the only place a page is declared. Add it there and

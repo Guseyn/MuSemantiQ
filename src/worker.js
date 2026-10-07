@@ -2,6 +2,7 @@ self['__UNILANG_FONT_SOURCES_STORAGE__'] = {}
 
 import {
   setupFonts,
+  supportedFontNamesFrom,
   isPageSchemaValid,
   generateIntermediateStructuresForSinglePage,
   generateStylesForSinglePage,
@@ -162,16 +163,7 @@ const eventHandlers = {
       return
     }
     const supportedFontSources = self['__UNILANG_FONT_SOURCES_STORAGE__'][fontSourcesReference]
-    const supportedFontNames = {
-      'chord-letters': Object.keys(supportedFontSources['chord-letters']),
-      'music': Object.keys(supportedFontSources['music']),
-      'text': [
-        ...new Set([
-          ...Object.keys(supportedFontSources['text']['regular']),
-          ...Object.keys(supportedFontSources['text']['bold'])
-        ])
-      ]
-    }
+    const supportedFontNames = supportedFontNamesFrom(supportedFontSources)
     const inputText = event.data.inputText
     if (!inputText) {
       self.postMessage({
@@ -293,16 +285,7 @@ const eventHandlers = {
       return
     }
     const supportedFontSources = self['__UNILANG_FONT_SOURCES_STORAGE__'][fontSourcesReference]
-    const supportedFontNames = {
-      'chord-letters': Object.keys(supportedFontSources['chord-letters']),
-      'music': Object.keys(supportedFontSources['music']),
-      'text': [
-        ...new Set([
-          ...Object.keys(supportedFontSources['text']['regular']),
-          ...Object.keys(supportedFontSources['text']['bold'])
-        ])
-      ]
-    }
+    const supportedFontNames = supportedFontNamesFrom(supportedFontSources)
     const inputText = event.data.inputText
     if (!inputText) {
       self.postMessage({
@@ -398,16 +381,7 @@ const eventHandlers = {
       return
     }
     const supportedFontSources = self['__UNILANG_FONT_SOURCES_STORAGE__'][fontSourcesReference]
-    const supportedFontNames = {
-      'chord-letters': Object.keys(supportedFontSources['chord-letters']),
-      'music': Object.keys(supportedFontSources['music']),
-      'text': [
-        ...new Set([
-          ...Object.keys(supportedFontSources['text']['regular']),
-          ...Object.keys(supportedFontSources['text']['bold'])
-        ])
-      ]
-    }
+    const supportedFontNames = supportedFontNamesFrom(supportedFontSources)
     const inputText = event.data.inputText
     if (!inputText) {
       self.postMessage({

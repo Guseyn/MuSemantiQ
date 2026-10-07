@@ -2,9 +2,69 @@
 
 <nav is="docs-contents"></nav>
 
-> **TO WRITE**
-> - what the worker is: `src/worker.js`, the low-level API behind a small message protocol, in a module worker
-> - why a worker at all: engraving is real work, and on the main thread the page would freeze while it happens
+## How it works
+
+1. **A thread of its own.** Loading fonts and engraving a score is real work. In a worker it happens beside the page, so the page does not freeze while it waits.
+2. **Messages only.** The page and the worker share nothing but messages. A message is an object with a `name`, an `id` and its own fields, and the reply carries the same `id`, with `status: 'ok'` when it worked, or with an `error` when it did not. A message with a name the worker does not know gets no reply at all.
+3. **Fonts once.** `fonts.setup` loads the fonts in the worker once, under a name you pick. Every later message refers to that name, so fonts are never sent again.
+4. **The same engine.** Inside, the worker runs the [Low-level API](/docs/api/overview#how-it-works), so the page itself never loads the engine.
+
+Below is a diagram of how the page and the worker communicate:
+
+1. The page sends the **font config** with `fonts.setup`, and the worker loads the fonts and keeps them as **supported font sources**, under the name the page picked.
+2. The page sends the **MSQ text** with one of the messages that generate a score, together with that name.
+3. The worker runs the **low-level API** on the text with those fonts.
+4. The worker sends back **SVG**, **MIDI**, or both.
+
+```mermaid
+flowchart LR
+  fontConfig@{ icon: "material:tune", label: "font config", pos: "b", h: 36, w: 36 }
+  pageText@{ icon: "material:description", label: "MSQ text", pos: "b", h: 36, w: 36 }
+  supportedFontSources@{ icon: "material:font-download", label: "supportedFontSources", pos: "b", h: 36, w: 36 }
+  engine@{ icon: "material:memory", label: "low-level API", pos: "b", h: 36, w: 36 }
+  svg@{ icon: "material:image", label: "SVG", pos: "b", h: 36, w: 36 }
+  midi@{ icon: "material:music-note", label: "MIDI", pos: "b", h: 36, w: 36 }
+  subgraph page [" page "]
+    fontConfig
+    pageText
+  end
+  subgraph worker [" worker "]
+    supportedFontSources
+    engine
+  end
+  subgraph result [" page "]
+    svg
+    midi
+  end
+  %% each message is named in the gap before the worker: a plain line into its name, an arrow out of it
+  fontsSetup["fonts.setup"]
+  %% every message that turns MSQ text into a score: SVG, MIDI, both, or both and the highlighted text
+  generate["svg.generate<br>midi.generate<br>svg.midi.generate<br>svg.midi.text.generate"]
+  fontConfig e1@--- fontsSetup
+  fontsSetup e2@--> supportedFontSources
+  pageText e3@--- generate
+  generate e4@--> engine
+  supportedFontSources e5@--> engine
+  engine e6@--> svg
+  engine e7@--> midi
+  %% the arrows move, from what we write to what we get
+  e1@{ animation: fast }
+  e2@{ animation: fast }
+  e3@{ animation: fast }
+  e4@{ animation: fast }
+  e5@{ animation: fast }
+  e6@{ animation: fast }
+  e7@{ animation: fast }
+  %% the docs' primary colour, for every icon, arrow and frame
+  classDef default stroke:#EE5253
+  linkStyle default stroke:#EE5253
+  style page stroke:#EE5253
+  style worker stroke:#EE5253
+  style result stroke:#EE5253
+  %% a message is only its name, with no box around it
+  style fontsSetup fill:none,stroke:none
+  style generate fill:none,stroke:none
+```
 
 ## Setup and a full example
 
@@ -41,10 +101,6 @@ rsync -a --delete --exclude music-js ../MuSemantiQ/src/drawer/font/ static/font
 ```
 
 </details>
-
-> **TO WRITE**
-> - the full example: a page that starts the worker, loads the fonts, and asks for a score and its MIDI
-> - `request`: one message out, one reply back, matched by `id`
 
 ```html
 <!-- static/index.html -->
@@ -133,20 +189,16 @@ rsync -a --delete --exclude music-js ../MuSemantiQ/src/drawer/font/ static/font
 </html>
 ```
 
-> **TO WRITE**
-> - serving `static/` with any static server, and opening the page
+Serve `static/` with any static server, and open http://localhost:8080:
 
 ```sh
-# serve static/ with any static server
-cd static
-python3 -m http.server 8080
+# serve static/ on port 8080; npx fetches http-server the first time
+npx http-server static -p 8080
 ```
 
-## Messages
+As a result, the page will show the music score, offer the MIDI file as a download, and list the lines the parser could not use, if there are any.
 
-> **TO WRITE**
-> - every message is an object with a `name`, an `id` and the fields of that message; every reply carries the same `id`, and `status: 'ok'` when it worked
-> - a failure is `{ id, error }`; a message with a name the worker does not know throws inside the worker, and nobody gets a reply
+## Messages
 
 ### 1. fonts.setup
 

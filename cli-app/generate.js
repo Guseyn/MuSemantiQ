@@ -4,12 +4,13 @@
  * output gets made.
  */
 import {
+  supportedFontNamesFrom,
   generateIntermediateStructuresForMultiplePages,
   generateStylesForMultiplePages,
   generateSvgForSinglePage,
   generateMidiForMultiplePages
 } from '#msq/api.js'
-import { loadFontSources, fontNamesFromSources, fontNamesFromConfig, defaultFontConfig } from './fonts.js'
+import { loadFontSources, fontNamesFromConfig, defaultFontConfig } from './fonts.js'
 import { planOutputs, resolveDestination, writeOutputs } from './output.js'
 import { DEFAULT_PAGE_DELIMITER } from './input.js'
 import { countErrors } from './report.js'
@@ -46,7 +47,7 @@ export default async function generate({
 
   if (needsGlyphs) {
     supportedFontSources = await loadFontSources(fontConfig)
-    supportedFontNames = fontNamesFromSources(supportedFontSources)
+    supportedFontNames = supportedFontNamesFrom(supportedFontSources)
   } else {
     supportedFontNames = fontNamesFromConfig({ ...defaultFontConfig(), ...(fontConfig || {}) })
   }

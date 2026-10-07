@@ -164,7 +164,7 @@ export function generateIntermediateStructuresForSinglePage({
       pageText
     ),
     progressionOfCommandsFromScenarios || [],
-    applyHighlighting || true,
+    applyHighlighting ?? true,
     applyOnlyHighlightingWithoutRefIds || false,
     supportedFontNames || {
       'chord-letters': ['gentium plus', 'gothic a1'],

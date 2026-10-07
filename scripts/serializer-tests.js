@@ -29,6 +29,7 @@ import assert from 'assert'
 
 import {
   setupFonts,
+  supportedFontNamesFrom,
   generateIntermediateStructuresForMultiplePages
 } from '#msq/api.js'
 import serialize from '#msq/language/serializer/serialize.js'
@@ -83,14 +84,7 @@ const supportedFontSources = await setupFonts({
     }
   }
 })
-const supportedFontNames = {
-  'chord-letters': Object.keys(supportedFontSources['chord-letters']),
-  'music': Object.keys(supportedFontSources['music']),
-  'text': [ ...new Set([
-    ...Object.keys(supportedFontSources['text']['regular']),
-    ...Object.keys(supportedFontSources['text']['bold'])
-  ]) ]
-}
+const supportedFontNames = supportedFontNamesFrom(supportedFontSources)
 
 const testNames = (await fs.readdir(`${ROOT}/page-schema/expected`))
   .filter((file) => file.endsWith('.json'))

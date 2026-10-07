@@ -5,34 +5,63 @@
 ## How it works
 
 1. **Plain ES modules.** Every file in `src` is a standard module with `import` and `export`, so Node.js and browsers load it as it is.
-2. **Import maps.** Inside `src`, modules import each other as `#msq/…`. In Node.js the `imports` of your `package.json` resolve that, and in the browser an import map does.
+2. **Import maps.** Inside `src`, modules import each other as `#msq/…`. In Node.js the `imports` are configured in `package.json`, and in the browser `<script type="importmap">` does that.
 3. **No build.** No bundler, no transpiler, no `npm install`. You copy `src` and use it.
 4. **The same API for the browser and Node.js.** The same functions, the same arguments, the same results. Only the font config differs: file paths in Node.js, URLs in the browser.
 
-> **TO WRITE**
-> - the pipeline: the fonts are loaded once, then each page is parsed, styled, drawn and performed
+Below is a diagram of how the MSQ engine works:
+
+1. We load the fonts declared in the **font configuration**, which gives us the glyph shapes for each font.
+2. From the loaded fonts, we take their names, the **supported font names**: the only fonts our MSQ text may choose.
+3. From the **MSQ text**, we parse the page structure, or **page schema**, and extract any **custom styles** and **MIDI settings** we have specified. A font chosen in the text must be one of the **supported font names**.
+4. The glyph shapes, combined with our **custom styles**, give us the **page styles**.
+5. We use the **page schema** and the **page styles** to generate **SVG**.
+6. We use the **page schema** and the extracted **MIDI settings** to generate **MIDI**.
 
 ```mermaid
 flowchart LR
-  fontConfig["font config"] --> supportedFontSources
-  pageText["MSQ text"] --> pageSchema
-  pageText --> customStyles
-  pageText --> midiSettings
-  customStyles --> pageStyles
-  supportedFontSources --> pageStyles
-  pageSchema --> svg["SVG"]
-  pageStyles --> svg
-  pageSchema --> midi["MIDI"]
-  midiSettings --> midi
-```
-
-> **TO WRITE**
-> - one `#msq/…` import, resolved two ways: by `package.json` in Node.js, by the import map in the browser
-
-```mermaid
-flowchart LR
-  import["import … from '#msq/api.js'"] -- Node.js --> packageJson["package.json imports"] --> nodeFile["./msq/api.js"]
-  import -- Browser --> importMap["import map"] --> browserFile["/js/msq/src/api.js"]
+  fontConfig@{ icon: "material:tune", label: "font config", pos: "b", h: 36, w: 36 }
+  pageText@{ icon: "material:description", label: "MSQ text", pos: "b", h: 36, w: 36 }
+  supportedFontSources@{ icon: "material:font-download", label: "supportedFontSources", pos: "b", h: 36, w: 36 }
+  supportedFontNames@{ icon: "material:list", label: "supportedFontNames", pos: "b", h: 36, w: 36 }
+  customStyles@{ icon: "material:palette", label: "customStyles", pos: "b", h: 36, w: 36 }
+  pageSchema@{ icon: "material:data-object", label: "pageSchema", pos: "b", h: 36, w: 36 }
+  midiSettings@{ icon: "material:piano", label: "midiSettings", pos: "b", h: 36, w: 36 }
+  pageStyles@{ icon: "material:format-paint", label: "pageStyles", pos: "b", h: 36, w: 36 }
+  svg@{ icon: "material:image", label: "SVG", pos: "b", h: 36, w: 36 }
+  midi@{ icon: "material:music-note", label: "MIDI", pos: "b", h: 36, w: 36 }
+  fontConfig e1@--> supportedFontSources
+  %% the names are taken from the loaded fonts; a font the text chooses must be one of them
+  supportedFontSources e2@--> supportedFontNames
+  supportedFontSources e3@--> pageStyles
+  supportedFontNames e4@--> customStyles
+  %% not drawn: it only puts the MSQ text in the same column as the font names
+  supportedFontSources ~~~ pageText
+  pageText e5@--> customStyles
+  %% three dashes: one level further, beside pageStyles, which also feeds SVG
+  pageText e6@---> pageSchema
+  pageText e7@---> midiSettings
+  customStyles e8@--> pageStyles
+  pageStyles e9@--> svg
+  pageSchema e10@--> svg
+  pageSchema e11@--> midi
+  midiSettings e12@--> midi
+  %% the arrows move, from what we write to what we get
+  e1@{ animation: fast }
+  e2@{ animation: fast }
+  e3@{ animation: fast }
+  e4@{ animation: fast }
+  e5@{ animation: fast }
+  e6@{ animation: fast }
+  e7@{ animation: fast }
+  e8@{ animation: fast }
+  e9@{ animation: fast }
+  e10@{ animation: fast }
+  e11@{ animation: fast }
+  e12@{ animation: fast }
+  %% the docs' primary colour, for every icon and arrow
+  classDef default stroke:#EE5253
+  linkStyle default stroke:#EE5253
 ```
 
 ## Setup and a full example
@@ -82,17 +111,14 @@ Finally, add the imports to your `package.json` and mark the package as a module
 
 </details>
 
-> **TO WRITE**
-> - the full example: a script that reads one MSQ file per page and writes one SVG and one MIDI file
-> - why it passes a font config: the defaults point into `./src/drawer/font/`, which exists only in `MuSemantiQ` itself
-
 ```js
 // render.js
-// fs reads the pages and writes the results
+
 import fs from 'fs'
-// the whole pipeline, from your copy of src
+
 import {
   setupFonts,
+  supportedFontNamesFrom,
   generateIntermediateStructuresForMultiplePages,
   generateStylesForMultiplePages,
   generateSvgForMultiplePages,
@@ -126,15 +152,21 @@ const multiplePagesText = fs.readdirSync('pages')
 // load the fonts once; the only async call
 const supportedFontSources = await setupFonts(fontConfig)
 
+// the names of those fonts, which the pages may choose
+const supportedFontNames = supportedFontNamesFrom(supportedFontSources)
+
 // parse every page; a mistake is reported, never thrown
 const {
   pageSchemaForEachPage,
   errorsForEachPage,
   customStylesForEachPage,
   midiSettingsForEachPage
-} = generateIntermediateStructuresForMultiplePages({ multiplePagesText })
+} = generateIntermediateStructuresForMultiplePages({
+  multiplePagesText,
+  supportedFontNames
+})
 
-// print what the parser could not use, page by page
+// print user errors from the parser, page by page
 errorsForEachPage.forEach((errors, pageIndex) => {
   errors.forEach((error) => console.error(`page ${pageIndex + 1}: ${error.trim()}`))
 })
@@ -160,13 +192,9 @@ const midi = generateMidiForMultiplePages({
 // write both files
 fs.writeFileSync('score.svg', svg)
 fs.writeFileSync('score.mid', midi.data)
-
-// when each note starts, in seconds, page by page
-console.log(midi.refsOnMappedWithTimeStamps)
 ```
 
-> **TO WRITE**
-> - the first page it reads, `pages/1.txt`
+Let's say, this is the first page, `pages/1.txt`:
 
 ```text
 default tempo is "1/4 = 76"
@@ -178,41 +206,21 @@ treble clef
 c d e f
 ```
 
-> **TO WRITE**
-> - the second page, `pages/2.txt`
+And this is the second one, `pages/2.txt`:
 
 ```text
 measure
 g a b c5
 ```
 
-> **TO WRITE**
-> - running it from the root of your project
+Run the script:
 
 ```sh
 # run the script from the root of your project
 node render.js
 ```
 
-> **TO WRITE**
-> - what you get: `score.svg` and `score.mid`, and the time of every note in the terminal
-
-```text
-{
-  '0': {
-    'note-1-1-1-1-1': 0,
-    'note-1-1-1-2-1': 0.7895,
-    'note-1-1-1-3-1': 1.5789,
-    'note-1-1-1-4-1': 2.3684
-  },
-  '1': {
-    'note-1-1-1-1-1': 3.1579,
-    'note-1-1-1-2-1': 3.9474,
-    'note-1-1-1-3-1': 4.7368,
-    'note-1-1-1-4-1': 5.5263
-  }
-}
-```
+As a result, you will get music score [`score.svg`](/images/api/score.svg) and MIDI file [`score.mid`](/images/api/score.mid).
 
 </e-tab>
 
@@ -260,10 +268,6 @@ Finally, add an import map to your page, before any module script, so that the `
 
 </details>
 
-> **TO WRITE**
-> - the full example: a page that engraves a score into itself and offers the MIDI as a download
-> - why the font config is required here: the browser has no defaults, and every entry is a URL
-
 ```html
 <!-- static/index.html -->
 <!DOCTYPE html>
@@ -287,16 +291,16 @@ Finally, add an import map to your page, before any module script, so that the `
     <a id="midi" download="score.mid">Download MIDI</a>
 
     <script type="module">
-      // the whole pipeline, from your copy of src
       import {
         setupFonts,
-        generateIntermediateStructuresForSinglePage,
-        generateStylesForSinglePage,
-        generateSvgForSinglePage,
-        generateMidiForSinglePage
+        supportedFontNamesFrom,
+        generateIntermediateStructuresForMultiplePages,
+        generateStylesForMultiplePages,
+        generateSvgForMultiplePages,
+        generateMidiForMultiplePages
       } from '#msq/api.js'
 
-      // the fonts, as URLs into your copy
+      // the fonts, as URLs into your copy; the browser has no defaults, so every one is listed
       const fontConfig = {
         'chord-letters': {
           'gentium plus': '/js/msq/src/drawer/font/chord-letters/GentiumPlus-Regular.ttf'
@@ -315,52 +319,53 @@ Finally, add an import map to your page, before any module script, so that the `
         }
       }
 
-      // the music of one page
-      const pageText = `
-        title is "A Short Piece"
+      // one file per page, in order; a browser cannot list a folder, so the names are written out
+      const multiplePagesText = await Promise.all(
+        [ '/pages/1.txt', '/pages/2.txt' ].map((url) => fetch(url).then((response) => response.text()))
+      )
 
-        measure
-        treble clef
-        c d e f
-      `
-
-      // load the fonts once; the only async call
+      // load the fonts once; the only async call of the API
       const supportedFontSources = await setupFonts(fontConfig)
 
-      // parse the page; a mistake is reported, never thrown
+      // the names of those fonts, which the pages may choose
+      const supportedFontNames = supportedFontNamesFrom(supportedFontSources)
+
+      // parse every page; a mistake is reported, never thrown
       const {
-        pageSchema,
-        errors,
-        customStyles,
-        midiSettings
-      } = generateIntermediateStructuresForSinglePage({ pageText })
+        pageSchemaForEachPage,
+        errorsForEachPage,
+        customStylesForEachPage,
+        midiSettingsForEachPage
+      } = generateIntermediateStructuresForMultiplePages({
+        multiplePagesText,
+        supportedFontNames
+      })
 
-      // show what the parser could not use
-      if (errors.length > 0) {
-        console.error(errors)
-      }
+      // print user errors from the parser, page by page
+      errorsForEachPage.forEach((errors, pageIndex) => {
+        errors.forEach((error) => console.error(`page ${pageIndex + 1}: ${error.trim()}`))
+      })
 
-      // merge the styles of the page with the defaults and the loaded fonts
-      const pageStyles = generateStylesForSinglePage({
-        customStyles,
+      // merge the styles of each page with the defaults and the loaded fonts
+      const pageStylesForEachPage = generateStylesForMultiplePages({
+        customStylesForEachPage,
         supportedFontSources
       })
 
-      // draw the page into the div
-      document.querySelector('#score').innerHTML = generateSvgForSinglePage({
-        pageSchema,
-        pageStyles
+      // draw every page into one SVG, one under another
+      const svg = generateSvgForMultiplePages({
+        pageSchemaForEachPage,
+        pageStylesForEachPage
       })
 
-      // number the measures, which the MIDI ref ids are made of
-      pageSchema.measuresParams.forEach((measureParams, measureIndex) => {
-        measureParams.pageIndex = 0
-        measureParams.measureIndexOnPage = measureIndex
+      // perform every page as one piece
+      const midi = generateMidiForMultiplePages({
+        pageSchemaForEachPage,
+        midiSettingsForEachPage
       })
-      // perform the page
-      const midi = generateMidiForSinglePage({ pageSchema, midiSettings })
 
-      // offer the MIDI file through the link
+      // put the score on the page, and the MIDI file behind the link
+      document.querySelector('#score').innerHTML = svg
       const midiBlob = new Blob([ midi.data ], { type: 'audio/midi' })
       document.querySelector('#midi').href = URL.createObjectURL(midiBlob)
     </script>
@@ -368,14 +373,33 @@ Finally, add an import map to your page, before any module script, so that the `
 </html>
 ```
 
-> **TO WRITE**
-> - serving `static/` with any static server, and opening the page
+Let's say, this is the first page, `static/pages/1.txt`:
+
+```text
+default tempo is "1/4 = 76"
+
+title is "A Short Piece"
+
+measure
+treble clef
+c d e f
+```
+
+And this is the second one, `static/pages/2.txt`:
+
+```text
+measure
+g a b c5
+```
+
+Serve `static/` with any static server, and open http://localhost:8080:
 
 ```sh
-# serve static/ with any static server
-cd static
-python3 -m http.server 8080
+# serve static/ on port 8080; npx fetches http-server the first time
+npx http-server static -p 8080
 ```
+
+As a result, the page will show the music score, the same as [`score.svg`](/images/api/score.svg), and offer the MIDI file [`score.mid`](/images/api/score.mid) as a download.
 
 </e-tab>
 
@@ -419,14 +443,48 @@ A promise of `supportedFontSources`, the same tree with every file loaded:
 - `chord-letters`: each chord-letter font, by name, as an opentype.js font.
 - `text.regular`, `text.bold`: each text font, by name, as an opentype.js font.
 - `music`: each music font, by name, as an opentype.js font; only braces are drawn from it.
-- `music-js`: each music font's glyph table, by name; every other glyph is drawn from it, which is why only **bravura** and **leland**, the two fonts with a table at the moment, can be listed under `music`.
+- `music-js`: each music font's glyph table, by name;
 
 </details>
 
-### 2. generateIntermediateStructuresForSinglePage
+### 2. supportedFontNamesFrom
 
 ```js
-// also in '#msq/language/api.js', which loads no drawer and no fonts
+function supportedFontNamesFrom(supportedFontSources)
+```
+
+<details is="e-details">
+<summary>Purpose</summary>
+
+Lists the names of the fonts you loaded, so the parser accepts `music font is …`, `text font is …` and `chord letters font is …` for exactly those.
+
+</details>
+
+<details is="e-details">
+<summary>Arguments</summary>
+
+`supportedFontSources`: what [setupFonts](#1-setupfonts) returned.
+
+```js
+{ 'chord-letters': { … }, 'text': { regular: { … }, bold: { … } }, 'music': { … }, 'music-js': { … } }
+```
+
+</details>
+
+<details is="e-details">
+<summary>Returns</summary>
+
+`supportedFontNames`, the names by category, for the parse functions:
+
+- `chord-letters`: the name of each chord-letter font.
+- `music`: the name of each music font.
+- `text`: the name of each text font, once, whether it was loaded as regular, bold or both.
+
+</details>
+
+### 3. generateIntermediateStructuresForSinglePage
+
+```js
 function generateIntermediateStructuresForSinglePage({
   pageText,
   applyHighlighting,
@@ -439,7 +497,7 @@ function generateIntermediateStructuresForSinglePage({
 <details is="e-details">
 <summary>Purpose</summary>
 
-Parses the MSQ text of one page into everything the rest of the pipeline needs, in one pass. It never throws on bad music: what it cannot read goes into `errors`, and the rest is parsed anyway.
+Parses the MSQ text of one page into everything the rest of the pipeline needs, in one pass. It tries to parse as much as possible, and never throws user errors, instead it returns them in `errors` property.
 
 </details>
 
@@ -452,13 +510,13 @@ Parses the MSQ text of one page into everything the rest of the pipeline needs, 
 'measure\ntreble clef\nc d e f'
 ```
 
-`applyHighlighting`: meant to switch the highlighted source off, but at the moment it is read as `applyHighlighting || true`, so the source is highlighted anyway.
+`applyHighlighting`: whether to build the highlighted source for the editor; `true` by default, and `false` skips it, which is all you want when you only draw or play.
 
 ```js
 true
 ```
 
-`applyOnlyHighlightingWithoutRefIds`: only highlight, with no ref ids, no page schema and no MIDI settings; this is the cheap parse the editor runs on every keystroke. **false** by default.
+`applyOnlyHighlightingWithoutRefIds`: only highlight, with no ref ids, no page schema and no MIDI settings; this is the cheap parse that, for example, the editor runs on every keystroke. **false** by default.
 
 ```js
 false
@@ -470,7 +528,7 @@ false
 []
 ```
 
-`supportedFontNames`: the font names a page may choose; by default the built-in ones, so pass the names you loaded if they differ.
+`supportedFontNames`: the font names a page may choose; by default the built-in ones, so pass what [supportedFontNamesFrom](#2-supportedfontnamesfrom) returns for the fonts you loaded.
 
 ```js
 { 'chord-letters': [ 'gentium plus' ], 'music': [ 'bravura' ], 'text': [ 'noto-serif' ] }
@@ -489,11 +547,11 @@ One object:
 - `midiSettings`: the MIDI settings of the page, for example `{ defaultTempo: '"1/4 = 76"' }`.
 - `comments`: the `comment:` blocks, each with its `text`, its quote and its line numbers.
 - `highlightsHtmlBuffer`: the source as an array of HTML fragments, each token in a `<span>` with a `ref-id`; `join('')` it before use.
-- `mapOfCharIndexesWithProgressionOfCommandsFromScenarios`: for every character of the source, the progression of commands at that point, which the editor uses for completion.
+- `mapOfCharIndexesWithProgressionOfCommandsFromScenarios`: for every character of the source, the progression of commands at that point. It can be used by the editor for autocompletion of commands.
 
 </details>
 
-### 3. generateIntermediateStructuresForMultiplePages
+### 4. generateIntermediateStructuresForMultiplePages
 
 ```js
 // also in '#msq/language/api.js'
@@ -522,7 +580,7 @@ The same parse, once per page, plus `pageIndex` and `measureIndexOnPage` written
 [ 'measure\nc d e f', 'measure\ng a b c5' ]
 ```
 
-The other four are the same as in [generateIntermediateStructuresForSinglePage](#2-generateintermediatestructuresforsinglepage), and apply to every page.
+The other four are the same as in [generateIntermediateStructuresForSinglePage](#3-generateintermediatestructuresforsinglepage), and apply to every page.
 
 </details>
 
@@ -541,7 +599,7 @@ One object, with one array entry per page:
 
 </details>
 
-### 4. generateStylesForSinglePage
+### 5. generateStylesForSinglePage
 
 ```js
 function generateStylesForSinglePage({
@@ -583,7 +641,7 @@ Merges a page's custom styles with the defaults and picks its fonts out of the l
 
 </details>
 
-### 5. generateStylesForMultiplePages
+### 6. generateStylesForMultiplePages
 
 ```js
 function generateStylesForMultiplePages({
@@ -625,7 +683,7 @@ function generateStylesForMultiplePages({
 
 </details>
 
-### 6. generateSvgForSinglePage
+### 7. generateSvgForSinglePage
 
 ```js
 function generateSvgForSinglePage({
@@ -675,7 +733,7 @@ The SVG:
 
 </details>
 
-### 7. generateSvgForMultiplePages
+### 8. generateSvgForMultiplePages
 
 ```js
 function generateSvgForMultiplePages({
@@ -732,7 +790,7 @@ The SVG:
 
 </details>
 
-### 8. generateMidiForSinglePage
+### 9. generateMidiForSinglePage
 
 ```js
 function generateMidiForSinglePage({
@@ -776,7 +834,7 @@ One object; a page with no measures gives an empty `Buffer` instead:
 
 </details>
 
-### 9. generateMidiForMultiplePages
+### 10. generateMidiForMultiplePages
 
 ```js
 function generateMidiForMultiplePages({
@@ -820,7 +878,7 @@ The same object as the single-page form, for the whole document:
 
 </details>
 
-### 10. isPageSchemaValid
+### 11. isPageSchemaValid
 
 ```js
 function isPageSchemaValid(pageSchema)
@@ -847,14 +905,11 @@ Checks the structure of a page schema against `src/language/schema/pageSchema.js
 <details is="e-details">
 <summary>Returns</summary>
 
-The result object of the JSON schema validator, which, despite the name of the function, is not a boolean and is always truthy:
-
-- `valid`: **true** or **false**; this is the answer.
-- `errors`: one entry per problem; its `stack` names the path to the value and what is wrong with it.
+**true** when the page schema is valid, **false** when it is not. To find out what is wrong, `validatedPageSchema(pageSchema)` from `#msq/language/schema/validatedPageSchema.js` returns the validator's `errors`, each with a `stack` naming the path to the value and what is wrong with it.
 
 </details>
 
-### 11. areAllPageSchemasValid
+### 12. areAllPageSchemasValid
 
 ```js
 function areAllPageSchemasValid(pageSchemas)

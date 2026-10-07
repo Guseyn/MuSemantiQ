@@ -411,8 +411,26 @@ is shown as it is, so the page still says what the diagram would have.
 }
 
 [data-content] docs-diagram > svg {
+  display: block;
+  margin: 0 auto;
   max-width: 100%;
   height: auto;
+}
+
+/*
+Mermaid measures a label at its own line height and sizes the box to it. The
+prose line height below would make a label of several lines taller than its box,
+and the last line would be cut off.
+*/
+[data-content] docs-diagram p {
+  line-height: inherit;
+}
+
+/* An animated arrow (e1@{ animation: fast }) stands still for whoever asked for less motion. */
+@media (prefers-reduced-motion: reduce) {
+  [data-content] docs-diagram path {
+    animation: none !important;
+  }
 }
 
 /*
@@ -427,6 +445,14 @@ tight for the ones a page stacks: Purpose, Arguments, Returns.
 [data-content] p,
 [data-content] li {
   line-height: 1.65;
+}
+
+/*
+A paragraph that introduces a code block, a diagram or a table would otherwise
+sit right on top of it, because e-ui gives paragraphs no margin.
+*/
+[data-content] p + :is(pre, docs-diagram, [data-table]) {
+  margin-top: var(--e-spacing-sm);
 }
 
 /* e-ui resets lists for its own components; prose needs its markers back. */
@@ -611,8 +637,9 @@ than a heading, so it does not list itself.
   margin: 0;
 }
 
+/* Under a numbered section, a dot: many of these headings already carry their own number */
 [data-content] nav[is="docs-contents"] ol ol {
-  list-style: lower-alpha;
+  list-style: disc;
 }
 
 /* ── Authoring notes ────────────────────────────────────────────────── */

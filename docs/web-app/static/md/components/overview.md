@@ -140,9 +140,8 @@ Finally, add an import map to your page, because the components import each othe
 > - serving `static/` with any static server, and opening the page
 
 ```sh
-# serve static/ with any static server
-cd static
-python3 -m http.server 8080
+# serve static/ on port 8080; npx fetches http-server the first time
+npx http-server static -p 8080
 ```
 
 > **TO WRITE**
@@ -153,7 +152,7 @@ title is "A Short Piece"
 
 measure
 treble clef
-c d e f
+c d e f g
 ```
 
 ## Elements

@@ -5,6 +5,7 @@ import assert from 'assert'
 // API
 import {
   setupFonts,
+  supportedFontNamesFrom,
   generateIntermediateStructuresForMultiplePages,
   areAllPageSchemasValid,
   generateStylesForMultiplePages,
@@ -127,16 +128,7 @@ async function runVisualTestForFont(visualTestDirForFont) {
     }
   })
 
-  const supportedFontNames = {
-    'chord-letters': Object.keys(supportedFontSources['chord-letters']),
-    'music': Object.keys(supportedFontSources['music']),
-    'text': [
-      ...new Set([
-        ...Object.keys(supportedFontSources['text']['regular']),
-        ...Object.keys(supportedFontSources['text']['bold'])
-      ])
-    ]
-  }
+  const supportedFontNames = supportedFontNamesFrom(supportedFontSources)
 
   for (const msqInputFile of listOfMSQInputFiles) {
     const testName = path.basename(msqInputFile).split('.')[0]

@@ -9,11 +9,16 @@ diagram on a page connects, and only once: most pages have none.
 
 The theme is set here rather than in each diagram, so every diagram looks like
 the rest of the docs: white boxes with e-ui's border, and the interface font.
+A node can also be an icon, from the Material Symbols in diagram-icons.js,
+with arrows that meet the icon rather than its label (arrows-to-icons.js).
 
 e-markdown moves its children out of itself once it has rendered them, which
 disconnects the element and connects it again, so it draws on the first
 connect only.
 */
+import materialIcons from '#docs/diagram-icons.js'
+import arrowsToIcons from '#docs/arrows-to-icons.js'
+
 let mermaidLoaded = null
 let numberOfDiagrams = 0
 
@@ -24,15 +29,18 @@ function loadedMermaid() {
       theme: 'base',
       fontFamily: 'Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif',
       themeVariables: {
-        fontSize: '14px',
+        fontSize: '16px',
         primaryColor: '#ffffff',
         primaryBorderColor: '#c0c0c0',
         primaryTextColor: '#0f172a',
         lineColor: '#36454f',
         edgeLabelBackground: '#ffffff'
       },
-      flowchart: { curve: 'basis', padding: 12 }
+      // At its own size rather than stretched to the card, so docs.css can centre it
+      flowchart: { curve: 'basis', padding: 12, useMaxWidth: false }
     })
+    // node@{ icon: "material:…" } draws a node as one of these, see diagram-icons.js
+    mermaid.registerIconPacks([ { name: 'material', icons: materialIcons } ])
     return mermaid
   })
   return mermaidLoaded
@@ -52,6 +60,8 @@ class DocsDiagram extends HTMLElement {
     try {
       const { svg } = await mermaid.render(`docs-diagram-${numberOfDiagrams}`, source)
       this.innerHTML = svg
+      // Measured, so only once it is in the page
+      arrowsToIcons(this.querySelector('svg'))
       this.setAttribute('data-drawn', '')
       /*
       Drawn, the diagram is taller than its placeholder, which moves everything

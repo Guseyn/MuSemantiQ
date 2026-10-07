@@ -337,7 +337,9 @@ export default function (scenarios) {
         parserState.lastDeclaredGlissando.direction = glissandoDirection
       }
       parserState.lastGlissandoDirection = glissandoDirection
-      parserState.highlightsHtmlBuffer.push(joinedTokenValuesWithRealDelimiters)
+      if (parserState.applyHighlighting) {
+        parserState.highlightsHtmlBuffer.push(joinedTokenValuesWithRealDelimiters)
+      }
     },
     actionOnlyForHighlightingWithoutRefIds: (parserState, joinedTokenValuesWithRealDelimiters, tokenValues) => {
       // no highlights needed

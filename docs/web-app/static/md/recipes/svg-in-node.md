@@ -12,6 +12,7 @@ import path from 'path'
 
 import {
   setupFonts,
+  supportedFontNamesFrom,
   generateIntermediateStructuresForMultiplePages,
   areAllPageSchemasValid,
   generateStylesForMultiplePages,
@@ -26,14 +27,7 @@ if (!input) {
 
 // 1. The fonts, and the names the music may call them by.
 const supportedFontSources = await setupFonts()
-const supportedFontNames = {
-  'chord-letters': Object.keys(supportedFontSources['chord-letters']),
-  'music': Object.keys(supportedFontSources['music']),
-  'text': [ ...new Set([
-    ...Object.keys(supportedFontSources['text']['regular']),
-    ...Object.keys(supportedFontSources['text']['bold'])
-  ]) ]
-}
+const supportedFontNames = supportedFontNamesFrom(supportedFontSources)
 
 // 2. The pages, split before parsing: the API splits nothing itself.
 const text = await fs.readFile(input, 'utf-8')
@@ -106,7 +100,7 @@ In Node, `setupFonts()` with no argument loads the fonts the repository ships: *
 
 You can pass a config of your own instead. It replaces a whole family at a time: give it `music` and the default text and chord-letter fonts stay. The shape is described in [setupFonts](/docs/api/overview#1-setupfonts).
 
-Two things come out of it, and both are needed. `supportedFontSources` is what the drawer engraves with. `supportedFontNames` is what the parser checks `music font is …`, `text font is …` and `chord letters font is …` against, so a name you did not register is an error in the music rather than a font that silently falls back.
+Two things come out of it, and both are needed. `supportedFontSources` is what the drawer engraves with. `supportedFontNames` is what the parser checks `music font is …`, `text font is …` and `chord letters font is …` against, so a name you did not register is an error in the music rather than a font that silently falls back. [supportedFontNamesFrom](/docs/api/overview#2-supportedfontnamesfrom) takes the names from the sources.
 
 ## 3. One file per page
 

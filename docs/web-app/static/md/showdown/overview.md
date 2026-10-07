@@ -265,9 +265,8 @@ Finally, create the font config, `static/js/font-config.json`. It's the same one
 > - serving `static/` with any static server, and opening the page
 
 ```sh
-# serve static/ with any static server
-cd static
-python3 -m http.server 8080
+# serve static/ on port 8080; npx fetches http-server the first time
+npx http-server static -p 8080
 ```
 
 > **TO WRITE**

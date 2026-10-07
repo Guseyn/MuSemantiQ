@@ -15,6 +15,7 @@ import toMusicXml from '#tools/musicxml/toMusicXml.js'
 import serialize from '#msq/language/serializer/serialize.js'
 import {
   setupFonts,
+  supportedFontNamesFrom,
   generateIntermediateStructuresForMultiplePages,
   areAllPageSchemasValid,
   generateStylesForMultiplePages,
@@ -33,14 +34,7 @@ async function loadedFonts() {
     const sources = await setupFonts()
     fonts = {
       sources,
-      names: {
-        'chord-letters': Object.keys(sources['chord-letters']),
-        'music': Object.keys(sources['music']),
-        'text': [ ...new Set([
-          ...Object.keys(sources['text']['regular']),
-          ...Object.keys(sources['text']['bold'])
-        ]) ]
-      }
+      names: supportedFontNamesFrom(sources)
     }
   }
   return fonts

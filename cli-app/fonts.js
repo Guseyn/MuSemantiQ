@@ -136,21 +136,6 @@ export function fontNamesFromConfig(config) {
 }
 
 /**
- * Names taken from *loaded* font sources — the idiom used by the test scripts
- * and by the browser worker.
- */
-export function fontNamesFromSources(sources) {
-  return {
-    'chord-letters': Object.keys(sources['chord-letters']),
-    'music': Object.keys(sources['music']),
-    'text': [ ...new Set([
-      ...Object.keys(sources['text']['regular']),
-      ...Object.keys(sources['text']['bold'])
-    ]) ]
-  }
-}
-
-/**
  * Load the fonts. A user config replaces a whole category rather than merging
  * into it, which is how `setupFonts()` behaves; supplying only `music` keeps
  * the default text and chord-letter fonts.
