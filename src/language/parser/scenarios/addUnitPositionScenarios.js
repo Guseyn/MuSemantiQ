@@ -1,7 +1,7 @@
 'use strict'
 
 import regexps from '#msq/language/parser/scenarios/static-objects/regexps.js'
-import withNumbersInsteadOfWords from '#msq/language/parser/scenarios/token/withNumbersInsteadOfWords.js'
+import replaceWordsWithNumbers from '#msq/language/parser/scenarios/token/replaceWordsWithNumbers.js'
 import addLineMeasureStaveVoicePositionScenarios from '#msq/language/parser/scenarios/addLineMeasureStaveVoicePositionScenarios.js'
 
 export default function (scenarios, requiredCommandProgression, commandProgressionLevel = 2, allowedCoordinates) {
@@ -10,11 +10,11 @@ export default function (scenarios, requiredCommandProgression, commandProgressi
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     onTheSameLineAsPrevScenario: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const tokensWithNumbersInsteadOfWords = withNumbersInsteadOfWords(tokenValues)
+      const tokensWithNumbersInsteadOfWords = replaceWordsWithNumbers(tokenValues)
       return regexps.unitPosition.test(tokensWithNumbersInsteadOfWords)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const tokensWithNumbersInsteadOfWords = withNumbersInsteadOfWords(tokenValues)
+      const tokensWithNumbersInsteadOfWords = replaceWordsWithNumbers(tokenValues)
       const unitPosition = regexps.unitPosition.match(tokensWithNumbersInsteadOfWords)[0] * 1 - 1
       parserState.lastMentionedUnitPosition = unitPosition
       if (parserState.applyHighlighting) {
@@ -50,11 +50,11 @@ export default function (scenarios, requiredCommandProgression, commandProgressi
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     onTheSameLineAsPrevScenario: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const tokensWithNumbersInsteadOfWords = withNumbersInsteadOfWords(tokenValues)
+      const tokensWithNumbersInsteadOfWords = replaceWordsWithNumbers(tokenValues)
       return regexps.positionOfUnit.test(tokensWithNumbersInsteadOfWords)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const tokensWithNumbersInsteadOfWords = withNumbersInsteadOfWords(tokenValues)
+      const tokensWithNumbersInsteadOfWords = replaceWordsWithNumbers(tokenValues)
       const unitPosition = regexps.positionOfUnit.match(tokensWithNumbersInsteadOfWords)[0] * 1 - 1
       parserState.lastMentionedUnitPosition = unitPosition
       if (parserState.applyHighlighting) {

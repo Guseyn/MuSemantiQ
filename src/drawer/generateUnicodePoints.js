@@ -3,7 +3,7 @@
 // font size(for font file) is 4.0 * intervalBetweenStaveLines
 const MUSCIC_FONT_SOURCE_SIZE = 4.0 
 
-import text from '#msq/drawer/elements/basic/text.js'
+import createText from '#msq/drawer/elements/basic/createText.js'
 import parseSvgPath from '#msq/drawer/lib/svgpath/parseSvgPath.js'
 import translateSvgPath from '#msq/drawer/lib/svgpath/translateSvgPath.js'
 
@@ -14,26 +14,26 @@ function generateUnicodePoints(unicode, musicFontSource, textFontSource, musicFo
     color: '#000', // does not matter what color is here
     anchor: 'center baseline'
   }
-  const drawnText = text(
+  const text = createText(
     JSON.parse(JSON.stringify(unicode).replace(/\\\\/g, '\\')),
     fontOptions
   )({ textFontSource }, 0, 0)
-  const drawnTextHeight = drawnText.bottom - drawnText.top
-  const drawnTextPath = parseSvgPath(drawnText.properties.d)
-  let drawnTextPathMovedToTopLeftCorner = drawnTextPath
-  if (drawnText.top < 0) {
-    const delta = drawnTextHeight
-    drawnTextPathMovedToTopLeftCorner = translateSvgPath(
-      drawnTextPathMovedToTopLeftCorner, 0, delta
+  const textHeight = text.bottom - text.top
+  const textPath = parseSvgPath(text.properties.d)
+  let textPathMovedToTopLeftCorner = textPath
+  if (text.top < 0) {
+    const delta = textHeight
+    textPathMovedToTopLeftCorner = translateSvgPath(
+      textPathMovedToTopLeftCorner, 0, delta
     )
   }
-  if (drawnText.left < 0) {
-    const delta = -drawnText.left
-    drawnTextPathMovedToTopLeftCorner = translateSvgPath(
-      drawnTextPathMovedToTopLeftCorner, delta, 0
+  if (text.left < 0) {
+    const delta = -text.left
+    textPathMovedToTopLeftCorner = translateSvgPath(
+      textPathMovedToTopLeftCorner, delta, 0
     )
   }
-  return drawnTextPathMovedToTopLeftCorner.flat()
+  return textPathMovedToTopLeftCorner.flat()
 }
 
 export default generateUnicodePoints

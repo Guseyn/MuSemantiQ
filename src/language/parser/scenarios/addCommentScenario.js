@@ -1,9 +1,9 @@
 'use strict'
 
 import regexps from '#msq/language/parser/scenarios/static-objects/regexps.js'
-import theSameScenarioButWithDifferentRequiredCommandProgression from '#msq/language/parser/scenarios/theSameScenarioButWithDifferentRequiredCommandProgression.js'
+import copyScenarioWithDifferentRequiredCommandProgression from '#msq/language/parser/scenarios/copyScenarioWithDifferentRequiredCommandProgression.js'
 
-const lastComment = parserState => parserState.comments[parserState.comments.length - 1]
+const getLastComment = parserState => parserState.comments[parserState.comments.length - 1]
 const NEW_LINE = '\n'
 
 export default function (scenarios) {
@@ -84,7 +84,7 @@ export default function (scenarios) {
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       const text = regexps.commentTextEnds.match(tokenValues)[0]
-      const lastCommentValue = lastComment(parserState)
+      const lastCommentValue = getLastComment(parserState)
       if (lastCommentValue.currentLineNumber !== lineNumber) {
         lastCommentValue.text += `\n${text}`
       } else {
@@ -117,7 +117,7 @@ export default function (scenarios) {
       return regexps.commentQuote.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastCommentValue = lastComment(parserState)
+      const lastCommentValue = getLastComment(parserState)
       lastCommentValue.endLineNumber = lineNumber
       if (parserState.applyHighlighting) {
         parserState.highlightsHtmlBuffer.push(
@@ -145,7 +145,7 @@ export default function (scenarios) {
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       const text = regexps.anything.match(tokenValues)[0]
-      const lastCommentValue = lastComment(parserState)
+      const lastCommentValue = getLastComment(parserState)
       if (lastCommentValue.currentLineNumber !== lineNumber) {
         lastCommentValue.text += `\n${text}`
       } else {
@@ -292,15 +292,15 @@ export default function (scenarios) {
     },
     itIsNewCommandProgressionFromLevel: 0
   }
-  scenarios['comment text ends (comment text starts)'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['comment text ends (comment text starts)'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['comment text ends (comment starts with text)'],
     'comment text starts'
   )
-  scenarios['quote ends comment (comment text starts)'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['quote ends comment (comment text starts)'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['quote ends comment (comment starts with text)'],
     'comment text starts'
   )
-  scenarios['comment text (comment text starts)'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['comment text (comment text starts)'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['comment text (comment starts with text)'],
     'comment text starts'
   )

@@ -1,4 +1,4 @@
-import parsedLanguage from '#msq/language/parser/parsedLanguage.js'
+import parseLanguage from '#msq/language/parser/parseLanguage.js'
 
 const NEW_LINE = '\n'
 
@@ -8,7 +8,7 @@ const NEW_LINE = '\n'
  * ⟅━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━⟆
  * /
 /**
- * High-level convenience wrapper around the low-level `parsedLanguage()` engine.
+ * High-level convenience wrapper around the low-level `parseLanguage()` engine.
  * It prepares the MuSemantiQ text, invokes the parser with correct defaults, and
  * extracts only the per-page rendering-related intermediate structures needed
  * by the drawer (SVG renderer), highlighting engine, and MIDI generator.
@@ -34,7 +34,7 @@ const NEW_LINE = '\n'
  *                   as a single highlight block
  *
  * @param {boolean} [params.applyOnlyHighlightingWithoutRefIds=false]
- *        Enables “highlight-only mode” from inside `parsedLanguage()`:
+ *        Enables “highlight-only mode” from inside `parseLanguage()`:
  *
  *        - only `actionOnlyForHighlightingWithoutRefIds` of scenarios are run
  *        - NO reference IDs
@@ -53,7 +53,7 @@ const NEW_LINE = '\n'
  *          - very advanced internal tooling
  *
  * @param {Object} [params.supportedFontNames]
- *        A stable list of supported font family names that `parsedLanguage()`
+ *        A stable list of supported font family names that `parseLanguage()`
  *        attaches to `parserState.pageSchema.fonts`.
  *
  *        These are *names*, not loaded font sources.
@@ -67,7 +67,7 @@ const NEW_LINE = '\n'
  *        }
  *
  *        Actual font loading is handled separately:
- *             setupFonts() → generatedStyles() → page() renderer
+ *             setupFonts() → generateStyles() → page() renderer
  *
  * ---------------------------------------------------------------------------
  * @returns {GeneratePageModelsResult}
@@ -87,7 +87,7 @@ const NEW_LINE = '\n'
  * @typedef {Object} GeneratePageModelsResult
  *
  * @property {Object} pageSchema
- *          The rendering/engraving model built by parsedLanguage:
+ *          The rendering/engraving model built by parseLanguage:
  *            - measure & stave geometry
  *            - symbols, durations, directions
  *            - key/time signatures
@@ -107,7 +107,7 @@ const NEW_LINE = '\n'
  * @property {Object} customStyles
  *          Any inline styling commands encountered in MuSemantiQ that override
  *          engraving parameters, spacing, fonts, color, etc. These feed into
- *          generatedStyles().
+ *          generateStyles().
  *
  * @property {Object} midiSettings
  *          All musical-performance metadata extracted from MuSemantiQ commands:
@@ -122,7 +122,7 @@ const NEW_LINE = '\n'
  *
  * ### What generateIntermediateStructuresForSinglePage() actually does
  * 1. Normalizes trailing newline behavior (required by parser mechanics).
- * 2. Passes configuration flags directly into parsedLanguage().
+ * 2. Passes configuration flags directly into parseLanguage().
  * 3. Returns only the subset of the parsed output needed for:
  *      - SVG generation
  *      - highlight overlays
@@ -138,7 +138,7 @@ const NEW_LINE = '\n'
  * ### Why this exists
  * It provides a clean public API that hides the dozens of parser state fields,
  * command-progression internals, tokenizer behavior, and scenario engine
- * complexity inside parsedLanguage().
+ * complexity inside parseLanguage().
  *
  * What you get is the **stable, simplified IR** for one page.
  *
@@ -159,7 +159,7 @@ export function generateIntermediateStructuresForSinglePage({
     mapOfCharIndexesWithProgressionOfCommandsFromScenarios,
     comments,
     midiSettings
-  } = parsedLanguage(
+  } = parseLanguage(
     normalizeMuSemantiQText(
       pageText
     ),

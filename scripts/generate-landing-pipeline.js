@@ -9,7 +9,7 @@ derived from them, and the outputs. None of that is drawn by hand. This script
 runs the pipeline once and writes every step's real result:
 
   md/landing/pipeline/<step>.md   each structure, fenced, for e-markdown to show
-                                  (JSON, MusicXML, and the highlighted HTML)
+                                  (JSON, and the highlighted HTML)
   images/pipeline/score.svg       the engraved score
   images/pipeline/midi.svg        the performance as a piano roll, drawn from the
                                   notes read back out of the MIDI file
@@ -34,7 +34,6 @@ import {
   generateMidiForSinglePage
 } from '#msq/api.js'
 import { Midi } from '#msq/midi/lib/@tonejs/Midi.js'
-import toMusicXml from '#tools/musicxml/toMusicXml.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const projectRoot = path.resolve(__dirname, '..')
@@ -196,12 +195,6 @@ structures.pageSchema.measuresParams.forEach((measureParams) => {
   delete measureParams.measureIndexOnPage
 })
 
-const { xml: musicXml } = toMusicXml({
-  pageSchema: structures.pageSchema,
-  customStyles: structures.customStyles,
-  midiSettings: structures.midiSettings
-})
-
 const highlightsHtml = structures.highlightsHtmlBuffer.join('')
 
 write(path.join(mdDir, 'words.md'), fenced('text', EXAMPLE))
@@ -217,7 +210,6 @@ write(path.join(mdDir, 'timing.md'), json({
   timeStampsMappedWithRefsOn: midi.timeStampsMappedWithRefsOn,
   refsOnMappedWithTimeStamps: midi.refsOnMappedWithTimeStamps
 }))
-write(path.join(mdDir, 'musicxml.md'), fenced('xml', musicXml.trim()))
 /*
 The highlighted source is HTML already. A <pre> is one of showdown's block
 tags, so it is passed through as written, and its colours come with it.

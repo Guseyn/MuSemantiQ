@@ -200,9 +200,7 @@ export const sitemap = [
     title: 'Tools, natively',
     pages: [
       { slug: 'smufl-font-generator', title: 'SMuFL to music-js font' },
-      { slug: 'magenta-soundfont-builder', title: 'Magenta soundfont builder' },
-      { slug: 'musicxml-import', title: 'MusicXML import [beta]' },
-      { slug: 'musicxml-export', title: 'MusicXML export [beta]' }
+      { slug: 'magenta-soundfont-builder', title: 'Magenta soundfont builder' }
     ]
   },
   {
@@ -213,7 +211,6 @@ export const sitemap = [
       { slug: 'font-viewer', title: 'Font viewer' },
       { slug: 'font-generator', title: 'Font generator' },
       { slug: 'soundfont-generator', title: 'Magenta soundfont generator' },
-      { slug: 'musicxml-tool', title: 'MusicXML tool [beta]' },
       { slug: 'test-viewer', title: 'Test viewer' }
     ]
   },

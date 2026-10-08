@@ -1,63 +1,63 @@
 'use strict'
 
-import currentPageLineIndex from '#msq/language/parser/scenarios/page-schema/currentPageLineIndex.js'
+import getCurrentPageLineIndex from '#msq/language/parser/scenarios/page-schema/getCurrentPageLineIndex.js'
 
 export default function (parserState, forConnection) {
   const indexesInHighlightsHtmlBufferWhereWeShouldFillPositionPlaceholders = forConnection
     ? parserState.indexesInHighlightsHtmlBufferWhereWeShouldFillPositionPlaceholdersForConnection
     : parserState.indexesInHighlightsHtmlBufferWhereWeShouldFillPositionPlaceholders
   if (
-    (parserState.calculatedUnitPageLineIndexByLastMentionedPositions !== undefined) &&
-    (parserState.calculatedUnitMeasureIndexByLastMentionedPositions !== undefined) &&
-    (parserState.calculatedUnitStaveIndexByLastMentionedPositions !== undefined) &&
-    (parserState.calculatedUnitVoiceIndexByLastMentionedPositions !== undefined) &&
-    (parserState.calculatedUnitIndexByLastMentionedPositions !== undefined) &&
+    (parserState.unitPageLineIndexByLastMentionedPositions !== undefined) &&
+    (parserState.unitMeasureIndexByLastMentionedPositions !== undefined) &&
+    (parserState.unitStaveIndexByLastMentionedPositions !== undefined) &&
+    (parserState.unitVoiceIndexByLastMentionedPositions !== undefined) &&
+    (parserState.unitIndexByLastMentionedPositions !== undefined) &&
     !forConnection
   ) {
     for (let index = 0; index < indexesInHighlightsHtmlBufferWhereWeShouldFillPositionPlaceholders.length; index++) {
       parserState.highlightsHtmlBuffer[indexesInHighlightsHtmlBufferWhereWeShouldFillPositionPlaceholders[index]] = parserState.highlightsHtmlBuffer[indexesInHighlightsHtmlBufferWhereWeShouldFillPositionPlaceholders[index]].replace(
         'class="clph" ref-id=""',
-        `class="clph" ref-id="line-${parserState.calculatedUnitPageLineIndexByLastMentionedPositions + 1}"`
+        `class="clph" ref-id="line-${parserState.unitPageLineIndexByLastMentionedPositions + 1}"`
       )
       parserState.highlightsHtmlBuffer[indexesInHighlightsHtmlBufferWhereWeShouldFillPositionPlaceholders[index]] = parserState.highlightsHtmlBuffer[indexesInHighlightsHtmlBufferWhereWeShouldFillPositionPlaceholders[index]].replace(
         'class="clpph" ref-id=""',
-        `class="clpph" ref-id="line-${parserState.calculatedUnitPageLineIndexByLastMentionedPositions + 1}"`
+        `class="clpph" ref-id="line-${parserState.unitPageLineIndexByLastMentionedPositions + 1}"`
       )
       parserState.highlightsHtmlBuffer[indexesInHighlightsHtmlBufferWhereWeShouldFillPositionPlaceholders[index]] = parserState.highlightsHtmlBuffer[indexesInHighlightsHtmlBufferWhereWeShouldFillPositionPlaceholders[index]].replace(
         'class="cmph" ref-id=""',
-        `class="cmph" ref-id="measure-${parserState.calculatedUnitMeasureIndexByLastMentionedPositions + 1}"`
+        `class="cmph" ref-id="measure-${parserState.unitMeasureIndexByLastMentionedPositions + 1}"`
       )
       parserState.highlightsHtmlBuffer[indexesInHighlightsHtmlBufferWhereWeShouldFillPositionPlaceholders[index]] = parserState.highlightsHtmlBuffer[indexesInHighlightsHtmlBufferWhereWeShouldFillPositionPlaceholders[index]].replace(
         'class="cmpph" ref-id=""',
-        `class="cmpph" ref-id="measure-${parserState.calculatedUnitMeasureIndexByLastMentionedPositions + 1}"`
+        `class="cmpph" ref-id="measure-${parserState.unitMeasureIndexByLastMentionedPositions + 1}"`
       )
       parserState.highlightsHtmlBuffer[indexesInHighlightsHtmlBufferWhereWeShouldFillPositionPlaceholders[index]] = parserState.highlightsHtmlBuffer[indexesInHighlightsHtmlBufferWhereWeShouldFillPositionPlaceholders[index]].replace(
         'class="csph" ref-id=""',
-        `class="csph" ref-id="stave-${parserState.calculatedUnitMeasureIndexByLastMentionedPositions + 1}-${parserState.calculatedUnitStaveIndexByLastMentionedPositions + 1}"`
+        `class="csph" ref-id="stave-${parserState.unitMeasureIndexByLastMentionedPositions + 1}-${parserState.unitStaveIndexByLastMentionedPositions + 1}"`
       )
       parserState.highlightsHtmlBuffer[indexesInHighlightsHtmlBufferWhereWeShouldFillPositionPlaceholders[index]] = parserState.highlightsHtmlBuffer[indexesInHighlightsHtmlBufferWhereWeShouldFillPositionPlaceholders[index]].replace(
         'class="cspph" ref-id=""',
-        `class="cspph" ref-id="stave-${parserState.calculatedUnitMeasureIndexByLastMentionedPositions + 1}-${parserState.calculatedUnitStaveIndexByLastMentionedPositions + 1}"`
+        `class="cspph" ref-id="stave-${parserState.unitMeasureIndexByLastMentionedPositions + 1}-${parserState.unitStaveIndexByLastMentionedPositions + 1}"`
       )
       parserState.highlightsHtmlBuffer[indexesInHighlightsHtmlBufferWhereWeShouldFillPositionPlaceholders[index]] = parserState.highlightsHtmlBuffer[indexesInHighlightsHtmlBufferWhereWeShouldFillPositionPlaceholders[index]].replace(
         'class="cvph" ref-id=""',
-        `class="cvph" ref-id="voice-${parserState.calculatedUnitMeasureIndexByLastMentionedPositions + 1}-${parserState.calculatedUnitStaveIndexByLastMentionedPositions + 1}-${parserState.calculatedUnitVoiceIndexByLastMentionedPositions + 1}"`
+        `class="cvph" ref-id="voice-${parserState.unitMeasureIndexByLastMentionedPositions + 1}-${parserState.unitStaveIndexByLastMentionedPositions + 1}-${parserState.unitVoiceIndexByLastMentionedPositions + 1}"`
       )
       parserState.highlightsHtmlBuffer[indexesInHighlightsHtmlBufferWhereWeShouldFillPositionPlaceholders[index]] = parserState.highlightsHtmlBuffer[indexesInHighlightsHtmlBufferWhereWeShouldFillPositionPlaceholders[index]].replace(
         'class="cvpph" ref-id=""',
-        `class="cvpph" ref-id="voice-${parserState.calculatedUnitMeasureIndexByLastMentionedPositions + 1}-${parserState.calculatedUnitStaveIndexByLastMentionedPositions + 1}-${parserState.calculatedUnitVoiceIndexByLastMentionedPositions + 1}"`
+        `class="cvpph" ref-id="voice-${parserState.unitMeasureIndexByLastMentionedPositions + 1}-${parserState.unitStaveIndexByLastMentionedPositions + 1}-${parserState.unitVoiceIndexByLastMentionedPositions + 1}"`
       )
       parserState.highlightsHtmlBuffer[indexesInHighlightsHtmlBufferWhereWeShouldFillPositionPlaceholders[index]] = parserState.highlightsHtmlBuffer[indexesInHighlightsHtmlBufferWhereWeShouldFillPositionPlaceholders[index]].replace(
         'class="cuph" ref-id=""',
-        `class="cuph" ref-id="unit-${parserState.calculatedUnitMeasureIndexByLastMentionedPositions + 1}-${parserState.calculatedUnitStaveIndexByLastMentionedPositions + 1}-${parserState.calculatedUnitVoiceIndexByLastMentionedPositions + 1}-${parserState.calculatedUnitIndexByLastMentionedPositions + 1}"`
+        `class="cuph" ref-id="unit-${parserState.unitMeasureIndexByLastMentionedPositions + 1}-${parserState.unitStaveIndexByLastMentionedPositions + 1}-${parserState.unitVoiceIndexByLastMentionedPositions + 1}-${parserState.unitIndexByLastMentionedPositions + 1}"`
       )
       parserState.highlightsHtmlBuffer[indexesInHighlightsHtmlBufferWhereWeShouldFillPositionPlaceholders[index]] = parserState.highlightsHtmlBuffer[indexesInHighlightsHtmlBufferWhereWeShouldFillPositionPlaceholders[index]].replace(
         'class="cupph" ref-id=""',
-        `class="cupph" ref-id="unit-${parserState.calculatedUnitMeasureIndexByLastMentionedPositions + 1}-${parserState.calculatedUnitStaveIndexByLastMentionedPositions + 1}-${parserState.calculatedUnitVoiceIndexByLastMentionedPositions + 1}-${parserState.calculatedUnitIndexByLastMentionedPositions + 1}"`
+        `class="cupph" ref-id="unit-${parserState.unitMeasureIndexByLastMentionedPositions + 1}-${parserState.unitStaveIndexByLastMentionedPositions + 1}-${parserState.unitVoiceIndexByLastMentionedPositions + 1}-${parserState.unitIndexByLastMentionedPositions + 1}"`
       )
       parserState.highlightsHtmlBuffer[indexesInHighlightsHtmlBufferWhereWeShouldFillPositionPlaceholders[index]] = parserState.highlightsHtmlBuffer[indexesInHighlightsHtmlBufferWhereWeShouldFillPositionPlaceholders[index]].replace(
         'class="th" ref-id=""',
-        `class="th" ref-id="unit-${parserState.calculatedUnitMeasureIndexByLastMentionedPositions + 1}-${parserState.calculatedUnitStaveIndexByLastMentionedPositions + 1}-${parserState.calculatedUnitVoiceIndexByLastMentionedPositions + 1}-${parserState.calculatedUnitIndexByLastMentionedPositions + 1}"`
+        `class="th" ref-id="unit-${parserState.unitMeasureIndexByLastMentionedPositions + 1}-${parserState.unitStaveIndexByLastMentionedPositions + 1}-${parserState.unitVoiceIndexByLastMentionedPositions + 1}-${parserState.unitIndexByLastMentionedPositions + 1}"`
       )
     }
   } else {
@@ -70,7 +70,7 @@ export default function (parserState, forConnection) {
     const stavePositionIsSpecified = stavePosition !== undefined
     const voicePositionIsSpecified = voicePosition !== undefined
     if (pageLinePositionIsNotSpecified) {
-      pageLinePosition = currentPageLineIndex(parserState)
+      pageLinePosition = getCurrentPageLineIndex(parserState)
       pageLinePositionIsNotSpecified = pageLinePosition === undefined
     }
     if (!pageLinePositionIsNotSpecified) {

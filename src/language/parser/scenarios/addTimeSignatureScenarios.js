@@ -2,7 +2,7 @@
 
 import regexps from '#msq/language/parser/scenarios/static-objects/regexps.js'
 import initNewMeasureParamsIfThereIsAlreadySuchMeasurePropertyOrNoMeasuresAtAll from '#msq/language/parser/scenarios/page-schema/initNewMeasureParamsIfThereIsAlreadySuchMeasurePropertyOrNoMeasuresAtAll.js'
-import lastMeasureParams from '#msq/language/parser/scenarios/page-schema/lastMeasureParams.js'
+import getLastMeasureParams from '#msq/language/parser/scenarios/page-schema/getLastMeasureParams.js'
 
 export default function (scenarios) {
   scenarios['time signature'] = {
@@ -12,7 +12,7 @@ export default function (scenarios) {
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       initNewMeasureParamsIfThereIsAlreadySuchMeasurePropertyOrNoMeasuresAtAll(parserState.pageSchema, 'timeSignatureParams', parserState)
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
       if (parserState.lastTimeSignatureParams) {
         lastMeasureParamsValue.lastTimeSignatureParams = undefined
         parserState.lastTimeSignatureParams = undefined
@@ -50,7 +50,7 @@ export default function (scenarios) {
       return regexps.timeSignatureValue.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
       const timeSignature = regexps.timeSignatureValue.match(tokenValues)
       if (timeSignature[0] === 'c') {
         lastMeasureParamsValue.timeSignatureParams.numerator = '4'
@@ -98,7 +98,7 @@ export default function (scenarios) {
       return regexps.forEachLine.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastTimeSignatureParamsValue = lastMeasureParams(parserState.pageSchema).timeSignatureParams
+      const lastTimeSignatureParamsValue = getLastMeasureParams(parserState.pageSchema).timeSignatureParams
       lastTimeSignatureParamsValue.forEachLineId = parserState.lastTimeSignatureValueForEachLineId
       parserState.lastTimeSignatureParams = lastTimeSignatureParamsValue
       if (parserState.applyHighlighting) {
@@ -133,7 +133,7 @@ export default function (scenarios) {
       return regexps.forLinesBelow.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastTimeSignatureParamsValue = lastMeasureParams(parserState.pageSchema).timeSignatureParams
+      const lastTimeSignatureParamsValue = getLastMeasureParams(parserState.pageSchema).timeSignatureParams
       lastTimeSignatureParamsValue.forEachLineId = parserState.lastTimeSignatureValueForEachLineId
       parserState.lastTimeSignatureParams = lastTimeSignatureParamsValue
       if (parserState.applyHighlighting) {

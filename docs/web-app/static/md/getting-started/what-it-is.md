@@ -27,7 +27,6 @@ From one piece of MSQ you can get:
 | **MIDI** | the performance, one continuous file for the whole document |
 | **Page schema** | the parsed page as JSON: measures, staves, voices and units, everything the drawer and the MIDI engine read |
 | **HTML highlights** | for adnvanced usage, if you want to build an editor for MSQ. It supports command highlighting in the text.<br> It also can include links to the elements in **SVG**, so in the editor you can `Cmd-click` (`Ctrl-click` on other systems) a note in the score to find the word that wrote it, and the other way round |
-| **MusicXML** (beta) | through the MusicXML tools in `tools/musicxml`, which convert a page both ways |
 
 ## 3. Who it is for
 
@@ -46,7 +45,6 @@ From one piece of MSQ you can get:
   - You can view and generate glyphs using any music font
   - You can integrate any Sound Font
   - Add/Check tests
-  - Transalte to/from MusicXML (beta)
 
 It runs on Node 22 or newer and in modern browsers, with no build step and no runtime npm dependencies.
 

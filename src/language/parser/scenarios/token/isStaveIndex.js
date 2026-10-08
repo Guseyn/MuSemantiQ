@@ -1,10 +1,10 @@
 'use strict'
 
-import withNumbersInsteadOfWords from '#msq/language/parser/scenarios/token/withNumbersInsteadOfWords.js'
+import replaceWordsWithNumbers from '#msq/language/parser/scenarios/token/replaceWordsWithNumbers.js'
 import regexps from '#msq/language/parser/scenarios/static-objects/regexps.js'
 
 export default function (tokenValues, joinedTokenValues) {
-  const tokenValuesWithNumbersInsteadOfWords = withNumbersInsteadOfWords(tokenValues)
+  const tokenValuesWithNumbersInsteadOfWords = replaceWordsWithNumbers(tokenValues)
   return regexps.staveIndex.test(tokenValuesWithNumbersInsteadOfWords) ||
     regexps.indexOfStave.test(tokenValuesWithNumbersInsteadOfWords)
 }

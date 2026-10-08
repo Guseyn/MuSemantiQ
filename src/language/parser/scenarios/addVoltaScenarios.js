@@ -2,9 +2,9 @@
 
 import regexps from '#msq/language/parser/scenarios/static-objects/regexps.js'
 import isVerticalCorrection from '#msq/language/parser/scenarios/token/isVerticalCorrection.js'
-import verticalCorrection from '#msq/language/parser/scenarios/token/verticalCorrection.js'
-import foundNextTokenValueOnTheLine from '#msq/language/parser/scenarios/token/foundNextTokenValueOnTheLine.js'
-import measureParamsByLastMentionedMeasurePosition from '#msq/language/parser/scenarios/page-schema/measureParamsByLastMentionedMeasurePosition.js'
+import parseVerticalCorrection from '#msq/language/parser/scenarios/token/parseVerticalCorrection.js'
+import findNextTokenValueOnTheLine from '#msq/language/parser/scenarios/token/findNextTokenValueOnTheLine.js'
+import findMeasureParamsByLastMentionedMeasurePosition from '#msq/language/parser/scenarios/page-schema/findMeasureParamsByLastMentionedMeasurePosition.js'
 import undefineAllMentionedPositions from '#msq/language/parser/scenarios/page-schema/undefineAllMentionedPositions.js'
 import undefineOnlyLastMentionedMeasurePosition from '#msq/language/parser/scenarios/page-schema/undefineOnlyLastMentionedMeasurePosition.js'
 import fillAllPlaceholdersInHighlightsHtmlBufferWithMentionedPositionsWhereItsNeeded from '#msq/language/parser/scenarios/highlights-html-buffer/fillAllPlaceholdersInHighlightsHtmlBufferWithMentionedPositionsWhereItsNeeded.js'
@@ -19,7 +19,7 @@ export default function (scenarios) {
         regexps.volta.test(tokenValues) &&
         !regexps.brackets.test(
           [
-            foundNextTokenValueOnTheLine(
+            findNextTokenValueOnTheLine(
               unitext, currentToken.firstCharIndexOfNextToken
             )
           ]
@@ -128,7 +128,7 @@ export default function (scenarios) {
       if (parserState.lastMentionedMeasurePosition === undefined) {
         parserState.errors.push(`measure position after command '${argumentsFromMainAction.joinedTokenValuesWithRealDelimiters}' is not specified on the line number ${argumentsFromMainAction.lineNumber}`)
       } else {
-        const measureParamsValue = measureParamsByLastMentionedMeasurePosition(parserState)
+        const measureParamsValue = findMeasureParamsByLastMentionedMeasurePosition(parserState)
         if (!measureParamsValue) {
           parserState.errors.push(`measure after command '${argumentsFromMainAction.joinedTokenValuesWithRealDelimiters}' is not found on the line ${argumentsFromMainAction.lineNumber}`)
         } else {
@@ -179,7 +179,7 @@ export default function (scenarios) {
       if (parserState.lastMentionedMeasurePosition === undefined) {
         parserState.errors.push(`measure position after command '${argumentsFromMainAction.joinedTokenValuesWithRealDelimiters}' is not specified on the line number ${argumentsFromMainAction.lineNumber}`)
       } else {
-        const measureParamsValue = measureParamsByLastMentionedMeasurePosition(parserState)
+        const measureParamsValue = findMeasureParamsByLastMentionedMeasurePosition(parserState)
         if (!measureParamsValue) {
           parserState.errors.push(`measure after command '${argumentsFromMainAction.joinedTokenValuesWithRealDelimiters}' is not found on the line ${argumentsFromMainAction.lineNumber}`)
         } else {
@@ -217,7 +217,7 @@ export default function (scenarios) {
           regexps.starts.test(tokenValues) &&
           !regexps.from.test(
             [
-              foundNextTokenValueOnTheLine(
+              findNextTokenValueOnTheLine(
                 unitext, currentToken.firstCharIndexOfNextToken
               )
             ]
@@ -228,7 +228,7 @@ export default function (scenarios) {
       ) &&
       !regexps.before.test(
         [
-          foundNextTokenValueOnTheLine(
+          findNextTokenValueOnTheLine(
             unitext, currentToken.firstCharIndexOfNextToken
           )
         ]
@@ -254,7 +254,7 @@ export default function (scenarios) {
       if (parserState.lastMentionedMeasurePosition === undefined) {
         parserState.errors.push(`measure position after command '${argumentsFromMainAction.joinedTokenValuesWithRealDelimiters}' is not specified on the line number ${argumentsFromMainAction.lineNumber}`)
       } else {
-        const measureParamsValue = measureParamsByLastMentionedMeasurePosition(parserState)
+        const measureParamsValue = findMeasureParamsByLastMentionedMeasurePosition(parserState)
         if (!measureParamsValue) {
           parserState.errors.push(`measure after command '${argumentsFromMainAction.joinedTokenValuesWithRealDelimiters}' is not found on the line ${argumentsFromMainAction.lineNumber}`)
         } else {
@@ -284,7 +284,7 @@ export default function (scenarios) {
       ) &&
       !regexps.after.test(
         [
-          foundNextTokenValueOnTheLine(
+          findNextTokenValueOnTheLine(
             unitext, currentToken.firstCharIndexOfNextToken
           )
         ]
@@ -310,7 +310,7 @@ export default function (scenarios) {
       if (parserState.lastMentionedMeasurePosition === undefined) {
         parserState.errors.push(`measure position after command '${argumentsFromMainAction.joinedTokenValuesWithRealDelimiters}' is not specified on the line number ${argumentsFromMainAction.lineNumber}`)
       } else {
-        const measureParamsValue = measureParamsByLastMentionedMeasurePosition(parserState)
+        const measureParamsValue = findMeasureParamsByLastMentionedMeasurePosition(parserState)
         if (!measureParamsValue) {
           parserState.errors.push(`measure after command '${argumentsFromMainAction.joinedTokenValuesWithRealDelimiters}' is not found on the line ${argumentsFromMainAction.lineNumber}`)
         } else {
@@ -341,7 +341,7 @@ export default function (scenarios) {
       return isVerticalCorrection(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      parserState[`lastStartVoltaMark-${parserState.numberOfVoltaMarks}`].yCorrection = verticalCorrection(tokenValues)
+      parserState[`lastStartVoltaMark-${parserState.numberOfVoltaMarks}`].yCorrection = parseVerticalCorrection(tokenValues)
       if (parserState.applyHighlighting) {
         const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
           regexps.verticalCorrectionHighlight, (match) => {

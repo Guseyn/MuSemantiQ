@@ -2,7 +2,7 @@
 
 <nav is="docs-contents"></nav>
 
-The dev tools are a small web app for working on MuSemantiQ itself: its fonts, its sound fonts, its MusicXML converters and its tests.
+The dev tools are a small web app for working on MuSemantiQ itself: its fonts, its sound fonts and its tests.
 
 ## How to Run Them
 
@@ -38,7 +38,6 @@ npm run dev-tools:download -- --yes
 - [Font viewer](/docs/dev-tools/font-viewer): trace a glyph out of a music font, see it in real music, and write it back into the music-js font.
 - [Font generator](/docs/dev-tools/font-generator): turn a SMuFL `.otf` into a music-js font.
 - [Magenta soundfont generator](/docs/dev-tools/soundfont-generator): render an `.sf2` soundbank into the samples the MIDI player plays.
-- [MusicXML tool](/docs/dev-tools/musicxml-tool): convert MusicXML to MSQ and back, and see the result engraved.
 - [Test viewer](/docs/dev-tools/test-viewer): compare what the last test run produced with the committed baselines, and adopt the new ones.
 
 ## Good to Know

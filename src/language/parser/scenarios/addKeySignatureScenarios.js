@@ -1,10 +1,10 @@
 'use strict'
 
-import foundNextTokenValueOnTheLine from '#msq/language/parser/scenarios/token/foundNextTokenValueOnTheLine.js'
+import findNextTokenValueOnTheLine from '#msq/language/parser/scenarios/token/findNextTokenValueOnTheLine.js'
 import regexps from '#msq/language/parser/scenarios/static-objects/regexps.js'
 import initNewMeasureParamsIfThereIsAlreadySuchMeasurePropertyOrNoMeasuresAtAll from '#msq/language/parser/scenarios/page-schema/initNewMeasureParamsIfThereIsAlreadySuchMeasurePropertyOrNoMeasuresAtAll.js'
-import lastMeasureParams from '#msq/language/parser/scenarios/page-schema/lastMeasureParams.js'
-import keySignatureThatUserMeant from '#msq/language/parser/scenarios/page-schema/keySignatureThatUserMeant.js'
+import getLastMeasureParams from '#msq/language/parser/scenarios/page-schema/getLastMeasureParams.js'
+import findKeySignatureThatUserMeant from '#msq/language/parser/scenarios/page-schema/findKeySignatureThatUserMeant.js'
 
 export default function (scenarios) {
   scenarios['key signature'] = {
@@ -45,21 +45,21 @@ export default function (scenarios) {
       return regexps.keySignatureName.test(tokenValues) &&
       !regexps.to.test(
         [
-          foundNextTokenValueOnTheLine(
+          findNextTokenValueOnTheLine(
             unitext, currentToken.firstCharIndexOfNextToken
           )
         ]
       )
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
       const keySignatureName = regexps.keySignatureName.match(tokenValues)[0]
       if (parserState.lastKeySignatureName) {
         lastMeasureParamsValue.keySignatureNameForEachLineId = undefined
         parserState.lastKeySignatureName = undefined
         parserState.lastKeySignatureNameForEachLineId += 1
       }
-      lastMeasureParamsValue.keySignatureName = keySignatureThatUserMeant(keySignatureName)
+      lastMeasureParamsValue.keySignatureName = findKeySignatureThatUserMeant(keySignatureName)
       const numberOfMeasures = parserState.pageSchema.measuresParams.length
       if (parserState.applyHighlighting) {
         const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
@@ -92,7 +92,7 @@ export default function (scenarios) {
       return regexps.forEachLine.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
       parserState.lastKeySignatureName = lastMeasureParamsValue.keySignatureName
       lastMeasureParamsValue.keySignatureNameForEachLineId = parserState.lastKeySignatureNameForEachLineId
       if (parserState.applyHighlighting) {
@@ -126,7 +126,7 @@ export default function (scenarios) {
       return regexps.forLinesBelow.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
       parserState.lastKeySignatureName = lastMeasureParamsValue.keySignatureName
       lastMeasureParamsValue.keySignatureNameForEachLineId = parserState.lastKeySignatureNameForEachLineId
       if (parserState.applyHighlighting) {

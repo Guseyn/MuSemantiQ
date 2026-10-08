@@ -129,7 +129,7 @@ Output was still written — the parser skips what it cannot read.
 ## Notes
 
 Generated SVGs contain faint outlines around some elements. Those come from the
-engine — `debugMode` in `src/drawer/elements/basic/svgAsString.js` — and not
+engine — `debugMode` in `src/drawer/elements/basic/convertSvgToString.js` — and not
 from this tool; the committed test fixtures were produced with them on.
 
 Prompts need a real terminal. Piped or redirected input is fine for the text

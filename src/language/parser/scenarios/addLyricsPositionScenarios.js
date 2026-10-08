@@ -1,6 +1,6 @@
 'use strict'
 
-import staveIndexByTokens from '#msq/language/parser/scenarios/token/staveIndexByTokens.js'
+import parseStaveIndexByTokens from '#msq/language/parser/scenarios/token/parseStaveIndexByTokens.js'
 import isStaveIndex from '#msq/language/parser/scenarios/token/isStaveIndex.js'
 import regexps from '#msq/language/parser/scenarios/static-objects/regexps.js'
 
@@ -50,8 +50,8 @@ export default function (scenarios) {
       return isStaveIndex(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const staveIndex = staveIndexByTokens(tokenValues)
-      parserState.pageSchema.lyricsUnderStaveIndex = staveIndexByTokens(tokenValues, true)
+      const staveIndex = parseStaveIndexByTokens(tokenValues)
+      parserState.pageSchema.lyricsUnderStaveIndex = parseStaveIndexByTokens(tokenValues, true)
       if (parserState.applyHighlighting) {
         const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
           regexps.staveIndexHighlight, (match) => {

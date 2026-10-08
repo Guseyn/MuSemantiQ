@@ -252,40 +252,6 @@
             </template>
           </template>
         </div>
-
-        <hr is="e-divider" data-hide-on-sidebar-closed data-hide-in-mobile>
-        <div is="e-info" data-hide-on-sidebar-closed data-hide-in-mobile>
-          <div is="e-stack" data-gap="xs">
-            <div is="e-row" data-gap="md" data-keep-flex-direction-row-in-mobile>
-              <kbd
-                is="e-kbd"
-                aria-label="Pin sidebar closed. Shortcut: Shift P"
-                aria-keyshortcuts="Shift+P"
-                data-action="
-                  document.querySelector('e-sidebar').close()
-                  localStorage.setItem('sidebarIsPinned', 'true')
-                "
-              >
-                ⇧ + P
-              </kbd>
-              <span data-font-size="xs">Pin Sidebar (Keep It Closed)</span>
-            </div>
-            <div is="e-row" data-gap="md" data-keep-flex-direction-row-in-mobile>
-              <kbd
-                is="e-kbd"
-                aria-label="Unpin sidebar. Shortcut: Shift U"
-                aria-keyshortcuts="Shift+U"
-                data-action="
-                  document.querySelector('e-sidebar').open()
-                  localStorage.removeItem('sidebarIsPinned')
-                "
-              >
-                ⇧ + U
-              </kbd>
-              <span data-font-size="xs">Unpin Sidebar</span>
-            </div>
-          </div>
-        </div>
       </nav>
 
       <footer>

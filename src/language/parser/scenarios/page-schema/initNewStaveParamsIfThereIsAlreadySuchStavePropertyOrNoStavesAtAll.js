@@ -1,6 +1,6 @@
 'use strict'
 
-import lastStaveParams from '#msq/language/parser/scenarios/page-schema/lastStaveParams.js'
+import getLastStaveParams from '#msq/language/parser/scenarios/page-schema/getLastStaveParams.js'
 
 export default function (lastMeasureParams, componentName, parserState) {
   if (!lastMeasureParams.stavesParams) {
@@ -11,8 +11,8 @@ export default function (lastMeasureParams, componentName, parserState) {
   }
   if (componentName) {
     if (
-      lastStaveParams(lastMeasureParams)[componentName] &&
-      !Array.isArray(lastStaveParams(lastMeasureParams)[componentName])
+      getLastStaveParams(lastMeasureParams)[componentName] &&
+      !Array.isArray(getLastStaveParams(lastMeasureParams)[componentName])
     ) {
       lastMeasureParams.stavesParams.push({})
     }

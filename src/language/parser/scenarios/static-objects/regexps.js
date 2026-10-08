@@ -17,7 +17,7 @@ import articulationNames from '#msq/language/parser/scenarios/static-objects/art
 import ornamentKeyNames from '#msq/language/parser/scenarios/static-objects/ornamentKeyNames.js'
 import midiSettingNames from '#msq/language/parser/scenarios/static-objects/midiSettingNames.js'
 import instrumentNames from '#msq/language/parser/scenarios/static-objects/instrumentNames.js'
-import withoutDoubleSpacesAndTrimmed from '#msq/language/parser/scenarios/token/withoutDoubleSpacesAndTrimmed.js'
+import removeDoubleSpacesAndTrim from '#msq/language/parser/scenarios/token/removeDoubleSpacesAndTrim.js'
 
 const VERTICAL_LINE = '|'
 const SLASH = '/'
@@ -597,7 +597,7 @@ const styleValueTests = {
 
 const midiSettingValueTests = {
   defaultInstrument: (tokenValues) => {
-    return firstArrayContainsSecondArray(instrumentNamesAsTokens, tokenValues)
+    return doesFirstArrayContainSecondArray(instrumentNamesAsTokens, tokenValues)
   },
   defaultTempo: (tokenValues) => {
     return isWrappedWithQuotes(tokenValues)
@@ -619,7 +619,7 @@ const areTwoArraysEqual = (firstArray, secondArray) => {
   return true
 }
 
-const firstArrayContainsSecondArray = (firstArray, secondArray) => {
+const doesFirstArrayContainSecondArray = (firstArray, secondArray) => {
   for (let index = 0; index < firstArray.length; index++) {
     if (areTwoArraysEqual(firstArray[index], secondArray)) {
       return true
@@ -688,7 +688,7 @@ const isWrappedWithQuotes = (tokenValues, itIsComment = false, canBeFollowedByCo
   )
 }
 
-const unwrappedFromQuotesValue = (tokenValues) => {
+const unwrapValueFromQuotes = (tokenValues) => {
   const joinedTokenValues = tokenValues.join(SPACE)
   if (joinedTokenValues[joinedTokenValues.length - 1] === ',') {
     return joinedTokenValues.slice(1, joinedTokenValues.length - 2)
@@ -808,7 +808,7 @@ export default {
   horizontalCorrectionHighlight: /(left|right)(\s+)(by)(\s+)(\d*\.?\d*)/,
   styleName: {
     test: (tokenValues) => {
-      return firstArrayContainsSecondArray(configurableStyleNamesAsTokens, tokenValues)
+      return doesFirstArrayContainSecondArray(configurableStyleNamesAsTokens, tokenValues)
     },
     match: (tokenValues) => {
       return [ tokenValues.join(SPACE) ]
@@ -835,7 +835,7 @@ export default {
   },
   midiSettingName: {
     test: (tokenValues) => {
-      return firstArrayContainsSecondArray(midiSettingNamesAsTokens, tokenValues)
+      return doesFirstArrayContainSecondArray(midiSettingNamesAsTokens, tokenValues)
     },
     match: (tokenValues) => {
       return [ tokenValues.join(SPACE) ]
@@ -859,7 +859,7 @@ export default {
         return false
       }
       if (
-        firstArrayContainsSecondArray(pageMetaNamesAsTokens, tokenValues.slice(0, tokenValueWithIsIndex)) &&
+        doesFirstArrayContainSecondArray(pageMetaNamesAsTokens, tokenValues.slice(0, tokenValueWithIsIndex)) &&
         isWrappedWithQuotes(tokenValues.slice(tokenValueWithIsIndex + 1))
       ) {
         return true
@@ -869,7 +869,7 @@ export default {
     match: (tokenValues) => {
       const tokenValueWithIsIndex = tokenValues.indexOf(IS)
       const pageMetaName = tokenValues.slice(0, tokenValueWithIsIndex).join(SPACE)
-      const pageMetaValue = unwrappedFromQuotesValue(tokenValues.slice(tokenValueWithIsIndex + 1))
+      const pageMetaValue = unwrapValueFromQuotes(tokenValues.slice(tokenValueWithIsIndex + 1))
       return [ pageMetaName, pageMetaValue ]
     }
   },
@@ -883,7 +883,7 @@ export default {
     test: (tokenValues) => {
       return (tokenValues[0] === FOR) &&
         (tokenValues[tokenValues.length - 1] === MEASURES) &&
-        firstArrayContainsSecondArray(applicationOfMeasureNumbersNamesAsTokens, tokenValues.slice(1, tokenValues.length - 1))
+        doesFirstArrayContainSecondArray(applicationOfMeasureNumbersNamesAsTokens, tokenValues.slice(1, tokenValues.length - 1))
     },
     match: (tokenValues) => {
       return [ tokenValues.slice(1, tokenValues.length - 1).join(SPACE) ]
@@ -960,13 +960,13 @@ export default {
   measureIndexHighlight: /(((measure)((\w|\s)+\w))|(((\w|\s)+\s)(measure)))/,
   withoutStartBarLine: {
     test: (tokenValues) => {
-      return firstArrayContainsSecondArray(WITHOUT_START_BARLINE, tokenValues)
+      return doesFirstArrayContainSecondArray(WITHOUT_START_BARLINE, tokenValues)
     }
   },
   withoutStartBarLineHighlight: /without(\s+)(opening|start)(\s+)(bar(\s+)line|barline)/,
   noStartBarLine: {
     test: (tokenValues) => {
-      return firstArrayContainsSecondArray(NO_START_BARLINE, tokenValues)
+      return doesFirstArrayContainSecondArray(NO_START_BARLINE, tokenValues)
     }
   },
   noStartBarLineHighlight: /no(\s+)(opening|start)(\s+)(bar(\s+)line|barline)/,
@@ -974,7 +974,7 @@ export default {
     test: (tokenValues) => {
       return (STARTS_BEGINS_OPENS.indexOf(tokenValues[0]) !== -1) &&
         (tokenValues[1] === WITH) &&
-        firstArrayContainsSecondArray(openingBarLineNamesAsTokens, tokenValues.slice(2))
+        doesFirstArrayContainSecondArray(openingBarLineNamesAsTokens, tokenValues.slice(2))
     },
     match: (tokenValues) => {
       return [ tokenValues.slice(2).join(SPACE) ]
@@ -982,7 +982,7 @@ export default {
   },
   openingBarLine: {
     test: (tokenValues) => {
-      return firstArrayContainsSecondArray(openingBarLineNamesAsTokensAsSeparateCommand, tokenValues)
+      return doesFirstArrayContainSecondArray(openingBarLineNamesAsTokensAsSeparateCommand, tokenValues)
     },
     match: (tokenValues) => {
       return [ tokenValues.slice(1).join(SPACE) ]
@@ -992,7 +992,7 @@ export default {
     test: (tokenValues) => {
       return (CLOSES_FINISHES_ENDS.indexOf(tokenValues[0]) !== -1) &&
         (tokenValues[1] === WITH) &&
-        firstArrayContainsSecondArray(closingBarLineNamesAsTokens, tokenValues.slice(2))
+        doesFirstArrayContainSecondArray(closingBarLineNamesAsTokens, tokenValues.slice(2))
     },
     match: (tokenValues) => {
       return [ tokenValues.slice(2).join(SPACE) ]
@@ -1000,7 +1000,7 @@ export default {
   },
   closingBarLine: {
     test: (tokenValues) => {
-      return firstArrayContainsSecondArray(closingBarLineNamesAsTokensAsSeparateCommand, tokenValues)
+      return doesFirstArrayContainSecondArray(closingBarLineNamesAsTokensAsSeparateCommand, tokenValues)
     },
     match: (tokenValues) => {
       return [ tokenValues.slice(1).join(SPACE) ]
@@ -1010,47 +1010,47 @@ export default {
   closingBarLineHighlight: new RegExp(`(${CLOSING} )?(${closingBarLineNames.join(VERTICAL_LINE)})`.replaceAll(SPACE, SPACE_REGEXP)),
   withRepeatSign: {
     test: (tokenValues) => {
-      return firstArrayContainsSecondArray(WITH_REPEAT_SIGN, tokenValues)
+      return doesFirstArrayContainSecondArray(WITH_REPEAT_SIGN, tokenValues)
     }
   },
   repeatSign: {
     test: (tokenValues) => {
-      return firstArrayContainsSecondArray(REPEAT_SIGN, tokenValues)
+      return doesFirstArrayContainSecondArray(REPEAT_SIGN, tokenValues)
     }
   },
   withRepeatSignHighlight: /((repeat(\s+)sign)|colon)/,
   atTheStart: {
     test: (tokenValues) => {
-      return firstArrayContainsSecondArray(AT_THE_START, tokenValues)
+      return doesFirstArrayContainSecondArray(AT_THE_START, tokenValues)
     }
   },
   atTheStartHighlight: /(at(\s+))?(the(\s+))?start/,
   atTheEnd: {
     test: (tokenValues) => {
-      return firstArrayContainsSecondArray(AT_THE_END, tokenValues)
+      return doesFirstArrayContainSecondArray(AT_THE_END, tokenValues)
     }
   },
   atTheEndHighlight: /(at(\s+))?(the(\s+))?end/,
   atTheStartOfTheMeasure: {
     test: (tokenValues) => {
-      return firstArrayContainsSecondArray(AT_THE_START_OF_THE_MEASURE, tokenValues)
+      return doesFirstArrayContainSecondArray(AT_THE_START_OF_THE_MEASURE, tokenValues)
     }
   },
   atTheStartOfTheMeasureHighlight: /(at(\s+))?(the(\s+))?start((\s+)of)?((\s+)the)?((\s+)measure)?/,
   atTheEndOfTheMeasure: {
     test: (tokenValues) => {
-      return firstArrayContainsSecondArray(AT_THE_END_OF_THE_MEASURE, tokenValues)
+      return doesFirstArrayContainSecondArray(AT_THE_END_OF_THE_MEASURE, tokenValues)
     }
   },
   atTheEndOfTheMeasureHighlight: /(at(\s+))?(the(\s+))?end((\s+)of)?((\s+)the)?((\s+)measure)?/,
   withMeasureRest: {
     test: (tokenValues) => {
-      return firstArrayContainsSecondArray(WITH_MEASURE_REST, tokenValues)
+      return doesFirstArrayContainSecondArray(WITH_MEASURE_REST, tokenValues)
     }
   },
   measureRest: {
     test: (tokenValues) => {
-      return firstArrayContainsSecondArray(MEASURE_REST, tokenValues)
+      return doesFirstArrayContainSecondArray(MEASURE_REST, tokenValues)
     }
   },
   measureRestHighlight: /(multi\s+)?measure(\s+)rest/,
@@ -1064,32 +1064,32 @@ export default {
   },
   ofPreviousBeat: {
     test: (tokenValues) => {
-      return firstArrayContainsSecondArray(OF_PREVIOUS_BEAT, tokenValues)
+      return doesFirstArrayContainSecondArray(OF_PREVIOUS_BEAT, tokenValues)
     }
   },
   ofPreviousBeats: {
     test: (tokenValues) => {
-      return firstArrayContainsSecondArray(OF_PREVIOUS_BEATS, tokenValues)
+      return doesFirstArrayContainSecondArray(OF_PREVIOUS_BEATS, tokenValues)
     }
   },
   measureWithSimileOfPreviousMeasure: {
     test: (tokenValues) => {
-      return firstArrayContainsSecondArray(MEASURE_WITH_SIMILE_OF_PREVIOUS_MEASURE, tokenValues)
+      return doesFirstArrayContainSecondArray(MEASURE_WITH_SIMILE_OF_PREVIOUS_MEASURE, tokenValues)
     }
   },
   measureWithSimileOfTwoPreviousMeasures: {
     test: (tokenValues) => {
-      return firstArrayContainsSecondArray(MEASURE_WITH_SIMILE_OF_TWO_PREVIOUS_MEASURES, tokenValues)
+      return doesFirstArrayContainSecondArray(MEASURE_WITH_SIMILE_OF_TWO_PREVIOUS_MEASURES, tokenValues)
     }
   },
   simileOfPreviousMeasure: {
     test: (tokenValues) => {
-      return firstArrayContainsSecondArray(SIMILE_OF_PREVIOUS_MEASURE, tokenValues)
+      return doesFirstArrayContainSecondArray(SIMILE_OF_PREVIOUS_MEASURE, tokenValues)
     }
   },
   simileOfTwoPreviousMeasures: {
     test: (tokenValues) => {
-      return firstArrayContainsSecondArray(SIMILE_OF_TWO_PREVIOUS_MEASURES, tokenValues)
+      return doesFirstArrayContainSecondArray(SIMILE_OF_TWO_PREVIOUS_MEASURES, tokenValues)
     }
   },
   simileHighlight: /(simile|repeat)/,
@@ -1159,7 +1159,7 @@ export default {
   },
   staveWithAndWithoutDelimeter: {
     test: (tokenValues) => {
-      return firstArrayContainsSecondArray(STAVE_WITH_AND_WITHOUT_DELIMITER, tokenValues)
+      return doesFirstArrayContainSecondArray(STAVE_WITH_AND_WITHOUT_DELIMITER, tokenValues)
     }
   },
   staveHighlight: /stave|staff/,
@@ -1193,7 +1193,7 @@ export default {
         (tokenValues[2] === IS)
       ) {
         const titleWithQuotes = tokenValues.slice(3)
-        const title = unwrappedFromQuotesValue(titleWithQuotes)
+        const title = unwrapValueFromQuotes(titleWithQuotes)
         return [ title ]
       }
       if (
@@ -1201,7 +1201,7 @@ export default {
         (tokenValues[1] === TITLE)
       ) {
         const titleWithQuotes = tokenValues.slice(2)
-        const title = unwrappedFromQuotesValue(titleWithQuotes)
+        const title = unwrapValueFromQuotes(titleWithQuotes)
         return [ title ]
       }
       if (
@@ -1209,14 +1209,14 @@ export default {
         (tokenValues[1] === IS)
       ) {
         const titleWithQuotes = tokenValues.slice(2)
-        const title = unwrappedFromQuotesValue(titleWithQuotes)
+        const title = unwrapValueFromQuotes(titleWithQuotes)
         return [ title ]
       }
       if (
         (tokenValues[0] === INSTRUMENT)
       ) {
         const titleWithQuotes = tokenValues.slice(1)
-        const title = unwrappedFromQuotesValue(titleWithQuotes)
+        const title = unwrapValueFromQuotes(titleWithQuotes)
         return [ title ]
       }
     }
@@ -1243,9 +1243,9 @@ export default {
   keySignatureName: {
     test: (tokenValues) => {
       if (tokenValues[0] === IS) {
-        return firstArrayContainsSecondArray(separateKeySignatureNamesAsTokens, tokenValues.slice(1))
+        return doesFirstArrayContainSecondArray(separateKeySignatureNamesAsTokens, tokenValues.slice(1))
       }
-      return firstArrayContainsSecondArray(separateKeySignatureNamesAsTokens, tokenValues)
+      return doesFirstArrayContainSecondArray(separateKeySignatureNamesAsTokens, tokenValues)
     },
     match: (tokenValues) => {
       if (tokenValues[0] === IS) {
@@ -1393,11 +1393,11 @@ export default {
     match: (tokenValues) => {
       if (tokenValues[2] === IS) {
         const repeatNoteValueWithQuotes = tokenValues.slice(3)
-        const repeatNoteValue = unwrappedFromQuotesValue(repeatNoteValueWithQuotes)
+        const repeatNoteValue = unwrapValueFromQuotes(repeatNoteValueWithQuotes)
         return [ repeatNoteValue ]
       }
       const repeatNoteValueWithQuotes = tokenValues.slice(2)
-      const repeatNoteValue = unwrappedFromQuotesValue(repeatNoteValueWithQuotes)
+      const repeatNoteValue = unwrapValueFromQuotes(repeatNoteValueWithQuotes)
       return [ repeatNoteValue ]
     }
   },
@@ -1437,13 +1437,13 @@ export default {
   tempoMarkHighlight: /(tempo(\s+)mark|tempo(\s+)note|tempo|metronome|metro)/,
   tempoMarkWithDotHighlight: {
     test: (string) => {
-      const stringWithoutDoubleSpacesAndTrimmed = withoutDoubleSpacesAndTrimmed(string)
+      const stringWithoutDoubleSpacesAndTrimmed = removeDoubleSpacesAndTrim(string)
       return stringWithoutDoubleSpacesAndTrimmed === WITH_DOT
     }
   },
   tempoMarkDottedHighlight: {
     test: (string) => {
-      const stringWithoutDoubleSpacesAndTrimmed = withoutDoubleSpacesAndTrimmed(string)
+      const stringWithoutDoubleSpacesAndTrimmed = removeDoubleSpacesAndTrim(string)
       return stringWithoutDoubleSpacesAndTrimmed === DOTTED
     }
   },
@@ -1456,9 +1456,9 @@ export default {
     },
     match: (tokenValues) => {
       if (tokenValues[0] === IS) {
-        return [ unwrappedFromQuotesValue(tokenValues.slice(1)) ]
+        return [ unwrapValueFromQuotes(tokenValues.slice(1)) ]
       }
-      return [ unwrappedFromQuotesValue(tokenValues) ]
+      return [ unwrapValueFromQuotes(tokenValues) ]
     }
   },
   tempoDurationPart: new RegExp(`(${tempoDurationPartNames.join(VERTICAL_LINE)}|dotted|with dot)`),
@@ -1473,7 +1473,7 @@ export default {
     test: (tokenValues) => {
       return (tokenValues[0] === WITH) &&
         (tokenValues[tokenValues.length - 1] === CLEF) &&
-        firstArrayContainsSecondArray(clefNamesAsTokens, tokenValues.slice(1, tokenValues.length - 1))
+        doesFirstArrayContainSecondArray(clefNamesAsTokens, tokenValues.slice(1, tokenValues.length - 1))
     },
     match: (tokenValues) => {
       return [ tokenValues.slice(1, tokenValues.length - 1).join(SPACE) ]
@@ -1482,7 +1482,7 @@ export default {
   clef: {
     test: (tokenValues) => {
       return (tokenValues[tokenValues.length - 1] === CLEF) &&
-        firstArrayContainsSecondArray(clefNamesAsTokens, tokenValues.slice(0, tokenValues.length - 1))
+        doesFirstArrayContainSecondArray(clefNamesAsTokens, tokenValues.slice(0, tokenValues.length - 1))
     },
     match: (tokenValues) => {
       return [ tokenValues.slice(0, tokenValues.length - 1).join(SPACE) ]
@@ -1687,15 +1687,15 @@ export default {
     test: (tokenValues) => {
       return (
         (tokenValues[0] === WITH) &&
-        firstArrayContainsSecondArray(noteKeyNamesAsTokens, tokenValues.slice(1, tokenValues.length - 1)) &&
+        doesFirstArrayContainSecondArray(noteKeyNamesAsTokens, tokenValues.slice(1, tokenValues.length - 1)) &&
         (tokenValues[tokenValues.length - 1] === KEY)
       ) ||
       (
-        firstArrayContainsSecondArray(mainNoteKeyNamesAsTokens, tokenValues)
+        doesFirstArrayContainSecondArray(mainNoteKeyNamesAsTokens, tokenValues)
       )
     },
     match: (tokenValues) => {
-      if (firstArrayContainsSecondArray(mainNoteKeyNamesAsTokens, tokenValues)) {
+      if (doesFirstArrayContainSecondArray(mainNoteKeyNamesAsTokens, tokenValues)) {
         return [ tokenValues.join(SPACE) ]
       }
       return [ tokenValues.slice(1, tokenValues.length - 1).join(SPACE) ]
@@ -1723,10 +1723,10 @@ export default {
     },
     match: (tokenValues) => {
       if (isWrappedWithQuotes(tokenValues.slice(2))) {
-        return [ unwrappedFromQuotesValue(tokenValues.slice(2)) ]
+        return [ unwrapValueFromQuotes(tokenValues.slice(2)) ]
       }
       if (isWrappedWithQuotes(tokenValues.slice(1))) {
-        return [ unwrappedFromQuotesValue(tokenValues.slice(1)) ]
+        return [ unwrapValueFromQuotes(tokenValues.slice(1)) ]
       }
     }
   },
@@ -1938,13 +1938,13 @@ export default {
         (tokenValues[0] === WITH) &&
         (tokenValues[1] === BREATH) &&
         (tokenValues[2] === MARK) &&
-        firstArrayContainsSecondArray(breathMarkNamesAsTokens, tokenValues.slice(3, tokenValues.length - 1)) &&
+        doesFirstArrayContainSecondArray(breathMarkNamesAsTokens, tokenValues.slice(3, tokenValues.length - 1)) &&
         (tokenValues[tokenValues.length - 1] === BEFORE)
       ) ||
       (
         (tokenValues[0] === WITH) &&
         (tokenValues[1] === BREATH) &&
-        firstArrayContainsSecondArray(breathMarkNamesAsTokens, tokenValues.slice(2, tokenValues.length - 1)) &&
+        doesFirstArrayContainSecondArray(breathMarkNamesAsTokens, tokenValues.slice(2, tokenValues.length - 1)) &&
         (tokenValues[tokenValues.length - 1] === BEFORE)
       ) ||
       (
@@ -1976,22 +1976,22 @@ export default {
         (tokenValues[0] === WITH) &&
         (tokenValues[1] === KEY) &&
         (tokenValues[2] === SIGNATURE) &&
-        firstArrayContainsSecondArray(separateKeySignatureNamesAsTokens, tokenValues.slice(3, tokenValues.length - 1)) &&
+        doesFirstArrayContainSecondArray(separateKeySignatureNamesAsTokens, tokenValues.slice(3, tokenValues.length - 1)) &&
         (tokenValues[tokenValues.length - 1] === BEFORE)
       ) ||
       (
         (tokenValues[0] === WITH) &&
-        firstArrayContainsSecondArray(separateKeySignatureNamesAsTokens, tokenValues.slice(1, tokenValues.length - 1)) &&
+        doesFirstArrayContainSecondArray(separateKeySignatureNamesAsTokens, tokenValues.slice(1, tokenValues.length - 1)) &&
         (tokenValues[tokenValues.length - 1] === BEFORE)
       )
     },
     match: (tokenValues) => {
       const firstOption = tokenValues.slice(3, tokenValues.length - 1)
-      if (firstArrayContainsSecondArray(separateKeySignatureNamesAsTokens, firstOption)) {
+      if (doesFirstArrayContainSecondArray(separateKeySignatureNamesAsTokens, firstOption)) {
         return [ firstOption.join(SPACE) ]
       }
       const secondOption = tokenValues.slice(1, tokenValues.length - 1)
-      if (firstArrayContainsSecondArray(separateKeySignatureNamesAsTokens, secondOption)) {
+      if (doesFirstArrayContainSecondArray(separateKeySignatureNamesAsTokens, secondOption)) {
         return [ secondOption.join(SPACE) ]
       }
     }
@@ -1999,7 +1999,7 @@ export default {
   withClefBefore: {
     test: (tokenValues) => {
       return (tokenValues[0] === WITH) &&
-        firstArrayContainsSecondArray(clefNamesAsTokens, tokenValues.slice(1, tokenValues.length - 2)) &&
+        doesFirstArrayContainSecondArray(clefNamesAsTokens, tokenValues.slice(1, tokenValues.length - 2)) &&
         (tokenValues[tokenValues.length - 2] === CLEF) &&
         (tokenValues[tokenValues.length - 1] === BEFORE)
     },
@@ -2015,16 +2015,16 @@ export default {
       }
       return (
         (tokenValues[0] === WITH) &&
-        firstArrayContainsSecondArray(clefNamesAsTokens, tokenValues.slice(1, tokenValueWithClefIndex)) &&
+        doesFirstArrayContainSecondArray(clefNamesAsTokens, tokenValues.slice(1, tokenValueWithClefIndex)) &&
         (tokenValues[tokenValueWithClefIndex + 1] === KEY) &&
         (tokenValues[tokenValueWithClefIndex + 2] === SIGNATURE) &&
-        firstArrayContainsSecondArray(separateKeySignatureNamesAsTokens, tokenValues.slice(tokenValueWithClefIndex + 3, tokenValues.length - 1)) &&
+        doesFirstArrayContainSecondArray(separateKeySignatureNamesAsTokens, tokenValues.slice(tokenValueWithClefIndex + 3, tokenValues.length - 1)) &&
         (tokenValues[tokenValues.length - 1] === BEFORE)
       ) ||
       (
         (tokenValues[0] === WITH) &&
         (clefNames.indexOf(tokenValues.slice(1, tokenValueWithClefIndex).join(SPACE)) !== -1) &&
-        firstArrayContainsSecondArray(separateKeySignatureNamesAsTokens, tokenValues.slice(tokenValueWithClefIndex + 1, tokenValues.length - 1)) &&
+        doesFirstArrayContainSecondArray(separateKeySignatureNamesAsTokens, tokenValues.slice(tokenValueWithClefIndex + 1, tokenValues.length - 1)) &&
         (tokenValues[tokenValues.length - 1] === BEFORE)
       )
     },
@@ -2032,11 +2032,11 @@ export default {
       const tokenValueWithClefIndex = tokenValues.indexOf(CLEF)
       const clefName = tokenValues.slice(1, tokenValueWithClefIndex).join(SPACE)
       const firstOption = tokenValues.slice(tokenValueWithClefIndex + 3, tokenValues.length - 1)
-      if (firstArrayContainsSecondArray(separateKeySignatureNamesAsTokens, firstOption)) {
+      if (doesFirstArrayContainSecondArray(separateKeySignatureNamesAsTokens, firstOption)) {
         return [ clefName, firstOption.join(SPACE) ]
       }
       const secondOption = tokenValues.slice(tokenValueWithClefIndex + 1, tokenValues.length - 1)
-      if (firstArrayContainsSecondArray(separateKeySignatureNamesAsTokens, secondOption)) {
+      if (doesFirstArrayContainSecondArray(separateKeySignatureNamesAsTokens, secondOption)) {
         return [ clefName, secondOption.join(SPACE) ]
       }
     }
@@ -2044,7 +2044,7 @@ export default {
   withArticulation: {
     test: (tokenValues) => {
       return (tokenValues[0] === WITH) &&
-        firstArrayContainsSecondArray(articulationNamesAsTokens, tokenValues.slice(1))
+        doesFirstArrayContainSecondArray(articulationNamesAsTokens, tokenValues.slice(1))
     },
     match: (tokenValues) => {
       return [ tokenValues.slice(1).join(SPACE) ]
@@ -2076,7 +2076,7 @@ export default {
         return false
       }
       return (tokenValues[0] === WITH) &&
-        firstArrayContainsSecondArray(ornamentKeyNamesAsTokens, tokenValues.slice(1, tokenValueWithKeyIndex)) &&
+        doesFirstArrayContainSecondArray(ornamentKeyNamesAsTokens, tokenValues.slice(1, tokenValueWithKeyIndex)) &&
         isAboveBelowOverUnder(tokenValues[tokenValueWithKeyIndex + 1])
     },
     match: (tokenValues) => {
@@ -2105,7 +2105,7 @@ export default {
         (tokenValues[1] === CHORD) &&
         isWrappedWithQuotes(wrappedChordValue)
       ) {
-        const chordValue = unwrappedFromQuotesValue(wrappedChordValue)
+        const chordValue = unwrapValueFromQuotes(wrappedChordValue)
         const devidedByBackSlash = chordValue.split(SLASH)
         if (
           (devidedByBackSlash.length === 1) ||
@@ -2136,7 +2136,7 @@ export default {
     },
     match: (tokenValues) => {
       const wrappedChordValue = tokenValues.slice(2)
-      return [ unwrappedFromQuotesValue(wrappedChordValue) ]
+      return [ unwrapValueFromQuotes(wrappedChordValue) ]
     }
   },
   withChordHighlight: CHORD,
@@ -2276,7 +2276,7 @@ export default {
         (isWrappedWithQuotes(tokenValues.slice(2)))
     },
     match: (tokenValues) => {
-      return [ unwrappedFromQuotesValue(tokenValues.slice(2)) ]
+      return [ unwrapValueFromQuotes(tokenValues.slice(2)) ]
     }
   },
   withDynamicHighlight: DYNAMIC,
@@ -2294,7 +2294,7 @@ export default {
       return isWrappedWithQuotes(tokenValues)
     },
     match: (tokenValues) => {
-      return [ unwrappedFromQuotesValue(tokenValues) ]
+      return [ unwrapValueFromQuotes(tokenValues) ]
     }
   },
   followedByDash: {
@@ -2368,7 +2368,7 @@ export default {
     match: (tokenValues) => {
       const joinedTokenValues = tokenValues.join(SPACE)
       const splittedCommand = joinedTokenValues.split(COLUMN)
-      return [ splittedCommand[1][0], unwrappedFromQuotesValue([ splittedCommand[1].slice(1) ]) ]
+      return [ splittedCommand[1][0], unwrapValueFromQuotes([ splittedCommand[1].slice(1) ]) ]
     }
   },
   commentStartsWithText: {
@@ -2537,7 +2537,7 @@ export default {
   noteIndexHighlight: /(((note)((\w|\s)+\w))|(((\w|\s)+\s)(note)))/,
   arpeggiated: {
     test: (tokenValues) => {
-      return firstArrayContainsSecondArray(IS_ARPEGGIATED, tokenValues)
+      return doesFirstArrayContainSecondArray(IS_ARPEGGIATED, tokenValues)
     }
   },
   arpeggiatedHighlight: /arpeggiated|arpeggio/,
@@ -3458,7 +3458,7 @@ export default {
   },
   withGlissando: {
     test: (tokenValues) => {
-      return firstArrayContainsSecondArray(WITH_GLISSANDO, tokenValues)
+      return doesFirstArrayContainSecondArray(WITH_GLISSANDO, tokenValues)
     }
   },
   glissandoHighlight: /(glissando|gliss\.|gliss|glis\.|glis)/,
@@ -3514,7 +3514,7 @@ export default {
         isWrappedWithQuotes(tokenValues.slice(2))
     },
     match: (tokenValues) => {
-      return [ unwrappedFromQuotesValue(tokenValues.slice(2)) ]
+      return [ unwrapValueFromQuotes(tokenValues.slice(2)) ]
     }
   },
   startsWithTextValueFrom: {
@@ -3525,7 +3525,7 @@ export default {
         (tokenValues[tokenValues.length - 1] === FROM)
     },
     match: (tokenValues) => {
-      return [ unwrappedFromQuotesValue(tokenValues.slice(2, tokenValues.length - 1)) ]
+      return [ unwrapValueFromQuotes(tokenValues.slice(2, tokenValues.length - 1)) ]
     }
   },
   finishesWithTextValue: {
@@ -3535,7 +3535,7 @@ export default {
         isWrappedWithQuotes(tokenValues.slice(2))
     },
     match: (tokenValues) => {
-      return [ unwrappedFromQuotesValue(tokenValues.slice(2)) ]
+      return [ unwrapValueFromQuotes(tokenValues.slice(2)) ]
     }
   },
   crescendoOrDiminuendo: {
@@ -3637,7 +3637,7 @@ export default {
       return isWrappedWithQuotes(tokenValues)
     },
     match: (tokenValues) => {
-      return [ unwrappedFromQuotesValue(tokenValues) ]
+      return [ unwrapValueFromQuotes(tokenValues) ]
     }
   },
   bracket: {
@@ -3647,7 +3647,7 @@ export default {
   },
   opensWithBracket: {
     test: (tokenValues) => {
-      return firstArrayContainsSecondArray(OPENS_WITH_BRACKET, tokenValues)
+      return doesFirstArrayContainSecondArray(OPENS_WITH_BRACKET, tokenValues)
     }
   },
   bracketHighlight: BRACKET,

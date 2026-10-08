@@ -109,7 +109,7 @@ export default function attachHighlighterToMidiPlayer({
     let refIds
     const refDataName = event.target.parentNode.getAttribute('data-name')
 
-    if (refDataName === 'noteBody') {
+    if (refDataName === 'noteHead') {
       refIds = event.target.parentNode.getAttribute('ref-ids')
     }
     if (refDataName === 'rest') {

@@ -2,9 +2,9 @@
 
 import regexps from '#msq/language/parser/scenarios/static-objects/regexps.js'
 import isDirection from '#msq/language/parser/scenarios/token/isDirection.js'
-import direction from '#msq/language/parser/scenarios/token/direction.js'
-import foundNextTokenValueOnTheLine from '#msq/language/parser/scenarios/token/foundNextTokenValueOnTheLine.js'
-import chordParamsByLastMentionedUnitPositions from '#msq/language/parser/scenarios/page-schema/chordParamsByLastMentionedUnitPositions.js'
+import parseDirection from '#msq/language/parser/scenarios/token/parseDirection.js'
+import findNextTokenValueOnTheLine from '#msq/language/parser/scenarios/token/findNextTokenValueOnTheLine.js'
+import findChordParamsByLastMentionedUnitPositions from '#msq/language/parser/scenarios/page-schema/findChordParamsByLastMentionedUnitPositions.js'
 import undefineAllMentionedPositions from '#msq/language/parser/scenarios/page-schema/undefineAllMentionedPositions.js'
 import undefineOnlyLastMentionedUnitPosition from '#msq/language/parser/scenarios/page-schema/undefineOnlyLastMentionedUnitPosition.js'
 import fillAllPlaceholdersInHighlightsHtmlBufferWithMentionedPositionsWhereItsNeeded from '#msq/language/parser/scenarios/highlights-html-buffer/fillAllPlaceholdersInHighlightsHtmlBufferWithMentionedPositionsWhereItsNeeded.js'
@@ -83,7 +83,7 @@ export default function (scenarios) {
       if (parserState.lastMentionedUnitPosition === undefined) {
         parserState.errors.push(`unit position after command '${argumentsFromMainAction.joinedTokenValuesWithRealDelimiters}' is not specified on the line number ${scenarios['glissando starts before unit'].lineNumber}`)
       } else {
-        const chordParamsValue = chordParamsByLastMentionedUnitPositions(parserState)
+        const chordParamsValue = findChordParamsByLastMentionedUnitPositions(parserState)
         if (!chordParamsValue) {
           parserState.errors.push(`unit after command '${argumentsFromMainAction.joinedTokenValuesWithRealDelimiters}' is not found on the line ${scenarios['glissando starts before unit'].lineNumber}`)
         } else {
@@ -147,7 +147,7 @@ export default function (scenarios) {
       if (parserState.lastMentionedUnitPosition === undefined) {
         parserState.errors.push(`unit position after command '${argumentsFromMainAction.joinedTokenValuesWithRealDelimiters}' is not specified on the line number ${argumentsFromMainAction.lineNumber}`)
       } else {
-        const chordParamsValue = chordParamsByLastMentionedUnitPositions(parserState)
+        const chordParamsValue = findChordParamsByLastMentionedUnitPositions(parserState)
         if (!chordParamsValue) {
           parserState.errors.push(`unit after command '${argumentsFromMainAction.joinedTokenValuesWithRealDelimiters}' is not found on the line ${argumentsFromMainAction.lineNumber}`)
         } else {
@@ -188,7 +188,7 @@ export default function (scenarios) {
           regexps.starts.test(tokenValues) &&
           !regexps.from.test(
             [
-              foundNextTokenValueOnTheLine(
+              findNextTokenValueOnTheLine(
                 unitext, currentToken.firstCharIndexOfNextToken
               )
             ]
@@ -200,7 +200,7 @@ export default function (scenarios) {
       !regexps.startsBefore.test(tokenValues) &&
       !regexps.before.test(
         [
-          foundNextTokenValueOnTheLine(
+          findNextTokenValueOnTheLine(
             unitext,
             currentToken.firstCharIndexOfNextToken
           )
@@ -227,7 +227,7 @@ export default function (scenarios) {
       if (parserState.lastMentionedUnitPosition === undefined) {
         parserState.errors.push(`unit position after command '${argumentsFromMainAction.joinedTokenValuesWithRealDelimiters}' is not specified on the line number ${argumentsFromMainAction.lineNumber}`)
       } else {
-        const chordParamsValue = chordParamsByLastMentionedUnitPositions(parserState)
+        const chordParamsValue = findChordParamsByLastMentionedUnitPositions(parserState)
         if (!chordParamsValue) {
           parserState.errors.push(`unit after command '${argumentsFromMainAction.joinedTokenValuesWithRealDelimiters}' is not found on the line ${argumentsFromMainAction.lineNumber}`)
         } else {
@@ -268,7 +268,7 @@ export default function (scenarios) {
       !regexps.finishesAfter.test(tokenValues) &&
       !regexps.after.test(
         [
-          foundNextTokenValueOnTheLine(
+          findNextTokenValueOnTheLine(
             unitext,
             currentToken.firstCharIndexOfNextToken
           )
@@ -295,7 +295,7 @@ export default function (scenarios) {
       if (parserState.lastMentionedUnitPosition === undefined) {
         parserState.errors.push(`unit position after command '${argumentsFromMainAction.joinedTokenValuesWithRealDelimiters}' is not specified on the line number ${argumentsFromMainAction.lineNumber}`)
       } else {
-        const chordParamsValue = chordParamsByLastMentionedUnitPositions(parserState)
+        const chordParamsValue = findChordParamsByLastMentionedUnitPositions(parserState)
         if (!chordParamsValue) {
           parserState.errors.push(`unit after command '${argumentsFromMainAction.joinedTokenValuesWithRealDelimiters}' is not found on the line ${argumentsFromMainAction.lineNumber}`)
         } else {
@@ -332,7 +332,7 @@ export default function (scenarios) {
       return isDirection(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const glissandoDirection = direction(tokenValues)
+      const glissandoDirection = parseDirection(tokenValues)
       if (parserState.lastDeclaredGlissando) {
         parserState.lastDeclaredGlissando.direction = glissandoDirection
       }

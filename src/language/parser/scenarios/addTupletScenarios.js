@@ -2,15 +2,15 @@
 
 import regexps from '#msq/language/parser/scenarios/static-objects/regexps.js'
 import isDirection from '#msq/language/parser/scenarios/token/isDirection.js'
-import direction from '#msq/language/parser/scenarios/token/direction.js'
+import parseDirection from '#msq/language/parser/scenarios/token/parseDirection.js'
 import isAboveBelowOverUnder from '#msq/language/parser/scenarios/token/isAboveBelowOverUnder.js'
-import directionByAboveBelowOverUnder from '#msq/language/parser/scenarios/token/directionByAboveBelowOverUnder.js'
+import parseDirectionByAboveBelowOverUnder from '#msq/language/parser/scenarios/token/parseDirectionByAboveBelowOverUnder.js'
 import isAboveBelowOverUnderStaveLines from '#msq/language/parser/scenarios/token/isAboveBelowOverUnderStaveLines.js'
-import directionByAboveBelowOverUnderStaveLines from '#msq/language/parser/scenarios/token/directionByAboveBelowOverUnderStaveLines.js'
+import parseDirectionByAboveBelowOverUnderStaveLines from '#msq/language/parser/scenarios/token/parseDirectionByAboveBelowOverUnderStaveLines.js'
 import isVerticalCorrection from '#msq/language/parser/scenarios/token/isVerticalCorrection.js'
-import verticalCorrection from '#msq/language/parser/scenarios/token/verticalCorrection.js'
-import foundNextTokenValueOnTheLine from '#msq/language/parser/scenarios/token/foundNextTokenValueOnTheLine.js'
-import chordParamsByLastMentionedUnitPositions from '#msq/language/parser/scenarios/page-schema/chordParamsByLastMentionedUnitPositions.js'
+import parseVerticalCorrection from '#msq/language/parser/scenarios/token/parseVerticalCorrection.js'
+import findNextTokenValueOnTheLine from '#msq/language/parser/scenarios/token/findNextTokenValueOnTheLine.js'
+import findChordParamsByLastMentionedUnitPositions from '#msq/language/parser/scenarios/page-schema/findChordParamsByLastMentionedUnitPositions.js'
 import undefineAllMentionedPositions from '#msq/language/parser/scenarios/page-schema/undefineAllMentionedPositions.js'
 import undefineOnlyLastMentionedUnitPosition from '#msq/language/parser/scenarios/page-schema/undefineOnlyLastMentionedUnitPosition.js'
 import fillAllPlaceholdersInHighlightsHtmlBufferWithMentionedPositionsWhereItsNeeded from '#msq/language/parser/scenarios/highlights-html-buffer/fillAllPlaceholdersInHighlightsHtmlBufferWithMentionedPositionsWhereItsNeeded.js'
@@ -105,12 +105,12 @@ export default function (scenarios) {
       if (parserState.lastMentionedUnitPosition === undefined) {
         parserState.errors.push(`unit position after command '${argumentsFromMainAction.joinedTokenValuesWithRealDelimiters}' is not specified on the line number ${argumentsFromMainAction.lineNumber}`)
       } else {
-        const chordParamsValue = chordParamsByLastMentionedUnitPositions(parserState)
+        const chordParamsValue = findChordParamsByLastMentionedUnitPositions(parserState)
         if (!chordParamsValue) {
           parserState.errors.push(`unit after command '${argumentsFromMainAction.joinedTokenValuesWithRealDelimiters}' is not found on the line ${argumentsFromMainAction.lineNumber}`)
         } else {
           chordParamsValue.tupletMarks = chordParamsValue.tupletMarks || []
-          const firstChordParamsInCurrentVoiceOnCurrentStave = parserState.pageSchema.measuresParams[parserState.calculatedUnitMeasureIndexByLastMentionedPositions].stavesParams[parserState.calculatedUnitStaveIndexByLastMentionedPositions].voicesParams[parserState.calculatedUnitVoiceIndexByLastMentionedPositions][0]
+          const firstChordParamsInCurrentVoiceOnCurrentStave = parserState.pageSchema.measuresParams[parserState.unitMeasureIndexByLastMentionedPositions].stavesParams[parserState.unitStaveIndexByLastMentionedPositions].voicesParams[parserState.unitVoiceIndexByLastMentionedPositions][0]
           firstChordParamsInCurrentVoiceOnCurrentStave.tupletMarks = firstChordParamsInCurrentVoiceOnCurrentStave.tupletMarks || []
           const tupletMarkKey = `tuplet-${parserState.numberOfTuplets}`
           const startTupletMark = {
@@ -185,7 +185,7 @@ export default function (scenarios) {
       if (parserState.lastMentionedUnitPosition === undefined) {
         parserState.errors.push(`unit position after command '${argumentsFromMainAction.joinedTokenValuesWithRealDelimiters}' is not specified on the line ${argumentsFromMainAction.lineNumber}`)
       } else {
-        const chordParamsValue = chordParamsByLastMentionedUnitPositions(parserState)
+        const chordParamsValue = findChordParamsByLastMentionedUnitPositions(parserState)
         if (!chordParamsValue) {
           parserState.errors.push(`unit after command '${argumentsFromMainAction.joinedTokenValuesWithRealDelimiters}' is not found on the line ${argumentsFromMainAction.lineNumber}`)
         } else {
@@ -240,7 +240,7 @@ export default function (scenarios) {
           regexps.starts.test(tokenValues) &&
           !regexps.from.test(
             [
-              foundNextTokenValueOnTheLine(
+              findNextTokenValueOnTheLine(
                 unitext, currentToken.firstCharIndexOfNextToken
               )
             ]
@@ -251,7 +251,7 @@ export default function (scenarios) {
       ) &&
       !regexps.before.test(
         [
-          foundNextTokenValueOnTheLine(
+          findNextTokenValueOnTheLine(
             unitext, currentToken.firstCharIndexOfNextToken
           )
         ]
@@ -278,7 +278,7 @@ export default function (scenarios) {
         parserState.errors.push(`unit position after command '${argumentsFromMainAction.joinedTokenValuesWithRealDelimiters}' is not specified on the line number ${argumentsFromMainAction.lineNumber}`)
       } else {
         const tupletMarkKey = `tuplet-${parserState.numberOfTuplets}`
-        const chordParamsValue = chordParamsByLastMentionedUnitPositions(parserState)
+        const chordParamsValue = findChordParamsByLastMentionedUnitPositions(parserState)
         if (!chordParamsValue) {
           parserState.errors.push(`unit after command '${argumentsFromMainAction.joinedTokenValuesWithRealDelimiters}' is not found on the line ${argumentsFromMainAction.lineNumber}`)
         } else {
@@ -338,7 +338,7 @@ export default function (scenarios) {
       ) &&
       !regexps.after.test(
         [
-          foundNextTokenValueOnTheLine(
+          findNextTokenValueOnTheLine(
             unitext, currentToken.firstCharIndexOfNextToken
           )
         ]
@@ -364,7 +364,7 @@ export default function (scenarios) {
       if (parserState.lastMentionedUnitPosition === undefined) {
         parserState.errors.push(`unit position after command '${argumentsFromMainAction.joinedTokenValuesWithRealDelimiters}' is not specified on the line number ${argumentsFromMainAction.lineNumber}`)
       } else {
-        const chordParamsValue = chordParamsByLastMentionedUnitPositions(parserState)
+        const chordParamsValue = findChordParamsByLastMentionedUnitPositions(parserState)
         const tupletMarkKey = `tuplet-${parserState.numberOfTuplets}`
         if (!chordParamsValue) {
           parserState.errors.push(`unit after command '${argumentsFromMainAction.joinedTokenValuesWithRealDelimiters}' is not found on the line ${argumentsFromMainAction.lineNumber}`)
@@ -401,7 +401,7 @@ export default function (scenarios) {
       return isDirection(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      parserState.lastTupletDirection = direction(tokenValues)
+      parserState.lastTupletDirection = parseDirection(tokenValues)
       if (parserState.lastChordParamsWithStartedTupletMark) {
         parserState.lastChordParamsWithStartedTupletMark.chordParams.tupletMarks[parserState.lastChordParamsWithStartedTupletMark.tupletMarkIndex].direction = parserState.lastTupletDirection
       }
@@ -422,7 +422,7 @@ export default function (scenarios) {
       return isAboveBelowOverUnder(tokenValues) &&
         !regexps.staveWithAndWithoutDelimeter.test(
           [
-            foundNextTokenValueOnTheLine(
+            findNextTokenValueOnTheLine(
               unitext,
               currentToken.firstCharIndexOfNextToken
             )
@@ -430,7 +430,7 @@ export default function (scenarios) {
         )
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      parserState.lastTupletDirection = directionByAboveBelowOverUnder(tokenValues)
+      parserState.lastTupletDirection = parseDirectionByAboveBelowOverUnder(tokenValues)
       if (parserState.lastChordParamsWithStartedTupletMark) {
         parserState.lastChordParamsWithStartedTupletMark.chordParams.tupletMarks[parserState.lastChordParamsWithStartedTupletMark.tupletMarkIndex].direction = parserState.lastTupletDirection
       }
@@ -451,7 +451,7 @@ export default function (scenarios) {
       return isAboveBelowOverUnderStaveLines(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      parserState.lastTupletDirection = directionByAboveBelowOverUnderStaveLines(tokenValues)
+      parserState.lastTupletDirection = parseDirectionByAboveBelowOverUnderStaveLines(tokenValues)
       parserState.lastTupletIsAboveOrBelowStaveLines = true
       if (parserState.lastChordParamsWithStartedTupletMark) {
         parserState.lastChordParamsWithStartedTupletMark.chordParams.tupletMarks[parserState.lastChordParamsWithStartedTupletMark.tupletMarkIndex].direction = parserState.lastTupletDirection
@@ -520,7 +520,7 @@ export default function (scenarios) {
       return isVerticalCorrection(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      parserState.lastTupletVerticalCorrection = verticalCorrection(tokenValues)
+      parserState.lastTupletVerticalCorrection = parseVerticalCorrection(tokenValues)
       if (parserState.lastChordParamsWithStartedTupletMark) {
         parserState.lastChordParamsWithStartedTupletMark.chordParams.tupletMarks[parserState.lastChordParamsWithStartedTupletMark.tupletMarkIndex].yCorrection = parserState.lastTupletVerticalCorrection
       }

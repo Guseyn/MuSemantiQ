@@ -1,9 +1,9 @@
 'use strict'
 
 import isDirection from '#msq/language/parser/scenarios/token/isDirection.js'
-import direction from '#msq/language/parser/scenarios/token/direction.js'
+import parseDirection from '#msq/language/parser/scenarios/token/parseDirection.js'
 import isAboveBelowOverUnder from '#msq/language/parser/scenarios/token/isAboveBelowOverUnder.js'
-import directionByAboveBelowOverUnder from '#msq/language/parser/scenarios/token/directionByAboveBelowOverUnder.js'
+import parseDirectionByAboveBelowOverUnder from '#msq/language/parser/scenarios/token/parseDirectionByAboveBelowOverUnder.js'
 import regexps from '#msq/language/parser/scenarios/static-objects/regexps.js'
 import applicationOfMeasureNumbers from '#msq/language/parser/scenarios/static-objects/applicationOfMeasureNumbers.js'
 
@@ -55,7 +55,7 @@ export default function (scenarios) {
       return isDirection(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      parserState.pageSchema.directionOfMeasureNumbers = direction(tokenValues)
+      parserState.pageSchema.directionOfMeasureNumbers = parseDirection(tokenValues)
       if (parserState.applyHighlighting) {
         // no highlights needed
         parserState.highlightsHtmlBuffer.push(joinedTokenValuesWithRealDelimiters)
@@ -75,7 +75,7 @@ export default function (scenarios) {
       return isAboveBelowOverUnder(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      parserState.pageSchema.directionOfMeasureNumbers = directionByAboveBelowOverUnder(tokenValues)
+      parserState.pageSchema.directionOfMeasureNumbers = parseDirectionByAboveBelowOverUnder(tokenValues)
       if (parserState.applyHighlighting) {
         parserState.highlightsHtmlBuffer.push(
           `<span class="th" ref-id="every-measure">${joinedTokenValuesWithRealDelimiters}`

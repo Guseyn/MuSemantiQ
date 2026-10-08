@@ -106,7 +106,7 @@ export default [
       { kind: 'scalar', name: "yOffset", value: 0.46, unit: 'interval' }
     ]
   },
-  { kind: 'scalar', name: "measureFermataOffsetY", value: 0.8, unit: 'interval' },
+  { kind: 'scalar', name: "barlineFermataOffsetY", value: 0.8, unit: 'interval' },
   {
     kind: 'glyph',
     name: "marcato",
@@ -270,7 +270,7 @@ export default [
   },
   {
     kind: 'glyph',
-    name: "darkNoteBody",
+    name: "blackNoteHead",
     smufl: '\uE1B1',
     fields: [ 'points' ],
     rest: [
@@ -279,7 +279,7 @@ export default [
   },
   {
     kind: 'glyph',
-    name: "halfNoteBody",
+    name: "halfNoteHead",
     smufl: '\uE1B0',
     fields: [ 'points' ],
     rest: [
@@ -288,7 +288,7 @@ export default [
   },
   {
     kind: 'glyph',
-    name: "wholeNoteBody",
+    name: "wholeNoteHead",
     smufl: '\uE1D2',
     fields: [ 'points' ],
     rest: [
@@ -297,7 +297,7 @@ export default [
   },
   {
     kind: 'glyph',
-    name: "ghostWholeNoteBody",
+    name: "ghostWholeNoteHead",
     smufl: '\uE0A7',
     fields: [ 'points' ],
     rest: [
@@ -306,7 +306,7 @@ export default [
   },
   {
     kind: 'glyph',
-    name: "ghostHalfNoteBody",
+    name: "ghostHalfNoteHead",
     smufl: '\uE0DA',
     fields: [ 'points' ],
     rest: [
@@ -315,7 +315,7 @@ export default [
   },
   {
     kind: 'glyph',
-    name: "ghostDarkNoteBody",
+    name: "ghostBlackNoteHead",
     smufl: '\uE0A9',
     fields: [ 'points' ],
     rest: [
@@ -323,8 +323,8 @@ export default [
     ]
   },
   { kind: 'scalar', name: "stemWidth", value: 0.14, unit: 'interval' },
-  { kind: 'scalar', name: "verticalStemCorrectionForGhostNoteAtEdgeOfUnitBody", value: 0.25, unit: 'interval' },
-  { kind: 'scalar', name: "verticalStemCorrectionForGhostHalfNoteAtEdgeOfUnitBody", value: 0.2, unit: 'interval' },
+  { kind: 'scalar', name: "verticalStemCorrectionForGhostNoteAtEdgeOfUnitNoteHeads", value: 0.25, unit: 'interval' },
+  { kind: 'scalar', name: "verticalStemCorrectionForGhostHalfNoteAtEdgeOfUnitNoteHeads", value: 0.2, unit: 'interval' },
   {
     kind: 'glyph',
     name: "sharpKey",
@@ -410,7 +410,7 @@ export default [
   { kind: 'scalar', name: "distanceBetweenKeysForSingleUnit", value: 0.3, unit: 'interval' },
   { kind: 'scalar', name: "distanceBetweenKeysAsNoteLettersForSingleUnit", value: 0.1, unit: 'interval' },
   { kind: 'scalar', name: "spaceAfterKeysForSingleUnits", value: 0.45, unit: 'interval' },
-  { kind: 'scalar', name: "spaceAfterKeysForSingleUnitsBeforeCrossStaveUnitThatContainsNotesOnAdditionalStaveLines", value: 0.9, unit: 'interval' },
+  { kind: 'scalar', name: "spaceAfterKeysForSingleUnitsBeforeCrossStaveUnitThatContainsNotesOnLedgerLines", value: 0.9, unit: 'interval' },
   {
     kind: 'group',
     name: "graceKeyOnStaveLineCenterYCorrections",
@@ -796,7 +796,7 @@ export default [
     ]
   },
   { kind: 'scalar', name: "distanceBetweenDots", value: 0.25, unit: 'interval' },
-  { kind: 'scalar', name: "emptyPaddingAroundDotsOnNonAddtionalStaveLines", value: 0.2, unit: 'interval' },
+  { kind: 'scalar', name: "emptyPaddingAroundDotsOnNonLedgerLines", value: 0.2, unit: 'interval' },
   { kind: 'scalar', name: "leftOffsetForDotsInSingleUnitWithNotesOnStaveLinesAndStemDirectionIsUpAndUnitDurationIsEqualToEighth", value: 1.2, unit: 'interval' },
   { kind: 'scalar', name: "leftOffsetForDotsInSingleUnitWithNotesOnStaveLinesAndStemDirectionIsUpAndUnitDurationIsLessThanEighth", value: 1.4, unit: 'interval' },
   { kind: 'scalar', name: "leftOffsetForDotsInSingleUnit", value: 0.5, unit: 'interval' },
@@ -1360,7 +1360,7 @@ export default [
     ]
   },
   { kind: 'scalar', name: "cTimeTopOffset", value: -0.02, unit: 'plain' },
-  { kind: 'scalar', name: "croccedCTimeTopOffset", value: -0.965, unit: 'interval' },
+  { kind: 'scalar', name: "crossedCTimeTopOffset", value: -0.965, unit: 'interval' },
   { kind: 'scalar', name: "numeratorTopOffset", value: -0.925, unit: 'interval' },
   { kind: 'scalar', name: "denominatorTopOffset", value: 1.075, unit: 'interval' },
   {

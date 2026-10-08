@@ -1,6 +1,6 @@
 'use strict'
 
-import withNumbersInsteadOfWords from '#msq/language/parser/scenarios/token/withNumbersInsteadOfWords.js'
+import replaceWordsWithNumbers from '#msq/language/parser/scenarios/token/replaceWordsWithNumbers.js'
 import regexps from '#msq/language/parser/scenarios/static-objects/regexps.js'
 
 export default function (scenarios) {
@@ -9,12 +9,12 @@ export default function (scenarios) {
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       return regexps.compressUnitsByNTimes.test(
-        withNumbersInsteadOfWords(tokenValues)
+        replaceWordsWithNumbers(tokenValues)
       )
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       parserState.lastMentionedUnitsCompression = regexps.compressUnitsByNTimes.match(
-        withNumbersInsteadOfWords(tokenValues)
+        replaceWordsWithNumbers(tokenValues)
       )[0]
       if (parserState.applyHighlighting) {
         const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
@@ -60,11 +60,11 @@ export default function (scenarios) {
     onTheSameLineAsPrevScenario: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       return regexps.unitLinePosition.test(
-        withNumbersInsteadOfWords(tokenValues)
+        replaceWordsWithNumbers(tokenValues)
       )
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const tokensWithNumbersInsteadOfWords = withNumbersInsteadOfWords(tokenValues)
+      const tokensWithNumbersInsteadOfWords = replaceWordsWithNumbers(tokenValues)
       const unitLinePosition = regexps.unitLinePosition.match(tokensWithNumbersInsteadOfWords)[0] * 1 - 1
       parserState.pageSchema.compressUnitsByNTimesInLines = parserState.pageSchema.compressUnitsByNTimesInLines || []
       parserState.pageSchema.compressUnitsByNTimesInLines[unitLinePosition] = parserState.lastMentionedUnitsCompression
@@ -101,11 +101,11 @@ export default function (scenarios) {
     onTheSameLineAsPrevScenario: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       return regexps.linePositionOfUnit.test(
-        withNumbersInsteadOfWords(tokenValues)
+        replaceWordsWithNumbers(tokenValues)
       )
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const tokensWithNumbersInsteadOfWords = withNumbersInsteadOfWords(tokenValues)
+      const tokensWithNumbersInsteadOfWords = replaceWordsWithNumbers(tokenValues)
       const unitLinePosition = regexps.linePositionOfUnit.match(tokensWithNumbersInsteadOfWords)[0] * 1 - 1
       parserState.pageSchema.compressUnitsByNTimesInLines = parserState.pageSchema.compressUnitsByNTimesInLines || []
       parserState.pageSchema.compressUnitsByNTimesInLines[unitLinePosition] = parserState.lastMentionedUnitsCompression
@@ -141,12 +141,12 @@ export default function (scenarios) {
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       return regexps.stretchUnitsByNTimes.test(
-        withNumbersInsteadOfWords(tokenValues)
+        replaceWordsWithNumbers(tokenValues)
       )
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       parserState.lastMentionedUnitsStretching = regexps.stretchUnitsByNTimes.match(
-        withNumbersInsteadOfWords(tokenValues)
+        replaceWordsWithNumbers(tokenValues)
       )[0]
       if (parserState.applyHighlighting) {
         const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
@@ -192,11 +192,11 @@ export default function (scenarios) {
     onTheSameLineAsPrevScenario: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       return regexps.unitLinePosition.test(
-        withNumbersInsteadOfWords(tokenValues)
+        replaceWordsWithNumbers(tokenValues)
       )
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const tokensWithNumbersInsteadOfWords = withNumbersInsteadOfWords(tokenValues)
+      const tokensWithNumbersInsteadOfWords = replaceWordsWithNumbers(tokenValues)
       const unitLinePosition = regexps.unitLinePosition.match(tokensWithNumbersInsteadOfWords)[0] * 1 - 1
       parserState.pageSchema.stretchUnitsByNTimesInLines = parserState.pageSchema.stretchUnitsByNTimesInLines || []
       parserState.pageSchema.stretchUnitsByNTimesInLines[unitLinePosition] = parserState.lastMentionedUnitsStretching
@@ -233,11 +233,11 @@ export default function (scenarios) {
     onTheSameLineAsPrevScenario: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       return regexps.linePositionOfUnit.test(
-        withNumbersInsteadOfWords(tokenValues)
+        replaceWordsWithNumbers(tokenValues)
       )
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const tokensWithNumbersInsteadOfWords = withNumbersInsteadOfWords(tokenValues)
+      const tokensWithNumbersInsteadOfWords = replaceWordsWithNumbers(tokenValues)
       const unitLinePosition = regexps.linePositionOfUnit.match(tokensWithNumbersInsteadOfWords)[0] * 1 - 1
       parserState.pageSchema.stretchUnitsByNTimesInLines = parserState.pageSchema.stretchUnitsByNTimesInLines || []
       parserState.pageSchema.stretchUnitsByNTimesInLines[unitLinePosition] = parserState.lastMentionedUnitsStretching

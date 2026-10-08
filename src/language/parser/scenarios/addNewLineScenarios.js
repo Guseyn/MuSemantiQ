@@ -1,8 +1,8 @@
 'use strict'
 
-import foundNextTokenValueOnTheLine from '#msq/language/parser/scenarios/token/foundNextTokenValueOnTheLine.js'
+import findNextTokenValueOnTheLine from '#msq/language/parser/scenarios/token/findNextTokenValueOnTheLine.js'
 import regexps from '#msq/language/parser/scenarios/static-objects/regexps.js'
-import lastMeasureParams from '#msq/language/parser/scenarios/page-schema/lastMeasureParams.js'
+import getLastMeasureParams from '#msq/language/parser/scenarios/page-schema/getLastMeasureParams.js'
 
 export default function (scenarios) {
   scenarios['new'] = {
@@ -11,7 +11,7 @@ export default function (scenarios) {
       return currentToken.firstOnTheLine &&
         regexps.new.test(tokenValues) &&
         regexps.line.test([
-          foundNextTokenValueOnTheLine(
+          findNextTokenValueOnTheLine(
             unitext, currentToken.firstCharIndexOfNextToken
           )
         ])
@@ -57,7 +57,7 @@ export default function (scenarios) {
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       parserState.pageSchema.measuresParams = parserState.pageSchema.measuresParams || []
       parserState.numberOfPageLines += 1
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
       if (lastMeasureParamsValue) {
         lastMeasureParamsValue.isLastMeasureOnPageLine = true
       }
@@ -66,7 +66,7 @@ export default function (scenarios) {
         pageLineNumber: parserState.numberOfPageLines
       })
       parserState.newlineAlreadyIntroducedNewMeasure = true
-      const updatedLastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
+      const updatedLastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
       if (parserState.lastCrossStaveConnectionsParamsForEachLine) {
         updatedLastMeasureParamsValue.connectionsParams = JSON.parse(JSON.stringify(parserState.lastCrossStaveConnectionsParamsForEachLine))
       }

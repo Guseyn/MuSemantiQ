@@ -125,10 +125,10 @@ The parser has a name for every construct it knows: **578** of them at the momen
 
 ```js
 // node --input-type=module -e "…this…"
-import parserScenarios from '#msq/language/parser/scenarios/parserScenarios.js'
+import createParserScenarios from '#msq/language/parser/scenarios/createParserScenarios.js'
 import { introducedBy } from './docs/concepts.js'
 
-for (const name of Object.keys(parserScenarios()).sort()) {
+for (const name of Object.keys(createParserScenarios()).sort()) {
   console.log(introducedBy(name), '\t', name)
 }
 ```

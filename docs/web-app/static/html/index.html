@@ -362,9 +362,6 @@
                             <li>
                               Sound Font Generator (for <a data-link href="https://github.com/magenta/magenta-js">Magenta</a>)
                             </li>
-                            <li>
-                              <a data-link href="https://www.musicxml.com/">MusicXML Support (beta)</a>
-                            </li>
                           </ul>
                         </li>
                       </ul>
@@ -540,10 +537,6 @@
                     <svg data-stage-art viewBox="0 -960 960 960" aria-hidden="true"><path d="M400-120q-66 0-113-47t-47-113q0-66 47-113t113-47q23 0 42.5 5.5T480-418v-422h240v160H560v400q0 66-47 113t-113 47Z"/></svg>
                     <span>MIDI</span>
                   </button>
-                  <button type="button" data-stage-button data-output="musicxml">
-                    <svg data-stage-art viewBox="0 -960 960 960" aria-hidden="true"><path d="M320-240 80-480l240-240 57 57-184 184 183 183-56 56Zm320 0-57-57 184-184-183-183 56-56 240 240-240 240Z"/></svg>
-                    <span>MusicXML</span>
-                  </button>
                   <button type="button" data-stage-button data-output="highlights">
                     <svg data-stage-art viewBox="0 -960 960 960" aria-hidden="true"><path d="M80 0v-160h800V0H80Zm504-480L480-584 320-424l103 104 161-160Zm-47-160 103 103 160-159-104-104-159 160Zm-84-29 216 216-189 190q-24 24-56.5 24T367-263l-27 23H140l126-125q-24-24-25-57.5t23-57.5l189-189Zm0 0 187-187q24-24 56.5-24t56.5 24l104 103q24 24 24 56.5T857-640L669-453 453-669Z"/></svg>
                     <span>Editor highlights</span>
@@ -659,16 +652,6 @@
                     <div data-code data-artifact>
                       <e-markdown
                         data-src="/md/landing/pipeline/timing.md"
-                        data-internal-state="${{ extensions: [ showdownHighlight({ auto_detection: false }) ] }}"
-                      ></e-markdown>
-                    </div>
-                </div>
-                <div data-note-for="musicxml">
-                  <h3>MusicXML</h3>
-                  <p>The same schema written out as MusicXML 4.0, to open in other notation software. It reads back in, too.</p>
-                    <div data-code data-artifact>
-                      <e-markdown
-                        data-src="/md/landing/pipeline/musicxml.md"
                         data-internal-state="${{ extensions: [ showdownHighlight({ auto_detection: false }) ] }}"
                       ></e-markdown>
                     </div>
@@ -905,7 +888,7 @@
 
               <div data-tab-panel="dev-tools">
                 <p>
-                  A second app for the work around the music: the fonts, the sound, MusicXML and the tests. It runs on your machine, against your working tree, and what it changes shows up in <code>git status</code>.
+                  A second app for the work around the music: the fonts, the sound and the tests. It runs on your machine, against your working tree, and what it changes shows up in <code>git status</code>.
                 </p>
                 <ul data-tools>
                   <li data-tool>
@@ -927,13 +910,6 @@
                     <div>
                       <h4><a data-link href="/docs/dev-tools/soundfont-generator">Soundfont generator</a></h4>
                       <p>Renders a General MIDI <code>.sf2</code> soundbank into the sample sets the MIDI player loads, one instrument at a time.</p>
-                    </div>
-                  </li>
-                  <li data-tool>
-                    <svg data-art data-tone="green" viewBox="0 0 64 64" aria-hidden="true"><path d="M22 20l-10 12 10 12M42 20l10 12-10 12M36 14l-8 36"/></svg>
-                    <div>
-                      <h4><a data-link href="/docs/dev-tools/musicxml-tool">MusicXML tool</a></h4>
-                      <p>Converts a score both ways, MusicXML to MSQ and MSQ to MusicXML, and engraves what comes out. In beta.</p>
                     </div>
                   </li>
                   <li data-tool>

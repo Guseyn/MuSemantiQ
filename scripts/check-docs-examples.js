@@ -34,7 +34,7 @@ import path from 'path'
 import url, { fileURLToPath } from 'url'
 
 import { generateIntermediateStructuresForSinglePage } from '#msq/language/api.js'
-import parserScenarios from '#msq/language/parser/scenarios/parserScenarios.js'
+import createParserScenarios from '#msq/language/parser/scenarios/createParserScenarios.js'
 
 import { allPages } from '../docs/web-app/static/js/docs/sitemap.js'
 import { introducedBy } from '../docs/concepts.js'
@@ -415,7 +415,7 @@ if (!fs.existsSync(fontConfigPath)) {
 }
 
 // ── Coverage: a concept no page introduces ───────────────────────────────
-const everyScenario = Object.keys(parserScenarios())
+const everyScenario = Object.keys(createParserScenarios())
 const orphans = everyScenario.filter((name) => !introducedBy(name))
 
 // ── Verdict ──────────────────────────────────────────────────────────────

@@ -2,10 +2,10 @@
 
 import regexps from '#msq/language/parser/scenarios/static-objects/regexps.js'
 import initNewMeasureParamsIfThereIsAlreadySuchMeasurePropertyOrNoMeasuresAtAll from '#msq/language/parser/scenarios/page-schema/initNewMeasureParamsIfThereIsAlreadySuchMeasurePropertyOrNoMeasuresAtAll.js'
-import lastMeasureParams from '#msq/language/parser/scenarios/page-schema/lastMeasureParams.js'
-import lastStaveParams from '#msq/language/parser/scenarios/page-schema/lastStaveParams.js'
+import getLastMeasureParams from '#msq/language/parser/scenarios/page-schema/getLastMeasureParams.js'
+import getLastStaveParams from '#msq/language/parser/scenarios/page-schema/getLastStaveParams.js'
 import clefs from '#msq/language/parser/scenarios/static-objects/clefs.js'
-import foundNextTokenValueOnTheLine from '#msq/language/parser/scenarios/token/foundNextTokenValueOnTheLine.js'
+import findNextTokenValueOnTheLine from '#msq/language/parser/scenarios/token/findNextTokenValueOnTheLine.js'
 
 export default function (scenarios) {
   scenarios['stave'] = {
@@ -17,7 +17,7 @@ export default function (scenarios) {
         ) &&
         !regexps.lines.test(
           [
-            foundNextTokenValueOnTheLine(
+            findNextTokenValueOnTheLine(
               unitext,
               currentToken.firstCharIndexOfNextToken
             )
@@ -26,7 +26,7 @@ export default function (scenarios) {
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       initNewMeasureParamsIfThereIsAlreadySuchMeasurePropertyOrNoMeasuresAtAll(parserState.pageSchema, 'stavesParams', parserState)
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
       lastMeasureParamsValue.stavesParams = lastMeasureParamsValue.stavesParams || []
       lastMeasureParamsValue.stavesParams.push({})
       const numberOfMeasures = parserState.pageSchema.measuresParams.length
@@ -69,8 +69,8 @@ export default function (scenarios) {
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       initNewMeasureParamsIfThereIsAlreadySuchMeasurePropertyOrNoMeasuresAtAll(parserState.pageSchema, 'stavesParams', parserState)
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
       const clefName = regexps.withClef.match(tokenValues)[0]
       lastStaveParamsValue.clef = clefs[clefName]
       const currentNumberOfStaves = lastMeasureParamsValue.stavesParams.length

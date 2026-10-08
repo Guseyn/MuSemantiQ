@@ -1,7 +1,7 @@
 'use strict'
 
 import regexps from '#msq/language/parser/scenarios/static-objects/regexps.js'
-import withNumbersInsteadOfWords from '#msq/language/parser/scenarios/token/withNumbersInsteadOfWords.js'
+import replaceWordsWithNumbers from '#msq/language/parser/scenarios/token/replaceWordsWithNumbers.js'
 
 export default function (
   scenarios,
@@ -21,11 +21,11 @@ export default function (
         if (forConnection && (parserState.lastMentionedUnitPosition !== undefined)) {
           return false
         }
-        const tokensWithNumbersInsteadOfWords = withNumbersInsteadOfWords(tokenValues)
+        const tokensWithNumbersInsteadOfWords = replaceWordsWithNumbers(tokenValues)
         return regexps.unitLinePosition.test(tokensWithNumbersInsteadOfWords)
       },
       action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-        const tokensWithNumbersInsteadOfWords = withNumbersInsteadOfWords(tokenValues)
+        const tokensWithNumbersInsteadOfWords = replaceWordsWithNumbers(tokenValues)
         const unitLinePosition = regexps.unitLinePosition.match(tokensWithNumbersInsteadOfWords)[0] * 1 - 1
         if (forConnection) {
           parserState.lastMentionedConnectionPageLinePosition = unitLinePosition
@@ -74,11 +74,11 @@ export default function (
         if (forConnection && (parserState.lastMentionedUnitPosition !== undefined)) {
           return false
         }
-        const tokensWithNumbersInsteadOfWords = withNumbersInsteadOfWords(tokenValues)
+        const tokensWithNumbersInsteadOfWords = replaceWordsWithNumbers(tokenValues)
         return regexps.linePositionOfUnit.test(tokensWithNumbersInsteadOfWords)
       },
       action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-        const tokensWithNumbersInsteadOfWords = withNumbersInsteadOfWords(tokenValues)
+        const tokensWithNumbersInsteadOfWords = replaceWordsWithNumbers(tokenValues)
         const unitLinePosition = regexps.linePositionOfUnit.match(tokensWithNumbersInsteadOfWords)[0] * 1 - 1
         if (forConnection) {
           parserState.lastMentionedConnectionPageLinePosition = unitLinePosition
@@ -129,11 +129,11 @@ export default function (
         if (forConnection && (parserState.lastMentionedUnitPosition !== undefined)) {
           return false
         }
-        const tokensWithNumbersInsteadOfWords = withNumbersInsteadOfWords(tokenValues)
+        const tokensWithNumbersInsteadOfWords = replaceWordsWithNumbers(tokenValues)
         return regexps.unitMeasurePosition.test(tokensWithNumbersInsteadOfWords)
       },
       action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-        const tokensWithNumbersInsteadOfWords = withNumbersInsteadOfWords(tokenValues)
+        const tokensWithNumbersInsteadOfWords = replaceWordsWithNumbers(tokenValues)
         const unitMeasurePosition = regexps.unitMeasurePosition.match(tokensWithNumbersInsteadOfWords)[0] * 1 - 1
         if (forConnection) {
           parserState.lastMentionedConnectionMeasurePosition = unitMeasurePosition
@@ -182,11 +182,11 @@ export default function (
         if (forConnection && (parserState.lastMentionedUnitPosition !== undefined)) {
           return false
         }
-        const tokensWithNumbersInsteadOfWords = withNumbersInsteadOfWords(tokenValues)
+        const tokensWithNumbersInsteadOfWords = replaceWordsWithNumbers(tokenValues)
         return regexps.measurePositionOfUnit.test(tokensWithNumbersInsteadOfWords)
       },
       action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-        const tokensWithNumbersInsteadOfWords = withNumbersInsteadOfWords(tokenValues)
+        const tokensWithNumbersInsteadOfWords = replaceWordsWithNumbers(tokenValues)
         const unitMeasurePosition = regexps.measurePositionOfUnit.match(tokensWithNumbersInsteadOfWords)[0] * 1 - 1
         if (forConnection) {
           parserState.lastMentionedConnectionMeasurePosition = unitMeasurePosition
@@ -237,11 +237,11 @@ export default function (
         if (forConnection && (parserState.lastMentionedUnitPosition !== undefined)) {
           return false
         }
-        const tokensWithNumbersInsteadOfWords = withNumbersInsteadOfWords(tokenValues)
+        const tokensWithNumbersInsteadOfWords = replaceWordsWithNumbers(tokenValues)
         return regexps.unitStavePosition.test(tokensWithNumbersInsteadOfWords)
       },
       action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-        const tokensWithNumbersInsteadOfWords = withNumbersInsteadOfWords(tokenValues)
+        const tokensWithNumbersInsteadOfWords = replaceWordsWithNumbers(tokenValues)
         const unitStavePosition = regexps.unitStavePosition.match(tokensWithNumbersInsteadOfWords)[0] * 1 - 1
         if (forConnection) {
           parserState.lastMentionedConnectionStavePosition = unitStavePosition
@@ -290,11 +290,11 @@ export default function (
         if (forConnection && (parserState.lastMentionedUnitPosition !== undefined)) {
           return false
         }
-        const tokensWithNumbersInsteadOfWords = withNumbersInsteadOfWords(tokenValues)
+        const tokensWithNumbersInsteadOfWords = replaceWordsWithNumbers(tokenValues)
         return regexps.stavePositionOfUnit.test(tokensWithNumbersInsteadOfWords)
       },
       action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-        const tokensWithNumbersInsteadOfWords = withNumbersInsteadOfWords(tokenValues)
+        const tokensWithNumbersInsteadOfWords = replaceWordsWithNumbers(tokenValues)
         const unitStavePosition = regexps.stavePositionOfUnit.match(tokensWithNumbersInsteadOfWords)[0] * 1 - 1
         if (forConnection) {
           parserState.lastMentionedConnectionStavePosition = unitStavePosition
@@ -345,11 +345,11 @@ export default function (
         if (forConnection && (parserState.lastMentionedUnitPosition !== undefined)) {
           return false
         }
-        const tokensWithNumbersInsteadOfWords = withNumbersInsteadOfWords(tokenValues)
+        const tokensWithNumbersInsteadOfWords = replaceWordsWithNumbers(tokenValues)
         return regexps.unitVoicePosition.test(tokensWithNumbersInsteadOfWords)
       },
       action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-        const tokensWithNumbersInsteadOfWords = withNumbersInsteadOfWords(tokenValues)
+        const tokensWithNumbersInsteadOfWords = replaceWordsWithNumbers(tokenValues)
         const unitVoicePosition = regexps.unitVoicePosition.match(tokensWithNumbersInsteadOfWords)[0] * 1 - 1
         if (forConnection) {
           parserState.lastMentionedConnectionVoicePosition = unitVoicePosition
@@ -398,11 +398,11 @@ export default function (
         if (forConnection && (parserState.lastMentionedUnitPosition !== undefined)) {
           return false
         }
-        const tokensWithNumbersInsteadOfWords = withNumbersInsteadOfWords(tokenValues)
+        const tokensWithNumbersInsteadOfWords = replaceWordsWithNumbers(tokenValues)
         return regexps.voicePositionOfUnit.test(tokensWithNumbersInsteadOfWords)
       },
       action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-        const tokensWithNumbersInsteadOfWords = withNumbersInsteadOfWords(tokenValues)
+        const tokensWithNumbersInsteadOfWords = replaceWordsWithNumbers(tokenValues)
         const unitVoicePosition = regexps.voicePositionOfUnit.match(tokensWithNumbersInsteadOfWords)[0] * 1 - 1
         if (forConnection) {
           parserState.lastMentionedConnectionVoicePosition = unitVoicePosition

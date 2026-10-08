@@ -8,7 +8,6 @@ import runtime from '#dev-nodes/runtime.js'
 import musicJsFont from './api/musicJsFont.js'
 import fonts from './api/fonts.js'
 import tests from './api/tests.js'
-import musicxml from './api/musicxml.js'
 import generators from './api/generators.js'
 import { REPOSITORY_ROOT, TEST_ROOT, resolveInside } from './api/shared.js'
 
@@ -92,7 +91,7 @@ server(
     indexFile: './dev-tools/web-app/static/html/index.html',
     // Everything that reads or writes the working tree: the music-js fonts the
     // font viewer edits, and the test artifacts the test viewer adopts.
-    api: [ ...musicJsFont, ...fonts, ...tests, ...musicxml, ...generators ],
+    api: [ ...musicJsFont, ...fonts, ...tests, ...generators ],
     static: [
       src(/^\/tests\//, {
         mapper: testArtifactPath,

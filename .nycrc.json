@@ -16,9 +16,9 @@
 
     "src/worker.js",
     "src/utils.js",
-    "src/midi/base64FromUint8.js",
+    "src/midi/convertUint8ToBase64.js",
 
-    "src/drawer/elements/basic/animatedSvgString.js",
+    "src/drawer/elements/basic/convertSvgToAnimatedString.js",
     "src/language/schema/**"
   ],
   "reporter": [

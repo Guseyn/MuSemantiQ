@@ -1,23 +1,23 @@
 'use strict'
 
-import instrumentForCurrentStaveInMidiFormat from '#msq/midi/instrumentForCurrentStaveInMidiFormat.js'
+import findInstrumentForCurrentStaveInMidiFormat from '#msq/midi/findInstrumentForCurrentStaveInMidiFormat.js'
 import instrumentTitleInMidiFormatByInstrumentOriginalName from '#msq/midi/instrumentTitleInMidiFormatByInstrumentOriginalName.js'
 import isChannelOccupied from '#msq/midi/isChannelOccupied.js'
-import noteHasSomeArticulations from '#msq/midi/noteHasSomeArticulations.js'
+import doesNoteHaveSomeArticulations from '#msq/midi/doesNoteHaveSomeArticulations.js'
 
 const PIZZICATO_ARTICULATIONS = [ 'leftHandPizzicato', 'snapPizzicato', 'naturalHarmonic' ]
 
-const instrumentCanBeReassigned = (note) => {
-  return !noteHasSomeArticulations(note, PIZZICATO_ARTICULATIONS) && !note.isGhost
+const canInstrumentBeReassigned = (note) => {
+  return !doesNoteHaveSomeArticulations(note, PIZZICATO_ARTICULATIONS) && !note.isGhost
 }
 
 export default function (midi, note, midiSettings, instrumentTitleParamsForCurrentMeasure, tracksForEachInstrumentOnEachStaveInEachVoice, instrumentsMappedWithChannels, currentInstrumentsForEachStaveOnEachVoice) {
   const staveVoiceKey = `${note.staveIndexConsideringStavePosition}-${note.voiceIndex}`
   const defaultInstrumentInMidiFormat = 0
-  const instrumentMidiNumberByParams = instrumentForCurrentStaveInMidiFormat(instrumentTitleParamsForCurrentMeasure, note)
+  const instrumentMidiNumberByParams = findInstrumentForCurrentStaveInMidiFormat(instrumentTitleParamsForCurrentMeasure, note)
   const instrumentMidiNumber = instrumentMidiNumberByParams ?? currentInstrumentsForEachStaveOnEachVoice[staveVoiceKey] ?? instrumentTitleInMidiFormatByInstrumentOriginalName[midiSettings.defaultInstrument] ?? defaultInstrumentInMidiFormat
   const instrumentStaveVoiceKey = `${instrumentMidiNumber}-${note.staveIndexConsideringStavePosition}-${note.voiceIndex}`
-  if (instrumentCanBeReassigned(note) && (currentInstrumentsForEachStaveOnEachVoice[staveVoiceKey] === undefined && instrumentMidiNumber !== undefined)) {
+  if (canInstrumentBeReassigned(note) && (currentInstrumentsForEachStaveOnEachVoice[staveVoiceKey] === undefined && instrumentMidiNumber !== undefined)) {
     currentInstrumentsForEachStaveOnEachVoice[staveVoiceKey] = instrumentMidiNumber
   }
   if (!tracksForEachInstrumentOnEachStaveInEachVoice[instrumentStaveVoiceKey]) {
