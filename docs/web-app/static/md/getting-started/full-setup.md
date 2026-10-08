@@ -81,7 +81,7 @@ rsync -a --delete ../MuSemantiQ/src/ static/js/msq/src
 ```
 This is what lets the `#msq/…` imports inside `src` resolve in the browser. The fonts are in the copy too, under `/js/msq/src/drawer/font/`.
 
-3. Follow [Low-Level API](/docs/api/overview), the **Browser** tab.
+3. Follow [Low-Level API](/docs/api/overview#browser), the **Browser** tab.
 
 ## In browser via Worker
 
