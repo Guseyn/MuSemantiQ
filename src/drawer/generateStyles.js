@@ -251,7 +251,6 @@ expected format is: {
       2 * stemWidth, 0.6 * intervalBetweenStaveLines
     ],
     slurStrokeOptions: { width: 0.125 * intervalBetweenStaveLines, color: fontColor, linecap: 'round', linejoin: 'round' },
-    sShapeSlurStrokeOptions: { width: 0.215 * intervalBetweenStaveLines, color: fontColor, linecap: 'round', linejoin: 'round' },
     parenthesesStrokeOptions: { width: 0.12 * intervalBetweenStaveLines, color: fontColor, linecap: 'round', linejoin: 'round' },
     tremoloStrokeOptions: { width: 0.05 * intervalBetweenStaveLines, color: fontColor, linecap: 'butt', linejoin: 'bevel' },
     crushGraceLineStrokeOptions: { width: 0.17 * intervalBetweenStaveLines, color: fontColor, linecap: 'round', linejoin: 'round' },
