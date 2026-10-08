@@ -1,4 +1,4 @@
-function tripletToBase64 (num, lookup) {
+function convertTripletToBase64 (num, lookup) {
   return lookup[num >> 18 & 0x3F] +
     lookup[num >> 12 & 0x3F] +
     lookup[num >> 6 & 0x3F] +
@@ -12,12 +12,12 @@ function encodeChunk (uint8, start, end, lookup) {
     tmp = ((uint8[i] << 16) & 0xFF0000) +
       ((uint8[i + 1] << 8) & 0xFF00) +
       (uint8[i + 2] & 0xFF)
-    output.push(tripletToBase64(tmp, lookup))
+    output.push(convertTripletToBase64(tmp, lookup))
   }
   return output.join('')
 }
 
-export function base64FromUint8 (uint8) {
+export function convertUint8ToBase64 (uint8) {
   let tmp
   const len = uint8.length
   const extraBytes = len % 3 // if we have 1 byte left, pad 2 bytes

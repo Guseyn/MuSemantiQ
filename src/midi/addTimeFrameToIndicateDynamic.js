@@ -41,11 +41,11 @@ const ORDERED_DYNAMIC_VALUES = [
 
 const DEFAULT_DELTA_DYNAMIC_IN_INDEXES = 7
 
-const calculatedEndingVelocityInCrescendoIfItIsNotSpeicified = (startVelocity) => {
+const calculateEndingVelocityInCrescendoIfItIsNotSpeicified = (startVelocity) => {
   return ORDERED_DYNAMIC_VALUES[ORDERED_DYNAMIC_VALUES.indexOf(startVelocity) + DEFAULT_DELTA_DYNAMIC_IN_INDEXES] || 127
 }
 
-const calculatedEndingVelocityInDiminuendoIfItIsNotSpeicified = (startVelocity) => {
+const calculateEndingVelocityInDiminuendoIfItIsNotSpeicified = (startVelocity) => {
   return ORDERED_DYNAMIC_VALUES[ORDERED_DYNAMIC_VALUES.indexOf(startVelocity) - DEFAULT_DELTA_DYNAMIC_IN_INDEXES] || 20
 }
 
@@ -64,13 +64,13 @@ export default function (articulationParams, dynamicChangeMark, dynamicsAuraForE
         if (dynamicChangeMark.valueAfter && DYNAMICS_MAPPED_WITH_MIDI_VELOCITIES[dynamicChangeMark.valueAfter]) {
           newDynamicAuraObject.endVelocity = DYNAMICS_MAPPED_WITH_MIDI_VELOCITIES[dynamicChangeMark.valueAfter]
         } else {
-          newDynamicAuraObject.endVelocity = calculatedEndingVelocityInCrescendoIfItIsNotSpeicified(newDynamicAuraObject.startVelocity)
+          newDynamicAuraObject.endVelocity = calculateEndingVelocityInCrescendoIfItIsNotSpeicified(newDynamicAuraObject.startVelocity)
         }
       } else {
         if (dynamicChangeMark.valueAfter && DYNAMICS_MAPPED_WITH_MIDI_VELOCITIES[dynamicChangeMark.valueAfter]) {
           newDynamicAuraObject.endVelocity = DYNAMICS_MAPPED_WITH_MIDI_VELOCITIES[dynamicChangeMark.valueAfter]
         } else {
-          newDynamicAuraObject.endVelocity = calculatedEndingVelocityInDiminuendoIfItIsNotSpeicified(newDynamicAuraObject.startVelocity)
+          newDynamicAuraObject.endVelocity = calculateEndingVelocityInDiminuendoIfItIsNotSpeicified(newDynamicAuraObject.startVelocity)
         }
       }
       dynamicsAuraForEachVoiceOnEachStaveSplittedInTimeFrames[time] = dynamicsAuraForEachVoiceOnEachStaveSplittedInTimeFrames[time] || {}
@@ -113,8 +113,8 @@ export default function (articulationParams, dynamicChangeMark, dynamicsAuraForE
       lastMentionedDynamicsForEachVoiceOnEachStave[staveVoiceKey] = newDynamicAuraObject.velocity
       if (isLastSingleUnitInVoiceOnPageLine) {
         const startVelocity = currentDynamicsAuraObjectsForEachVoiceOnEachStave[staveVoiceKey][0].startVelocity
-        const dynamicChangeStepForCrescendo = (calculatedEndingVelocityInCrescendoIfItIsNotSpeicified(startVelocity) - startVelocity) / newDynamicAuraObject.count
-        const dynamicChangeStepForDiminuendo = (startVelocity - calculatedEndingVelocityInDiminuendoIfItIsNotSpeicified(startVelocity)) / newDynamicAuraObject.count
+        const dynamicChangeStepForCrescendo = (calculateEndingVelocityInCrescendoIfItIsNotSpeicified(startVelocity) - startVelocity) / newDynamicAuraObject.count
+        const dynamicChangeStepForDiminuendo = (startVelocity - calculateEndingVelocityInDiminuendoIfItIsNotSpeicified(startVelocity)) / newDynamicAuraObject.count
         for (let dynamicIndex = 0; dynamicIndex < currentDynamicsAuraObjectsForEachVoiceOnEachStave[staveVoiceKey].length; dynamicIndex++) {
           const dynamicAuraObject = currentDynamicsAuraObjectsForEachVoiceOnEachStave[staveVoiceKey][dynamicIndex]
           if (newDynamicAuraObject.type === 'crescendo') {

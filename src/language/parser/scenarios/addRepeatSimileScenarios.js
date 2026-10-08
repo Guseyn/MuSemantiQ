@@ -2,11 +2,11 @@
 
 import regexps from '#msq/language/parser/scenarios/static-objects/regexps.js'
 import isVerticalCorrection from '#msq/language/parser/scenarios/token/isVerticalCorrection.js'
-import verticalCorrection from '#msq/language/parser/scenarios/token/verticalCorrection.js'
-import withNumbersInsteadOfWords from '#msq/language/parser/scenarios/token/withNumbersInsteadOfWords.js'
-import foundNextTokenValueOnTheLine from '#msq/language/parser/scenarios/token/foundNextTokenValueOnTheLine.js'
-import foundNextTokenValuesOnTheLine from '#msq/language/parser/scenarios/token/foundNextTokenValuesOnTheLine.js'
-import chordParamsByLastMentionedUnitPositions from '#msq/language/parser/scenarios/page-schema/chordParamsByLastMentionedUnitPositions.js'
+import parseVerticalCorrection from '#msq/language/parser/scenarios/token/parseVerticalCorrection.js'
+import replaceWordsWithNumbers from '#msq/language/parser/scenarios/token/replaceWordsWithNumbers.js'
+import findNextTokenValueOnTheLine from '#msq/language/parser/scenarios/token/findNextTokenValueOnTheLine.js'
+import findNextTokenValuesOnTheLine from '#msq/language/parser/scenarios/token/findNextTokenValuesOnTheLine.js'
+import findChordParamsByLastMentionedUnitPositions from '#msq/language/parser/scenarios/page-schema/findChordParamsByLastMentionedUnitPositions.js'
 import undefineAllMentionedPositions from '#msq/language/parser/scenarios/page-schema/undefineAllMentionedPositions.js'
 import undefineOnlyLastMentionedUnitPosition from '#msq/language/parser/scenarios/page-schema/undefineOnlyLastMentionedUnitPosition.js'
 import fillAllPlaceholdersInHighlightsHtmlBufferWithMentionedPositionsWhereItsNeeded from '#msq/language/parser/scenarios/highlights-html-buffer/fillAllPlaceholdersInHighlightsHtmlBufferWithMentionedPositionsWhereItsNeeded.js'
@@ -69,14 +69,14 @@ const updateNoteAndRestRefIdsInHighlightsHtmlBufferThatFollowAfterSimileUnit = (
 
 const addSimileUnitsToPageSchema = (parserState) => {
   if (
-    parserState.calculatedUnitMeasureIndexByLastMentionedPositions !== undefined &&
-    parserState.calculatedUnitStaveIndexByLastMentionedPositions !== undefined &&
-    parserState.calculatedUnitVoiceIndexByLastMentionedPositions !== undefined &&
+    parserState.unitMeasureIndexByLastMentionedPositions !== undefined &&
+    parserState.unitStaveIndexByLastMentionedPositions !== undefined &&
+    parserState.unitVoiceIndexByLastMentionedPositions !== undefined &&
     parserState[`lastSimileMarkUnitIndex-${parserState.numberOfSimileMarks}`] !== undefined
   ) {
-    const measureIndex = parserState.calculatedUnitMeasureIndexByLastMentionedPositions
-    const staveIndex = parserState.calculatedUnitStaveIndexByLastMentionedPositions
-    const voiceIndex = parserState.calculatedUnitVoiceIndexByLastMentionedPositions
+    const measureIndex = parserState.unitMeasureIndexByLastMentionedPositions
+    const staveIndex = parserState.unitStaveIndexByLastMentionedPositions
+    const voiceIndex = parserState.unitVoiceIndexByLastMentionedPositions
     const singleChordIndex = parserState[`lastSimileMarkUnitIndex-${parserState.numberOfSimileMarks}`]
     const simileCount = parserState[`lastStartSimileMark-${parserState.numberOfSimileMarks}`].count
     const simileYCorrection = parserState[`lastStartSimileMark-${parserState.numberOfSimileMarks}`].yCorrection
@@ -106,16 +106,16 @@ export default function (scenarios) {
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     startsOnNewLine: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const nextTokenValueOnTheLine = foundNextTokenValueOnTheLine(
+      const nextTokenValueOnTheLine = findNextTokenValueOnTheLine(
         unitext,
         currentToken.firstCharIndexOfNextToken
       )
-      const nextThreeTokensOnTheLine = foundNextTokenValuesOnTheLine(
+      const nextThreeTokensOnTheLine = findNextTokenValuesOnTheLine(
         unitext,
         currentToken.firstCharIndexOfNextToken,
         3
       )
-      const nextFourTokensOnTheLine = foundNextTokenValuesOnTheLine(
+      const nextFourTokensOnTheLine = findNextTokenValuesOnTheLine(
         unitext,
         currentToken.firstCharIndexOfNextToken,
         4
@@ -187,7 +187,7 @@ export default function (scenarios) {
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       return regexps.ofPreviousBeat.test(
-        withNumbersInsteadOfWords(tokenValues)
+        replaceWordsWithNumbers(tokenValues)
       )
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
@@ -210,7 +210,7 @@ export default function (scenarios) {
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       return regexps.ofPreviousBeats.test(
-        withNumbersInsteadOfWords(tokenValues)
+        replaceWordsWithNumbers(tokenValues)
       )
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
@@ -233,12 +233,12 @@ export default function (scenarios) {
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       return regexps.simileCount.test(
-        withNumbersInsteadOfWords(tokenValues)
+        replaceWordsWithNumbers(tokenValues)
       )
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       const simileCount = regexps.simileCount.match(
-        withNumbersInsteadOfWords(tokenValues)
+        replaceWordsWithNumbers(tokenValues)
       )[0] * 1
       parserState[`lastStartSimileMark-${parserState.numberOfSimileMarks}`].count = simileCount
       if (parserState.applyHighlighting) {
@@ -273,7 +273,7 @@ export default function (scenarios) {
         regexps.starts.test(tokenValues) &&
         !regexps.from.test(
           [
-            foundNextTokenValueOnTheLine(
+            findNextTokenValueOnTheLine(
               unitext, currentToken.firstCharIndexOfNextToken
             )
           ]
@@ -286,7 +286,7 @@ export default function (scenarios) {
         !regexps.forEach.test(
           [
             currentToken.value,
-            foundNextTokenValueOnTheLine(
+            findNextTokenValueOnTheLine(
               unitext,
               currentToken.firstCharIndexOfNextToken
             )
@@ -314,14 +314,14 @@ export default function (scenarios) {
       if (parserState.lastMentionedUnitPosition === undefined) {
         parserState.errors.push(`unit position after command '${argumentsFromMainAction.joinedTokenValuesWithRealDelimiters}' is not specified on the line number ${argumentsFromMainAction.lineNumber}`)
       } else {
-        const chordParamsValue = chordParamsByLastMentionedUnitPositions(parserState)
+        const chordParamsValue = findChordParamsByLastMentionedUnitPositions(parserState)
         if (!chordParamsValue) {
           parserState.errors.push(`unit after command '${argumentsFromMainAction.joinedTokenValuesWithRealDelimiters}' is not found on the line ${argumentsFromMainAction.lineNumber}`)
         } else {
           if (!chordParamsValue.simileMark) {
             chordParamsValue.simileMark = parserState[`lastStartSimileMark-${parserState.numberOfSimileMarks}`]
           }
-          parserState[`lastSimileMarkUnitIndex-${parserState.numberOfSimileMarks}`] = parserState.calculatedUnitIndexByLastMentionedPositions
+          parserState[`lastSimileMarkUnitIndex-${parserState.numberOfSimileMarks}`] = parserState.unitIndexByLastMentionedPositions
         }
       }
       if (parserState.applyHighlighting) {
@@ -364,7 +364,7 @@ export default function (scenarios) {
       if (parserState.lastMentionedUnitPosition === undefined) {
         parserState.errors.push(`unit position after command '${argumentsFromMainAction.joinedTokenValuesWithRealDelimiters}' is not specified on the line number ${argumentsFromMainAction.lineNumber}`)
       } else {
-        const chordParamsValue = chordParamsByLastMentionedUnitPositions(parserState)
+        const chordParamsValue = findChordParamsByLastMentionedUnitPositions(parserState)
         if (!chordParamsValue) {
           parserState.errors.push(`unit after command '${argumentsFromMainAction.joinedTokenValuesWithRealDelimiters}' is not found on the line ${argumentsFromMainAction.lineNumber}`)
         } else {
@@ -374,7 +374,7 @@ export default function (scenarios) {
               finish: true
             }
           }
-          parserState[`lastSimileMarkUnitIndex-${parserState.numberOfSimileMarks}`] = parserState.calculatedUnitIndexByLastMentionedPositions
+          parserState[`lastSimileMarkUnitIndex-${parserState.numberOfSimileMarks}`] = parserState.unitIndexByLastMentionedPositions
         }
       }
       if (parserState.applyHighlighting) {
@@ -395,7 +395,7 @@ export default function (scenarios) {
       return isVerticalCorrection(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      parserState[`lastStartSimileMark-${parserState.numberOfSimileMarks}`].yCorrection = verticalCorrection(tokenValues)
+      parserState[`lastStartSimileMark-${parserState.numberOfSimileMarks}`].yCorrection = parseVerticalCorrection(tokenValues)
       if (parserState.applyHighlighting) {
         const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
           regexps.verticalCorrectionHighlight, (match) => {

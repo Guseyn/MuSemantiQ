@@ -6,10 +6,10 @@ export default function (parserState) {
   parserState.lastMentionedStavePosition = undefined
   parserState.lastMentionedVoicePosition = undefined
   parserState.lastMentionedUnitPosition = undefined
-  parserState.calculatedUnitMeasureIndexByLastMentionedPositions = undefined
-  parserState.calculatedUnitStaveIndexByLastMentionedPositions = undefined
-  parserState.calculatedUnitVoiceIndexByLastMentionedPositions = undefined
-  parserState.calculatedUnitIndexByLastMentionedPositions = undefined
+  parserState.unitMeasureIndexByLastMentionedPositions = undefined
+  parserState.unitStaveIndexByLastMentionedPositions = undefined
+  parserState.unitVoiceIndexByLastMentionedPositions = undefined
+  parserState.unitIndexByLastMentionedPositions = undefined
   parserState.lastMentionedConnectionPageLinePosition = undefined
   parserState.lastMentionedConnectionMeasurePosition = undefined
   parserState.lastMentionedConnectionStavePosition = undefined

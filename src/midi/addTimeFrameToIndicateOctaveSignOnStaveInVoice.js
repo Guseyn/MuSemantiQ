@@ -1,10 +1,10 @@
 'use strict'
 
-import octaveAdjustmentForUnitParamsByOctaveSignMark from '#msq/midi/octaveAdjustmentForUnitParamsByOctaveSignMark.js'
+import calculateOctaveAdjustmentForUnitParamsByOctaveSignMark from '#msq/midi/calculateOctaveAdjustmentForUnitParamsByOctaveSignMark.js'
 
 export default function (octaveSignMark, octaveSignAuraForEachVoiceOnEachStaveSplittedInTimeFrames, indicatorsOfOctaveSignEndingsByStaveAndVoice, unitIsGrace, graceCountersForEachVoiceInEachStaveSplittedInTimeFrames, time, staveIndexesOccupiedByUnit, voiceIndex, staveVoiceKey) {
   if (octaveSignMark && !octaveSignMark.finish) {
-    const octaveSignAdjustment = octaveAdjustmentForUnitParamsByOctaveSignMark(octaveSignMark)
+    const octaveSignAdjustment = calculateOctaveAdjustmentForUnitParamsByOctaveSignMark(octaveSignMark)
     if (octaveSignAdjustment !== 0) {
       staveIndexesOccupiedByUnit.forEach(staveIndex => {
         const occupiedStaveVoiceKey = `${staveIndex}-${voiceIndex}`

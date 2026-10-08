@@ -13,7 +13,7 @@ node scripts/visual-tests.js --only=chord  # run only tests whose name contains 
 npm run coverage && npm run coverage:check # c8; thresholds: statements 87, branches 86, functions 82, lines 87
 
 npm run dev-tools:setup  # download nodes, EHTML and e-ui from GitHub (asks first), copy src, web-components and fonts in
-npm run dev-tools        # https://127.0.0.1:8889, the server only — test viewer, font generator/viewer, MusicXML, sound-font tools
+npm run dev-tools        # https://127.0.0.1:8889, the server only — test viewer, font generator/viewer, sound-font tools
 npm run browser-app:setup # copy src, web-components and fonts into the app (once, and after changing them)
 npm run browser-app      # https://127.0.0.1:8888, the server only
 npm run docs             # https://127.0.0.1:8890 — landing page + documentation (runs docs:check first)
@@ -40,17 +40,17 @@ Every run writes `actual/` for every test, pass or fail, and merges verdicts int
 **Pipeline (`src/api.js`)** — `setupFonts` → `generateIntermediateStructuresFor{Single,Multiple}Page(s)` → `generateStylesFor…` → `generateSvgFor…` / `generateMidiFor…`. Multi-page SVG stacks pages vertically; multi-page MIDI concatenates every page's `measuresParams` into one timeline.
 
 **Language (`src/language/`)** — `api.js` is the parse-only half of the API (re-exported by `src/api.js`) so pages can parse without loading the drawer, fonts or MIDI. **Nothing in `src/language` may import outside it**: it is served to browsers unmodified.
-- `parser/parsedLanguage.js` tokenizes line by line and runs *scenarios*. Each `parser/scenarios/add*Scenarios.js` registers named scenarios (`condition`, `action`, `actionOnlyForHighlightingWithoutRefIds`, `startsOnNewLine`, `itIsNewCommandProgressionFromLevel`, `prohibitedCommandProgressions`, …) into `parserScenarios.js`. The stack of active scenario names ("progression of commands") decides which scenarios can fire next (`mapWithScenariosAndScenariosWhereItIsRequired.js`).
+- `parser/parseLanguage.js` tokenizes line by line and runs *scenarios*. Each `parser/scenarios/add*Scenarios.js` registers named scenarios (`condition`, `action`, `actionOnlyForHighlightingWithoutRefIds`, `startsOnNewLine`, `itIsNewCommandProgressionFromLevel`, `prohibitedCommandProgressions`, …) into `createParserScenarios.js`. The stack of active scenario names ("progression of commands") decides which scenarios can fire next (`mapWithScenariosAndScenariosWhereItIsRequired.js`).
 - One pass builds `pageSchema`, `customStyles`, `midiSettings`, comments, errors (non-fatal), and the editor's highlight HTML. `ref-id` attributes in that HTML link editor text to SVG elements and MIDI timestamps.
 - `schema/` validates page schemas; `serializer/` turns parser output back into MSQ text.
 
-**Drawer (`src/drawer/`)** — `elements/<concept>/` are curried builders, `element(params)(styles, left, top)`, returning positioned SVG element trees; `page/page.js` is the root and `basic/svgAsString.js` serializes. `generatedStyles.js` derives all spacing from stave-line spacing plus font metrics. Music glyphs come from `font/music-js/<font>.js` tables generated from SMuFL fonts by `tools/smufl/`; only bravura and leland have tables, so only they may be listed in font configs.
+**Drawer (`src/drawer/`)** — `elements/` is laid out like the MSQ Language section of the docs: `<group>/<page>/` (`spans/slurs/`, `marks-on-units/lyrics/`, `grouping-notes/ties/` …), plus `basic/` (SVG primitives: `createGroup`, `createPath`, `createText` …) and `shared/` (helpers used across groups: stave offsets, moving units, the curve core). Drawers are curried, `drawX(params)(styles, left, top)`, returning positioned SVG element trees; `the-page/page-lines/drawPage.js` is the root and `basic/convertSvgToString.js` serializes. `generateStyles.js` derives all spacing from stave-line spacing plus font metrics. Music glyphs come from `font/music-js/<font>.js` tables generated from SMuFL fonts by `tools/smufl/`; only bravura and leland have tables, so only they may be listed in font configs.
 
 **MIDI (`src/midi/`)** — `midi.js` walks `measuresParams` into time frames and returns MIDI bytes plus `timeStampsMappedWithRefsOn` / `refsOnMappedWithTimeStamps` for score ↔ playback sync.
 
 **Browser delivery** — `src/worker.js` exposes the API over `postMessage` (`fonts.setup`, …). Module workers get no import map, so `scripts/copy-msq-into-apps.js` writes a copy of `src/` with `#msq` specifiers rewritten (via `worker.importmap` in `package.json`) into each app's `static/js/msq/worker/`, plus an unmodified `src/language` copy into `static/js/msq/language/` for main-thread parsing. `web-components/` (`<template is="msq-*">`, the editor) is copied into each app by `web-components:update`. All of these copies, fonts (symlinked by `setup:symlinks`) and vendored libs are gitignored — edit only `src/` and `web-components/`; `watch:src` / `watch:web-components` keep copies current.
 
-**Tools (`tools/`)** — SMuFL → music-js font generation, MusicXML import/export, Magenta sound-font rendering; used by dev-tools, not shipped in the worker.
+**Tools (`tools/`)** — SMuFL → music-js font generation, Magenta sound-font rendering; used by dev-tools, not shipped in the worker.
 
 ## Sibling libraries: nodes, EHTML, e-ui
 
@@ -89,5 +89,5 @@ Lives in `../e-pages` (GitHub `Guseyn/e-dev`). Open a docs page with `?dev=true`
 ## Conventions
 
 - ES modules, 2-space indent, no semicolons. Internal imports use the `#msq/…`, `#tools/…` specifiers from `package.json` `imports`, not relative paths.
-- One function per file, default-exported, named by what it returns or does, often long (`initNewStaveParamsIfThereIsAlreadySuchStavePropertyOrNoStavesAtAll.js`).
+- One function per file, default-exported, the file named after the function, often long (`initNewStaveParamsIfThereIsAlreadySuchStavePropertyOrNoStavesAtAll.js`). Functions are named with a verb: `draw…` returns SVG elements, `create…` is an SVG primitive, `calculate…` returns a number or points, `find…`/`get…` pick something, `parse…` reads tokens, `is…`/`are…`/`does…`/`should…` return booleans. Data modules (static objects, lookup tables) keep noun names. Variables are named after what they hold, without a participle prefix (`const coda = drawCoda(…)`, not `drawnCoda`); pageSchema property names never change.
 - Comments are prose explaining *why* (see the scripts and `.gitignore`); match that when adding code.

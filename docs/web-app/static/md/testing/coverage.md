@@ -44,7 +44,7 @@ They are in the `coverage:check` script in `package.json`. They are where the co
 - the vendored libraries in `src/drawer/lib`, `src/language/lib` and `src/midi/lib`
 - the generated font tables in `src/drawer/font/`
 - `src/worker.js`, which runs only in a browser
-- `src/language/schema/`, and a few small helpers: `src/drawer/generateUnicodePoints.js`, `src/drawer/font-urls.js`, `src/utils.js`, `src/midi/base64FromUint8.js`, `src/drawer/elements/basic/animatedSvgString.js` and `src/language/parser/scenarios/string/`
+- `src/language/schema/`, and a few small helpers: `src/drawer/generateUnicodePoints.js`, `src/drawer/font-urls.js`, `src/utils.js`, `src/midi/convertUint8ToBase64.js`, `src/drawer/elements/basic/convertSvgToAnimatedString.js` and `src/language/parser/scenarios/string/`
 
 A few files that nothing in MSQ reaches yet, such as the keys of rare accidentals, are marked with `/* c8 ignore start */` inside the file.
 

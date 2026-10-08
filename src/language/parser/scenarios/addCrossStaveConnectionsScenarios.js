@@ -2,12 +2,12 @@
 
 import regexps from '#msq/language/parser/scenarios/static-objects/regexps.js'
 import initNewMeasureParamsIfThereIsAlreadySuchMeasurePropertyOrNoMeasuresAtAll from '#msq/language/parser/scenarios/page-schema/initNewMeasureParamsIfThereIsAlreadySuchMeasurePropertyOrNoMeasuresAtAll.js'
-import lastMeasureParams from '#msq/language/parser/scenarios/page-schema/lastMeasureParams.js'
-import lastCrossStaveConnectionParam from '#msq/language/parser/scenarios/page-schema/lastCrossStaveConnectionParam.js'
-import staveIndexByTokens from '#msq/language/parser/scenarios/token/staveIndexByTokens.js'
+import getLastMeasureParams from '#msq/language/parser/scenarios/page-schema/getLastMeasureParams.js'
+import getLastCrossStaveConnectionParam from '#msq/language/parser/scenarios/page-schema/getLastCrossStaveConnectionParam.js'
+import parseStaveIndexByTokens from '#msq/language/parser/scenarios/token/parseStaveIndexByTokens.js'
 import isStaveIndex from '#msq/language/parser/scenarios/token/isStaveIndex.js'
-import foundNextTokenValueOnTheLine from '#msq/language/parser/scenarios/token/foundNextTokenValueOnTheLine.js'
-import theSameScenarioButWithDifferentRequiredCommandProgression from '#msq/language/parser/scenarios/theSameScenarioButWithDifferentRequiredCommandProgression.js'
+import findNextTokenValueOnTheLine from '#msq/language/parser/scenarios/token/findNextTokenValueOnTheLine.js'
+import copyScenarioWithDifferentRequiredCommandProgression from '#msq/language/parser/scenarios/copyScenarioWithDifferentRequiredCommandProgression.js'
 
 export default function (scenarios) {
   scenarios['bracket or brace'] = {
@@ -18,7 +18,7 @@ export default function (scenarios) {
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       initNewMeasureParamsIfThereIsAlreadySuchMeasurePropertyOrNoMeasuresAtAll(parserState.pageSchema, 'connectionsParams', parserState)
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
       lastMeasureParamsValue.connectionsParams = lastMeasureParamsValue.connectionsParams || []
       parserState.lastCrossStaveConnectionsParamsForEachLine = parserState.lastCrossStaveConnectionsParamsForEachLine || []
       const connectionName = currentToken.value
@@ -72,7 +72,7 @@ export default function (scenarios) {
         !regexps.forEach.test(
           [
             currentToken.value,
-            foundNextTokenValueOnTheLine(
+            findNextTokenValueOnTheLine(
               unitext,
               currentToken.firstCharIndexOfNextToken
             )
@@ -81,7 +81,7 @@ export default function (scenarios) {
         !regexps.forLines.test(
           [
             currentToken.value,
-            foundNextTokenValueOnTheLine(
+            findNextTokenValueOnTheLine(
               unitext,
               currentToken.firstCharIndexOfNextToken
             )
@@ -148,9 +148,9 @@ export default function (scenarios) {
       return isStaveIndex(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const staveIndex = staveIndexByTokens(tokenValues, true)
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastCrossStaveConnectionParamValue = lastCrossStaveConnectionParam(lastMeasureParamsValue)
+      const staveIndex = parseStaveIndexByTokens(tokenValues, true)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastCrossStaveConnectionParamValue = getLastCrossStaveConnectionParam(lastMeasureParamsValue)
       const indexOfIfThereIsAlreadyCrossStaveConnectionParamValueInLastMeasureForThisStaveIndex = lastMeasureParamsValue.connectionsParams.findIndex(param => ((param.staveStartNumber === staveIndex) || (param.staveEndNumber === staveIndex)))
       if (
         (indexOfIfThereIsAlreadyCrossStaveConnectionParamValueInLastMeasureForThisStaveIndex !== -1) &&
@@ -199,7 +199,7 @@ export default function (scenarios) {
     },
     activateActionWhenProgressionOfCommandsChangesIfItIsLastTokenAndActionDidntHappenBefore: true
   }
-  scenarios['connection from stave index'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['connection from stave index'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['connection for stave index'],
     'connection from'
   )
@@ -241,9 +241,9 @@ export default function (scenarios) {
       return isStaveIndex(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const staveIndex = staveIndexByTokens(tokenValues, true)
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastCrossStaveConnectionParamValue = lastCrossStaveConnectionParam(lastMeasureParamsValue)
+      const staveIndex = parseStaveIndexByTokens(tokenValues, true)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastCrossStaveConnectionParamValue = getLastCrossStaveConnectionParam(lastMeasureParamsValue)
       const indexOfIfThereIsAlreadyCrossStaveConnectionParamValueInLastMeasureForThisStaveIndex = lastMeasureParamsValue.connectionsParams.findIndex(param => (param.staveEndNumber === staveIndex))
       if (
         (indexOfIfThereIsAlreadyCrossStaveConnectionParamValueInLastMeasureForThisStaveIndex !== -1) &&
@@ -299,8 +299,8 @@ export default function (scenarios) {
       return regexps.forEachLine.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastCrossStaveConnectionsParamValue = lastCrossStaveConnectionParam(lastMeasureParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastCrossStaveConnectionsParamValue = getLastCrossStaveConnectionParam(lastMeasureParamsValue)
       lastCrossStaveConnectionsParamValue.forEachLineId = parserState.lastCrossStaveConnectionsParamsForEachLineId
       parserState.lastCrossStaveConnectionsParamsForEachLine.push(lastCrossStaveConnectionsParamValue)
       if (parserState.applyHighlighting) {
@@ -335,8 +335,8 @@ export default function (scenarios) {
       return regexps.forLinesBelow.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastCrossStaveConnectionsParamValue = lastCrossStaveConnectionParam(lastMeasureParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastCrossStaveConnectionsParamValue = getLastCrossStaveConnectionParam(lastMeasureParamsValue)
       lastCrossStaveConnectionsParamValue.forEachLineId = parserState.lastCrossStaveConnectionsParamsForEachLineId
       parserState.lastCrossStaveConnectionsParamsForEachLine.push(lastCrossStaveConnectionsParamValue)
       if (parserState.applyHighlighting) {

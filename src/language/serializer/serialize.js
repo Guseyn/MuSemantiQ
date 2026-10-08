@@ -3,7 +3,7 @@
 /**
  * A parsed page, written back as MSQ source.
  *
- * The reverse of the parser: where `parsedLanguage` turns text into a page
+ * The reverse of the parser: where `parseLanguage` turns text into a page
  * schema and the settings that came with it, this turns them back into text that
  * parses to the same thing.
  *
@@ -14,8 +14,8 @@
  * characters, and is not meant to.
  */
 
-import unitText from '#msq/language/serializer/unitText.js'
-import spanText from '#msq/language/serializer/spanText.js'
+import serializeUnit from '#msq/language/serializer/serializeUnit.js'
+import serializeSpans from '#msq/language/serializer/serializeSpans.js'
 import configurableStyles from '#msq/language/parser/scenarios/static-objects/configurableStyles.js'
 import midiSettingNames from '#msq/language/parser/scenarios/static-objects/midiSettings.js'
 
@@ -39,7 +39,7 @@ const OPENING_BAR_LINE_WORDS = {
  * writes. Deriving it from the parser's own table is what keeps the two from
  * drifting apart.
  */
-function commandForEachKey(table) {
+function createCommandForEachKey(table) {
   const commands = {}
   for (const [ command, key ] of Object.entries(table)) {
     if (!(key in commands)) {
@@ -49,23 +49,23 @@ function commandForEachKey(table) {
   return commands
 }
 
-const STYLE_COMMANDS = commandForEachKey(configurableStyles)
-const MIDI_SETTING_COMMANDS = commandForEachKey(midiSettingNames)
+const STYLE_COMMANDS = createCommandForEachKey(configurableStyles)
+const MIDI_SETTING_COMMANDS = createCommandForEachKey(midiSettingNames)
 
 /**
  * `mezzoSoprano` is one word in the schema and two in the source.
  */
-const clefWords = (clef) => clef.replace(/([a-z])([A-Z])/g, '$1 $2').toLowerCase()
+const serializeClef = (clef) => clef.replace(/([a-z])([A-Z])/g, '$1 $2').toLowerCase()
 
 /**
  * A command that applies beyond its own measure says so.
  */
-const scopeText = (forEachLineId) => forEachLineId === undefined ? '' : ' for each line'
+const serializeScope = (forEachLineId) => forEachLineId === undefined ? '' : ' for each line'
 
 /**
  * A vertical nudge, as the distance and the way it goes.
  */
-const correctionText = (yCorrection) =>
+const serializeCorrection = (yCorrection) =>
   typeof yCorrection !== 'number' || yCorrection === 0
     ? ''
     : ` ${Math.abs(yCorrection)} ${yCorrection < 0 ? 'up' : 'down'}`
@@ -73,7 +73,7 @@ const correctionText = (yCorrection) =>
 /**
  * The page's styles and midi settings, each as `<name> is <value>`.
  */
-function settingLines(values, commands) {
+function serializeSettings(values, commands) {
   return Object.entries(values || {})
     .filter(([ key, value ]) => commands[key] && value !== undefined && value !== null && value !== '')
     .map(([ key, value ]) => `${commands[key]} is ${value}`)
@@ -82,18 +82,18 @@ function settingLines(values, commands) {
 /**
  * The page-wide settings, which live beside the schema rather than in it.
  */
-function pageMeta(schema) {
+function serializePageMeta(schema) {
   const lines = []
-  const say = (command, value) => {
+  const writeCommand = (command, value) => {
     if (value !== undefined && value !== null && value !== '') {
       lines.push(`${command} is "${value}"`)
     }
   }
-  say('title', schema.title)
-  say('subtitle', schema.subtitle)
-  say('left subtitle', schema.leftSubtitle)
-  say('right subtitle', schema.rightSubtitle)
-  say('page number', schema.pageNumber)
+  writeCommand('title', schema.title)
+  writeCommand('subtitle', schema.subtitle)
+  writeCommand('left subtitle', schema.leftSubtitle)
+  writeCommand('right subtitle', schema.rightSubtitle)
+  writeCommand('page number', schema.pageNumber)
 
   if (schema.showMeasureNumbers) {
     const scope = { first: 'first measures', all: 'all measures', 'first&last': 'first and last measures' }
@@ -131,7 +131,7 @@ function pageMeta(schema) {
 /**
  * The commands that belong to a measure rather than to any note in it.
  */
-function measureCommands(measure) {
+function serializeMeasureCommands(measure) {
   const lines = []
 
   /*
@@ -163,19 +163,19 @@ function measureCommands(measure) {
   if (measure.timeSignatureParams) {
     const { cMode, crossed, numerator, denominator } = measure.timeSignatureParams
     const value = cMode ? (crossed ? 'crossed c' : 'c') : `${numerator}:${denominator}`
-    lines.push(`time signature is ${value}${scopeText(measure.timeSignatureParams.forEachLineId)}`)
+    lines.push(`time signature is ${value}${serializeScope(measure.timeSignatureParams.forEachLineId)}`)
   }
   if (measure.keySignatureName) {
     lines.push(
       `key signature is ${measure.keySignatureName.split('|')[0]}` +
-      scopeText(measure.keySignatureNameForEachLineId)
+      serializeScope(measure.keySignatureNameForEachLineId)
     )
   }
 
   for (const connection of measure.connectionsParams || []) {
     lines.push(
       `${connection.name} from stave ${connection.staveStartNumber + 1}` +
-      ` to stave ${connection.staveEndNumber + 1}${scopeText(connection.forEachLineId)}`
+      ` to stave ${connection.staveEndNumber + 1}${serializeScope(connection.forEachLineId)}`
     )
   }
   for (const title of measure.instrumentTitlesParams || []) {
@@ -186,14 +186,14 @@ function measureCommands(measure) {
       (end > start
         ? `instrument "${title.value}" between stave ${start} and stave ${end}`
         : `instrument title is "${title.value}" for stave ${start}`) +
-      scopeText(title.forEachLineId)
+      serializeScope(title.forEachLineId)
     )
   }
 
   if (measure.tempoMark) {
     lines.push(
       `tempo is "${(measure.tempoMark.textValueParts || []).join('')}"` +
-      correctionText(measure.tempoMark.yCorrection)
+      serializeCorrection(measure.tempoMark.yCorrection)
     )
   }
 
@@ -213,20 +213,20 @@ function measureCommands(measure) {
   if (measure.coda) {
     lines.push(
       `coda at the ${measure.coda.measurePosition} of the measure` +
-      correctionText(measure.coda.yCorrection)
+      serializeCorrection(measure.coda.yCorrection)
     )
   }
   if (measure.sign) {
     lines.push(
       `sign at the ${measure.sign.measurePosition} of the measure` +
-      correctionText(measure.sign.yCorrection)
+      serializeCorrection(measure.sign.yCorrection)
     )
   }
   if (measure.repetitionNote) {
     lines.push(
       `repetition note "${measure.repetitionNote.value}"` +
       ` at the ${measure.repetitionNote.measurePosition} of the measure` +
-      correctionText(measure.repetitionNote.yCorrection)
+      serializeCorrection(measure.repetitionNote.yCorrection)
     )
   }
   return lines
@@ -236,7 +236,7 @@ function measureCommands(measure) {
  * A volta runs from one measure to another, so it is written once for the page
  * rather than on each measure it covers.
  */
-function voltaLines(measures) {
+function serializeVoltas(measures) {
   const marked = measures.findIndex((one) => one.voltaMark && one.voltaMark.value !== undefined)
   if (marked === -1) {
     return []
@@ -261,22 +261,22 @@ function voltaLines(measures) {
 
   return [
     `volta${volta.value ? ` with text "${volta.value}"` : ' bracket'}` +
-    ` ${opens} ${closes}${correctionText(volta.yCorrection)}`
+    ` ${opens} ${closes}${serializeCorrection(volta.yCorrection)}`
   ]
 }
 
 /**
  * One voice: its units, then the marks that span them.
  */
-function voiceLines(units) {
+function serializeVoice(units) {
   /*
   The units a simile stands for are produced by the simile command itself, so
   writing them out as well would say the same thing twice.
   */
   const written = units.filter((one) => !one.isSimile)
   return [
-    ...written.flatMap((unit, index) => unitText(unit, written[index - 1])),
-    ...spanText(written)
+    ...written.flatMap((unit, index) => serializeUnit(unit, written[index - 1])),
+    ...serializeSpans(written)
   ]
 }
 
@@ -288,7 +288,7 @@ function voiceLines(units) {
  * them. Each block is laid into the lines it claims, and the page is padded with
  * blank lines when a comment sits past the end of the music.
  */
-function withComments(lines, comments) {
+function addComments(lines, comments) {
   const placed = [ ...lines ]
   for (const comment of comments || []) {
     const quote = comment.startQuote || '"'
@@ -314,9 +314,9 @@ function withComments(lines, comments) {
 export default function serialize(pageSchema, customStyles, midiSettings, comments) {
   const schema = pageSchema || {}
   const lines = [
-    ...settingLines(customStyles, STYLE_COMMANDS),
-    ...settingLines(midiSettings, MIDI_SETTING_COMMANDS),
-    ...pageMeta(schema)
+    ...serializeSettings(customStyles, STYLE_COMMANDS),
+    ...serializeSettings(midiSettings, MIDI_SETTING_COMMANDS),
+    ...serializePageMeta(schema)
   ]
 
   let pageLineNumber = null
@@ -328,12 +328,12 @@ export default function serialize(pageSchema, customStyles, midiSettings, commen
     pageLineNumber = measure.pageLineNumber
 
     lines.push('', 'measure')
-    lines.push(...measureCommands(measure))
+    lines.push(...serializeMeasureCommands(measure))
 
     for (const stave of measure.stavesParams || []) {
       lines.push('stave')
       if (stave.clef) {
-        lines.push(`${clefWords(stave.clef)} clef`)
+        lines.push(`${serializeClef(stave.clef)} clef`)
       }
       const voices = stave.voicesParams || []
       voices.forEach((units, index) => {
@@ -341,13 +341,13 @@ export default function serialize(pageSchema, customStyles, midiSettings, commen
         if (index > 0) {
           lines.push('voice')
         }
-        lines.push(...voiceLines(units))
+        lines.push(...serializeVoice(units))
       })
     }
   }
 
-  lines.push(...voltaLines(schema.measuresParams || []))
+  lines.push(...serializeVoltas(schema.measuresParams || []))
 
   const body = lines.join('\n').trim().split('\n')
-  return `${withComments(body, comments).join('\n')}\n`
+  return `${addComments(body, comments).join('\n')}\n`
 }

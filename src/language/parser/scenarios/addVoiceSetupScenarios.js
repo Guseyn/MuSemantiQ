@@ -3,8 +3,8 @@
 import regexps from '#msq/language/parser/scenarios/static-objects/regexps.js'
 import initNewMeasureParamsIfThereIsAlreadySuchMeasurePropertyOrNoMeasuresAtAll from '#msq/language/parser/scenarios/page-schema/initNewMeasureParamsIfThereIsAlreadySuchMeasurePropertyOrNoMeasuresAtAll.js'
 import initNewStaveParamsIfThereIsAlreadySuchStavePropertyOrNoStavesAtAll from '#msq/language/parser/scenarios/page-schema/initNewStaveParamsIfThereIsAlreadySuchStavePropertyOrNoStavesAtAll.js'
-import lastMeasureParams from '#msq/language/parser/scenarios/page-schema/lastMeasureParams.js'
-import lastStaveParams from '#msq/language/parser/scenarios/page-schema/lastStaveParams.js'
+import getLastMeasureParams from '#msq/language/parser/scenarios/page-schema/getLastMeasureParams.js'
+import getLastStaveParams from '#msq/language/parser/scenarios/page-schema/getLastStaveParams.js'
 
 export default function (scenarios) {
   scenarios['voice'] = {
@@ -17,9 +17,9 @@ export default function (scenarios) {
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       initNewMeasureParamsIfThereIsAlreadySuchMeasurePropertyOrNoMeasuresAtAll(parserState.pageSchema, 'stavesParams', parserState)
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
       initNewStaveParamsIfThereIsAlreadySuchStavePropertyOrNoStavesAtAll(lastMeasureParamsValue, 'voicesParams', parserState)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
       lastStaveParamsValue.voicesParams = lastStaveParamsValue.voicesParams || []
       lastStaveParamsValue.voicesParams.push([])
       const numberOfMeasures = parserState.pageSchema.measuresParams.length

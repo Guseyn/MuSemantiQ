@@ -45,7 +45,7 @@ Separate them with a line `====next page====`. The CLI writes one SVG per page a
 
 ### Can I Bring In Scores I Already Have?
 
-Yes, from MusicXML, but it's in beta and solves this only partly. Anything that's not supported is dropped and listed in the import report. See [MusicXML import](/docs/tools/musicxml-import) and [MusicXML export](/docs/tools/musicxml-export).
+Not at the moment. MSQ can't import scores from other formats, so you write them in MSQ.
 
 ### Can I Send a Pull Request?
 

@@ -899,7 +899,7 @@ function isPageSchemaValid(pageSchema)
 <details is="e-details">
 <summary>Purpose</summary>
 
-Checks the structure of a page schema against `src/language/schema/pageSchema.js`, not its music, so four whole notes in a measure of **2/4** pass with flying colours. It is for schemas that did not come from the parser: built by hand, imported from MusicXML, or changed after parsing.
+Checks the structure of a page schema against `src/language/schema/pageSchema.js`, not its music, so four whole notes in a measure of **2/4** pass with flying colours. It is for schemas that did not come from the parser: built by hand, or changed after parsing.
 
 </details>
 
@@ -917,7 +917,7 @@ Checks the structure of a page schema against `src/language/schema/pageSchema.js
 <details is="e-details">
 <summary>Returns</summary>
 
-**true** when the page schema is valid, **false** when it is not. To find out what is wrong, `validatedPageSchema(pageSchema)` from `#msq/language/schema/validatedPageSchema.js` returns the validator's `errors`, each with a `stack` naming the path to the value and what is wrong with it.
+**true** when the page schema is valid, **false** when it is not. To find out what is wrong, `validatePageSchema(pageSchema)` from `#msq/language/schema/validatePageSchema.js` returns the validator's `errors`, each with a `stack` naming the path to the value and what is wrong with it.
 
 </details>
 

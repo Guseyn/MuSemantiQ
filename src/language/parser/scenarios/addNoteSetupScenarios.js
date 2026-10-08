@@ -1,43 +1,43 @@
 'use strict'
 
 import regexps from '#msq/language/parser/scenarios/static-objects/regexps.js'
-import foundNextTokenValueOnTheLine from '#msq/language/parser/scenarios/token/foundNextTokenValueOnTheLine.js'
-import foundNextTokenValuesOnTheLine from '#msq/language/parser/scenarios/token/foundNextTokenValuesOnTheLine.js'
-import withNumbersInsteadOfWords from '#msq/language/parser/scenarios/token/withNumbersInsteadOfWords.js'
+import findNextTokenValueOnTheLine from '#msq/language/parser/scenarios/token/findNextTokenValueOnTheLine.js'
+import findNextTokenValuesOnTheLine from '#msq/language/parser/scenarios/token/findNextTokenValuesOnTheLine.js'
+import replaceWordsWithNumbers from '#msq/language/parser/scenarios/token/replaceWordsWithNumbers.js'
 import isVerticalCorrection from '#msq/language/parser/scenarios/token/isVerticalCorrection.js'
-import verticalCorrection from '#msq/language/parser/scenarios/token/verticalCorrection.js'
+import parseVerticalCorrection from '#msq/language/parser/scenarios/token/parseVerticalCorrection.js'
 import isHorizontalCorrection from '#msq/language/parser/scenarios/token/isHorizontalCorrection.js'
-import horizontalCorrection from '#msq/language/parser/scenarios/token/horizontalCorrection.js'
+import parseHorizontalCorrection from '#msq/language/parser/scenarios/token/parseHorizontalCorrection.js'
 import isDirection from '#msq/language/parser/scenarios/token/isDirection.js'
 import isStaveIndex from '#msq/language/parser/scenarios/token/isStaveIndex.js'
-import direction from '#msq/language/parser/scenarios/token/direction.js'
-import staveIndexByTokens from '#msq/language/parser/scenarios/token/staveIndexByTokens.js'
+import parseDirection from '#msq/language/parser/scenarios/token/parseDirection.js'
+import parseStaveIndexByTokens from '#msq/language/parser/scenarios/token/parseStaveIndexByTokens.js'
 import isRoundness from '#msq/language/parser/scenarios/token/isRoundness.js'
-import roundness from '#msq/language/parser/scenarios/token/roundness.js'
+import parseRoundness from '#msq/language/parser/scenarios/token/parseRoundness.js'
 import isAboveBelowOverUnderStaveLines from '#msq/language/parser/scenarios/token/isAboveBelowOverUnderStaveLines.js'
 import isAboveBelowOverUnder from '#msq/language/parser/scenarios/token/isAboveBelowOverUnder.js'
-import directionByAboveBelowOverUnderStaveLines from '#msq/language/parser/scenarios/token/directionByAboveBelowOverUnderStaveLines.js'
-import directionByAboveBelowOverUnder from '#msq/language/parser/scenarios/token/directionByAboveBelowOverUnder.js'
+import parseDirectionByAboveBelowOverUnderStaveLines from '#msq/language/parser/scenarios/token/parseDirectionByAboveBelowOverUnderStaveLines.js'
+import parseDirectionByAboveBelowOverUnder from '#msq/language/parser/scenarios/token/parseDirectionByAboveBelowOverUnder.js'
 import isMeasureNumber from '#msq/language/parser/scenarios/token/isMeasureNumber.js'
-import measureNumber from '#msq/language/parser/scenarios/token/measureNumber.js'
+import parseMeasureNumber from '#msq/language/parser/scenarios/token/parseMeasureNumber.js'
 import isNumberOfStrokes from '#msq/language/parser/scenarios/token/isNumberOfStrokes.js'
-import numberOfStrokes from '#msq/language/parser/scenarios/token/numberOfStrokes.js'
+import parseNumberOfStrokes from '#msq/language/parser/scenarios/token/parseNumberOfStrokes.js'
 import isNumberOfTimes from '#msq/language/parser/scenarios/token/isNumberOfTimes.js'
-import numberOfTimes from '#msq/language/parser/scenarios/token/numberOfTimes.js'
-import restPositionNumberByRestPositionName from '#msq/language/parser/scenarios/page-schema/restPositionNumberByRestPositionName.js'
+import parseNumberOfTimes from '#msq/language/parser/scenarios/token/parseNumberOfTimes.js'
+import getRestPositionNumberByRestPositionName from '#msq/language/parser/scenarios/page-schema/getRestPositionNumberByRestPositionName.js'
 import initNewMeasureParamsIfThereIsAlreadySuchMeasurePropertyOrNoMeasuresAtAll from '#msq/language/parser/scenarios/page-schema/initNewMeasureParamsIfThereIsAlreadySuchMeasurePropertyOrNoMeasuresAtAll.js'
 import initNewStaveParamsIfThereIsAlreadySuchStavePropertyOrNoStavesAtAll from '#msq/language/parser/scenarios/page-schema/initNewStaveParamsIfThereIsAlreadySuchStavePropertyOrNoStavesAtAll.js'
 import initNewVoiceParamsIfThereIsNoVoicesAtAllAndInitNewChordParamsIfThereIsAlreadySuchChordProperty from '#msq/language/parser/scenarios/page-schema/initNewVoiceParamsIfThereIsNoVoicesAtAllAndInitNewChordParamsIfThereIsAlreadySuchChordProperty.js'
-import lastMeasureParams from '#msq/language/parser/scenarios/page-schema/lastMeasureParams.js'
-import lastStaveParams from '#msq/language/parser/scenarios/page-schema/lastStaveParams.js'
-import lastVoiceParams from '#msq/language/parser/scenarios/page-schema/lastVoiceParams.js'
-import lastNonSimileChordParams from '#msq/language/parser/scenarios/page-schema/lastNonSimileChordParams.js'
-import lastNoteParams from '#msq/language/parser/scenarios/page-schema/lastNoteParams.js'
-import lastKeyParams from '#msq/language/parser/scenarios/page-schema/lastKeyParams.js'
-import lastArticulationParams from '#msq/language/parser/scenarios/page-schema/lastArticulationParams.js'
-import lastGlissandoMark from '#msq/language/parser/scenarios/page-schema/lastGlissandoMark.js'
-import lastLyric from '#msq/language/parser/scenarios/page-schema/lastLyric.js'
-import keySignatureThatUserMeant from '#msq/language/parser/scenarios/page-schema/keySignatureThatUserMeant.js'
+import getLastMeasureParams from '#msq/language/parser/scenarios/page-schema/getLastMeasureParams.js'
+import getLastStaveParams from '#msq/language/parser/scenarios/page-schema/getLastStaveParams.js'
+import getLastVoiceParams from '#msq/language/parser/scenarios/page-schema/getLastVoiceParams.js'
+import findLastNonSimileChordParams from '#msq/language/parser/scenarios/page-schema/findLastNonSimileChordParams.js'
+import getLastNoteParams from '#msq/language/parser/scenarios/page-schema/getLastNoteParams.js'
+import getLastKeyParams from '#msq/language/parser/scenarios/page-schema/getLastKeyParams.js'
+import getLastArticulationParams from '#msq/language/parser/scenarios/page-schema/getLastArticulationParams.js'
+import getLastGlissandoMark from '#msq/language/parser/scenarios/page-schema/getLastGlissandoMark.js'
+import getLastLyric from '#msq/language/parser/scenarios/page-schema/getLastLyric.js'
+import findKeySignatureThatUserMeant from '#msq/language/parser/scenarios/page-schema/findKeySignatureThatUserMeant.js'
 import noteDurations from '#msq/language/parser/scenarios/static-objects/noteDurations.js'
 import stavePositions from '#msq/language/parser/scenarios/static-objects/stavePositions.js'
 import noteKeys from '#msq/language/parser/scenarios/static-objects/noteKeys.js'
@@ -45,7 +45,7 @@ import breathMarks from '#msq/language/parser/scenarios/static-objects/breathMar
 import clefs from '#msq/language/parser/scenarios/static-objects/clefs.js'
 import articulations from '#msq/language/parser/scenarios/static-objects/articulations.js'
 import ornamentKeys from '#msq/language/parser/scenarios/static-objects/ornamentKeys.js'
-import theSameScenarioButWithDifferentRequiredCommandProgression from '#msq/language/parser/scenarios/theSameScenarioButWithDifferentRequiredCommandProgression.js'
+import copyScenarioWithDifferentRequiredCommandProgression from '#msq/language/parser/scenarios/copyScenarioWithDifferentRequiredCommandProgression.js'
 
 const defaultChordDuration = 1 / 4
 
@@ -70,7 +70,7 @@ export default function (scenarios) {
         (regexps.rest.test(tokenValues) && currentToken.firstOnTheLine) ||
         regexps.topMidBottomRest.test(tokenValues)
       ) && (
-        foundNextTokenValueOnTheLine(
+        findNextTokenValueOnTheLine(
           unitext,
           currentToken.firstCharIndexOfNextToken
         ) !== CLEF
@@ -82,11 +82,11 @@ export default function (scenarios) {
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       initNewMeasureParamsIfThereIsAlreadySuchMeasurePropertyOrNoMeasuresAtAll(parserState.pageSchema, 'stavesParams', parserState)
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
       initNewStaveParamsIfThereIsAlreadySuchStavePropertyOrNoStavesAtAll(lastMeasureParamsValue, 'voicesParams', parserState)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
       initNewVoiceParamsIfThereIsNoVoicesAtAllAndInitNewChordParamsIfThereIsAlreadySuchChordProperty(lastStaveParamsValue, 'notes')
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
       const chordScopeIsNotActive = !parserState.chordScopeIsActive
       if (chordScopeIsNotActive) {
         lastVoiceParamsValue.push({})
@@ -114,14 +114,14 @@ export default function (scenarios) {
           octaveNumber = match[2]
         }
       } else if (itIsRest) {
-        const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
+        const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
         if (lastChordParamsValue.notes && lastChordParamsValue.notes.length > 0) {
           parserState.chordScopeIsActive = false
           lastVoiceParamsValue.push({})
         }
         const match = regexps.topMidBottomRest.match(tokenValues)
         noteDuration = noteDurations[match[0]]
-        positionNumber = restPositionNumberByRestPositionName(match[1])
+        positionNumber = getRestPositionNumberByRestPositionName(match[1])
       }
       const currentNumberOfStaves = lastMeasureParamsValue.stavesParams.length
       const currentNumberOfVoices = lastStaveParamsValue.voicesParams.length
@@ -132,12 +132,12 @@ export default function (scenarios) {
         octaveNumber,
         positionNumber
       }
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
       lastChordParamsValue.notes = lastChordParamsValue.notes || []
       lastChordParamsValue.notes.push(noteParams)
       const currentNumberOfNotes = lastChordParamsValue.notes.length
       noteParams.id = currentNumberOfNotes - 1
-      const lastNoteParamsValue = lastNoteParams(lastChordParamsValue)
+      const lastNoteParamsValue = getLastNoteParams(lastChordParamsValue)
       if (itIsRest) {
         lastChordParamsValue.isRest = true
       }
@@ -220,10 +220,10 @@ export default function (scenarios) {
     },
     itIsNewCommandProgressionFromLevel: 0,
     actionWhenProgressionOfCommandsChanges: (parserState, scenarioNameThatChangedCommandsProgression, lineNumber, argumentsFromMainAction) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
       const currentNumberOfMeasures = parserState.pageSchema.measuresParams.length
       const currentNumberOfStaves = lastMeasureParamsValue.stavesParams.length
       const currentNumberOfVoices = lastStaveParamsValue.voicesParams.length
@@ -334,8 +334,8 @@ export default function (scenarios) {
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       parserState.chordScopeIsActive = false
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
       const currentNumberOfStaves = lastMeasureParamsValue.stavesParams.length
       const currentNumberOfVoices = lastStaveParamsValue.voicesParams.length
       if (parserState.lastStavePosition[currentNumberOfStaves - 1] && parserState.lastStavePosition[currentNumberOfStaves - 1][currentNumberOfVoices - 1]) {
@@ -361,10 +361,10 @@ export default function (scenarios) {
       const firstCommandVariation = regexps.stemDirection.match(tokenValues)
       const secondCommandVariation = regexps.directionOfStem.match(tokenValues)
       const stemDirection = (firstCommandVariation || secondCommandVariation)[0]
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
       lastChordParamsValue.stemDirection = stemDirection
       const currentNumberOfMeasures = parserState.pageSchema.measuresParams.length
       const currentNumberOfStaves = lastMeasureParamsValue.stavesParams.length
@@ -406,11 +406,11 @@ export default function (scenarios) {
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       const stavePositionName = regexps.stavePosition.match(tokenValues)[0]
       const stavePosition = stavePositions[stavePositionName]
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
-      const lastNoteParamsValue = lastNoteParams(lastChordParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
+      const lastNoteParamsValue = getLastNoteParams(lastChordParamsValue)
       lastNoteParamsValue.stave = stavePosition
       parserState.keysOfLastNote.forEach(keyParams => {
         keyParams.stave = stavePosition
@@ -451,17 +451,17 @@ export default function (scenarios) {
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       return regexps.withNumberOfDots.test(
-        withNumbersInsteadOfWords(tokenValues)
+        replaceWordsWithNumbers(tokenValues)
       )
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       const numberOfDots = regexps.withNumberOfDots.match(
-        withNumbersInsteadOfWords(tokenValues)
+        replaceWordsWithNumbers(tokenValues)
       )[0] * 1
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
       lastChordParamsValue.numberOfDots = numberOfDots
       const currentNumberOfMeasures = parserState.pageSchema.measuresParams.length
       const currentNumberOfStaves = lastMeasureParamsValue.stavesParams.length
@@ -497,10 +497,10 @@ export default function (scenarios) {
       return regexps.dotted.test(tokenValues) || regexps.withDot.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
       lastChordParamsValue.numberOfDots = 1
       const currentNumberOfMeasures = parserState.pageSchema.measuresParams.length
       const currentNumberOfStaves = lastMeasureParamsValue.stavesParams.length
@@ -548,10 +548,10 @@ export default function (scenarios) {
       return regexps.beamed.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
       const currentNumberOfMeasures = parserState.pageSchema.measuresParams.length
       const currentNumberOfStaves = lastMeasureParamsValue.stavesParams.length
       const currentNumberOfVoices = lastStaveParamsValue.voicesParams.length
@@ -595,10 +595,10 @@ export default function (scenarios) {
       return regexps.notBeamed.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
       lastChordParamsValue.beamedWithNext = false
       parserState.groupScoreIsActive = false
       parserState.graceGroupScoreIsActive = false
@@ -627,8 +627,8 @@ export default function (scenarios) {
       return regexps.withNext.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
       const currentNumberOfMeasures = parserState.pageSchema.measuresParams.length
       const currentNumberOfStaves = lastMeasureParamsValue.stavesParams.length
       const currentNumberOfVoices = lastStaveParamsValue.voicesParams.length
@@ -664,8 +664,8 @@ export default function (scenarios) {
       return regexps.withNext.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
       const currentNumberOfMeasures = parserState.pageSchema.measuresParams.length
       const currentNumberOfStaves = lastMeasureParamsValue.stavesParams.length
       const currentNumberOfVoices = lastStaveParamsValue.voicesParams.length
@@ -701,10 +701,10 @@ export default function (scenarios) {
       return regexps.withOnlyPrimaryLine.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
       lastChordParamsValue.beamedWithNextWithJustOneBeam = true
       const currentNumberOfMeasures = parserState.pageSchema.measuresParams.length
       const currentNumberOfStaves = lastMeasureParamsValue.stavesParams.length
@@ -741,11 +741,11 @@ export default function (scenarios) {
       return regexps.withNoteKey.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
-      const lastNoteParamsValue = lastNoteParams(lastChordParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
+      const lastNoteParamsValue = getLastNoteParams(lastChordParamsValue)
       const { noteName, octaveNumber, positionNumber, stave } = lastNoteParamsValue
       lastChordParamsValue.keysParams = lastChordParamsValue.keysParams || []
       const keyTypeName = regexps.withNoteKey.match(tokenValues)
@@ -804,11 +804,11 @@ export default function (scenarios) {
       return regexps.withParentheses.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
-      const lastKeyParamsValue = lastKeyParams(lastChordParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
+      const lastKeyParamsValue = getLastKeyParams(lastChordParamsValue)
       lastKeyParamsValue.withParentheses = true
       const currentNumberOfMeasures = parserState.pageSchema.measuresParams.length
       const currentNumberOfStaves = lastMeasureParamsValue.stavesParams.length
@@ -846,10 +846,10 @@ export default function (scenarios) {
       return regexps.withParentheses.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
       const numberOfNotes = lastChordParamsValue.notes.length
       lastChordParamsValue.parentheses = lastChordParamsValue.parentheses || []
       lastChordParamsValue.parentheses.push({
@@ -929,11 +929,11 @@ export default function (scenarios) {
     actionWhenProgressionOfCommandsChanges: (parserState, scenarioNameThatChangedCommandsProgression, lineNumber, argumentsFromMainAction) => {
       if (parserState.lastNoteTextPositionApplicationToNote === undefined) {
         parserState.lastNoteTextPositionApplicationToNote = true
-        const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-        const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-        const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-        const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
-        const lastNoteParamsValue = lastNoteParams(lastChordParamsValue)
+        const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+        const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+        const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+        const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
+        const lastNoteParamsValue = getLastNoteParams(lastChordParamsValue)
         const { noteName, octaveNumber, positionNumber, stave } = lastNoteParamsValue
         lastChordParamsValue.keysParams = lastChordParamsValue.keysParams || []
         const keyType = 'noteLetter'
@@ -978,11 +978,11 @@ export default function (scenarios) {
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       parserState.lastNoteTextPositionApplicationToNote = 'beside'
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
-      const lastNoteParamsValue = lastNoteParams(lastChordParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
+      const lastNoteParamsValue = getLastNoteParams(lastChordParamsValue)
       const { noteName, octaveNumber, positionNumber, stave } = lastNoteParamsValue
       lastChordParamsValue.keysParams = lastChordParamsValue.keysParams || []
       const keyType = 'noteLetter'
@@ -1027,14 +1027,14 @@ export default function (scenarios) {
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       parserState.lastNoteTextPositionApplicationToNote = 'up|down'
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
       lastChordParamsValue.articulationParams = lastChordParamsValue.articulationParams || []
       const newArticulationParams = {
         name: 'noteLetter',
-        direction: direction(tokenValues),
+        direction: parseDirection(tokenValues),
         textValue: parserState.lastNoteTextValue
       }
       lastChordParamsValue.articulationParams.push(newArticulationParams)
@@ -1067,7 +1067,7 @@ export default function (scenarios) {
       return isAboveBelowOverUnder(tokenValues) &&
         !regexps.staveWithAndWithoutDelimeter.test(
           [
-            foundNextTokenValueOnTheLine(
+            findNextTokenValueOnTheLine(
               unitext, currentToken.firstCharIndexOfNextToken
             )
           ]
@@ -1075,14 +1075,14 @@ export default function (scenarios) {
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       parserState.lastNoteTextPositionApplicationToNote = 'up|down'
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
       lastChordParamsValue.articulationParams = lastChordParamsValue.articulationParams || []
       const newArticulationParams = {
         name: 'noteLetter',
-        direction: directionByAboveBelowOverUnder(tokenValues),
+        direction: parseDirectionByAboveBelowOverUnder(tokenValues),
         textValue: parserState.lastNoteTextValue
       }
       lastChordParamsValue.articulationParams.push(newArticulationParams)
@@ -1116,14 +1116,14 @@ export default function (scenarios) {
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       parserState.lastNoteTextPositionApplicationToNote = 'up|down'
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
       lastChordParamsValue.articulationParams = lastChordParamsValue.articulationParams || []
       const newArticulationParams = {
         name: 'noteLetter',
-        direction: directionByAboveBelowOverUnderStaveLines(tokenValues),
+        direction: parseDirectionByAboveBelowOverUnderStaveLines(tokenValues),
         textValue: parserState.lastNoteTextValue,
         aboveBelowOverUnderStaveLines: true
       }
@@ -1167,12 +1167,12 @@ export default function (scenarios) {
       return isVerticalCorrection(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
-      const lastArticulationParamsValue = lastArticulationParams(lastChordParamsValue)
-      lastArticulationParamsValue.yCorrection = verticalCorrection(tokenValues)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
+      const lastArticulationParamsValue = getLastArticulationParams(lastChordParamsValue)
+      lastArticulationParamsValue.yCorrection = parseVerticalCorrection(tokenValues)
       const currentNumberOfMeasures = parserState.pageSchema.measuresParams.length
       const currentNumberOfStaves = lastMeasureParamsValue.stavesParams.length
       const currentNumberOfVoices = lastStaveParamsValue.voicesParams.length
@@ -1201,11 +1201,11 @@ export default function (scenarios) {
     },
     itIsNewCommandProgressionFromLevel: 3
   }
-  scenarios['note with text above or below vertical correction'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['note with text above or below vertical correction'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with text up or down vertical correction'],
     'note with text above or below'
   )
-  scenarios['note with text above or below stave vertical correction'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['note with text above or below stave vertical correction'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with text up or down vertical correction'],
     'note with text above or below stave'
   )
@@ -1216,10 +1216,10 @@ export default function (scenarios) {
       return regexps.tiedWithNext.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
       lastChordParamsValue.tiedWithNext = {}
       const currentNumberOfMeasures = parserState.pageSchema.measuresParams.length
       const currentNumberOfStaves = lastMeasureParamsValue.stavesParams.length
@@ -1271,10 +1271,10 @@ export default function (scenarios) {
       return regexps.tiedBefore.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
       lastChordParamsValue.tiedBefore = {}
       const currentNumberOfMeasures = parserState.pageSchema.measuresParams.length
       const currentNumberOfStaves = lastMeasureParamsValue.stavesParams.length
@@ -1319,11 +1319,11 @@ export default function (scenarios) {
       return isMeasureNumber(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
-      const measureNumberValue = measureNumber(tokenValues)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
+      const measureNumberValue = parseMeasureNumber(tokenValues)
       lastChordParamsValue.tiedBeforeMeasure = Object.assign({
         index: measureNumberValue
       }, lastChordParamsValue.tiedBefore)
@@ -1358,10 +1358,10 @@ export default function (scenarios) {
       return regexps.tiedAfter.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
       lastChordParamsValue.tiedAfter = {}
       const currentNumberOfMeasures = parserState.pageSchema.measuresParams.length
       const currentNumberOfStaves = lastMeasureParamsValue.stavesParams.length
@@ -1406,11 +1406,11 @@ export default function (scenarios) {
       return isMeasureNumber(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
-      const measureNumberValue = measureNumber(tokenValues)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
+      const measureNumberValue = parseMeasureNumber(tokenValues)
       lastChordParamsValue.tiedAfterMeasure = Object.assign({
         index: measureNumberValue
       }, lastChordParamsValue.tiedAfter)
@@ -1446,11 +1446,11 @@ export default function (scenarios) {
       return isDirection(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
-      lastChordParamsValue.tiedWithNext.direction = direction(tokenValues)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
+      lastChordParamsValue.tiedWithNext.direction = parseDirection(tokenValues)
       if (parserState.applyHighlighting) {
         // no highlights needed
         parserState.highlightsHtmlBuffer.push(joinedTokenValuesWithRealDelimiters)
@@ -1470,11 +1470,11 @@ export default function (scenarios) {
       return isAboveBelowOverUnder(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
-      lastChordParamsValue.tiedWithNext.direction = directionByAboveBelowOverUnder(tokenValues)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
+      lastChordParamsValue.tiedWithNext.direction = parseDirectionByAboveBelowOverUnder(tokenValues)
       if (parserState.applyHighlighting) {
         // no highlights needed
         parserState.highlightsHtmlBuffer.push(joinedTokenValuesWithRealDelimiters)
@@ -1494,14 +1494,14 @@ export default function (scenarios) {
       return isDirection(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
       if (lastChordParamsValue.tiedBefore) {
-        lastChordParamsValue.tiedBefore.direction = direction(tokenValues)
+        lastChordParamsValue.tiedBefore.direction = parseDirection(tokenValues)
       } else if (lastChordParamsValue.tiedBeforeMeasure) {
-        lastChordParamsValue.tiedBeforeMeasure.direction = direction(tokenValues)
+        lastChordParamsValue.tiedBeforeMeasure.direction = parseDirection(tokenValues)
       }
       if (parserState.applyHighlighting) {
         // no highlights needed
@@ -1522,14 +1522,14 @@ export default function (scenarios) {
       return isAboveBelowOverUnder(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
       if (lastChordParamsValue.tiedBefore) {
-        lastChordParamsValue.tiedBefore.direction = directionByAboveBelowOverUnder(tokenValues)
+        lastChordParamsValue.tiedBefore.direction = parseDirectionByAboveBelowOverUnder(tokenValues)
       } else if (lastChordParamsValue.tiedBeforeMeasure) {
-        lastChordParamsValue.tiedBeforeMeasure.direction = directionByAboveBelowOverUnder(tokenValues)
+        lastChordParamsValue.tiedBeforeMeasure.direction = parseDirectionByAboveBelowOverUnder(tokenValues)
       }
       if (parserState.applyHighlighting) {
         // no highlights needed
@@ -1550,14 +1550,14 @@ export default function (scenarios) {
       return isDirection(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
       if (lastChordParamsValue.tiedAfter) {
-        lastChordParamsValue.tiedAfter.direction = direction(tokenValues)
+        lastChordParamsValue.tiedAfter.direction = parseDirection(tokenValues)
       } else if (lastChordParamsValue.tiedAfterMeasure) {
-        lastChordParamsValue.tiedAfterMeasure.direction = direction(tokenValues)
+        lastChordParamsValue.tiedAfterMeasure.direction = parseDirection(tokenValues)
       }
       if (parserState.applyHighlighting) {
         // no highlights needed
@@ -1578,14 +1578,14 @@ export default function (scenarios) {
       return isAboveBelowOverUnder(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
       if (lastChordParamsValue.tiedAfter) {
-        lastChordParamsValue.tiedAfter.direction = directionByAboveBelowOverUnder(tokenValues)
+        lastChordParamsValue.tiedAfter.direction = parseDirectionByAboveBelowOverUnder(tokenValues)
       } else if (lastChordParamsValue.tiedAfterMeasure) {
-        lastChordParamsValue.tiedAfterMeasure.direction = directionByAboveBelowOverUnder(tokenValues)
+        lastChordParamsValue.tiedAfterMeasure.direction = parseDirectionByAboveBelowOverUnder(tokenValues)
       }
       if (parserState.applyHighlighting) {
         // no highlights needed
@@ -1606,11 +1606,11 @@ export default function (scenarios) {
       return isRoundness(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
-      lastChordParamsValue.tiedWithNext.roundCoefficientFactor = roundness(tokenValues)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
+      lastChordParamsValue.tiedWithNext.roundCoefficientFactor = parseRoundness(tokenValues)
       const currentNumberOfMeasures = parserState.pageSchema.measuresParams.length
       const currentNumberOfStaves = lastMeasureParamsValue.stavesParams.length
       const currentNumberOfVoices = lastStaveParamsValue.voicesParams.length
@@ -1646,14 +1646,14 @@ export default function (scenarios) {
       return isRoundness(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
       if (lastChordParamsValue.tiedBefore) {
-        lastChordParamsValue.tiedBefore.roundCoefficientFactor = roundness(tokenValues)
+        lastChordParamsValue.tiedBefore.roundCoefficientFactor = parseRoundness(tokenValues)
       } else if (lastChordParamsValue.tiedBeforeMeasure) {
-        lastChordParamsValue.tiedBeforeMeasure.roundCoefficientFactor = roundness(tokenValues)
+        lastChordParamsValue.tiedBeforeMeasure.roundCoefficientFactor = parseRoundness(tokenValues)
       }
       const currentNumberOfMeasures = parserState.pageSchema.measuresParams.length
       const currentNumberOfStaves = lastMeasureParamsValue.stavesParams.length
@@ -1690,14 +1690,14 @@ export default function (scenarios) {
       return isRoundness(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
       if (lastChordParamsValue.tiedAfter) {
-        lastChordParamsValue.tiedAfter.roundCoefficientFactor = roundness(tokenValues)
+        lastChordParamsValue.tiedAfter.roundCoefficientFactor = parseRoundness(tokenValues)
       } else if (lastChordParamsValue.tiedAfterMeasure) {
-        lastChordParamsValue.tiedAfterMeasure.roundCoefficientFactor = roundness(tokenValues)
+        lastChordParamsValue.tiedAfterMeasure.roundCoefficientFactor = parseRoundness(tokenValues)
       }
       const currentNumberOfMeasures = parserState.pageSchema.measuresParams.length
       const currentNumberOfStaves = lastMeasureParamsValue.stavesParams.length
@@ -1734,10 +1734,10 @@ export default function (scenarios) {
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       parserState.numberOfGlissandos += 1
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
       const key = `glissando-${parserState.numberOfGlissandos}`
       lastChordParamsValue.glissandoMarks = lastChordParamsValue.glissandoMarks || []
       lastChordParamsValue.glissandoMarks.push({ key })
@@ -1764,11 +1764,11 @@ export default function (scenarios) {
     },
     itIsNewCommandProgressionFromLevel: 1,
     actionWhenProgressionOfCommandsChanges: (parserState, scenarioNameThatChangedCommandsProgression, lineNumber, argumentsFromMainAction) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
-      const lastGlissandoMarkValue = lastGlissandoMark(lastChordParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
+      const lastGlissandoMarkValue = getLastGlissandoMark(lastChordParamsValue)
       if (lastGlissandoMarkValue && !lastGlissandoMarkValue.after && (lastGlissandoMarkValue.afterMeasure === undefined) && !lastGlissandoMarkValue.before && (lastGlissandoMarkValue.beforeMeasure === undefined)) {
         lastGlissandoMarkValue.after = true
       }
@@ -1787,12 +1787,12 @@ export default function (scenarios) {
       return isDirection(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
-      const lastGlissandoMarkValue = lastGlissandoMark(lastChordParamsValue)
-      lastGlissandoMarkValue.direction = direction(tokenValues)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
+      const lastGlissandoMarkValue = getLastGlissandoMark(lastChordParamsValue)
+      lastGlissandoMarkValue.direction = parseDirection(tokenValues)
       if (parserState.applyHighlighting) {
         // no highlights needed
         parserState.highlightsHtmlBuffer.push(joinedTokenValuesWithRealDelimiters)
@@ -1811,11 +1811,11 @@ export default function (scenarios) {
       return regexps.after.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
-      const lastGlissandoMarkValue = lastGlissandoMark(lastChordParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
+      const lastGlissandoMarkValue = getLastGlissandoMark(lastChordParamsValue)
       lastGlissandoMarkValue.after = true
       if (parserState.applyHighlighting) {
         // no highlights needed
@@ -1835,11 +1835,11 @@ export default function (scenarios) {
       return regexps.before.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
-      const lastGlissandoMarkValue = lastGlissandoMark(lastChordParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
+      const lastGlissandoMarkValue = getLastGlissandoMark(lastChordParamsValue)
       lastGlissandoMarkValue.before = true
       if (parserState.applyHighlighting) {
         // no highlights needed
@@ -1860,12 +1860,12 @@ export default function (scenarios) {
       return isMeasureNumber(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
-      const lastGlissandoMarkValue = lastGlissandoMark(lastChordParamsValue)
-      const measureNumberValue = measureNumber(tokenValues)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
+      const lastGlissandoMarkValue = getLastGlissandoMark(lastChordParamsValue)
+      const measureNumberValue = parseMeasureNumber(tokenValues)
       lastGlissandoMarkValue.afterMeasure = measureNumberValue
       lastGlissandoMarkValue.after = false
       if (parserState.applyHighlighting) {
@@ -1899,12 +1899,12 @@ export default function (scenarios) {
       return isMeasureNumber(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
-      const lastGlissandoMarkValue = lastGlissandoMark(lastChordParamsValue)
-      const measureNumberValue = measureNumber(tokenValues)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
+      const lastGlissandoMarkValue = getLastGlissandoMark(lastChordParamsValue)
+      const measureNumberValue = parseMeasureNumber(tokenValues)
       lastGlissandoMarkValue.beforeMeasure = measureNumberValue
       lastGlissandoMarkValue.after = false
       if (parserState.applyHighlighting) {
@@ -1937,10 +1937,10 @@ export default function (scenarios) {
       return regexps.isRest.test(tokenValues) && !currentToken.firstOnTheLine
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
       lastChordParamsValue.isRest = true
       const currentNumberOfMeasures = parserState.pageSchema.measuresParams.length
       const currentNumberOfStaves = lastMeasureParamsValue.stavesParams.length
@@ -1976,11 +1976,11 @@ export default function (scenarios) {
       return regexps.isGhost.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
-      const lastNoteParamsValue = lastNoteParams(lastChordParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
+      const lastNoteParamsValue = getLastNoteParams(lastChordParamsValue)
       const currentNumberOfStaves = lastMeasureParamsValue.stavesParams.length
       const currentNumberOfVoices = lastStaveParamsValue.voicesParams.length
       const chordScopeIsNotActive = !parserState.chordScopeIsActive
@@ -2009,11 +2009,11 @@ export default function (scenarios) {
       return regexps.isNotGhost.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
-      const lastNoteParamsValue = lastNoteParams(lastChordParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
+      const lastNoteParamsValue = getLastNoteParams(lastChordParamsValue)
       const currentNumberOfStaves = lastMeasureParamsValue.stavesParams.length
       const currentNumberOfVoices = lastStaveParamsValue.voicesParams.length
       const chordScopeIsNotActive = !parserState.chordScopeIsActive
@@ -2042,10 +2042,10 @@ export default function (scenarios) {
       return regexps.isGrace.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
       lastChordParamsValue.isGrace = true
       if (regexps.isGrace.match(tokenValues)[0]) {
         lastChordParamsValue.hasGraceCrushLine = true
@@ -2069,10 +2069,10 @@ export default function (scenarios) {
       return regexps.withCrushLine.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
       lastChordParamsValue.hasGraceCrushLine = true
       const currentNumberOfMeasures = parserState.pageSchema.measuresParams.length
       const currentNumberOfStaves = lastMeasureParamsValue.stavesParams.length
@@ -2108,10 +2108,10 @@ export default function (scenarios) {
       return regexps.isCentralized.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
       lastChordParamsValue.isFullMeasure = true
       if (parserState.applyHighlighting) {
         // no highlights needed
@@ -2131,10 +2131,10 @@ export default function (scenarios) {
       return regexps.withBreathMarkBefore.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
       const breathMarkTypeName = regexps.withBreathMarkBefore.match(tokenValues)[0]
       const breathMarkType = breathMarks[breathMarkTypeName]
       lastChordParamsValue.breathMarkBefore = {
@@ -2183,11 +2183,11 @@ export default function (scenarios) {
       return isVerticalCorrection(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
-      lastChordParamsValue.breathMarkBefore.yCorrection = verticalCorrection(tokenValues)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
+      lastChordParamsValue.breathMarkBefore.yCorrection = parseVerticalCorrection(tokenValues)
       const currentNumberOfMeasures = parserState.pageSchema.measuresParams.length
       const currentNumberOfStaves = lastMeasureParamsValue.stavesParams.length
       const currentNumberOfVoices = lastStaveParamsValue.voicesParams.length
@@ -2222,16 +2222,16 @@ export default function (scenarios) {
       return regexps.withKeySignatureBefore.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
       const currentNumberOfMeasures = parserState.pageSchema.measuresParams.length
       const currentNumberOfStaves = lastMeasureParamsValue.stavesParams.length
       const currentNumberOfVoices = lastStaveParamsValue.voicesParams.length
       const currentNumberOfUnits = parserState.numberOfUnitsBeforeFinishingDeclaringNewOne
       const keySignatureName = regexps.withKeySignatureBefore.match(tokenValues)[0]
-      lastChordParamsValue.keySignatureBefore = keySignatureThatUserMeant(keySignatureName)
+      lastChordParamsValue.keySignatureBefore = findKeySignatureThatUserMeant(keySignatureName)
       if (parserState.lastKeySignatureName) {
         parserState.lastKeySignatureName = lastChordParamsValue.keySignatureBefore
         parserState.lastKeySignatureNameForEachLineId += 1
@@ -2279,10 +2279,10 @@ export default function (scenarios) {
       return regexps.withClefBefore.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
       const currentNumberOfMeasures = parserState.pageSchema.measuresParams.length
       const currentNumberOfStaves = lastMeasureParamsValue.stavesParams.length
       const currentNumberOfVoices = lastStaveParamsValue.voicesParams.length
@@ -2321,10 +2321,10 @@ export default function (scenarios) {
       return regexps.withClefAndKeySignatureBefore.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
       const currentNumberOfMeasures = parserState.pageSchema.measuresParams.length
       const currentNumberOfStaves = lastMeasureParamsValue.stavesParams.length
       const currentNumberOfVoices = lastStaveParamsValue.voicesParams.length
@@ -2333,7 +2333,7 @@ export default function (scenarios) {
       const clefName = match[0]
       const clef = clefs[clefName]
       const keySignatureName = match[1]
-      const keySignature = keySignatureThatUserMeant(keySignatureName)
+      const keySignature = findKeySignatureThatUserMeant(keySignatureName)
       lastChordParamsValue.clefBefore = clef
       lastChordParamsValue.keySignatureBefore = keySignature
       parserState.lastClef[currentNumberOfStaves - 1] = clef
@@ -2385,10 +2385,10 @@ export default function (scenarios) {
       return regexps.withArticulation.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
       const match = regexps.withArticulation.match(tokenValues)
       const articulationName = articulations[match[0]]
       lastChordParamsValue.articulationParams = lastChordParamsValue.articulationParams || []
@@ -2439,10 +2439,10 @@ export default function (scenarios) {
       return regexps.withTurn.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
       const articulationName = 'turn'
       lastChordParamsValue.articulationParams = lastChordParamsValue.articulationParams || []
       const newArticulation = {
@@ -2492,10 +2492,10 @@ export default function (scenarios) {
       return regexps.withMordent.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
       const articulationName = 'mordent'
       lastChordParamsValue.articulationParams = lastChordParamsValue.articulationParams || []
       const newArticulation = {
@@ -2545,10 +2545,10 @@ export default function (scenarios) {
       return regexps.withTrill.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
       const articulationName = 'trill'
       lastChordParamsValue.articulationParams = lastChordParamsValue.articulationParams || []
       const newArticulation = {
@@ -2599,12 +2599,12 @@ export default function (scenarios) {
       return isDirection(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
-      const lastArticulationParamsValue = lastArticulationParams(lastChordParamsValue)
-      lastArticulationParamsValue.direction = direction(tokenValues)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
+      const lastArticulationParamsValue = getLastArticulationParams(lastChordParamsValue)
+      lastArticulationParamsValue.direction = parseDirection(tokenValues)
       if (parserState.applyHighlighting) {
         // no highlights needed
         parserState.highlightsHtmlBuffer.push(joinedTokenValuesWithRealDelimiters)
@@ -2616,13 +2616,13 @@ export default function (scenarios) {
     },
     itIsNewCommandProgressionFromLevel: 2
   }
-  scenarios['note with turn direction'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['note with turn direction'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with articulation direction'], 'note with turn'
   )
-  scenarios['note with mordent direction'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['note with mordent direction'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with articulation direction'], 'note with mordent'
   )
-  scenarios['note with trill direction'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['note with trill direction'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with articulation direction'], 'note with trill'
   )
   scenarios['note with articulation above or below'] = {
@@ -2633,7 +2633,7 @@ export default function (scenarios) {
       return isAboveBelowOverUnder(tokenValues) &&
         !regexps.staveWithAndWithoutDelimeter.test(
           [
-            foundNextTokenValueOnTheLine(
+            findNextTokenValueOnTheLine(
               unitext,
               currentToken.firstCharIndexOfNextToken
             )
@@ -2641,12 +2641,12 @@ export default function (scenarios) {
         )
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
-      const lastArticulationParamsValue = lastArticulationParams(lastChordParamsValue)
-      lastArticulationParamsValue.direction = directionByAboveBelowOverUnder(tokenValues)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
+      const lastArticulationParamsValue = getLastArticulationParams(lastChordParamsValue)
+      lastArticulationParamsValue.direction = parseDirectionByAboveBelowOverUnder(tokenValues)
       if (parserState.applyHighlighting) {
         // no highlights needed
         parserState.highlightsHtmlBuffer.push(joinedTokenValuesWithRealDelimiters)
@@ -2658,13 +2658,13 @@ export default function (scenarios) {
     },
     itIsNewCommandProgressionFromLevel: 2
   }
-  scenarios['note with turn above or below'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['note with turn above or below'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with articulation above or below'], 'note with turn'
   )
-  scenarios['note with mordent above or below'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['note with mordent above or below'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with articulation above or below'], 'note with mordent'
   )
-  scenarios['note with trill above or below'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['note with trill above or below'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with articulation above or below'], 'note with trill'
   )
   scenarios['note with articulation above or below stave'] = {
@@ -2674,12 +2674,12 @@ export default function (scenarios) {
       return isAboveBelowOverUnderStaveLines(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
-      const lastArticulationParamsValue = lastArticulationParams(lastChordParamsValue)
-      lastArticulationParamsValue.direction = directionByAboveBelowOverUnderStaveLines(tokenValues)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
+      const lastArticulationParamsValue = getLastArticulationParams(lastChordParamsValue)
+      lastArticulationParamsValue.direction = parseDirectionByAboveBelowOverUnderStaveLines(tokenValues)
       lastArticulationParamsValue.aboveBelowOverUnderStaveLines = true
       const currentNumberOfMeasures = parserState.pageSchema.measuresParams.length
       if (parserState.applyHighlighting) {
@@ -2705,13 +2705,13 @@ export default function (scenarios) {
     },
     itIsNewCommandProgressionFromLevel: 2
   }
-  scenarios['note with turn above or below stave'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['note with turn above or below stave'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with articulation above or below stave'], 'note with turn'
   )
-  scenarios['note with mordent above or below stave'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['note with mordent above or below stave'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with articulation above or below stave'], 'note with mordent'
   )
-  scenarios['note with trill above or below stave'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['note with trill above or below stave'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with articulation above or below stave'], 'note with trill'
   )
   scenarios['note with turn key above or below'] = {
@@ -2721,11 +2721,11 @@ export default function (scenarios) {
       return regexps.withOrnamentKeyAboveBelowOverUnder.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
-      const lastArticulationParamsValue = lastArticulationParams(lastChordParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
+      const lastArticulationParamsValue = getLastArticulationParams(lastChordParamsValue)
       const match = regexps.withOrnamentKeyAboveBelowOverUnder.match(tokenValues)
       const ornamentKeyName = ornamentKeys[match[0]]
       const ornamentKeyPosition = match[1]
@@ -2765,10 +2765,10 @@ export default function (scenarios) {
     },
     itIsNewCommandProgressionFromLevel: 2
   }
-  scenarios['note with mordent key above or below'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['note with mordent key above or below'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with turn key above or below'], 'note with mordent'
   )
-  scenarios['note with trill key above or below'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['note with trill key above or below'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with turn key above or below'], 'note with trill'
   )
   scenarios['note with turn after'] = {
@@ -2778,11 +2778,11 @@ export default function (scenarios) {
       return regexps.after.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
-      const lastArticulationParamsValue = lastArticulationParams(lastChordParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
+      const lastArticulationParamsValue = getLastArticulationParams(lastChordParamsValue)
       lastArticulationParamsValue.followedAfter = true
       if (parserState.applyHighlighting) {
         // no highlights needed
@@ -2802,11 +2802,11 @@ export default function (scenarios) {
       return regexps.isInverted.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
-      const lastArticulationParamsValue = lastArticulationParams(lastChordParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
+      const lastArticulationParamsValue = getLastArticulationParams(lastChordParamsValue)
       lastArticulationParamsValue.inverted = true
       if (parserState.applyHighlighting) {
         // no highlights needed
@@ -2819,7 +2819,7 @@ export default function (scenarios) {
     },
     itIsNewCommandProgressionFromLevel: 2
   }
-  scenarios['note with mordent inverted'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['note with mordent inverted'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with turn inverted'], 'note with mordent'
   )
   scenarios['note with trill with wave after'] = {
@@ -2829,11 +2829,11 @@ export default function (scenarios) {
       return regexps.withWaveAfter.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
-      const lastArticulationParamsValue = lastArticulationParams(lastChordParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
+      const lastArticulationParamsValue = getLastArticulationParams(lastChordParamsValue)
       lastArticulationParamsValue.withWave = true
       const currentNumberOfMeasures = parserState.pageSchema.measuresParams.length
       const currentNumberOfStaves = lastMeasureParamsValue.stavesParams.length
@@ -2870,12 +2870,12 @@ export default function (scenarios) {
       return isVerticalCorrection(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
-      const lastArticulationParamsValue = lastArticulationParams(lastChordParamsValue)
-      lastArticulationParamsValue.yCorrection = verticalCorrection(tokenValues)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
+      const lastArticulationParamsValue = getLastArticulationParams(lastChordParamsValue)
+      lastArticulationParamsValue.yCorrection = parseVerticalCorrection(tokenValues)
       const currentNumberOfMeasures = parserState.pageSchema.measuresParams.length
       const currentNumberOfStaves = lastMeasureParamsValue.stavesParams.length
       const currentNumberOfVoices = lastStaveParamsValue.voicesParams.length
@@ -2904,13 +2904,13 @@ export default function (scenarios) {
     },
     itIsNewCommandProgressionFromLevel: 2
   }
-  scenarios['note with turn vertical correction'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['note with turn vertical correction'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with articulation vertical correction'], 'note with turn'
   )
-  scenarios['note with mordent vertical correction'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['note with mordent vertical correction'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with articulation vertical correction'], 'note with mordent'
   )
-  scenarios['note with trill vertical correction'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['note with trill vertical correction'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with articulation vertical correction'], 'note with trill'
   )
   scenarios['note with chord letter'] = {
@@ -2920,10 +2920,10 @@ export default function (scenarios) {
       return regexps.withChord.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
       const chordLetter = regexps.withChord.match(tokenValues)[0]
       lastChordParamsValue.relatedChordLetter = {
         textValue: chordLetter
@@ -2984,11 +2984,11 @@ export default function (scenarios) {
       return isDirection(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
-      lastChordParamsValue.relatedChordLetter.direction = direction(tokenValues)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
+      lastChordParamsValue.relatedChordLetter.direction = parseDirection(tokenValues)
       parserState.lastChordLetterDirection = lastChordParamsValue.relatedChordLetter.direction
       if (parserState.applyHighlighting) {
         // no highlights needed
@@ -3009,15 +3009,15 @@ export default function (scenarios) {
       return isAboveBelowOverUnder(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
       const currentNumberOfMeasures = parserState.pageSchema.measuresParams.length
       const currentNumberOfStaves = lastMeasureParamsValue.stavesParams.length
       const currentNumberOfVoices = lastStaveParamsValue.voicesParams.length
       const currentNumberOfUnits = parserState.numberOfUnitsBeforeFinishingDeclaringNewOne
-      lastChordParamsValue.relatedChordLetter.direction = directionByAboveBelowOverUnder(tokenValues)
+      lastChordParamsValue.relatedChordLetter.direction = parseDirectionByAboveBelowOverUnder(tokenValues)
       parserState.lastChordLetterDirection = lastChordParamsValue.relatedChordLetter.direction
       if (parserState.applyHighlighting) {
         parserState.highlightsHtmlBuffer.push(
@@ -3079,11 +3079,11 @@ export default function (scenarios) {
       return isVerticalCorrection(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
-      lastChordParamsValue.relatedChordLetter.yCorrection = verticalCorrection(tokenValues)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
+      lastChordParamsValue.relatedChordLetter.yCorrection = parseVerticalCorrection(tokenValues)
       const currentNumberOfMeasures = parserState.pageSchema.measuresParams.length
       const currentNumberOfStaves = lastMeasureParamsValue.stavesParams.length
       const currentNumberOfVoices = lastStaveParamsValue.voicesParams.length
@@ -3115,7 +3115,7 @@ export default function (scenarios) {
     requiredCommandProgression: 'note',
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const nextTwoTokens = foundNextTokenValuesOnTheLine(
+      const nextTwoTokens = findNextTokenValuesOnTheLine(
         unitext, currentToken.firstCharIndexOfNextToken, 2
       )
       return regexps.isOctaveOrTwoOctavesHigherOrLower.test(tokenValues) &&
@@ -3124,10 +3124,10 @@ export default function (scenarios) {
         (nextTwoTokens.indexOf('clef') === -1)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
       const match = regexps.isOctaveOrTwoOctavesHigherOrLower.match(tokenValues)
       const isTwoOctaves = match[0]
       const octaveSignMainValue = isTwoOctaves ? '15' : '8'
@@ -3186,12 +3186,12 @@ export default function (scenarios) {
       return isVerticalCorrection(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
-      const lastArticulationParamsValue = lastArticulationParams(lastChordParamsValue)
-      lastArticulationParamsValue.yCorrection = verticalCorrection(tokenValues)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
+      const lastArticulationParamsValue = getLastArticulationParams(lastChordParamsValue)
+      lastArticulationParamsValue.yCorrection = parseVerticalCorrection(tokenValues)
       const currentNumberOfMeasures = parserState.pageSchema.measuresParams.length
       const currentNumberOfStaves = lastMeasureParamsValue.stavesParams.length
       const currentNumberOfVoices = lastStaveParamsValue.voicesParams.length
@@ -3227,10 +3227,10 @@ export default function (scenarios) {
       return regexps.withTremolo.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
       lastChordParamsValue.tremoloParams = {
         type: 'single'
       }
@@ -3277,10 +3277,10 @@ export default function (scenarios) {
       return regexps.withNext.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
       lastChordParamsValue.tremoloParams.type = 'withNext'
       const currentNumberOfMeasures = parserState.pageSchema.measuresParams.length
       const currentNumberOfStaves = lastMeasureParamsValue.stavesParams.length
@@ -3317,11 +3317,11 @@ export default function (scenarios) {
       return isNumberOfStrokes(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
-      lastChordParamsValue.tremoloParams.customNumberOfTremoloStrokes = numberOfStrokes(tokenValues)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
+      lastChordParamsValue.tremoloParams.customNumberOfTremoloStrokes = parseNumberOfStrokes(tokenValues)
       const currentNumberOfMeasures = parserState.pageSchema.measuresParams.length
       const currentNumberOfStaves = lastMeasureParamsValue.stavesParams.length
       const currentNumberOfVoices = lastStaveParamsValue.voicesParams.length
@@ -3357,10 +3357,10 @@ export default function (scenarios) {
       return regexps.repeat.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
       parserState.numberOfSimileMarks += 1
       lastChordParamsValue.simileMark = {
         refId: `simile-mark-${parserState.numberOfSimileMarks}`,
@@ -3390,10 +3390,10 @@ export default function (scenarios) {
     },
     itIsNewCommandProgressionFromLevel: 1,
     actionWhenProgressionOfCommandsChanges: (parserState, scenarioNameThatChangedCommandsProgression, lineNumber, argumentsFromMainAction) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
       const currentNumberOfMeasures = parserState.pageSchema.measuresParams.length
       const currentNumberOfStaves = lastMeasureParamsValue.stavesParams.length
       const currentNumberOfVoices = lastStaveParamsValue.voicesParams.length
@@ -3430,11 +3430,11 @@ export default function (scenarios) {
       return isNumberOfTimes(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
-      lastChordParamsValue.simileMark.count = numberOfTimes(tokenValues)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
+      lastChordParamsValue.simileMark.count = parseNumberOfTimes(tokenValues)
       if (parserState.applyHighlighting) {
         const joinedTokenValuesWithRealDelimitersWithHighlightedNumber = joinedTokenValuesWithRealDelimiters.replace(
           regexps.simileCountHighlight, (match) => {
@@ -3466,11 +3466,11 @@ export default function (scenarios) {
       return isVerticalCorrection(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
-      lastChordParamsValue.simileMark.yCorrection = verticalCorrection(tokenValues)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
+      lastChordParamsValue.simileMark.yCorrection = parseVerticalCorrection(tokenValues)
       if (parserState.applyHighlighting) {
         const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
           regexps.verticalCorrectionHighlight, (match) => {
@@ -3501,10 +3501,10 @@ export default function (scenarios) {
       return regexps.withDynamic.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
       const dynamicTextValue = regexps.withDynamic.match(tokenValues)[0]
       lastChordParamsValue.articulationParams = lastChordParamsValue.articulationParams || []
       const newArticulationParams = {
@@ -3566,7 +3566,7 @@ export default function (scenarios) {
       return isAboveBelowOverUnder(tokenValues) &&
         !regexps.staveWithAndWithoutDelimeter.test(
           [
-            foundNextTokenValueOnTheLine(
+            findNextTokenValueOnTheLine(
               unitext,
               currentToken.firstCharIndexOfNextToken
             )
@@ -3574,12 +3574,12 @@ export default function (scenarios) {
         )
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
-      const lastArticulationParamsValue = lastArticulationParams(lastChordParamsValue)
-      lastArticulationParamsValue.direction = directionByAboveBelowOverUnder(tokenValues)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
+      const lastArticulationParamsValue = getLastArticulationParams(lastChordParamsValue)
+      lastArticulationParamsValue.direction = parseDirectionByAboveBelowOverUnder(tokenValues)
       if (parserState.applyHighlighting) {
         // no highlights needed
         parserState.highlightsHtmlBuffer.push(joinedTokenValuesWithRealDelimiters)
@@ -3599,12 +3599,12 @@ export default function (scenarios) {
       return isAboveBelowOverUnderStaveLines(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
-      const lastArticulationParamsValue = lastArticulationParams(lastChordParamsValue)
-      lastArticulationParamsValue.direction = directionByAboveBelowOverUnderStaveLines(tokenValues)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
+      const lastArticulationParamsValue = getLastArticulationParams(lastChordParamsValue)
+      lastArticulationParamsValue.direction = parseDirectionByAboveBelowOverUnderStaveLines(tokenValues)
       const currentNumberOfMeasures = parserState.pageSchema.measuresParams.length
       if (parserState.applyHighlighting) {
         const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
@@ -3637,12 +3637,12 @@ export default function (scenarios) {
       return isDirection(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
-      const lastArticulationParamsValue = lastArticulationParams(lastChordParamsValue)
-      lastArticulationParamsValue.direction = direction(tokenValues)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
+      const lastArticulationParamsValue = getLastArticulationParams(lastChordParamsValue)
+      lastArticulationParamsValue.direction = parseDirection(tokenValues)
       if (parserState.applyHighlighting) {
         // no highlights needed
         parserState.highlightsHtmlBuffer.push(joinedTokenValuesWithRealDelimiters)
@@ -3662,12 +3662,12 @@ export default function (scenarios) {
       return isVerticalCorrection(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
-      const lastArticulationParamsValue = lastArticulationParams(lastChordParamsValue)
-      lastArticulationParamsValue.yCorrection = verticalCorrection(tokenValues)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
+      const lastArticulationParamsValue = getLastArticulationParams(lastChordParamsValue)
+      lastArticulationParamsValue.yCorrection = parseVerticalCorrection(tokenValues)
       const currentNumberOfMeasures = parserState.pageSchema.measuresParams.length
       const currentNumberOfStaves = lastMeasureParamsValue.stavesParams.length
       const currentNumberOfVoices = lastStaveParamsValue.voicesParams.length
@@ -3703,10 +3703,10 @@ export default function (scenarios) {
       return regexps.withLyrics.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
       lastChordParamsValue.relatedLyrics = lastChordParamsValue.relatedLyrics || []
       lastChordParamsValue.relatedLyrics.push({})
       const currentNumberOfMeasures = parserState.pageSchema.measuresParams.length
@@ -3752,11 +3752,11 @@ export default function (scenarios) {
       return regexps.textValue.test(tokenValues, false, true)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
-      const lastLyricValue = lastLyric(lastChordParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
+      const lastLyricValue = getLastLyric(lastChordParamsValue)
       const textValue = regexps.textValue.match(tokenValues)[0]
       lastLyricValue.textValue = textValue
       const currentNumberOfMeasures = parserState.pageSchema.measuresParams.length
@@ -3794,11 +3794,11 @@ export default function (scenarios) {
       return regexps.followedByDash.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
-      const lastLyricValue = lastLyric(lastChordParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
+      const lastLyricValue = getLastLyric(lastChordParamsValue)
       lastLyricValue.dashAfter = true
       const currentNumberOfMeasures = parserState.pageSchema.measuresParams.length
       const currentNumberOfStaves = lastMeasureParamsValue.stavesParams.length
@@ -3835,11 +3835,11 @@ export default function (scenarios) {
       return regexps.underscoreStarts.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
-      const lastLyricValue = lastLyric(lastChordParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
+      const lastLyricValue = getLastLyric(lastChordParamsValue)
       lastLyricValue.underscoreStarts = true
       const currentNumberOfMeasures = parserState.pageSchema.measuresParams.length
       const currentNumberOfStaves = lastMeasureParamsValue.stavesParams.length
@@ -3876,11 +3876,11 @@ export default function (scenarios) {
       return regexps.underscoreFinishes.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
-      const lastLyricValue = lastLyric(lastChordParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
+      const lastLyricValue = getLastLyric(lastChordParamsValue)
       lastLyricValue.underscoreFinishes = true
       const currentNumberOfMeasures = parserState.pageSchema.measuresParams.length
       const currentNumberOfStaves = lastMeasureParamsValue.stavesParams.length
@@ -3917,12 +3917,12 @@ export default function (scenarios) {
       return isVerticalCorrection(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
-      const lastLyricValue = lastLyric(lastChordParamsValue)
-      lastLyricValue.yCorrection = verticalCorrection(tokenValues)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
+      const lastLyricValue = getLastLyric(lastChordParamsValue)
+      lastLyricValue.yCorrection = parseVerticalCorrection(tokenValues)
       const currentNumberOfMeasures = parserState.pageSchema.measuresParams.length
       const currentNumberOfStaves = lastMeasureParamsValue.stavesParams.length
       const currentNumberOfVoices = lastStaveParamsValue.voicesParams.length
@@ -3957,7 +3957,7 @@ export default function (scenarios) {
       return regexps.withPedal.test(tokenValues) &&
         !regexps.release.test(
           [
-            foundNextTokenValueOnTheLine(
+            findNextTokenValueOnTheLine(
               unitext,
               currentToken.firstCharIndexOfNextToken
             )
@@ -3966,10 +3966,10 @@ export default function (scenarios) {
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       parserState.numberOfPedalMarks += 1
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
       lastChordParamsValue.pedalMark = {
         key: `pedal-${parserState.numberOfPedalMarks}`,
         textValue: 'Ped.',
@@ -4047,11 +4047,11 @@ export default function (scenarios) {
       return isStaveIndex(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
-      const staveIndex = staveIndexByTokens(tokenValues, true)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
+      const staveIndex = parseStaveIndexByTokens(tokenValues, true)
       lastChordParamsValue.pedalMark.underStaveIndex = staveIndex
       const numberOfMeasures = parserState.pageSchema.measuresParams.length
       if (parserState.applyHighlighting) {
@@ -4085,11 +4085,11 @@ export default function (scenarios) {
       return isVerticalCorrection(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
-      lastChordParamsValue.pedalMark.yCorrection = verticalCorrection(tokenValues)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
+      lastChordParamsValue.pedalMark.yCorrection = parseVerticalCorrection(tokenValues)
       const currentNumberOfMeasures = parserState.pageSchema.measuresParams.length
       const currentNumberOfStaves = lastMeasureParamsValue.stavesParams.length
       const currentNumberOfVoices = lastStaveParamsValue.voicesParams.length
@@ -4126,10 +4126,10 @@ export default function (scenarios) {
       return regexps.text.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
       lastChordParamsValue.pedalMark.textValue = regexps.text.match(tokenValues)[0]
       if (parserState.applyHighlighting) {
         const joinedTokenValuesWithRealDelimitersWithHighlightedString = joinedTokenValuesWithRealDelimiters.replace(
@@ -4163,10 +4163,10 @@ export default function (scenarios) {
       return regexps.opensWithBracket.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
       lastChordParamsValue.pedalMark.textValue = undefined
       lastChordParamsValue.pedalMark.withBrackets = true
       lastChordParamsValue.pedalMark.finish = false
@@ -4201,10 +4201,10 @@ export default function (scenarios) {
       return regexps.afterBefore.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
       const pedalPositionToTheChord = regexps.afterBefore.match(tokenValues)[0]
       if (pedalPositionToTheChord === 'after') {
         lastChordParamsValue.pedalMark.afterUnit = true
@@ -4229,10 +4229,10 @@ export default function (scenarios) {
       return regexps.withVariablePeak.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
       if (parserState[`lastStartPedalMark-${parserState.numberOfPedalMarks}`]) {
         parserState[`lastStartPedalMark-${parserState.numberOfPedalMarks}`].finish = false
         parserState[`lastStartPedalMark-${parserState.numberOfPedalMarks}`].withBrackets = true
@@ -4284,10 +4284,10 @@ export default function (scenarios) {
       return regexps.afterBefore.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
       const variablePeakPositionToTheChord = regexps.afterBefore.match(tokenValues)[0]
       if (variablePeakPositionToTheChord === 'after') {
         lastChordParamsValue.pedalMark.afterUnit = true
@@ -4314,10 +4314,10 @@ export default function (scenarios) {
       return regexps.text.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
       lastChordParamsValue.pedalMark.textValue = regexps.text.match(tokenValues)[0]
       const currentNumberOfMeasures = parserState.pageSchema.measuresParams.length
       const currentNumberOfStaves = lastMeasureParamsValue.stavesParams.length
@@ -4353,10 +4353,10 @@ export default function (scenarios) {
       return regexps.withRelease.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
       if (parserState[`lastStartPedalMark-${parserState.numberOfPedalMarks}`]) {
         parserState[`lastStartPedalMark-${parserState.numberOfPedalMarks}`].finish = false
       }
@@ -4405,7 +4405,7 @@ export default function (scenarios) {
         !regexps.afterMeasure.test(
           [
             currentToken.value,
-            foundNextTokenValueOnTheLine(
+            findNextTokenValueOnTheLine(
               unitext,
               currentToken.firstCharIndexOfNextToken
             )
@@ -4413,10 +4413,10 @@ export default function (scenarios) {
         )
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
       const releasePositionToTheChord = regexps.afterBefore.match(tokenValues)[0]
       if (releasePositionToTheChord === 'after') {
         lastChordParamsValue.pedalMark.afterUnit = true
@@ -4443,10 +4443,10 @@ export default function (scenarios) {
       return regexps.bracket.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
       lastChordParamsValue.pedalMark.withBrackets = true
       lastChordParamsValue.pedalMark.withBracketClosure = true
       lastChordParamsValue.pedalMark.release = false
@@ -4482,10 +4482,10 @@ export default function (scenarios) {
       return regexps.atTheEndOfTheMeasure.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
       lastChordParamsValue.pedalMark.atEndOfMeasure = true
       lastChordParamsValue.pedalMark.finish = true
       if (lastChordParamsValue.pedalMark.withBrackets) {
@@ -4524,10 +4524,10 @@ export default function (scenarios) {
       return regexps.afterMeasure.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
       lastChordParamsValue.pedalMark.atEndOfMeasure = true
       lastChordParamsValue.pedalMark.tillEndOfMeasure = true
       lastChordParamsValue.pedalMark.release = false
@@ -4565,11 +4565,11 @@ export default function (scenarios) {
       return isHorizontalCorrection(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
-      lastChordParamsValue.relatedXCorrection = horizontalCorrection(tokenValues)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
+      lastChordParamsValue.relatedXCorrection = parseHorizontalCorrection(tokenValues)
       const currentNumberOfMeasures = parserState.pageSchema.measuresParams.length
       const currentNumberOfStaves = lastMeasureParamsValue.stavesParams.length
       const currentNumberOfVoices = lastStaveParamsValue.voicesParams.length

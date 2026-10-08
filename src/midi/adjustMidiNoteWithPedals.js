@@ -1,6 +1,6 @@
 'use strict'
 
-import allConnectedTracks from '#msq/midi/allConnectedTracks.js'
+import findAllConnectedTracks from '#msq/midi/findAllConnectedTracks.js'
 
 const MIDI_CC_FACTOR = 127
 
@@ -11,7 +11,7 @@ export default function (repertoireNote, midiNote, tracksForEachInstrumentOnEach
   if (!repertoireNote.pedalMark) {
     return
   }
-  const allConnectedTracksWithNote = allConnectedTracks(repertoireNote, tracksForEachInstrumentOnEachStaveInEachVoice)
+  const allConnectedTracksWithNote = findAllConnectedTracks(repertoireNote, tracksForEachInstrumentOnEachStaveInEachVoice)
 
   for (let trackIndex = 0; trackIndex < allConnectedTracksWithNote.length; trackIndex++) {
     if (

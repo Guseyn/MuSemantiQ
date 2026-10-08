@@ -54,7 +54,7 @@ header; rerun it after changing that source or the music fonts.
 
 The phrase is inlined rather than given to an `<img>` because the animation
 works on the parts the engine named — `stavePiece`, each `singleUnit`,
-`beamLines` — and an image has no parts.
+`beams` — and an image has no parts.
 
 "How it works" walks one small page through the pipeline, and everything it
 shows is the engine's own output:
@@ -62,7 +62,7 @@ shows is the engine's own output:
     npm run docs:pipeline
 
 runs `scripts/generate-landing-pipeline.js`, which writes every intermediate
-structure, the page styles, the MIDI timing maps, the MusicXML and the
+structure, the page styles, the MIDI timing maps and the
 highlighted source into `static/md/landing/pipeline/`, and the score, a piano
 roll of the MIDI and the MIDI file itself into `static/images/pipeline/`. They
 are committed; rerun it after changing the example in that script or the

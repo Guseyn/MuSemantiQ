@@ -1,7 +1,7 @@
 'use strict'
 
 import initNewMeasureParamsIfThereIsAlreadySuchMeasurePropertyOrNoMeasuresAtAll from '#msq/language/parser/scenarios/page-schema/initNewMeasureParamsIfThereIsAlreadySuchMeasurePropertyOrNoMeasuresAtAll.js'
-import lastMeasureParams from '#msq/language/parser/scenarios/page-schema/lastMeasureParams.js'
+import getLastMeasureParams from '#msq/language/parser/scenarios/page-schema/getLastMeasureParams.js'
 import openingBarLines from '#msq/language/parser/scenarios/static-objects/openingBarLines.js'
 import closingBarLines from '#msq/language/parser/scenarios/static-objects/closingBarLines.js'
 import regexps from '#msq/language/parser/scenarios/static-objects/regexps.js'
@@ -15,7 +15,7 @@ export default function (scenarios) {
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       initNewMeasureParamsIfThereIsAlreadySuchMeasurePropertyOrNoMeasuresAtAll(parserState.pageSchema, 'withoutStartBarLine', parserState)
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
       lastMeasureParamsValue.withoutStartBarLine = true
       const numberOfMeasures = parserState.pageSchema.measuresParams.length
       if (parserState.applyHighlighting) {
@@ -49,7 +49,7 @@ export default function (scenarios) {
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       initNewMeasureParamsIfThereIsAlreadySuchMeasurePropertyOrNoMeasuresAtAll(parserState.pageSchema, 'openingBarLineName', parserState)
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
       const openingBarLineName = regexps.openingBarLine.match(tokenValues)[0]
       const openingBarLine = openingBarLines[openingBarLineName]
       lastMeasureParamsValue.openingBarLineName = openingBarLine
@@ -85,7 +85,7 @@ export default function (scenarios) {
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       initNewMeasureParamsIfThereIsAlreadySuchMeasurePropertyOrNoMeasuresAtAll(parserState.pageSchema, 'closingBarLineName', parserState)
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
       const closingBarLineName = regexps.closingBarLine.match(tokenValues)[0]
       const closingBarLine = closingBarLines[closingBarLineName]
       lastMeasureParamsValue.closingBarLineName = closingBarLine

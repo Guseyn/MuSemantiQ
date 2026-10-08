@@ -1,21 +1,21 @@
 'use strict'
 
-import theSameScenarioButWithDifferentRequiredCommandProgression from '#msq/language/parser/scenarios/theSameScenarioButWithDifferentRequiredCommandProgression.js'
+import copyScenarioWithDifferentRequiredCommandProgression from '#msq/language/parser/scenarios/copyScenarioWithDifferentRequiredCommandProgression.js'
 import initNewMeasureParamsIfThereIsAlreadySuchMeasurePropertyOrNoMeasuresAtAll from '#msq/language/parser/scenarios/page-schema/initNewMeasureParamsIfThereIsAlreadySuchMeasurePropertyOrNoMeasuresAtAll.js'
 import initNewStaveParamsIfThereIsAlreadySuchStavePropertyOrNoStavesAtAll from '#msq/language/parser/scenarios/page-schema/initNewStaveParamsIfThereIsAlreadySuchStavePropertyOrNoStavesAtAll.js'
 import initNewVoiceParamsIfThereIsNoVoicesAtAllAndInitNewChordParamsIfThereIsAlreadySuchChordProperty from '#msq/language/parser/scenarios/page-schema/initNewVoiceParamsIfThereIsNoVoicesAtAllAndInitNewChordParamsIfThereIsAlreadySuchChordProperty.js'
-import lastMeasureParams from '#msq/language/parser/scenarios/page-schema/lastMeasureParams.js'
-import lastStaveParams from '#msq/language/parser/scenarios/page-schema/lastStaveParams.js'
-import lastVoiceParams from '#msq/language/parser/scenarios/page-schema/lastVoiceParams.js'
-import lastNonSimileChordParams from '#msq/language/parser/scenarios/page-schema/lastNonSimileChordParams.js'
-import lastParentheses from '#msq/language/parser/scenarios/page-schema/lastParentheses.js'
+import getLastMeasureParams from '#msq/language/parser/scenarios/page-schema/getLastMeasureParams.js'
+import getLastStaveParams from '#msq/language/parser/scenarios/page-schema/getLastStaveParams.js'
+import getLastVoiceParams from '#msq/language/parser/scenarios/page-schema/getLastVoiceParams.js'
+import findLastNonSimileChordParams from '#msq/language/parser/scenarios/page-schema/findLastNonSimileChordParams.js'
+import getLastParentheses from '#msq/language/parser/scenarios/page-schema/getLastParentheses.js'
 import regexps from '#msq/language/parser/scenarios/static-objects/regexps.js'
 import stavePositions from '#msq/language/parser/scenarios/static-objects/stavePositions.js'
 import isNoteIndex from '#msq/language/parser/scenarios/token/isNoteIndex.js'
-import noteIndexByTokens from '#msq/language/parser/scenarios/token/noteIndexByTokens.js'
-import foundNextTokenValueOnTheLine from '#msq/language/parser/scenarios/token/foundNextTokenValueOnTheLine.js'
+import parseNoteIndexByTokens from '#msq/language/parser/scenarios/token/parseNoteIndexByTokens.js'
+import findNextTokenValueOnTheLine from '#msq/language/parser/scenarios/token/findNextTokenValueOnTheLine.js'
 import isDirection from '#msq/language/parser/scenarios/token/isDirection.js'
-import direction from '#msq/language/parser/scenarios/token/direction.js'
+import parseDirection from '#msq/language/parser/scenarios/token/parseDirection.js'
 import noteDurations from '#msq/language/parser/scenarios/static-objects/noteDurations.js'
 
 const defaultChordDuration = 1 / 4
@@ -28,7 +28,7 @@ export default function (scenarios) {
       return regexps.chordWithDuration.test(tokenValues)
         && !regexps.letters.test(
           [
-            foundNextTokenValueOnTheLine(
+            findNextTokenValueOnTheLine(
               unitext, currentToken.firstCharIndexOfNextToken
             )
           ]
@@ -36,16 +36,16 @@ export default function (scenarios) {
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       initNewMeasureParamsIfThereIsAlreadySuchMeasurePropertyOrNoMeasuresAtAll(parserState.pageSchema, 'stavesParams', parserState)
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
       initNewStaveParamsIfThereIsAlreadySuchStavePropertyOrNoStavesAtAll(lastMeasureParamsValue, 'voicesParams', parserState)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
       initNewVoiceParamsIfThereIsNoVoicesAtAllAndInitNewChordParamsIfThereIsAlreadySuchChordProperty(lastStaveParamsValue, 'notes')
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
       const unitDuration = noteDurations[regexps.chordWithDuration.match(tokenValues)[0]]
       lastVoiceParamsValue.push({
         notes: []
       })
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
       const currentNumberOfMeasures = parserState.pageSchema.measuresParams.length
       const currentNumberOfStaves = lastMeasureParamsValue.stavesParams.length
       const currentNumberOfVoices = lastStaveParamsValue.voicesParams.length
@@ -93,10 +93,10 @@ export default function (scenarios) {
         parserState.chordScopeIsActive = false
       }
 
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
       const currentNumberOfStaves = lastMeasureParamsValue.stavesParams.length
       const currentNumberOfVoices = lastStaveParamsValue.voicesParams.length
       if (!parserState.lastBeamStatus[currentNumberOfStaves - 1]) {
@@ -183,8 +183,8 @@ export default function (scenarios) {
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       const stavePositionName = regexps.stavePosition.match(tokenValues)[0]
       const stavePosition = stavePositions[stavePositionName]
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
       const currentNumberOfMeasures = parserState.pageSchema.measuresParams.length
       const currentNumberOfStaves = lastMeasureParamsValue.stavesParams.length
       const currentNumberOfVoices = lastStaveParamsValue.voicesParams.length
@@ -228,10 +228,10 @@ export default function (scenarios) {
       return regexps.withParentheses.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
       lastChordParamsValue.parentheses = lastChordParamsValue.parentheses || []
       lastChordParamsValue.parentheses.push({
         appliedToWholeUnit: true
@@ -292,9 +292,9 @@ export default function (scenarios) {
     },
     itIsNewCommandProgressionFromLevel: 2,
     actionWhenProgressionOfCommandsChanges: (parserState, scenarioNameThatChangedCommandsProgression, lineNumber, argumentsFromMainAction) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
       const currentNumberOfMeasures = parserState.pageSchema.measuresParams.length
       const currentNumberOfStaves = lastMeasureParamsValue.stavesParams.length
       const currentNumberOfVoices = lastStaveParamsValue.voicesParams.length
@@ -320,12 +320,12 @@ export default function (scenarios) {
       return isNoteIndex(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
-      const lastChordParenthesesValue = lastParentheses(lastChordParamsValue)
-      const noteIndex = noteIndexByTokens(tokenValues, true)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
+      const lastChordParenthesesValue = getLastParentheses(lastChordParamsValue)
+      const noteIndex = parseNoteIndexByTokens(tokenValues, true)
       if (noteIndex !== undefined) {
         lastChordParenthesesValue.appliedToWholeUnit = false
         lastChordParenthesesValue.fromNoteIndex = noteIndex
@@ -373,9 +373,9 @@ export default function (scenarios) {
     },
     itIsNewCommandProgressionFromLevel: 2,
     actionWhenProgressionOfCommandsChanges: (parserState, scenarioNameThatChangedCommandsProgression, lineNumber, argumentsFromMainAction) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
       const currentNumberOfMeasures = parserState.pageSchema.measuresParams.length
       const currentNumberOfStaves = lastMeasureParamsValue.stavesParams.length
       const currentNumberOfVoices = lastStaveParamsValue.voicesParams.length
@@ -406,12 +406,12 @@ export default function (scenarios) {
       return isNoteIndex(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
-      const lastChordParenthesesValue = lastParentheses(lastChordParamsValue)
-      const noteIndex = noteIndexByTokens(tokenValues, true)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
+      const lastChordParenthesesValue = getLastParentheses(lastChordParamsValue)
+      const noteIndex = parseNoteIndexByTokens(tokenValues, true)
       if (noteIndex !== undefined) {
         lastChordParenthesesValue.appliedToWholeUnit = false
         lastChordParenthesesValue.toNoteIndex = noteIndex
@@ -451,8 +451,8 @@ export default function (scenarios) {
       return regexps.isGhost.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
       const currentNumberOfStaves = lastMeasureParamsValue.stavesParams.length
       const currentNumberOfVoices = lastStaveParamsValue.voicesParams.length
       if (!parserState.lastGhostStatus[currentNumberOfStaves - 1]) {
@@ -477,8 +477,8 @@ export default function (scenarios) {
       return regexps.isNotGhost.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
       const currentNumberOfStaves = lastMeasureParamsValue.stavesParams.length
       const currentNumberOfVoices = lastStaveParamsValue.voicesParams.length
       if (!parserState.lastGhostStatus[currentNumberOfStaves - 1]) {
@@ -503,10 +503,10 @@ export default function (scenarios) {
       return regexps.arpeggiated.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
       lastChordParamsValue.arpeggiated = { }
       const currentNumberOfMeasures = parserState.pageSchema.measuresParams.length
       const currentNumberOfStaves = lastMeasureParamsValue.stavesParams.length
@@ -550,10 +550,10 @@ export default function (scenarios) {
       return regexps.withChordBelow.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
       lastChordParamsValue.arpeggiated.isConnectedWithNextChord = true
       const currentNumberOfMeasures = parserState.pageSchema.measuresParams.length
       const currentNumberOfStaves = lastMeasureParamsValue.stavesParams.length
@@ -589,10 +589,10 @@ export default function (scenarios) {
       return regexps.withArrow.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
       lastChordParamsValue.arpeggiated.arrow = 'up'
       const currentNumberOfMeasures = parserState.pageSchema.measuresParams.length
       const currentNumberOfStaves = lastMeasureParamsValue.stavesParams.length
@@ -628,11 +628,11 @@ export default function (scenarios) {
       return isDirection(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-      const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-      const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
-      lastChordParamsValue.arpeggiated.arrow = direction(tokenValues)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+      const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+      const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
+      lastChordParamsValue.arpeggiated.arrow = parseDirection(tokenValues)
       if (parserState.applyHighlighting) {
         // no highlights needed
         parserState.highlightsHtmlBuffer.push(joinedTokenValuesWithRealDelimiters)
@@ -688,10 +688,10 @@ export default function (scenarios) {
     actionWhenProgressionOfCommandsChanges: (parserState, scenarioNameThatChangedCommandsProgression, lineNumber, argumentsFromMainAction) => {
       if (parserState.lastNoteTextPositionApplicationToNote === undefined) {
         parserState.lastNoteTextPositionApplicationToNote = true
-        const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-        const lastStaveParamsValue = lastStaveParams(lastMeasureParamsValue)
-        const lastVoiceParamsValue = lastVoiceParams(lastStaveParamsValue)
-        const lastChordParamsValue = lastNonSimileChordParams(lastVoiceParamsValue)
+        const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+        const lastStaveParamsValue = getLastStaveParams(lastMeasureParamsValue)
+        const lastVoiceParamsValue = getLastVoiceParams(lastStaveParamsValue)
+        const lastChordParamsValue = findLastNonSimileChordParams(lastVoiceParamsValue)
         lastChordParamsValue.articulationParams = lastChordParamsValue.articulationParams || []
         const newArticulationParams = {
           name: 'noteLetter',
@@ -719,334 +719,334 @@ export default function (scenarios) {
     },
     activateActionWhenProgressionOfCommandsChangesIfItIsLastTokenAndActionDidntHappenBefore: true
   }
-  scenarios['chord with text up or down'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with text up or down'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with text up or down'], 'chord with text'
   )
-  scenarios['chord with text above or below'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with text above or below'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with text above or below'], 'chord with text'
   )
-  scenarios['chord with text above or below stave'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with text above or below stave'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with text above or below stave'], 'chord with text'
   )
-  scenarios['chord with text up or down vertical correction'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with text up or down vertical correction'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with text up or down vertical correction'], 'chord with text up or down'
   )
-  scenarios['chord with text above or below vertical correction'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with text above or below vertical correction'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with text above or below vertical correction'], 'chord with text above or below'
   )
-  scenarios['chord with text above or below stave vertical correction'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with text above or below stave vertical correction'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with text above or below stave vertical correction'], 'chord with text above or below stave'
   )
-  scenarios['chord with number of dots'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with number of dots'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with number of dots'], 'chord'
   )
-  scenarios['dotted chord'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['dotted chord'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['dotted note'], 'chord'
   )
-  scenarios['chord stem direction'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord stem direction'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note stem direction'], 'chord'
   )
-  scenarios['chord beamed'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord beamed'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note beamed'], 'chord'
   )
-  scenarios['chord not beamed'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord not beamed'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note not beamed'], 'chord'
   )
-  scenarios['chord beamed with next'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord beamed with next'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note beamed with next'], 'chord beamed'
   )
-  scenarios['chord not beamed with next'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord not beamed with next'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note not beamed with next'], 'chord not beamed'
   )
-  scenarios['chord beamed with only primary line'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord beamed with only primary line'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note beamed with only primary line'], 'chord beamed'
   )
-  scenarios['chord is tied with next'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord is tied with next'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note is tied with next'], 'chord'
   )
-  scenarios['chord is tied before'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord is tied before'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note is tied before'], 'chord'
   )
-  scenarios['chord is tied before measure number'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord is tied before measure number'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note is tied before measure number'], 'chord is tied before'
   )
-  scenarios['chord is tied after'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord is tied after'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note is tied after'], 'chord'
   )
-  scenarios['chord is tied after measure number'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord is tied after measure number'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note is tied after measure number'], 'chord is tied after'
   )
-  scenarios['chord tied with next direction'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord tied with next direction'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note tied with next direction'], 'chord is tied with next'
   )
-  scenarios['chord tied with next above or below'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord tied with next above or below'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note tied with next above or below'], 'chord is tied with next'
   )
-  scenarios['chord tied before direction'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord tied before direction'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note tied before direction'], 'chord is tied before'
   )
-  scenarios['chord tied before above or below'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord tied before above or below'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note tied before above or below'], 'chord is tied before'
   )
-  scenarios['chord tied after direction'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord tied after direction'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note tied after direction'], 'chord is tied after'
   )
-  scenarios['chord tied after above or below'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord tied after above or below'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note tied after above or below'], 'chord is tied after'
   )
-  scenarios['chord tied with next roundness'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord tied with next roundness'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note tied with next roundness'], 'chord is tied with next'
   )
-  scenarios['chord tied before roundness'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord tied before roundness'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note tied before roundness'], 'chord is tied before'
   )
-  scenarios['chord tied after roundness'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord tied after roundness'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note tied after roundness'], 'chord is tied after'
   )
-  scenarios['chord with glissando'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with glissando'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with glissando'], 'chord'
   )
-  scenarios['chord with glissando direction'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with glissando direction'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with glissando direction'], 'chord with glissando'
   )
-  scenarios['chord with glissando after'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with glissando after'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with glissando after'], 'chord with glissando'
   )
-  scenarios['chord with glissando before'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with glissando before'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with glissando before'], 'chord with glissando'
   )
-  scenarios['chord with glissando after measure number'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with glissando after measure number'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with glissando after measure number'], 'chord with glissando after'
   )
-  scenarios['chord with glissando before measure number'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with glissando before measure number'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with glissando after measure number'], 'chord with glissando before'
   )
-  scenarios['chord is grace'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord is grace'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note is grace'], 'chord'
   )
-  scenarios['chord with crushed grace'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with crushed grace'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with crushed grace'], 'chord is grace'
   )
-  scenarios['chord is rest'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord is rest'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note is rest'], 'chord'
   )
-  scenarios['chord is centralized'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord is centralized'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note is centralized'], 'chord'
   )
-  scenarios['chord with breath mark before'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with breath mark before'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with breath mark before'], 'chord'
   )
-  scenarios['chord with breath mark before vertical correction'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with breath mark before vertical correction'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with breath mark before vertical correction'], 'chord with breath mark before'
   )
-  scenarios['chord with key signature before'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with key signature before'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with key signature before'], 'chord'
   )
-  scenarios['chord with clef before'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with clef before'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with clef before'], 'chord'
   )
-  scenarios['chord with clef and key signature before'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with clef and key signature before'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with clef before'], 'chord'
   )
-  scenarios['chord with articulation'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with articulation'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with articulation'], 'chord'
   )
-  scenarios['chord with turn'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with turn'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with turn'], 'chord'
   )
-  scenarios['chord with mordent'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with mordent'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with mordent'], 'chord'
   )
-  scenarios['chord with trill'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with trill'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with trill'], 'chord'
   )
-  scenarios['chord with articulation direction'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with articulation direction'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with articulation direction'], 'chord with articulation'
   )
-  scenarios['chord with turn direction'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with turn direction'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with turn direction'], 'chord with turn'
   )
-  scenarios['chord with mordent direction'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with mordent direction'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with mordent direction'], 'chord with mordent'
   )
-  scenarios['chord with trill direction'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with trill direction'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with trill direction'], 'chord with trill'
   )
-  scenarios['chord with articulation above or below'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with articulation above or below'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with articulation above or below'], 'chord with articulation'
   )
-  scenarios['chord with turn above or below'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with turn above or below'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with turn above or below'], 'chord with turn'
   )
-  scenarios['chord with mordent above or below'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with mordent above or below'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with mordent above or below'], 'chord with mordent'
   )
-  scenarios['chord with trill above or below'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with trill above or below'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with trill above or below'], 'chord with trill'
   )
-  scenarios['chord with articulation above or below stave'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with articulation above or below stave'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with articulation above or below stave'], 'chord with articulation'
   )
-  scenarios['chord with turn above or below stave'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with turn above or below stave'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with turn above or below stave'], 'chord with turn'
   )
-  scenarios['chord with mordent above or below stave'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with mordent above or below stave'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with mordent above or below stave'], 'chord with mordent'
   )
-  scenarios['chord with trill above or below stave'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with trill above or below stave'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with trill above or below stave'], 'chord with trill'
   )
-  scenarios['chord with turn key above or below'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with turn key above or below'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with turn key above or below'], 'chord with turn'
   )
-  scenarios['chord with mordent key above or below'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with mordent key above or below'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with mordent key above or below'], 'chord with mordent'
   )
-  scenarios['chord with trill key above or below'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with trill key above or below'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with trill key above or below'], 'chord with trill'
   )
-  scenarios['chord with turn after'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with turn after'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with turn after'], 'chord with turn'
   )
-  scenarios['chord with turn inverted'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with turn inverted'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with turn inverted'], 'chord with turn'
   )
-  scenarios['chord with trill with wave after'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with trill with wave after'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with trill with wave after'], 'chord with trill'
   )
-  scenarios['chord with articulation vertical correction'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with articulation vertical correction'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with articulation vertical correction'], 'chord with articulation'
   )
-  scenarios['chord with turn vertical correction'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with turn vertical correction'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with turn vertical correction'], 'chord with turn'
   )
-  scenarios['chord with mordent vertical correction'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with mordent vertical correction'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with mordent vertical correction'], 'chord with mordent'
   )
-  scenarios['chord with trill vertical correction'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with trill vertical correction'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with trill vertical correction'], 'chord with trill'
   )
-  scenarios['chord with chord letter'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with chord letter'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with chord letter'], 'chord'
   )
-  scenarios['chord with chord letter direction'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with chord letter direction'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with chord letter direction'], 'chord with chord letter'
   )
-  scenarios['chord with chord letter above or below'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with chord letter above or below'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with chord letter above or below'], 'chord with chord letter'
   )
-  scenarios['chord with chord letter above or below measure'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with chord letter above or below measure'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with chord letter above or below measure'], 'chord with chord letter above or below'
   )
-  scenarios['chord with chord letter vertical correction'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with chord letter vertical correction'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with chord letter vertical correction'], 'chord with chord letter'
   )
-  scenarios['chord with octave sign'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with octave sign'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with octave sign'], 'chord'
   )
-  scenarios['chord with octave sign vertical correction'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with octave sign vertical correction'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with octave sign vertical correction'], 'chord with octave sign'
   )
-  scenarios['chord with tremolo'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with tremolo'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with tremolo'], 'chord'
   )
-  scenarios['chord with tremolo with next'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with tremolo with next'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with tremolo with next'], 'chord with tremolo'
   )
-  scenarios['chord with tremolo number of strokes'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with tremolo number of strokes'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with tremolo number of strokes'], 'chord with tremolo'
   )
-  scenarios['repeat chord'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['repeat chord'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['repeat note'], 'chord'
   )
-  scenarios['repeat chord via simile'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['repeat chord via simile'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['repeat note via simile'], 'repeat chord'
   )
-  scenarios['repeat chord number of times'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['repeat chord number of times'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['repeat note number of times'], 'repeat chord'
   )
-  scenarios['repeat chord vertical correction'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['repeat chord vertical correction'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['repeat note vertical correction'], 'repeat chord'
   )
-  scenarios['chord with dynamic'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with dynamic'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with dynamic'], 'chord'
   )
-  scenarios['chord with dynamic direction'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with dynamic direction'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with dynamic direction'], 'chord with dynamic'
   )
-  scenarios['chord with dynamic above or below'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with dynamic above or below'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with dynamic above or below'], 'chord with dynamic'
   )
-  scenarios['chord with dynamic above or below stave'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with dynamic above or below stave'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with dynamic above or below stave'], 'chord with dynamic'
   )
-  scenarios['chord dynamic vertical correction'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord dynamic vertical correction'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note dynamic vertical correction'], 'chord with dynamic'
   )
-  scenarios['chord with lyrics'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with lyrics'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with lyrics'], 'chord'
   )
-  scenarios['chord with lyrics text value'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with lyrics text value'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with lyrics text value'], 'chord with lyrics'
   )
-  scenarios['chord with lyrics followed by dash'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with lyrics followed by dash'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with lyrics followed by dash'], 'chord with lyrics'
   )
-  scenarios['chord with lyrics where underscore starts'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with lyrics where underscore starts'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with lyrics where underscore starts'], 'chord with lyrics'
   )
-  scenarios['chord with lyrics where underscore finishes'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with lyrics where underscore finishes'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with lyrics where underscore finishes'], 'chord with lyrics'
   )
-  scenarios['chord with lyrics with vertical correction'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with lyrics with vertical correction'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with lyrics with vertical correction'], 'chord with lyrics'
   )
-  scenarios['chord with pedal'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with pedal'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with pedal'], 'chord'
   )
-  scenarios['chord with pedal under'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with pedal under'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with pedal under'], 'chord with pedal'
   )
-  scenarios['chord with pedal under stave index'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with pedal under stave index'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with pedal under stave index'], 'chord with pedal under'
   )
-  scenarios['chord with pedal vertical correction'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with pedal vertical correction'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with pedal vertical correction'], 'chord with pedal'
   )
-  scenarios['chord with pedal text'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with pedal text'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with pedal text'], 'chord with pedal'
   )
-  scenarios['chord with pedal opens with bracket'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with pedal opens with bracket'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with pedal opens with bracket'], 'chord with pedal'
   )
-  scenarios['chord with pedal before|after'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with pedal before|after'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with pedal before|after'], 'chord with pedal'
   )
-  scenarios['chord with variable peak'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with variable peak'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with variable peak'], 'chord'
   )
-  scenarios['chord with variable peak before|after'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with variable peak before|after'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with variable peak before|after'], 'chord with variable peak'
   )
-  scenarios['chord with variable peak text'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with variable peak text'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with variable peak text'], 'chord with variable peak'
   )
-  scenarios['chord with release'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with release'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with release'], 'chord'
   )
-  scenarios['chord with release before|after'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with release before|after'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with release before|after'], 'chord with release'
   )
-  scenarios['chord with release bracket'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with release bracket'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with release bracket'], 'chord with release'
   )
-  scenarios['chord with release at the end of measure'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with release at the end of measure'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with release at the end of measure'], 'chord with release'
   )
-  scenarios['chord with release after measure'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with release after measure'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with release after measure'], 'chord with release'
   )
-  scenarios['chord with horizontal correction'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['chord with horizontal correction'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['note with horizontal correction'], 'chord'
   )
 }

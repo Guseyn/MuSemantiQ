@@ -10,7 +10,7 @@ import {
   generateMidiForSinglePage
 } from '#msq/api.js'
 
-import { base64FromUint8 } from '#msq/utils.js'
+import { convertUint8ToBase64 } from '#msq/utils.js'
 
 import generateUnicodePoints from '#msq/drawer/generateUnicodePoints.js'
 
@@ -197,7 +197,7 @@ const eventHandlers = {
       pageSchema,
       pageStyles
     })
-    const svgDataSrc = `data:image/svg+xml;base64,${base64FromUint8(new TextEncoder().encode(svg))}`
+    const svgDataSrc = `data:image/svg+xml;base64,${convertUint8ToBase64(new TextEncoder().encode(svg))}`
     self.postMessage({
       status: 'ok',
       id,
@@ -244,7 +244,7 @@ const eventHandlers = {
       pageSchema,
       midiSettings
     })
-    const midiDataSrc = `data:audio/mpeg;base64,${base64FromUint8(midi.data)}`
+    const midiDataSrc = `data:audio/mpeg;base64,${convertUint8ToBase64(midi.data)}`
     self.postMessage({
       status: 'ok',
       id,
@@ -320,7 +320,7 @@ const eventHandlers = {
       pageSchema,
       pageStyles
     })
-    const svgDataSrc = `data:image/svg+xml;base64,${base64FromUint8(new TextEncoder().encode(svg))}`
+    const svgDataSrc = `data:image/svg+xml;base64,${convertUint8ToBase64(new TextEncoder().encode(svg))}`
 
     // TODO: this should be already in page schema somehow already
     if (pageSchema && pageSchema.measuresParams) {
@@ -333,7 +333,7 @@ const eventHandlers = {
       pageSchema,
       midiSettings
     })
-    const midiDataSrc = `data:audio/mpeg;base64,${base64FromUint8(midi.data)}`
+    const midiDataSrc = `data:audio/mpeg;base64,${convertUint8ToBase64(midi.data)}`
     const timeStampsMappedWithRefsOn = midi.timeStampsMappedWithRefsOn
     const refsOnMappedWithTimeStamps = midi.refsOnMappedWithTimeStamps
     self.postMessage({
@@ -417,7 +417,7 @@ const eventHandlers = {
       pageSchema,
       pageStyles
     })
-    const svgDataSrc = `data:image/svg+xml;base64,${base64FromUint8(new TextEncoder().encode(svg))}`
+    const svgDataSrc = `data:image/svg+xml;base64,${convertUint8ToBase64(new TextEncoder().encode(svg))}`
 
     // TODO: this should be already in page schema somehow already
     if (pageSchema && pageSchema.measuresParams) {
@@ -430,7 +430,7 @@ const eventHandlers = {
       pageSchema,
       midiSettings
     })
-    const midiDataSrc = `data:audio/mpeg;base64,${base64FromUint8(midi.data)}`
+    const midiDataSrc = `data:audio/mpeg;base64,${convertUint8ToBase64(midi.data)}`
     const timeStampsMappedWithRefsOn = midi.timeStampsMappedWithRefsOn
     const refsOnMappedWithTimeStamps = midi.refsOnMappedWithTimeStamps
     self.postMessage({

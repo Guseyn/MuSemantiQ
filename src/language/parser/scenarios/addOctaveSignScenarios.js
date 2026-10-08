@@ -2,10 +2,10 @@
 
 import regexps from '#msq/language/parser/scenarios/static-objects/regexps.js'
 import isVerticalCorrection from '#msq/language/parser/scenarios/token/isVerticalCorrection.js'
-import verticalCorrection from '#msq/language/parser/scenarios/token/verticalCorrection.js'
-import foundNextTokenValueOnTheLine from '#msq/language/parser/scenarios/token/foundNextTokenValueOnTheLine.js'
-import foundNextTokenValuesOnTheLine from '#msq/language/parser/scenarios/token/foundNextTokenValuesOnTheLine.js'
-import chordParamsByLastMentionedUnitPositions from '#msq/language/parser/scenarios/page-schema/chordParamsByLastMentionedUnitPositions.js'
+import parseVerticalCorrection from '#msq/language/parser/scenarios/token/parseVerticalCorrection.js'
+import findNextTokenValueOnTheLine from '#msq/language/parser/scenarios/token/findNextTokenValueOnTheLine.js'
+import findNextTokenValuesOnTheLine from '#msq/language/parser/scenarios/token/findNextTokenValuesOnTheLine.js'
+import findChordParamsByLastMentionedUnitPositions from '#msq/language/parser/scenarios/page-schema/findChordParamsByLastMentionedUnitPositions.js'
 import undefineAllMentionedPositions from '#msq/language/parser/scenarios/page-schema/undefineAllMentionedPositions.js'
 import undefineOnlyLastMentionedUnitPosition from '#msq/language/parser/scenarios/page-schema/undefineOnlyLastMentionedUnitPosition.js'
 import fillAllPlaceholdersInHighlightsHtmlBufferWithMentionedPositionsWhereItsNeeded from '#msq/language/parser/scenarios/highlights-html-buffer/fillAllPlaceholdersInHighlightsHtmlBufferWithMentionedPositionsWhereItsNeeded.js'
@@ -17,7 +17,7 @@ export default function (scenarios) {
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     startsOnNewLine: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const nextTwoTokens = foundNextTokenValuesOnTheLine(
+      const nextTwoTokens = findNextTokenValuesOnTheLine(
         unitext, currentToken.firstCharIndexOfNextToken, 2
       )
       return regexps.octaveOrTwoOctavesHigherOrLower.test(tokenValues) &&
@@ -81,7 +81,7 @@ export default function (scenarios) {
           regexps.starts.test(tokenValues) &&
           !regexps.from.test(
             [
-              foundNextTokenValueOnTheLine(
+              findNextTokenValueOnTheLine(
                 unitext, currentToken.firstCharIndexOfNextToken
               )
             ]
@@ -111,7 +111,7 @@ export default function (scenarios) {
       if (parserState.lastMentionedUnitPosition === undefined) {
         parserState.errors.push(`unit position after command '${argumentsFromMainAction.joinedTokenValuesWithRealDelimiters}' is not specified on the line number ${argumentsFromMainAction.lineNumber}`)
       } else {
-        const chordParamsValue = chordParamsByLastMentionedUnitPositions(parserState)
+        const chordParamsValue = findChordParamsByLastMentionedUnitPositions(parserState)
         if (!chordParamsValue) {
           parserState.errors.push(`unit after command '${argumentsFromMainAction.joinedTokenValuesWithRealDelimiters}' is not found on the line ${argumentsFromMainAction.lineNumber}`)
         } else {
@@ -157,7 +157,7 @@ export default function (scenarios) {
       if (parserState.lastMentionedUnitPosition === undefined) {
         parserState.errors.push(`unit position after command '${argumentsFromMainAction.joinedTokenValuesWithRealDelimiters}' is not specified on the line number ${argumentsFromMainAction.lineNumber}`)
       } else {
-        const chordParamsValue = chordParamsByLastMentionedUnitPositions(parserState)
+        const chordParamsValue = findChordParamsByLastMentionedUnitPositions(parserState)
         if (!chordParamsValue) {
           parserState.errors.push(`unit after command '${argumentsFromMainAction.joinedTokenValuesWithRealDelimiters}' is not found on the line ${argumentsFromMainAction.lineNumber}`)
         } else {
@@ -185,7 +185,7 @@ export default function (scenarios) {
       return isVerticalCorrection(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      parserState[`lastStartOctaveSignMark-${parserState.numberOfOctaveSignMarks}`].yCorrection = verticalCorrection(tokenValues)
+      parserState[`lastStartOctaveSignMark-${parserState.numberOfOctaveSignMarks}`].yCorrection = parseVerticalCorrection(tokenValues)
       if (parserState.applyHighlighting) {
         const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
           regexps.verticalCorrectionHighlight, (match) => {

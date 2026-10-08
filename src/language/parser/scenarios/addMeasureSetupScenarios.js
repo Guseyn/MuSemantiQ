@@ -1,18 +1,18 @@
 'use strict'
 
 import initMeasureParams from '#msq/language/parser/scenarios/page-schema/initMeasureParams.js'
-import lastMeasureParams from '#msq/language/parser/scenarios/page-schema/lastMeasureParams.js'
+import getLastMeasureParams from '#msq/language/parser/scenarios/page-schema/getLastMeasureParams.js'
 import openingBarLines from '#msq/language/parser/scenarios/static-objects/openingBarLines.js'
 import closingBarLines from '#msq/language/parser/scenarios/static-objects/closingBarLines.js'
-import withNumbersInsteadOfWords from '#msq/language/parser/scenarios/token/withNumbersInsteadOfWords.js'
-import foundNextTokenValueOnTheLine from '#msq/language/parser/scenarios/token/foundNextTokenValueOnTheLine.js'
+import replaceWordsWithNumbers from '#msq/language/parser/scenarios/token/replaceWordsWithNumbers.js'
+import findNextTokenValueOnTheLine from '#msq/language/parser/scenarios/token/findNextTokenValueOnTheLine.js'
 import regexps from '#msq/language/parser/scenarios/static-objects/regexps.js'
 
 export default function (scenarios) {
   scenarios['measure'] = {
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const nextTokenValueOnTheLine = foundNextTokenValueOnTheLine(
+      const nextTokenValueOnTheLine = findNextTokenValueOnTheLine(
         unitext,
         currentToken.firstCharIndexOfNextToken
       )
@@ -70,7 +70,7 @@ export default function (scenarios) {
       return regexps.withoutStartBarLine.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      lastMeasureParams(parserState.pageSchema).withoutStartBarLine = true
+      getLastMeasureParams(parserState.pageSchema).withoutStartBarLine = true
       const numberOfMeasures = parserState.pageSchema.measuresParams.length
       if (parserState.applyHighlighting) {
         const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
@@ -104,7 +104,7 @@ export default function (scenarios) {
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       const openingBarLineName = regexps.opensWithBarLine.match(tokenValues)[0]
       const openingBarLine = openingBarLines[openingBarLineName]
-      lastMeasureParams(parserState.pageSchema).openingBarLineName = openingBarLine
+      getLastMeasureParams(parserState.pageSchema).openingBarLineName = openingBarLine
       const numberOfMeasures = parserState.pageSchema.measuresParams.length
       if (parserState.applyHighlighting) {
         const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
@@ -138,7 +138,7 @@ export default function (scenarios) {
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       const closingBarLineName = regexps.closesWithBarLine.match(tokenValues)[0]
       const closingBarLine = closingBarLines[closingBarLineName]
-      lastMeasureParams(parserState.pageSchema).closingBarLineName = closingBarLine
+      getLastMeasureParams(parserState.pageSchema).closingBarLineName = closingBarLine
       const numberOfMeasures = parserState.pageSchema.measuresParams.length
       if (parserState.applyHighlighting) {
         const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
@@ -194,7 +194,7 @@ export default function (scenarios) {
     },
     itIsNewCommandProgressionFromLevel: 1,
     actionWhenProgressionOfCommandsChanges: (parserState, scenarioNameThatChangedCommandsProgression, lineNumber, argumentsFromMainAction) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
       if (!lastMeasureParamsValue.repeatDotsMarkAtTheStart && !lastMeasureParamsValue.repeatDotsMarkAtTheEnd) {
         lastMeasureParamsValue.repeatDotsMarkAtTheStart = true
         lastMeasureParamsValue.repeatDotsMarkAtTheEnd = true
@@ -215,7 +215,7 @@ export default function (scenarios) {
       return regexps.atTheStart.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      lastMeasureParams(parserState.pageSchema).repeatDotsMarkAtTheStart = true
+      getLastMeasureParams(parserState.pageSchema).repeatDotsMarkAtTheStart = true
       const numberOfMeasures = parserState.pageSchema.measuresParams.length
       if (parserState.applyHighlighting) {
         const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
@@ -248,7 +248,7 @@ export default function (scenarios) {
       return regexps.atTheEnd.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      lastMeasureParams(parserState.pageSchema).repeatDotsMarkAtTheEnd = true
+      getLastMeasureParams(parserState.pageSchema).repeatDotsMarkAtTheEnd = true
       const numberOfMeasures = parserState.pageSchema.measuresParams.length
       if (parserState.applyHighlighting) {
         const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
@@ -280,7 +280,7 @@ export default function (scenarios) {
       return regexps.withMeasureRest.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      lastMeasureParams(parserState.pageSchema).isMeasureRest = true
+      getLastMeasureParams(parserState.pageSchema).isMeasureRest = true
       const numberOfMeasures = parserState.pageSchema.measuresParams.length
       if (parserState.applyHighlighting) {
         const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
@@ -318,13 +318,13 @@ export default function (scenarios) {
     onTheSameLineAsPrevScenario: true,
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const optionsForMeasureRest = withNumbersInsteadOfWords(tokenValues)
+      const optionsForMeasureRest = replaceWordsWithNumbers(tokenValues)
       return regexps.multiMeasureRestCount.test(optionsForMeasureRest)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const optionsForMeasureRest = withNumbersInsteadOfWords(tokenValues)
+      const optionsForMeasureRest = replaceWordsWithNumbers(tokenValues)
       const multiMeasureRestCount = regexps.multiMeasureRestCount.match(optionsForMeasureRest)[0]
-      lastMeasureParams(parserState.pageSchema).multiMeasureRestCount = `${multiMeasureRestCount}`
+      getLastMeasureParams(parserState.pageSchema).multiMeasureRestCount = `${multiMeasureRestCount}`
       const numberOfMeasures = parserState.pageSchema.measuresParams.length
       if (parserState.applyHighlighting) {
         const joinedTokenValuesWithRealDelimitersWithHighlightedNumber = joinedTokenValuesWithRealDelimiters.replace(
@@ -356,7 +356,7 @@ export default function (scenarios) {
       return regexps.measureWithSimileOfPreviousMeasure.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      lastMeasureParams(parserState.pageSchema).similePreviousMeasureCount = '1'
+      getLastMeasureParams(parserState.pageSchema).similePreviousMeasureCount = '1'
       const numberOfMeasures = parserState.pageSchema.measuresParams.length
       if (parserState.applyHighlighting) {
         const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
@@ -404,7 +404,7 @@ export default function (scenarios) {
       return regexps.measureWithSimileOfTwoPreviousMeasures.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      lastMeasureParams(parserState.pageSchema).simileTwoPreviousMeasuresCount = '1'
+      getLastMeasureParams(parserState.pageSchema).simileTwoPreviousMeasuresCount = '1'
       const numberOfMeasures = parserState.pageSchema.measuresParams.length
       if (parserState.applyHighlighting) {
         const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
@@ -450,14 +450,14 @@ export default function (scenarios) {
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       return regexps.simileCount.test(
-        withNumbersInsteadOfWords(tokenValues)
+        replaceWordsWithNumbers(tokenValues)
       )
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       const simileCount = regexps.simileCount.match(
-        withNumbersInsteadOfWords(tokenValues)
+        replaceWordsWithNumbers(tokenValues)
       )[0]
-      lastMeasureParams(parserState.pageSchema).similePreviousMeasureCount = simileCount
+      getLastMeasureParams(parserState.pageSchema).similePreviousMeasureCount = simileCount
       const numberOfMeasures = parserState.pageSchema.measuresParams.length
       if (parserState.applyHighlighting) {
         const joinedTokenValuesWithRealDelimitersWithHighlightedNumber = joinedTokenValuesWithRealDelimiters.replace(
@@ -487,14 +487,14 @@ export default function (scenarios) {
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       return regexps.simileCount.test(
-        withNumbersInsteadOfWords(tokenValues)
+        replaceWordsWithNumbers(tokenValues)
       )
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       const simileCount = regexps.simileCount.match(
-        withNumbersInsteadOfWords(tokenValues)
+        replaceWordsWithNumbers(tokenValues)
       )[0]
-      lastMeasureParams(parserState.pageSchema).simileTwoPreviousMeasuresCount = simileCount
+      getLastMeasureParams(parserState.pageSchema).simileTwoPreviousMeasuresCount = simileCount
       const numberOfMeasures = parserState.pageSchema.measuresParams.length
       if (parserState.applyHighlighting) {
         const joinedTokenValuesWithRealDelimitersWithHighlightedNumber = joinedTokenValuesWithRealDelimiters.replace(
@@ -526,7 +526,7 @@ export default function (scenarios) {
       return regexps.endsWithFermata.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      lastMeasureParams(parserState.pageSchema).endsWithFermata = true
+      getLastMeasureParams(parserState.pageSchema).endsWithFermata = true
       const numberOfMeasures = parserState.pageSchema.measuresParams.length
       if (parserState.applyHighlighting) {
         const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(

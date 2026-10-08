@@ -807,7 +807,7 @@ export default function ({
       ],
       yOffset: 0.46 * intervalBetweenStaveLines
     },
-    measureFermataOffsetY: 0.8 * intervalBetweenStaveLines,
+    barlineFermataOffsetY: 0.8 * intervalBetweenStaveLines,
     marcato: {
       unicode: '',
       upPoints: [
@@ -2351,7 +2351,7 @@ export default function ({
       octaveFifteenUp: 1.7  * intervalBetweenStaveLines,
       octaveFifteenDown: 1.5  * intervalBetweenStaveLines
     },
-    darkNoteBody: {
+    blackNoteHead: {
       unicode: '',
       points: [
         'M',
@@ -2368,7 +2368,7 @@ export default function ({
       ],
       yCorrection: -1.11 * intervalBetweenStaveLines
     },
-    halfNoteBody: {
+    halfNoteHead: {
       unicode: '',
       points: [
         'M',
@@ -2400,7 +2400,7 @@ export default function ({
       ],
       yCorrection: -1.11 * intervalBetweenStaveLines
     },
-    wholeNoteBody: {
+    wholeNoteHead: {
       unicode: '',
       points: [
         'M',
@@ -2428,7 +2428,7 @@ export default function ({
       ],
       yCorrection: -1.09 * intervalBetweenStaveLines
     },
-    ghostWholeNoteBody: {
+    ghostWholeNoteHead: {
       unicode: '',
       points: [
         'M',
@@ -2510,7 +2510,7 @@ export default function ({
       ],
       yCorrection: -1.0 * intervalBetweenStaveLines
     },
-    ghostHalfNoteBody: {
+    ghostHalfNoteHead: {
       unicode: '',
       points: [
         'M',
@@ -2556,7 +2556,7 @@ export default function ({
       ],
       yCorrection: -1.0 * intervalBetweenStaveLines
     },
-    ghostDarkNoteBody: {
+    ghostBlackNoteHead: {
       unicode: '',
       points: [
         'M',
@@ -2606,8 +2606,8 @@ export default function ({
       yCorrection: -1.0 * intervalBetweenStaveLines
     },
     stemWidth: 0.14 * intervalBetweenStaveLines,
-    verticalStemCorrectionForGhostNoteAtEdgeOfUnitBody: 0.25 * intervalBetweenStaveLines,
-    verticalStemCorrectionForGhostHalfNoteAtEdgeOfUnitBody: 0.2 * intervalBetweenStaveLines,
+    verticalStemCorrectionForGhostNoteAtEdgeOfUnitNoteHeads: 0.25 * intervalBetweenStaveLines,
+    verticalStemCorrectionForGhostHalfNoteAtEdgeOfUnitNoteHeads: 0.2 * intervalBetweenStaveLines,
     sharpKey: {
       unicode: '',
       points: [
@@ -3447,7 +3447,7 @@ export default function ({
     distanceBetweenKeysForSingleUnit: 0.3 * intervalBetweenStaveLines,
     distanceBetweenKeysAsNoteLettersForSingleUnit: 0.1 * intervalBetweenStaveLines,
     spaceAfterKeysForSingleUnits: 0.45 * intervalBetweenStaveLines,
-    spaceAfterKeysForSingleUnitsBeforeCrossStaveUnitThatContainsNotesOnAdditionalStaveLines: 0.9 * intervalBetweenStaveLines,
+    spaceAfterKeysForSingleUnitsBeforeCrossStaveUnitThatContainsNotesOnLedgerLines: 0.9 * intervalBetweenStaveLines,
     graceKeyOnStaveLineCenterYCorrections: {
       'doubleFlatKey': 0.5 * intervalBetweenStaveLines,
       'doubleSharpKey': 0.0 * intervalBetweenStaveLines,
@@ -5967,7 +5967,7 @@ export default function ({
       yCorrection: -0.5 * intervalBetweenStaveLines
     },
     distanceBetweenDots: 0.25 * intervalBetweenStaveLines,
-    emptyPaddingAroundDotsOnNonAddtionalStaveLines: 0.2 * intervalBetweenStaveLines,
+    emptyPaddingAroundDotsOnNonLedgerLines: 0.2 * intervalBetweenStaveLines,
     leftOffsetForDotsInSingleUnitWithNotesOnStaveLinesAndStemDirectionIsUpAndUnitDurationIsEqualToEighth: 1.2 * intervalBetweenStaveLines,
     leftOffsetForDotsInSingleUnitWithNotesOnStaveLinesAndStemDirectionIsUpAndUnitDurationIsLessThanEighth: 1.4 * intervalBetweenStaveLines,
     leftOffsetForDotsInSingleUnit: 0.5 * intervalBetweenStaveLines,
@@ -15744,7 +15744,7 @@ export default function ({
       }
     },
     cTimeTopOffset: 0.0 * intervalBetweenStaveLines,
-    croccedCTimeTopOffset: -0.88 * intervalBetweenStaveLines,
+    crossedCTimeTopOffset: -0.88 * intervalBetweenStaveLines,
     numeratorTopOffset: -0.9 * intervalBetweenStaveLines ,
     denominatorTopOffset: 1.1 * intervalBetweenStaveLines,
     tempoLetters: {

@@ -923,7 +923,7 @@ examples are the parts that are theirs.
   color: var(--accent);
 }
 
-/* JSON and MusicXML, for the pipeline's structures */
+/* JSON, for the pipeline's structures */
 [data-code] .hljs-number,
 [data-code] .hljs-literal {
   color: #1f7a8c;

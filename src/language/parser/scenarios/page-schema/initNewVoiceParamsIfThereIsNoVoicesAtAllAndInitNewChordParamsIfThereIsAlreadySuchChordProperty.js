@@ -1,6 +1,6 @@
 'use strict'
 
-import lastNonSimileChordParams from '#msq/language/parser/scenarios/page-schema/lastNonSimileChordParams.js'
+import findLastNonSimileChordParams from '#msq/language/parser/scenarios/page-schema/findLastNonSimileChordParams.js'
 
 export default function (lastStaveParams, componentName, parserState) {
   if (!lastStaveParams.voicesParams) {
@@ -10,7 +10,7 @@ export default function (lastStaveParams, componentName, parserState) {
     lastStaveParams.voicesParams.push([])
   }
   if (componentName) {
-    const lastChordParamsValue = lastNonSimileChordParams(lastStaveParams)
+    const lastChordParamsValue = findLastNonSimileChordParams(lastStaveParams)
     if (
       lastChordParamsValue &&
       lastChordParamsValue[componentName] &&

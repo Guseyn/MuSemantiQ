@@ -66,4 +66,4 @@ Without the `data-sound-font` attribute, the player uses Magenta's own sound fon
 - It takes a lot of time and space. One program is about **105 MB**, and all 128 programs take hours.
 - Render only the instruments you need.
 
-Read next: [MusicXML import](/docs/tools/musicxml-import)
+Read next: [Dev tools](/docs/dev-tools/overview)

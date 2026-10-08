@@ -2,13 +2,13 @@
 
 import regexps from '#msq/language/parser/scenarios/static-objects/regexps.js'
 import initNewMeasureParamsIfThereIsAlreadySuchMeasurePropertyOrNoMeasuresAtAll from '#msq/language/parser/scenarios/page-schema/initNewMeasureParamsIfThereIsAlreadySuchMeasurePropertyOrNoMeasuresAtAll.js'
-import lastMeasureParams from '#msq/language/parser/scenarios/page-schema/lastMeasureParams.js'
-import lastInstrumentTitleParam from '#msq/language/parser/scenarios/page-schema/lastInstrumentTitleParam.js'
-import staveIndexByTokens from '#msq/language/parser/scenarios/token/staveIndexByTokens.js'
+import getLastMeasureParams from '#msq/language/parser/scenarios/page-schema/getLastMeasureParams.js'
+import getLastInstrumentTitleParam from '#msq/language/parser/scenarios/page-schema/getLastInstrumentTitleParam.js'
+import parseStaveIndexByTokens from '#msq/language/parser/scenarios/token/parseStaveIndexByTokens.js'
 import isStaveIndex from '#msq/language/parser/scenarios/token/isStaveIndex.js'
-import foundNextTokenValueOnTheLine from '#msq/language/parser/scenarios/token/foundNextTokenValueOnTheLine.js'
-import foundNextTokenValuesOnTheLine from '#msq/language/parser/scenarios/token/foundNextTokenValuesOnTheLine.js'
-import theSameScenarioButWithDifferentRequiredCommandProgression from '#msq/language/parser/scenarios/theSameScenarioButWithDifferentRequiredCommandProgression.js'
+import findNextTokenValueOnTheLine from '#msq/language/parser/scenarios/token/findNextTokenValueOnTheLine.js'
+import findNextTokenValuesOnTheLine from '#msq/language/parser/scenarios/token/findNextTokenValuesOnTheLine.js'
+import copyScenarioWithDifferentRequiredCommandProgression from '#msq/language/parser/scenarios/copyScenarioWithDifferentRequiredCommandProgression.js'
 
 export default function (scenarios) {
   scenarios['instrument title'] = {
@@ -18,7 +18,7 @@ export default function (scenarios) {
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       initNewMeasureParamsIfThereIsAlreadySuchMeasurePropertyOrNoMeasuresAtAll(parserState.pageSchema, 'instrumentTitlesParams', parserState)
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
       lastMeasureParamsValue.instrumentTitlesParams = lastMeasureParamsValue.instrumentTitlesParams || []
       parserState.lastInstrumentTitlesParamsForEachLine = parserState.lastInstrumentTitlesParamsForEachLine || []
       const instrumentTitle = regexps.instrumentTitle.match(tokenValues)[0]
@@ -83,7 +83,7 @@ export default function (scenarios) {
       !regexps.forEach.test(
         [
           currentToken.value,
-          foundNextTokenValueOnTheLine(
+          findNextTokenValueOnTheLine(
             unitext,
             currentToken.firstCharIndexOfNextToken
           )
@@ -92,7 +92,7 @@ export default function (scenarios) {
       !regexps.forLines.test(
         [
           currentToken.value,
-          foundNextTokenValueOnTheLine(
+          findNextTokenValueOnTheLine(
             unitext,
             currentToken.firstCharIndexOfNextToken
           )
@@ -101,7 +101,7 @@ export default function (scenarios) {
       !regexps.forLinesBelow.test(
         [
           currentToken.value,
-          foundNextTokenValuesOnTheLine(
+          findNextTokenValuesOnTheLine(
             unitext,
             currentToken.firstCharIndexOfNextToken,
             2
@@ -169,9 +169,9 @@ export default function (scenarios) {
       return isStaveIndex(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const staveIndex = staveIndexByTokens(tokenValues, true)
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastInstrumentTitleParamValue = lastInstrumentTitleParam(lastMeasureParamsValue)
+      const staveIndex = parseStaveIndexByTokens(tokenValues, true)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastInstrumentTitleParamValue = getLastInstrumentTitleParam(lastMeasureParamsValue)
       const indexOfIfThereIsAlreadyInstrumentTitlesParamValueInLastMeasureForThisStaveIndex = lastMeasureParamsValue.instrumentTitlesParams.findIndex(param => ((param.staveStartNumber === staveIndex) || (param.staveEndNumber === staveIndex)))
       if (
         (indexOfIfThereIsAlreadyInstrumentTitlesParamValueInLastMeasureForThisStaveIndex !== -1) &&
@@ -221,7 +221,7 @@ export default function (scenarios) {
     },
     activateActionWhenProgressionOfCommandsChangesIfItIsLastTokenAndActionDidntHappenBefore: true
   }
-  scenarios['instrument title between stave index 1'] = theSameScenarioButWithDifferentRequiredCommandProgression(
+  scenarios['instrument title between stave index 1'] = copyScenarioWithDifferentRequiredCommandProgression(
     scenarios['instrument title for stave index'],
     'instrument title between'
   )
@@ -261,9 +261,9 @@ export default function (scenarios) {
       return isStaveIndex(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const staveIndex = staveIndexByTokens(tokenValues, true)
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastInstrumentTitleParamValue = lastInstrumentTitleParam(lastMeasureParamsValue)
+      const staveIndex = parseStaveIndexByTokens(tokenValues, true)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastInstrumentTitleParamValue = getLastInstrumentTitleParam(lastMeasureParamsValue)
       const indexOfIfThereIsAlreadyInstrumentTitlesParamValueInLastMeasureForThisStaveIndex = lastMeasureParamsValue.instrumentTitlesParams.findIndex(param => (param.staveEndNumber === staveIndex))
       if (
         (indexOfIfThereIsAlreadyInstrumentTitlesParamValueInLastMeasureForThisStaveIndex !== -1) &&
@@ -322,8 +322,8 @@ export default function (scenarios) {
       return regexps.forEachLine.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastInstrumentTitlesParamValue = lastInstrumentTitleParam(lastMeasureParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastInstrumentTitlesParamValue = getLastInstrumentTitleParam(lastMeasureParamsValue)
       lastInstrumentTitlesParamValue.forEachLineId = parserState.lastInstrumentTitlesParamsForEachLineId
       parserState.lastInstrumentTitlesParamsForEachLine.push(lastInstrumentTitlesParamValue)
       if (parserState.applyHighlighting) {
@@ -358,8 +358,8 @@ export default function (scenarios) {
       return regexps.forLinesBelow.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      const lastInstrumentTitlesParamValue = lastInstrumentTitleParam(lastMeasureParamsValue)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const lastInstrumentTitlesParamValue = getLastInstrumentTitleParam(lastMeasureParamsValue)
       lastInstrumentTitlesParamValue.forEachLineId = parserState.lastInstrumentTitlesParamsForEachLineId
       parserState.lastInstrumentTitlesParamsForEachLine.push(lastInstrumentTitlesParamValue)
       if (parserState.applyHighlighting) {

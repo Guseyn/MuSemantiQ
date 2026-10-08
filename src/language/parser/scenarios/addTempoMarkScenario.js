@@ -2,11 +2,11 @@
 
 import regexps from '#msq/language/parser/scenarios/static-objects/regexps.js'
 import initNewMeasureParamsIfThereIsAlreadySuchMeasurePropertyOrNoMeasuresAtAll from '#msq/language/parser/scenarios/page-schema/initNewMeasureParamsIfThereIsAlreadySuchMeasurePropertyOrNoMeasuresAtAll.js'
-import lastMeasureParams from '#msq/language/parser/scenarios/page-schema/lastMeasureParams.js'
+import getLastMeasureParams from '#msq/language/parser/scenarios/page-schema/getLastMeasureParams.js'
 import isVerticalCorrection from '#msq/language/parser/scenarios/token/isVerticalCorrection.js'
-import verticalCorrection from '#msq/language/parser/scenarios/token/verticalCorrection.js'
-import tempoValueParts from '#msq/language/parser/scenarios/token/tempoValueParts.js'
-import foundNextTokenValueOnTheLine from '#msq/language/parser/scenarios/token/foundNextTokenValueOnTheLine.js'
+import parseVerticalCorrection from '#msq/language/parser/scenarios/token/parseVerticalCorrection.js'
+import parseTempoValueParts from '#msq/language/parser/scenarios/token/parseTempoValueParts.js'
+import findNextTokenValueOnTheLine from '#msq/language/parser/scenarios/token/findNextTokenValueOnTheLine.js'
 
 export default function (scenarios) {
   scenarios['tempo mark'] = {
@@ -15,7 +15,7 @@ export default function (scenarios) {
         regexps.tempoOrMetronome.test(tokenValues) &&
         !regexps.markOrNote.test(
           [
-            foundNextTokenValueOnTheLine(
+            findNextTokenValueOnTheLine(
               unitext,
               currentToken.firstCharIndexOfNextToken
             )
@@ -65,10 +65,10 @@ export default function (scenarios) {
       return regexps.tempoMarkText.test(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
       const tempoValue = regexps.tempoMarkText.match(tokenValues)[0]
       lastMeasureParamsValue.tempoMark = {
-        textValueParts: tempoValueParts(tempoValue)
+        textValueParts: parseTempoValueParts(tempoValue)
       }
       const numberOfMeasures = parserState.pageSchema.measuresParams.length
       if (parserState.applyHighlighting) {
@@ -147,8 +147,8 @@ export default function (scenarios) {
       return isVerticalCorrection(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
-      lastMeasureParamsValue.tempoMark.yCorrection = verticalCorrection(tokenValues)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      lastMeasureParamsValue.tempoMark.yCorrection = parseVerticalCorrection(tokenValues)
       const numberOfMeasures = parserState.pageSchema.measuresParams.length
       if (parserState.applyHighlighting) {
         const joinedTokenValuesWithRealDelimitersWithHighlightedNumber = joinedTokenValuesWithRealDelimiters.replace(

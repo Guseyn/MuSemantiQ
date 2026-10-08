@@ -1,6 +1,6 @@
 'use strict'
 
-import lastMeasureParams from '#msq/language/parser/scenarios/page-schema/lastMeasureParams.js'
+import getLastMeasureParams from '#msq/language/parser/scenarios/page-schema/getLastMeasureParams.js'
 
 export default function (pageSchema, componentName, parserState) {
   pageSchema.measuresParams = pageSchema.measuresParams || []
@@ -22,8 +22,8 @@ export default function (pageSchema, componentName, parserState) {
   }
   if (componentName) {
     if (
-      lastMeasureParams(pageSchema)[componentName] &&
-      !Array.isArray(lastMeasureParams(pageSchema)[componentName]) &&
+      getLastMeasureParams(pageSchema)[componentName] &&
+      !Array.isArray(getLastMeasureParams(pageSchema)[componentName]) &&
       componentNameIsNotBarLine &&
       !parserState.newlineAlreadyIntroducedNewMeasure
     ) {

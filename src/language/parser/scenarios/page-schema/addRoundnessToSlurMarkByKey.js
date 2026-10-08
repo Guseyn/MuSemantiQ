@@ -1,10 +1,10 @@
 'use strict'
 
-import slurMarkWithSpecifiedKey from '#msq/language/parser/scenarios/page-schema/slurMarkWithSpecifiedKey.js'
+import findSlurMarkWithSpecifiedKey from '#msq/language/parser/scenarios/page-schema/findSlurMarkWithSpecifiedKey.js'
 
 export default function (parserState, slurMarkKey, roundness) {
-  const foundSlurMarkWithSpecifiedKey = slurMarkWithSpecifiedKey(parserState, slurMarkKey)
-  if (foundSlurMarkWithSpecifiedKey) {
-    foundSlurMarkWithSpecifiedKey.roundCoefficientFactor = roundness
+  const slurMarkWithSpecifiedKey = findSlurMarkWithSpecifiedKey(parserState, slurMarkKey)
+  if (slurMarkWithSpecifiedKey) {
+    slurMarkWithSpecifiedKey.roundCoefficientFactor = roundness
   }
 }

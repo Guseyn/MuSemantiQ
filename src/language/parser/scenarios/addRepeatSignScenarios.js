@@ -1,7 +1,7 @@
 'use strict'
 
 import initNewMeasureParamsIfThereIsAlreadySuchMeasurePropertyOrNoMeasuresAtAll from '#msq/language/parser/scenarios/page-schema/initNewMeasureParamsIfThereIsAlreadySuchMeasurePropertyOrNoMeasuresAtAll.js'
-import lastMeasureParams from '#msq/language/parser/scenarios/page-schema/lastMeasureParams.js'
+import getLastMeasureParams from '#msq/language/parser/scenarios/page-schema/getLastMeasureParams.js'
 import regexps from '#msq/language/parser/scenarios/static-objects/regexps.js'
 
 export default function (scenarios) {
@@ -35,10 +35,10 @@ export default function (scenarios) {
     },
     itIsNewCommandProgressionFromLevel: 0,
     actionWhenProgressionOfCommandsChanges: (parserState, scenarioNameThatChangedCommandsProgression, lineNumber, argumentsFromMainAction) => {
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
       if (!lastMeasureParamsValue.repeatDotsMarkAtTheStart && !lastMeasureParamsValue.repeatDotsMarkAtTheEnd) {
         initNewMeasureParamsIfThereIsAlreadySuchMeasurePropertyOrNoMeasuresAtAll(parserState.pageSchema, 'repeatDotsMarkAtTheStart', parserState)
-        const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
+        const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
         lastMeasureParamsValue.repeatDotsMarkAtTheStart = true
         lastMeasureParamsValue.repeatDotsMarkAtTheEnd = true
       }
@@ -66,7 +66,7 @@ export default function (scenarios) {
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       initNewMeasureParamsIfThereIsAlreadySuchMeasurePropertyOrNoMeasuresAtAll(parserState.pageSchema, 'repeatDotsMarkAtTheStart', parserState)
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
       lastMeasureParamsValue.repeatDotsMarkAtTheStart = true
       const numberOfMeasures = parserState.pageSchema.measuresParams.length
       if (parserState.applyHighlighting) {
@@ -101,7 +101,7 @@ export default function (scenarios) {
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       initNewMeasureParamsIfThereIsAlreadySuchMeasurePropertyOrNoMeasuresAtAll(parserState.pageSchema, 'repeatDotsMarkAtTheEnd', parserState)
-      const lastMeasureParamsValue = lastMeasureParams(parserState.pageSchema)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
       lastMeasureParamsValue.repeatDotsMarkAtTheEnd = true
       const numberOfMeasures = parserState.pageSchema.measuresParams.length
       if (parserState.applyHighlighting) {

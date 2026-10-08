@@ -1,10 +1,10 @@
 import opentype from '#msq/drawer/lib/opentype/opentype.js'
-import validatedPageSchema from '#msq/language/schema/validatedPageSchema.js'
-import generatedStyles from '#msq/drawer/generatedStyles.js'
-import svgAsString from '#msq/drawer/elements/basic/svgAsString.js'
-import svg from '#msq/drawer/elements/basic/svg.js'
-import page from '#msq/drawer/elements/page/page.js'
-import midi from '#msq/midi/midi.js'
+import validatePageSchema from '#msq/language/schema/validatePageSchema.js'
+import generateStyles from '#msq/drawer/generateStyles.js'
+import convertSvgToString from '#msq/drawer/elements/basic/convertSvgToString.js'
+import createSvg from '#msq/drawer/elements/basic/createSvg.js'
+import drawPage from '#msq/drawer/elements/the-page/page-lines/drawPage.js'
+import generateMidi from '#msq/midi/generateMidi.js'
 
 
 /**
@@ -649,7 +649,7 @@ export function generateStylesForSinglePage({
   customStyles,
   supportedFontSources
 }) {
-  const cofiguratedStyles = generatedStyles({
+  const cofiguratedStyles = generateStyles({
     ...customStyles,
     fontSources: supportedFontSources
   })
@@ -734,9 +734,9 @@ export function generateSvgForSinglePage({
   left,
   top
 }) {
-  return svgAsString(
-    svg(
-      page(
+  return convertSvgToString(
+    createSvg(
+      drawPage(
         pageSchema
       )(pageStyles, left || 0, top || 0)
     )
@@ -784,7 +784,7 @@ export function generateSvgForSinglePage({
  *
  *
  * @returns {Object}
- *          A MIDI result object produced by the low-level internal `midi()`
+ *          A MIDI result object produced by the low-level internal `generateMidi()`
  *          engine. It provides raw MIDI bytes **plus lookup maps** for audio ↔
  *          engraving synchronization.
  *
@@ -854,7 +854,7 @@ export function generateMidiForSinglePage({
   pageSchema,
   midiSettings
 }) {
-  return midi(
+  return generateMidi(
     pageSchema,
     [ midiSettings ]
   )
@@ -975,7 +975,7 @@ export function generateStylesForMultiplePages({
   supportedFontSources
 }) {
   return customStylesForEachPage.map(customStyles => {
-    return generatedStyles({
+    return generateStyles({
       ...customStyles,
       fontSources: supportedFontSources
     })
@@ -1095,15 +1095,15 @@ export function generateSvgForMultiplePages({
   intervalBetweenPages = intervalBetweenPages || 15
 
   pageSchemaForEachPage.forEach((pageSchema, pageIndex) => {
-    const svgPage = page(
+    const svgPage = drawPage(
       pageSchema
     )(pageStylesForEachPage[pageIndex], currentPageLeftOffset, currentPageTopOffset)
     svgPage.bottom
     allSvgPages.push(svgPage)
     currentPageTopOffset = svgPage.bottom + intervalBetweenPages
   })
-  return svgAsString(
-    svg(...allSvgPages)
+  return convertSvgToString(
+    createSvg(...allSvgPages)
   )
 }
 
@@ -1170,7 +1170,7 @@ export function generateSvgForMultiplePages({
  *
  *
  * @returns {Object}
- *          A MIDI result object produced by the low-level internal `midi()` engine.
+ *          A MIDI result object produced by the low-level internal `generateMidi()` engine.
  *
  *          The returned object contains:
  *
@@ -1232,7 +1232,7 @@ export function generateMidiForMultiplePages({
       ...pageSchema.measuresParams
     )
   })
-  return midi(
+  return generateMidi(
     {
       measuresParams: measureParamsForAllPages
     },
@@ -1294,7 +1294,7 @@ export function generateMidiForMultiplePages({
  */
 export function isPageSchemaValid(pageSchema) {
   // The validator returns a result object, which is always truthy; the answer is its `valid`
-  return validatedPageSchema(pageSchema).valid
+  return validatePageSchema(pageSchema).valid
 }
 
 /**
@@ -1364,7 +1364,7 @@ export function isPageSchemaValid(pageSchema) {
  */
 export function areAllPageSchemasValid(pageSchemas) {
   // The validator returns a result object, which is always truthy; the answer is its `valid`
-  return pageSchemas.every(pageSchema => validatedPageSchema(pageSchema).valid)
+  return pageSchemas.every(pageSchema => validatePageSchema(pageSchema).valid)
 }
 
 // ⟅━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━⟆

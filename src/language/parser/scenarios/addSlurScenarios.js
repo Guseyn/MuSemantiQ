@@ -1,16 +1,16 @@
 'use strict'
 
 import regexps from '#msq/language/parser/scenarios/static-objects/regexps.js'
-import foundNextTokenValueOnTheLine from '#msq/language/parser/scenarios/token/foundNextTokenValueOnTheLine.js'
+import findNextTokenValueOnTheLine from '#msq/language/parser/scenarios/token/findNextTokenValueOnTheLine.js'
 import isDirection from '#msq/language/parser/scenarios/token/isDirection.js'
-import direction from '#msq/language/parser/scenarios/token/direction.js'
+import parseDirection from '#msq/language/parser/scenarios/token/parseDirection.js'
 import isRoundness from '#msq/language/parser/scenarios/token/isRoundness.js'
-import roundness from '#msq/language/parser/scenarios/token/roundness.js'
+import parseRoundness from '#msq/language/parser/scenarios/token/parseRoundness.js'
 import isAboveBelowOverUnder from '#msq/language/parser/scenarios/token/isAboveBelowOverUnder.js'
-import directionByAboveBelowOverUnder from '#msq/language/parser/scenarios/token/directionByAboveBelowOverUnder.js'
+import parseDirectionByAboveBelowOverUnder from '#msq/language/parser/scenarios/token/parseDirectionByAboveBelowOverUnder.js'
 import isVerticalCorrection from '#msq/language/parser/scenarios/token/isVerticalCorrection.js'
-import verticalCorrection from '#msq/language/parser/scenarios/token/verticalCorrection.js'
-import chordParamsByLastMentionedUnitPositions from '#msq/language/parser/scenarios/page-schema/chordParamsByLastMentionedUnitPositions.js'
+import parseVerticalCorrection from '#msq/language/parser/scenarios/token/parseVerticalCorrection.js'
+import findChordParamsByLastMentionedUnitPositions from '#msq/language/parser/scenarios/page-schema/findChordParamsByLastMentionedUnitPositions.js'
 import removeSlurMarksThatFinishFromChordsParamsByKeyAndSlurMarksFromCurrentChordParamsThatDontFinishByKey from '#msq/language/parser/scenarios/page-schema/removeSlurMarksThatFinishFromChordsParamsByKeyAndSlurMarksFromCurrentChordParamsThatDontFinishByKey.js'
 import addDirectionToSlurMarkByKey from '#msq/language/parser/scenarios/page-schema/addDirectionToSlurMarkByKey.js'
 import addRoundnessToSlurMarkByKey from '#msq/language/parser/scenarios/page-schema/addRoundnessToSlurMarkByKey.js'
@@ -129,7 +129,7 @@ export default function (scenarios) {
       if (parserState.lastMentionedUnitPosition === undefined) {
         parserState.errors.push(`unit position after command '${argumentsFromMainAction.joinedTokenValuesWithRealDelimiters}' is not specified on the line number ${argumentsFromMainAction.lineNumber}`)
       } else {
-        const chordParamsValue = chordParamsByLastMentionedUnitPositions(parserState)
+        const chordParamsValue = findChordParamsByLastMentionedUnitPositions(parserState)
         if (!chordParamsValue) {
           parserState.errors.push(`unit after command '${argumentsFromMainAction.joinedTokenValuesWithRealDelimiters}' is not found on the line ${argumentsFromMainAction.lineNumber}`)
         } else {
@@ -166,7 +166,7 @@ export default function (scenarios) {
       return isAboveBelowOverUnder(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      parserState.lastSlurDirection = directionByAboveBelowOverUnder(tokenValues)
+      parserState.lastSlurDirection = parseDirectionByAboveBelowOverUnder(tokenValues)
       if (parserState.applyHighlighting) {
         parserState.highlightsHtmlBuffer.push(joinedTokenValuesWithRealDelimiters)
       }
@@ -203,7 +203,7 @@ export default function (scenarios) {
       if (parserState.lastMentionedUnitPosition === undefined) {
         parserState.errors.push(`unit position after command '${argumentsFromMainAction.joinedTokenValuesWithRealDelimiters}' is not specified on the line ${argumentsFromMainAction.lineNumber}`)
       } else {
-        const chordParamsValue = chordParamsByLastMentionedUnitPositions(parserState)
+        const chordParamsValue = findChordParamsByLastMentionedUnitPositions(parserState)
         if (!chordParamsValue) {
           parserState.errors.push(`unit after command '${argumentsFromMainAction.joinedTokenValuesWithRealDelimiters}' is not found on the line ${argumentsFromMainAction.lineNumber}`)
         } else {
@@ -250,7 +250,7 @@ export default function (scenarios) {
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       const slurMarkKey = `slur-${parserState.numberOfSlurs}`
-      const slurDirection = directionByAboveBelowOverUnder(tokenValues)
+      const slurDirection = parseDirectionByAboveBelowOverUnder(tokenValues)
       addDirectionToSlurMarkByKey(parserState, slurMarkKey, slurDirection)
       parserState.lastSShapeSlurPartDirection = slurDirection
       parserState.lastSlurDirection = slurDirection
@@ -274,7 +274,7 @@ export default function (scenarios) {
           regexps.starts.test(tokenValues) &&
           !regexps.from.test(
             [
-              foundNextTokenValueOnTheLine(
+              findNextTokenValueOnTheLine(
                 unitext, currentToken.firstCharIndexOfNextToken
               )
             ]
@@ -285,7 +285,7 @@ export default function (scenarios) {
       ) &&
       !regexps.before.test(
         [
-          foundNextTokenValueOnTheLine(
+          findNextTokenValueOnTheLine(
             unitext, currentToken.firstCharIndexOfNextToken
           )
         ]
@@ -311,7 +311,7 @@ export default function (scenarios) {
       if (parserState.lastMentionedUnitPosition === undefined) {
         parserState.errors.push(`unit position after command '${argumentsFromMainAction.joinedTokenValuesWithRealDelimiters}' is not specified on the line number ${argumentsFromMainAction.lineNumber}`)
       } else {
-        const chordParamsValue = chordParamsByLastMentionedUnitPositions(parserState)
+        const chordParamsValue = findChordParamsByLastMentionedUnitPositions(parserState)
         if (!chordParamsValue) {
           parserState.errors.push(`unit after command '${argumentsFromMainAction.joinedTokenValuesWithRealDelimiters}' is not found on the line ${argumentsFromMainAction.lineNumber}`)
         } else {
@@ -344,7 +344,7 @@ export default function (scenarios) {
       return isAboveBelowOverUnder(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      parserState.lastSlurDirection = directionByAboveBelowOverUnder(tokenValues)
+      parserState.lastSlurDirection = parseDirectionByAboveBelowOverUnder(tokenValues)
       if (parserState.applyHighlighting) {
         // no highlights needed
         parserState.highlightsHtmlBuffer.push(joinedTokenValuesWithRealDelimiters)
@@ -366,7 +366,7 @@ export default function (scenarios) {
       ) &&
       !regexps.after.test(
         [
-          foundNextTokenValueOnTheLine(
+          findNextTokenValueOnTheLine(
             unitext, currentToken.firstCharIndexOfNextToken
           )
         ]
@@ -392,7 +392,7 @@ export default function (scenarios) {
       if (parserState.lastMentionedUnitPosition === undefined) {
         parserState.errors.push(`unit position after command '${argumentsFromMainAction.joinedTokenValuesWithRealDelimiters}' is not specified on the line number ${argumentsFromMainAction.lineNumber}`)
       } else {
-        const chordParamsValue = chordParamsByLastMentionedUnitPositions(parserState)
+        const chordParamsValue = findChordParamsByLastMentionedUnitPositions(parserState)
         if (!chordParamsValue) {
           parserState.errors.push(`unit after command '${argumentsFromMainAction.joinedTokenValuesWithRealDelimiters}' is not found on the line ${argumentsFromMainAction.lineNumber}`)
         } else {
@@ -433,7 +433,7 @@ export default function (scenarios) {
       return isAboveBelowOverUnder(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      parserState.lastSShapeSlurPartDirection = directionByAboveBelowOverUnder(tokenValues)
+      parserState.lastSShapeSlurPartDirection = parseDirectionByAboveBelowOverUnder(tokenValues)
       parserState.lastSlurDirection = parserState.lastSShapeSlurPartDirection
       if (parserState.applyHighlighting) {
         // no highlights needed
@@ -454,7 +454,7 @@ export default function (scenarios) {
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       const slurMarkKey = `slur-${parserState.numberOfSlurs}`
-      const slurDirection = direction(tokenValues)
+      const slurDirection = parseDirection(tokenValues)
       addDirectionToSlurMarkByKey(parserState, slurMarkKey, slurDirection)
       parserState.lastSlurDirection = slurDirection
       if (parserState.applyHighlighting) {
@@ -485,7 +485,7 @@ export default function (scenarios) {
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       const slurMarkKey = `slur-${parserState.numberOfSlurs}`
-      const slurDirection = directionByAboveBelowOverUnder(tokenValues)
+      const slurDirection = parseDirectionByAboveBelowOverUnder(tokenValues)
       addDirectionToSlurMarkByKey(parserState, slurMarkKey, slurDirection)
       parserState.lastSlurDirection = slurDirection
       if (parserState.applyHighlighting) {
@@ -509,7 +509,7 @@ export default function (scenarios) {
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       const slurMarkKey = `slur-${parserState.numberOfSlurs}`
-      const roundnessValue = roundness(tokenValues)
+      const roundnessValue = parseRoundness(tokenValues)
       addRoundnessToSlurMarkByKey(parserState, slurMarkKey, roundnessValue)
       parserState.lastSlurRoundness = roundnessValue
       if (parserState.applyHighlighting) {
@@ -561,7 +561,7 @@ export default function (scenarios) {
       if (parserState.lastMentionedUnitPosition === undefined) {
         parserState.errors.push(`unit position after command '${argumentsFromMainAction.joinedTokenValuesWithRealDelimiters}' is not specified on the line number ${argumentsFromMainAction.lineNumber}`)
       } else {
-        const chordParamsValue = chordParamsByLastMentionedUnitPositions(parserState)
+        const chordParamsValue = findChordParamsByLastMentionedUnitPositions(parserState)
         if (!chordParamsValue) {
           parserState.errors.push(`unit after command '${argumentsFromMainAction.joinedTokenValuesWithRealDelimiters}' is not found on the line ${argumentsFromMainAction.lineNumber}`)
         } else {
@@ -598,7 +598,7 @@ export default function (scenarios) {
       return isAboveBelowOverUnder(tokenValues)
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      parserState.lastSShapeSlurPartDirection = directionByAboveBelowOverUnder(tokenValues)
+      parserState.lastSShapeSlurPartDirection = parseDirectionByAboveBelowOverUnder(tokenValues)
       if (parserState.applyHighlighting) {
         // no highlights needed
         parserState.highlightsHtmlBuffer.push(joinedTokenValuesWithRealDelimiters)
@@ -649,7 +649,7 @@ export default function (scenarios) {
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       const slurMarkKey = `slur-${parserState.numberOfSlurs}`
-      const verticalCorrectionValue = verticalCorrection(tokenValues)
+      const verticalCorrectionValue = parseVerticalCorrection(tokenValues)
       addLeftYCorrectionToSlurMarkByKey(parserState, slurMarkKey, verticalCorrectionValue)
       parserState.lastSlurLeftYCorrection = verticalCorrectionValue
       if (parserState.applyHighlighting) {
@@ -713,7 +713,7 @@ export default function (scenarios) {
     },
     action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       const slurMarkKey = `slur-${parserState.numberOfSlurs}`
-      const verticalCorrectionValue = verticalCorrection(tokenValues)
+      const verticalCorrectionValue = parseVerticalCorrection(tokenValues)
       addRightYCorrectionToSlurMarkByKey(parserState, slurMarkKey, verticalCorrectionValue)
       parserState.lastSlurRightYCorrection = verticalCorrectionValue
       if (parserState.applyHighlighting) {

@@ -32,4 +32,4 @@ brew install fluidsynth lame
 - **Rendered sets** lists your sets. You can delete a whole set or one instrument from it.
 - The soundbanks and the rendered sets are not committed to git.
 
-Read next: [MusicXML tool](/docs/dev-tools/musicxml-tool)
+Read next: [Test viewer](/docs/dev-tools/test-viewer)

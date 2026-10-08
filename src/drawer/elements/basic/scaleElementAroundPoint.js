@@ -24,19 +24,19 @@ export default function (element, scaleX = 1, scaleY = scaleX, customPoint) {
     )
     const originalWidth = element.right - element.left
     const originalHeight = element.bottom - element.top
-    const scaledWidth = originalWidth * scaleX
-    const scaledHeight = originalHeight * scaleY
+    const width = originalWidth * scaleX
+    const height = originalHeight * scaleY
     const boxDeltaXLeft = Math.abs(element.left - point.x)
-      ? (scaledWidth - originalWidth) / (originalWidth / Math.abs(element.left - point.x))
+      ? (width - originalWidth) / (originalWidth / Math.abs(element.left - point.x))
       : 0
     const boxDeltaXRight = Math.abs(element.right - point.x)
-      ? (scaledWidth - originalWidth) / (originalWidth / Math.abs(element.right - point.x))
+      ? (width - originalWidth) / (originalWidth / Math.abs(element.right - point.x))
       : 0
     const boxDeltaYTop = Math.abs(element.top - point.y)
-      ? (scaledHeight - originalHeight) / (originalHeight / Math.abs(element.top - point.y))
+      ? (height - originalHeight) / (originalHeight / Math.abs(element.top - point.y))
       : 0
     const boxDeltaYBottom = Math.abs(element.bottom - point.y)
-      ? (scaledHeight - originalHeight) / (originalHeight / Math.abs(element.bottom - point.y))
+      ? (height - originalHeight) / (originalHeight / Math.abs(element.bottom - point.y))
       : 0
     element.top = element.top - boxDeltaYTop
     element.right = element.right + boxDeltaXRight
