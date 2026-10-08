@@ -1,6 +1,6 @@
-# Repeat signs
+# Repeat Signs
 
-A repeat sign belongs to a measure, like a barline. You can add it at the start and/or at the end of each measure:
+A repeat sign belongs to a measure, like a barline. You can add it at the start of a measure, at the end, or both:
 
 ```msq-editor opens-with=text
 measure
@@ -13,7 +13,7 @@ repeat sign at the end
 g a b c5
 ```
 
-It's important to mention that a repeat sign draws only the dots. The barline next to them is still the barline of that side of the measure, so you choose it yourself, and conventionally it's a double bold barline:
+It's important to mention that a repeat sign draws only the dots. The barline next to them is the usual barline of the measure, so you choose it yourself. Usually it's a double bold barline:
 
 ```msq-editor opens-with=text
 measure
@@ -28,9 +28,9 @@ with repeat sign at the end
 g a b c5
 ```
 
-As you remember from [Barlines](/docs/language/barlines), the forms written right after `measure` must come before anything else in the measure. `with repeat sign at the start` and `with repeat sign at the end` are such forms as well.
+As you remember from [Barlines](/docs/language/barlines), the lines right after `measure` must come before anything else in the measure. The same goes for `with repeat sign at the start` and `with repeat sign at the end`.
 
-You can also use the key word `colon` instead of `repeat sign`:
+Instead of `repeat sign`, you can write `colon`:
 
 ```msq-editor opens-with=text
 measure
@@ -45,7 +45,7 @@ with colon at the end
 g a b c5
 ```
 
-And you can declare a repeat sign as a separate command, which still belongs to the current measure and can be written anywhere in it:
+You can also write a repeat sign as a separate command. It belongs to the current measure and can go anywhere in it:
 
 ```msq-editor opens-with=text
 measure
@@ -57,7 +57,7 @@ repeat sign at the start
 repeat sign at the end
 ```
 
-**Important note:** if a separate `repeat sign` comes right after a line of units, leave an empty line before it. Otherwise the word `repeat` is read as a repeat of the last unit, which is a [simile](/docs/language/similes). `colon` does not have this problem:
+**Important note:** if a separate `repeat sign` comes right after a line of units, put an empty line before it. Otherwise `repeat` is read as "repeat the last unit", which is a [simile](/docs/language/similes). `colon` doesn't have this problem:
 
 ```msq-editor opens-with=text
 measure
@@ -71,7 +71,7 @@ g a b c5
 colon at the end
 ```
 
-If you just write `repeat sign` (or `with repeat sign`), without saying which side, the dots are drawn on both sides of the measure:
+If you write just `repeat sign` (or `with repeat sign`), without a side, the dots are drawn on both sides of the measure:
 
 ```msq-editor opens-with=text
 measure
@@ -90,6 +90,6 @@ c5 b a g
 
 `at start` and `at end`, without `the`, work as well.
 
-Repeat signs are also played: when the MIDI player reaches a repeat sign at the end of a measure, it goes back to the last repeat sign at the start of a measure (or to the beginning, if there is none) and plays that part once more. More about playback you can read in [MIDI settings](/docs/language/midi-settings).
+Repeat signs are also played. When the MIDI player reaches a repeat sign at the end of a measure, it goes back to the last repeat sign at the start of a measure, or to the beginning if there is none, and plays that part once more. More about playback you can read in [MIDI settings](/docs/language/midi-settings).
 
 Read next: [Volta brackets](/docs/language/volta-brackets)

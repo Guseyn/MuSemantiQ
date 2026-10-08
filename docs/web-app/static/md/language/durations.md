@@ -1,6 +1,6 @@
 # Durations
 
-By default, the duration of a note is a quarter. You can easily change it by putting the duration before the note name, separated by a space:
+By default, a note is a quarter. But you can easily change that by putting the duration before the note, with a space:
 
 ```msq-editor opens-with=text
 1/2 c
@@ -8,11 +8,11 @@ By default, the duration of a note is a quarter. You can easily change it by put
 1/8 f g a b
 ```
 
-The duration is a separate word, so the space is required: `1/2c` is not recognised. And it always goes before the note, never after it.
+The duration is a separate word, so the space is required: `1/2c` is not recognised. And it always goes before the note, never after.
 
-## 1. All the durations
+## 1. All the Durations
 
-A duration is written as a whole number or a fraction. Let's take a look at the short ones first:
+A duration is a whole number or a fraction. Let's take a look at the short ones first:
 
 ```msq-editor opens-with=text
 1/4 a
@@ -33,7 +33,7 @@ And the long ones:
 4 a
 ```
 
-In the table below you can see all the durations that are supported at the moment:
+All the durations supported at the moment:
 
 | Duration | Name |
 | --- | --- |
@@ -49,11 +49,11 @@ In the table below you can see all the durations that are supported at the momen
 | `1/128` | hundred twenty-eighth note |
 | `1/256` | two hundred fifty-sixth note |
 
-Any other number, like `3` or `1/3`, is not a duration. Uneven durations are made with [dots](/docs/language/dots) and [tuplets](/docs/language/tuplets).
+Any other number, like `3` or `1/3`, is not a duration. For other lengths there are [dots](/docs/language/dots) and [tuplets](/docs/language/tuplets).
 
-## 2. A duration sticks
+## 2. A Duration Sticks
 
-If you want to change the duration for a sequence of notes, you just need to specify it one time before the first note in that sequence. Every note after it keeps that duration until another one is given:
+You write a duration only once, before the first note. All the next notes get the same duration until you write another one:
 
 ```msq-editor opens-with=text
 1/4 a a a
@@ -62,7 +62,7 @@ If you want to change the duration for a sequence of notes, you just need to spe
 1/8 a a a
 ```
 
-As you can see, the duration doesn't care about lines of the text: it carries on through them until you change it. So the first note on a line doesn't need a duration if it's the same as the one before:
+As you can see, new lines don't change the duration either. So the first note on a line doesn't need a duration if it's the same as before:
 
 ```msq-editor opens-with=text
 1/8 c d e f
@@ -70,7 +70,7 @@ g a b c5
 1/4 c5 b a g
 ```
 
-Only the notes before the first duration on a page take the default quarter:
+Only the notes before the first duration on a page are quarters by default:
 
 ```msq-editor opens-with=text
 c d
@@ -78,6 +78,6 @@ c d
 f
 ```
 
-It's important to mention that the last duration is remembered for each stave and each voice separately. So a duration in one voice never leaks into another. More about that you can read in [Staves](/docs/language/staves) and [Voices](/docs/language/voices).
+It's important to mention that the last duration is remembered for each stave and each voice separately. So a duration in one voice never goes into another one. More about that you can read in [Staves](/docs/language/staves) and [Voices](/docs/language/voices).
 
 Read next: [Dots](/docs/language/dots)

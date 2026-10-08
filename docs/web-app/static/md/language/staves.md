@@ -1,6 +1,6 @@
 # Staves
 
-Each measure consists of staves. Until now every example had just one, and MSQ created it for you. When you need more, you declare them with `stave`.
+Each measure consists of staves. Until now every example had one stave, and MSQ created it for you. If you need more, you declare them with `stave`.
 
 Let's start with a simple example:
 
@@ -12,11 +12,11 @@ stave with bass clef
 c3 d3 e3 f3
 ```
 
-As you can see, each `stave` opens a new stave in the current measure, and everything written after it, until the next `stave`, goes on that stave.
+As you can see, each `stave` starts a new stave in the current measure. Everything after it, until the next `stave`, goes on that stave.
 
-## 1. Declaring a stave
+## 1. Declaring a Stave
 
-`stave` must be the first word on its line, and it takes nothing else on that line except, optionally, a clef. You can declare a stave with a clef in one command, as above, or declare the stave and put the clef on the next line, the way you did on [Clefs](/docs/language/clefs):
+`stave` must be the first word on its line. The only other thing you can write on that line is a clef. So you can declare a stave and its clef in one line, like above, or put the clef on the next line, like on [Clefs](/docs/language/clefs):
 
 ```msq-editor opens-with=text
 measure
@@ -28,7 +28,7 @@ bass clef
 c3 b2 a2 g2
 ```
 
-Both forms produce the same thing. The combined form `stave with … clef` accepts every clef from [Clefs](/docs/language/clefs), including the octave ones:
+Both give the same result. `stave with … clef` works with every clef from [Clefs](/docs/language/clefs), including the octave ones:
 
 ```msq-editor opens-with=text
 measure
@@ -38,7 +38,7 @@ stave with bass clef
 stave with octave down clef
 ```
 
-If you prefer the American spelling, `staff` is accepted everywhere `stave` is:
+You can also write `staff` instead of `stave`, everywhere:
 
 ```msq-editor opens-with=text
 measure
@@ -48,11 +48,11 @@ staff with bass clef
 e3 f3 g3 a3
 ```
 
-**Side note:** A second clef in the same measure also opens a new stave, because one stave cannot start with two clefs. So `treble clef` followed later by `bass clef` gives you two staves even without the word `stave`. It works, but writing `stave` makes the structure much easier to read.
+**Side note:** A second clef in the same measure also starts a new stave, because one stave can't start with two clefs. So `treble clef` and then `bass clef` give you two staves even without `stave`. It works, but with `stave` the text is much easier to read.
 
-## 2. Staves are per measure
+## 2. Staves Are per Measure
 
-It's important to mention that staves belong to a measure, not to the whole page. Every measure declares its own staves, so a grand staff repeats `stave` in every measure:
+It's important to mention that staves belong to a measure, not to the page. Every measure declares its own staves, so for a grand staff you write `stave` in every measure:
 
 ```msq-editor opens-with=text
 measure
@@ -74,9 +74,9 @@ stave
 1 c3
 ```
 
-As you may notice, the clefs are written only in the first measure. A stave remembers the clef of the stave with the same number in the previous measures, so the second stave is still read in bass clef in the second and the third measure.
+As you may notice, the clefs are written only in the first measure. A stave takes the clef of the stave with the same number in the previous measures. So the second stave is still in bass clef in the second and the third measure.
 
-If a measure has notes but no `stave`, it has only one stave, and the others disappear from that measure:
+If a measure has notes but no `stave`, it has only one stave, and the other staves are gone in that measure:
 
 ```msq-editor opens-with=text
 measure
@@ -89,7 +89,7 @@ measure
 g a b c5
 ```
 
-The only exception is a measure with nothing in it at all. An empty measure is drawn with as many staves as the measure before it:
+The only exception is a completely empty measure. It's drawn with as many staves as the measure before it:
 
 ```msq-editor opens-with=text
 measure
@@ -101,9 +101,9 @@ c3 d3 e3 f3
 measure
 ```
 
-## 3. As many staves as you need
+## 3. As Many Staves as You Need
 
-You can declare as many staves in a measure as you need, and a stave may stay empty in some measures:
+You can declare as many staves in a measure as you need, and a stave can be empty in some measures:
 
 ```msq-editor opens-with=text
 measure
@@ -128,6 +128,6 @@ stave
 1 g3
 ```
 
-The staves in the first measure have clefs and nothing else. That is enough to set up the system, and the measures after it only need to say which stave the music goes on.
+The staves in the first measure have only clefs. That's enough to set them up, and the next measures only need to say which stave the music goes on.
 
 Read next: [Voices](/docs/language/voices)

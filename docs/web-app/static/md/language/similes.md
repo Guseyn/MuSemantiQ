@@ -1,10 +1,15 @@
 # Similes
 
-A simile is a mark that says "repeat what came before" instead of writing the same music again. There are four scopes of it: a unit, a range of units, the previous measure, and the two previous measures. A unit-level simile is written as an attribute of a unit, a range of units is a command of its own after the music, and a measure-level simile is a property of a measure.
+A simile is a mark that says "repeat what came before", so you don't write the same music again. A simile can repeat:
 
-## 1. Simile as a unit
+1. a unit: you write it after the unit;
+2. a range of units: a separate command after the music;
+3. the previous measure: a property of a measure;
+4. the two previous measures: a property of a measure.
 
-A simile can be considered as a sound unit, like notes, rests and chords. Let's start with a simple example, when you want to repeat a note several times:
+## 1. Simile as a Unit
+
+A simile is a sound unit, like notes, rests and chords. Let's start with a simple example, where we repeat a note several times:
 
 ```msq-editor opens-with=text
 measure
@@ -12,7 +17,7 @@ treble clef
 a repeat three times
 ```
 
-As you can see, `repeat` goes right after the unit, and `N times` says how many times it's repeated. Without `N times`, the unit is repeated once. You can also write `repeat via simile`, if you want to say it more explicitly:
+As you can see, `repeat` goes right after the unit, and `N times` says how many times. Without `N times`, the unit is repeated once. You can also write `repeat via simile`:
 
 ```msq-editor opens-with=text
 measure
@@ -21,7 +26,7 @@ a repeat
 c5 repeat via simile 2 times
 ```
 
-Of course, the duration of a simile is the same as the duration of the repeated unit:
+A simile has the same duration as the unit it repeats:
 
 ```msq-editor opens-with=text
 1/256 a repeat 2 times
@@ -39,7 +44,7 @@ treble clef
 c e g
 ```
 
-By default, simile marks are vertically positioned in the middle of the stave. But you can easily change that:
+By default, simile marks are in the middle of the stave. But you can easily change that:
 
 ```msq-editor opens-with=text
 measure
@@ -50,11 +55,11 @@ voice
 c repeat three times 2 down
 ```
 
-All you need is to specify a number and a direction after it. `2 down` means that we lower the element by two intervals between stave lines.
+All you need is to write a number and a direction. `2 down` moves the mark down by two intervals between stave lines.
 
-## 2. Simile for a range of units
+## 2. Simile for a Range of Units
 
-A simile can also repeat a range of units. Here we use unit positions, like for [slurs](/docs/language/slurs):
+A simile can also repeat a range of units. Here we point to units by their positions, like for [slurs](/docs/language/slurs):
 
 ```msq-editor opens-with=text
 measure
@@ -63,7 +68,7 @@ c d e f
 simile from first unit to 4th unit 3 times
 ```
 
-It might seem that the `simile` command is a part of the measure. Visually it is, of course. But in terms of the page structure, you can declare all similes after all measures. Let's take a look at the following example:
+The simile is drawn in the measure, but the `simile` command doesn't have to be written there. You can write all similes after all measures:
 
 ```msq-editor opens-with=text
 measure
@@ -79,9 +84,9 @@ c d e
 simile in measure 1 from unit 1 to unit 3
 ```
 
-As you may notice, we didn't specify a page line for the simile above. In this case, it takes the last line declared before `simile`. That's why `measure 1` is the first measure of the second line.
+As you may notice, we didn't write a page line for the simile above. In this case, it takes the last line before `simile`. That's why `measure 1` is the first measure of the second line.
 
-Let's put the simile before the second line and see how it works in this case:
+Let's put the simile before the second line:
 
 ```msq-editor opens-with=text
 measure
@@ -98,7 +103,7 @@ measure
 c d e
 ```
 
-You can also simply specify the line:
+You can also just name the line:
 
 ```msq-editor opens-with=text
 measure
@@ -115,7 +120,7 @@ c d e
 simile on line 1, in measure 1 from unit 1 to unit 3
 ```
 
-If you don't mention `measure`, `stave` or `voice`, the simile takes the first measure, the first stave and the first voice of the line. Let's take a look at a more complex example, where we specify all the coordinates:
+If you don't write `measure`, `stave` or `voice`, the simile takes the first measure, the first stave and the first voice of the line. Here we write all of them:
 
 ```msq-editor opens-with=text
 measure
@@ -152,9 +157,9 @@ from first unit to third unit
 1.5 down
 ```
 
-As you can see, the coordinates of the line, the measure, the stave and the voice go right after `simile`, and the units are named with `from` and `to` (or `starts at` and `finishes at`).
+As you can see, the line, the measure, the stave and the voice go right after `simile`, and the units go after `from` and `to` (or `starts at` and `finishes at`).
 
-Another important detail is that similes are also sound units. The `simile` command is not a part of the measure, but the units (simile marks) it adds belong to the measure. Let's examine the following commands:
+It's important to mention that similes are sound units. The `simile` command is not a part of the measure, but the simile marks it adds are units of the measure. Let's take a look at the following example:
 
 ```msq-editor opens-with=text
 measure
@@ -166,7 +171,7 @@ simile from unit 1 to unit 3
 simile from unit 4 to unit 6
 ```
 
-As you can see, you need to be careful when you specify unit positions, because the 4th unit above is actually the first simile. So we repeated a range of units where a simile is included. This is not what we want, so let's rewrite it correctly:
+As you can see, you need to be careful with unit positions: the 4th unit above is actually the first simile. So the range we repeated includes a simile. This is not what we want, so let's fix it:
 
 ```msq-editor opens-with=text
 measure
@@ -178,7 +183,7 @@ simile from unit 1 to unit 3
 simile from unit 5 to unit 7
 ```
 
-By default, a simile for a range of units is drawn as if it repeats the previous beat. MSQ does not know anything about the beat you use each time, so for flexibility, you specify whether it's one beat you want to repeat, or several beats:
+By default, a simile for a range of units is drawn as if it repeats the previous beat. MSQ doesn't know what your beat is, so you say yourself whether you repeat one beat or several beats:
 
 ```msq-editor opens-with=text
 measure
@@ -192,11 +197,16 @@ repeat of previous beat in measure 1 from unit 1 to unit 3
 repeat of previous beats in measure 2 from unit 1 to unit 6
 ```
 
-As you can see, the beat above is apparently equal to 3/8. In the first measure, we repeat one previous beat, so the simile mark has just two strokes. And in the second measure, we repeat two previous beats, and the simile mark has two strokes and one dot on each side. You can write `simile` instead of `repeat`, and `prev` or `prev.` instead of `previous`.
+As you can see, the beat above is 3/8:
 
-**Important note:** if a range simile starting with `repeat` comes right after a line of units, leave an empty line before it. Otherwise `repeat` gets attached to the last unit as a unit simile. `simile` does not have this problem.
+- in the first measure, we repeat one previous beat, so the simile mark has just two strokes;
+- in the second measure, we repeat two previous beats, so the mark has two strokes and a dot on each side.
 
-The example above can be written with beams, to show separate beats:
+You can write `simile` instead of `repeat`, and `prev` or `prev.` instead of `previous`.
+
+**Important note:** if a range simile that starts with `repeat` comes right after a line of units, put an empty line before it. Otherwise `repeat` is read as a simile of the last unit. `simile` doesn't have this problem.
+
+The same example with beams, to show the beats:
 
 ```msq-editor opens-with=text
 measure
@@ -210,7 +220,7 @@ repeat of previous beat in measure 1 from unit 1 to unit 3
 repeat of previous beats in measure 2 from unit 1 to unit 6
 ```
 
-You can expect that similes are synchronised according to their durations, like other units:
+Similes are lined up by their durations, like other units:
 
 ```msq-editor opens-with=text
 measure
@@ -224,7 +234,7 @@ d e f
 repeat of prev. beat in first stave from first unit to third unit two times
 ```
 
-Like in the previous section, you can correct the vertical position of simile marks:
+Like in the previous section, you can move simile marks up or down:
 
 ```msq-editor opens-with=text
 measure
@@ -234,7 +244,7 @@ treble clef
 repeat from unit 1 to unit 3 three times 2 down
 ```
 
-## 3. Simile of the previous measure
+## 3. Simile of the Previous Measure
 
 Like a [measure rest](/docs/language/measures), a simile of the previous measure is a property of a measure:
 
@@ -247,7 +257,7 @@ measure
 simile of previous measure
 ```
 
-It can also be written on one line with `measure`, and it can be counted:
+It can also be written on one line with `measure`, and you can say how many times:
 
 ```msq-editor opens-with=text
 measure
@@ -258,7 +268,7 @@ measure with simile of previous measure 3 times
 measure
 ```
 
-If you need to repeat the previous measure once, you don't need to specify the number of repetitions:
+To repeat the previous measure once, you don't need to write the number:
 
 ```msq-editor opens-with=text
 measure
@@ -282,7 +292,7 @@ measure with simile of previous measure 3 times
 measure
 ```
 
-As a separate command, it's counted in the same way:
+As a separate command, the number works the same way:
 
 ```msq-editor opens-with=text
 measure
@@ -295,9 +305,9 @@ measure
 
 You can write `repeat` instead of `simile`, `for` instead of `of`, and `prev` or `prev.` instead of `previous`.
 
-## 4. Simile of the two previous measures
+## 4. Simile of the Two Previous Measures
 
-In the same way, you can declare a simile of the two previous measures:
+In the same way, you can repeat the two previous measures:
 
 ```msq-editor opens-with=text
 measure
@@ -310,7 +320,7 @@ measure with simile of two previous measures 3 times
 measure
 ```
 
-If you need to repeat the two previous measures once, you don't need to specify the number of repetitions:
+To repeat them once, you don't need to write the number:
 
 ```msq-editor opens-with=text
 measure
@@ -323,7 +333,7 @@ measure with simile of two previous measures
 measure
 ```
 
-A simile of the two previous measures applies to all the staves:
+It also applies to all the staves:
 
 ```msq-editor opens-with=text
 measure
@@ -341,7 +351,7 @@ measure with simile of two previous measures 3 times
 measure
 ```
 
-You can also declare it as a separate command:
+You can also write it as a separate command:
 
 ```msq-editor opens-with=text
 measure
@@ -356,6 +366,6 @@ measure
 
 `2` can be written instead of `two`.
 
-Similes are not only drawn: the MIDI player plays the repeated units, measures and ranges as if they were written out in full.
+Similes are not only drawn. The MIDI player plays the repeated units, measures and ranges as if they were written out in full.
 
 Read next: [Unit spacing](/docs/language/unit-spacing)

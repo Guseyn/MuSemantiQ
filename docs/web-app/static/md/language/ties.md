@@ -1,6 +1,6 @@
 # Ties
 
-A tie joins two notes of the same pitch into one sound: the second note is not played again, it just makes the first one longer. You can connect notes with ties as follows:
+A tie joins two notes of the same pitch into one sound. The second note is not played again, it just makes the first one longer. You connect notes with ties like this:
 
 ```msq-editor opens-with=text
 1/4 c is tied with next
@@ -9,11 +9,11 @@ c
 1/8 d
 ```
 
-You can omit `is`, and write just `tied with next`.
+You can skip `is`, and write just `tied with next`.
 
-## 1. Direction of a tie
+## 1. Direction of a Tie
 
-The direction of a tie depends on the stem directions and on the positions of the tied notes:
+The direction of a tie depends on the stems and the positions of the tied notes:
 
 ```msq-editor opens-with=text
 a with stem up, tied with next
@@ -29,7 +29,7 @@ a with stem down, tied with next
 a with stem up
 ```
 
-But you can force the direction of a tie with `up` or `down` right after it:
+But you can set it with `up` or `down` right after the tie:
 
 ```msq-editor opens-with=text
 a with stem down, tied with next up
@@ -48,9 +48,9 @@ e tied with next below
 e
 ```
 
-## 2. Roundness of a tie
+## 2. Roundness of a Tie
 
-You can also control the roundness, or convexity, of a tie. All you need is to specify a number from **1** to **10** with `with roundness`. The bigger the number, the more a tie is rounded:
+You can also set how round a tie is. All you need is to write `with roundness` and a number from **1** to **10**. The bigger the number, the rounder the tie:
 
 ```msq-editor opens-with=text
 1/2 a tied with next, with roundness 1
@@ -63,11 +63,11 @@ You can also control the roundness, or convexity, of a tie. All you need is to s
 1/8 a
 ```
 
-`with convex` works the same way as `with roundness`. By default, if you don't specify the number, the roundness varies depending on the distance between the tied units.
+`with convex` works the same as `with roundness`. By default, the roundness depends on the distance between the tied units.
 
-## 3. Tied chords
+## 3. Tied Chords
 
-The same way you tie chords:
+You tie chords the same way:
 
 ```msq-editor opens-with=text
 1/2 chord tied with next
@@ -82,7 +82,7 @@ c d e f g
 
 ```
 
-As you can see above, a chord without whole tones and a chord with whole tones are connected differently. Let's try to change the direction of the ties:
+As you can see, a chord without whole tones and a chord with whole tones are tied differently. Let's change the direction of the ties:
 
 ```msq-editor opens-with=text
 1/2 chord tied with next up
@@ -97,9 +97,9 @@ c d e f g
 
 ```
 
-For chords without whole tones we change the direction of all the ties. In the chord with whole tones, the top tie stays directed upwards and the bottom tie downwards, to avoid intersections between notes and ties.
+In the chord without whole tones, all the ties change direction. In the chord with whole tones, the top tie still goes up and the bottom tie still goes down, so ties don't cross notes.
 
-If a note in a chord is tied, then the whole chord is tied with what follows:
+If a note in a chord is tied, the whole chord is tied with the next one:
 
 ```msq-editor opens-with=text
 chord
@@ -109,11 +109,11 @@ c e g
 
 ```
 
-## 4. What a tie connects to
+## 4. What a Tie Connects To
 
-It's worth to note that a tie doesn't connect notes, it rather connects positions of notes. A tie always tries to find a note on the same position among the units that follow after the tied unit, in the same voice. By using this technique ties look more pleasant to the eye, especially for chords with whole tones.
+A tie doesn't connect notes, it connects positions of notes. A tie looks for a note on the same position in the next units of the same voice. This way ties look nicer, especially for chords with whole tones.
 
-So a tied chord can be connected to separate notes, and separate tied notes to a chord:
+So a tied chord can connect to separate notes, and separate tied notes to a chord:
 
 ```msq-editor opens-with=text
 1/4 chord tied with next up
@@ -132,7 +132,7 @@ c e g
 
 ```
 
-And a tie can skip the units that have nothing on its position:
+And a tie skips the units that have nothing on its position:
 
 ```msq-editor opens-with=text
 1/2 c is tied with next
@@ -140,16 +140,16 @@ And a tie can skip the units that have nothing on its position:
 1/4 c
 ```
 
-If a tie cannot connect to any note, it will be drawn till the end of the line:
+If a tie can't find a note, it's drawn to the end of the line:
 
 ```msq-editor opens-with=text
 1/4 c d e is tied with next
 f
 ```
 
-## 5. Ties before and after
+## 5. Ties Before and After
 
-A tie can also come from before a unit, or go on after it, without a second note. You write it as `is tied before` or `is tied after`. `is` can be omitted here too:
+A tie can also come from before a unit, or go on after it, without a second note. You write `is tied before` or `is tied after`. You can skip `is` here too:
 
 ```msq-editor opens-with=text
 1/2 a is tied before
@@ -157,7 +157,7 @@ A tie can also come from before a unit, or go on after it, without a second note
 d5 is tied after
 ```
 
-The direction and the roundness work for them in the same way:
+The direction and the roundness work the same for them:
 
 ```msq-editor opens-with=text
 1/2 a tied before up
@@ -165,10 +165,20 @@ The direction and the roundness work for them in the same way:
 d5 tied after down, with roundness 3
 ```
 
-It's the way to write a tie that comes from the previous line of the page, or goes on to the next one.
+This is how you write a tie that comes from the previous page line, or goes on to the next one.
 
-A tie before or after can also reach into another measure. For that, add the number of a measure on the same page line to it: `is tied before measure 2` draws the tie from the start of the second measure of the line, and `is tied after measure 4` draws it till the end of the fourth one. The measure must contain something though. It can be useful in combination with [volta brackets](/docs/language/volta-brackets). You will see how measures are declared in [Measures](/docs/language/measures).
+A tie before or after can also go into another measure. For that, add the number of a measure on the same page line:
 
-It's important to mention how a tie differs from a slur. A tie joins notes on the same position into one longer sound, and it finds its second note by itself. A slur can connect any units, of any pitch, and you say exactly where it starts and where it finishes. Slurs you can read about in [Slurs](/docs/language/slurs).
+- `is tied before measure 2` draws the tie from the start of the second measure of the line.
+- `is tied after measure 4` draws it to the end of the fourth measure.
+
+The measure must not be empty. It's useful with [volta brackets](/docs/language/volta-brackets). You will see how to write measures in [Measures](/docs/language/measures).
+
+It's important to mention how a tie is different from a slur:
+
+- A tie joins notes on the same position into one longer sound, and it finds its second note itself.
+- A slur can connect any units, of any pitch, and you say exactly where it starts and where it finishes.
+
+You can read about slurs in [Slurs](/docs/language/slurs).
 
 Read next: [Tuplets](/docs/language/tuplets)

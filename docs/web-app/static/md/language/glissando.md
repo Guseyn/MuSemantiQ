@@ -1,10 +1,10 @@
 # Glissando
 
-A glissando is a slide from one sound to another. For different cases you can write it in two ways: as an attribute of a unit, or as a separate command that connects two units.
+A glissando is a slide from one sound to another. You can write it in two ways: as an attribute of a unit, or as a separate command that connects two units.
 
-## 1. Glissando as a unit attribute
+## 1. Glissando as a Unit Attribute
 
-If a glissando needs to go out of a unit and finish after the measure, you just need to type `with glissando`:
+If a glissando goes out of a unit and finishes after the measure, you just need to write `with glissando`:
 
 ```msq-editor opens-with=text
 measure
@@ -12,7 +12,7 @@ treble clef
 a with glissando
 ```
 
-You can set a direction, and also explicitly say that the glissando finishes after the measure:
+You can set a direction, and also say that the glissando finishes after the measure:
 
 ```msq-editor opens-with=text
 measure
@@ -20,7 +20,7 @@ treble clef
 a with glissando after up
 ```
 
-In a similar way, you can say that a glissando comes into a unit from before the measure:
+In the same way, you can say that a glissando comes into a unit from before the measure:
 
 ```msq-editor opens-with=text
 measure
@@ -28,7 +28,7 @@ treble clef
 a with glissando before up
 ```
 
-You can also specify the number of the measure that a glissando finishes after or starts before. It's important to mention that those measures cannot be empty:
+You can also write the number of the measure that a glissando finishes after or starts before. It's important to mention that those measures can't be empty:
 
 ```msq-editor opens-with=text
 measure
@@ -52,11 +52,11 @@ stave
 1/16 a beamed b c d a b c d
 ```
 
-As you can see, `before` and `after` with a measure number are how a glissando reaches across the end of a page line: the measure numbers are counted within the page line where the unit is.
+As you can see, this is how a glissando goes from one page line to the next: with `before` and `after` and a measure number. The measures are counted within the page line of the unit.
 
-## 2. Glissando as a separate command
+## 2. Glissando as a Separate Command
 
-In order to connect two units, you use `glissando` as a separate command, after the music, like a [slur](/docs/language/slurs):
+To connect two units, you write `glissando` as a separate command after the music, like a [slur](/docs/language/slurs):
 
 ```msq-editor opens-with=text
 measure
@@ -85,7 +85,7 @@ glissando in first measure from first unit to second unit
 glissando in second measure from unit 1 to unit 2
 ```
 
-Like slurs, glissandos are cross-measure elements:
+Like slurs, glissandos can go from one measure to another:
 
 ```msq-editor opens-with=text
 measure
@@ -117,7 +117,7 @@ from first unit in first measure on first stave
 to first unit in second measure on second stave
 ```
 
-You can also declare glissandos that start before a unit or finish after a unit:
+A glissando can also start before a unit or finish after a unit:
 
 ```msq-editor opens-with=text
 measure
@@ -131,7 +131,7 @@ glissando up starts before first unit on first stave
 glissando down finishes after first unit on second stave
 ```
 
-By default, a glissando is drawn as a wave. But you can explicitly say that it's a `wave` or a `line`:
+By default, a glissando is drawn as a wave. But you can say that it's a `wave` or a `line`:
 
 ```msq-editor opens-with=text
 measure
@@ -167,14 +167,16 @@ to first unit in fourth measure on second stave
 
 You can also write `as waves` and `as lines`.
 
-The unit coordinates for glissandos work in the same way as for [slurs](/docs/language/slurs), you have to remember the following rules:
+The coordinates of units work the same as for [slurs](/docs/language/slurs). You have to remember the following rules:
 
-1. If a `line` is not specified after the `glissando` key word, it applies to the last line declared before it.
-2. If you don't specify `measure`, `stave` and `voice`, it assumes that you mean the first measure, the first stave and the first voice.
-3. Along with a `unit` coordinate you can specify only `measure` and `stave` (like `first note in first measure, in second stave`). You cannot set `voice` along with a unit, only right after the `glissando` key word, for the whole glissando, because a glissando is not a cross-voice element. And you cannot set `line` along with a unit, because each glissando, or each part of a glissando, is declared for the line where it is located.
-4. If you specified `measure` and `stave` for the first unit, and they don't change for the second one, you don't need to repeat them.
+1. If you don't write `line` after `glissando`, it applies to the last line above it.
+2. If you don't write `measure`, `stave` and `voice`, it means the first measure, the first stave and the first voice.
+3. Next to a `unit` you can write only `measure` and `stave` (like `first note in first measure, in second stave`).
+   - `voice` goes right after `glissando`, for the whole glissando, because a glissando can't go from one voice to another.
+   - `line` can't go next to a unit, because each glissando, or each part of it, belongs to the line where it's written.
+4. If `measure` and `stave` of the second unit are the same as of the first one, you don't need to repeat them.
 
-The key word `glissando` can also be written as `gliss` or `gliss.`, both as a command and in `with glissando`:
+You can also write `glissando` as `gliss` or `gliss.`, both as a command and in `with glissando`:
 
 ```msq-editor opens-with=text
 measure
@@ -187,6 +189,6 @@ measure
 gliss. in second measure from first unit to second unit
 ```
 
-Both kinds of glissando are also heard: the MIDI player plays a glissando as a quick run of notes, and for a glissando on a single unit it follows the direction you set.
+You also hear both kinds of glissando: the MIDI player plays a glissando as a quick run of notes. For a glissando on one unit, it goes in the direction you set.
 
 Read next: [Tremolo](/docs/language/tremolo)

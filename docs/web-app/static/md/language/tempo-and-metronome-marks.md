@@ -1,8 +1,8 @@
-# Tempo and metronome marks
+# Tempo and Metronome Marks
 
-Each measure can have a tempo or metronome mark. You declare it as a text, which can be a word, a metronome mark, or both. Durations written in the text are drawn as note symbols.
+Each measure can have a tempo or metronome mark. You write it as a text: a word, a metronome mark, or both. Durations in the text are drawn as note symbols.
 
-Let's start with a basic example, where we use only a word:
+Let's start with a simple example, with only a word:
 
 ```msq-editor opens-with=text
 measure
@@ -11,7 +11,7 @@ tempo is "Andante"
 c d e f
 ```
 
-You can write `tempo`, `tempo mark`, `tempo note`, `metronome`, `metronome mark` or `metro`, they are all the same thing here, so you can use the words that feel more appropriate in each case. The `is` can be omitted.
+You can write `tempo`, `tempo mark`, `tempo note`, `metronome`, `metronome mark` or `metro`. They all mean the same thing. You can skip `is`.
 
 Let's add a note to the mark:
 
@@ -22,7 +22,7 @@ metronome mark is "Allegro (1/4 = 120)"
 c d e f
 ```
 
-Each time you write a duration in the text, it's converted to the corresponding note symbol. These are all the supported ones:
+Each duration in the text is drawn as its note symbol. These are all the supported ones:
 
 ```msq-editor opens-with=text
 measure
@@ -40,7 +40,7 @@ tempo is "Moderato (quarter = 96)"
 c d e f
 ```
 
-You can also write durations with dots, with `dotted` or `with dot` after them:
+To add a dot to a duration, write `dotted` or `with dot` after it:
 
 ```msq-editor opens-with=text
 measure
@@ -49,7 +49,7 @@ metronome mark is "1 dotted, 1/2 with dot, 1/4 dotted, 1/8 with dot, 1/16 dotted
 c d e f
 ```
 
-The vertical position of a tempo mark is always adjusted, but you can correct it regardless:
+A tempo mark moves up or down by itself, but you can correct it:
 
 ```msq-editor opens-with=text
 measure
@@ -74,6 +74,11 @@ tempo is "a tempo (1/4 = 100)"
 c5 b a g
 ```
 
-It's important to mention that a tempo mark is not only drawn, it's also what the MIDI player plays at. If the text contains a metronome mark like **1/4 = 120**, that is the tempo. If it contains only a tempo word, like **Andante** or **Presto**, the player takes a tempo for that word, and words like **accelerando** or **rit.** change the tempo gradually. Without any tempo mark, the music is played at **120** quarters per minute, and the `default tempo` setting from [MIDI settings](/docs/language/midi-settings) changes that, but only when the first measure has no tempo mark of its own.
+It's important to mention that a tempo mark is not only drawn. The MIDI player also plays at that tempo:
+
+- If the text has a metronome mark like **1/4 = 120**, that is the tempo.
+- If it has only a tempo word, like **Andante** or **Presto**, the player picks a tempo for that word.
+- Words like **accelerando** or **rit.** change the tempo gradually.
+- Without any tempo mark, the music is played at **120** quarters per minute. The `default tempo` setting from [MIDI settings](/docs/language/midi-settings) changes that, but only when the first measure has no tempo mark of its own.
 
 Read next: [Measure numbers](/docs/language/measure-numbers)

@@ -169,12 +169,14 @@ browser-app/web-app/static/js/msq/
 # The wordmark, linked from the repository root rather than copied.
 browser-app/web-app/static/images/logo.svg
 
-# Everything under dev-tools/ that a command rebuilds. `npm run dev-tools` runs
-# all of them before starting the server, so a clone needs none of it tracked:
+# Everything under dev-tools/ that a command rebuilds. `npm run dev-tools:setup`
+# runs all of them, so a clone needs none of it tracked. nodes, EHTML and e-ui
+# come either from GitHub or, for the maintainer, from the checkouts next to
+# this one:
 #
-#   nodes/            npm run dev-tools:nodes:update   (from ../nodes.js)
-#   js/ehtml/         npm run dev-tools:ehtml:update   (from ../EHTML)
-#   js/e-ui/, e-ui.css  npm run dev-tools:eui:update   (from ../e-ui)
+#   nodes/            npm run dev-tools:download, or dev-tools:nodes:update  (from ../nodes.js)
+#   js/ehtml/         npm run dev-tools:download, or dev-tools:ehtml:update  (from ../EHTML)
+#   js/e-ui/, e-ui.css  npm run dev-tools:download, or dev-tools:eui:update  (from ../e-ui)
 #   js/msq/           npm run web-components:update + msq:apps:update
 #   font/             npm run setup:symlinks
 #   images/logo.svg   npm run setup:symlinks

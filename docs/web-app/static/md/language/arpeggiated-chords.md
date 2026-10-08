@@ -1,6 +1,6 @@
-# Arpeggiated chords
+# Arpeggiated Chords
 
-An arpeggiated (rolled) chord is played one note after another rather than all at once, and it is drawn with a wavy line in front of it. You can turn any chord into an arpeggiated one:
+An arpeggiated (rolled) chord is played one note after another, not all at once. It's drawn with a wavy line in front of it. Any chord can be arpeggiated:
 
 ```msq-editor opens-with=text
 chord is arpeggiated
@@ -11,7 +11,7 @@ d f a d5
 
 ```
 
-As you remember from [Chords](/docs/language/chords), everything about a chord goes on the `chord` line, and `is arpeggiated` is no exception. You can also write `is arpeggio`, or leave out `is`:
+As you remember from [Chords](/docs/language/chords), everything about a chord goes on the `chord` line, and `is arpeggiated` too. You can also write `is arpeggio`, or leave out `is`:
 
 ```msq-editor opens-with=text
 chord is arpeggiated
@@ -25,7 +25,7 @@ c e g b
 
 ```
 
-The wave is drawn as tall as the chord it rolls, so chords of different reach get waves of different length:
+The wave is as tall as its chord, so a wider chord gets a longer wave:
 
 ```msq-editor opens-with=text
 measure
@@ -46,7 +46,7 @@ c e g c5 e5 g5
 
 ## 1. Arrows
 
-You can add an arrow to the wave to show the direction of the roll:
+You can add an arrow to the wave to show the direction:
 
 ```msq-editor opens-with=text
 chord is arpeggiated with arrow up
@@ -59,11 +59,11 @@ c e g b
 
 If you write just `with arrow`, the arrow points up.
 
-By default, the notes of an arpeggiated chord are played from the lowest one up. An arrow down turns that around, and the chord is played from the highest note down.
+By default, the notes are played from the lowest one up. With an arrow down, they are played from the highest one down.
 
-## 2. Arpeggiated chords in several voices
+## 2. Arpeggiated Chords in Several Voices
 
-A chord can be arpeggiated in each voice, and the waves can be joined into one. You just need to write `with chord below` on the upper chord:
+If chords in different voices are arpeggiated, you can join their waves into one. You just need to write `with chord below` on the upper chord:
 
 ```msq-editor opens-with=text
 measure
@@ -78,11 +78,11 @@ g3 b3 d
 
 ```
 
-It's important to mention that the chord below has to be arpeggiated as well, because `with chord below` only joins two waves: it does not create the second one.
+It's important to mention that the chord below has to be arpeggiated too, because `with chord below` only joins two waves. It doesn't create the second one.
 
-## 3. Arpeggiated chords across staves
+## 3. Arpeggiated Chords Across Staves
 
-In the same way, you can join arpeggiated chords on different staves, so that one wave spans both hands:
+In the same way, you can join arpeggiated chords on different staves, so one wave goes through both of them:
 
 ```msq-editor opens-with=text
 measure
@@ -100,6 +100,6 @@ c3 g3 c
 
 ```
 
-The waves joined like this are also played as one roll, through all the chords they connect.
+Joined waves are also played as one roll, through all the chords they connect.
 
 Read next: [Chord letters](/docs/language/chord-letters)

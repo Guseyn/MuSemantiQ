@@ -1,6 +1,6 @@
-# Crescendo and diminuendo
+# Crescendo and Diminuendo
 
-A crescendo or a diminuendo (a hairpin) is a span, like a [slur](/docs/language/slurs): it's a command of its own, written after the music, and it names the units where it starts and finishes.
+A crescendo or a diminuendo (a hairpin) works like a [slur](/docs/language/slurs): it's a separate command, you write it after the music, and it names the units where it starts and finishes.
 
 Let's start with a simple example:
 
@@ -12,14 +12,14 @@ treble clef
 crescendo below stave from first unit to fourth unit
 ```
 
-The key words can be written in different ways:
+You can write the key words in different ways:
 
 | Hairpin | Key words |
 | --- | --- |
 | crescendo | `crescendo`, `cresc`, `cresc.`, `cres`, `cres.` |
 | diminuendo | `diminuendo`, `dim`, `dim.` |
 
-An endpoint can also carry a dynamic, so the hairpin starts or finishes with letters:
+A hairpin can also start or finish with a dynamic:
 
 ```msq-editor opens-with=text
 measure
@@ -37,9 +37,9 @@ starts with "f" at 1st unit
 finishes with "p" at 5th unit
 ```
 
-You can omit the dynamic letters if you don't need them, on one side or on both. The letters are written in quotes, like in `with dynamic` for a single unit, which you can read about in [Dynamics](/docs/language/dynamics).
+You can skip the dynamic on one side or on both. The letters are in quotes, the same as `with dynamic` in [Dynamics](/docs/language/dynamics).
 
-By default, a hairpin is drawn above the stave. But you can easily change that, either with `up` and `down`, or with `above stave` and `below stave`:
+By default, a hairpin is drawn above the stave. But you can easily change that with `up` and `down`, or with `above stave` and `below stave`:
 
 ```msq-editor opens-with=text
 measure
@@ -71,7 +71,7 @@ finishes with "p" at 5th unit
 
 You can also write `over stave` and `under stave`, and `staff` instead of `stave`.
 
-The vertical position of a hairpin is always adjusted, so it does not intersect other elements. But you still can correct it:
+A hairpin is moved up or down automatically, so it doesn't cross other elements. But you can still move it yourself:
 
 ```msq-editor opens-with=text
 measure
@@ -89,7 +89,7 @@ starts with "f" at 1st unit
 finishes with "p" at 5th unit
 ```
 
-Here we moved the crescendo up by one interval between stave lines, and the diminuendo down by one interval.
+Here the crescendo goes up by one interval between stave lines, and the diminuendo goes down by one interval.
 
 A hairpin can run from one measure into another:
 
@@ -103,14 +103,16 @@ g a b c5
 diminuendo from third unit in first measure to second unit in second measure
 ```
 
-The unit coordinates for crescendo and diminuendo work almost in the same way as for [slurs](/docs/language/slurs), you have to remember the following rules:
+The coordinates of units work almost the same as for [slurs](/docs/language/slurs). You have to remember the following rules:
 
-1. If a `line` is not specified after the `crescendo` or `diminuendo` key word, the hairpin applies to the last line declared before it.
-2. If you don't specify `measure`, `stave` and `voice`, it assumes that you mean the first measure, the first stave and the first voice.
-3. Along with a `unit` coordinate you can specify only `measure` (like `first note in first measure`). You cannot set `stave` and `voice` along with a unit, only right after the key word, for the whole hairpin, because a hairpin is not a cross-stave or cross-voice element. And you cannot set `line` along with a unit, because each hairpin is declared for the line where it is located.
-4. If you specified `measure` for the first unit, and it does not change for the last one, you don't need to repeat it.
+1. If you don't write `line` after `crescendo` or `diminuendo`, the hairpin applies to the last line above it.
+2. If you don't write `measure`, `stave` and `voice`, it means the first measure, the first stave and the first voice.
+3. Next to a `unit` you can write only `measure` (like `first note in first measure`).
+   - `stave` and `voice` go right after the key word, for the whole hairpin, because a hairpin can't go from one stave or voice to another.
+   - `line` can't go next to a unit, because each hairpin belongs to the line where it's written.
+4. If the last unit is in the same `measure` as the first one, you don't need to repeat it.
 
-Here is a hairpin on the second stave, with the stave named for the whole hairpin:
+Here is a hairpin on the second stave:
 
 ```msq-editor opens-with=text
 measure

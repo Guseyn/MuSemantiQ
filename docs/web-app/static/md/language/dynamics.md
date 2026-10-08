@@ -1,6 +1,6 @@
 # Dynamics
 
-A dynamic mark is an attribute of a unit. You write it with `with dynamic`, and the letters go in quotes.
+You add a dynamic mark to a unit with `with dynamic`. The letters go in quotes.
 
 Let's start with a simple example:
 
@@ -12,11 +12,11 @@ f
 g with dynamic "ff" below stave
 ```
 
-It's important to mention that the quotes are required: `with dynamic p` is not recognised. Either double or single quotes will do.
+It's important to mention that the quotes are required: `with dynamic p` doesn't work. Double or single quotes are both fine.
 
-## 1. Supported letters
+## 1. Supported Letters
 
-The music font has a drawn glyph for each of these values, so they look the way dynamics look in engraved music:
+The music font has a glyph for each of these values, so they look like dynamics in printed music:
 
 | | |
 | --- | --- |
@@ -40,7 +40,7 @@ a with dynamic "sfz"
 a with dynamic "rfz"
 ```
 
-Anything else in the quotes is still drawn, just as plain text in the dynamics font rather than as a glyph:
+Anything else in the quotes is still drawn, but as plain text in the dynamics font, not as a glyph:
 
 ```msq-editor opens-with=text
 1/2 a with dynamic "poco f"
@@ -59,7 +59,7 @@ a with dynamic "mf" up
 a with dynamic "f" down
 ```
 
-You can use different phrasing to set a direction — `above` and `below`, `over` and `under`, or `is down`:
+You can also write `above` and `below`, `over` and `under`, or `is down`:
 
 ```msq-editor opens-with=text
 a with dynamic "p" above
@@ -69,7 +69,7 @@ a with dynamic "f" under
 a with dynamic "ff" is down
 ```
 
-A dynamic mark is always outside the stave, whichever way you choose. So `above stave` and `below stave` do not change anything here, but you can use them to emphasise it:
+A dynamic mark is always outside the stave. So `above stave` and `below stave` don't change anything here, but you can still write them if you like:
 
 ```msq-editor opens-with=text
 a with dynamic "p" above stave
@@ -78,9 +78,9 @@ a with dynamic "mf" above stave
 a with dynamic "f" below stave
 ```
 
-## 3. Vertical correction
+## 3. Vertical Correction
 
-The vertical position of a dynamic mark is always adjusted, so it does not intersect other elements. But you can still correct it: `1 up` moves it one interval between stave lines up, and `1 down` moves it one interval down:
+A dynamic mark is always placed so that it doesn't cross other elements. But you can still move it yourself: `1 up` moves it up by one interval between stave lines, and `1 down` moves it down by one:
 
 ```msq-editor opens-with=text
 a with dynamic "p" above stave 1 up
@@ -91,7 +91,7 @@ a with dynamic "f" below stave 1 down
 
 ## 4. Chords
 
-A chord takes a dynamic mark on its `chord` line:
+For a chord, the dynamic mark goes on the `chord` line:
 
 ```msq-editor opens-with=text
 1/2 chord with dynamic "p"
@@ -102,9 +102,9 @@ c e g c5
 
 ```
 
-## 5. Dynamics in playback
+## 5. Dynamics in Playback
 
-A dynamic mark sets how loud the music is played, from its unit onwards, until the next dynamic mark:
+A dynamic mark sets how loud the music is played, from its unit until the next dynamic mark:
 
 ```msq-editor opens-with=text
 1/4 c with dynamic "pp"
@@ -113,7 +113,7 @@ g with dynamic "ff"
 a b c5
 ```
 
-These are the MIDI velocities each value is played with, out of **127**. A unit before any dynamic mark is played at **100**:
+These are the MIDI velocities for each value, out of **127**. A unit before any dynamic mark is played at **100**:
 
 | Value | Velocity | Value | Velocity | Value | Velocity |
 | --- | --- | --- | --- | --- | --- |
@@ -128,6 +128,6 @@ These are the MIDI velocities each value is played with, out of **127**. A unit 
 | **r** | 100 | **rf** | 47 | **rfz** | 57 |
 | **s** | 120 | **z** | 127 | | |
 
-A gradual change of dynamics — a hairpin — is not an attribute of one unit but a span across several, so it has its own page: [Crescendo and diminuendo](/docs/language/crescendo-and-diminuendo).
+A gradual change of dynamics, a hairpin, goes across several units, not one. So it has its own page: [Crescendo and diminuendo](/docs/language/crescendo-and-diminuendo).
 
 Read next: [Text labels](/docs/language/text-labels)

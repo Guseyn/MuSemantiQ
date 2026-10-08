@@ -1,8 +1,11 @@
-# Unit spacing
+# Unit Spacing
 
-There are a couple of ways to manage space on a page. You can change the font size, or the width of a page line, and both are explained in [Page format](/docs/language/page-format). Another way is to change the spacing between units, and that is what this page is about.
+You can manage space on a page in a few ways:
 
-In **MuSemantiQ**, the space between two units depends on the unit with the shortest duration on the page line those units belong to. Let's take a look at the following score:
+- change the font size or the width of a page line, see [Page format](/docs/language/page-format);
+- change the spacing between units, which is what this page is about.
+
+The space between two units depends on the shortest unit on their page line. Let's take a look at the following score:
 
 ```msq-editor opens-with=text
 1 a
@@ -23,9 +26,12 @@ new line
 1/8 a
 ```
 
-As you can see, the whole note on the first line takes less space than the whole note on the third line. The first line has nothing shorter than a half note, so a half note gets the least space there, and everything else is measured from it. On the third line the shortest unit is an eighth, so the eighth gets that least space, and every longer unit gets more.
+As you can see, the whole note on the first line takes less space than the whole note on the third line:
 
-It means that a line with short notes gets wide quickly. MuSemantiQ does not squeeze a line to make it fit: you can put on a line as many things as you want. But when at least one line crosses the bounds, a red dashed line is drawn where every line should end:
+- On the first line, the shortest unit is a half note. It gets the least space, and the other units get more.
+- On the third line, the shortest unit is an eighth. Now the eighth gets the least space, so every longer unit gets more.
+
+So a line with short notes gets wide quickly. MSQ doesn't squeeze a line to make it fit: you can put as many things on a line as you want. But when a line goes too far, a red dashed line shows where every line should end:
 
 ```msq-editor opens-with=text
 1/32 c d e f g a b c5 d5 e5 f5 g5 a5 b5 c6 d6
@@ -33,7 +39,7 @@ It means that a line with short notes gets wide quickly. MuSemantiQ does not squ
 1/32 c d e f g a b c5 d5 e5 f5 g5 a5 b5 c6 d6
 ```
 
-## 1. Compressing units
+## 1. Compressing Units
 
 When a page is too loose, or a line does not fit, you can compress units:
 
@@ -52,7 +58,7 @@ new line
 1/8 a
 ```
 
-It's important to mention that the number must be greater than **1** and not greater than **5**. It does not have to be whole: **1.2** or **2.5** works just as well. You can also write it as a word:
+The number must be greater than **1** and not greater than **5**. It can be a fraction, like **1.2** or **2.5**. You can also write it as a word:
 
 ```msq-editor opens-with=text
 compress units by two times
@@ -64,9 +70,9 @@ compress units by two times
 1/8 a
 ```
 
-## 2. Stretching units
+## 2. Stretching Units
 
-In the same way, you can stretch units, and the number follows the same rules:
+In the same way, you can stretch units. The number has the same rules:
 
 ```msq-editor opens-with=text
 stretch units by 1.4 times
@@ -76,9 +82,9 @@ treble clef
 1/4 c d e f
 ```
 
-## 3. Only one line
+## 3. Only One Line
 
-Usually it's only one line that is crowded, and the rest of the page is fine. So you can compress or stretch units only in a certain page line, by adding `in line` and its number:
+Usually only one line is crowded. So you can compress or stretch units only in one page line, by adding `in line` and its number:
 
 ```msq-editor opens-with=text
 compress units by 2 times in line 2
@@ -102,7 +108,7 @@ new line
 1/8 a
 ```
 
-Page lines are counted from **1**, the same way `new line` creates them. The line can also be named the other way round, with an ordinal, which reads more naturally sometimes:
+Page lines are counted from **1**. You can also name a line with an ordinal, like `first` or `2nd`:
 
 ```msq-editor opens-with=text
 stretch units by 1.5 times in the first line
@@ -118,11 +124,11 @@ new line
 
 Instead of `in` you can also write `on`, `at` or `with`, and `the` is optional: `on line 2`, `in the line 2`, `line 2`, `the 2nd line`.
 
-A line that has its own setting ignores the setting for the whole page, so you can combine both: one number for the page, and a different one for the line that needs it. The only exception is when a line ends up with both a compression and a stretching, then the stretching wins.
+A line with its own setting ignores the setting for the whole page. So you can have one number for the page and another one for a single line. If a line has both a compression and a stretching, the stretching wins.
 
-## 4. Hiding the last measure
+## 4. Hiding the Last Measure
 
-As you remember from [Measures](/docs/language/measures), the last measure of a line fills the rest of the space on that line. So if you want the last measure with music to keep its own width and its closing barline, you end the page with one more measure, an empty one, and that one stretches to the end of the line instead. You can hide it:
+As you remember from [Measures](/docs/language/measures), the last measure of a line fills the rest of that line. If you want the last measure with music to keep its own width, add one more empty measure at the end of the page. The empty one stretches to the end of the line instead, and you can hide it:
 
 ```msq-editor opens-with=text
 hide the last measure
@@ -135,6 +141,6 @@ measure
 measure
 ```
 
-As you can see, the music stops where it stops, and the page keeps its width. It works only for the last measure of the whole page, and only if that measure doesn't contain any units.
+As you can see, the music ends where it ends, and the page keeps its width. It works only for the last measure of the whole page, and only if that measure has no units.
 
 Read next: [Colours](/docs/language/colours)

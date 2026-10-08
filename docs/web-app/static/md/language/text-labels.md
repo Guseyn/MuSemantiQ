@@ -1,6 +1,6 @@
-# Text labels
+# Text Labels
 
-A text label is any short text attached to a unit: a fingering, a string number, a word. It's very useful for fingerpicking notation, or just for some other information you want next to a note.
+A text label is a short text on a unit: a fingering, a string number, a word. It's useful for fingerpicking, or for anything else you want next to a note.
 
 Let's start with a simple example:
 
@@ -11,9 +11,9 @@ e with text "3"
 f with text "sim." above stave
 ```
 
-As you can see, by default a text label on a note is placed beside it, on its left, where an accidental would be.
+As you can see, by default a text label is placed on the left of the note, where an accidental would be.
 
-## 1. The key word
+## 1. The Key Word
 
 The text goes in quotes, double or single. You can omit the `text` key word:
 
@@ -24,9 +24,9 @@ a with text '3'
 a with '4'
 ```
 
-## 2. Above, below and beside
+## 2. Above, Below and Beside
 
-You can attach a text label above a unit, below it, or beside it:
+A text label can be above a unit, below it, or beside it:
 
 ```msq-editor opens-with=text
 1/4 a with text "1" above
@@ -34,7 +34,7 @@ a with text "1" below
 a with text "1" beside
 ```
 
-`up` and `down` mean the same as `above` and `below`, and so do `over` and `under`:
+`up` and `down`, and `over` and `under`, mean the same as `above` and `below`:
 
 ```msq-editor opens-with=text
 1/4 a with text "1" up
@@ -46,7 +46,7 @@ a with text "1" is down
 
 ## 3. Chords
 
-A chord can take a text label on its `chord` line, above or below it. By default, it's above:
+For a chord, the text label goes on the `chord` line, above or below the chord. By default, it's above:
 
 ```msq-editor opens-with=text
 chord with text "1"
@@ -60,7 +60,7 @@ c e g
 
 ```
 
-Or you can give every note of a chord its own label. A note in a chord takes a label in the same way as a single note does:
+Or you can give each note in a chord its own label, the same way as for a single note:
 
 ```msq-editor opens-with=text
 chord
@@ -75,11 +75,11 @@ g with text "1" beside
 
 ```
 
-`beside` is only for notes: a chord as a whole cannot have a label beside it, because it has no single note head to stand next to.
+`beside` works only for notes. A whole chord can't have a label beside it, because it doesn't have one note head to stand next to.
 
-## 4. Above or below the stave
+## 4. Above or Below the Stave
 
-If you want a text label to be above or below the stave rather than next to the unit, you just need to emphasise that:
+If you want a text label above or below the stave, not next to the unit, add `stave`:
 
 ```msq-editor opens-with=text
 1/4 a with "a" below
@@ -89,11 +89,11 @@ a with stem down, with "a" above
 a with text "a" above stave
 ```
 
-`staff` is accepted instead of `stave`: `with text "a" under staff`.
+You can also write `staff` instead of `stave`: `with text "a" under staff`.
 
-## 5. Vertical correction
+## 5. Vertical Correction
 
-The vertical position of a text label above or below a unit is always adjusted. But you can correct it regardless: `1 up` moves it one interval between stave lines up, and `1 down` moves it one interval down:
+A text label above or below a unit is always placed for you. But you can still move it yourself: `1 up` moves it up by one interval between stave lines, and `1 down` moves it down by one:
 
 ```msq-editor opens-with=text
 1/4 a with text "1" above 1 up
@@ -102,8 +102,8 @@ a with text "1" above stave 2 up
 a with text "1" below stave 2 down
 ```
 
-It's important to mention that a label placed `beside` a note cannot be corrected, because it is placed exactly like an accidental.
+It's important to mention that a label `beside` a note can't be moved, because it is placed exactly like an accidental.
 
-**Side note:** a text label belongs to one unit and is placed for that unit alone. Words that are sung are different: they are lined up with each other across the whole page line, so they have their own command, described in [Lyrics](/docs/language/lyrics).
+**Side note:** a text label belongs to one unit only. Sung words are different: they are lined up with each other across the whole page line, so they have their own command. More about that you can read in [Lyrics](/docs/language/lyrics).
 
 Read next: [Grace units](/docs/language/grace-units)

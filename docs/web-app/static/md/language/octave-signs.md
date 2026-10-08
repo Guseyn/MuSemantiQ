@@ -1,8 +1,8 @@
-# Octave signs
+# Octave Signs
 
-An octave sign says that the music under it sounds one or two octaves higher or lower than it's written. It can be attached to a single unit, or it can cover a group of units with a bracket.
+An octave sign says that the music under it sounds one or two octaves higher or lower than written. You can put it on one unit, or on a group of units with a bracket.
 
-## 1. Octave signs for single units
+## 1. Octave Signs for Single Units
 
 Let's see how you can add an octave sign to a single unit:
 
@@ -26,7 +26,7 @@ a is 2 octaves higher
 a is two octaves lower
 ```
 
-The vertical position of an octave sign is always adjusted, but you can correct it regardless:
+An octave sign is placed up or down automatically, but you can still move it:
 
 ```msq-editor opens-with=text
 measure
@@ -39,9 +39,9 @@ a is two octaves down 1 down
 
 Here `1 up` moves the octave sign up by one interval between stave lines, and `1 down` moves it down by one interval.
 
-## 2. Octave signs with brackets
+## 2. Octave Signs With Brackets
 
-When an octave sign covers several units, you declare it like other elements that connect units, after the music. The bracket is drawn over the whole range, from the first unit to the last one:
+For several units, you write the octave sign after the music, like a [slur](/docs/language/slurs). The bracket goes from the first unit to the last one:
 
 ```msq-editor opens-with=text
 measure
@@ -76,9 +76,9 @@ from first unit in first measure
 to third unit in second measure
 ```
 
-The endpoints can be written as `from` and `to`, or as `starts at` and `finishes at` (`begins` and `ends` work as well).
+You can write the start and the finish as `from` and `to`, or as `starts at` and `finishes at` (`begins` and `ends` work too).
 
-Like for single units, you can correct the vertical position of an octave sign with a bracket:
+You can move an octave sign with a bracket up or down too:
 
 ```msq-editor opens-with=text
 measure
@@ -103,7 +103,7 @@ from first unit in first measure
 to third unit in second measure
 ```
 
-Like for slurs, you can declare all octave signs after all the lines, and name the line for each of them:
+Like slurs, you can write all octave signs after all the lines, and name the line for each of them:
 
 ```msq-editor opens-with=text
 measure
@@ -128,12 +128,14 @@ from first unit in first measure
 to third unit in second measure
 ```
 
-The unit coordinates for octave signs work almost in the same way as for [slurs](/docs/language/slurs), you have to remember the following rules:
+The coordinates of units work almost the same as for [slurs](/docs/language/slurs). You have to remember the following rules:
 
-1. If a `line` is not specified after the octave sign, it applies to the last line declared before it.
-2. If you don't specify `measure`, `stave` and `voice`, it assumes that you mean the first measure, the first stave and the first voice.
-3. Along with a `unit` coordinate you can specify only `measure` (like `first note in first measure`). The `stave` and `voice` are set right after the octave sign, for the whole bracket, because an octave sign is not a cross-stave or cross-voice element. And you cannot set `line` along with a unit, because each octave sign is declared for the line where it is located.
-4. If you specified `measure` for the first unit, and it does not change for the last one, you don't need to repeat it.
+1. If you don't write `line` after the octave sign, it applies to the last line above it.
+2. If you don't write `measure`, `stave` and `voice`, it means the first measure, the first stave and the first voice.
+3. Next to a `unit` you can write only `measure` (like `first note in first measure`).
+   - `stave` and `voice` go right after the octave sign, for the whole bracket, because an octave sign can't go from one stave or voice to another.
+   - `line` can't go next to a unit, because each octave sign belongs to the line where it's written.
+4. If the last unit is in the same `measure` as the first one, you don't need to repeat it.
 
 Here is an octave sign on the lower stave of a grand staff:
 
@@ -147,6 +149,6 @@ c2 d2 e2 f2
 octave down in second stave from first unit to fourth unit
 ```
 
-It's important to mention that an octave sign changes not only what you see, but also what you hear: the units under it are played one or two octaves higher or lower. More about playback you can read in [MIDI settings](/docs/language/midi-settings).
+It's important to mention that an octave sign also changes what you hear: the units under it are played one or two octaves higher or lower. More about playback you can read in [MIDI settings](/docs/language/midi-settings).
 
 Read next: [Glissando](/docs/language/glissando)

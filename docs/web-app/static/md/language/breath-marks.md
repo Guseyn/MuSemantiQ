@@ -1,6 +1,6 @@
-# Breath marks
+# Breath Marks
 
-A breath mark tells a singer or a wind player where to take a breath. You add it before a unit:
+A breath mark shows a singer or a wind player where to take a breath. You add it before a unit:
 
 ```msq-editor opens-with=text
 1/4 c d
@@ -14,7 +14,7 @@ As you can see, `mark` is optional: `with breath before` means the same as `with
 
 ## 1. Shapes
 
-By default, a breath mark is drawn as a comma. But you can easily choose its shape:
+By default, a breath mark is drawn as a comma. But you can easily change its shape:
 
 ```msq-editor opens-with=text
 1/4 c d
@@ -31,7 +31,7 @@ These are all the shapes supported at the moment:
 | comma | `comma` |
 | double slashes | `double slashes`, `double slash` |
 
-The shape can also be written with `as`, and together with `mark`, if it reads better to you:
+You can also write the shape with `as`, or together with `mark`, if it reads better to you:
 
 ```msq-editor opens-with=text
 1/4 c d
@@ -41,9 +41,9 @@ a with breath mark double slash before
 b
 ```
 
-## 2. Before, not after
+## 2. Before, Not After
 
-It's important to mention that a breath mark always belongs to the unit that comes *after* the breath. So a breath at the end of a measure is written on the first unit of the next one, and it is drawn after the barline, right in front of that unit:
+It's important to mention that a breath mark always belongs to the unit *after* the breath. So a breath at the end of a measure is written on the first unit of the next measure. It is drawn after the barline, right before that unit:
 
 ```msq-editor opens-with=text
 measure
@@ -54,9 +54,9 @@ measure
 a b c5
 ```
 
-## 3. Vertical position
+## 3. Vertical Position
 
-A breath mark is placed above the stave, but you can correct its vertical position:
+A breath mark is placed above the stave, but you can move it up or down:
 
 ```msq-editor opens-with=text
 measure
@@ -70,11 +70,11 @@ measure
 a g f
 ```
 
-`1 down` means that the breath mark moves one interval between stave lines down, and `2 up` moves it two intervals up.
+`1 down` moves the breath mark down by one interval between stave lines, and `2 up` moves it up by two.
 
-## 4. Breath marks on several staves
+## 4. Breath Marks on Several Staves
 
-If you declare a breath mark before a unit, the same breath mark is added on the other staves as well, so that the units on all the staves stay in sync:
+A breath mark before a unit is added on the other staves too, so the units on all the staves stay in line:
 
 ```msq-editor opens-with=text
 measure
@@ -93,6 +93,6 @@ a3
 a3
 ```
 
-**Side note:** a breath mark is also heard: in playback, it adds a pause before the unit that carries it, on every stave at once.
+**Side note:** a breath mark is also heard. In playback, it adds a pause before its unit, on every stave at once.
 
 Read next: [Arpeggiated chords](/docs/language/arpeggiated-chords)

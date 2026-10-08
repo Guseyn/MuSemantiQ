@@ -1,6 +1,6 @@
 # Colours
 
-A page has four colours you can set: the background, the font, the stave lines and the page border. Each of them is a style, and a style is written as its name, `is`, and a value.
+You can set four colours on a page: the background, the font, the stave lines and the page border. You write each one as its name, `is`, and a value.
 
 Let's start with the background:
 
@@ -12,7 +12,13 @@ treble clef
 c d e f
 ```
 
-By default the background is **#FDF5E6**. A colour can be written in three ways: as a CSS colour name like **lavenderblush**, as a hex value, or with `rgb()`. So both of the following give you the same page as the one above:
+By default, the background is **#FDF5E6**. You can write a colour in three ways:
+
+- a CSS colour name, like **lavenderblush**;
+- a hex value;
+- `rgb()`.
+
+So these two pages look the same as the one above:
 
 ```msq-editor opens-with=text
 background color is #FFF0F5
@@ -30,9 +36,11 @@ treble clef
 c d e f
 ```
 
-A hex value can have **3**, **4**, **6** or **8** digits, so it can carry transparency, and `rgba()` works as well, with the alpha as the fourth number. It's important to mention that a colour name has to be written in lower case, the way CSS lists them: **lavenderblush** works, **LavenderBlush** does not.
+- A hex value can have **3**, **4**, **6** or **8** digits, so it can have transparency.
+- `rgba()` works too, with the alpha as the fourth number.
+- A colour name must be in lower case, as in CSS: **lavenderblush** works, **LavenderBlush** doesn't.
 
-## 1. Font colour and stave lines colour
+## 1. Font Colour and Stave Lines Colour
 
 In the same way you can set `font color` and `stave lines color`:
 
@@ -46,11 +54,13 @@ treble clef
 c d e f
 ```
 
-The font colour is not only the colour of the text. It is the colour of everything drawn on the page except the stave lines: note heads, stems, beams, clefs, barlines, slurs, and every title and label. By default it is **#121212**. The stave lines have a colour of their own, **#343434** by default, so you can make them lighter than the music on top of them.
+The font colour is not only for text. It's the colour of everything on the page except the stave lines: note heads, stems, beams, clefs, barlines, slurs, titles and labels. By default, it's **#121212**.
 
-## 2. Page border colour
+The stave lines have their own colour, **#343434** by default, so you can make them lighter than the music.
 
-By default the page has no border: its colour is transparent. As soon as you give it a colour, it is drawn:
+## 2. Page Border Colour
+
+By default, the page border is transparent, so you don't see it. Give it a colour, and it's drawn:
 
 ```msq-editor opens-with=text
 page border color is #414A4C
@@ -60,11 +70,11 @@ treble clef
 c d e f
 ```
 
-How thick the border is, is a size rather than a colour, so it is explained in [Page format](/docs/language/page-format).
+The border's thickness is a size, not a colour, so it's in [Page format](/docs/language/page-format).
 
 ## 3. Spellings
 
-You can write both `color` and `colour`, and some of the names have a shorter or a different form:
+You can write `color` or `colour`, and some names have other forms:
 
 | Style | Also written as |
 |---|---|
@@ -83,8 +93,8 @@ treble clef
 c d e f
 ```
 
-## 4. Where to write them
+## 4. Where to Write Them
 
-A colour is a page-level style. Wherever you write it, it colours the whole page, so the text reads best when all the styles are at the top, before the music. If you set the same colour twice, the last one wins.
+A colour is set for the whole page, wherever you write it. It's easier to read when all the styles are at the top, before the music. If you set the same colour twice, the last one wins.
 
 Read next: [Fonts](/docs/language/fonts)

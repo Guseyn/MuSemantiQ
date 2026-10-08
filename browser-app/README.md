@@ -4,6 +4,7 @@ A small web app demonstrating the MuSemantiQ web components: music written as
 text, engraved as SVG and played back as MIDI, entirely in the browser.
 
 ```
+npm run browser-app:setup   # once, and after changing src/ or web-components/
 npm run browser-app
 ```
 
@@ -57,14 +58,17 @@ Inside `static/js/msq/web-components/` (a copy of the top-level
 
 ## Running it
 
-`npm run browser-app` does four things in order:
+`npm run browser-app:setup` prepares the app, in three steps:
 
 1. `setup:symlinks` — recreates the three font symlinks under `static/font/`
 2. `msq:apps:update` — regenerates `static/js/msq/worker/` and
    `static/js/msq/language/` from `src/`
 3. `web-components:update` — copies `web-components/` to
    `static/js/msq/web-components/`
-4. starts `web-app/main.js`
+
+`npm run browser-app` only starts `web-app/main.js`. Run the setup again after
+changing `src/` or `web-components/`, or keep `watch:src` and
+`watch:web-components` running.
 
 Run it from the repository root; the paths in `main.js` and `env/local.json` are
 relative to the working directory. `ENV` chooses which file under `web-app/env/`

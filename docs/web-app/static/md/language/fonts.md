@@ -1,10 +1,10 @@
 # Fonts
 
-A page is drawn with three fonts: a music font, a text font and a font for chord letters. Each one is a style, so you choose it the same way you choose a colour.
+A page uses three fonts: a music font, a text font and a font for chord letters. You choose each one the same way you choose a colour.
 
-## 1. Music font
+## 1. Music Font
 
-The music font draws everything that is music: note heads, flags, rests, clefs, accidentals, articulations, ornaments, braces. There are two music fonts on this site: **Bravura**, which is the default, and **Leland**:
+The music font draws all the music symbols: note heads, flags, rests, clefs, accidentals, articulations, ornaments, braces. This site has two music fonts: **Bravura** (the default) and **Leland**:
 
 ```msq-editor opens-with=text
 music font is leland
@@ -32,9 +32,9 @@ time signature is 3:4
 1/4 d5 with staccato
 ```
 
-## 2. Text font
+## 2. Text Font
 
-The text font draws every word on the page: the title and subtitles, lyrics, text labels, tempo marks, instrument titles, measure numbers. There are two text fonts on this site: **noto-serif**, which is the default, and **noto-sans**:
+The text font draws every word on the page: the title and subtitles, lyrics, text labels, tempo marks, instrument titles, measure numbers. This site has two text fonts: **noto-serif** (the default) and **noto-sans**:
 
 ```msq-editor opens-with=text
 text font is noto-serif
@@ -62,11 +62,11 @@ treble clef
 c d e f
 ```
 
-A text font comes in two weights, regular and bold. You don't choose the weight: the bold one is used where the notation asks for it, for example in tempo marks and in the number over a multi-measure rest.
+A text font has two weights, regular and bold. You don't choose the weight. Bold is used where notation needs it, for example in tempo marks and in the number over a multi-measure rest.
 
-## 3. Chord letters font
+## 3. Chord Letters Font
 
-Chord letters have a font of their own, because they need figures that a text font does not draw well. There are two of them on this site: **gentium plus**, which is the default, and **gothic a1**:
+Chord letters have their own font, because a text font doesn't draw their symbols well. This site has two: **gentium plus** (the default) and **gothic a1**:
 
 ```msq-editor opens-with=text
 chord letters font is gentium plus
@@ -90,25 +90,35 @@ treble clef
 1/4 c5 with chord "C/F^sharp"
 ```
 
-## 4. Where the names come from
+## 4. Where the Names Come From
 
-The names above are not a part of the language. A page can only name a font that has been registered before it is drawn, and the names are whatever the font config that registered them says. On this site the config names **bravura** and **leland**, **noto-serif** and **noto-sans**, **gentium plus** and **gothic a1**, and that's why exactly these six work here. If you name a font that is not registered, the line is reported as an error, and the page is drawn with the default font. The default is the first font of each kind in the config.
+The names above are not part of the language. They come from the font config:
+
+- A page can use only a font that was registered before the page is drawn.
+- A font's name is the name it has in the font config. This site's config has **bravura** and **leland**, **noto-serif** and **noto-sans**, **gentium plus** and **gothic a1**. That's why exactly these six work here.
+- If you name a font that isn't registered, you get an error on that line, and the page uses the default font.
+- The default is the first font of each kind in the config.
 
 The names are not case sensitive: `music font is Leland` works as well as `music font is leland`.
 
-How to register fonts, both in the browser and in Node, you can read in [Fonts and font config](/docs/components/overview#1-msq-font-loader) and [setupFonts](/docs/api/overview#1-setupfonts).
+How to register fonts in the browser and in Node, you can read in [Fonts and font config](/docs/components/overview#1-msq-font-loader) and [setupFonts](/docs/api/overview#1-setupfonts).
 
-## 5. Why a music font is two files
+## 5. Why a Music Font Is Two Files
 
-A text font is one file. A music font is two: the font itself (an `.otf` file) and a JavaScript table generated from it. The table holds the outline of every glyph MuSemantiQ draws, already measured in stave-line spacings, together with the small corrections that put each glyph exactly where it belongs on a stave. That is what lets the drawer place a glyph without reading the font at the moment of drawing. The `.otf` file is still needed for the one glyph drawn at a size nobody can know in advance: a brace, which has to reach across however many staves it connects.
+A text font is one file. A music font is two files:
 
-The tables are generated from SMuFL fonts by the tool in `tools/smufl/`, and at the moment only **Bravura** and **Leland** have one. That's why only these two can be listed as music fonts. How to make a table for another SMuFL font you can read in [SMuFL to music-js font](/docs/tools/smufl-font-generator).
+- the font itself, an `.otf` file;
+- a JavaScript table made from it.
 
-## 6. Font sizes
+The table has the outline of every glyph MSQ draws, measured in stave-line spacings, and small corrections that put each glyph in the right place on a stave. So the drawer doesn't need to read the font while it draws. The `.otf` file is still needed for braces, because a brace has to be as tall as the staves it connects, and nobody knows that size in advance.
 
-There is no single size for the music font. The size of everything is measured against one number, the `interval between stave lines`, and `font size` is just another name for it. By default it is **8.5**. When you make it bigger, the whole score gets bigger in proportion: the glyphs, the spaces between them, the staves, the text.
+The tables are made from SMuFL fonts by the tool in `tools/smufl/`. At the moment, only **Bravura** and **Leland** have a table, so only these two can be music fonts. How to make a table for another SMuFL font, you can read in [SMuFL to music-js font](/docs/tools/smufl-font-generator).
 
-The text on a page can also be sized on its own:
+## 6. Font Sizes
+
+The music font has no size of its own. Everything is sized from one number, the `interval between stave lines`, and `font size` is another name for it. By default, it's **8.5**. Make it bigger, and the whole score gets bigger: the glyphs, the spaces between them, the staves, the text.
+
+You can also size the text separately:
 
 | Style | Default | What it sizes |
 |---|---|---|
@@ -120,6 +130,6 @@ The text on a page can also be sized on its own:
 | `page number font size` | **3.2** | the page number |
 | `instrument font size`, `instrument title font size` | **3.4** | instrument titles |
 
-It's important to mention that every size except the first one is written in stave-line spacings, not in pixels. **5.4** for the title means five and four tenths of the interval between stave lines, so the title grows together with the music when you change `font size`. How these are written, with examples, is explained in [Page format](/docs/language/page-format), together with the other sizes of a page.
+It's important to mention that every size except the first one is in stave-line spacings, not in pixels. **5.4** for the title means 5.4 intervals between stave lines, so the title grows with the music when you change `font size`. Examples of these, and the other sizes of a page, are in [Page format](/docs/language/page-format).
 
 Read next: [Page format](/docs/language/page-format)

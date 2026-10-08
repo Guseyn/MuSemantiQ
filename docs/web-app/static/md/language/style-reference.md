@@ -1,8 +1,8 @@
-# The full style reference
+# The Full Style Reference
 
-This page gathers every style of a page in one place. Each of them is explained, with examples, on the page that introduces it; here they are only listed, so you can find a name or a default quickly.
+This page lists every style in one place, so you can quickly find a name or a default. Each style is explained, with examples, on its own page.
 
-As you remember from [Page format](/docs/language/page-format), every style is written the same way, on a line of its own: the name, `is`, and a value without quotes. Styles apply to the whole page, wherever they are written:
+As you remember from [Page format](/docs/language/page-format), you write every style on its own line: the name, `is`, and a value without quotes. A style applies to the whole page, wherever you write it:
 
 ```msq-editor opens-with=text
 background color is ivory
@@ -24,7 +24,7 @@ measure
 
 ## 1. Colours
 
-A colour is a CSS colour name in lower case, a hex value of **3**, **4**, **6** or **8** digits, `rgb(r, g, b)` or `rgba(r, g, b, a)`. See [Colours](/docs/language/colours).
+A colour is one of these: a CSS colour name in lower case, a hex value of **3**, **4**, **6** or **8** digits, `rgb(r, g, b)` or `rgba(r, g, b, a)`. See [Colours](/docs/language/colours).
 
 | Style | Also written as | Default |
 |---|---|---|
@@ -35,7 +35,7 @@ A colour is a CSS colour name in lower case, a hex value of **3**, **4**, **6** 
 
 ## 2. Fonts
 
-A font is the name it was registered with in the font config, in any case. See [Fonts](/docs/language/fonts).
+A font is its name in the font config. Upper or lower case doesn't matter. See [Fonts](/docs/language/fonts).
 
 | Style | Default | Names on this site |
 |---|---|---|
@@ -45,7 +45,7 @@ A font is the name it was registered with in the font config, in any case. See [
 
 ## 3. Sizes
 
-A size is a number. Two of them are in pixels; every other one is in intervals between stave lines, which means it is multiplied by the font size. See [Page format](/docs/language/page-format).
+A size is a number. `page line width` and `page height` are in pixels. The others, except `font size` itself, are in intervals between stave lines, so they are multiplied by the font size. See [Page format](/docs/language/page-format).
 
 | Style | Also written as | Default | Unit | What it sizes |
 |---|---|---|---|---|
@@ -71,29 +71,29 @@ A size is a number. Two of them are in pixels; every other one is in intervals b
 | `instrument font size` | `instrument title font size` | **3.4** | stave-line intervals | instrument titles |
 | `empty measure width` | | **10** | stave-line intervals | the narrowest a measure can be |
 
-A size set to **0** is the same as a size not set, so its default is used.
+A size of **0** means the size isn't set, so its default is used.
 
-## 4. Page format
+## 4. Page Format
 
 | Style | Values | Default |
 |---|---|---|
 | `page format` | **a3**, **a4**, **b4**, **c4** | none |
 
-With a format set, the page is the size of that paper at **96** pixels per inch, and `page line width` and `page height` are ignored. See [Page format](/docs/language/page-format).
+With a format, the page is the size of that paper at **96** pixels per inch, and `page line width` and `page height` are ignored. See [Page format](/docs/language/page-format).
 
-## 5. How styles affect each other
+## 5. How Styles Affect Each Other
 
-A few styles are not independent, and it helps to know which:
+Some styles affect each other:
 
-1. `font size` scales every size measured in stave-line intervals. When you change it, the paddings, offsets, intervals and text sizes change with it, and the music gets wider, but `page line width` stays where it is. So a bigger font size fits fewer units on a line, and a smaller one fits more.
-2. How many units fit on a line depends on `page line width` against the spacing between units. When a line doesn't fit, you can make it longer, make the font size smaller, or compress units, which is explained in [Unit spacing](/docs/language/unit-spacing).
-3. `page format` takes over `page line width` and `page height`, and the page line becomes the width of the paper minus `page left and right paddings`. So with a format, the paddings are what decides how long a page line is.
-4. `page lines top offset` only applies when the page has a title, a subtitle, or a left or right subtitle.
-5. `page border width` is only visible once `page border color` is set, because the border is transparent by default.
+1. `font size` scales every size in stave-line intervals: paddings, offsets, intervals and text sizes. The music gets wider, but `page line width` stays the same. So a bigger font size fits fewer units on a line, and a smaller one fits more.
+2. How many units fit on a line depends on `page line width` and the spacing between units. When a line doesn't fit, you can make it longer, make the font size smaller, or compress units (see [Unit spacing](/docs/language/unit-spacing)).
+3. `page format` replaces `page line width` and `page height`. The page line is the paper width minus `page left and right paddings`. So with a format, the paddings decide how long a page line is.
+4. `page lines top offset` works only when the page has a title, a subtitle, or a left or right subtitle.
+5. `page border width` is visible only when `page border color` is set, because the border is transparent by default.
 
-## 6. Close to styles, but not styles
+## 6. Close to Styles, but Not Styles
 
-A few commands also apply to the whole page, but they are not written as `<name> is <value>`, so they are not in the tables above:
+These commands also apply to the whole page, but they are not written as `<name> is <value>`, so they are not in the tables above:
 
 | Command | What it does | Page |
 |---|---|---|
@@ -101,6 +101,6 @@ A few commands also apply to the whole page, but they are not written as `<name>
 | `stretch units by N times` | moves units further apart, on the page or `in line N` | [Unit spacing](/docs/language/unit-spacing) |
 | `hide the last measure` | hides the empty last measure of the page | [Unit spacing](/docs/language/unit-spacing) |
 
-The settings that change what is heard rather than what is drawn are listed in [MIDI settings](/docs/language/midi-settings).
+The settings that change what you hear, not what you see, are in [MIDI settings](/docs/language/midi-settings).
 
 Read next: [Handling errors](/docs/language/handling-errors)

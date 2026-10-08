@@ -1,6 +1,6 @@
-# Titles and page meta
+# Titles and Page Meta
 
-Every page can have a title, subtitles and a page number. MSQ calls them page meta, because they belong to the page rather than to any measure in it.
+Every page can have a title, subtitles and a page number. MSQ calls them page meta, because they belong to the page, not to a measure.
 
 Let's start with a simple example:
 
@@ -15,9 +15,9 @@ treble clef
 c d e f
 ```
 
-## 1. Title and subtitles
+## 1. Title and Subtitles
 
-There are four text fields at the top of a page, and each of them is written as the name of the field, `is`, and the text in quotes:
+There are four text fields at the top of a page. You write each of them as the name of the field, `is`, and the text in quotes:
 
 ```msq-editor opens-with=text
 title is "Title"
@@ -30,9 +30,9 @@ treble clef
 c d e f
 ```
 
-The title and the subtitle are centred above the music, the left subtitle sits on the left and the right subtitle on the right.
+The title and the subtitle are in the centre above the music. The left subtitle is on the left, and the right subtitle is on the right.
 
-Some of the fields have other names, so you can use the one that reads best for your score:
+Some fields have other names, and you can use any of them:
 
 | Field | You can also write |
 | --- | --- |
@@ -53,7 +53,7 @@ measure
 1/4 b g d b3
 ```
 
-## 2. Page number
+## 2. Page Number
 
 It's really easy to set a number for a page:
 
@@ -65,7 +65,7 @@ treble clef
 c d e f
 ```
 
-It is displayed at the bottom of the page, in the centre. The value is quoted, so you can write the number in any format you like:
+It's shown at the bottom of the page, in the centre. The value is in quotes, so you can write the number in any format:
 
 ```msq-editor opens-with=text
 page number is "6/12"
@@ -75,9 +75,9 @@ treble clef
 c d e f
 ```
 
-## 3. The value is always in quotes
+## 3. The Value Is Always in Quotes
 
-It's important to mention that the value is always wrapped in quotes, and a value without them is not recognised as page meta. Everything between the first and the last quote is the value, so you can use quotes inside it:
+It's important to mention that the value is always in quotes. Without them, it's not recognised as page meta. The value is everything between the first and the last quote, so you can use quotes inside it:
 
 ```msq-editor opens-with=text
 title is ""Title with quotes""
@@ -87,7 +87,7 @@ treble clef
 c d e f
 ```
 
-If you want a title or a subtitle on several lines, separate each line with **\n**:
+To write a title or a subtitle on several lines, separate the lines with **\n**:
 
 ```msq-editor opens-with=text
 title is "First line\nSecond line"
@@ -98,9 +98,9 @@ treble clef
 c d e f
 ```
 
-## 4. One field per line
+## 4. One Field per Line
 
-Each field must start on a new line and take the whole line. If you put two of them on one line, the first quote and the last quote belong to different fields, and everything between them becomes the title:
+Each field must be on its own line. If you put two fields on one line, everything between the first and the last quote becomes the title:
 
 ```msq-editor opens-with=text
 title is "Title", subtitle is "Subtitle"
@@ -110,7 +110,7 @@ treble clef
 c d e f
 ```
 
-Page meta may sit anywhere in the source, before the music, after it, or between two measures. It does not open a measure or a stave, and it does not change anything around it:
+Page meta can be anywhere in the text: before the music, after it, or between two measures. It doesn't start a measure or a stave, and it doesn't change anything around it:
 
 ```msq-editor opens-with=text
 measure

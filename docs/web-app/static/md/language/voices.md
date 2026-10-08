@@ -1,6 +1,6 @@
 # Voices
 
-Each stave consists of voices. A voice is an independent line of music: two voices on one stave move at the same time, each with its own rhythm.
+Each stave consists of voices. A voice is a separate line of music. Two voices on one stave play at the same time, each with its own rhythm.
 
 Let's start with a simple example:
 
@@ -13,11 +13,11 @@ voice
 1/2 c e
 ```
 
-As you can see, each `voice` opens another voice on the current stave, and the units after it, until the next `voice`, belong to it.
+As you can see, each `voice` starts a new voice on the current stave. The units after it, until the next `voice`, belong to it.
 
-## 1. Declaring a voice
+## 1. Declaring a Voice
 
-`voice` must be the first word on its line, and the units of the voice start on the next line. You don't need a `stave` for voices: if there is none, the voices go on the one stave MSQ creates for you.
+`voice` must be the first word on its line, and the units of the voice start on the next line. You don't need `stave` for voices. Without it, the voices go on the stave that MSQ creates for you.
 
 ```msq-editor opens-with=text
 measure
@@ -28,7 +28,7 @@ voice
 1/4 c c c c
 ```
 
-Visually voices make sense only when they have units in them. You can declare as many voices on a stave as you need:
+You see a voice only when it has units. You can declare as many voices on a stave as you need:
 
 ```msq-editor opens-with=text
 measure
@@ -43,11 +43,11 @@ voice
 
 ## 2. Stems
 
-By default, the first voice takes stems up, and the second voice and every voice after it take stems down. That keeps the voices out of each other's way, and it is why you did not need to write a single stem direction above. As you remember from [Stems](/docs/language/stems), you can still change the direction of any unit.
+By default, the first voice has stems up, and all the other voices have stems down. This way the voices don't get in each other's way, and that's why you didn't need to write any stem direction above. As you remember from [Stems](/docs/language/stems), you can still change the direction of any unit.
 
-## 3. Each voice remembers its own duration
+## 3. Each Voice Remembers Its Own Duration
 
-As you remember from [Durations](/docs/language/durations), a duration sticks until you give another one. It's important to mention that it sticks *per voice*: each voice keeps its own duration and its own stem direction, from one measure to the next.
+As you remember from [Durations](/docs/language/durations), a duration stays until you write another one. It's important to mention that this works for each voice separately. Each voice keeps its own duration and its own stem direction, from one measure to the next.
 
 ```msq-editor opens-with=text
 measure
@@ -64,11 +64,11 @@ voice
 f a
 ```
 
-As you may notice, in the second measure no voice has a duration, and still the first one is in quarters and the second one in halves.
+As you may notice, in the second measure no voice has a duration, but the first voice is still in quarters and the second one in halves.
 
-## 4. Voices across staves
+## 4. Voices Across Staves
 
-Voices live inside a stave, so each stave has its own voices, and they are numbered from one on every stave:
+Voices are inside a stave. So each stave has its own voices, and they are numbered from one on every stave:
 
 ```msq-editor opens-with=text
 measure
@@ -84,9 +84,9 @@ voice
 1 c2
 ```
 
-## 5. When rhythms do not line up
+## 5. When Rhythms Do Not Line Up
 
-The units of different voices are placed by time, not by their order. A unit that starts at the same moment as a unit in another voice is drawn above or below it, and units that start in between are placed in between:
+The units of different voices are placed by time, not by their order. If a unit starts at the same time as a unit in another voice, it's drawn above or below it. Units that start in between are placed in between:
 
 ```msq-editor opens-with=text
 measure
@@ -98,7 +98,7 @@ voice
 1/4 e f g f
 ```
 
-Voices don't have to add up to the same length either. You can add as many units to a voice as you want, it's not restricted by the other voices or by a time signature. That allows you to focus on the melody and fix the details along the way:
+Voices don't have to be the same length. You can put as many units into a voice as you want. Other voices and the time signature don't limit it. So you can write the melody first and fix the details later:
 
 ```msq-editor opens-with=text
 measure
@@ -109,7 +109,7 @@ voice
 1/2 e
 ```
 
-When one voice has a pause, give it a rest, so the other voice keeps its place:
+When a voice has a pause, give it a rest, so that the other voice stays in its place:
 
 ```msq-editor opens-with=text
 measure

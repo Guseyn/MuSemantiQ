@@ -1,6 +1,6 @@
 # Coda
 
-Each measure can have a coda symbol. Like a [sign](/docs/language/sign), you declare it with `coda` inside the measure:
+Each measure can have a coda symbol. Like a [sign](/docs/language/sign), you add it with `coda` inside the measure:
 
 ```msq-editor opens-with=text
 measure
@@ -20,7 +20,7 @@ coda
 g a b c5
 ```
 
-You can explicitly say where you want to put it, at the start or at the end of the measure:
+You can say explicitly where to put it, at the start or at the end of the measure:
 
 ```msq-editor opens-with=text
 measure
@@ -34,7 +34,7 @@ measure
 c5 b a g
 ```
 
-The vertical position of a coda is always adjusted depending on the elements in the measure, but you still can correct it:
+A coda moves up or down by itself, depending on what's in the measure. But you can still correct it:
 
 ```msq-editor opens-with=text
 measure
@@ -45,7 +45,13 @@ a b d
 
 Here we moved the coda up by one interval between stave lines.
 
-Conventionally, a coda comes in a pair with a sign and a repetition instruction. The first coda marks the place where you leave, the second one marks where the coda section begins, and a "D.S. al Coda" (or "D.C. al Coda") instruction says when to go back. Here are the two codas and the sign, the instruction itself comes on the next page:
+Usually, codas come in a pair, together with a sign and a repetition instruction:
+
+- the first coda marks where you leave;
+- the second coda marks where the coda section starts;
+- a "D.S. al Coda" (or "D.C. al Coda") instruction says when to go back.
+
+Here are the two codas and the sign. The instruction itself is on the next page:
 
 ```msq-editor opens-with=text
 measure

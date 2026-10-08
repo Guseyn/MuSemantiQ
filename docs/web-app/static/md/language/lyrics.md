@@ -1,8 +1,11 @@
 # Lyrics
 
-Lyrics are a little different from other marks on units. They are read as a line of text under the music, but each syllable belongs to one unit, and the units can come from different voices and, in some cases, from different staves.
+Lyrics are a little different from other marks on units:
 
-To make life easier, lyrics are attributes of units, and from the context of how they are declared, they are positioned as a line and get dashes and underscores where needed.
+- They are read as one line of text under the music.
+- But each syllable belongs to one unit, and these units can be in different voices, and sometimes on different staves.
+
+So you add each syllable to its unit, and MSQ puts all the syllables in one line, with dashes and underscores where needed.
 
 Let's start with a very basic example:
 
@@ -14,11 +17,11 @@ f with lyrics "to"
 g with lyrics "me"
 ```
 
-The syllable is always in quotes. Instead of `with lyrics` you can also write `with lyric`, `with new lyrics` or `with new lyric`.
+The syllable is always in quotes. Instead of `with lyrics`, you can also write `with lyric`, `with new lyrics` or `with new lyric`.
 
 ## 1. Dashes
 
-A word that is split between several units needs a dash between its syllables. You just need to write `followed by dash` after a syllable:
+When a word is split between several units, its syllables need a dash between them. You just need to write `followed by dash` after a syllable:
 
 ```msq-editor opens-with=text
 measure
@@ -33,7 +36,7 @@ You can also write `is followed by dash`, and `hyphen` instead of `dash`.
 
 ## 2. Underscores
 
-When one syllable is held over several units (a melisma), an underscore runs under them. You mark where it starts and where it finishes:
+When one syllable is held over several units (a melisma), an underscore is drawn under them. You mark where it starts and where it finishes:
 
 ```msq-editor opens-with=text
 measure
@@ -50,7 +53,7 @@ measure
 1 c5 with lyrics "sis"
 ```
 
-As you can see, the underscore can run over a barline. The unit where it finishes may carry a syllable of its own, or no syllable at all, just `with lyrics where underscore ends`:
+As you can see, the underscore can go over a barline. The unit where it finishes can have its own syllable, or no syllable at all, just `with lyrics where underscore ends`:
 
 ```msq-editor opens-with=text
 1/2 a with lyrics "uni" where underscore starts, tied with next
@@ -65,9 +68,9 @@ These are all the ways to write it:
 | start | `where underscore starts`, `where underscore begins`, `with underscore starts`, `with underscore begins`, `underscore starts`, `underscore begins` |
 | finish | `where underscore finishes`, `where underscore ends`, `with underscore finishes`, `with underscore ends`, `underscore finishes`, `underscore ends` |
 
-## 3. Lyrics across voices and staves
+## 3. Lyrics Across Voices and Staves
 
-Lyrics can be constructed from different voices and staves. Each syllable is placed under its own unit, and they are all read as one line:
+Lyrics can come from different voices and staves. Each syllable is placed under its own unit, and they are all read as one line:
 
 ```msq-editor opens-with=text
 measure
@@ -94,9 +97,9 @@ c3
 c3 with lyrics "son"
 ```
 
-## 4. Lyrics under another stave
+## 4. Lyrics Under Another Stave
 
-By default, lyrics are placed under the first stave. You can put them under a certain stave with the following command:
+By default, lyrics are placed under the first stave. You can put them under another stave with this command:
 
 ```msq-editor opens-with=text
 lyrics is under stave 2
@@ -115,11 +118,15 @@ e3 with lyrics "three"
 f3 with lyrics "four"
 ```
 
-It's a command of the whole page, so it can be written anywhere, and it applies to every measure. `is` is optional, `below` means the same as `under`, and the stave can be written as `stave 2`, `second stave` or `2nd stave`.
+It's a command of the whole page, so you can write it anywhere, and it works for every measure. Also:
 
-## 5. Vertical position
+- `is` is optional.
+- `below` means the same as `under`.
+- The stave can be written as `stave 2`, `second stave` or `2nd stave`.
 
-The vertical position of lyrics is always adjusted, but you can correct it:
+## 5. Vertical Position
+
+The vertical position of lyrics is set automatically, but you can correct it:
 
 ```msq-editor opens-with=text
 measure
@@ -134,13 +141,13 @@ e5 with lyrics "in" 2 down
 1/2 f5 with lyrics "deo"
 ```
 
-`1 down` means that the syllable moves one interval between stave lines down. As you may notice, **deo** has no correction of its own but still sits with **in**: lyrics are a line, so the syllables after a correction keep it until another correction changes it.
+`1 down` moves the syllable down by one interval between stave lines. As you may notice, **deo** has no correction of its own, but it still sits with **in**. Lyrics are a line, so the syllables after a correction keep it, until another correction changes it.
 
-The correction can go before the syllable or after it: `with lyrics 1 down "a"` means the same as `with lyrics "a" 1 down`.
+The correction can go before the syllable or after it. `with lyrics 1 down "a"` means the same as `with lyrics "a" 1 down`.
 
-## 6. Several lines of lyrics
+## 6. Several Lines of Lyrics
 
-A unit can carry several syllables, one for each line (verse) of lyrics. The first `with lyrics` is the first line, the second is the line under it, and so on:
+A unit can have several syllables, one for each line (verse) of lyrics. The first `with lyrics` is the first line, the second one is the line under it, and so on:
 
 ```msq-editor opens-with=text
 1/4 a
@@ -167,6 +174,6 @@ e with lyrics "five", with lyrics "six"
 f with lyrics "seven", with lyrics "eight"
 ```
 
-**Side note:** unlike [Text labels](/docs/language/text-labels), which are placed next to their own unit, lyrics are always positioned as a line under the stave.
+**Side note:** [Text labels](/docs/language/text-labels) are placed next to their own unit. Lyrics are always placed as a line under the stave.
 
 Read next: [Mid-measure clefs](/docs/language/mid-measure-clefs)

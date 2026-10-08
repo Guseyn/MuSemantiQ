@@ -15,11 +15,11 @@ measure
 measure rest
 ```
 
-As you can see, each `measure` closes the previous measure with a bar line and starts a new one. The last measure on a line fills the rest of the space on that line, so you can keep adding measures and watch the line grow.
+As you can see, each `measure` ends the previous measure with a bar line and starts a new one. The last measure on a line takes the rest of the space on that line.
 
-## 1. Writing a measure
+## 1. Writing a Measure
 
-`measure` must be the first word on its line, and the units of the measure start on the next line. Notes written right after `measure` on the same line are not recognised, so the measure always looks like this:
+`measure` must be the first word on its line, and the units of the measure start on the next line. Notes on the same line as `measure` are not recognised:
 
 ```msq-editor opens-with=text
 measure
@@ -28,7 +28,7 @@ measure
 1/4 g a b c5
 ```
 
-Indentation and empty lines are only for you: the parser ignores them. So you can shape the text the way that is easier to read:
+The parser ignores indentation and empty lines, so you can use them to make the text easier to read:
 
 ```msq-editor opens-with=text
 measure
@@ -38,7 +38,7 @@ measure
   1/2 g c5
 ```
 
-A measure can also be empty. Then it is drawn as an empty piece of stave:
+A measure can be empty. Then it's drawn as an empty piece of stave:
 
 ```msq-editor opens-with=text
 measure
@@ -46,15 +46,15 @@ measure
 measure
 ```
 
-## 2. A measure is created for you
+## 2. A Measure Is Created for You
 
-You didn't need `measure` on any of the previous pages, because if you don't declare one, a measure is created for you. So these notes land in one measure:
+You didn't need `measure` on the previous pages, because if you don't declare one, MSQ creates it for you. So these notes go into one measure:
 
 ```msq-editor opens-with=text
 1/4 c d e f g a b c5
 ```
 
-It's important to mention that notes written before the first `measure` still go into a measure of their own, and `measure` then starts the second one:
+It's important to mention that notes before the first `measure` still get their own measure, and `measure` then starts the second one:
 
 ```msq-editor opens-with=text
 1/4 c d e f
@@ -62,9 +62,9 @@ measure
 1/4 g a b c5
 ```
 
-## 3. Nothing is counted
+## 3. Nothing Is Counted
 
-A measure is not restricted by any time signature. You can add as many units to a measure as you want, and MSQ will not tell you that it is over-full or under-full:
+A measure is not limited by a time signature. You can put as many units into a measure as you want, and MSQ doesn't tell you that it's too full or not full enough:
 
 ```msq-editor opens-with=text
 measure
@@ -75,11 +75,11 @@ measure
 1 c
 ```
 
-It allows you to focus on the melody first and make adjustments along the way.
+So you can write the melody first and fix it later.
 
-## 4. Measure rests
+## 4. Measure Rests
 
-A whole measure of silence is a property of the measure rather than a unit in it. You just need to write `measure rest` inside the measure:
+A whole measure of silence belongs to the measure, it's not a unit. You just need to write `measure rest` inside the measure:
 
 ```msq-editor opens-with=text
 measure
@@ -92,7 +92,7 @@ measure
 1/4 g a b c5
 ```
 
-When the rest lasts several measures, you can say how many with `multi measure rest N times`. The count is drawn above the rest:
+If the rest lasts several measures, write `multi measure rest N times`. The number is drawn above the rest:
 
 ```msq-editor opens-with=text
 measure
@@ -105,7 +105,7 @@ measure
 1/4 g a b c5
 ```
 
-The word `multi` is optional, and the count can be a number or a word from **one** to **ten**:
+The word `multi` is optional. The number can be written in digits or as a word from **one** to **ten**:
 
 ```msq-editor opens-with=text
 measure
@@ -115,7 +115,7 @@ measure
 multi measure rest four times
 ```
 
-`measure rest` can go on any line of the measure. And if you write it without `measure` at all, a new measure is created for it when the current one already is a measure rest, so two rests in a row give you two measures:
+`measure rest` can be on any line of the measure. If you write it without `measure`, and the current measure is already a measure rest, a new measure is created for it. So two rests in a row give you two measures:
 
 ```msq-editor opens-with=text
 1/4 c d e f
@@ -125,9 +125,9 @@ measure rest
 multi measure rest 3 times
 ```
 
-## 5. Commands that start with `with`
+## 5. Commands That Start With `with`
 
-A measure can also carry its properties on the same line as `measure`, joined by `with`:
+You can also write the properties of a measure on the same line as `measure`, after `with`:
 
 ```msq-editor opens-with=text
 measure
@@ -150,12 +150,12 @@ measure
 with multi measure rest 6 times
 ```
 
-Such commands attach to the measure only while the measure is still the last thing you wrote. You have to remember the following rules:
+These commands work only right after `measure`. You have to remember the following rules:
 
 1. A `with …` command of a measure must come right after `measure`, on the same line or on the next one.
-2. An empty line between them ends the measure's own commands, so the `with …` line after it is not recognised.
-3. Any other command in between — a clef, a key signature, a time signature, a connection between staves — ends them too.
+2. If there is an empty line between them, the `with …` line is not recognised.
+3. The same happens if there is any other command between them: a clef, a key signature, a time signature or a connection between staves.
 
-So if a measure needs both, write the measure's own commands first and everything else after them. The same rule applies to every other command a measure has, like bar lines and fermatas, which you will meet on later pages.
+So write the `with …` commands first, and everything else after them. The same rule works for all the other commands of a measure, like bar lines and fermatas, which you will see on later pages.
 
 Read next: [Clefs](/docs/language/clefs)

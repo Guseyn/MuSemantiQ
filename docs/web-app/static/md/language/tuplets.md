@@ -1,6 +1,6 @@
 # Tuplets
 
-A tuplet squeezes a number of units into the time of a different number of them, like three eighths in the time of two. In MSQ a tuplet is written after the notes it covers, not before them, because it points at those notes by their positions.
+A tuplet puts some number of units into the time of a different number of units, like three eighths in the time of two. In MSQ, a tuplet is written after its notes, not before, because it points at those notes by their positions.
 
 Let's start with a basic example:
 
@@ -10,11 +10,11 @@ Let's start with a basic example:
 tuplet 3 from first unit to third unit
 ```
 
-A tuplet must start on a new line. It's a good habit to separate it from the music with an empty line, so it's easy to see where the notes end.
+A tuplet starts on a new line. It's good to put an empty line before it, so it's easy to see where the notes end.
 
-## 1. Naming the range
+## 1. Naming the Range
 
-After `tuplet` and its value, you say where the tuplet starts and where it finishes. The units are counted from the start of the measure, and chords and rests count as units the same way as notes:
+After `tuplet` and its value, you say where the tuplet starts and where it finishes. The units are counted from the start of the measure. Chords and rests are counted too, like notes:
 
 ```msq-editor opens-with=text
 1/8 c d e f g a
@@ -23,9 +23,9 @@ tuplet 3 from first unit to third unit
 tuplet 3 from fourth unit to 6th unit
 ```
 
-As you can see, one line of music can have as many tuplets as you need, one per line of text.
+As you can see, you can have as many tuplets as you need, one per line of text.
 
-You can use numbers from 1 to 10 as words. For example, `1` is `first`, or `one`, or even `1st`. Other numbers you write as digits, or with a suffix like `11th` or `12th`. And the number can go before or after the key word, so `first unit` and `unit 1` are the same:
+Numbers from 1 to 10 can be words. For example, `1` is `first`, or `one`, or `1st`. Other numbers are digits, or digits with a suffix like `11th` or `12th`. The number can go before or after the key word, so `first unit` and `unit 1` are the same:
 
 ```msq-editor opens-with=text
 1/8 c d e
@@ -35,7 +35,13 @@ tuplet 3 from unit 1 to unit 3
 tuplet 3 from the fourth unit to the sixth unit
 ```
 
-Instead of `unit` you can write `note` or `chord`, whichever reads better. There are also several ways to say where a tuplet starts and finishes: `from ... to ...`, `starts at ... finishes at ...`, `begins from ... ends with ...`. You can also put the range on the next line:
+Instead of `unit` you can write `note` or `chord`. To say where a tuplet starts and finishes, you can write:
+
+- `from ... to ...`
+- `starts at ... finishes at ...`
+- `begins from ... ends with ...`
+
+You can also put this on the next line:
 
 ```msq-editor opens-with=text
 1/8 c d e
@@ -49,11 +55,11 @@ tuplet 3
 from unit 4 to unit 6
 ```
 
-It's important to mention that the tuplet has to be written after its units. If you declare it before them, there are no units to point at yet, and MSQ tells you that the units are not found.
+It's important to mention that a tuplet has to be written after its units. If you write it before them, there are no units yet, and MSQ tells you that the units are not found.
 
-## 2. Tuplet values
+## 2. Tuplet Values
 
-You can declare all sorts of tuplets:
+You can write all sorts of tuplets:
 
 ```msq-editor opens-with=text
 1/16 a beamed, b, a, b, a not beamed
@@ -63,7 +69,7 @@ tuplet 5 from unit 1 to unit 5
 tuplet 6 from unit 6 to unit 11
 ```
 
-But keep in mind that even when you see the value `3` in a tuplet, it actually means `3:2`: three units in the time of two. If you need another ratio, you can write it in full:
+But keep in mind that the value `3` actually means `3:2`: three units in the time of two. If you need another ratio, you can write it in full:
 
 ```msq-editor opens-with=text
 a a a a a a
@@ -71,7 +77,7 @@ a a a a a a
 tuplet 6:3 from first unit to sixth unit
 ```
 
-Both parts of the ratio are whole numbers, so `3/2` or `2.5` is not a tuplet value. Below in the table you can see the default ratios for values without the second part:
+Both numbers of the ratio are whole numbers, so `3/2` or `2.5` is not a tuplet value. The default ratios for values with one number:
 
 | Tuplet value | Default ratio |
 | --- | --- |
@@ -84,11 +90,11 @@ Both parts of the ratio are whole numbers, so `3/2` or `2.5` is not a tuplet val
 | `12` | 12:8 |
 | `n`, if it's not one of the values above | n:(n - 1) |
 
-The ratio is what the playback uses, and the value is what you see on the page, exactly as you wrote it.
+The playback uses the ratio. On the page you see the value exactly as you wrote it.
 
 ## 3. Brackets
 
-By default, a tuplet over one beamed group goes without a bracket, but you can force one with `with brackets`:
+By default, a tuplet over one beamed group has no bracket. But you can add one with `with brackets`:
 
 ```msq-editor opens-with=text
 1/8 a beamed, b, e not beamed
@@ -96,7 +102,7 @@ By default, a tuplet over one beamed group goes without a bracket, but you can f
 tuplet 3 with brackets from first unit to third unit
 ```
 
-When the units of a tuplet are not beamed together, or they are quarters or longer, the bracket is drawn anyway, because without it you couldn't tell which units the tuplet covers:
+If the units of a tuplet are not beamed together, or they are quarters or longer, the bracket is always drawn, because without it you couldn't see which units are in the tuplet:
 
 ```msq-editor opens-with=text
 1/4 a b c5
@@ -106,7 +112,7 @@ tuplet 3 from first unit to third unit
 
 ## 4. Placement
 
-You can set the direction of a tuplet with `up` or `down`, or with `above` and `below`. `over` and `under` work too:
+You can set the direction of a tuplet with `up` or `down`, `above` or `below`, `over` or `under`:
 
 ```msq-editor opens-with=text
 1/8 b3 beamed, c, b3 not beamed
@@ -120,7 +126,7 @@ tuplet 3 down with brackets from unit 7 to unit 9
 tuplet 3 below with brackets from unit 10 to unit 12
 ```
 
-There is also `above stave` and `below stave`. The difference between `below` and `below stave` is that `below stave` guarantees that a tuplet will be rendered below the stave:
+There are also `above stave` and `below stave`. The difference is that `below stave` always draws the tuplet below the stave, and `below` doesn't:
 
 ```msq-editor opens-with=text
 1/8 a beamed, b, a not beamed
@@ -130,7 +136,7 @@ tuplet 3 above stave with brackets from first unit to third unit
 tuplet 3 below stave with brackets from fourth unit to sixth unit
 ```
 
-The vertical position of tuplets is always adjusted, so they don't intersect other elements, but you can correct it regardless. You just need to say how much up or down it should move, in intervals between stave lines:
+Tuplets are always moved so they don't cross other elements, but you can still move them yourself. Just say how much up or down, in intervals between stave lines:
 
 ```msq-editor opens-with=text
 1/8 a beamed, b, a not beamed
@@ -139,11 +145,11 @@ tuplet 3 below stave with brackets 0.5 down
 from first unit to third unit
 ```
 
-Here we moved the tuplet down by half of an interval between stave lines.
+Here the tuplet moves down by half of an interval between stave lines.
 
-## 5. Starting before and finishing after
+## 5. Starting Before and Finishing After
 
-You can also configure tuplets, so they start before a unit or finish after a unit:
+A tuplet can also start before a unit or finish after a unit:
 
 ```msq-editor opens-with=text
 1/8 a beamed, b, a not beamed
@@ -156,11 +162,11 @@ tuplet 3 above stave with brackets
 starts at fourth unit and finishes after sixth unit
 ```
 
-`before first unit` and `after third unit` without `starts` and `finishes` work in the same way.
+`before first unit` and `after third unit` without `starts` and `finishes` work the same.
 
-## 6. Nested tuplets
+## 6. Nested Tuplets
 
-Tuplets can be nested, and the playback takes all of them into account:
+Tuplets can be inside other tuplets, and the playback takes all of them into account:
 
 ```msq-editor opens-with=text
 1/8 a beamed a a not beamed
@@ -173,6 +179,6 @@ tuplet 3 with brackets from unit 1 to unit 3
 tuplet 5 with brackets from unit 4 to unit 8
 ```
 
-A tuplet can also go from one measure to another, and it can be set to a particular measure, stave and voice. The coordinates for that work absolutely in the same way as for slurs, which you can read about in [Slurs](/docs/language/slurs).
+A tuplet can also go from one measure to another, and it can be set to a specific measure, stave and voice. This works exactly the same as for slurs, which you can read about in [Slurs](/docs/language/slurs).
 
 Read next: [Measures](/docs/language/measures)

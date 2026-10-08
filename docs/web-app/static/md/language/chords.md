@@ -1,13 +1,13 @@
 # Chords
 
-A chord is a unit made of several notes that sound together. In order to create a chord, you need to type `chord`, and then list all its notes starting from the next line:
+A chord is a unit of several notes that sound together. To write a chord, type `chord`, and list its notes on the next line:
 
 ```msq-editor opens-with=text
 chord
 c e g
 ```
 
-You can also put each note of the chord on a new line. Indentation is only decoration, the parser ignores it:
+You can also put each note on its own line. The parser ignores indentation:
 
 ```msq-editor opens-with=text
 chord
@@ -16,11 +16,11 @@ chord
   g
 ```
 
-Each chord must start on a new line. The notes can't be written on the same line as `chord`.
+Each chord starts on a new line. The notes can't be on the same line as `chord`.
 
-## 1. The empty line rule
+## 1. The Empty Line Rule
 
-A chord's note list runs on until something ends it. Another `chord` ends the previous one, so you can write chords one after another:
+The notes of a chord go on until something ends the chord. Another `chord` ends the previous one, so you can write chords one after another:
 
 ```msq-editor opens-with=text
 chord
@@ -31,7 +31,7 @@ chord
 e g b
 ```
 
-But a note is a different story. To separate a chord from the note that follows after, you have to put an empty line between them:
+But a note doesn't end a chord. To write a note after a chord, you have to put an empty line between them:
 
 ```msq-editor opens-with=text
 chord
@@ -40,7 +40,7 @@ c e g
 a
 ```
 
-It's important to mention that this is the most common mistake with chords. Without the empty line, the next note is read as another member of the chord. In the example below, `a` is not a separate note, it's the fourth note of the chord:
+It's important to mention that this is the most common mistake with chords. Without the empty line, the next note becomes part of the chord. In the example below, `a` is not a separate note, it's the fourth note of the chord:
 
 ```msq-editor opens-with=text
 chord
@@ -48,7 +48,7 @@ c e g
 a
 ```
 
-So the habit is simple: always finish a chord with an empty line.
+So just always end a chord with an empty line.
 
 ```msq-editor opens-with=text
 chord
@@ -61,9 +61,9 @@ e g c5
 
 ```
 
-## 2. Duration of a chord
+## 2. Duration of a Chord
 
-Like for notes, the default duration of a chord is a quarter. To set a duration for the chord, you need to put it before `chord`, separated by a space:
+Like a note, a chord is a quarter by default. To set its duration, put it before `chord`, with a space:
 
 ```msq-editor opens-with=text
 1/2 chord
@@ -77,7 +77,7 @@ e g b
 
 ```
 
-A chord takes part in the same sticky duration as notes do: it keeps the duration of the units before it, and passes its own to the units after it:
+The duration works the same as with notes: a chord gets the duration of the units before it, and the units after it get the chord's duration:
 
 ```msq-editor opens-with=text
 1/8 c d
@@ -91,7 +91,7 @@ c e g
 a
 ```
 
-You still can set a duration for notes in the chord, but the chord has only one duration. The last specified duration overrides the durations mentioned before it:
+You can still write durations on the notes inside the chord, but a chord has only one duration. The last one wins:
 
 ```msq-editor opens-with=text
 1/4 chord
@@ -99,9 +99,9 @@ You still can set a duration for notes in the chord, but the chord has only one 
 
 ```
 
-As you can see, the chord is a sixteenth. Of course, it's not recommended to write this way: the duration goes on the `chord` line, not on the notes.
+As you can see, the chord is a sixteenth. It's not recommended to write this way: put the duration on the `chord` line, not on the notes.
 
-## 3. Notes in a chord
+## 3. Notes in a Chord
 
 Each note in the chord can have an octave:
 
@@ -116,7 +116,7 @@ g3 e4 c5
 
 ```
 
-The notes don't have to be in order. MSQ sorts them by pitch when it draws the chord:
+The notes can be in any order. MSQ sorts them by pitch when it draws the chord:
 
 ```msq-editor opens-with=text
 chord
@@ -124,7 +124,7 @@ g c e
 
 ```
 
-A key follows its own note in the note list, exactly like for a single note:
+A key goes after its own note, like with a single note:
 
 ```msq-editor opens-with=text
 chord
@@ -135,9 +135,9 @@ d with fl key, f with # key with parentheses, a
 
 ```
 
-## 4. Dots and rests
+## 4. Dots and Rests
 
-A dot is written after `chord`, and it applies to the whole chord:
+A dot goes after `chord`, and it's for the whole chord:
 
 ```msq-editor opens-with=text
 1/4 chord dotted
@@ -151,7 +151,7 @@ c e g c5
 
 ```
 
-If you add dots to any of the notes in a chord, they will be applied to the whole chord as well. It's not recommended to do that, because it's easy to miss:
+If you add dots to one of the notes in a chord, they also go to the whole chord. It's not recommended, because it's easy to miss:
 
 ```msq-editor opens-with=text
 1/2 chord
@@ -159,7 +159,7 @@ c with two dots, e, g
 
 ```
 
-Chords can also be marked as a rest. As you remember from [Rests](/docs/language/rests), a rest pinned to a note is drawn where that note would be. For a chord, the rest takes the position of its first note:
+A chord can also be marked as a rest. As you remember from [Rests](/docs/language/rests), a rest on a note is drawn where that note would be. For a chord, the rest is drawn where its first note would be:
 
 ```msq-editor opens-with=text
 chord is rest
@@ -170,6 +170,6 @@ g, b is rest, d5
 
 ```
 
-As you can see, marking any note of a chord as a rest makes the whole chord a rest. There is not much sense in it, unless you're experimenting and you just want to mark and unmark chords as rests easily.
+As you can see, if any note of a chord is a rest, the whole chord is a rest. It's only useful when you want to easily mark and unmark chords as rests while you experiment.
 
 Read next: [Beams](/docs/language/beams)

@@ -1,6 +1,6 @@
 # Ornaments
 
-Ornaments are attributes of a unit, just like [articulations](/docs/language/articulations). There are three of them: trill, mordent and turn, and the last two can be inverted.
+Ornaments are attributes of a unit, just like [articulations](/docs/language/articulations). There are three of them: trill, mordent and turn. A mordent and a turn can be inverted.
 
 Let's start with a simple example:
 
@@ -20,14 +20,14 @@ A trill is an attribute of a unit:
 a with trill
 ```
 
-You can add a wave to a trill with `with wave after`. The wave runs from the trill to the next unit:
+`with wave after` adds a wave to a trill. The wave goes from the trill to the next unit:
 
 ```msq-editor opens-with=text
 1/2 a with trill with wave after
 1/4 a
 ```
 
-You can set a direction for it, with `up` and `down` or with `above` and `below`:
+You can set its direction with `up` and `down`, or with `above` and `below`:
 
 ```msq-editor opens-with=text
 measure
@@ -54,7 +54,7 @@ You can also force it above or below the stave:
 b with trill below stave
 ```
 
-The vertical position of a trill is always adjusted, but you can still correct it if you like. `1 down` moves it one interval between stave lines down, and `1 up` moves it one interval up:
+A trill is always placed for you, but you can still move it yourself. `1 down` moves it down by one interval between stave lines, and `1 up` moves it up by one:
 
 ```msq-editor opens-with=text
 measure
@@ -91,7 +91,7 @@ a with mordent with natural key above
 a with mordent with natural key below
 ```
 
-And you can have both at once. It's easier to read when each one is on its own line:
+You can have both at once. It's easier to read when each one is on its own line:
 
 ```msq-editor opens-with=text
 a with mordent
@@ -117,7 +117,7 @@ a with mordent with fl key below
 a with mordent with n key above
 ```
 
-The direction, `above stave` and `below stave`, and the vertical correction work for a mordent in the same way as for a trill:
+The direction, `above stave`, `below stave` and moving up or down work for a mordent the same way as for a trill:
 
 ```msq-editor opens-with=text
 1/4 a with mordent down
@@ -139,7 +139,7 @@ You can make it inverted:
 a with turn inverted
 ```
 
-You can add keys to it, exactly like to a mordent:
+You can add keys to it, the same way as to a mordent:
 
 ```msq-editor opens-with=text
 a with turn with sharp key above
@@ -154,22 +154,22 @@ with sharp key above
 with flat key below
 ```
 
-You can also place a turn after a unit rather than over it, with `after`:
+With `after`, a turn is placed after a unit, not over it:
 
 ```msq-editor opens-with=text
 1/2 a with turn after
 1/4 a
 ```
 
-And the vertical position of a turn can be corrected in the same way:
+And you can move a turn up or down in the same way:
 
 ```msq-editor opens-with=text
 a with turn with sharp key above 1 up
 ```
 
-## 4. Keys on a trill
+## 4. Keys on a Trill
 
-A trill can take keys too, which tell which note it alternates with:
+A trill can have keys too. They tell which note it alternates with:
 
 ```msq-editor opens-with=text
 1/4 a with trill with sharp key above
@@ -178,7 +178,7 @@ b with trill with flat key below
 
 ## 5. Chords
 
-Ornaments work for chords in the same way. The ornament goes on the `chord` line:
+For a chord, the ornament goes on the `chord` line:
 
 ```msq-editor opens-with=text
 1/4 chord with mordent
@@ -189,7 +189,11 @@ d f a
 
 ```
 
-**Side note:** ornaments are played, not only drawn. A trill alternates with the note above it, a mordent and a turn play their notes around the unit, an inverted one goes the other way, and the keys you add change the notes they go to.
+**Side note:** ornaments are also heard in playback:
+
+- A trill alternates with the note above it.
+- A mordent and a turn play their notes around the unit. An inverted one goes the other way.
+- The keys you add change the notes they go to.
 
 Appoggiatura and acciaccatura are not ornaments in MSQ. You write them with a [grace unit](/docs/language/grace-units) and a slur.
 

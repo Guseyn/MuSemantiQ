@@ -1,6 +1,6 @@
-# Cross-stave chords
+# Cross-Stave Chords
 
-A note or a chord can be drawn on the next or the previous stave from the stave where it's declared. It's how piano music often moves a hand's notes to the other stave without changing the voice they belong to:
+A note or a chord can be drawn on the stave below or above the one where you write it. Piano music often does this: a hand's notes move to the other stave but stay in the same voice:
 
 ```msq-editor opens-with=text
 measure
@@ -12,7 +12,13 @@ stave with bass clef
 1/4 c3
 ```
 
-You can write `on next stave`, `on previous stave` or `on prev stave`, and `on current stave` or `on cur stave` for the stave where the unit is declared. `in` and `at` work instead of `on`, and `staff` instead of `stave`.
+You can write:
+
+- `on next stave`;
+- `on previous stave` or `on prev stave`;
+- `on current stave` or `on cur stave`, for the stave where you write the unit.
+
+`in` and `at` work instead of `on`, and `staff` instead of `stave`.
 
 A single note inside a chord can move as well:
 
@@ -25,7 +31,7 @@ a, b on next stave, c5 on prev stave
 stave with treble clef
 ```
 
-If you position notes of a cross-stave chord on staves that are missing, they are drawn on the stave where they are declared:
+If you move notes to a stave that doesn't exist, they are drawn on the stave where you wrote them:
 
 ```msq-editor opens-with=text
 measure
@@ -34,7 +40,7 @@ chord
 a, b on next stave, c5 on prev stave
 ```
 
-You can move a whole chord to the next or the previous stave, by typing the position right after the `chord` key word:
+To move a whole chord to the next or the previous stave, write the position right after `chord`:
 
 ```msq-editor opens-with=text
 measure
@@ -48,7 +54,7 @@ b c5 d5
 stave with bass clef
 ```
 
-As you can see above, when you move a whole chord, all the following chords in the same voice are drawn on that stave as well, until an empty line. You can override this behaviour by saying that a chord must be drawn on the current stave:
+As you can see above, when you move a whole chord, the next chords in the same voice are drawn on that stave too, until an empty line. To stop that, say that a chord must be drawn on the current stave:
 
 ```msq-editor opens-with=text
 measure
@@ -62,9 +68,9 @@ b c5 d5
 stave with bass clef
 ```
 
-A single note that is a unit of its own moves alone, it does not affect the units after it, like `g3` in the first example on this page.
+A single note (not in a chord) moves alone. It doesn't affect the units after it, like `g3` in the first example on this page.
 
-You should keep in mind that although a note or a chord can be drawn on a different stave, in terms of the page structure it still belongs to the stave and the voice where it's declared. Below, the chords of the second voice are declared on the first stave, and they stay a part of it while some of their notes are drawn on the next stave:
+Keep in mind that a moved note or chord still belongs to the stave and the voice where you wrote it. It's only drawn somewhere else. Below, the chords of the second voice are written on the first stave, and they stay a part of it, while some of their notes are drawn on the next stave:
 
 ```msq-editor opens-with=text
 measure
@@ -86,9 +92,9 @@ c d e on next stave
 stave with treble clef
 ```
 
-It also means that a moved unit is still counted among the units of its own stave and voice, for example when a [slur](/docs/language/slurs) names it by its position.
+It also means that a moved unit is still counted in its own stave and voice, for example when a [slur](/docs/language/slurs) points to it by its position.
 
-Beamed units can cross between staves too. The beam then spans both staves, and the stems reach between them:
+Beamed units can cross between staves too. The beam then goes across both staves, and the stems reach between them:
 
 ```msq-editor opens-with=text
 measure
@@ -99,9 +105,9 @@ c3 on next stave, g3 on next stave not beamed
 stave with bass clef
 ```
 
-As you may notice, a single note needs its own `on next stave` each time, because its position does not carry over to the next unit.
+As you may notice, each single note needs its own `on next stave`, because it doesn't carry over to the next unit.
 
-You can expect that colliding cross-stave chords are visually separated:
+Cross-stave chords that collide are moved apart:
 
 ```msq-editor opens-with=text
 measure
@@ -117,7 +123,7 @@ chord
 c e f
 ```
 
-And you can expect that the notes drawn on the next or the previous stave take into account the clef of that stave:
+And notes drawn on the next or the previous stave follow the clef of that stave:
 
 ```msq-editor opens-with=text
 measure

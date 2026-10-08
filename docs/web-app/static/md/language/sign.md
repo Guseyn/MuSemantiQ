@@ -1,6 +1,6 @@
-# Sign (segno)
+# Sign (Segno)
 
-Each measure can have a sign (segno). You declare it with `sign` inside the measure:
+Each measure can have a sign (segno). You add it with `sign` inside the measure:
 
 ```msq-editor opens-with=text
 measure
@@ -20,9 +20,9 @@ measure
 c5 b a g
 ```
 
-As you can see, by default the segno is at the start of the measure. It's because this mark is usually used with "Dal segno", an instruction that tells the performer to repeat the music from the nearest preceding segno.
+As you can see, by default the segno is at the start of the measure. It's because it's usually used with "Dal segno", which tells the performer to go back to the last segno and play from there.
 
-If you need a segno at the end of the measure, or you want to explicitly declare that it's at the start, you just say so:
+If you want the segno at the end of the measure, or want to say explicitly that it's at the start, just write it:
 
 ```msq-editor opens-with=text
 measure
@@ -36,9 +36,9 @@ measure
 c d e f
 ```
 
-The word `the` can be omitted: `at start of measure` and `at end of measure` work as well.
+You can skip `the`: `at start of measure` and `at end of measure` work as well.
 
-The vertical position of the sign is always adjusted to the content of the measure:
+The sign moves up or down by itself, depending on the notes in the measure:
 
 ```msq-editor opens-with=text
 measure
@@ -50,7 +50,7 @@ sign
 c6 d6 e6
 ```
 
-But you can also correct it, if you want:
+But you can correct it:
 
 ```msq-editor opens-with=text
 measure
@@ -61,8 +61,8 @@ measure
 c d e f
 ```
 
-Here we just moved the sign up by one interval between stave lines.
+Here we moved the sign up by one interval between stave lines.
 
-A segno is also followed by the MIDI player: when it meets a "D.S." instruction, it jumps back to the segno. The instructions themselves are written with `repetition note`, which is described in [Repetition instructions](/docs/language/repetition-instructions).
+The MIDI player also follows the segno: when it meets a "D.S." instruction, it jumps back to it. The instructions are written with `repetition note`, see [Repetition instructions](/docs/language/repetition-instructions).
 
 Read next: [Coda](/docs/language/coda)

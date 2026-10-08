@@ -1,8 +1,8 @@
 # Slurs
 
-A slur does not belong to a measure, because it can connect units from different measures and even from different staves. So a slur is a command of its own, and it's written **after** the music it covers: it names units by their positions, and those units must already exist when the slur is read.
+A slur can connect units from different measures and even from different staves, so it doesn't belong to a measure. It's a separate command, and you write it **after** the music. It names the units by their positions, so those units must already be written above it.
 
-## 1. Simple slurs
+## 1. Simple Slurs
 
 Let's start with basics:
 
@@ -14,7 +14,11 @@ treble clef
 slur from first unit to fourth unit
 ```
 
-You can write a position as a word or as a number, before or after the key word: `first unit`, `1st unit` and `unit 1` are the same thing. Words work for numbers from **1** to **10** (`first` … `tenth`, `one` … `ten`), because it keeps highlighting in the editor fast, and that is where most positions are anyway. For bigger numbers you can write `11th` or `unit 11`. The key words `unit`, `note` and `chord` are also the same thing here, and rests are counted as units too:
+You can write a position as a word or as a number, before or after the key word. `first unit`, `1st unit` and `unit 1` are the same.
+
+- Words work only from **1** to **10** (`first` … `tenth`, `one` … `ten`), because it keeps highlighting in the editor fast, and most positions are there anyway.
+- For bigger numbers, write `11th` or `unit 11`.
+- `unit`, `note` and `chord` are the same here, and rests are counted as units too:
 
 ```msq-editor opens-with=text
 measure
@@ -24,7 +28,7 @@ treble clef
 slur from note 1 to 4th note
 ```
 
-A slur takes its units from the last page line declared before it. That is how you can put slurs on several lines:
+A slur takes its units from the last page line above it. So you can put slurs on several lines like this:
 
 ```msq-editor opens-with=text
 measure
@@ -39,7 +43,7 @@ a d f g
 slur from first unit to fourth unit
 ```
 
-As you see, each slur applies to the last line declared before the slur. But you can also declare all the slurs after all the lines, and name the line:
+As you can see, each slur applies to the line above it. But you can also write all the slurs after all the lines, and name the line:
 
 ```msq-editor opens-with=text
 measure
@@ -73,7 +77,7 @@ slur on second line, in first measure from first unit to fourth unit
 slur on second line, in second measure from first unit to fourth unit
 ```
 
-It's important to mention that measures are numbered within their page line. On the second line, `first measure` is the first measure of that line, not the first measure of the page.
+It's important to mention that measures are counted within their page line. On the second line, `first measure` is the first measure of that line, not of the page.
 
 In the same way, you can put slurs in different staves:
 
@@ -88,7 +92,7 @@ slur in first stave from first unit to fourth unit
 slur in second stave from first unit to fourth unit
 ```
 
-A slur connects units only in the same voice, so you name the voice for the whole slur:
+A slur connects units only in one voice, so you name the voice once, for the whole slur:
 
 ```msq-editor opens-with=text
 measure
@@ -102,7 +106,7 @@ slur in first voice from first note to fourth unit
 slur in second voice from first note to fourth unit down
 ```
 
-As you can see, you can control the direction of a slur with the `up` and `down` key words.
+As you can see, `up` and `down` set the direction of a slur.
 
 A slur is a cross-measure element:
 
@@ -136,7 +140,7 @@ changes stave at first note in second measure in second stave
 and finishes at fourth unit in second measure in second stave
 ```
 
-It's important to mention the exact unit where a slur changes its stave, because otherwise the slur misjudges which units are under it, and it would intersect or ignore some of them. Here is the same slur without `changes stave`:
+It's important to name the unit where a slur changes its stave. Otherwise the slur doesn't know which units are under it, and it crosses or ignores some of them. Here is the same slur without `changes stave`:
 
 ```msq-editor opens-with=text
 measure
@@ -155,7 +159,7 @@ starts above first note in first measure in first stave
 and finishes at fourth unit in second measure in second stave
 ```
 
-As you may notice, a slur can be written over several lines, and you can join its parts with commas or `and`. Cross-stave slurs work and look better when they are s-shaped, more about that below, in the section about s-shaped slurs.
+As you may notice, you can write a slur over several lines, and join its parts with commas or `and`. Cross-stave slurs look better when they are s-shaped. More about that below, in the section about s-shaped slurs.
 
 If a slur needs to start before a unit or finish after a unit, you just say so:
 
@@ -174,16 +178,16 @@ measure
 slur starts before first unit and finishes at 4th unit
 ```
 
-This is how a slur reaches across the end of a page line: its part on the first line `finishes after` a unit, and its part on the next line `starts before` one.
+This is how a slur goes from one page line to the next: its part on the first line `finishes after` a unit, and its part on the next line `starts before` a unit.
 
-The endpoints can be written in different ways, so you can choose what reads better:
+You can write the start and the finish in different ways:
 
 | Start | Finish |
 | --- | --- |
 | `from`, `starts at`, `starts from`, `begins at`, `begins from` | `to`, `finishes at`, `ends at` |
 | `starts before`, `begins before` | `finishes after`, `ends after` |
 
-You can set a direction for a slur with `up` and `down`, or you can say that a slur starts or finishes `above` or `below` a certain unit:
+You can set the direction of a slur with `up` and `down`, or say that it starts or finishes `above` or `below` a unit:
 
 ```msq-editor opens-with=text
 measure
@@ -203,22 +207,24 @@ a d f g
 slur up starts at first unit and finishes at 4th unit
 ```
 
-If you mention several directions for a simple slur, the last one wins over all the others.
+If you write several directions for a simple slur, the last one wins.
 
 ## 2. Coordinates
 
-In terms of the coordinates of units (`line`, `measure`, `stave` and `voice`) in slurs, you have to remember the following rules:
+For the coordinates of units in a slur (`line`, `measure`, `stave` and `voice`), you have to remember the following rules:
 
-1. If a `line` is not specified after the `slur` key word, the slur applies to the last line declared before it.
-2. If you don't specify `measure`, `stave` and `voice`, the slur assumes that you mean the first measure, the first stave and the first voice.
-3. Along with a `unit` coordinate you can specify only `measure` and `stave` (like `first note in first measure, in second stave`). You cannot set `voice` along with a unit, only right after the `slur` key word, for the whole slur, because a slur is not a cross-voice element. And you cannot set `line` along with a unit, because each slur, or each part of a slur, is declared for the line where it is located.
-4. If you specified `measure` and `stave` for the first unit of a slur, and they don't change for the other units, you don't need to repeat them.
+1. If you don't write `line` after `slur`, the slur applies to the last line above it.
+2. If you don't write `measure`, `stave` and `voice`, it means the first measure, the first stave and the first voice.
+3. Next to a `unit` you can write only `measure` and `stave` (like `first note in first measure, in second stave`).
+   - `voice` goes right after `slur`, for the whole slur, because a slur can't go from one voice to another.
+   - `line` can't go next to a unit, because each slur, or each part of a slur, belongs to the line where it's written.
+4. If `measure` and `stave` of the next units are the same as of the first unit, you don't need to repeat them.
 
-The words `stave` and `staff` are the same thing everywhere in a slur.
+`stave` and `staff` are the same everywhere in a slur.
 
-## 3. Shaping slurs
+## 3. Shaping Slurs
 
-You can configure how rounded a slur is. A number from **1** to **10** after `roundness` (or `convex`) sets the roundness of a slur:
+You can set how round a slur is, with a number from **1** to **10** after `roundness` (or `convex`):
 
 ```msq-editor opens-with=text
 measure
@@ -234,7 +240,7 @@ slur in second measure from first note to note 5 with roundness 7
 slur in third measure from first note to note 5 with roundness 10
 ```
 
-You can also correct the vertical position of the left and the right points of a slur:
+You can also move the left and the right points of a slur up or down:
 
 ```msq-editor opens-with=text
 measure
@@ -252,7 +258,7 @@ with right point 1 up
 
 In the second measure we moved both points of the slur up by one interval between stave lines.
 
-A slur adjusts itself, so it does not intersect notes and chords under it:
+A slur adjusts itself, so it doesn't cross the notes and chords under it:
 
 ```msq-editor opens-with=text
 measure
@@ -262,7 +268,7 @@ c d3 c
 slur from unit 1 to unit 3
 ```
 
-For the right point of a slur, you can also say where it is attached: to the note head, or to the middle of the stem. It is especially useful for slurs that start from [grace notes](/docs/language/grace-units):
+For the right point of a slur, you can also say where it's attached: to the note head, or to the middle of the stem. It's useful for slurs that start from [grace notes](/docs/language/grace-units):
 
 ```msq-editor opens-with=text
 measure
@@ -294,9 +300,9 @@ with right point attached to note head
 
 As you may notice, `note head` and `note body` are the same thing.
 
-## 4. S-shaped slurs
+## 4. S-Shaped Slurs
 
-If you need a cross-stave slur, it's highly recommended to make it s-shaped with `with s-shape`:
+For a cross-stave slur, it's better to make it s-shaped with `with s-shape`:
 
 ```msq-editor opens-with=text
 measure
@@ -332,6 +338,6 @@ goes through 9th note
 finishes at 12th note
 ```
 
-`goes through` marks a unit where the slur changes its direction. As you can see, everything that works for simple slurs works for s-shaped slurs as well.
+`goes through` marks the unit where the slur changes its direction. As you can see, everything that works for simple slurs works for s-shaped slurs too.
 
 Read next: [Crescendo and diminuendo](/docs/language/crescendo-and-diminuendo)

@@ -9,8 +9,8 @@ They are written once here and **copied** into every app that shows a score:
                      ──►  dev-tools/web-app/static/js/msq/web-components/
                      ──►  docs/web-app/static/js/msq/web-components/
 
-by `npm run web-components:update`, which `npm run browser-app`,
-`npm run dev-tools` and `npm run docs` all run before starting.
+by `npm run web-components:update`, which `npm run browser-app:setup`,
+`npm run dev-tools:setup` and `npm run docs` all run.
 `npm run watch:web-components` keeps the copies in step while you work. The copies are generated, so they are
 not tracked — this folder is the only place to edit them.
 

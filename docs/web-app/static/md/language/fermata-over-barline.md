@@ -1,6 +1,6 @@
-# Fermata over barline
+# Fermata Over Barline
 
-A fermata over a barline belongs to the measure, not to a unit: it's drawn over the closing barline of the measure and says that the music pauses there. In order to draw it, you add it to the structure of the measure:
+A fermata over a barline belongs to the measure, not to a unit. It's drawn over the closing barline of the measure, and it means the music pauses there. You add it right after `measure`:
 
 ```msq-editor opens-with=text
 measure
@@ -19,9 +19,9 @@ measure ends with fermata
 g a b c5
 ```
 
-It's one of the forms that are written right after `measure`, like `ends with double barline` from [Barlines](/docs/language/barlines). So it has the same ordering rule: `ends with fermata` must follow `measure` before anything else does, before a clef, a stave or a unit.
+It works like `ends with double barline` from [Barlines](/docs/language/barlines): `ends with fermata` must come right after `measure`, before anything else: before a clef, a stave or a unit.
 
-You can also declare the fermata as a separate command, which still belongs to the current measure but can be written anywhere in it:
+You can also write the fermata as a separate command. It belongs to the current measure and can go anywhere in it:
 
 ```msq-editor opens-with=text
 measure
@@ -32,7 +32,12 @@ fermata at the end
 
 `fermata` on its own works as well.
 
-It's important to mention how this differs from `with fermata` on a unit, which you know from [Articulations](/docs/language/articulations). A unit fermata is drawn over (or under) that unit and holds that unit, while a fermata over a barline is drawn over the barline and holds the end of the whole measure:
+It's important to mention that this is not the same as `with fermata` on a unit, which you know from [Articulations](/docs/language/articulations):
+
+- a unit fermata is drawn over (or under) its unit and holds that unit;
+- a fermata over a barline is drawn over the barline and holds the end of the whole measure.
+
+Here are both:
 
 ```msq-editor opens-with=text
 measure
@@ -42,6 +47,6 @@ measure ends with fermata
 g a b c5
 ```
 
-When the music is played, a fermata over a barline adds a pause of **2.5** seconds after the measure, and a unit fermata adds a pause of **2** seconds after its unit. Both can be changed with the `fermata duration` setting, which you can read about in [MIDI settings](/docs/language/midi-settings).
+When the music is played, a fermata over a barline adds a pause of **2.5** seconds after the measure, and a unit fermata adds a pause of **2** seconds after its unit. You can change both with the `fermata duration` setting, see [MIDI settings](/docs/language/midi-settings).
 
 Read next: [Tempo and metronome marks](/docs/language/tempo-and-metronome-marks)

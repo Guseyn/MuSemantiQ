@@ -1,6 +1,6 @@
-# Adjusting units
+# Adjusting Units
 
-There are certain cases where it's quite useful to adjust the horizontal position of a unit. Let's first explore how this works in MSQ.
+Sometimes it's useful to move a unit to the left or to the right.
 
 Let's start with the following example:
 
@@ -19,7 +19,7 @@ new line
 1/4 a is right by 3
 ```
 
-As you see, just by adding `is left by N` or `is right by N` to a unit, you can control its horizontal position. The word `is` can be left out, and the number can be a decimal, or even written as a word:
+As you can see, you just add `is left by N` or `is right by N` to a unit. The word `is` can be left out, and the number can be a decimal, or even a word:
 
 ```msq-editor opens-with=text
 measure
@@ -30,7 +30,7 @@ c5 left by 0.5
 d5 is right by two
 ```
 
-The number is measured in the distance between two stave lines, the same measure the rest of the engraving is built on. So **1** moves a unit by the height of one space of the stave, and the move stays in proportion when the interval between stave lines is changed.
+The number is in intervals between stave lines, like everything else on the page. So **1** moves a unit by one space of the stave, and if you change the interval between stave lines, the move changes with it.
 
 A chord is adjusted on its `chord` line:
 
@@ -50,11 +50,11 @@ a sharp b sharp c5 flat
 
 ```
 
-It's quite important to mention that when you move a unit, all the elements that belong to it and stand before it move too: its accidentals, its arpeggio, and so on, as you can see above.
+It's important to mention that when you move a unit, everything in front of it that belongs to it moves too: its accidentals, its arpeggio, and so on, as you can see above.
 
-## 1. What else moves
+## 1. What Else Moves
 
-Moving a unit does not break the synchronization of units in different voices and staves. Everything that sounds at the same time moves together:
+Units in different voices and staves stay in sync. Everything that sounds at the same time moves together:
 
 ```msq-editor opens-with=text
 measure
@@ -64,7 +64,7 @@ stave with bass clef
 1/4 c3 d3 e3 f3
 ```
 
-And when you move a unit, all the units that follow it get repositioned as well:
+And all the units after it move as well:
 
 ```msq-editor opens-with=text
 measure
@@ -74,11 +74,16 @@ e is right by 5
 f
 ```
 
-## 2. When you need it
+## 2. When You Need It
 
-In the majority of cases you don't need to adjust the position of units. This is an escape hatch: MSQ reserves a safe space between units by default, and when a page is too tight or too loose it's better to reach for [Unit spacing](/docs/language/unit-spacing) first. There are so many edge cases where it's unclear whether the positions of units should be adjusted, that it was decided to give the full control to you. However, there are some concrete examples where it's useful.
+In most cases, you don't need to move units:
 
-Let's start with [tuplets](/docs/language/tuplets). By default, tuplets have irregular spaces between their units when there are units in other voices or staves:
+- By default, MSQ keeps enough space between units.
+- If a page is too tight or too loose, try [Unit spacing](/docs/language/unit-spacing) first.
+
+But there are so many edge cases where it's not clear whether units should be moved, that it was decided to give you full control. Here are some examples where it's useful.
+
+Let's start with [tuplets](/docs/language/tuplets). By default, the spaces between units in a tuplet are uneven when there are units in other voices or staves:
 
 ```msq-editor opens-with=text
 measure
@@ -98,7 +103,7 @@ tuplet 3 with brackets in first voice from unit 1 to unit 3
 tuplet 5 with brackets in first voice from unit 4 to unit 8
 ```
 
-By moving a few units, you can even out those spaces:
+If you move a few units, the spaces become even:
 
 ```msq-editor opens-with=text
 measure
@@ -144,7 +149,7 @@ a2
 g2
 ```
 
-The arpeggiated chord leaves a wide gap before it. We can now easily optimize the space on the score:
+There is a wide gap before the arpeggiated chord. We can easily fix it:
 
 ```msq-editor opens-with=text
 measure

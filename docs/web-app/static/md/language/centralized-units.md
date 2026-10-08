@@ -1,6 +1,6 @@
-# Centralized units
+# Centralized Units
 
-By default, all units are aligned to the left side of the measure. If you want a unit to be aligned in the center, you just need to mark it.
+By default, all units are aligned to the left side of the measure. If you want a unit in the center, you just need to mark it.
 
 Let's take a look at the difference between a simple unit and a centralized one:
 
@@ -16,7 +16,7 @@ measure
 1/4 c d e f
 ```
 
-The case it exists for is a unit that fills a whole measure by itself, most often a whole rest:
+It's for a unit that fills the whole measure by itself, most often a whole rest:
 
 ```msq-editor opens-with=text
 measure
@@ -27,7 +27,7 @@ measure
 1/4 c d e f
 ```
 
-The command has four spellings, and they all mean the same thing:
+You can write it in four ways, and they all mean the same:
 
 | You write         |
 |-------------------|
@@ -52,9 +52,9 @@ c e g
 
 As you can see from the last measure, a chord is centralized on its `chord` line.
 
-## 1. Only the only unit in its voice
+## 1. Only the Only Unit in Its Voice
 
-There is an important detail that you need to keep in mind: you can centralize a unit only if it's the only unit in its voice.
+It's important to remember that you can centralize a unit only if it's the only unit in its voice.
 
 Let's take a look at the following example:
 
@@ -73,7 +73,7 @@ stave
 1 rest is centralized
 ```
 
-As you see, if we mark the only unit in a voice as centralized, it's positioned in the center of the measure, and the rest of the measure moves with it, so that the units stay in step. Otherwise, it does not happen:
+As you can see, if the only unit in a voice is centralized, it's placed in the center of the measure, and the rest of the measure moves with it, so the units stay in sync. Otherwise, nothing happens:
 
 ```msq-editor opens-with=text
 measure
@@ -99,11 +99,11 @@ voice
 
 In the second measure the upper voice has two units, so neither of them is centralized.
 
-Nothing is centralized in a measure where voices collide, or in a measure that contains [cross-stave chords](/docs/language/cross-stave-chords), because it would decrease the readability of the music score.
+Nothing is centralized in a measure where voices collide, or in a measure with [cross-stave chords](/docs/language/cross-stave-chords), because it would make the score harder to read.
 
-## 2. Centralized units and unit spacing
+## 2. Centralized Units and Unit Spacing
 
-A unit is centralized after the measure has got its width. So when a measure is wider than its units need, for example because it's the last one on its page line and is stretched to the end of it, a centralized unit is still placed in its center:
+A unit is centralized after the measure gets its width. So if a measure is wider than its units need, a centralized unit is still placed in its center. For example, when it's the last measure on its page line and it's stretched to the end of the line:
 
 ```msq-editor opens-with=text
 measure
@@ -114,6 +114,6 @@ measure
 1 rest is centralized
 ```
 
-The same is true when you compress or stretch units: the measure changes its width, and a centralized unit follows its center. More about that you can read in [Unit spacing](/docs/language/unit-spacing).
+The same is true when you compress or stretch units. The measure changes its width, and a centralized unit stays in its center. More about that you can read in [Unit spacing](/docs/language/unit-spacing).
 
 Read next: [Adjusting units](/docs/language/adjusting-units)

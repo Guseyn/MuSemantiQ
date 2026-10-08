@@ -12,8 +12,10 @@ npm run test:visual:all                    # also: audio, serializer
 node scripts/visual-tests.js --only=chord  # run only tests whose name contains "chord" (all three runners accept --only)
 npm run coverage && npm run coverage:check # c8; thresholds: statements 87, branches 86, functions 82, lines 87
 
-npm run dev-tools        # https://127.0.0.1:8889 — test viewer, font generator/viewer, MusicXML, sound-font tools
-npm run browser-app # https://127.0.0.1:8888
+npm run dev-tools:setup  # download nodes, EHTML and e-ui from GitHub (asks first), copy src, web-components and fonts in
+npm run dev-tools        # https://127.0.0.1:8889, the server only — test viewer, font generator/viewer, MusicXML, sound-font tools
+npm run browser-app:setup # copy src, web-components and fonts into the app (once, and after changing them)
+npm run browser-app      # https://127.0.0.1:8888, the server only
 npm run docs             # https://127.0.0.1:8890 — landing page + documentation (runs docs:check first)
 npm run docs:check       # validate every example in docs/web-app/static/md
 npm run docs:pipeline    # re-engrave the landing page's "How it works" artefacts (committed)
@@ -21,7 +23,7 @@ npm run cli-app -- --input score.txt --svg --midi
 npm run create:msq:worker -- -o static/js/msq/worker  # only the worker, relative imports, any mount point
 ```
 
-`dev-tools` first rsyncs nodes, EHTML and e-ui from sibling checkouts (see [Sibling libraries](#sibling-libraries-nodes-ehtml-e-ui)) and fails if those are missing. `docs` expects them already copied: run `npm run docs:vendor` first (it also copies e-dev).
+`dev-tools:setup` downloads nodes, EHTML and e-ui as zips from GitHub (`scripts/download-dev-tools-libraries.js`, `--yes` skips the question); `dev-tools:vendor` copies them from sibling checkouts instead (see [Sibling libraries](#sibling-libraries-nodes-ehtml-e-ui)), which picks up unpushed changes. `docs` expects them already copied: run `npm run docs:vendor` first (it also copies e-dev).
 
 ## Tests are golden-file comparisons
 

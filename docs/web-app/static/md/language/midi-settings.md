@@ -1,12 +1,12 @@
-# MIDI settings
+# MIDI Settings
 
-A page is not only drawn, it is also played. MIDI settings change how it sounds: the instrument, the tempo, and how long a fermata holds. There are three of them, and they are written just like styles: the name, `is`, and a value, on a line of their own.
+A page is not only drawn, it's also played. MIDI settings change how it sounds. There are three of them: the instrument, the tempo, and how long a fermata holds. You write them like styles: the name, `is`, and a value, on a separate line.
 
-It's important to mention that MIDI settings change only what you hear, and never what you see. The score is drawn exactly the same with or without them. That's also why every example comes with a player: press **Render the score**, and then play, to hear the difference.
+It's important to mention that MIDI settings change only what you hear, never what you see. That's why every example here has a player: press **Render the score**, and then play, to hear the difference.
 
-## 1. Default instrument
+## 1. Default Instrument
 
-By default a page is played on a piano. You can set `default instrument` for the whole page without mentioning an instrument anywhere in the score:
+By default, a page is played on a piano. You can set `default instrument` for the whole page, without writing an instrument anywhere in the score:
 
 ```msq-editor opens-with=text
 default instrument is guitar
@@ -17,7 +17,7 @@ c d e f
 g a b c5
 ```
 
-As you remember from [Instrument titles](/docs/language/instrument-titles), a stave can have an instrument title. When the title is a name MuSemantiQ knows, the stave is played on that instrument, and it wins over the default one. So in the following example the first stave is played on a flute, and the second one on the default instrument, a cello:
+As you remember from [Instrument titles](/docs/language/instrument-titles), a stave can have an instrument title. If MuSemantiQ knows that name, the stave is played on that instrument instead of the default one. So in the following example the first stave is played on a flute, and the second one on the default instrument, a cello:
 
 ```msq-editor opens-with=text
 default instrument is cello
@@ -30,9 +30,10 @@ stave with bass clef
 1/2 c3 g2
 ```
 
-An instrument title is found by its whole name, in any case, and if that is not a name MuSemantiQ knows, by its first word. So a stave titled "Violin I" is played on a violin. The value of `default instrument` has to be one of the names exactly, in lower case.
+- An instrument title is matched by its whole name, in any case. If that doesn't match, it's matched by its first word. So a stave titled "Violin I" is played on a violin.
+- `default instrument` has to be exactly one of the names, in lower case.
 
-The names follow the General MIDI list of instruments, and many of them have shorter forms. Here are all the names that are recognised, with the number of the MIDI program each one plays:
+The names come from the General MIDI list of instruments, and many of them have shorter forms. Here are all the names, with the number of the MIDI program each one plays:
 
 | Program | Names |
 |---|---|
@@ -164,9 +165,9 @@ The names follow the General MIDI list of instruments, and many of them have sho
 | 125 | `applause` |
 | 126 | `gunshot` |
 
-## 2. Default tempo
+## 2. Default Tempo
 
-By default a page is played at **120** quarter notes per minute. You can set `default tempo`:
+By default, a page is played at **120** quarter notes per minute. You can change it with `default tempo`:
 
 ```msq-editor opens-with=text
 default tempo is "1/4 = 60"
@@ -186,7 +187,7 @@ c d e f
 g a b c5
 ```
 
-Unlike a style, the value of `default tempo` is written in quotes, because it is the same text a tempo mark takes, and it is understood the same way. As you remember from [Tempo and metronome marks](/docs/language/tempo-and-metronome-marks), that text can be a duration and a number, like **"1/4 = 76"** or **"1/2 = 60"**, a tempo word, like **"Andante"**, or both. A word on its own gives the tempo that word usually means:
+Unlike a style, the value of `default tempo` is in quotes, because it's the same text as in a tempo mark, and it works the same way. As you remember from [Tempo and metronome marks](/docs/language/tempo-and-metronome-marks), it can be a duration and a number, like **"1/4 = 76"** or **"1/2 = 60"**, a tempo word, like **"Andante"**, or both. A word alone gives the tempo that word usually means:
 
 ```msq-editor opens-with=text
 default tempo is "Andante"
@@ -197,9 +198,9 @@ c d e f
 g a b c5
 ```
 
-The difference is that a tempo mark is drawn, and the default tempo is not. That's what the default tempo is for: a score that has to be played at a certain speed, but that you don't want to put a metronome mark on.
+The difference is that a tempo mark is drawn, and the default tempo is not. So you use the default tempo when a score has to be played at a certain speed, but you don't want a metronome mark on it.
 
-When the first measure has a tempo mark of its own, the default tempo is not used at all: what is written on the page wins. And a tempo mark further on changes the tempo from its measure, whatever the default was:
+If the first measure has its own tempo mark, the default tempo is not used at all. And a tempo mark later on changes the tempo from its measure, no matter what the default was:
 
 ```msq-editor opens-with=text
 default tempo is "1/4 = 60"
@@ -213,9 +214,14 @@ tempo is "1/4 = 120"
 c d e f
 ```
 
-## 3. Fermata duration
+## 3. Fermata Duration
 
-A fermata holds the music: the unit under it sounds longer, and everything after it comes later. By default a fermata on a unit adds **2** seconds, and a fermata over a barline adds **2.5** seconds. You can set how many **seconds** a fermata adds with `fermata duration`, and it works both for the fermata articulation and for the fermata at the end of a measure:
+A fermata holds the music: the unit under it sounds longer, and everything after it comes later. By default:
+
+- a fermata on a unit adds **2** seconds;
+- a fermata over a barline adds **2.5** seconds.
+
+You can set how many **seconds** a fermata adds with `fermata duration`. It works for both kinds of fermata:
 
 ```msq-editor opens-with=text
 fermata duration is 0.5
@@ -238,9 +244,9 @@ measure
 g a b c5
 ```
 
-The number can have a fraction, and it can be **0**, in which case a fermata is drawn but doesn't hold the music at all.
+The number can have a fraction, and it can be **0**. Then a fermata is drawn, but doesn't hold the music at all.
 
-## 4. Spellings and values
+## 4. Spellings and Values
 
 | Setting | Value | Default |
 |---|---|---|
@@ -248,6 +254,8 @@ The number can have a fraction, and it can be **0**, in which case a fermata is 
 | `default tempo` | the text of a tempo mark, in quotes | **120** quarter notes per minute |
 | `fermata duration` | a number of seconds, without quotes | **2** on a unit, **2.5** over a barline |
 
-Like styles, MIDI settings apply to the whole page wherever they are written, and if you set the same one twice, the last one wins. A value that is not recognised, like an instrument that is not in the table, is reported as an error, as explained in [Handling errors](/docs/language/handling-errors), and the default is used.
+- Like styles, MIDI settings apply to the whole page, no matter where you write them.
+- If you set the same one twice, the last one wins.
+- A value that is not recognised, like an instrument that is not in the table, is reported as an error (see [Handling errors](/docs/language/handling-errors)), and the default is used.
 
 Read next: [Command index](/docs/language/command-index)

@@ -1,6 +1,11 @@
 # Tremolo
 
-A tremolo is a fast repetition. There are two kinds of it: strokes on a single unit, which repeat that unit, and a tremolo *between* two units, which alternates them. Both are attributes of units, so they are written right on the unit, with no span command after the music.
+A tremolo is a fast repetition. There are two kinds of it:
+
+- strokes on one unit, which repeat that unit;
+- a tremolo *between* two units, which switches between them.
+
+Both are attributes of units, so you write them right on the unit, not as a separate command after the music.
 
 Let's start with an example that has both of them:
 
@@ -11,7 +16,7 @@ d
 1/2 g
 ```
 
-## 1. Tremolo for a single unit
+## 1. Tremolo for a Single Unit
 
 All you need is to write `with tremolo` after a unit:
 
@@ -24,13 +29,20 @@ All you need is to write `with tremolo` after a unit:
 1/32 a with tremolo
 ```
 
-As you can see, the number of strokes depends on the duration. By default, units of a quarter and longer get three strokes, eighths get two, and sixteenths get one. Thirty-second units and shorter are not marked with tremolo at all, because their duration is already too small. You may also notice that for units with flags the strokes are drawn shorter (horizontally), because it's easier to read.
+As you can see, the number of strokes depends on the duration. By default:
+
+- a quarter and longer get three strokes;
+- an eighth gets two;
+- a sixteenth gets one;
+- a thirty-second and shorter get no tremolo at all, because they are already too short.
+
+You may also notice that for units with flags the strokes are shorter, because it's easier to read.
 
 You can set the number of strokes yourself with `with 1 stroke`, `with 2 strokes` or `with 3 strokes`. But you have to remember the following rules:
 
-1. You cannot set more than three strokes.
-2. For eighth units, you can set only one or two strokes.
-3. For sixteenth units, there is always one stroke, no matter how many strokes you specify.
+1. You can't set more than three strokes.
+2. For eighths, you can set only one or two strokes.
+3. For sixteenths, there is always one stroke, no matter how many you set.
 
 ```msq-editor opens-with=text
 new line
@@ -57,9 +69,9 @@ new line
 
 The strokes also say how fast the unit is repeated when it's played: one stroke means eighths (for units longer than an eighth), two strokes mean sixteenths, and three strokes mean thirty-seconds. So a half note with three strokes is played as sixteen thirty-second notes.
 
-## 2. Tremolo between two units
+## 2. Tremolo Between Two Units
 
-In order to connect two units with a tremolo, you write `with tremolo with next` on the first of them:
+To connect two units with a tremolo, you write `with tremolo with next` on the first of them:
 
 ```msq-editor opens-with=text
 measure
@@ -79,9 +91,13 @@ measure
 1/16 a with tremolo with next
 ```
 
-Keep in mind that you can connect only two units with the same duration. The second unit is the next one in the same voice, and it can also be the first unit of the next measure. When it's played, the MIDI player alternates the two units, as fast as the strokes say.
+Keep in mind:
 
-The same rules on the number of strokes apply here as well:
+- You can connect only two units with the same duration.
+- The second unit is the next one in the same voice. It can also be the first unit of the next measure.
+- When it's played, the MIDI player switches between the two units, as fast as the strokes say.
+
+The same rules about the number of strokes work here too:
 
 ```msq-editor opens-with=text
 new line

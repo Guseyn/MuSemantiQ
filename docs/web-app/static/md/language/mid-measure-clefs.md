@@ -1,6 +1,6 @@
-# Mid-measure clefs
+# Mid-Measure Clefs
 
-A mid-measure clef is essentially a clef before a unit. It is drawn smaller than the clef at the start of a stave, right in front of the unit that carries it.
+A mid-measure clef is a clef before a unit. It's drawn smaller than the clef at the start of a stave, right in front of its unit.
 
 Let's start with a simple example:
 
@@ -24,7 +24,7 @@ g with g clef before
 a
 ```
 
-It's usually done when a line runs so low or so high that it would otherwise need a lot of ledger lines. Changing the clef for a few units makes such a passage much easier to read:
+It's usually used when the notes go so low or so high that they would need a lot of ledger lines. With another clef, they are much easier to read:
 
 ```msq-editor opens-with=text
 measure
@@ -38,9 +38,9 @@ b3 with treble clef before
 d5
 ```
 
-## 1. What a mid-measure clef changes
+## 1. What a Mid-Measure Clef Changes
 
-A mid-measure clef does not apply only to the unit that carries it. It changes how everything after it on the same stave is read, until the next clef. As you can see, the notes in the following measure are still read in bass clef:
+A mid-measure clef is not only for its unit. Everything after it on the same stave is read in this clef, until the next clef. As you can see, the notes in the next measure are still read in bass clef:
 
 ```msq-editor opens-with=text
 measure
@@ -52,7 +52,7 @@ measure
 f3 d3 b2 g2
 ```
 
-It also affects all the following page lines:
+It also works for all the following page lines:
 
 ```msq-editor opens-with=text
 measure
@@ -65,9 +65,9 @@ new line
 f3 d3 b2 g2
 ```
 
-It's important to mention that a clef belongs to a stave, not to a voice. So when a stave has several voices, the other voices on that stave are read in the new clef as well.
+It's important to mention that a clef belongs to a stave, not to a voice. So if a stave has several voices, the other voices on that stave are read in the new clef too.
 
-Units in other voices and on other staves adjust their horizontal position when a mid-measure clef is added, so that the synchronization of units does not get ruined:
+Units in other voices and on other staves adjust their position too, so they stay in sync:
 
 ```msq-editor opens-with=text
 measure
@@ -91,9 +91,9 @@ c3
 c3
 ```
 
-## 2. Mid-measure clefs on chords
+## 2. Mid-Measure Clefs on Chords
 
-A chord takes a mid-measure clef in the same way, on its `chord` line:
+A chord gets a mid-measure clef in the same way, on its `chord` line:
 
 ```msq-editor opens-with=text
 measure
@@ -105,7 +105,7 @@ c3 e3 g3
 f3
 ```
 
-## 3. Changing clef and key signature at once
+## 3. Changing Clef and Key Signature at Once
 
 You can change the clef and the key signature before the same unit with one command, `with <clef> clef and key signature <key signature> before`:
 
@@ -128,6 +128,6 @@ d3 with bass clef f major before
 c3
 ```
 
-The key signature part of this command is a mid-measure key signature, and it follows the same rules. More about that you can read on the next page.
+The key signature in this command is a mid-measure key signature, with the same rules. More about that you can read on the next page.
 
 Read next: [Mid-measure key signatures](/docs/language/mid-measure-key-signatures)

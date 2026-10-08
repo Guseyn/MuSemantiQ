@@ -1,6 +1,6 @@
-# Mid-measure key signatures
+# Mid-Measure Key Signatures
 
-A mid-measure key signature is essentially a key signature before a unit. It lets you change key part way through a measure, right in front of the unit where the new key starts.
+A mid-measure key signature is a key signature before a unit. With it, you can change the key in the middle of a measure, right in front of the unit where the new key starts.
 
 Let's start with a simple example:
 
@@ -12,7 +12,7 @@ e with key signature g major before
 f
 ```
 
-All you need is to write `with key signature <key signature> before` after the unit. The names are the same as in [Key signatures](/docs/language/key-signatures), and a minor name works as well as a major one:
+All you need is to write `with key signature <key signature> before` after the unit. The names are the same as in [Key signatures](/docs/language/key-signatures), major and minor:
 
 ```msq-editor opens-with=text
 measure
@@ -33,9 +33,12 @@ e with g major before
 f
 ```
 
-As you may notice, a mid-measure key signature is always drawn together with a small clef in front of it. If you don't specify a mid-measure clef, it's the clef that the stave already has. If you never declared a clef for the stave, it's treble.
+As you may notice, a mid-measure key signature is always drawn with a small clef in front of it:
 
-A chord takes a mid-measure key signature on its `chord` line:
+- If you don't specify a mid-measure clef, it's the clef of the stave.
+- If the stave has no clef, it's treble.
+
+A chord gets a mid-measure key signature on its `chord` line:
 
 ```msq-editor opens-with=text
 measure
@@ -47,9 +50,9 @@ e g b
 f
 ```
 
-## 1. What a mid-measure key signature changes
+## 1. What a Mid-Measure Key Signature Changes
 
-A key signature applies to all staves, so a mid-measure key signature is drawn on every stave of the measure, even though you write it on one unit only:
+A key signature is for all staves. So a mid-measure key signature is drawn on every stave of the measure, even though you write it on one unit:
 
 ```msq-editor opens-with=text
 measure
@@ -61,9 +64,9 @@ stave with bass clef
 1/4 c3 d3 e3 f3
 ```
 
-Units in other voices and on other staves adjust their horizontal position when a mid-measure key signature is added, so that the synchronization of units does not get ruined.
+Units in other voices and on other staves adjust their position too, so they stay in sync.
 
-It's important to mention how it works with [accidentals](/docs/language/accidentals). An accidental lasts until the end of its measure, but only until the mid-measure key signature: from that point on, the new key decides. In the example below the first two notes are **F sharp**, and the last one is **F natural**, because the key of **C major** came after the sharp:
+It's important to mention how it works with [accidentals](/docs/language/accidentals). An accidental lasts until the end of its measure, but only until the mid-measure key signature. After it, the new key decides. In the example below, the first two notes are **F sharp**, and the last one is **F natural**, because the key of **C major** comes after the sharp:
 
 ```msq-editor opens-with=text
 measure
@@ -74,7 +77,7 @@ g with key signature c major before
 f
 ```
 
-When you declared the key signature `for each line` or `for lines below`, a mid-measure key signature replaces it for all the following page lines:
+If you declared the key signature `for each line` or `for lines below`, a mid-measure key signature replaces it for all the following page lines:
 
 ```msq-editor opens-with=text
 measure
@@ -88,7 +91,7 @@ new line
 c5 d5 e5 f5
 ```
 
-## 2. Changing clef and key signature at once
+## 2. Changing Clef and Key Signature at Once
 
 As you remember from [Mid-measure clefs](/docs/language/mid-measure-clefs), you can change the clef and the key signature with one command. You can also write them as two commands on the same unit, separated by a comma:
 
@@ -114,8 +117,8 @@ c3
 c3
 ```
 
-## 3. When to use it
+## 3. When to Use It
 
-A mid-measure key signature is for the case when the key really changes in the middle of a measure. When the new key starts with a measure, it's better to declare it on that measure with `key signature is …`, as described in [Key signatures](/docs/language/key-signatures): then it's drawn after the barline, where a reader expects it.
+Use a mid-measure key signature only when the key changes in the middle of a measure. If the new key starts with a measure, it's better to declare it on that measure with `key signature is …`, as described in [Key signatures](/docs/language/key-signatures). Then it's drawn after the barline, where a reader expects it.
 
 Read next: [Centralized units](/docs/language/centralized-units)

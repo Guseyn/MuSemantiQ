@@ -1,12 +1,18 @@
-# Command index
+# Command Index
 
-Every command of the language on one page, in alphabetical order, with its other spellings and a link to the page that introduces it. The language section is ordered for learning: each page builds on the one before it, and that's not the order you want when you just need to find a name. This page is the way in by name.
+This page lists every command of the language in alphabetical order, with its other spellings and a link to the page that explains it. The other pages are in learning order, so use this one when you just need to find a name.
 
-In the tables below, `N` stands for a number, `"…"` for text in quotes, and a word in angle brackets, like `<clef>`, for one of the names listed on the page the row links to. A lot of commands also accept small words that don't change anything: `is`, `the`, and `in`, `on` or `at` in front of a position. They are left out here, so the tables stay readable.
+In the tables below:
 
-## 1. Commands that start a line
+- `N` is a number;
+- `"…"` is text in quotes;
+- a word in angle brackets, like `<clef>`, is one of the names listed on the linked page.
 
-These are written at the start of a line, and most of them take the whole line.
+Many commands also accept small words that change nothing: `is`, `the`, and `in`, `on` or `at` before a position. They are left out here to keep the tables short.
+
+## 1. Commands That Start a Line
+
+You write these at the start of a line. Most of them take the whole line.
 
 | Command | Also written as | What it does | Page |
 |---|---|---|---|
@@ -53,9 +59,9 @@ These are written at the start of a line, and most of them take the whole line.
 | `voice` | | starts a new voice on the current stave | [Voices](/docs/language/voices) |
 | `volta with text "…" from … to …` | `volta bracket`, `volta brackets`; `starts before`, `finishes after` | draws a volta bracket over measures | [Volta brackets](/docs/language/volta-brackets) |
 
-## 2. What a unit can carry
+## 2. What a Unit Can Carry
 
-These are written after a unit, on the same line, and separated by commas when there are several: `1/4 c with stem up, with staccato`. Everything here works for a note and for a chord, unless the row says otherwise.
+You write these after a unit, on the same line. Several of them are separated by commas: `1/4 c with stem up, with staccato`. Everything here works for a note and for a chord, unless the row says otherwise.
 
 | Command | Also written as | What it does | Page |
 |---|---|---|---|
@@ -89,11 +95,11 @@ These are written after a unit, on the same line, and separated by commas when t
 | `with tremolo` | `with tremolo with next`; `with 1 stroke`, `with 2 strokes`, `with 3 strokes` | a tremolo | [Tremolo](/docs/language/tremolo) |
 | `with trill` | `with turn`, `with mordent`; `inverted`, for a turn or a mordent; `with wave after`; `with turn after`; `with sharp key above`; `up`, `down`, `above stave`, `below stave` | an ornament | [Ornaments](/docs/language/ornaments) |
 
-Almost every mark on a unit can also be moved up or down a little by adding `N up` or `N down` at its end: `with staccato above stave 1 up`.
+You can move almost every mark on a unit up or down a little by adding `N up` or `N down` at its end: `with staccato above stave 1 up`.
 
-## 3. What goes inside a span
+## 3. What Goes Inside a Span
 
-A span is a command that runs from one unit to another: a slur, a tuplet, a glissando, a crescendo, an octave sign, a simile, a volta bracket. They all name their ends the same way, and it is explained in [Slurs](/docs/language/slurs).
+A span is a command that goes from one unit to another: a slur, a tuplet, a glissando, a crescendo, an octave sign, a simile, a volta bracket. They all name their ends the same way, as explained in [Slurs](/docs/language/slurs).
 
 | Part | Also written as | What it does |
 |---|---|---|
@@ -109,13 +115,13 @@ A span is a command that runs from one unit to another: a slur, a tuplet, a glis
 | `with left point N up` | `with right point`; `attached to middle of stem`, `attached to note body`, `attached to note head` | moves the ends of a slur |
 | `with roundness N` | | how round a slur or a tie is, from **1** to **10** |
 
-## 4. Styles and MIDI settings
+## 4. Styles and MIDI Settings
 
-The names of all the styles, with their spellings and defaults, are in [The full style reference](/docs/language/style-reference). The three MIDI settings, and every instrument name `default instrument` accepts, are in [MIDI settings](/docs/language/midi-settings).
+All the styles, with their spellings and defaults, are in [The full style reference](/docs/language/style-reference). The three MIDI settings, and every instrument name for `default instrument`, are in [MIDI settings](/docs/language/midi-settings).
 
-## 5. Keeping this list honest
+## 5. Keeping This List Honest
 
-The parser names every construct it recognises: there are **578** of them at the moment. `docs/concepts.js` says which page introduces each one, and `npm run docs:check` fails when a construct is added that no page introduces. So the list the tables above are made from can always be printed from the source itself. Run this from the root of the repository:
+The parser has a name for every construct it knows: **578** of them at the moment. `docs/concepts.js` says which page introduces each one, and `npm run docs:check` fails when a new construct has no page. So you can always print the full list from the source. Run this from the root of the repository:
 
 ```js
 // node --input-type=module -e "…this…"
@@ -127,6 +133,6 @@ for (const name of Object.keys(parserScenarios()).sort()) {
 }
 ```
 
-It prints every construct next to the page that introduces it. The names that fill the angle brackets, like every clef, articulation, accidental and instrument, are in `src/language/parser/scenarios/static-objects/`, one file for each list.
+It prints every construct next to the page that introduces it. The names in angle brackets, like every clef, articulation, accidental and instrument, are in `src/language/parser/scenarios/static-objects/`, one file for each list.
 
-Read next: [Overview](/docs/api/overview)
+Read next: [Low-Level API](/docs/api/overview)

@@ -1529,7 +1529,8 @@ export default {
       }
     }
   },
-  noteWithDurationAndOctaveHighlight: new RegExp(`(${noteDurationNames.join(VERTICAL_LINE)})?( *)(${noteNames.join(VERTICAL_LINE)})(\\d)?`),
+  // a note counts only between spaces, delimiters or the ends of the text, so neither the `a` nor the `d` of `and` in `c and d` is taken for a note
+  noteWithDurationAndOctaveHighlight: new RegExp(`(?<![^\\s,;])(${noteDurationNames.join(VERTICAL_LINE)})?( *)(${noteNames.join(VERTICAL_LINE)})(\\d)?(?![^\\s,;])`),
   stemDirection: {
     test: (tokenValues) => {
       return (

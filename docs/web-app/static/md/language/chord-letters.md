@@ -1,6 +1,6 @@
-# Chord letters
+# Chord Letters
 
-Chord letters (chord symbols) name the harmony above the music, the way lead sheets and guitar parts do. You can attach a chord letter to any unit with `with chord` and the symbol in quotes:
+Chord letters (chord symbols) show the harmony above the music, like in lead sheets and guitar parts. You add a chord letter to a unit with `with chord` and the symbol in quotes:
 
 ```msq-editor opens-with=text
 1/4 c with chord "C"
@@ -9,9 +9,9 @@ g with chord "F"
 c5 with chord "G7"
 ```
 
-## 1. Any unit, in any voice and on any stave
+## 1. Any Unit, in Any Voice and on Any Stave
 
-A chord letter can be attached to any unit, in any voice and on any stave, so you can choose exactly where in time it lands:
+You can add a chord letter to any unit, in any voice and on any stave. So you choose exactly where in time it is:
 
 ```msq-editor opens-with=text
 measure
@@ -27,7 +27,7 @@ voice
 1/8 a3 with chord "A", a3, a3, a3
 ```
 
-As you can see, no matter where you declare chord letters, they are positioned above the whole measure, over the units where you declared them. That is the difference from other marks on units: a chord letter belongs to the measure as a whole, not to the stave of its unit, because it names the harmony of all the staves at once.
+As you can see, no matter where you declare chord letters, they are drawn above the whole measure, over their units. This is different from other marks on units. A chord letter belongs to the whole measure, not to the stave of its unit, because it shows the harmony of all the staves at once.
 
 A chord can carry a chord letter too, on its `chord` line:
 
@@ -40,9 +40,9 @@ b3 d f g
 
 ```
 
-## 2. Below the measure
+## 2. Below the Measure
 
-If you want a chord letter to be positioned below the measure, you just say so in the text:
+If you want a chord letter below the measure, you just write it:
 
 ```msq-editor opens-with=text
 measure
@@ -58,9 +58,9 @@ voice
 1/8 a3 with chord "A", a3, a3, a3
 ```
 
-As you may notice, you need to type `below measure` only once, and all the following chord letters keep the same direction, until you change it with `above measure`.
+As you may notice, you write `below measure` only once. All the following chord letters stay below, until you write `above measure`.
 
-The word `measure` is optional, and `over` and `under` mean the same as `above` and `below`. You can also use `up` and `down`:
+The word `measure` is optional. `over` and `under` mean the same as `above` and `below`. You can also use `up` and `down`:
 
 ```msq-editor opens-with=text
 1/4 c with chord "C" under
@@ -70,9 +70,9 @@ f with chord "F" down
 g with chord "G" up
 ```
 
-## 3. Vertical position
+## 3. Vertical Position
 
-The vertical position of chord letters is adjusted automatically, but you can correct it:
+The vertical position of chord letters is set automatically, but you can correct it:
 
 ```msq-editor opens-with=text
 measure
@@ -86,7 +86,7 @@ stave with bass clef
 1/2 a3 a3
 ```
 
-`1 up` means that the chord letter moves one interval between stave lines up.
+`1 up` moves the chord letter up by one interval between stave lines.
 
 ## 4. Superscripts
 
@@ -99,7 +99,7 @@ g with chord "G^13"
 c5 with chord "D^add9"
 ```
 
-It's quite simple: everything after the `^` character is displayed as a superscript. A slash `/` ends the superscript, and after it you write the bass note of a slash chord, which can have its own superscript:
+Everything after `^` is a superscript. A slash `/` ends it. After the slash you write the bass note of a slash chord, and it can have its own superscript:
 
 ```msq-editor opens-with=text
 1/4 c with chord "C/G"
@@ -113,11 +113,11 @@ You have to remember the following rules:
 1. There is at most one `/` in a chord letter.
 2. There is at most one `^` on each side of the `/`.
 
-A chord letter that breaks one of them is not recognised, and the command is reported as an error.
+If a chord letter breaks one of them, it's not recognised, and you get an error.
 
 ## 5. Symbols
 
-As you may notice, the `flat` key word turns into the flat symbol. These are all the symbols supported at the moment, and the key words that write them:
+As you may notice, the `flat` key word becomes the flat symbol. These are all the symbols supported at the moment, and their key words:
 
 | Symbol | Key words |
 |---|---|
@@ -127,9 +127,9 @@ As you may notice, the `flat` key word turns into the flat symbol. These are all
 | ø | `half-diminished`, `half-dim`, `half dim`, `halfdim`, `hf dim`, `hfdim` |
 | Δ | `major sign`, `major`, `maj` |
 
-It's important to mention that these key words are replaced wherever they appear in the quotes, in any letter case, so `"Cmaj7"` is drawn as **CΔ7**. There is no way at the moment to write the letters `maj` or `dim` as they are.
+It's important to mention that these key words are replaced anywhere in the quotes, in any letter case. So `"Cmaj7"` is drawn as **CΔ7**. At the moment, you can't write the letters `maj` or `dim` as they are.
 
-Let's take a look at some chord letters with the symbols above:
+Let's take a look at some chord letters with these symbols:
 
 ```msq-editor opens-with=text
 1/4 c with chord "C^halfdim13"

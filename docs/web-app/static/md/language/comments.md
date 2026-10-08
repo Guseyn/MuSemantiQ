@@ -1,6 +1,6 @@
 # Comments
 
-It's possible to add comments to the music. They don't get rendered, they are just notes for yourself or for whoever reads the text after you.
+You can add comments to the music. They are not drawn. They are just notes for you or for whoever reads the text after you.
 
 Let's start with a simple example:
 
@@ -9,16 +9,16 @@ comment: "This melody is just a draft."
 c d e f
 ```
 
-## 1. How to write a comment
+## 1. How to Write a Comment
 
-A comment starts with `comment` and its text goes in double quotes. You can use `side note` instead of `comment`, they mean the same thing:
+A comment starts with `comment`, and its text goes in double quotes. You can write `side note` instead of `comment`:
 
 ```msq-editor opens-with=text
 side note: "The same as a comment."
 c d e f
 ```
 
-The colon is optional. You can also write `is` instead of it, or nothing at all:
+The colon is optional. You can write `is` instead, or nothing at all:
 
 ```msq-editor opens-with=text
 comment "no colon"
@@ -27,18 +27,18 @@ comment is "with is"
 e f
 ```
 
-You can use only double quotes for comments, unlike for other text in MSQ. It's done this way, so you can use single quotes inside of a comment:
+Unlike other text in MSQ, comments use only double quotes. This way you can use single quotes inside a comment:
 
 ```msq-editor opens-with=text
 comment: "It's fine to write 'quotes' here."
 c d e f
 ```
 
-It's important to mention that `comment` and `side note` are written in lowercase, like every other key word in MSQ.
+`comment` and `side note` are lowercase, like every other key word in MSQ.
 
-## 2. Comments over several lines
+## 2. Comments Over Several Lines
 
-A comment may run over as many lines as you need. It lasts until the closing double quote:
+A comment can take as many lines as you need. It ends at the closing double quote:
 
 ```msq-editor opens-with=text
 comment: "
@@ -49,9 +49,9 @@ comment: "
 c d e f
 ```
 
-## 3. Where a comment can be
+## 3. Where a Comment Can Be
 
-A comment can sit on a line of its own anywhere on the page, including between two lines of units:
+A comment can be on its own line anywhere on the page, also between two lines of units:
 
 ```msq-editor opens-with=text
 1/8 c d e f
@@ -59,17 +59,17 @@ comment: "the second half goes down"
 g f e d
 ```
 
-A comment can also finish a line of units:
+A comment can also be at the end of a line of units:
 
 ```msq-editor opens-with=text
 1/4 c d e f comment: "up"
 g f e d comment: "and down"
 ```
 
-But a comment always ends its line. Anything you write after the closing quote on the same line is not recognised, so the next units have to start on a new line.
+But nothing can go after a comment on the same line. Anything after the closing quote is not recognised, so the next units start on a new line.
 
-## 4. Comments are kept
+## 4. Comments Are Kept
 
-Comments are not thrown away when the text is parsed: the parser keeps each comment together with the lines it was written on. So when a page is turned back into text by the serializer, every comment is put back on the line where it was, as `comment: "..."`. More about the serializer you can read in [The page schema](/docs/api/overview).
+The parser doesn't throw comments away. It keeps each comment with the lines it was written on. So when the serializer turns a page back into text, every comment goes back to its line, as `comment: "..."`. More about the serializer you can read in [The page schema](/docs/api/overview).
 
 Read next: [Chords](/docs/language/chords)

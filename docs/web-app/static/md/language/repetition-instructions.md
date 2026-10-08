@@ -1,6 +1,6 @@
-# Repetition instructions
+# Repetition Instructions
 
-Repetition instructions are the words that tell a performer where to go next: "D.C. al Fine", "D.S. al Coda", "Fine" and others. Each measure can have one, and you declare it with `repetition note`:
+Repetition instructions are the words that tell a performer where to go next: "D.C. al Fine", "D.S. al Coda", "Fine" and others. Each measure can have one. You add it with `repetition note`:
 
 ```msq-editor opens-with=text
 measure
@@ -9,9 +9,9 @@ c d e f
 repetition note "D.C. al Fine"
 ```
 
-You can also write `repetition mark` or `repetition instruction`, and put `is` before the text if it reads better: `repetition instruction is "Fine"`.
+You can also write `repetition mark` or `repetition instruction`, and you can put `is` before the text: `repetition instruction is "Fine"`.
 
-The text is free, the language does not constrain what you write in the quotes. Let's take a look at how instructions combine with a [sign](/docs/language/sign) and [codas](/docs/language/coda):
+You can write any text in the quotes. Let's take a look at instructions together with a [sign](/docs/language/sign) and [codas](/docs/language/coda):
 
 ```msq-editor opens-with=text
 measure
@@ -36,7 +36,7 @@ closes with double bold barline
 c d e
 ```
 
-Like codas and signs, a repetition instruction is at the start of the measure by default, and you can explicitly declare its position:
+Like codas and signs, a repetition instruction is at the start of the measure by default, and you can say explicitly where to put it:
 
 ```msq-editor opens-with=text
 measure
@@ -48,7 +48,7 @@ repetition note "End" at the end of the measure
 g a b c5
 ```
 
-As for codas and signs, the vertical position of repetition instructions is always adjusted. But you can always correct it:
+Like codas and signs, a repetition instruction moves up or down by itself. But you can correct it:
 
 ```msq-editor opens-with=text
 measure
@@ -59,9 +59,9 @@ c d e f
 
 Here we moved the repetition instruction up by two intervals between stave lines.
 
-## What the MIDI player does with them
+## What the MIDI Player Does With Them
 
-The text is free for drawing, but only a few exact texts are also followed when the music is played. You have to write them exactly as in the table, with the same letters, dots and capitals:
+Any text is drawn, but only a few texts are also played. You have to write them exactly as in the table, with the same letters, dots and capitals:
 
 | Text | What is played |
 | --- | --- |

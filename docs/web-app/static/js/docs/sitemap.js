@@ -41,12 +41,12 @@ export const sitemap = [
   },
   {
     slug: 'language',
-    title: 'MSQ language',
+    title: 'MSQ Language',
     groups: [
       {
-        title: 'Notes on a page',
+        title: 'Notes on a Page',
         pages: [
-          { slug: 'first-notes', title: 'Your first notes' },
+          { slug: 'first-notes', title: 'Your First Notes' },
           { slug: 'octaves', title: 'Octaves' },
           { slug: 'durations', title: 'Durations' },
           { slug: 'dots', title: 'Dots' },
@@ -56,7 +56,7 @@ export const sitemap = [
         ]
       },
       {
-        title: 'Grouping notes',
+        title: 'Grouping Notes',
         pages: [
           { slug: 'chords', title: 'Chords' },
           { slug: 'beams', title: 'Beams' },
@@ -66,88 +66,88 @@ export const sitemap = [
         ]
       },
       {
-        title: 'The page',
+        title: 'The Page',
         pages: [
           { slug: 'measures', title: 'Measures' },
           { slug: 'clefs', title: 'Clefs' },
-          { slug: 'key-signatures', title: 'Key signatures' },
-          { slug: 'time-signatures', title: 'Time signatures' },
+          { slug: 'key-signatures', title: 'Key Signatures' },
+          { slug: 'time-signatures', title: 'Time Signatures' },
           { slug: 'staves', title: 'Staves' },
           { slug: 'voices', title: 'Voices' },
-          { slug: 'page-lines', title: 'Page lines' },
-          { slug: 'titles-and-page-meta', title: 'Titles and page meta' }
+          { slug: 'page-lines', title: 'Page Lines' },
+          { slug: 'titles-and-page-meta', title: 'Titles and Page Meta' }
         ]
       },
       {
-        title: 'Marks on units',
+        title: 'Marks on Units',
         pages: [
           { slug: 'articulations', title: 'Articulations' },
           { slug: 'ornaments', title: 'Ornaments' },
           { slug: 'dynamics', title: 'Dynamics' },
-          { slug: 'text-labels', title: 'Text labels' },
-          { slug: 'grace-units', title: 'Grace units' },
-          { slug: 'ghost-units', title: 'Ghost units' },
+          { slug: 'text-labels', title: 'Text Labels' },
+          { slug: 'grace-units', title: 'Grace Units' },
+          { slug: 'ghost-units', title: 'Ghost Units' },
           { slug: 'parentheses', title: 'Parentheses' },
-          { slug: 'breath-marks', title: 'Breath marks' },
-          { slug: 'arpeggiated-chords', title: 'Arpeggiated chords' },
-          { slug: 'chord-letters', title: 'Chord letters' },
+          { slug: 'breath-marks', title: 'Breath Marks' },
+          { slug: 'arpeggiated-chords', title: 'Arpeggiated Chords' },
+          { slug: 'chord-letters', title: 'Chord Letters' },
           { slug: 'lyrics', title: 'Lyrics' },
-          { slug: 'mid-measure-clefs', title: 'Mid-measure clefs' },
-          { slug: 'mid-measure-key-signatures', title: 'Mid-measure key signatures' },
-          { slug: 'centralized-units', title: 'Centralized units' },
-          { slug: 'adjusting-units', title: 'Adjusting units' }
+          { slug: 'mid-measure-clefs', title: 'Mid-Measure Clefs' },
+          { slug: 'mid-measure-key-signatures', title: 'Mid-Measure Key Signatures' },
+          { slug: 'centralized-units', title: 'Centralized Units' },
+          { slug: 'adjusting-units', title: 'Adjusting Units' }
         ]
       },
       {
         title: 'Spans',
         pages: [
           { slug: 'slurs', title: 'Slurs' },
-          { slug: 'crescendo-and-diminuendo', title: 'Crescendo and diminuendo' },
-          { slug: 'octave-signs', title: 'Octave signs' },
+          { slug: 'crescendo-and-diminuendo', title: 'Crescendo and Diminuendo' },
+          { slug: 'octave-signs', title: 'Octave Signs' },
           { slug: 'glissando', title: 'Glissando' },
           { slug: 'tremolo', title: 'Tremolo' },
-          { slug: 'pedal-marks', title: 'Pedal marks' }
+          { slug: 'pedal-marks', title: 'Pedal Marks' }
         ]
       },
       {
-        title: 'Measure furniture',
+        title: 'Measure Furniture',
         pages: [
           { slug: 'barlines', title: 'Barlines' },
-          { slug: 'repeat-signs', title: 'Repeat signs' },
-          { slug: 'volta-brackets', title: 'Volta brackets' },
-          { slug: 'sign', title: 'Sign (segno)' },
+          { slug: 'repeat-signs', title: 'Repeat Signs' },
+          { slug: 'volta-brackets', title: 'Volta Brackets' },
+          { slug: 'sign', title: 'Sign (Segno)' },
           { slug: 'coda', title: 'Coda' },
-          { slug: 'repetition-instructions', title: 'Repetition instructions' },
-          { slug: 'fermata-over-barline', title: 'Fermata over barline' },
-          { slug: 'tempo-and-metronome-marks', title: 'Tempo and metronome marks' },
-          { slug: 'measure-numbers', title: 'Measure numbers' },
-          { slug: 'instrument-titles', title: 'Instrument titles' },
-          { slug: 'cross-stave-connections', title: 'Cross-stave connections' },
-          { slug: 'cross-stave-chords', title: 'Cross-stave chords' },
+          { slug: 'repetition-instructions', title: 'Repetition Instructions' },
+          { slug: 'fermata-over-barline', title: 'Fermata Over Barline' },
+          { slug: 'tempo-and-metronome-marks', title: 'Tempo and Metronome Marks' },
+          { slug: 'measure-numbers', title: 'Measure Numbers' },
+          { slug: 'instrument-titles', title: 'Instrument Titles' },
+          { slug: 'cross-stave-connections', title: 'Cross-Stave Connections' },
+          { slug: 'cross-stave-chords', title: 'Cross-Stave Chords' },
           { slug: 'similes', title: 'Similes' }
         ]
       },
       {
-        title: 'Layout and styles',
+        title: 'Layout and Styles',
         pages: [
-          { slug: 'unit-spacing', title: 'Unit spacing' },
+          { slug: 'unit-spacing', title: 'Unit Spacing' },
           { slug: 'colours', title: 'Colours' },
           { slug: 'fonts', title: 'Fonts' },
-          { slug: 'page-format', title: 'Page format' },
-          { slug: 'style-reference', title: 'The full style reference' }
+          { slug: 'page-format', title: 'Page Format' },
+          { slug: 'style-reference', title: 'The Full Style Reference' }
         ]
       },
       {
         title: 'Operational',
         pages: [
-          { slug: 'handling-errors', title: 'Handling errors' },
-          { slug: 'midi-settings', title: 'MIDI settings' }
+          { slug: 'handling-errors', title: 'Handling Errors' },
+          { slug: 'midi-settings', title: 'MIDI Settings' }
         ]
       },
       {
         title: 'Reference',
         pages: [
-          { slug: 'command-index', title: 'Command index' }
+          { slug: 'command-index', title: 'Command Index' }
         ]
       }
     ]
@@ -192,8 +192,7 @@ export const sitemap = [
     title: 'Example apps',
     pages: [
       { slug: 'browser-app', title: 'Browser app' },
-      { slug: 'cli', title: 'CLI' },
-      { slug: 'embedding', title: 'Embedding in your own app' }
+      { slug: 'cli', title: 'CLI' }
     ]
   },
   {
@@ -202,8 +201,8 @@ export const sitemap = [
     pages: [
       { slug: 'smufl-font-generator', title: 'SMuFL to music-js font' },
       { slug: 'magenta-soundfont-builder', title: 'Magenta soundfont builder' },
-      { slug: 'musicxml-import', title: 'MusicXML import' },
-      { slug: 'musicxml-export', title: 'MusicXML export' }
+      { slug: 'musicxml-import', title: 'MusicXML import [beta]' },
+      { slug: 'musicxml-export', title: 'MusicXML export [beta]' }
     ]
   },
   {
@@ -214,7 +213,7 @@ export const sitemap = [
       { slug: 'font-viewer', title: 'Font viewer' },
       { slug: 'font-generator', title: 'Font generator' },
       { slug: 'soundfont-generator', title: 'Magenta soundfont generator' },
-      { slug: 'musicxml-tool', title: 'MusicXML tool' },
+      { slug: 'musicxml-tool', title: 'MusicXML tool [beta]' },
       { slug: 'test-viewer', title: 'Test viewer' }
     ]
   },
@@ -225,17 +224,6 @@ export const sitemap = [
       { slug: 'the-suites', title: 'The three suites' },
       { slug: 'baselines', title: 'Baselines' },
       { slug: 'coverage', title: 'Coverage' }
-    ]
-  },
-  {
-    slug: 'recipes',
-    title: 'Recipes',
-    pages: [
-      { slug: 'svg-in-node', title: 'Engrave to SVG in Node' },
-      { slug: 'folder-from-cli', title: 'Render a folder from the CLI' },
-      { slug: 'embed-playable-score', title: 'Embed a playable score' },
-      { slug: 'ship-your-own-font', title: 'Ship your own music font' },
-      { slug: 'convert-musicxml-library', title: 'Convert a MusicXML library' }
     ]
   },
   {

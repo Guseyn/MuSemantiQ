@@ -1,10 +1,10 @@
-# Pedal marks
+# Pedal Marks
 
-Pedal marks are quite unique in how they are structured. They can be attached to units in different voices, and sometimes in different voices on different staves. To make life easier, pedal marks are attributes of units, and from the way they are declared, they are positioned, connected or separated when it's needed.
+Pedal marks can be on units in different voices, and sometimes in different voices on different staves. To make it simpler, pedal marks are attributes of units. From how you write them, MSQ decides where to draw them, and which of them to connect or separate.
 
-## 1. Simple pedal marks
+## 1. Simple Pedal Marks
 
-Let's start with the simple pair, `with pedal` on one unit and `with release` on another:
+Let's start with a simple pair, `with pedal` on one unit and `with release` on another:
 
 ```msq-editor opens-with=text
 measure
@@ -44,9 +44,9 @@ rest
 rest
 ```
 
-As you can see, each pedal mark is configured separately. It was designed in this way intentionally, and we will get to the point in the next section. Instead of `under` you can write `below`, and the stave can be written as `second stave` or `stave 2`.
+As you can see, each pedal mark is set up separately. This is on purpose, and the next section shows why. Instead of `under` you can write `below`, and the stave can be `second stave` or `stave 2`.
 
-The vertical position of pedal marks is always adjusted, so they don't intersect other elements. But you still can correct it:
+Pedal marks are moved up or down automatically, so they don't cross other elements. But you can still move them yourself:
 
 ```msq-editor opens-with=text
 measure
@@ -55,11 +55,11 @@ a with pedal 2 down
 b
 ```
 
-Here we moved the pedal mark down by two intervals between stave lines.
+Here the pedal mark goes down by two intervals between stave lines.
 
-## 2. Pedal marks with brackets, variable peaks and releases
+## 2. Pedal Marks With Brackets, Variable Peaks and Releases
 
-Now, let's see how you can create more complex pedal structures. First of all, a pedal and its release on a grand staff:
+Now, let's see how you can make more complex pedal structures. First, a pedal and its release on a grand staff:
 
 ```msq-editor opens-with=text
 measure
@@ -95,7 +95,7 @@ a2
 c3
 ```
 
-As you can see, we also specified the stave under which we want the pedal marks. You can write `starts with bracket` or `begins with bracket` as well.
+As you can see, we also set the stave for the pedal marks. You can also write `starts with bracket` or `begins with bracket`.
 
 You can use a closing bracket instead of the release mark, with `with release bracket`:
 
@@ -117,7 +117,7 @@ a2
 c3
 ```
 
-You can use variable peaks along the way, for a half release of the pedal:
+You can add variable peaks in between, for a half release of the pedal:
 
 ```msq-editor opens-with=text
 measure
@@ -161,7 +161,7 @@ a2
 c3
 ```
 
-Each time you use the key word `pedal`, a new pedal structure starts. Let's take a look at the following example:
+Each `pedal` starts a new pedal structure. Let's take a look at the following example:
 
 ```msq-editor opens-with=text
 measure
@@ -182,7 +182,7 @@ measure
 1/8 a with release
 ```
 
-As you can see, all the marks are right under the units where they are declared. You can easily change that with the `before` and `after` key words, so the marks are drawn before or after their units:
+As you can see, all the marks are right under their units. You can easily change that with `before` and `after`, so the marks are drawn before or after their units:
 
 ```msq-editor opens-with=text
 measure
@@ -245,7 +245,7 @@ measure
 1/8 a with release after measure
 ```
 
-The vertical correction on the `pedal` moves the whole pedal structure:
+Moving the `pedal` up or down moves the whole pedal structure:
 
 ```msq-editor opens-with=text
 measure
@@ -266,7 +266,7 @@ measure
 1/8 a with release after measure
 ```
 
-And as it's been shown before, the stave you set on the `pedal` is where the whole pedal structure is positioned:
+And as you saw before, the stave you set on the `pedal` is where the whole pedal structure is drawn:
 
 ```msq-editor opens-with=text
 measure
@@ -304,9 +304,9 @@ stave
 1/8 rest
 ```
 
-## 3. Pedal marks on several staves and voices
+## 3. Pedal Marks on Several Staves and Voices
 
-If there are several instruments with pedals, you can create pedal structures for several staves. By default, a structure is positioned under the stave where its marks are declared, but you can still specify a stave for it, like in the example above:
+If several instruments have pedals, you can make pedal structures for several staves. By default, a structure is drawn under the stave where its marks are written, but you can still set a stave for it, like in the example above:
 
 ```msq-editor opens-with=text
 measure
@@ -359,7 +359,7 @@ stave
 1/8 rest
 ```
 
-For pedal structures on several staves, it's recommended to keep them where they are declared, to avoid any confusion:
+For pedal structures on several staves, it's better to keep them under their own staves, so it's not confusing:
 
 ```msq-editor opens-with=text
 measure
@@ -422,7 +422,7 @@ voice
 1/4 c with variable peak
 ```
 
-As it's been told before, each `pedal` key word starts a new pedal structure, and without it the other pedal marks are not drawn:
+As you remember, each `pedal` starts a new pedal structure. Without it, the other pedal marks are not drawn:
 
 ```msq-editor opens-with=text
 measure
@@ -493,6 +493,6 @@ voice
 1/4 c
 ```
 
-A pedal is also heard: from the `pedal` to its release, the MIDI player holds the sustain pedal down.
+You also hear a pedal: from the `pedal` to its release, the MIDI player holds the sustain pedal down.
 
 Read next: [Barlines](/docs/language/barlines)

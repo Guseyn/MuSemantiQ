@@ -1,6 +1,6 @@
-# Ghost units
+# Ghost Units
 
-A ghost unit is a note or chord that is played for its rhythm rather than for its pitch: a muted, percussive note. It is drawn with a cross instead of a regular note head.
+A ghost unit is a note or chord played for its rhythm, not its pitch: a muted, percussive note. It is drawn with a cross instead of a regular note head.
 
 Let's start with a simple example:
 
@@ -11,9 +11,9 @@ e is ghost
 f
 ```
 
-## 1. Marking a unit as ghost
+## 1. Marking a Unit as Ghost
 
-You can turn a note into a ghost note just by marking it. `is ghost` and plain `ghost` mean the same:
+To make a note a ghost note, just mark it. `is ghost` and `ghost` mean the same:
 
 ```msq-editor opens-with=text
 a is ghost
@@ -32,11 +32,11 @@ The shape of a ghost note depends on its duration:
 1/32 a
 ```
 
-## 2. Ghost carries over
+## 2. Ghost Carries Over
 
-As you may notice in the example above, you only need to mark the first note as ghost, and all the following units in the same voice are assumed to be ghosts as well. It carries over the measures too, until you say otherwise.
+As you may notice in the example above, you only need to mark the first note as ghost. All the next units in the same voice become ghosts too, also in the next measures, until you say otherwise.
 
-If you want to stop this, just mark a unit as not a ghost, with `is not ghost` or `not ghost`:
+To stop it, mark a unit with `is not ghost` or `not ghost`:
 
 ```msq-editor opens-with=text
 1/4 a is ghost
@@ -46,7 +46,7 @@ a
 a
 ```
 
-It's important to mention that this is kept for each stave separately, so a ghost on one stave does not turn the next stave into ghosts:
+It's important to mention that this works for each stave separately, so a ghost on one stave doesn't turn the next stave into ghosts:
 
 ```msq-editor opens-with=text
 measure
@@ -59,7 +59,7 @@ stave with bass clef
 
 ## 3. Chords
 
-In the same way, you can mark a chord as ghost, on its `chord` line. And like with notes, the chords after it become ghosts too:
+To make a chord ghost, mark it on the `chord` line. Like with notes, the chords after it become ghosts too:
 
 ```msq-editor opens-with=text
 chord is ghost
@@ -70,7 +70,7 @@ g d5 b5
 
 ```
 
-Or you can mark just a certain note in a chord as ghost. Inside a chord, it does not carry over to other notes or to the next unit:
+Or you can mark just one note in a chord as ghost. Then it doesn't carry over to other notes or to the next unit:
 
 ```msq-editor opens-with=text
 chord
@@ -81,10 +81,10 @@ g d5 b5
 
 ```
 
-## 4. Ghost units in playback
+## 4. Ghost Units in Playback
 
-A ghost unit still occupies its full duration, like any other unit. But in playback it is not played by the instrument of its stave: it gets a short percussive sound instead, so what you hear is its rhythm.
+A ghost unit still takes its full duration, like any other unit. But in playback it isn't played by the instrument of its stave. It gets a short percussive sound instead, so you hear only its rhythm.
 
-**Side note:** a ghost unit is not the same as a unit in parentheses. A ghost note changes how a note is played, while parentheses only say that a note is optional or implied, and it is played as usual. Parentheses have their own page: [Parentheses](/docs/language/parentheses).
+**Side note:** a ghost unit is not the same as a unit in parentheses. A ghost note changes how a note is played. Parentheses only say that a note is optional or implied, and it is played as usual. Parentheses have their own page: [Parentheses](/docs/language/parentheses).
 
 Read next: [Parentheses](/docs/language/parentheses)

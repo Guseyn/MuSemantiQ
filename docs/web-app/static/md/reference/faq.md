@@ -1,54 +1,63 @@
-# FAQ and limitations
+# FAQ and Limitations
 
-The questions that come up, with straight answers. The limitations are here too, each with the reason for it and a link to where it is discussed in more depth.
+<nav is="docs-contents"></nav>
 
-## 1. Questions
+## Questions
 
-### Do I need to install anything besides Node?
+### Do I Need to Install Anything Besides Node.js?
 
-For the browser example and the CLI, no: Node 22 or newer is enough, and `npm install` only downloads **c8** for test coverage. The dev tools and this documentation also need my libraries nodes, EHTML and e-ui cloned beside the repository. See [Full setup](/docs/getting-started/full-setup).
+- For the low-level API, the browser example and the CLI: no, Node.js 22 or newer is enough. `npm install` only downloads **c8**, for test coverage.
+- For the dev tools: they also need [nodes](https://github.com/Guseyn/nodes.js), [EHTML](https://github.com/Guseyn/EHTML) and [e-ui](https://github.com/Guseyn/e-ui), but `npm run dev-tools:setup` downloads them for you. See [Dev tools](/docs/dev-tools/overview).
+- For these docs: you need the same three libraries next to the repository.
 
-### Can I install it from npm as a dependency?
+### How Do I Run the Browser Example?
 
-Not at the moment. You use it from a clone of the repository: `src/api.js` for the engine, `src/language/api.js` for parsing alone, and `web-components/` for the elements. See [Low-Level API](/docs/api/overview) and [Embedding in your own app](/docs/examples/embedding).
+```bash
+npm run browser-app:setup
+npm run browser-app
+```
 
-### Does the parser stop at the first mistake?
+The first command copies the engine, the web components and the fonts into the app. Run it again after you change `src/` or `web-components/`. The second one only starts the server, at https://127.0.0.1:8888. See [Browser app](/docs/examples/browser-app).
 
-No. It never throws on bad input. It draws everything it understood and collects an error for everything it did not, with the line it was on. The CLI still writes its output and then exits with code **1**, so a script can tell. See [Handling errors](/docs/language/handling-errors).
+### Can I Install It From npm?
 
-### Is the output always the same for the same text?
+Not at the moment. You download the repository and use `src/api.js` for the engine, `src/language/api.js` for parsing only, and `web-components/` for the elements. See [Low-Level API](/docs/api/overview).
 
-Yes. The same text with the same fonts gives the same SVG and the same MIDI, byte for byte. The test suites rely on that, because they compare every output with a committed one. See [The three suites](/docs/testing/the-suites).
+### Does the Parser Stop at the First Mistake?
 
-### Which music fonts can I use?
+No. It draws everything it understood and gives you an error, with its line, for everything it didn't. The CLI still writes its files and then exits with code **1**. See [Handling errors](/docs/language/handling-errors).
 
-**Bravura** and **Leland**. A music font needs a music-js table as well as its outline file, and at the moment only those two have one. The repository also has the `.otf` files of **Petaluma** and **MuseJazz**, but no tables for them. A new table is generated from any SMuFL font with the font generator, and what it makes is a starting point that still has to be tuned by eye. See [Fonts and font config](/docs/components/overview#1-msq-font-loader) and [SMuFL to music-js font](/docs/tools/smufl-font-generator).
+### Is the Output Always the Same for the Same Text?
 
-### What does playback sound like, and does it need the internet?
+Yes. The same text with the same fonts gives the same SVG and MIDI, byte for byte. The tests rely on that. See [The three suites](/docs/testing/the-suites).
 
-When a component is not given a sound font, the player loads the default Magenta sound font, **SGM Plus**, from Google's storage, so it needs a connection. You can render a local sample set from any General MIDI `.sf2` soundbank with the sound font generator in the dev tools, which needs **fluidsynth** and **lame** installed. See [Magenta soundfont builder](/docs/tools/magenta-soundfont-builder).
+### Which Music Fonts Can I Use?
 
-### How do I write several pages?
+**Bravura** and **Leland**, because only they have a music-js table. The repository also has **Petaluma** and **MuseJazz**, but without tables. You can make a table from any SMuFL font with the font generator. See [SMuFL to music-js font](/docs/tools/smufl-font-generator).
 
-The language has no page break, so a document of several pages is split before it is parsed. The CLI and the tests split at a line reading `====next page====`, and the CLI can also take a folder with one file per page. The CLI writes one SVG per page and one MIDI file for the whole document, because music does not stop at a page boundary. See [Multiple pages](/docs/api/overview).
+### Does Playback Need the Internet?
 
-### Can I bring in scores I already have?
+Only if you don't give the player a sound font. Then it loads the default Magenta sound font, **SGM Plus**, from Google. You can make your own sound font from any General MIDI `.sf2` file. See [Magenta soundfont builder](/docs/tools/magenta-soundfont-builder).
 
-Yes, from MusicXML. `tools/musicxml` converts a MusicXML score into a page and a page back into MusicXML, and the MusicXML tool in the dev tools does it on a page and engraves both sides. Nothing is guessed on the way in: whatever is not supported is dropped and named in the import report. See [MusicXML import](/docs/tools/musicxml-import) and [MusicXML export](/docs/tools/musicxml-export).
+### How Do I Write Several Pages?
 
-### Can I send a pull request?
+Separate them with a line `====next page====`. The CLI writes one SVG per page and one MIDI file for all of them. It can also take a folder with one file per page. See [CLI](/docs/examples/cli).
 
-No, pull requests are not accepted. You can fork the project and change it under the terms of the [license](/docs/reference/license), and issues, suggestions and discussions on [GitHub](https://github.com/Guseyn/MuSemantiQ/issues) are welcome.
+### Can I Bring In Scores I Already Have?
 
-## 2. Limitations
+Yes, from MusicXML, but it's in beta and solves this only partly. Anything that's not supported is dropped and listed in the import report. See [MusicXML import](/docs/tools/musicxml-import) and [MusicXML export](/docs/tools/musicxml-export).
 
-These are the things MuSemantiQ does not do at the moment. You have to remember the following:
+### Can I Send a Pull Request?
 
-1. **No PDF or PNG output.** The engine draws SVG and nothing else, and the CLI writes SVG, MIDI, the page schema and the highlighted source. To get a PDF you print the SVG, from a browser for example.
-2. **Safari through a polyfill.** The components are customized built-in elements, which WebKit does not implement. Chromium-based browsers and Firefox work natively, and in Safari the components load a polyfill that ships with them, so you don't have to do anything for it. The browser example, the dev tools and this documentation have been checked in WebKit, but not yet in Safari itself. See [Browser support](/docs/components/overview).
-3. **No check that a measure adds up.** A time signature is drawn, not enforced, so MSQ will not tell you that a measure is over-full or short. You can put as many units into a measure as you want, which lets you write the music first and fix the rhythm after. See [Time signatures](/docs/language/time-signatures).
-4. **No automatic line breaks.** Measures stay on the page line you wrote them on. If you never write `new line`, the line, and the page with it, just grow wider. See [Page lines](/docs/language/page-lines) and [Unit spacing](/docs/language/unit-spacing).
-5. **Two music fonts.** Only Bravura and Leland have music-js tables, as described above.
+No, pull requests are not accepted. You can fork the project under the [license](/docs/reference/license). Issues, suggestions and discussions on [GitHub](https://github.com/Guseyn/MuSemantiQ/issues) are welcome.
+
+## Limitations
+
+1. **No PDF or PNG.** The engine draws SVG only. To get a PDF, print the SVG from a browser.
+2. **Safari works through a polyfill.** The components load it themselves, so you don't need to do anything. It's checked in WebKit, but not yet in Safari itself.
+3. **Measures are not checked.** A time signature is drawn, not enforced, so you can put as many units into a measure as you want. See [Time signatures](/docs/language/time-signatures).
+4. **No automatic line breaks.** Measures stay on the page line you wrote them on. See [Page lines](/docs/language/page-lines).
+5. **Two music fonts.** Only Bravura and Leland have music-js tables.
 
 > **TO WRITE**
 > - which of the limitations above are planned and which are deliberately out of scope (PDF and PNG output, automatic line breaks)
