@@ -12,5 +12,5 @@ treble clef
 slur from first unit to second unit
 with right point attached to note body
 
-slur from third unit to fourth unit
+slur up from third unit to fourth unit
 with right point attached to middle of stem

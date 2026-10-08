@@ -2,6 +2,7 @@
 
 import calculateSlurPoints from '#msq/drawer/elements/spans/slurs/calculateSlurPoints.js'
 import calculateSShapeSlurPoints from '#msq/drawer/elements/spans/slurs/calculateSShapeSlurPoints.js'
+import calculateSShapeSlurOutlinePoints from '#msq/drawer/elements/spans/slurs/calculateSShapeSlurOutlinePoints.js'
 import calculateSlurJunctionPointForSingleUnit from '#msq/drawer/elements/spans/slurs/calculateSlurJunctionPointForSingleUnit.js'
 import createPath from '#msq/drawer/elements/basic/createPath.js'
 import createGroup from '#msq/drawer/elements/basic/createGroup.js'
@@ -48,7 +49,7 @@ export default function (markedSlur, slurMarkKey, voicesBody, extendedFromLeftSi
     return slur
   }
 
-  const sShapeSlurPoins = calculateSShapeSlurPoints(
+  const sShapeSlurPoints = calculateSShapeSlurPoints(
     markedSlur,
     slurLeftPoint,
     slurRightPoint,
@@ -59,17 +60,14 @@ export default function (markedSlur, slurMarkKey, voicesBody, extendedFromLeftSi
     styles
   )
 
-  const tunedSShapeSlurStrokeOptions = Object.assign({}, styles.sShapeSlurStrokeOptions)
-  if (markedSlur.isGrace) {
-    tunedSShapeSlurStrokeOptions.width *= styles.graceElementsScaleFactor
-  }
+  const thickness = styles.slurBulkCoefficient * 0.8 * (markedSlur.isGrace ? styles.graceElementsScaleFactor : 1)
   const slur = createGroup(
     'slur',
     [
       createPath(
-        sShapeSlurPoins,
-        tunedSShapeSlurStrokeOptions,
-        false,
+        calculateSShapeSlurOutlinePoints(sShapeSlurPoints, thickness),
+        styles.slurStrokeOptions,
+        true,
         0,
         0
       )
