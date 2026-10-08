@@ -1,8 +1,8 @@
-# Low-level API
+# Low-Level API
 
 <nav is="docs-contents"></nav>
 
-## How it works
+## How It Works
 
 1. **Plain ES modules.** Every file in `src` is a standard module with `import` and `export`, so Node.js and browsers load it as it is.
 2. **Import maps.** Inside `src`, modules import each other as `#msq/…`. In Node.js the `imports` are configured in `package.json`, and in the browser `<script type="importmap">` does that.
@@ -64,7 +64,7 @@ flowchart LR
   linkStyle default stroke:#EE5253
 ```
 
-## Setup and a full example
+## Setup and a Full Example
 
 <e-tabs data-apply-hash-navigation>
 
@@ -110,6 +110,9 @@ Finally, add the imports to your `package.json` and mark the package as a module
 ```
 
 </details>
+
+<details is="e-details">
+<summary>Full Example</summary>
 
 ```js
 // render.js
@@ -194,6 +197,8 @@ fs.writeFileSync('score.svg', svg)
 fs.writeFileSync('score.mid', midi.data)
 ```
 
+</details>
+
 Let's say, this is the first page, `pages/1.txt`:
 
 ```text
@@ -226,10 +231,12 @@ As a result, you will get music score [`score.svg`](/images/api/score.svg) and M
 
 <e-tab data-title="Browser">
 
+**Important note:** this is not the recommended way. Everything runs on the main thread, so the page freezes while the fonts load and while a score is engraved. 
+
+It's still shown here to demonstrate how the engine and the API work natively in the browser. If you can, use the [Worker](/docs/worker/overview) instead.
+
 <details is="e-details">
 <summary>Setup</summary>
-
-**Important note:** this is not the recommended way. Everything runs on the main thread, so the page freezes while the fonts load and while a score is engraved. If you can, use the [Worker](/docs/worker/overview) instead.
 
 First, download MuSemantiQ next to your project:
 
@@ -267,6 +274,9 @@ Finally, add an import map to your page, before any module script, so that the `
 ```
 
 </details>
+
+<details is="e-details">
+<summary>Full Example</summary>
 
 ```html
 <!-- static/index.html -->
@@ -372,6 +382,8 @@ Finally, add an import map to your page, before any module script, so that the `
   </body>
 </html>
 ```
+
+</details>
 
 Let's say, this is the first page, `static/pages/1.txt`:
 

@@ -37,7 +37,8 @@ const pageWithTheExample = path.join(staticDir, 'md', 'api', 'overview.md')
 const outputDir = path.join(staticDir, 'images', 'api')
 
 function pageTextAfter(markdown, fileName) {
-  const fence = new RegExp('`' + fileName.replace('.', '\\.') + '`[^\\n]*\\n+```text\\n([\\s\\S]*?)\\n```')
+  // the first ```text fence after the name, past the <details> it is folded into
+  const fence = new RegExp('`' + fileName.replace('.', '\\.') + '`[^\\n]*\\n(?:[^\\n]*\\n)*?```text\\n([\\s\\S]*?)\\n```')
   const match = markdown.match(fence)
   if (!match) {
     throw new Error(`no \`\`\`text fence after \`${fileName}\` in ${pageWithTheExample}`)

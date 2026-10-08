@@ -38,9 +38,9 @@ From one piece of MSQ you can get:
 
 ## 4. What does it provide
 
-1. **The API.** `src/api.js` is plain JavaScript modules that run in Node and in a browser worker: set up the fonts, parse a page, then generate SVG or MIDI from it. See [Low-level API](/docs/api/overview).
+1. **The API.** `src/api.js` is plain JavaScript modules that run in Node and in a browser worker: set up the fonts, parse a page, then generate SVG or MIDI from it. See [Low-Level API](/docs/api/overview).
 1. **The CLI.** `npm run cli-app` turns a file, or a folder of files, into SVG and MIDI from the command line. See [CLI](/docs/examples/cli).
-1. **The web components.** `<template is="msq-svg">`, `<template is="msq-midi>`, `<template is="msq-svg-midi"` and `<template is="msq-editor>` turn MSQ written inside a page into a score, a player or an editor. The examples on this site are exactly that. More about them you can read in [Web components](/docs/components/overview).
+1. **The web components.** `<template is="msq-svg">`, `<template is="msq-midi>`, `<template is="msq-svg-midi"` and `<template is="msq-editor>` turn MSQ written inside a page into a score, a player or an editor. The examples on this site are exactly that. More about them you can read in [Web Components](/docs/components/overview).
 1. **Showdown extensions.** You can declare language blocks in Markdown: **msq-svg**, **msq-midi**, **msq-svg-midi** and **msq-editor**, and the rest will be handled by showdown library.
 1. **Dev Tools**. 
   - You can view and generate glyphs using any music font

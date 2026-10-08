@@ -10,7 +10,7 @@ For the browser example and the CLI, no: Node 22 or newer is enough, and `npm in
 
 ### Can I install it from npm as a dependency?
 
-Not at the moment. You use it from a clone of the repository: `src/api.js` for the engine, `src/language/api.js` for parsing alone, and `web-components/` for the elements. See [Low-level API](/docs/api/overview) and [Embedding in your own app](/docs/examples/embedding).
+Not at the moment. You use it from a clone of the repository: `src/api.js` for the engine, `src/language/api.js` for parsing alone, and `web-components/` for the elements. See [Low-Level API](/docs/api/overview) and [Embedding in your own app](/docs/examples/embedding).
 
 ### Does the parser stop at the first mistake?
 

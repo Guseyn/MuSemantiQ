@@ -154,9 +154,9 @@ export const sitemap = [
   },
   {
     slug: 'api',
-    title: 'Low-level API',
+    title: 'Low-Level API',
     pages: [
-      { slug: 'overview', title: 'Low-level API' }
+      { slug: 'overview', title: 'Low-Level API' }
     ]
   },
   {
@@ -168,16 +168,16 @@ export const sitemap = [
   },
   {
     slug: 'components',
-    title: 'Web components',
+    title: 'Web Components',
     pages: [
-      { slug: 'overview', title: 'Web components' }
+      { slug: 'overview', title: 'Web Components' }
     ]
   },
   {
     slug: 'showdown',
-    title: 'Showdown extensions',
+    title: 'Showdown Extensions',
     pages: [
-      { slug: 'overview', title: 'Showdown extensions' }
+      { slug: 'overview', title: 'Showdown Extensions' }
     ]
   },
   {

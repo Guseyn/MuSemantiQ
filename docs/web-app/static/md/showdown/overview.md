@@ -1,13 +1,157 @@
-# Showdown extensions
+# Showdown Extensions
 
 <nav is="docs-contents"></nav>
 
-> **TO WRITE**
-> - what the extensions do: a fenced block named after a component becomes that component, with the music inside it
-> - the music never goes through markdown, so blank lines and lines starting with `-` or `#` reach the component as written
-> - they do not import showdown, so they work with whichever copy you have, in the browser and in Node.js
+## How It Works
 
-## Setup and a full example
+1. If you name a code block after a web component, for example `msq-svg-midi`, it becomes that component. The music goes inside of it, and the words after the name become its attributes.
+2. The music inside of a code block doesn't go through markdown at all. Otherwise markdown would break it: it would split it at empty lines, add `<br>` between lines, and turn lines that start with `-` or `#` into lists and headings. So the music gets into the element exactly as you wrote it.
+3. The extensions don't import showdown. They are just plain objects that showdown calls, so you can use them with any copy of showdown, in the browser and in Node.js.
+4. As a result, you get HTML with `<template is="msq-…">` elements in it. They are rendered only on a page with the [web components](/docs/components/overview).
+5. The extensions don't load fonts. `msqExtensions({ fontSources: 'myFonts' })` just adds `data-font-sources="myFonts"` to every element, except `<msq-midi>`, which doesn't need fonts. Fonts are loaded by `<msq-font-loader>` from its font config, with `data-font-sources-reference="myFonts"`. So both names must be the same.
+
+<e-tabs>
+
+<e-tab data-title="Node.js">
+
+Below is a diagram of how a markdown file becomes an HTML file:
+
+1. The `lang` filter runs before showdown parses anything: it takes every **msq fence** out of the **markdown**, as written, and leaves a placeholder in its place.
+2. **Showdown** converts everything else into HTML.
+3. The `output` filter runs after it: it puts each fence back in place of its placeholder, as a `<template is="msq-…">` with the music inside and with the `data-font-sources` attribute set to the name you gave the extensions.
+4. You get **HTML** with `<template is="msq-…">` in it, which draws on any page with the web components and a font loader of the same name.
+
+```mermaid
+flowchart TB
+  markdown@{ icon: "material:description", label: "markdown", pos: "b", h: 36, w: 36 }
+  fences@{ icon: "material:music-note", label: "msq fences, as written", pos: "b", h: 36, w: 36 }
+  showdown@{ icon: "material:memory", label: "showdown", pos: "b", h: 36, w: 36 }
+  html@{ icon: "material:code", label: "page.html<br>with msq-* templates", pos: "b", h: 36, w: 36 }
+  %% markdown into HTML: the music goes around showdown, never through it
+  subgraph conversion [" showdown with the msq extensions "]
+    lang["lang filter"]
+    fences
+    showdown
+    output["output filter"]
+  end
+  markdown e1@--- lang
+  lang e2@--> fences
+  lang e3@--> showdown
+  showdown e4@--- output
+  fences e5@--- output
+  output e6@--> html
+  %% the arrows move, from what we write to what we get
+  e1@{ animation: fast }
+  e2@{ animation: fast }
+  e3@{ animation: fast }
+  e4@{ animation: fast }
+  e5@{ animation: fast }
+  e6@{ animation: fast }
+  %% the docs' primary colour, for every icon, arrow and frame
+  classDef default stroke:#EE5253
+  linkStyle default stroke:#EE5253
+  style conversion stroke:#EE5253
+  %% a filter is only its name, with no box around it
+  style lang fill:none,stroke:none
+  style output fill:none,stroke:none
+```
+
+</e-tab>
+
+<e-tab data-title="Browser">
+
+Below is a diagram of how a markdown file becomes a page with scores:
+
+1. The `lang` filter runs before showdown parses anything: it takes every **msq fence** out of the **markdown**, as written, and leaves a placeholder in its place.
+2. **Showdown** converts everything else into HTML.
+3. The `output` filter runs after it: it puts each fence back in place of its placeholder, as a `<template is="msq-…">` with the music inside and with the `data-font-sources` attribute set to the name you gave the extensions.
+4. On the page, the templates sit inside a `<msq-font-loader>`, which loads the fonts from its **font config** into the worker with the `fonts.setup` message, under the same name, and only then puts the templates on the page.
+5. From there it's the same as on the [Web Components](/docs/components/overview#how-it-works) page: every template sends its **MSQ text** to the worker with its own message, the worker runs the **low-level API**, and the element puts the **score**, the **player** or both into its own shadow root.
+
+```mermaid
+flowchart TB
+  markdown@{ icon: "material:description", label: "markdown", pos: "b", h: 36, w: 36 }
+  fences@{ icon: "material:music-note", label: "msq fences, as written", pos: "b", h: 36, w: 36 }
+  showdown@{ icon: "material:memory", label: "showdown", pos: "b", h: 36, w: 36 }
+  fontConfig@{ icon: "material:tune", label: "font config", pos: "b", h: 36, w: 36 }
+  fontLoader@{ icon: "material:download", label: "msq-font-loader", pos: "b", h: 36, w: 36 }
+  elements@{ icon: "material:code", label: "msq-* templates", pos: "b", h: 36, w: 36 }
+  supportedFontSources@{ icon: "material:font-download", label: "supportedFontSources", pos: "b", h: 36, w: 36 }
+  engine@{ icon: "material:memory", label: "low-level API", pos: "b", h: 36, w: 36 }
+  score@{ icon: "material:image", label: "score", pos: "b", h: 36, w: 36 }
+  player@{ icon: "material:play-circle", label: "player", pos: "b", h: 36, w: 36 }
+  %% markdown into HTML: the music goes around showdown, never through it
+  subgraph conversion [" showdown with the msq extensions "]
+    lang["lang filter"]
+    fences
+    showdown
+    output["output filter"]
+  end
+  %% from here on, the same as on the Web components page
+  subgraph page [" page "]
+    fontConfig
+    fontLoader
+    elements
+  end
+  subgraph worker [" one worker for the page "]
+    supportedFontSources
+    engine
+  end
+  subgraph result [" page "]
+    score
+    player
+  end
+  fontsSetup["fonts.setup"]
+  generate["svg.generate<br>midi.generate<br>svg.midi.generate<br>svg.midi.text.generate"]
+  markdown e1@--- lang
+  lang e2@--> fences
+  lang e3@--> showdown
+  showdown e4@--- output
+  fences e5@--- output
+  output e6@--> elements
+  %% the loader reads the font config, and registers the fonts under the name the extensions wrote
+  fontConfig e7@--> fontLoader
+  fontLoader e8@--- fontsSetup
+  fontsSetup e9@--> supportedFontSources
+  elements e10@--- generate
+  generate e11@--> engine
+  supportedFontSources e12@--> engine
+  engine e13@--> score
+  engine e14@--> player
+  %% the arrows move, from what we write to what we get
+  e1@{ animation: fast }
+  e2@{ animation: fast }
+  e3@{ animation: fast }
+  e4@{ animation: fast }
+  e5@{ animation: fast }
+  e6@{ animation: fast }
+  e7@{ animation: fast }
+  e8@{ animation: fast }
+  e9@{ animation: fast }
+  e10@{ animation: fast }
+  e11@{ animation: fast }
+  e12@{ animation: fast }
+  e13@{ animation: fast }
+  e14@{ animation: fast }
+  %% the docs' primary colour, for every icon, arrow and frame
+  classDef default stroke:#EE5253
+  linkStyle default stroke:#EE5253
+  style conversion stroke:#EE5253
+  style page stroke:#EE5253
+  style worker stroke:#EE5253
+  style result stroke:#EE5253
+  %% a filter or a message is only its name, with no box around it
+  style lang fill:none,stroke:none
+  style output fill:none,stroke:none
+  style fontsSetup fill:none,stroke:none
+  style generate fill:none,stroke:none
+```
+
+</e-tab>
+
+</e-tabs>
+
+## Setup and a Full Example
 
 <e-tabs data-apply-hash-navigation>
 
@@ -56,8 +200,8 @@ Finally, mark the package as a module in your `package.json`, because the extens
 
 </details>
 
-> **TO WRITE**
-> - the full example: a script that turns a markdown file into HTML, with the components already in it, for example to send the page from your server
+<details is="e-details">
+<summary>Full Example</summary>
 
 ```js
 // render.js
@@ -67,7 +211,8 @@ import * as showdown from './showdown/showdown.js'
 // the four msq extensions
 import msqExtensions from './msq/showdown-extensions/msqExtensions.js'
 
-// a converter that turns msq fences into elements, with the fonts named myFonts
+// a converter that turns msq fences into elements; 'myFonts' is only a name here,
+// written on every element: the page that shows this HTML loads the fonts under it
 const converter = new showdown.Converter({
   extensions: [ msqExtensions({ fontSources: 'myFonts' }) ]
 })
@@ -82,8 +227,9 @@ fs.writeFileSync('page.html', html)
 console.log(html)
 ```
 
-> **TO WRITE**
-> - the markdown it reads, `page.md`
+</details>
+
+Let's say, this is the markdown it reads, `page.md`:
 
 ````markdown
  # A Short Piece
@@ -97,16 +243,14 @@ console.log(html)
  ```
 ````
 
-> **TO WRITE**
-> - running it
+Run the script:
 
 ```sh
 # run the script from the root of your project
 node render.js
 ```
 
-> **TO WRITE**
-> - what you get: the fence is now the element, and the page that serves it needs the [web components](/docs/components/overview) and a font loader with the same reference
+As a result, you will get `page.html`, where the fence is now the element:
 
 ```html
 <h1 id="ashortpiece">A Short Piece</h1>
@@ -115,6 +259,19 @@ node render.js
 measure
 treble clef
 c d e f
+</template>
+```
+
+It draws on a page with the [web components](/docs/components/overview), inside a font loader that registers the fonts under that same name, `myFonts`:
+
+```html
+<!-- load the fonts under the name myFonts, then show the HTML from page.html -->
+<template is="msq-font-loader" data-font-sources-reference="myFonts" data-font-config-src="/js/font-config.json">
+  <template is="msq-svg-midi" data-font-sources="myFonts" data-file-name="a-short-piece">
+  measure
+  treble clef
+  c d e f
+  </template>
 </template>
 ```
 
@@ -142,7 +299,7 @@ unzip EHTML.zip
 mv EHTML-master EHTML
 ```
 
-Then set up the web components: the worker, the components, the language and the fonts. More about each step you can read in [Web components](/docs/components/overview):
+Then set up the web components: the worker, the components, the language and the fonts. More about each step you can read in [Web Components](/docs/components/overview):
 
 ```sh
 # go to your project
@@ -192,8 +349,8 @@ Finally, create the font config, `static/js/font-config.json`. It's the same one
 
 </details>
 
-> **TO WRITE**
-> - the full example: a page that fetches a markdown file, converts it, and puts the result inside a font loader, so every score waits for its fonts
+<details is="e-details">
+<summary>Full Example</summary>
 
 ```html
 <!-- static/index.html -->
@@ -225,7 +382,8 @@ Finally, create the font config, `static/js/font-config.json`. It's the same one
       import * as showdown from '/js/showdown/showdown.js'
       import msqExtensions from '/js/msq/showdown-extensions/msqExtensions.js'
 
-      // a converter that turns msq fences into elements, with the fonts named myFonts
+      // a converter that turns msq fences into elements; 'myFonts' is the name
+      // the font loader below registers the fonts under
       const converter = new showdown.Converter({
         extensions: [ msqExtensions({ fontSources: 'myFonts' }) ]
       })
@@ -235,6 +393,7 @@ Finally, create the font config, `static/js/font-config.json`. It's the same one
 
       // a font loader, so every score waits for the fonts
       const loader = document.createElement('template', { is: 'msq-font-loader' })
+      // it registers the fonts under myFonts, the name the converter wrote on every element
       loader.setAttribute('data-font-sources-reference', 'myFonts')
       loader.setAttribute('data-font-config-src', '/js/font-config.json')
       // the converted markdown goes inside it
@@ -246,8 +405,9 @@ Finally, create the font config, `static/js/font-config.json`. It's the same one
 </html>
 ```
 
-> **TO WRITE**
-> - the markdown it fetches, `static/md/page.md`
+</details>
+
+Let's say, this is the markdown it fetches, `static/md/page.md`:
 
 ````markdown
  # A Short Piece
@@ -261,21 +421,19 @@ Finally, create the font config, `static/js/font-config.json`. It's the same one
  ```
 ````
 
-> **TO WRITE**
-> - serving `static/` with any static server, and opening the page
+Serve `static/` with any static server, and open http://localhost:8080:
 
 ```sh
 # serve static/ on port 8080; npx fetches http-server the first time
 npx http-server static -p 8080
 ```
 
-> **TO WRITE**
-> - what you get
+As a result, you will get:
 
 ```msq-svg-midi file-name=a-short-piece
 measure
 treble clef
-c d e f
+c d e f g
 ```
 
 </e-tab>
@@ -283,9 +441,6 @@ c d e f
 </e-tabs>
 
 ## Extensions
-
-> **TO WRITE**
-> - every extension is a function that takes the default attributes and returns what showdown expects in `extensions`
 
 ### 1. msqExtensions
 
@@ -305,7 +460,7 @@ All four extensions at once: `msq-svg`, `msq-midi`, `msq-svg-midi` and `msq-edit
 <details is="e-details">
 <summary>Arguments</summary>
 
-`fontSources`: the name a `msq-font-loader` registered its fonts under, written as `data-font-sources` on every element except `msq-midi`, which does not need fonts.
+`fontSources`: the name a `<msq-font-loader>` registered its fonts under, written as the `data-font-sources` attribute on every element except `<msq-midi>`, which does not need fonts.
 
 ```js
 { fontSources: 'myFonts' }
@@ -352,7 +507,7 @@ One element each, for a page that should turn only some fences into components a
 <details is="e-details">
 <summary>Arguments</summary>
 
-`fontSources`: the name a `msq-font-loader` registered its fonts under; `msqMidi` has none.
+`fontSources`: the name a `<msq-font-loader>` registered its fonts under; `msqMidi` has none.
 
 ```js
 { fontSources: 'myFonts' }
@@ -375,7 +530,7 @@ An array of showdown extensions:
 
 </details>
 
-### 3. The fence
+### 3. The Fence
 
 ````markdown
  ```msq-editor opens-with=text file-name="a short piece" data-editor-height=320px
@@ -395,7 +550,7 @@ How a component is written in markdown: the name of the element after the backti
 <details is="e-details">
 <summary>Parts</summary>
 
-`msq-editor`: the element; `msq-svg`, `msq-midi`, `msq-svg-midi` or `msq-editor`, and any other name is left to showdown as a plain code block.
+`msq-editor`: the name of the element; `msq-svg`, `msq-midi`, `msq-svg-midi` or `msq-editor`, and any other name is left to showdown as a plain code block.
 
 ```text
 msq-svg | msq-midi | msq-svg-midi | msq-editor

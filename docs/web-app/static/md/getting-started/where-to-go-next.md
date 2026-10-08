@@ -8,7 +8,7 @@ If you want to write music, read [MSQ language](/docs/language/first-notes) from
 
 ## 2. Use the low-level API
 
-If you want to engrave or perform from your own code in Node.js, read [Low-level API](/docs/api/overview). It is the pipeline itself: `setupFonts`, then the parsing, the styles, and the SVG and MIDI for one page or many.
+If you want to engrave or perform from your own code in Node.js, read [Low-Level API](/docs/api/overview). It is the pipeline itself: `setupFonts`, then the parsing, the styles, and the SVG and MIDI for one page or many.
 
 ## 3. Use the worker in the browser
 
@@ -16,11 +16,11 @@ If you want the same API in the browser without blocking your page, read [Worker
 
 ## 4. Use the native web components
 
-If you want scores in your own pages, read [Web components](/docs/components/overview). A `<template is="msq-svg">` with MSQ inside it becomes a score, `msq-midi` becomes a player, `msq-svg-midi` becomes both, and `msq-editor` becomes an editor.
+If you want scores in your own pages, read [Web Components](/docs/components/overview). A `<template is="msq-svg">` with MSQ inside it becomes a score, `msq-midi` becomes a player, `msq-svg-midi` becomes both, and `msq-editor` becomes an editor.
 
 ## 5. Use the showdown extensions in markdown
 
-If you write markdown, read [Showdown extensions](/docs/showdown/overview). A fenced block named after a component becomes that component, so you can put music into markdown the same way you put code.
+If you write markdown, read [Showdown Extensions](/docs/showdown/overview). A fenced block named after a component becomes that component, so you can put music into markdown the same way you put code.
 
 ## 6. Use it in combination with EHTML
 

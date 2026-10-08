@@ -73,6 +73,23 @@ function pointOnIcon(icon, towardX, towardY, gap) {
 }
 
 export default function arrowsToIcons(svg) {
+  /*
+  The title of a frame sits where arrows come into it from above. Frames are
+  drawn before arrows, so each title is moved after them, into the same group
+  (frames have no offset of their own). It gets a glow the colour of the card
+  rather than a background: a background reaches up over the frame's border.
+  */
+  for (const title of svg.querySelectorAll('g.cluster-label')) {
+    const frames = title.closest('g.clusters')
+    if (frames && frames.parentNode) {
+      frames.parentNode.appendChild(title)
+    }
+    const words = title.querySelector('foreignObject > div')
+    if (words) {
+      const glow = 'var(--docs-block-bg, #ffffff)'
+      words.style.textShadow = `0 0 2px ${glow}, 0 0 3px ${glow}, 0 0 4px ${glow}, 0 0 6px ${glow}`
+    }
+  }
   const icons = [ ...svg.querySelectorAll('g.icon-shape') ].map(iconMovedToTheMiddle)
   if (icons.length === 0) {
     return

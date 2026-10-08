@@ -2,16 +2,16 @@
 
 <nav is="docs-contents"></nav>
 
-## How it works
+## How It Works
 
-1. **A thread of its own.** Loading fonts and engraving a score is real work. In a worker it happens beside the page, so the page does not freeze while it waits.
-2. **Messages only.** The page and the worker share nothing but messages. A message is an object with a `name`, an `id` and its own fields, and the reply carries the same `id`, with `status: 'ok'` when it worked, or with an `error` when it did not. A message with a name the worker does not know gets no reply at all.
-3. **Fonts once.** `fonts.setup` loads the fonts in the worker once, under a name you pick. Every later message refers to that name, so fonts are never sent again.
-4. **The same engine.** Inside, the worker runs the [Low-level API](/docs/api/overview#how-it-works), so the page itself never loads the engine.
+1. The worker runs in a separate thread, so the page doesn't freeze while fonts are loading and scores are rendering.
+2. The page and the worker talk to each other only with messages. Each message is an object with a `name`, an `id` and its own fields. The worker replies with the same `id` and with `status: 'ok'`, or with an `error` if something went wrong. If the worker doesn't know the `name`, it doesn't reply at all.
+3. You load fonts only once, with the `fonts.setup` message, and you give them a name. Then you just use this name in other messages.
+4. Inside, the worker uses the same [Low-Level API](/docs/api/overview#how-it-works), so you don't need to load it on the page.
 
 Below is a diagram of how the page and the worker communicate:
 
-1. The page sends the **font config** with `fonts.setup`, and the worker loads the fonts and keeps them as **supported font sources**, under the name the page picked.
+1. The page sends the **font config** with the `fonts.setup` message, and the worker loads the fonts and keeps them as **supported font sources**, under the name the page picked.
 2. The page sends the **MSQ text** with one of the messages that generate a score, together with that name.
 3. The worker runs the **low-level API** on the text with those fonts.
 4. The worker sends back **SVG**, **MIDI**, or both.
@@ -66,7 +66,7 @@ flowchart LR
   style generate fill:none,stroke:none
 ```
 
-## Setup and a full example
+## Setup and a Full Example
 
 <details is="e-details">
 <summary>Setup</summary>
@@ -101,6 +101,9 @@ rsync -a --delete --exclude music-js ../MuSemantiQ/src/drawer/font/ static/font
 ```
 
 </details>
+
+<details is="e-details">
+<summary>Full Example</summary>
 
 ```html
 <!-- static/index.html -->
@@ -189,6 +192,8 @@ rsync -a --delete --exclude music-js ../MuSemantiQ/src/drawer/font/ static/font
 </html>
 ```
 
+</details>
+
 Serve `static/` with any static server, and open http://localhost:8080:
 
 ```sh
@@ -265,7 +270,7 @@ Parses and engraves one page. Nothing is played, so nothing is heard, which is s
 <details is="e-details">
 <summary>Fields</summary>
 
-`fontSourcesReference`: the name a `fonts.setup` registered the fonts under.
+`fontSourcesReference`: the name a `fonts.setup` message registered the fonts under.
 
 ```js
 'myFonts'
@@ -297,7 +302,7 @@ worker.postMessage({ id, name: 'midi.generate', inputText })
 <details is="e-details">
 <summary>Purpose</summary>
 
-Parses and performs one page. It is the only message that needs no fonts, so it takes no reference and can be sent before `fonts.setup`.
+Parses and performs one page. It is the only message that needs no fonts, so it takes no reference and can be sent before the `fonts.setup` message.
 
 </details>
 
@@ -336,7 +341,7 @@ Engraves and performs one page from a single parse, and links the two, so a scor
 <details is="e-details">
 <summary>Fields</summary>
 
-`fontSourcesReference`: the name a `fonts.setup` registered the fonts under.
+`fontSourcesReference`: the name a `fonts.setup` message registered the fonts under.
 
 ```js
 'myFonts'
@@ -372,14 +377,14 @@ worker.postMessage({ id, name: 'svg.midi.text.generate', fontSourcesReference, i
 <details is="e-details">
 <summary>Purpose</summary>
 
-Everything `svg.midi.generate` does, plus the source text highlighted with the same ref ids, so the text, the score and the playback all point at each other. This is what the editor sends.
+Everything the `svg.midi.generate` message does, plus the source text highlighted with the same ref ids, so the text, the score and the playback all point at each other. This is what the editor sends.
 
 </details>
 
 <details is="e-details">
 <summary>Fields</summary>
 
-`fontSourcesReference`: the name a `fonts.setup` registered the fonts under.
+`fontSourcesReference`: the name a `fonts.setup` message registered the fonts under.
 
 ```js
 'myFonts'
@@ -396,7 +401,7 @@ Everything `svg.midi.generate` does, plus the source text highlighted with the s
 <details is="e-details">
 <summary>Reply</summary>
 
-- `svg`, `svgDataSrc`, `midiDataSrc`, `timeStampsMappedWithRefsOn`, `refsOnMappedWithTimeStamps`, `customStyles`, `errors`: the same as in `svg.midi.generate`.
+- `svg`, `svgDataSrc`, `midiDataSrc`, `timeStampsMappedWithRefsOn`, `refsOnMappedWithTimeStamps`, `customStyles`, `errors`: the same as in the `svg.midi.generate` message.
 - `highlightsHtmlBuffer`: the source as an array of HTML fragments, every token in a `<span>` with a `ref-id`; `join('')` it before use.
 
 </details>
@@ -417,7 +422,7 @@ Traces characters of a loaded music font into path points. The font viewer in th
 <details is="e-details">
 <summary>Fields</summary>
 
-`fontSourcesReference`: the name a `fonts.setup` registered the fonts under.
+`fontSourcesReference`: the name a `fonts.setup` message registered the fonts under.
 
 ```js
 'myFonts'
@@ -457,4 +462,4 @@ Traces characters of a loaded music font into path points. The font viewer in th
 
 </details>
 
-Read next: [Web components](/docs/components/overview)
+Read next: [Web Components](/docs/components/overview)

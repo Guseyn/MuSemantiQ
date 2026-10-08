@@ -46,6 +46,26 @@ function loadedMermaid() {
   return mermaidLoaded
 }
 
+/*
+Mermaid measures every label as it draws. In a tab that is not open, or anything
+else with display: none, everything measures as zero and the drawing comes out
+collapsed, so a hidden diagram waits until it first has a size of its own.
+*/
+function shown(element) {
+  if (element.getClientRects().length > 0) {
+    return Promise.resolve()
+  }
+  return new Promise((resolve) => {
+    const observer = new ResizeObserver(() => {
+      if (element.getClientRects().length > 0) {
+        observer.disconnect()
+        resolve()
+      }
+    })
+    observer.observe(element)
+  })
+}
+
 class DocsDiagram extends HTMLElement {
   #drawn = false
 
@@ -55,13 +75,24 @@ class DocsDiagram extends HTMLElement {
     }
     this.#drawn = true
     const source = this.textContent
+    await shown(this)
     const mermaid = await loadedMermaid()
     numberOfDiagrams += 1
     try {
       const { svg } = await mermaid.render(`docs-diagram-${numberOfDiagrams}`, source)
       this.innerHTML = svg
       // Measured, so only once it is in the page
-      arrowsToIcons(this.querySelector('svg'))
+      const drawing = this.querySelector('svg')
+      arrowsToIcons(drawing)
+      /*
+      A diagram shrinks to fit the card, but past three quarters of its size its
+      words get too small to read, on a phone most of all: from there the card
+      scrolls sideways instead, as a code block does.
+      */
+      const naturalWidth = drawing.viewBox.baseVal && drawing.viewBox.baseVal.width
+      if (naturalWidth) {
+        drawing.style.minWidth = `${Math.round(naturalWidth * 0.75)}px`
+      }
       this.setAttribute('data-drawn', '')
       /*
       Drawn, the diagram is taller than its placeholder, which moves everything
