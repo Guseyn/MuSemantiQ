@@ -2,6 +2,7 @@
 
 import createParserScenarios from '#msq/language/parser/scenarios/createParserScenarios.js'
 import mapWithScenariosAndScenariosWhereItIsRequired from '#msq/language/parser/scenarios/mapWithScenariosAndScenariosWhereItIsRequired.js'
+import adapters from '#msq/language/parser/scenarios/adapters.js'
 const parserScenarios = createParserScenarios()
 const constructedMapWithScenariosAndScenariosWhereItIsRequired = mapWithScenariosAndScenariosWhereItIsRequired(parserScenarios)
 
@@ -17,7 +18,24 @@ const ON_EMPTY_LINE = 'on empty line'
 const LAST_CHAR = 'last char'
 const LAST_LEVEL = 'last level'
 
-const runParserScenarios = (createParserScenarios, typeOfScenarios, numberOfActivatedScenarios, progressionOfCommandsFromScenarios, lastScenarioLineNumber, unitext, lineNumber, itIsLastChar, currentToken, tokenAccumulator, delimitersBeforeFirstTokenOnTheLine, delimetersAfterEachToken, parserState, queueOfActionsOnProgressionOfCommandsChange) => {
+// main's action for a change of progression first, then each adapter's, with what main returned
+const runActionOnProgressionOfCommandsChange = (queuedAction, parserState, scenarioNameThatChangedCommandsProgression, lineNumber) => {
+  const fromMain = queuedAction.action
+    ? queuedAction.action(parserState, scenarioNameThatChangedCommandsProgression, lineNumber, queuedAction.argumentsFromMainAction)
+    : undefined
+  for (const { action, state } of queuedAction.adapterActions) {
+    action({
+      parserState,
+      state,
+      scenarioNameThatChangedCommandsProgression,
+      lineNumber,
+      argumentsFromMainAction: queuedAction.argumentsFromMainAction,
+      fromMain
+    })
+  }
+}
+
+const runParserScenarios = (createParserScenarios, typeOfScenarios, numberOfActivatedScenarios, progressionOfCommandsFromScenarios, lastScenarioLineNumber, unitext, lineNumber, itIsLastChar, currentToken, tokenAccumulator, delimitersBeforeFirstTokenOnTheLine, delimetersAfterEachToken, parserState, queueOfActionsOnProgressionOfCommandsChange, run) => {
   const tokenValues = extractTokenValuesFromTokens(tokenAccumulator)
   const tokenValuesWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem = removeCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem(tokenAccumulator)
   const joinedTokenValuesWithRealDelimiters = joinTokensWithRealDelimiters(tokenAccumulator, delimitersBeforeFirstTokenOnTheLine, delimetersAfterEachToken)
@@ -73,7 +91,7 @@ const runParserScenarios = (createParserScenarios, typeOfScenarios, numberOfActi
             progressionOfCommandsFromScenarios.splice(scenario.itIsNewCommandProgressionFromLevel)
           }
           progressionOfCommandsFromScenarios.push(scenarioName)
-          if (!parserState.applyOnlyHighlightingWithoutRefIds || !parserState.applyHighlighting) {
+          if (run.runMain) {
             for (let actionIndex = 0; actionIndex < queueOfActionsOnProgressionOfCommandsChange.length; actionIndex++) {
               const currentActionOnProgressionOfCommandsChange = queueOfActionsOnProgressionOfCommandsChange[actionIndex]
               if (
@@ -81,17 +99,21 @@ const runParserScenarios = (createParserScenarios, typeOfScenarios, numberOfActi
                 (progressionOfCommandsFromScenarios.indexOf(currentActionOnProgressionOfCommandsChange.scenarioName) === (progressionOfCommandsFromScenarios.length - 1))
               ) {
                 const scenarioNameThatChangedCommandsProgression = scenarioName
-                currentActionOnProgressionOfCommandsChange.action(parserState, scenarioNameThatChangedCommandsProgression, lineNumber, currentActionOnProgressionOfCommandsChange.argumentsFromMainAction)
+                runActionOnProgressionOfCommandsChange(currentActionOnProgressionOfCommandsChange, parserState, scenarioNameThatChangedCommandsProgression, lineNumber)
                 queueOfActionsOnProgressionOfCommandsChange.splice(actionIndex, 1)
                 actionIndex--
               }
             }
-            if (scenario.actionWhenProgressionOfCommandsChanges) {
+            const adapterActionsOnProgressionOfCommandsChange = run.adapters
+              .filter(({ adapter }) => scenario.adapters[adapter.name] && scenario.adapters[adapter.name].actionWhenProgressionOfCommandsChanges)
+              .map(({ adapter, state }) => ({ action: scenario.adapters[adapter.name].actionWhenProgressionOfCommandsChanges, state }))
+            if (scenario.actionWhenProgressionOfCommandsChanges || adapterActionsOnProgressionOfCommandsChange.length > 0) {
               queueOfActionsOnProgressionOfCommandsChange.unshift({
                 scenarioName,
                 scenarioType: scenario.type,
                 levelOfCommandProgression: scenario.itIsNewCommandProgressionFromLevel,
                 action: scenario.actionWhenProgressionOfCommandsChanges,
+                adapterActions: adapterActionsOnProgressionOfCommandsChange,
                 activateOnLastToken: scenario.activateActionWhenProgressionOfCommandsChangesIfItIsLastTokenAndActionDidntHappenBefore,
                 argumentsFromMainAction: {
                   unitext,
@@ -105,10 +127,24 @@ const runParserScenarios = (createParserScenarios, typeOfScenarios, numberOfActi
             }
           }
         }
-        if (parserState.applyHighlighting && parserState.applyOnlyHighlightingWithoutRefIds) {
-          scenario.actionOnlyForHighlightingWithoutRefIds(parserState, joinedTokenValuesWithRealDelimiters, finalTokenValues)
-        } else {
-          scenario.action(unitext, lineNumber, currentToken, finalTokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState)
+        const fromMain = (run.runMain && scenario.action)
+          ? scenario.action(unitext, lineNumber, currentToken, finalTokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState)
+          : undefined
+        for (const { adapter, state } of run.adapters) {
+          const adapterScenario = scenario.adapters[adapter.name]
+          if (adapterScenario && adapterScenario.action) {
+            adapterScenario.action({
+              unitext,
+              lineNumber,
+              currentToken,
+              tokenValues: finalTokenValues,
+              joinedTokenValuesWithRealDelimiters,
+              progressionOfCommandsFromScenarios,
+              parserState,
+              state,
+              fromMain
+            })
+          }
         }
         tokenAccumulator.length = 0
         lastScenarioLineNumber.value = lineNumber
@@ -119,17 +155,37 @@ const runParserScenarios = (createParserScenarios, typeOfScenarios, numberOfActi
   }
 }
 
+/*
+runMain: whether the main scenarios run (they build the page schema, errors, comments,
+styles and MIDI settings). adapterNames: the adapters that run as well, or instead when
+runMain is false (see scenarios/adapters.js and README.md).
+*/
 export default function (
   unitext,
   progressionOfCommandsFromScenarios = [],
-  applyHighlighting = true,
-  applyOnlyHighlightingWithoutRefIds = true,
-  fonts = {
-    'chord-letters': ['gentium plus', 'gothic a1'],
-    'music': ['bravura', 'leland'],
-    'text': ['noto-sans', 'noto-serif']
-  }
+  {
+    runMain = true,
+    adapterNames = [],
+    fonts = {
+      'chord-letters': ['gentium plus', 'gothic a1'],
+      'music': ['bravura', 'leland'],
+      'text': ['noto-sans', 'noto-serif']
+    }
+  } = {}
 ) {
+  const run = {
+    runMain,
+    adapters: adapterNames.map((adapterName) => {
+      const adapter = adapters[adapterName]
+      if (!adapter) {
+        throw new Error(`there is no adapter '${adapterName}'`)
+      }
+      if (adapter.runsWithMain !== runMain) {
+        throw new Error(`adapter '${adapterName}' runs ${adapter.runsWithMain ? 'with' : 'without'} the main scenarios`)
+      }
+      return { adapter, state: undefined }
+    })
+  }
   const mapOfCharIndexesWithProgressionOfCommandsFromScenarios = {}
   const numberOfActivatedScenarios = {
     value: 0
@@ -138,12 +194,6 @@ export default function (
   const parserState = {
     pageSchema: {},
     fonts,
-    highlightsHtmlBuffer: [],
-    applyHighlighting,
-    applyOnlyHighlightingWithoutRefIds,
-    indexesInHighlightsHtmlBufferWhereWeShouldFillPositionPlaceholders: [],
-    indexesInHighlightsHtmlBufferWhereWeShouldFillPositionPlaceholdersForConnection: [],
-    indexesInHighlightsHtmlBufferWithNotesDeclarationsOfLastChord: [],
     lastMentionedStyleKey: undefined,
     lastMentionedMidiSettingKey: undefined,
     lastMentionedUnitPosition: undefined,
@@ -223,6 +273,9 @@ export default function (
     numberOfVoltaMarks: 0,
     numberOfPedalMarks: 0
   }
+  for (const activeAdapter of run.adapters) {
+    activeAdapter.state = activeAdapter.adapter.createState(parserState)
+  }
   const currentTokenChars = []
   const currentLineChars = []
   const allPrevTokens = []
@@ -279,7 +332,7 @@ export default function (
       if (!nextIsDelimeterBetweenTokens || currentToken.lastOnTheLine) {
         currentToken.firstCharIndexOfNextToken = charIndex + 1
         tokenAccumulator.push(currentToken)
-        runParserScenarios(parserScenarios, REGULAR, numberOfActivatedScenarios, progressionOfCommandsFromScenarios, lastScenarioLineNumber, unitext, lineNumber, itIsLastChar, currentToken, tokenAccumulator, delimitersBeforeFirstTokenOnTheLine, delimetersAfterEachToken, parserState, queueOfActionsOnProgressionOfCommandsChange)
+        runParserScenarios(parserScenarios, REGULAR, numberOfActivatedScenarios, progressionOfCommandsFromScenarios, lastScenarioLineNumber, unitext, lineNumber, itIsLastChar, currentToken, tokenAccumulator, delimitersBeforeFirstTokenOnTheLine, delimetersAfterEachToken, parserState, queueOfActionsOnProgressionOfCommandsChange, run)
         const tokenIsNew = noProcessedTokensOnTheLine
           ? true
           : prevTokenOnTheLine.tokenNumber !== tokenNumber
@@ -299,14 +352,19 @@ export default function (
         }
       }
     } else {
-      if (parserState.applyHighlighting && itIsLastChar && itIsDelimeterBetweenTokens && (parserState.highlightsHtmlBuffer !== undefined)) {
-        parserState.highlightsHtmlBuffer.push(delimitersBeforeFirstTokenOnTheLine.join(EMPTY_STRING))
+      if (itIsLastChar && itIsDelimeterBetweenTokens) {
+        const trailingWhitespace = delimitersBeforeFirstTokenOnTheLine.join(EMPTY_STRING)
+        for (const { adapter, state } of run.adapters) {
+          if (adapter.addTrailingWhitespace) {
+            adapter.addTrailingWhitespace(state, trailingWhitespace)
+          }
+        }
       }
     }
     if (itIsNewLineChar) {
       if (currentLineChars.join(EMPTY_STRING).length === 0 && parserState.emptyLineNumbers !== undefined) {
         parserState.emptyLineNumbers.push(lineNumber)
-        runParserScenarios(parserScenarios, ON_EMPTY_LINE, numberOfActivatedScenarios, progressionOfCommandsFromScenarios, lastScenarioLineNumber, unitext, lineNumber, itIsLastChar, undefined, tokenAccumulator, delimitersBeforeFirstTokenOnTheLine, delimetersAfterEachToken, parserState, queueOfActionsOnProgressionOfCommandsChange)
+        runParserScenarios(parserScenarios, ON_EMPTY_LINE, numberOfActivatedScenarios, progressionOfCommandsFromScenarios, lastScenarioLineNumber, unitext, lineNumber, itIsLastChar, undefined, tokenAccumulator, delimitersBeforeFirstTokenOnTheLine, delimetersAfterEachToken, parserState, queueOfActionsOnProgressionOfCommandsChange, run)
       }
       lineNumber += 1
       prevTokensOnTheLine.length = 0
@@ -315,29 +373,26 @@ export default function (
     }
     mapOfCharIndexesWithProgressionOfCommandsFromScenarios[charIndex] = progressionOfCommandsFromScenarios.slice()
   }
-  if (!applyOnlyHighlightingWithoutRefIds || !applyHighlighting) {
+  if (runMain) {
     for (let actionIndex = 0; actionIndex < queueOfActionsOnProgressionOfCommandsChange.length; actionIndex++) {
       const currentActionOnProgressionOfCommandsChange = queueOfActionsOnProgressionOfCommandsChange[actionIndex]
       if (currentActionOnProgressionOfCommandsChange.activateOnLastToken) {
         const scenarioNameThatChangedCommandsProgression = LAST_CHAR
-        currentActionOnProgressionOfCommandsChange.action(parserState, scenarioNameThatChangedCommandsProgression, lineNumber, currentActionOnProgressionOfCommandsChange.argumentsFromMainAction)
+        runActionOnProgressionOfCommandsChange(currentActionOnProgressionOfCommandsChange, parserState, scenarioNameThatChangedCommandsProgression, lineNumber)
       }
     }
   }
-  if (!parserState.applyHighlighting) {
-    if (parserState.highlightsHtmlBuffer.length !== 0) {
-      throw new Error('parserState.highlightsHtmlBuffer.length is 0, although !parserState.applyHighlighting')
-    }
-    parserState.highlightsHtmlBuffer = [ unitext ]
-  }
+  const resultsOfAdapters = Object.assign({}, ...run.adapters.map(({ adapter, state }) => adapter.finish(state, unitext)))
   const object = {
     pageSchema: parserState.pageSchema,
-    highlightsHtmlBuffer: parserState.highlightsHtmlBuffer,
+    // without an adapter that highlights, the text as it is
+    highlightsHtmlBuffer: [ unitext ],
     customStyles: parserState.customStyles,
     errors: parserState.errors,
     comments: parserState.comments,
     midiSettings: parserState.midiSettings,
-    mapOfCharIndexesWithProgressionOfCommandsFromScenarios
+    mapOfCharIndexesWithProgressionOfCommandsFromScenarios,
+    ...resultsOfAdapters
   }
   return object
 }
