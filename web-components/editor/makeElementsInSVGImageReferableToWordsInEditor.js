@@ -2,6 +2,8 @@ import createdRefRectHoveringRefElement from '#msq/web-components/editor/created
 import scoreSvgElement from '#msq/web-components/editor/scoreSvgElement.js'
 import notifyUserToUpdateSVGImage from '#msq/web-components/editor/notifyUserToUpdateSVGImage.js'
 import theCommandKeyIsHeld from '#msq/web-components/editor/theCommandKeyIsHeld.js'
+import placeCaretInTextareaBeforeSpan from '#msq/web-components/editor/placeCaretInTextareaBeforeSpan.js'
+import scrollToSpanInEditorIfItIsOutOfView from '#msq/web-components/editor/scrollToSpanInEditorIfItIsOutOfView.js'
 
 export default (divUnderneathTextarea, textarea, lineNumbersColumn, editTabButton) => {
   const svgPlaceholder = textarea.initialParentElement
@@ -13,8 +15,6 @@ export default (divUnderneathTextarea, textarea, lineNumbersColumn, editTabButto
       if ((typeof node.hasAttribute === 'function') && node.hasAttribute('ref-ids')) {
         let refRectHoveringRefElement
         const refRectHoveringRefElementClickEvent = () => {
-          editTabButton.click()
-          divUnderneathTextarea.style.zIndex = '+2'
           const refIdValues = node.getAttribute('ref-ids').split(',')
           let firstRefIdValue
           let firstSpanWithRefIdInEditor
@@ -25,12 +25,15 @@ export default (divUnderneathTextarea, textarea, lineNumbersColumn, editTabButto
               break
             }
           }
+          // Before the edit tab opens: it focuses the textarea, and Chromium then
+          // scrolls to wherever the caret is at that moment.
           if (firstSpanWithRefIdInEditor) {
-            // firstSpanWithRefIdInEditor.scrollIntoView({ block: 'center', inline: 'center' })
-            textarea.scrollTop = divUnderneathTextarea.scrollTop
-            textarea.scrollLeft = divUnderneathTextarea.scrollLeft
-            lineNumbersColumn.scrollTop = divUnderneathTextarea.scrollTop
-            lineNumbersColumn.scrollLeft = divUnderneathTextarea.scrollLeft
+            placeCaretInTextareaBeforeSpan(firstSpanWithRefIdInEditor, divUnderneathTextarea, textarea)
+          }
+          editTabButton.click()
+          divUnderneathTextarea.style.zIndex = '+2'
+          if (firstSpanWithRefIdInEditor) {
+            scrollToSpanInEditorIfItIsOutOfView(firstSpanWithRefIdInEditor, divUnderneathTextarea, textarea, lineNumbersColumn)
             for (let refIdIndex = 0; refIdIndex < refIdValues.length; refIdIndex++) {
               const spansWithRefIdInEditor = divUnderneathTextarea.querySelectorAll(`[ref-id="${refIdValues[refIdIndex]}"]`)
               for (let spanIndex = 0; spanIndex < spansWithRefIdInEditor.length; spanIndex++) {
