@@ -149,6 +149,21 @@ async function runVisualTestForFont(visualTestDirForFont) {
       supportedFontNames
     })
 
+    // The editor parses as you type in highlight-only mode: no page schema, and spans without ref-ids
+    const {
+      htmlHighlightsForEachPage: htmlHighlightsWithoutRefIdsForEachPage,
+      mapOfCharIndexesWithProgressionOfCommandsFromScenariosForEachPage: mapOfCharIndexesWithoutRefIdsForEachPage
+    } = generateIntermediateStructuresForMultiplePages({
+      multiplePagesText,
+      supportedFontNames,
+      applyHighlighting: true,
+      applyOnlyHighlightingWithoutRefIds: true
+    })
+    const htmlHighlightsWithoutRefIdsForAllPages = htmlHighlightsWithoutRefIdsForEachPage.map(
+      htmlHighlightsForSinglePage => htmlHighlightsForSinglePage.join(EMPTY_STRING)
+    ).join(PAGE_DELIMITER)
+    const stringifiedMapOfCharIndexesWithoutRefIds = JSON.stringify(mapOfCharIndexesWithoutRefIdsForEachPage.flat())
+
     if (!areAllPageSchemasValid(pageSchemaForEachPage)) {
       throw new Error('Some of the page schemas are not valid')
     }
@@ -177,6 +192,8 @@ async function runVisualTestForFont(visualTestDirForFont) {
     let expectedStringifiedCustomStyles
     let expectedStringifiedComments
     let expectedStringifiedMapOfCharIndexesWithProgressionOfCommandsFromScenarios
+    let expectedHtmlHighlightsWithoutRefIds
+    let expectedStringifiedMapOfCharIndexesWithoutRefIds
 
     let testType
     try {
@@ -187,7 +204,9 @@ async function runVisualTestForFont(visualTestDirForFont) {
         expectedStringifiedErrors,
         expectedStringifiedCustomStyles,
         expectedStringifiedComments,
-        expectedStringifiedMapOfCharIndexesWithProgressionOfCommandsFromScenarios
+        expectedStringifiedMapOfCharIndexesWithProgressionOfCommandsFromScenarios,
+        expectedHtmlHighlightsWithoutRefIds,
+        expectedStringifiedMapOfCharIndexesWithoutRefIds
       ] = await Promise.all(
         [
           fs.readFile(`${ROOT}/${visualTestDirForFont}/svg/expected/${testName}.svg`, 'utf-8'),
@@ -196,7 +215,9 @@ async function runVisualTestForFont(visualTestDirForFont) {
           fs.readFile(`${ROOT}/${visualTestDirForFont}/errors/expected/${testName}.json`, 'utf-8'),
           fs.readFile(`${ROOT}/${visualTestDirForFont}/custom-styles/expected/${testName}.json`, 'utf-8'),
           fs.readFile(`${ROOT}/${visualTestDirForFont}/comments/expected/${testName}.json`, 'utf-8'),
-          fs.readFile(`${ROOT}/${visualTestDirForFont}/char-progressions/expected/${testName}.json`, 'utf-8')
+          fs.readFile(`${ROOT}/${visualTestDirForFont}/char-progressions/expected/${testName}.json`, 'utf-8'),
+          fs.readFile(`${ROOT}/${visualTestDirForFont}/html-highlights-without-ref-ids/expected/${testName}.html`, 'utf-8'),
+          fs.readFile(`${ROOT}/${visualTestDirForFont}/char-progressions-without-ref-ids/expected/${testName}.json`, 'utf-8')
         ]
       )
 
@@ -248,6 +269,20 @@ async function runVisualTestForFont(visualTestDirForFont) {
         expectedStringifiedComments,
         `${red('failed')} for "${testName}" test`
       )
+      process.stdout.write(`"${testName}" ${green('passed')} for ${testType}\n`)
+      testType = 'html highlights without ref-ids'
+      assert.strictEqual(
+        htmlHighlightsWithoutRefIdsForAllPages,
+        expectedHtmlHighlightsWithoutRefIds,
+        `${red('Failed')} for "${testName}" test`
+      )
+      process.stdout.write(`"${testName}" ${green('passed')} for ${testType}\n`)
+      testType = 'char-progressions without ref-ids'
+      assert.strictEqual(
+        stringifiedMapOfCharIndexesWithoutRefIds,
+        expectedStringifiedMapOfCharIndexesWithoutRefIds,
+        `${red('Failed')} for "${testName}" test`
+      )
       process.stdout.write(`"${testName}" ${green('passed')} for ${testType}\n\n`)
       listOfPassedTests.push({
         name: testName
@@ -268,7 +303,9 @@ async function runVisualTestForFont(visualTestDirForFont) {
           fs.writeFile(`${ROOT}/${visualTestDirForFont}/errors/actual/${testName}.json`, stringifiedErrors),
           fs.writeFile(`${ROOT}/${visualTestDirForFont}/custom-styles/actual/${testName}.json`, stringifiedCustomStyles),
           fs.writeFile(`${ROOT}/${visualTestDirForFont}/comments/actual/${testName}.json`, stringifiedComments),
-          fs.writeFile(`${ROOT}/${visualTestDirForFont}/char-progressions/actual/${testName}.json`, stringifiedMapOfCharIndexesWithProgressionOfCommandsFromScenarios)
+          fs.writeFile(`${ROOT}/${visualTestDirForFont}/char-progressions/actual/${testName}.json`, stringifiedMapOfCharIndexesWithProgressionOfCommandsFromScenarios),
+          fs.writeFile(`${ROOT}/${visualTestDirForFont}/html-highlights-without-ref-ids/actual/${testName}.html`, htmlHighlightsWithoutRefIdsForAllPages),
+          fs.writeFile(`${ROOT}/${visualTestDirForFont}/char-progressions-without-ref-ids/actual/${testName}.json`, stringifiedMapOfCharIndexesWithoutRefIds)
         ]
       )
     }

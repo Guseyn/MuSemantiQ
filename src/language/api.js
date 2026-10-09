@@ -1,5 +1,21 @@
 import parseLanguage from '#msq/language/parser/parseLanguage.js'
 
+// The two highlighting flags as the parser's options: which scenarios run, and which adapters with them
+function parserOptions({ applyHighlighting, applyOnlyHighlightingWithoutRefIds, supportedFontNames }) {
+  const highlightsOnly = (applyHighlighting ?? true) && (applyOnlyHighlightingWithoutRefIds || false)
+  return {
+    runMain: !highlightsOnly,
+    adapterNames: highlightsOnly
+      ? [ 'highlight-without-ref-ids' ]
+      : ((applyHighlighting ?? true) ? [ 'highlight' ] : []),
+    fonts: supportedFontNames || {
+      'chord-letters': ['gentium plus', 'gothic a1'],
+      'music': ['bravura', 'leland'],
+      'text': ['noto-sans', 'noto-serif']
+    }
+  }
+}
+
 const NEW_LINE = '\n'
 
 /**
@@ -7,6 +23,7 @@ const NEW_LINE = '\n'
  *               2. generateIntermediateStructuresForSinglePage
  * ⟅━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━⟆
  * /
+
 /**
  * High-level convenience wrapper around the low-level `parseLanguage()` engine.
  * It prepares the MuSemantiQ text, invokes the parser with correct defaults, and
@@ -34,13 +51,14 @@ const NEW_LINE = '\n'
  *                   as a single highlight block
  *
  * @param {boolean} [params.applyOnlyHighlightingWithoutRefIds=false]
- *        Enables “highlight-only mode” from inside `parseLanguage()`:
+ *        Enables “highlight-only mode”: the parser runs the
+ *        `highlight-without-ref-ids` adapter instead of the main scenarios
+ *        (see src/language/parser/README.md):
  *
- *        - only `actionOnlyForHighlightingWithoutRefIds` of scenarios are run
  *        - NO reference IDs
  *        - NO pageSchema modifications
  *        - NO MIDI settings
- *        - NO command progression effects
+ *        - NO actions on changes of the progression of commands
  *
  *        This is perfect for editors or live preview UIs that want markup
  *        but not engraving/musical semantics.
@@ -164,13 +182,7 @@ export function generateIntermediateStructuresForSinglePage({
       pageText
     ),
     progressionOfCommandsFromScenarios || [],
-    applyHighlighting ?? true,
-    applyOnlyHighlightingWithoutRefIds || false,
-    supportedFontNames || {
-      'chord-letters': ['gentium plus', 'gothic a1'],
-      'music': ['bravura', 'leland'],
-      'text': ['noto-sans', 'noto-serif']
-    }
+    parserOptions({ applyHighlighting, applyOnlyHighlightingWithoutRefIds, supportedFontNames })
   )
   return {
     pageSchema,
