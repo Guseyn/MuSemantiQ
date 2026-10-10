@@ -2,6 +2,8 @@
 
 const QUARTER = 0.25
 const MAX_END_ANGLE = Math.PI * 50 / 180
+// each step halves the range of t, so 20 steps find x to about a millionth of the slur's width
+const BISECTION_STEPS = 40
 
 const cubic = (p0, p1, p2, p3, t) => {
   const u = 1 - t
@@ -12,7 +14,7 @@ const cubic = (p0, p1, p2, p3, t) => {
 const yAtX = (start, c1, c2, end, x) => {
   let low = 0
   let high = 1
-  for (let i = 0; i < 40; i++) {
+  for (let i = 0; i < BISECTION_STEPS; i++) {
     const middle = (low + high) / 2
     if (cubic(start.x, c1.x, c2.x, end.x, middle) < x) {
       low = middle
