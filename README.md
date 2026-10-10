@@ -1,4 +1,4 @@
-<img src="logo.png" height="200"></img>
+<img src="logo.png" width="300"></img>
 
 MuSemantiQ (MSQ) is a text language for music. You write music as plain text, and MSQ
 draws it as a score (SVG) and plays it (MIDI). It's plain JavaScript that runs in Node.js
