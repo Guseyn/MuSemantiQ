@@ -8,38 +8,35 @@ MuSemantiQ (MSQ) is a text language for music. You write music as plain text, an
 draws it as a score (SVG) and plays it (MIDI). It's plain JavaScript that runs in Node.js
 (22 or newer) and in the browser, with no build step and no runtime dependencies.
 
+The text below:
+
 ```text
+page line width is 300
+background color is white
+
 measure
 treble clef
-1/4 c d e f
+1/4 c d e f g a b c5 with stem down
 ```
+
+renders as:
+
+<img src="readme-score-1.svg" height="200"></img>
 
 ## What MSQ gives you
 
-- **The engine** (`src/api.js`). Fonts are set up once, then a page goes through these
-  steps: text → page schema → styles → SVG and MIDI.
-  - `setupFonts`
-  - `generateIntermediateStructuresForSinglePage` / `…ForMultiplePages`
-  - `generateStylesForSinglePage` / `…ForMultiplePages`
-  - `generateSvgForSinglePage` / `…ForMultiplePages`
-  - `generateMidiForSinglePage` / `…ForMultiplePages`
-
-  The MIDI comes with maps between the text and the playback time, so a player can show
-  which note is playing.
-- **The language alone** (`src/language/api.js`). It parses MSQ text without loading the
-  drawer, the fonts or MIDI. It gives you the page schema, errors, comments, custom
-  styles, MIDI settings and the editor's highlights. It also turns a parsed page back
-  into text (the serializer).
-- **The worker** (`src/worker.js`). The same API in a Web Worker, called with `postMessage`.
-- **Web components** (`web-components/`). Put MSQ text in a page and get a score, a
-  player or an editor: `msq-svg`, `msq-midi`, `msq-svg-midi`, `msq-editor` and
-  `msq-font-loader`. They only talk to the worker, so they work on any page.
-- **Showdown extensions** (`showdown-extensions/`). Write an `msq-…` fenced block in
-  markdown and it becomes a web component.
-- **Tools** (`tools/`).
-  - `smufl/` turns a SMuFL font into the JavaScript font tables the drawer uses.
-    Bravura and Leland are already done.
-  - `magenta/` makes a sound font from Magenta's samples.
+- **Low-Level API** (`src/api.js`): functions that turn MSQ text into SVG and MIDI.
+- **Worker** (`src/worker.js`): the same API in a Web Worker.
+- **Web Components** (`web-components/`): `msq-svg`, `msq-midi`, `msq-svg-midi` and
+  `msq-editor` show a score, a player or an editor for the MSQ text inside them.
+- **Showdown Extensions** (`showdown-extensions/`): turn `msq-…` fenced blocks in markdown
+  into web components.
+- **Dev tools** (`dev-tools/`):
+  - **Test viewer**: shows expected and actual output of every test side by side.
+  - **Font viewer**: shows every glyph of a music font.
+  - **Font generator**: makes JavaScript font tables from a SMuFL font.
+  - **Magenta sound font generator**: makes a sound font for the player.
+- **CLI** (`cli-app/`): makes SVG and MIDI files from MSQ text in the terminal.
 
 ## Where things are
 
@@ -134,40 +131,6 @@ npm run docs          # checks the examples, then https://127.0.0.1:8890
 
 See `docs/README.md`.
 
-## The documentation
-
-Every page is declared in `docs/web-app/static/js/docs/sitemap.js`. The text of each page
-is `docs/web-app/static/md/<section>/<page>.md`. The sections:
-
-1. **Getting started**
-2. **MSQ Language**: Notes on a Page, Grouping Notes, The Page, Marks on Units, Spans,
-   Measure Furniture, Layout and Styles, Operational, Reference
-3. **Low-Level API**
-4. **Worker**
-5. **Web Components**
-6. **Showdown Extensions**
-7. **With EHTML**
-8. **Example apps**: the browser app and the CLI
-9. **Tools, natively**
-10. **Dev tools**
-11. **Testing**
-12. **Reference**
-
-Examples in the pages are fenced blocks named after the element:
-
-````markdown
-```msq-editor opens-with=text
-measure
-treble clef
-1/4 c d e f
-```
-````
-
-`npm run docs:check` parses every example and checks two things: it has no errors, and it
-doesn't use a command before the page that introduces it (`docs/concepts.js` says which
-page introduces which command). So the examples go from simple to complex in the order of
-the sitemap.
-
 ## Tests
 
 The tests compare output with files saved in `expected/`:
@@ -214,7 +177,7 @@ npm run docs:api-example                    # remakes score.svg and score.mid th
 
 ## nodes, EHTML, e-ui and e-dev
 
-The apps use four small libraries by the same author, each with no dependencies and no
+The apps use four small libraries, each with no dependencies and no
 build step:
 
 - [nodes](https://github.com/Guseyn/nodes.js): the HTTP/2 server
@@ -230,15 +193,3 @@ They are copied into the apps, not installed:
 - The `*:vendor` and `*:update` scripts copy them from checkouts in folders beside this
   one (`../nodes.js`, `../EHTML`, `../e-ui`, `../e-pages`). They replace the copy each
   time, so fix a bug in the library itself, then copy it again.
-
-## Code style
-
-- ES modules, 2-space indent, no semicolons. Imports use the `#msq/…` and `#tools/…`
-  names from `package.json`, not relative paths.
-- One function per file, default-exported, and the file has the function's name. Names
-  start with a verb: `draw…` returns SVG elements, `calculate…` returns a number or points,
-  `find…` / `get…` pick something, `is…` returns a boolean. Tables and other data keep
-  noun names.
-- Comments say why, not what.
-- The output must be the same byte for byte on every run. That's why the fonts are always
-  loaded in the same order.
