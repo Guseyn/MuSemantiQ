@@ -28,30 +28,6 @@ export default function (markedSlur, slurLeftPoint, slurRightPoint, slurDirectio
   const { intervalBetweenStaveLines, leftMarginForConnectionsThatStartBefore } = styles
   const sign = slurDirection === 'up' ? -1 : +1
   const units = markedSlur.allSingleUnitsOnTheWay
-  const firstUnit = units[0]
-  const lastUnit = units[units.length - 1]
-
-  const isHeadSide = (unit) => unit.stemless || !unit.stemDirection || (unit.stemDirection === 'up') !== (sign < 0)
-  const outerHead = (unit) => {
-    const heads = unit.notesWithCoordinates || []
-    if (heads.length === 0) {
-      return null
-    }
-    return heads.reduce((outer, head) => (sign > 0 ? head.bottom > outer.bottom : head.top < outer.top) ? head : outer)
-  }
-  const attachToHead = (point, head) => {
-    if (!head) {
-      return
-    }
-    point.x = (head.left + head.right) / 2
-    point.y = (sign < 0 ? head.top : head.bottom) + sign * styles.slurJunctionPointForSingleUnitYOffset
-  }
-  if (isHeadSide(firstUnit)) {
-    attachToHead(slurLeftPoint, outerHead(firstUnit))
-  }
-  if (markedSlur.rightPlacement !== 'middleStem' && isHeadSide(lastUnit)) {
-    attachToHead(slurRightPoint, outerHead(lastUnit))
-  }
 
   if (extendedFromLeftSide) {
     slurLeftPoint.x = markedSlur.voicesBodyThatSlurStartsBefore.left + leftMarginForConnectionsThatStartBefore

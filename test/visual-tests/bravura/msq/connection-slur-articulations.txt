@@ -1,0 +1,24 @@
+comment: "
+  A slur that starts or finishes at a note with an articulation on the same
+  side goes from beyond the articulation, not from the note head.
+"
+
+measure
+treble clef
+1/4 c with stem up, with staccato down
+1/4 d
+1/4 e
+1/4 f with stem up, with accent down
+measure
+1/4 c5 with stem down, with tenuto up
+1/4 b
+1/4 a
+1/4 g with stem down, with staccato up
+
+slur in first measure
+starts below first unit
+finishes below fourth unit
+
+slur in second measure
+starts above first unit
+finishes above fourth unit
