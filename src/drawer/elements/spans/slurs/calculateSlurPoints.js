@@ -2,6 +2,8 @@
 
 const QUARTER = 0.25
 const MAX_END_ANGLE = Math.PI * 50 / 180
+// each step halves the range of t, so 20 steps find x to about a millionth of the slur's width
+const BISECTION_STEPS = 40
 
 const cubic = (p0, p1, p2, p3, t) => {
   const u = 1 - t
@@ -12,7 +14,7 @@ const cubic = (p0, p1, p2, p3, t) => {
 const yAtX = (start, c1, c2, end, x) => {
   let low = 0
   let high = 1
-  for (let i = 0; i < 40; i++) {
+  for (let i = 0; i < BISECTION_STEPS; i++) {
     const middle = (low + high) / 2
     if (cubic(start.x, c1.x, c2.x, end.x, middle) < x) {
       low = middle
@@ -28,30 +30,6 @@ export default function (markedSlur, slurLeftPoint, slurRightPoint, slurDirectio
   const { intervalBetweenStaveLines, leftMarginForConnectionsThatStartBefore } = styles
   const sign = slurDirection === 'up' ? -1 : +1
   const units = markedSlur.allSingleUnitsOnTheWay
-  const firstUnit = units[0]
-  const lastUnit = units[units.length - 1]
-
-  const isHeadSide = (unit) => unit.stemless || !unit.stemDirection || (unit.stemDirection === 'up') !== (sign < 0)
-  const outerHead = (unit) => {
-    const heads = unit.notesWithCoordinates || []
-    if (heads.length === 0) {
-      return null
-    }
-    return heads.reduce((outer, head) => (sign > 0 ? head.bottom > outer.bottom : head.top < outer.top) ? head : outer)
-  }
-  const attachToHead = (point, head) => {
-    if (!head) {
-      return
-    }
-    point.x = (head.left + head.right) / 2
-    point.y = (sign < 0 ? head.top : head.bottom) + sign * styles.slurJunctionPointForSingleUnitYOffset
-  }
-  if (isHeadSide(firstUnit)) {
-    attachToHead(slurLeftPoint, outerHead(firstUnit))
-  }
-  if (markedSlur.rightPlacement !== 'middleStem' && isHeadSide(lastUnit)) {
-    attachToHead(slurRightPoint, outerHead(lastUnit))
-  }
 
   if (extendedFromLeftSide) {
     slurLeftPoint.x = markedSlur.voicesBodyThatSlurStartsBefore.left + leftMarginForConnectionsThatStartBefore

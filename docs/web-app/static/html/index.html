@@ -9,13 +9,7 @@
       content="MuSemantiQ is a toolkit for writing sheet music with words. It engraves what you write as an SVG score and plays it back, the same way every time."
     >
     <meta name="color-scheme" content="light">
-
-    <!--
-      No e-ui here. It is a design system for tools — the dev tools and the
-      documentation use it — and this page is neither. Its tokens are its own.
-    -->
     <link rel="stylesheet" href="/css/landing.css">
-
     <script type="importmap">
       {
         "imports": {
@@ -28,13 +22,7 @@
       }
     </script>
     <script type="module">
-      /*
-      EHTML's polyfill first. The msq elements carry their own and skip it when
-      one has already run, but EHTML's has no such guard, so if the msq copy
-      ran first, EHTML's would wrap customElements.define a second time in
-      Safari.
-      */
-      import '#ehtml/third-party/custom-elements-polyfill.js'
+      import '#ehtml/main'
 
       import '#msq/web-components/msq-font-loader-template.js'
       import '#msq/web-components/msq-svg-template.js'
@@ -42,19 +30,6 @@
       import '#msq/web-components/msq-svg-midi-template.js'
       import '#msq/web-components/msq-editor-template.js'
 
-      /*
-      EHTML is here for e-markdown alone: the code on this page is markdown in
-      md/landing/, so it is written the way it reads and comes out highlighted.
-      The extension is a global because e-markdown takes it through
-      data-internal-state, which is evaluated as an expression. Those
-      e-markdowns are inside the font loader, so they are not activated until
-      long after this has run.
-      */
-      /*
-      The page's own movement: screens that cross-fade and rise into place,
-      the rail, the engraved phrase, the carousels and the pipeline diagram.
-      Each is an element of its own, declared in js/landing/.
-      */
       import '/js/landing/landing-screen.js'
       import '/js/landing/landing-rail.js'
       import '/js/landing/landing-phrase.js'
@@ -67,9 +42,7 @@
       import '#docs/copy-code.js'
 
       import showdownHighlight from '#ehtml/showdown/extensions/highlight.js'
-      // ```msq-* fences in markdown become the elements (the toolkit's showdown example)
       import msqExtensions from '/js/showdown-extensions/msqExtensions.js'
-      import '#ehtml/main'
 
       window.showdownHighlight = showdownHighlight
       window.msqExtensions = msqExtensions
@@ -81,7 +54,7 @@
     <nav is="landing-rail" data-rail aria-label="Sections"></nav>
 
     <!-- ── 01 ─────────────────────────────────────────────────────────── -->
-    <section is="landing-screen" data-screen id="start" data-number="01" data-label="Start">
+    <section is="landing-screen" data-screen id="start" data-number="00" data-label="Start">
       <div data-inner data-hero>
         <a href="/" data-logo aria-label="MuSemantiQ" data-reveal></a>
 
@@ -89,13 +62,6 @@
           Sheet music,<br>written with words
         </h1>
 
-        <!--
-          A real engraved phrase, drawn by the engine from eight words of MSQ
-          and animated into place: the stave rules itself, then the notes
-          arrive, then the beams join them. A page about writing music with
-          words should not be decorated with a picture of music, so this is
-          not one — see scripts/generate-landing-art.js. Drawn by landing-phrase.
-        -->
         <div is="landing-phrase" data-stave data-phrase aria-hidden="true">
           <e-svg data-src="/images/phrase.svg"></e-svg>
         </div>
@@ -151,6 +117,7 @@
                 data-font-sources="msqFontSources"
                 data-editor-height="240px"
               >
+                background color is white
                 page top padding is 5
                 page lines top offset is 18
                 interval between staves is 14.5
@@ -217,7 +184,7 @@
 
                 slur in first measure from first chord to 6th chord
                 with right point 0.5 up
-                with roundness 3
+                with roundness 4
 
                 measure
                 tempo mark is "Presto con fuoco" 2 down
@@ -260,7 +227,7 @@
                 f2 stem up
 
                 slur in second measure from first unit and finishes after 16th unit
-                with roundness 1
+                with roundness 4
 
                 crescendo in second measure from first unit to 16th unit below stave 2 down
 
@@ -280,25 +247,10 @@
         <section is="landing-screen" data-screen id="features" data-number="03" data-label="What you get">
           <div data-inner data-wide>
             <h2 data-reveal>What you get</h2>
-
-            <!--
-              One feature at a time, with the next one just showing at the edge so
-              it is clear there is more. The row is the thing that scrolls; the
-              buttons move it by exactly one card, and the edges are masked so a
-              card leaves by fading rather than by being cut off.
-
-              Each drawing says what its card is about in the page's own hairline
-              vocabulary, in a tone of its own (data-tone, see landing.css).
-            -->
             <div is="landing-carousel" data-carousel data-reveal style="--d: 80ms">
               <div data-carousel-viewport>
                 <ul data-cards>
                   <li data-card>
-                    <!--
-                      Deterministic: the four-point spark that has come to mean
-                      "generated", struck through. It reads at a glance, which a
-                      little diagram of a neural net does not.
-                    -->
                     <svg data-art data-tone="crimson" viewBox="0 0 64 64" aria-hidden="true">
                       <path data-fill d="M32 13l4.5 14.5L51 32l-14.5 4.5L32 51l-4.5-14.5L13 32l14.5-4.5z"/>
                       <path d="M13 51L51 13"/>
@@ -317,7 +269,6 @@
                   </li>
 
                   <li data-card>
-                    <!-- Free: a lock standing open. -->
                     <svg data-art data-tone="green" viewBox="0 0 64 64" aria-hidden="true">
                       <rect data-fill x="14" y="30" width="36" height="24" rx="2"/>
                       <path d="M24 30v-8a8 8 0 0 1 16 0"/>
@@ -369,13 +320,6 @@
                   </li>
 
                   <li data-card>
-                    <!--
-                      Extendable: three blocks and a dashed slot for the next.
-                      The view box is cropped to the drawing (x 10–46, y 22–58,
-                      and room for the stroke), so it fills its tile. Cropping
-                      also magnifies the lines, so they are drawn thinner to
-                      weigh the same as the other icons'.
-                    -->
                     <svg data-art data-tone="teal" viewBox="8 20 40 40" style="stroke-width: 1.75" aria-hidden="true">
                       <rect data-fill x="10" y="22" width="16" height="16"/>
                       <rect data-fill x="30" y="22" width="16" height="16"/>
@@ -404,7 +348,6 @@
                   </li>
 
                   <li data-card>
-                    <!-- Customizable: every knob is a written command. -->
                     <svg data-art data-tone="violet" viewBox="0 0 64 64" aria-hidden="true">
                       <path d="M12 22h40M12 32h40M12 42h40"/>
                       <circle data-solid cx="24" cy="22" r="4"/>
@@ -432,12 +375,6 @@
                   </li>
 
                   <li data-card>
-                    <!--
-                      Navigable: words on the left, a note on the right, and
-                      under both an arrow across the whole width, pointing both
-                      ways. Cropped to the drawing like Extendable, with thinner
-                      lines to match.
-                    -->
                     <svg data-art data-tone="amber" viewBox="6 12 48 48" style="stroke-width: 2" aria-hidden="true">
                       <path d="M8 22h16M8 28h12M8 34h16M8 40h10"/>
                       <ellipse data-solid cx="46" cy="40" rx="6" ry="4.5" transform="rotate(-20 46 40)"/>
@@ -473,15 +410,6 @@
             <p data-reveal style="--d: 60ms">
               One small page, all the way through. Pick a step to see what the engine really makes of it.
             </p>
-
-            <!--
-              The stage icons are Google's Material Symbols (Apache License 2.0).
-
-              The pipeline down the left, and on the right what each step really
-              makes of one small example: every structure, style and output is
-              the engine's own, written by scripts/generate-landing-pipeline.js
-              (npm run docs:pipeline). Nothing here is drawn by hand.
-            -->
             <div is="landing-flow" data-flow-layout>
               <ol data-flow aria-label="The pipeline">
                 <li data-stage="words">
@@ -551,7 +479,11 @@
                     <div data-code data-artifact>
                       <e-markdown
                         data-src="/md/landing/pipeline/words.md"
-                        data-internal-state="${{ extensions: [ showdownHighlight({ auto_detection: false }) ] }}"
+                        data-internal-state="${{
+                          extensions: [
+                            showdownHighlight({ auto_detection: false })
+                          ]
+                        }}"
                       ></e-markdown>
                     </div>
                 </div>
@@ -676,11 +608,6 @@
               The same engine, wherever you need it: in Node, in a browser worker, as elements in a page, in markdown, and on the command line.
             </p>
 
-            <!--
-              One part of the toolkit at a time (landing-tabs). Each shows its
-              code, and where the result can run on this page, it runs: the web
-              components and the markdown beside them are real, not pictures.
-            -->
             <div is="landing-tabs" data-tabs data-reveal style="--d: 120ms">
               <div data-tab-list aria-label="The toolkit">
                 <button type="button" data-tab="api">Low-level API</button>
@@ -1006,6 +933,5 @@
 
       </main>
     </template>
-
   </body>
 </html>
