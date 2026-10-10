@@ -1,7 +1,7 @@
 <img src="logo.png" width="300"></img>
 
-MuSemantiQ (MSQ) is a text language for music. You write music as plain text, and MSQ
-draws it as a score (SVG) and plays it (MIDI). It's plain JavaScript that runs in Node.js
+**M**u**S**emanti**Q** (**MSQ**) is a text language for music. You write music as plain text, and MSQ
+draws it as a score (**SVG**) and plays it (**MIDI**). It's plain JavaScript that runs in Node.js
 (22 or newer) and in the browser, with no build step and no runtime dependencies.
 
 The text below:
