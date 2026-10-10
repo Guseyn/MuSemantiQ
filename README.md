@@ -1,7 +1,3 @@
-# MuSemantiQ
-
-The Semantic Music Engine
-
 <img src="logo.png" height="200"></img>
 
 MuSemantiQ (MSQ) is a text language for music. You write music as plain text, and MSQ
