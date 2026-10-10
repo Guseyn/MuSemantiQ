@@ -20,6 +20,7 @@
     "coverage": "c8 npm run test:all",
     "coverage:report": "c8 report --reporter=html",
     "coverage:check": "c8 check-coverage --statements 87 --branches 86 --functions 82 --lines 87",
+    "release": "node scripts/gh-release.js",
 
     "ehtml:update": "rsync -a --delete ../EHTML/src/ browser-app/web-app/static/js/ehtml",
     "nodes:update": "rsync -a --delete ../nodes.js/nodes/ browser-app/nodes/",
