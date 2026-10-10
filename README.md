@@ -15,7 +15,7 @@ treble clef
 1/4 c d e f g a b c5 with stem down
 ```
 
-renders as:
+rendered as:
 
 <img src="readme-score-1.svg" height="200"></img>
 
