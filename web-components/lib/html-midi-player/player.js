@@ -85,6 +85,7 @@ export class PlayerElement extends HTMLElement {
     this.ns = null
     this._playing = false
     this.seeking = false
+    this.manuallyStopped = false
   }
 
   connectedCallback() {
@@ -119,6 +120,21 @@ export class PlayerElement extends HTMLElement {
         }
       }
       this.seeking = false
+    })
+
+    // The whole player is focusable, and SPACE toggles play/pause while it has
+    // focus (the play button keeps its own native SPACE/Enter behaviour).
+    this.tabIndex = 0
+    this.addEventListener('keydown', (event) => {
+      if (event.key !== ' ' || event.composedPath()[0] !== this) {
+        return
+      }
+      event.preventDefault()
+      if (this.playing) {
+        this.stop()
+      } else {
+        this.start()
+      }
     })
 
     this.initPlayerNow()
@@ -231,6 +247,7 @@ export class PlayerElement extends HTMLElement {
           this.controlPanel.dataset.state = 'playing'
           this.playButton.setAttribute('aria-label', 'Stop')
           try {
+            this.manuallyStopped = false
             const promise = this.player.start(this.ns, undefined, offset)
             if (!looped) {
               this.dispatchEvent(new CustomEvent('start'))
@@ -238,7 +255,7 @@ export class PlayerElement extends HTMLElement {
               this.dispatchEvent(new CustomEvent('loop'))
             }
             await promise
-            this.handleStop(true)
+            this.handleStop(!this.manuallyStopped)
           } catch (error) {
             this.handleStop()
             throw error
@@ -252,6 +269,7 @@ export class PlayerElement extends HTMLElement {
   }
 
   stop() {
+    this.manuallyStopped = true
     if (this.player && this.player.isPlaying()) {
       this.player.stop()
     }

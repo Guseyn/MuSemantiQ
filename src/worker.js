@@ -7,7 +7,10 @@ import {
   generateIntermediateStructuresForSinglePage,
   generateStylesForSinglePage,
   generateSvgForSinglePage,
-  generateMidiForSinglePage
+  generateMidiForSinglePage,
+  generateIntermediateStructuresForMultiplePages,
+  generateStylesForMultiplePages,
+  generateMidiForMultiplePages
 } from '#msq/api.js'
 
 import { convertUint8ToBase64 } from '#msq/utils.js'
@@ -446,6 +449,103 @@ const eventHandlers = {
       errors
     })
     return
+  },
+  /*
+  Every page of a document at once, for an editor with pages. Each page gets
+  its own score and its own MIDI, so the player under a page highlights that
+  page's notes, and the document gets one MIDI with all pages, played without
+  a break between them.
+  */
+  'pages.svg.midi.text.generate': (event) => {
+    const id = event.data.id
+    if (!id) {
+      self.postMessage({
+        id,
+        error: 'No id provided'
+      })
+      return
+    }
+    const fontSourcesReference = event.data.fontSourcesReference
+    if (!fontSourcesReference) {
+      self.postMessage({
+        id,
+        error: 'No fontSourcesReference provided'
+      })
+      return
+    }
+    if (!self['__UNILANG_FONT_SOURCES_STORAGE__'][fontSourcesReference]) {
+      self.postMessage({
+        id,
+        error: `Font sources cannot be found by reference (${fontSourcesReference})`
+      })
+      return
+    }
+    const supportedFontSources = self['__UNILANG_FONT_SOURCES_STORAGE__'][fontSourcesReference]
+    const supportedFontNames = supportedFontNamesFrom(supportedFontSources)
+    const pagesText = event.data.pagesText
+    if (!Array.isArray(pagesText) || pagesText.length === 0) {
+      self.postMessage({
+        id,
+        error: 'No pagesText provided'
+      })
+      return
+    }
+    const {
+      pageSchemaForEachPage,
+      htmlHighlightsForEachPage,
+      errorsForEachPage,
+      customStylesForEachPage,
+      midiSettingsForEachPage
+    } = generateIntermediateStructuresForMultiplePages({
+      multiplePagesText: pagesText,
+      applyHighlighting: true,
+      applyOnlyHighlightingWithoutRefIds: false,
+      supportedFontNames
+    })
+    const invalidPageIndex = pageSchemaForEachPage.findIndex(pageSchema => !isPageSchemaValid(pageSchema))
+    if (invalidPageIndex !== -1) {
+      self.postMessage({
+        id,
+        error: `Page schema of page ${invalidPageIndex + 1} is not valid`
+      })
+      return
+    }
+    const pageStylesForEachPage = generateStylesForMultiplePages({
+      customStylesForEachPage,
+      supportedFontSources
+    })
+    const pages = pageSchemaForEachPage.map((pageSchema, pageIndex) => {
+      const svg = generateSvgForSinglePage({
+        pageSchema,
+        pageStyles: pageStylesForEachPage[pageIndex]
+      })
+      const midi = generateMidiForSinglePage({
+        pageSchema,
+        midiSettings: midiSettingsForEachPage[pageIndex]
+      })
+      return {
+        svg,
+        svgDataSrc: `data:image/svg+xml;base64,${convertUint8ToBase64(new TextEncoder().encode(svg))}`,
+        midiDataSrc: `data:audio/mpeg;base64,${convertUint8ToBase64(midi.data)}`,
+        timeStampsMappedWithRefsOn: midi.timeStampsMappedWithRefsOn,
+        refsOnMappedWithTimeStamps: midi.refsOnMappedWithTimeStamps,
+        customStyles: customStylesForEachPage[pageIndex],
+        highlightsHtmlBuffer: htmlHighlightsForEachPage[pageIndex],
+        errors: errorsForEachPage[pageIndex]
+      }
+    })
+    const midiForAllPages = generateMidiForMultiplePages({
+      pageSchemaForEachPage,
+      midiSettingsForEachPage
+    })
+    self.postMessage({
+      status: 'ok',
+      id,
+      pages,
+      midiDataSrcForAllPages: `data:audio/mpeg;base64,${convertUint8ToBase64(midiForAllPages.data)}`,
+      timeStampsMappedWithRefsOn: midiForAllPages.timeStampsMappedWithRefsOn,
+      refsOnMappedWithTimeStamps: midiForAllPages.refsOnMappedWithTimeStamps
+    })
   }
 }
 

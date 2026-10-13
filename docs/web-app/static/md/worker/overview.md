@@ -39,7 +39,7 @@ flowchart LR
   %% each message is named in the gap before the worker: a plain line into its name, an arrow out of it
   fontsSetup["fonts.setup"]
   %% every message that turns MSQ text into a score: SVG, MIDI, both, or both and the highlighted text
-  generate["svg.generate<br>midi.generate<br>svg.midi.generate<br>svg.midi.text.generate"]
+  generate["svg.generate<br>midi.generate<br>svg.midi.generate<br>svg.midi.text.generate<br>pages.svg.midi.text.generate"]
   fontConfig e1@--- fontsSetup
   fontsSetup e2@--> supportedFontSources
   pageText e3@--- generate
@@ -406,7 +406,45 @@ Everything the `svg.midi.generate` message does, plus the source text highlighte
 
 </details>
 
-### 6. glyph.trace
+### 6. pages.svg.midi.text.generate
+
+```js
+worker.postMessage({ id, name: 'pages.svg.midi.text.generate', fontSourcesReference, pagesText })
+```
+
+<details is="e-details">
+<summary>Purpose</summary>
+
+The same as the `svg.midi.text.generate` message, but for all pages of a document at once. Each page gets its own score and its own MIDI, and the document also gets one MIDI with all pages, played one after another. An editor with pages sends this.
+
+</details>
+
+<details is="e-details">
+<summary>Fields</summary>
+
+`fontSourcesReference`: the name a `fonts.setup` message registered the fonts under.
+
+```js
+'myFonts'
+```
+
+`pagesText`: the MSQ text of each page, in order.
+
+```js
+[ 'measure\ntreble clef\nc d e f', 'measure\ntreble clef\ng a b c5' ]
+```
+
+</details>
+
+<details is="e-details">
+<summary>Reply</summary>
+
+- `pages`: one object per page, with the same fields as the reply to the `svg.midi.text.generate` message.
+- `midiDataSrcForAllPages`: one MIDI file with all pages, as a base64 data URL.
+
+</details>
+
+### 7. glyph.trace
 
 ```js
 worker.postMessage({ id, name: 'glyph.trace', fontSourcesReference, musicFontName, characters, musicFontSourceSize, intervalBetweenStaveLines })

@@ -40,7 +40,11 @@ export default (divUnderneathTextarea, textarea, renderPreviewTabButton) => {
           const refElementInSVGPlaceholder = refElementsInSvgPlaceholderWithSpecifiedRefId[refElementIndex]
           const refRectHoveringRefElement = createdRefRectHoveringRefElement(refElementInSVGPlaceholder, svgElement, 'ref-rect-hover', 'ref-rect-hover-from-editor')
           svgElement.appendChild(refRectHoveringRefElement)
-          // refRectHoveringRefElement.scrollIntoView({ block: 'center', inline: 'center' })
+          // The score view opens after the tab switch settles, so scroll on the
+          // next frame; 'nearest' only scrolls when the mark is out of view.
+          requestAnimationFrame(() => {
+            refRectHoveringRefElement.scrollIntoView({ block: 'nearest', inline: 'nearest' })
+          })
           setTimeout(() => {
             if (svgElement.contains(refRectHoveringRefElement)) {
               svgElement.removeChild(refRectHoveringRefElement)

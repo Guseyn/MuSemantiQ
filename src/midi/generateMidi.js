@@ -68,7 +68,13 @@ const REGEXP_WITH_QUOTES = /^"|"$/g
 
 export default function (pageSchema, midiSettingsForEachPage = []) {
   if (!pageSchema.measuresParams) {
-    return Buffer.alloc(0)
+    // a page with no measures plays nothing; keep the reply the same shape as a
+    // real one, so callers read `midi.data` and the timing maps without a branch
+    return {
+      data: itIsBrowserEnv ? [] : Buffer.alloc(0),
+      timeStampsMappedWithRefsOn: {},
+      refsOnMappedWithTimeStamps: {}
+    }
   }
 
   pageSchema = clone(pageSchema)

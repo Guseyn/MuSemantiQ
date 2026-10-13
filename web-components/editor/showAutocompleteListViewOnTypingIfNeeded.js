@@ -122,27 +122,82 @@ const MARGIN_ABOVE = 2.5
 const MARGIN_BELOW = 4
 const LEAST_ROOM = 96
 
+/*
+Where a line really is, measured rather than multiplied.
+
+The computed line-height is not always the pitch the lines are laid out at.
+WebKit, which is what the desktop app runs in, sets lines at a whole number of
+pixels: a line-height of 1.4em at 13px reads back as 18.2px but is drawn at 18.
+Multiplied by the line number that error grows down the text, so far enough in
+the list was opening tens of pixels below the word, and on top of it when it
+flipped above. Chromium keeps the fraction, which is why it never showed there.
+
+So the lines up to the caret's are laid out in a hidden block with the same
+font and line-height, and its height says where the caret's line ends.
+*/
+function offsetsOfLineInTextarea(textarea, lineNumber) {
+  let probe = textarea.lineOffsetProbe
+  if (!probe) {
+    probe = document.createElement('div')
+    probe.setAttribute('aria-hidden', 'true')
+    Object.assign(probe.style, {
+      position: 'fixed',
+      top: '0',
+      left: '-10000px',
+      visibility: 'hidden',
+      pointerEvents: 'none',
+      whiteSpace: 'pre',
+      margin: '0',
+      padding: '0',
+      border: 'none'
+    })
+    textarea.getRootNode().appendChild(probe)
+    textarea.lineOffsetProbe = probe
+  }
+  // Longhands rather than `font`: WebKit can read the shorthand back empty.
+  const textareaComputedStyle = window.getComputedStyle(textarea)
+  for (const property of [ 'fontFamily', 'fontSize', 'fontWeight', 'fontStyle', 'letterSpacing', 'lineHeight' ]) {
+    probe.style[property] = textareaComputedStyle[property]
+  }
+  probe.textContent = 'x\n'.repeat(lineNumber) + 'x'
+  const bottom = probe.getBoundingClientRect().height
+  return { top: bottom * lineNumber / (lineNumber + 1), bottom }
+}
+
 function positionAutocompleteListViewAtCaret(autocompleteListView, textarea, lineNumberWhereCaretIsOn, widthOfTextBeforeTheWord) {
   const textareaBox = textarea.getBoundingClientRect()
-  const textareaComputedStyle = window.getComputedStyle(textarea)
-  const lineHeight = textareaComputedStyle.getPropertyValue('line-height').split('px')[0] * 1
+  const offsetsOfTheLine = offsetsOfLineInTextarea(textarea, lineNumberWhereCaretIsOn)
 
   /* To change this value, you also need to change value padding-left of div[data-autocomplete] div[data-option] in css/editor.js */
   const distanceToMoveAutocompleteListViewSoWeCanAddPaddingToItAndTheTextWouldAlignCorrectly = 10
 
   // The caret's line, in the viewport: the textarea scrolls under a fixed box.
-  const topOfTheLine = textareaBox.top + lineHeight * lineNumberWhereCaretIsOn - textarea.scrollTop
-  const bottomOfTheLine = topOfTheLine + lineHeight
+  const topOfTheLine = textareaBox.top + offsetsOfTheLine.top - textarea.scrollTop
+  const bottomOfTheLine = textareaBox.top + offsetsOfTheLine.bottom - textarea.scrollTop
 
   const roomBelow = window.innerHeight - bottomOfTheLine - MARGIN_ABOVE
   const roomAbove = topOfTheLine - MARGIN_BELOW
 
   /*
-  Below the word by preference — that is where the eye already is — and above it
-  when there is neither enough room below nor as much of it as there is above.
+  How tall the list wants to be: as many options as it has, up to the cap in
+  css/editor.js. The height left over from the last word is let go first, or a
+  list squeezed once would measure squeezed for good.
   */
-  const goesBelow = roomBelow >= LEAST_ROOM || roomBelow >= roomAbove
-  autocompleteListView.style.maxHeight = `${Math.max(LEAST_ROOM, Math.floor(goesBelow ? roomBelow : roomAbove))}px`
+  autocompleteListView.style.maxHeight = ''
+  const wantedHeight = autocompleteListView.getBoundingClientRect().height
+
+  /*
+  Below the word by preference — that is where the eye already is. Above it when
+  the whole list fits there and not below. When it fits on neither side, on the
+  side with more room, cut to that room.
+  */
+  const fitsBelow = roomBelow >= wantedHeight
+  const fitsAbove = roomAbove >= wantedHeight
+  const goesBelow = fitsBelow || (!fitsAbove && roomBelow >= roomAbove)
+  const room = goesBelow ? roomBelow : roomAbove
+  if (room < wantedHeight) {
+    autocompleteListView.style.maxHeight = `${Math.max(LEAST_ROOM, Math.floor(room))}px`
+  }
 
   const height = autocompleteListView.getBoundingClientRect().height
   autocompleteListView.style.top = goesBelow

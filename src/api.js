@@ -1229,7 +1229,7 @@ export function generateMidiForMultiplePages({
   const measureParamsForAllPages = []
   pageSchemaForEachPage.forEach(pageSchema => {
     measureParamsForAllPages.push(
-      ...pageSchema.measuresParams
+      ...(pageSchema.measuresParams || [])
     )
   })
   return generateMidi(
