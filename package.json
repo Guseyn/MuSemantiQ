@@ -1,6 +1,6 @@
 {
   "name": "MuSemantiQ",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "MuSemantiQ",
   "main": "index.js",
   "type": "module",
