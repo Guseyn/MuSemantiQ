@@ -88,6 +88,10 @@ class MuSemantiQEditor extends MSQTemplateElement {
               <span>Colour the source</span>
             </label>
             <label>
+              <input type="number" data-setting="font-size" min="8" max="72" step="1">
+              <span>Editor font size (px)</span>
+            </label>
+            <label>
               <input type="color" data-setting="played-colour">
               <span>Colour of a note as it sounds</span>
             </label>
@@ -341,6 +345,7 @@ class MuSemantiQEditor extends MSQTemplateElement {
     const at = (name) => this.settingsContainer.querySelector(`[data-setting="${name}"]`)
     at('autocomplete').checked = !this.editor.textarea.autocompleteIsOff
     at('highlighting').checked = !this.editor.divUnderneathTextarea.highlightingIsOff
+    at('font-size').value = this.#editorFontSizePx()
     at('played-colour').value = this.#playedColour()
     at('reference-colour').value =
       getComputedStyle(this.host).getPropertyValue('--navigation-highlight-color').trim() || '#f5cd79'
@@ -349,6 +354,12 @@ class MuSemantiQEditor extends MSQTemplateElement {
 
   #playedColour() {
     return this.getAttribute('data-highlight-color') || '#C40233'
+  }
+
+  #editorFontSizePx() {
+    const fontSize = getComputedStyle(this.editor.textarea).fontSize
+    const px = parseFloat(fontSize)
+    return Number.isFinite(px) ? Math.round(px) : 16
   }
 
   #wireSettings() {
@@ -365,6 +376,19 @@ class MuSemantiQEditor extends MSQTemplateElement {
         this.editor.divUnderneathTextarea,
         parsedHighlights(this.editor.textarea.value, [], this.editor.textarea.supportedFontNames).html
       )
+    })
+
+    at('font-size').addEventListener('change', (event) => {
+      const px = Number.parseInt(event.target.value, 10)
+      if (!Number.isFinite(px) || px < 1) {
+        return
+      }
+      // The textarea, the highlight layer underneath it, the line-number gutter
+      // and the autocomplete list all take their size from the same property, so
+      // setting it once keeps them lined up.
+      this.host.style.setProperty('--editor-font-size', `${px}px`)
+      // The gutter is as wide as the numbers it holds, so re-measure the editor.
+      this.editor.adjustForScreen()
     })
 
     at('played-colour').addEventListener('change', (event) => {

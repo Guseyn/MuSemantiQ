@@ -67,7 +67,8 @@ export default /*css*/`
     cursor: pointer;
   }
   div[data-settings-container] label:has(input[type="checkbox"]),
-  div[data-settings-container] label:has(input[type="color"]) {
+  div[data-settings-container] label:has(input[type="color"]),
+  div[data-settings-container] label:has(input[type="number"]) {
     flex-direction: row;
     align-items: center;
     gap: 0.7em;
@@ -86,6 +87,17 @@ export default /*css*/`
     width: 100%;
     box-sizing: border-box;
     padding: 0.55em 0.7em;
+    font: inherit;
+    color: inherit;
+    background: var(--surface-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 0.4em;
+  }
+  div[data-settings-container] input[type="number"] {
+    flex: none;
+    width: 4.5em;
+    box-sizing: border-box;
+    padding: 0.45em 0.6em;
     font: inherit;
     color: inherit;
     background: var(--surface-bg);
