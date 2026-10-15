@@ -490,6 +490,12 @@ const eventHandlers = {
       })
       return
     }
+    // Parallel to pagesText: true where the page's score is already up to date
+    // with its text, so its SVG and per-page MIDI can be skipped. Defaults to
+    // all false so callers that don't send it still get every page generated.
+    const isRenderedForEachPage = Array.isArray(event.data.isRenderedForEachPage)
+      ? event.data.isRenderedForEachPage
+      : pagesText.map(() => false)
     const {
       pageSchemaForEachPage,
       htmlHighlightsForEachPage,
@@ -514,7 +520,13 @@ const eventHandlers = {
       customStylesForEachPage,
       supportedFontSources
     })
+    // The page schemas above are needed for the combined MIDI regardless. But a
+    // page that is already rendered keeps its existing score, so only generate
+    // the SVG and per-page MIDI for pages that actually changed.
     const pages = pageSchemaForEachPage.map((pageSchema, pageIndex) => {
+      if (isRenderedForEachPage[pageIndex]) {
+        return null
+      }
       const svg = generateSvgForSinglePage({
         pageSchema,
         pageStyles: pageStylesForEachPage[pageIndex]
