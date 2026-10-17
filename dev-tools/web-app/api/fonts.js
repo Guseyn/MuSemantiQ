@@ -80,7 +80,7 @@ async function musicFonts() {
     return {
       name,
       file,
-      url: `/font/music/${file}`,
+      url: `/js/msq/worker/drawer/font/music/${file}`,
       js: traced.has(name) ? `/js/msq/worker/drawer/font/music-js/${name}.js` : null,
       usable: traced.has(name),
       says: traced.has(name) ? `traced into ${name}.js` : 'not traced yet'
@@ -131,8 +131,8 @@ async function textFonts() {
       regular: family.regular,
       bold: family.bold || family.regular,
       url: {
-        regular: `/font/text/${family.regular || family.bold}`,
-        bold: `/font/text/${family.bold || family.regular}`
+        regular: `/js/msq/worker/drawer/font/text/${family.regular || family.bold}`,
+        bold: `/js/msq/worker/drawer/font/text/${family.bold || family.regular}`
       },
       usable: !!(family.regular || family.bold),
       boldStandsIn: standingIn,
@@ -148,7 +148,7 @@ async function chordLetterFonts() {
   return (await listed(FAMILIES['chord-letters'].directory, '.ttf')).map((file) => ({
     name: chordNameOf(file),
     file,
-    url: `/font/chord-letters/${file}`,
+    url: `/js/msq/worker/drawer/font/chord-letters/${file}`,
     usable: true,
     says: file
   })).sort((one, other) => one.name.localeCompare(other.name))

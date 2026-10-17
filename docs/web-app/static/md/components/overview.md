@@ -110,8 +110,7 @@ rsync -a --delete ../MuSemantiQ/src/language/ static/js/msq/language
 Copy the font files. The glyph tables are already in the worker, under `drawer/font/music-js/`:
 
 ```sh
-# copy the font files; the glyph tables are already in the worker
-rsync -a --delete --exclude music-js ../MuSemantiQ/src/drawer/font/ static/font
+# the fonts come with the worker, under drawer/font/ (the .otf/.ttf files are copied too)
 ```
 
 Finally, add an import map to your page, because the components import each other and the language through `#msq/…` specifiers:
@@ -182,17 +181,17 @@ The font config it points at, `static/js/font-config.json`:
 ```json
 {
   "chord-letters": {
-    "gentium plus": "/font/chord-letters/GentiumPlus-Regular.ttf"
+    "gentium plus": "/js/msq/worker/drawer/font/chord-letters/GentiumPlus-Regular.ttf"
   },
   "text": {
     "noto-serif": {
-      "regular": "/font/text/NotoSerif-Regular.ttf",
-      "bold": "/font/text/NotoSerif-Bold.ttf"
+      "regular": "/js/msq/worker/drawer/font/text/NotoSerif-Regular.ttf",
+      "bold": "/js/msq/worker/drawer/font/text/NotoSerif-Bold.ttf"
     }
   },
   "music": {
     "bravura": {
-      "font": "/font/music/Bravura.otf",
+      "font": "/js/msq/worker/drawer/font/music/Bravura.otf",
       "js": "/js/msq/worker/drawer/font/music-js/bravura.js"
     }
   }

@@ -36,7 +36,6 @@ browser-app/
     └── static/         everything served to the browser
         ├── html/       index.html — the demo page, and 404.html
         ├── css/        e-ui.css (unused by this example)
-        ├── font/       three symlinks into src/drawer/font/
         ├── midi/       a couple of sample .mid files
         └── js/msq/     the browser build of MuSemantiQ (generated, not tracked)
             ├── web-components/   copied from web-components/
@@ -60,7 +59,7 @@ Inside `static/js/msq/web-components/` (a copy of the top-level
 
 `npm run browser-app:setup` prepares the app, in three steps:
 
-1. `setup:symlinks` — recreates the three font symlinks under `static/font/`
+1. `setup:symlinks` — recreates the logo and sound-bank symlinks
 2. `msq:apps:update` — regenerates `static/js/msq/worker/` and
    `static/js/msq/language/` from `src/`
 3. `web-components:update` — copies `web-components/` to
@@ -88,7 +87,7 @@ mkcert localhost 127.0.0.1 ::1
 
 | Script | What it does | When you need it |
 | --- | --- | --- |
-| `npm run setup:symlinks` | Points `static/font/{chord-letters,music,text}` at `src/drawer/font/*` | Runs on `npm install`. Run it by hand if the fonts 404 — for example after unpacking a zip, which does not preserve symlinks |
+| `npm run setup:symlinks` | Creates the logo and sound-bank symlinks | Runs on `npm install`. Run it by hand if those 404 |
 | `npm run msq:apps:update` | Deletes `static/js/msq/worker/` and rebuilds it from `src/`, rewriting `#msq/...` imports to real URLs | After any change under `src/`. Part of `browser-app` already |
 | `npm run watch:src` | The same, then rebuilds on every change under `src/` | In a second terminal while working on `src/`, so the browser only needs a reload |
 | `npm run web-components:update` | Copies `web-components/` to `static/js/msq/web-components/` | After any change under `web-components/`. Part of `browser-app` already; `npm run watch:web-components` keeps it in step |
@@ -138,8 +137,8 @@ source, so the whole folder is gitignored, and an edit made there is silently
 reverted by the next build. Change `src/` or `web-components/` and run the
 scripts again.
 
-The font symlinks are committed as symlinks, so a normal clone gets them; the
-`setup:symlinks` script exists to repair them.
+The fonts come with the worker build, under `js/msq/worker/drawer/font/`; the
+`setup:symlinks` script only handles the logo and sound-bank links.
 
 ## The components
 
@@ -182,11 +181,11 @@ also what keeps them from rendering too early. Everything that engraves must be
   is="msq-font-loader"
   data-font-sources-reference="msqFontSources"
   data-font-config='{
-    "music": { "bravura": { "font": "/font/music/Bravura.otf",
+    "music": { "bravura": { "font": "/js/msq/worker/drawer/font/music/Bravura.otf",
                             "js": "/js/msq/worker/drawer/font/music-js/bravura.js" } },
-    "text":  { "noto-serif": { "regular": "/font/text/NotoSerif-Regular.ttf",
-                               "bold":    "/font/text/NotoSerif-Bold.ttf" } },
-    "chord-letters": { "gentium plus": "/font/chord-letters/GentiumPlus-Regular.ttf" }
+    "text":  { "noto-serif": { "regular": "/js/msq/worker/drawer/font/text/NotoSerif-Regular.ttf",
+                               "bold":    "/js/msq/worker/drawer/font/text/NotoSerif-Bold.ttf" } },
+    "chord-letters": { "gentium plus": "/js/msq/worker/drawer/font/chord-letters/GentiumPlus-Regular.ttf" }
   }'
 >
   <!-- score, player and editor components go here -->
@@ -302,7 +301,7 @@ usual causes:
 
 - a component that engraves placed **outside** the `msq-font-loader`
 - `data-font-sources` not matching the loader's `data-font-sources-reference`
-- missing font symlinks, so the font requests 404 — run `npm run setup:symlinks`
+- missing font files under `js/msq/worker/drawer/font/`, so the font requests 404 — run `npm run msq:apps:update`
 - Safari, with `lib/custom-elements-polyfill.js` missing from the components'
   copy, so they cannot load it — run `npm run web-components:update`
 

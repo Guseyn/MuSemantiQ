@@ -312,8 +312,7 @@ node ../MuSemantiQ/scripts/create-msq-worker.js -o static/js/msq/worker
 rsync -a --delete ../MuSemantiQ/web-components/ static/js/msq/web-components
 # copy the language, which the editor parses with on the page
 rsync -a --delete ../MuSemantiQ/src/language/ static/js/msq/language
-# copy the font files; the glyph tables are already in the worker
-rsync -a --delete --exclude music-js ../MuSemantiQ/src/drawer/font/ static/font
+# the fonts come with the worker, under drawer/font/ (the .otf/.ttf files are copied too)
 ```
 
 Copy the extensions next to them, and showdown:
@@ -330,17 +329,17 @@ Finally, create the font config, `static/js/font-config.json`. It's the same one
 ```json
 {
   "chord-letters": {
-    "gentium plus": "/font/chord-letters/GentiumPlus-Regular.ttf"
+    "gentium plus": "/js/msq/worker/drawer/font/chord-letters/GentiumPlus-Regular.ttf"
   },
   "text": {
     "noto-serif": {
-      "regular": "/font/text/NotoSerif-Regular.ttf",
-      "bold": "/font/text/NotoSerif-Bold.ttf"
+      "regular": "/js/msq/worker/drawer/font/text/NotoSerif-Regular.ttf",
+      "bold": "/js/msq/worker/drawer/font/text/NotoSerif-Bold.ttf"
     }
   },
   "music": {
     "bravura": {
-      "font": "/font/music/Bravura.otf",
+      "font": "/js/msq/worker/drawer/font/music/Bravura.otf",
       "js": "/js/msq/worker/drawer/font/music-js/bravura.js"
     }
   }

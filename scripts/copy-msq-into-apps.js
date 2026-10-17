@@ -164,6 +164,10 @@ function processDirectory(dir, outBaseDir) {
 
       // Write to output
       fs.writeFileSync(outPath, code, 'utf-8')
+    } else if (entry.isFile() && /\.(otf|ttf|txt)$/i.test(entry.name)) {
+      // The font files (and their license) are not code: copy them as they are,
+      // so drawer/font in the worker mirrors src/drawer/font.
+      fs.copyFileSync(srcPath, outPath)
     }
   }
 }

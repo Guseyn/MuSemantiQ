@@ -54,16 +54,11 @@ function soundBanksIn(directory) {
 
 console.log('Setting up symlinks for the browser apps...\n')
 
-// The font files themselves are never copied — each app's static folder points
-// at the one place they live.
-const drawerFontDir = join(srcDir, 'drawer/font')
-
 // The rendered Magenta sample sets, likewise: ~184 MB per soundbank that takes
 // hours to build, so both apps play the one copy.
 const magentaSoundFontDir = join(srcDir, 'midi/magenta-sound-font')
 
 for (const staticDir of staticDirs) {
-  const fontDir = join(staticDir, 'font')
   if (!existsSync(staticDir)) {
     continue
   }
@@ -78,18 +73,9 @@ for (const staticDir of staticDirs) {
     `${staticDir.replace(projectRoot + '/', '')}/images/logo.svg → logo.svg`
   )
 
-  mkdirSync(fontDir, { recursive: true })
-  for (const family of [ 'chord-letters', 'music', 'text' ]) {
-    createSymlink(
-      join(fontDir, family),
-      join(drawerFontDir, family),
-      `${staticDir.replace(projectRoot + '/', '')}/font/${family} → src/drawer/font/${family}`
-    )
-  }
-
-  // One link per soundbank rather than one for the folder, the same way the
-  // font families are linked: the static folder stays a real directory, and a
-  // set rendered later is picked up by running this again.
+  // One link per soundbank rather than one for the folder: the static folder
+  // stays a real directory, and a set rendered later is picked up by running
+  // this again.
   mkdirSync(magentaSoundFontDir, { recursive: true })
   const soundFontDir = join(staticDir, 'magenta-sound-font')
   mkdirSync(soundFontDir, { recursive: true })

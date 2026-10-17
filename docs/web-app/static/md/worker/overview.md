@@ -93,11 +93,10 @@ mkdir -p static/js/msq
 node ../MuSemantiQ/scripts/create-msq-worker.js -o static/js/msq/worker
 ```
 
-The worker holds only `.js` files, so copy the font files separately. The glyph tables are already in the worker, under `drawer/font/music-js/`:
+The worker carries the fonts too, under `drawer/font/` — the `.otf`/`.ttf` files are copied alongside the glyph tables:
 
 ```sh
-# copy the font files; the glyph tables are already in the worker
-rsync -a --delete --exclude music-js ../MuSemantiQ/src/drawer/font/ static/font
+# the fonts come with the worker, under drawer/font/ (the .otf/.ttf files are copied too)
 ```
 
 </details>
@@ -150,17 +149,17 @@ rsync -a --delete --exclude music-js ../MuSemantiQ/src/drawer/font/ static/font
         fontSourcesReference: 'myFonts',
         fontConfig: {
           'chord-letters': {
-            'gentium plus': '/font/chord-letters/GentiumPlus-Regular.ttf'
+            'gentium plus': '/js/msq/worker/drawer/font/chord-letters/GentiumPlus-Regular.ttf'
           },
           'text': {
             'noto-serif': {
-              'regular': '/font/text/NotoSerif-Regular.ttf',
-              'bold': '/font/text/NotoSerif-Bold.ttf'
+              'regular': '/js/msq/worker/drawer/font/text/NotoSerif-Regular.ttf',
+              'bold': '/js/msq/worker/drawer/font/text/NotoSerif-Bold.ttf'
             }
           },
           'music': {
             'bravura': {
-              'font': '/font/music/Bravura.otf',
+              'font': '/js/msq/worker/drawer/font/music/Bravura.otf',
               'js': '/js/msq/worker/drawer/font/music-js/bravura.js'
             }
           }
@@ -231,9 +230,9 @@ crypto.randomUUID()
 
 ```js
 {
-  'chord-letters': { 'gentium plus': '/font/chord-letters/GentiumPlus-Regular.ttf' },
-  'text': { 'noto-serif': { regular: '/font/text/NotoSerif-Regular.ttf', bold: '/font/text/NotoSerif-Bold.ttf' } },
-  'music': { 'bravura': { font: '/font/music/Bravura.otf', js: '/js/msq/worker/drawer/font/music-js/bravura.js' } }
+  'chord-letters': { 'gentium plus': '/js/msq/worker/drawer/font/chord-letters/GentiumPlus-Regular.ttf' },
+  'text': { 'noto-serif': { regular: '/js/msq/worker/drawer/font/text/NotoSerif-Regular.ttf', bold: '/js/msq/worker/drawer/font/text/NotoSerif-Bold.ttf' } },
+  'music': { 'bravura': { font: '/js/msq/worker/drawer/font/music/Bravura.otf', js: '/js/msq/worker/drawer/font/music-js/bravura.js' } }
 }
 ```
 

@@ -29,21 +29,21 @@
       data-font-sources-reference="msqFontSources"
       data-font-config='{
         "chord-letters": {
-          "gentium plus": "/font/chord-letters/GentiumPlus-Regular.ttf"
+          "gentium plus": "/js/msq/worker/drawer/font/chord-letters/GentiumPlus-Regular.ttf"
         },
         "text": {
           "noto-serif": {
-            "regular": "/font/text/NotoSerif-Regular.ttf",
-            "bold": "/font/text/NotoSerif-Bold.ttf"
+            "regular": "/js/msq/worker/drawer/font/text/NotoSerif-Regular.ttf",
+            "bold": "/js/msq/worker/drawer/font/text/NotoSerif-Bold.ttf"
           }
         },
         "music": {
           "bravura": {
-            "font": "/font/music/Bravura.otf",
+            "font": "/js/msq/worker/drawer/font/music/Bravura.otf",
             "js": "/js/msq/worker/drawer/font/music-js/bravura.js"
           },
           "leland": {
-            "font": "/font/music/Leland.otf",
+            "font": "/js/msq/worker/drawer/font/music/Leland.otf",
             "js": "/js/msq/worker/drawer/font/music-js/leland.js"
           }
         }

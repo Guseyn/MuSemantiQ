@@ -15,7 +15,7 @@ npm run browser-app:setup
 
 It does three things:
 
-- links the fonts into `static/font/`
+- copies the fonts into `js/msq/worker/drawer/font/`
 - copies `src/` into `static/js/msq/worker/` and `src/language/` into `static/js/msq/language/`
 - copies `web-components/` into `static/js/msq/web-components/`
 
