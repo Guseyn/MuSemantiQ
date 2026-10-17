@@ -33,7 +33,7 @@ const POINT_FIELDS = [
 function locate(lines, entryPath) {
   const stack = []
   let inside = null
-  const found = { arrays: [], yCorrection: null }
+  const found = { arrays: [], yCorrection: null, unicode: null }
 
   for (let index = 0; index < lines.length; index++) {
     const line = lines[index]
@@ -58,6 +58,16 @@ function locate(lines, entryPath) {
     }
 
     if (!inside) {
+      continue
+    }
+
+    const unicode = line.match(/^(\s*)unicode: '([^']*)'(,?)\s*$/)
+    if (unicode && found.unicode === null) {
+      found.unicode = {
+        line: index,
+        indent: unicode[1].length,
+        comma: unicode[3] === ','
+      }
       continue
     }
 
@@ -127,6 +137,15 @@ const readCodepoints = (literal) =>
     /\\u([0-9a-fA-F]{4})/g,
     (whole, hex) => String.fromCharCode(parseInt(hex, 16))
   )
+
+/**
+ * The `unicode:` literal a character stands for, as the generator writes it —
+ * readable `\uXXXX` escapes rather than the invisible character itself.
+ */
+const escapedUnicode = (characters) =>
+  `'${[ ...characters ].map(
+    (character) => '\\u' + character.codePointAt(0).toString(16).toUpperCase().padStart(4, '0')
+  ).join('')}'`
 
 /**
  * Every entry a music-js font holds, as the dotted path it is addressed by.
@@ -300,9 +319,9 @@ const fontSource = endpoint('/dev/font-source/:font', 'GET', async ({ stream, pa
  * change. Everything either of them does begins here.
  */
 async function glyphEdit(request) {
-  const { font, entry, points, yCorrection } = request
+  const { font, entry, points, yCorrection, unicode } = request
   if (typeof font !== 'string' || typeof entry !== 'string' || !Array.isArray(points)) {
-    return { status: 400, error: 'Expected { font, entry, points, yCorrection? }' }
+    return { status: 400, error: 'Expected { font, entry, points, unicode?, yCorrection? }' }
   }
 
   const file = fontFileFor(font)
@@ -330,6 +349,15 @@ async function glyphEdit(request) {
   */
   const array = found.arrays[0]
   const edits = []
+
+  if (typeof unicode === 'string' && unicode !== '' && found.unicode) {
+    const { line, indent, comma } = found.unicode
+    edits.push({
+      start: line,
+      end: line,
+      lines: [ `${' '.repeat(indent)}unicode: ${escapedUnicode(unicode)}${comma ? ',' : ''}` ]
+    })
+  }
 
   if (typeof yCorrection === 'number' && found.yCorrection) {
     const { line, indent, comma } = found.yCorrection
@@ -366,6 +394,7 @@ async function glyphEdit(request) {
     entry,
     field: array.field,
     wrote: written.length,
+    unicode: typeof unicode === 'string' && unicode !== '' && found.unicode !== null,
     yCorrection: typeof yCorrection === 'number' && found.yCorrection !== null
   }
 }
@@ -425,6 +454,7 @@ const applyGlyph = endpoint('/dev/font-glyph', 'POST', async ({ stream }) => {
     entry: edit.entry,
     field: edit.field,
     wrote: edit.wrote,
+    unicode: edit.unicode,
     yCorrection: edit.yCorrection
   })
 })

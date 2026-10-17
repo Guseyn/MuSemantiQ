@@ -70,11 +70,12 @@ const entriesFromTheServer = handedOver('entriesRead', 'entriesAnswer')
  */
 
 /**
- * Walk the file, calling back with the line index of the entry's yCorrection.
+ * Walk the file, collecting the entry's `unicode` and `yCorrection` lines.
  */
 function locate(lines, entryPath) {
   const stack = []
   let inside = false
+  const found = { unicode: null, yCorrection: null }
 
   for (let index = 0; index < lines.length; index++) {
     const line = lines[index]
@@ -102,11 +103,21 @@ function locate(lines, entryPath) {
       continue
     }
 
+    const unicode = line.match(/^(\s*)unicode: '([^']*)'(,?)\s*$/)
+    if (unicode && found.unicode === null) {
+      found.unicode = {
+        line: index,
+        indent: unicode[1].length,
+        value: unicode[2],
+        comma: unicode[3] === ','
+      }
+    }
+
     const correction = line.match(
       /^(\s*)yCorrection: (-?[\d.]+) \* intervalBetweenStaveLines(,?)\s*$/
     )
     if (correction) {
-      return {
+      found.yCorrection = {
         line: index,
         indent: correction[1].length,
         value: Number(correction[2]),
@@ -114,8 +125,19 @@ function locate(lines, entryPath) {
       }
     }
   }
-  return null
+  return found
 }
+
+/**
+ * The codepoints a `unicode:` literal stands for, read the same way the server
+ * reads them: the font holds either the character itself or a `\uXXXX` escape,
+ * and this turns the escapes back into characters.
+ */
+const readCodepoints = (literal) =>
+  literal.replace(
+    /\\u([0-9a-fA-F]{4})/g,
+    (whole, hex) => String.fromCharCode(parseInt(hex, 16))
+  )
 
 /**
  * The yCorrection an entry currently carries, in stave-line intervals, or null
@@ -123,7 +145,16 @@ function locate(lines, entryPath) {
  */
 function readYCorrection(source, entryPath) {
   const found = locate(source.split('\n'), entryPath)
-  return found ? found.value : null
+  return found.yCorrection ? found.yCorrection.value : null
+}
+
+/**
+ * The characters an entry's `unicode:` currently stands for, or null when the
+ * font holds no such entry.
+ */
+function readUnicode(source, entryPath) {
+  const found = locate(source.split('\n'), entryPath)
+  return found.unicode ? readCodepoints(found.unicode.value) : null
 }
 
 // --- the music each glyph is judged in -------------------------------------
@@ -606,6 +637,27 @@ function refresh({ retrace = true } = {}) {
 }
 
 /**
+ * Show the codepoint the selected font actually holds for the selected entry.
+ *
+ * It comes out of that font's own music-js file rather than out of the scaffold,
+ * whose value is only the codepoint the generator started from — the font's
+ * `unicode` is what the glyph really draws with, and it can differ.
+ */
+async function syncUnicodeFromFont() {
+  const glyph = entryNamed(elements.entry.value)
+  let characters = glyph ? glyph.smufl : ''
+  try {
+    const fromFont = readUnicode(await musicJsSource(elements.font.value), elements.entry.value)
+    if (fromFont) {
+      characters = fromFont
+    }
+  } catch {
+    // the font could not be read — fall back to the scaffold's codepoint
+  }
+  elements.codepoint.value = unicodeLabel(characters).split(' ')[0]
+}
+
+/**
  * Picking an entry fills in its codepoint, its size and its correction, so the
  * three inputs always describe the glyph on screen.
  */
@@ -615,7 +667,7 @@ async function loadEntry() {
     return
   }
   tuning = false
-  elements.codepoint.value = unicodeLabel(glyph.smufl).split(' ')[0]
+  await syncUnicodeFromFont()
   const sourceSize = scaffold.find((node) => node.name === 'musicFontSourceSize')
   elements.size.value = String((sourceSize ? sourceSize.value : 4) * (glyph.scale || 1))
   await syncCorrectionFromFont()
@@ -770,6 +822,7 @@ control('save-example').addEventListener('click', () => saveExample({
 elements.previousGlyph.addEventListener('click', () => stepGlyph(-1))
 elements.nextGlyph.addEventListener('click', () => stepGlyph(1))
 elements.font.addEventListener('change', async () => {
+  await syncUnicodeFromFont()
   await syncCorrectionFromFont()
   writeUrl({ push: true })
 })
@@ -840,6 +893,7 @@ control('apply').addEventListener('click', async () => {
         font,
         entry,
         points: traced,
+        unicode: charactersFrom(elements.codepoint.value),
         yCorrection: elements.correction.value === ''
           ? undefined
           : Number(elements.correction.value)
@@ -853,6 +907,7 @@ control('apply').addEventListener('click', async () => {
     fontSources.delete(result.font)
     window.showToast(
       `Wrote ${result.wrote} point lines into ${result.font}.js` +
+      `${result.unicode ? ' and its unicode' : ''}` +
       `${result.yCorrection ? ' and its yCorrection' : ''}.`
     )
   } catch (error) {
