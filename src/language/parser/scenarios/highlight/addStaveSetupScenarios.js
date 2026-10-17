@@ -5,8 +5,8 @@ import regexps from '#msq/language/parser/scenarios/static-objects/regexps.js'
 export default function (scenarios) {
   scenarios['stave'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { numberOfMeasures, numberOfStaves } }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.staveHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.staveHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="csph" ref-id="stave-lines-${numberOfMeasures}-${numberOfStaves}">${match}</span>`
         }
       )
@@ -22,8 +22,8 @@ export default function (scenarios) {
   }
   scenarios['stave with clef'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { numberOfMeasures, currentNumberOfStaves } }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.clefHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.clefHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="eh" ref-id="clef-${numberOfMeasures}-${currentNumberOfStaves}">${match}</span>`
         }
       )

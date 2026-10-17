@@ -4,9 +4,9 @@
 
 import char from '#msq/drawer/lib/opentype/char.js'
 
-const {  isArabicChar  } = char
+const { isArabicChar } = char
 
-function arabicWordStartCheck(contextParams) {
+function arabicWordStartCheck (contextParams) {
   const char = contextParams.current
   const prevChar = contextParams.get(-1)
   return (
@@ -17,7 +17,7 @@ function arabicWordStartCheck(contextParams) {
   )
 }
 
-function arabicWordEndCheck(contextParams) {
+function arabicWordEndCheck (contextParams) {
   const nextChar = contextParams.get(1)
   return (
   // ? last arabic char

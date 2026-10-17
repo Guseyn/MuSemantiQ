@@ -1,6 +1,6 @@
 'use strict'
 
-const supportedBreathMarkTypes = ['comma', 'double slash']
+const supportedBreathMarkTypes = [ 'comma', 'double slash' ]
 import createPath from '#msq/drawer/elements/basic/createPath.js'
 import createGroup from '#msq/drawer/elements/basic/createGroup.js'
 import addPropertiesToElement from '#msq/drawer/elements/basic/addPropertiesToElement.js'
@@ -8,7 +8,7 @@ import addPropertiesToElement from '#msq/drawer/elements/basic/addPropertiesToEl
 export default function (selectedSingleUnitsParamsToBeIncludedInNextCrossStaveUnit, midMeasureClefsForCrossStaveUnits, midMeasureKeySignaturesForCrossStaveUnits, numberOfStaves, styles, leftOffset, topOffsetsForEachStave, containsDrawnCrossStaveElementsBesideCrossStaveUnits) {
   const { intervalBetweenStaveLines, spaceAfterMidMeasureClefs, spaceAfterMidMeasureKeySignaturesForBreathMark, breathMarkAsComma, breathMarkAsDoubleSlash, fontColor } = styles
   const breathMarkTypes = {
-    'comma': breathMarkAsComma,
+    comma: breathMarkAsComma,
     'double slash': breathMarkAsDoubleSlash
   }
   let breathMark

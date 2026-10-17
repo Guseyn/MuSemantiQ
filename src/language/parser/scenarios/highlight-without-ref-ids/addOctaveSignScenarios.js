@@ -7,8 +7,8 @@ import addLineMeasureStaveVoicePositionScenarios from '#msq/language/parser/scen
 export default function (scenarios) {
   scenarios['octave sign'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.isOctaveOrTwoOctavesHigherOrLowerHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.isOctaveOrTwoOctavesHigherOrLowerHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="eh">${match}</span>`
         }
       )
@@ -35,8 +35,8 @@ export default function (scenarios) {
   addUnitPositionScenarios(scenarios, 'octave sign to unit', 2, { measure: true })
   scenarios['octave sign vertical correction'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.verticalCorrectionHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.verticalCorrectionHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="th">${match}</span>`
         }
       )

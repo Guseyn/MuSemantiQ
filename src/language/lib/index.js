@@ -18,7 +18,7 @@ export default {
   scan
 }
 
-export function validate(instance, schema, options) {
+export function validate (instance, schema, options) {
   const v = new Validator()
   return v.validate(instance, schema, options)
 }

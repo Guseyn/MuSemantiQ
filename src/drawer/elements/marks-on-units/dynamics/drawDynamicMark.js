@@ -33,7 +33,7 @@ export default function (singleUnit, articulationIndex, currentArticulationParam
   components.push(
     dynamicText
   )
-  let groupedDynamicText = createGroup(
+  const groupedDynamicText = createGroup(
     'dynamicText',
     components
   )

@@ -1,22 +1,20 @@
 'use strict'
 
+const paramCounts = { a: 7, c: 6, h: 1, l: 2, m: 2, r: 4, q: 4, s: 4, t: 2, v: 1, z: 0 }
 
-var paramCounts = { a: 7, c: 6, h: 1, l: 2, m: 2, r: 4, q: 4, s: 4, t: 2, v: 1, z: 0 }
-
-var SPECIAL_SPACES = [
+const SPECIAL_SPACES = [
   0x1680, 0x180E, 0x2000, 0x2001, 0x2002, 0x2003, 0x2004, 0x2005, 0x2006,
   0x2007, 0x2008, 0x2009, 0x200A, 0x202F, 0x205F, 0x3000, 0xFEFF
 ]
 
-function isSpace(ch) {
+function isSpace (ch) {
   return (ch === 0x0A) || (ch === 0x0D) || (ch === 0x2028) || (ch === 0x2029) || // Line terminators
     // White spaces
     (ch === 0x20) || (ch === 0x09) || (ch === 0x0B) || (ch === 0x0C) || (ch === 0xA0) ||
     (ch >= 0x1680 && SPECIAL_SPACES.indexOf(ch) >= 0)
 }
 
-function isCommand(code) {
-  /*eslint-disable no-bitwise*/
+function isCommand (code) {
   switch (code | 0x20) {
     case 0x6D/* m */:
     case 0x7A/* z */:
@@ -34,42 +32,40 @@ function isCommand(code) {
   return false
 }
 
-function isArc(code) {
+function isArc (code) {
   return (code | 0x20) === 0x61
 }
 
-function isDigit(code) {
+function isDigit (code) {
   return (code >= 48 && code <= 57)   // 0..9
 }
 
-function isDigitStart(code) {
+function isDigitStart (code) {
   return (code >= 48 && code <= 57) || /* 0..9 */
           code === 0x2B || /* + */
           code === 0x2D || /* - */
           code === 0x2E   /* . */
 }
 
-
-function State(path) {
-  this.index  = 0
-  this.path   = path
-  this.max    = path.length
+function State (path) {
+  this.index = 0
+  this.path = path
+  this.max = path.length
   this.result = []
-  this.param  = 0.0
-  this.err    = ''
+  this.param = 0.0
+  this.err = ''
   this.segmentStart = 0
-  this.data   = []
+  this.data = []
 }
 
-function skipSpaces(state) {
+function skipSpaces (state) {
   while (state.index < state.max && isSpace(state.path.charCodeAt(state.index))) {
     state.index++
   }
 }
 
-
-function scanFlag(state) {
-  var ch = state.path.charCodeAt(state.index)
+function scanFlag (state) {
+  const ch = state.path.charCodeAt(state.index)
 
   if (ch === 0x30/* 0 */) {
     state.param = 0
@@ -86,16 +82,15 @@ function scanFlag(state) {
   state.err = 'SvgPath: arc flag can be 0 or 1 only (at pos ' + state.index + ')'
 }
 
-
-function scanParam(state) {
-  var start = state.index,
-    index = start,
-    max = state.max,
-    zeroFirst = false,
-    hasCeiling = false,
-    hasDecimal = false,
-    hasDot = false,
-    ch
+function scanParam (state) {
+  const start = state.index
+  let index = start
+  const max = state.max
+  let zeroFirst = false
+  let hasCeiling = false
+  let hasDecimal = false
+  let hasDot = false
+  let ch
 
   if (index >= max) {
     state.err = 'SvgPath: missed param (at pos ' + index + ')'
@@ -173,19 +168,18 @@ function scanParam(state) {
   state.param = parseFloat(state.path.slice(start, index)) + 0.0
 }
 
-
-function finalizeSegment(state) {
-  var cmd, cmdLC
+function finalizeSegment (state) {
+  let cmd, cmdLC
 
   // Process duplicated commands (without comand name)
 
   // This logic is shamelessly borrowed from Raphael
   // https://github.com/DmitryBaranovskiy/raphael/
   //
-  cmd   = state.path[state.segmentStart]
+  cmd = state.path[state.segmentStart]
   cmdLC = cmd.toLowerCase()
 
-  var params = state.data
+  let params = state.data
 
   if (cmdLC === 'm' && params.length > 2) {
     state.result.push([ cmd, params[0], params[1] ])
@@ -197,7 +191,6 @@ function finalizeSegment(state) {
   if (cmdLC === 'r') {
     state.result.push([ cmd ].concat(params))
   } else {
-
     while (params.length >= paramCounts[cmdLC]) {
       state.result.push([ cmd ].concat(params.splice(0, paramCounts[cmdLC])))
       if (!paramCounts[cmdLC]) {
@@ -207,10 +200,9 @@ function finalizeSegment(state) {
   }
 }
 
-
-function scanSegment(state) {
-  var max = state.max,
-    cmdCode, is_arc, comma_found, need_params, i
+function scanSegment (state) {
+  const max = state.max
+  let cmdCode; let is_arc; let comma_found; let need_params; let i
 
   state.segmentStart = state.index
   cmdCode = state.path.charCodeAt(state.index)
@@ -274,16 +266,15 @@ function scanSegment(state) {
   finalizeSegment(state)
 }
 
-
 /* Returns array of segments:
  *
  * [
  *   [ command, coord1, coord2, ... ]
  * ]
  */
-export default function pathParse(svgPath) {
-  var state = new State(svgPath)
-  var max = state.max
+export default function pathParse (svgPath) {
+  const state = new State(svgPath)
+  const max = state.max
 
   skipSpaces(state)
 
@@ -293,9 +284,7 @@ export default function pathParse(svgPath) {
 
   if (state.err.length) {
     state.result = []
-
   } else if (state.result.length) {
-
     if ('mM'.indexOf(state.result[0][0]) < 0) {
       state.err = 'SvgPath: string should start with `M` or `m`'
       state.result = []

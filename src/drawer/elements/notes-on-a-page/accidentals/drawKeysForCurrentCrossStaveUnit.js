@@ -18,23 +18,23 @@ import drawSesquisharpKeyShape from '#msq/drawer/elements/notes-on-a-page/accide
 import drawNoteLetterShape from '#msq/drawer/elements/marks-on-units/text-labels/drawNoteLetterShape.js'
 import drawParenthesesSpline from '#msq/drawer/elements/marks-on-units/parentheses/drawParenthesesSpline.js'
 const keysTypes = {
-  'doubleFlatKey': drawDoubleFlatKeyShape,
-  'doubleSharpKey': drawDoubleSharpKeyShape,
-  'flatKey': drawFlatKeyShape,
-  'naturalKey': drawNaturalKeyShape,
-  'sharpKey': drawSharpKeyShape,
-  'demiflatKey': drawDemiflatKeyShape,
-  'sesquiflatKey': drawSesquiflatKeyShape,
-  'demisharpKey': drawDemisharpKeyShape,
-  'sesquisharpKey': drawSesquisharpKeyShape,
-  'noteLetter': drawNoteLetterShape
+  doubleFlatKey: drawDoubleFlatKeyShape,
+  doubleSharpKey: drawDoubleSharpKeyShape,
+  flatKey: drawFlatKeyShape,
+  naturalKey: drawNaturalKeyShape,
+  sharpKey: drawSharpKeyShape,
+  demiflatKey: drawDemiflatKeyShape,
+  sesquiflatKey: drawSesquiflatKeyShape,
+  demisharpKey: drawDemisharpKeyShape,
+  sesquisharpKey: drawSesquisharpKeyShape,
+  noteLetter: drawNoteLetterShape
 }
 
 export default function (selectedSingleUnitsParamsToBeIncludedInNextCrossStaveUnit, measureIndexInGeneral, countersForEachVoice, numberOfStaveLines, arpeggiatedWavesForCrossStaveUnits, breathMarksBeforeCrossStaveUnits, styles, leftOffset, topOffsetsForEachStave, relativePositionToArpeggiatedWave = 'after', containsDrawnCrossStaveElementsBesideCrossStaveUnits) {
   const { spaceAfterBreathMark, distanceBetweenKeysForSingleUnit, distanceBetweenKeysAsNoteLettersForSingleUnit, offsetForKeyParenthesesFromBothSides, keyParenthesesYPadding, spaceAfterArpeggiatedWaveAndBeforeKeysForCrossStaveUnit, graceElementsScaleFactor, graceKeyOnStaveLineCenterYCorrections, graceKeyBetweenStaveLinesCenterYCorrections } = styles
   const keysForCurrentCrossStaveUnit = []
   const allKeysParams = []
-  let isThereArpeggiatedWavesInCurrentCrossStaveUnit = selectedSingleUnitsParamsToBeIncludedInNextCrossStaveUnit.findIndex(singleUnitParams => singleUnitParams.arpeggiated) !== -1
+  const isThereArpeggiatedWavesInCurrentCrossStaveUnit = selectedSingleUnitsParamsToBeIncludedInNextCrossStaveUnit.findIndex(singleUnitParams => singleUnitParams.arpeggiated) !== -1
   let isCurrentCrossStaveUnitGrace = false
   for (let singleUnitParamIndex = 0; singleUnitParamIndex < selectedSingleUnitsParamsToBeIncludedInNextCrossStaveUnit.length; singleUnitParamIndex++) {
     const currentSingleUnitParams = selectedSingleUnitsParamsToBeIncludedInNextCrossStaveUnit[singleUnitParamIndex]
@@ -79,7 +79,7 @@ export default function (selectedSingleUnitsParamsToBeIncludedInNextCrossStaveUn
   for (let keyIndex = 0; keyIndex < sortedKeysParams.length; keyIndex++) {
     const keyParams = sortedKeysParams[keyIndex]
     const isGrace = keyParams.isGrace
-    let staveIndexThatActuallyRelatesToTheKeyPosition = keyParams.staveIndexConsideringStavePosition ?? keyParams.staveIndex
+    const staveIndexThatActuallyRelatesToTheKeyPosition = keyParams.staveIndexConsideringStavePosition ?? keyParams.staveIndex
     const topOffsetOfStaveForTheKeyConsideringItsStave = topOffsetsForEachStave[keyParams.staveIndexConsideringStavePosition] ?? topOffsetsForEachStave[keyParams.staveIndex]
     const keyFunction = keyParams.keyType === 'noteLetter'
       ? keysTypes['noteLetter'](keyParams.positionNumber, keyParams.textValue)
@@ -248,7 +248,7 @@ export default function (selectedSingleUnitsParamsToBeIncludedInNextCrossStaveUn
   let maxRightOfGroupsOfKeysOnEachStave
   const areasWithKeysInTheFirstColumn = []
   for (const [ staveIndexThatActuallyRelatesToTheKeyPosition, keysColumnsOnStave ] of Object.entries(keysColumnsByStaves)) {
-    const allDrawnKeysOnStave = [...keysColumnsOnStave.flatMap(keyColumn => keyColumn.shapes)]
+    const allDrawnKeysOnStave = [ ...keysColumnsOnStave.flatMap(keyColumn => keyColumn.shapes) ]
     for (let keyColumnIndex = 0; keyColumnIndex < keysColumnsOnStave.length; keyColumnIndex++) {
       for (let keyIndex = 0; keyIndex < keysColumnsOnStave[keyColumnIndex].shapes.length; keyIndex++) {
         if (keysColumnsOnStave[keyColumnIndex].shapes[keyIndex].right < keysColumnsOnStave[keyColumnIndex].maxRight) {

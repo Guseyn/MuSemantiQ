@@ -6,7 +6,6 @@ import openingBarLineNames from '#msq/language/parser/scenarios/static-objects/o
 import closingBarLineNames from '#msq/language/parser/scenarios/static-objects/closingBarLineNames.js'
 import applicationOfMeasureNumbersNames from '#msq/language/parser/scenarios/static-objects/applicationOfMeasureNumbersNames.js'
 import keySignatureNames from '#msq/language/parser/scenarios/static-objects/keySignatureNames.js'
-import tempoDurationPartNames from '#msq/language/parser/scenarios/static-objects/tempoDurationPartNames.js'
 import clefNames from '#msq/language/parser/scenarios/static-objects/clefNames.js'
 import noteDurationNames from '#msq/language/parser/scenarios/static-objects/noteDurationNames.js'
 import noteNames from '#msq/language/parser/scenarios/static-objects/noteNames.js'
@@ -23,7 +22,6 @@ const VERTICAL_LINE = '|'
 const SLASH = '/'
 const EMPTY = ''
 const SPACE = ' '
-const SPACE_REGEXP = '(\\s+)'
 const COLUMN = ':'
 const SEMI_COLUMN = ';'
 const COMMA = ','
@@ -371,7 +369,7 @@ const FOR_EACH = [ 'for', 'each' ]
 const COMMENT = 'comment'
 const SIDE_NOTE = 'side note'
 const SIDE = 'side'
-var IS_ARPEGGIATED = [
+const IS_ARPEGGIATED = [
   [ 'is', 'arpeggiated' ],
   [ 'is', 'arpeggio' ],
   [ 'arpeggiated' ],
@@ -466,19 +464,121 @@ const mainNoteKeyNames = [ 'sharp', 'flat', 'natural', 'double sharp', 'double f
 const mainNoteKeyNamesAsTokens = mainNoteKeyNames.map(name => name.split(SPACE))
 const breathMarkNamesAsTokens = [
   ...breathMarkNames.map(name => name.split(SPACE)),
-  ...breathMarkNames.map(name => ['as'].concat(name.split(SPACE)))
+  ...breathMarkNames.map(name => [ 'as' ].concat(name.split(SPACE)))
 ]
 const articulationNamesAsTokens = articulationNames.map(name => name.split(SPACE))
 const ornamentKeyNamesAsTokens = ornamentKeyNames.map(name => name.split(SPACE))
 
 import cssColors from '#msq/language/parser/scenarios/static-objects/cssColors.js'
 
+const isDigitChar = (char) => {
+  return (char >= '0') && (char <= '9')
+}
+
+const tokenize = (text) => {
+  const tokens = []
+  let index = 0
+  while (index < text.length) {
+    if (text[index] === ' ' || text[index] === '\t' || text[index] === '\n' || text[index] === '\r') {
+      index += 1
+      continue
+    }
+    const start = index
+    while (index < text.length && text[index] !== ' ' && text[index] !== '\t' && text[index] !== '\n' && text[index] !== '\r') {
+      index += 1
+    }
+    let end = index
+    while (end > start && (text[end - 1] === ',' || text[end - 1] === ';')) {
+      end -= 1
+    }
+    tokens.push({ value: text.slice(start, end), start, end })
+  }
+  return tokens
+}
+
 const isColor = (tokenValues) => {
   const joinedTokenValues = tokenValues.join(SPACE)
-  return /^#([a-f0-9]{3,4}|[a-f0-9]{4}(?:[a-f0-9]{2}){1,2})\b$/i.test(joinedTokenValues) ||
-    /^rgb\((\d{1,3}),\s*(\d{1,3}),\s*(\d{1,3})\)$/.test(joinedTokenValues) ||
-    /^rgba\((\d{1,3}%?),\s*(\d{1,3}%?),\s*(\d{1,3}%?),\s*(\d*(?:\.\d+)?)\)$/.test(joinedTokenValues) ||
+  return isHexColorString(joinedTokenValues) ||
+    isRgbColorString(joinedTokenValues) ||
+    isRgbaColorString(joinedTokenValues) ||
     (cssColors.indexOf(joinedTokenValues) !== -1)
+}
+
+const isHexColorString = (string) => {
+  if (string[0] !== '#') {
+    return false
+  }
+  const hex = string.slice(1)
+  if ((hex.length !== 3) && (hex.length !== 4) && (hex.length !== 6) && (hex.length !== 8)) {
+    return false
+  }
+  const hexDigits = '0123456789abcdefABCDEF'
+  for (let index = 0; index < hex.length; index++) {
+    if (hexDigits.indexOf(hex[index]) === -1) {
+      return false
+    }
+  }
+  return true
+}
+
+const isDigitsUpToThree = (string) => {
+  const trimmed = string.trim()
+  if ((trimmed.length < 1) || (trimmed.length > 3)) {
+    return false
+  }
+  for (let index = 0; index < trimmed.length; index++) {
+    if (!isDigitChar(trimmed[index])) {
+      return false
+    }
+  }
+  return true
+}
+
+const isRgbColorString = (string) => {
+  if (!string.startsWith('rgb(') || !string.endsWith(')')) {
+    return false
+  }
+  const inner = string.slice(4, string.length - 1)
+  const parts = inner.split(',')
+  if (parts.length !== 3) {
+    return false
+  }
+  return parts.every(isDigitsUpToThree)
+}
+
+const isRgbaColorString = (string) => {
+  if (!string.startsWith('rgba(') || !string.endsWith(')')) {
+    return false
+  }
+  const inner = string.slice(5, string.length - 1)
+  const parts = inner.split(',')
+  if (parts.length !== 4) {
+    return false
+  }
+  const firstThreeAreNumbers = parts.slice(0, 3).every((part) => {
+    const trimmed = part.trim()
+    const withoutPercent = trimmed.endsWith('%') ? trimmed.slice(0, trimmed.length - 1) : trimmed
+    return isDigitsUpToThree(withoutPercent)
+  })
+  const lastIsDecimal = (() => {
+    const trimmed = parts[3].trim()
+    if (trimmed.length === 0) {
+      return false
+    }
+    let sawDot = false
+    for (let index = 0; index < trimmed.length; index++) {
+      if (isDigitChar(trimmed[index])) {
+        continue
+      }
+      if (trimmed[index] === '.' && !sawDot) {
+        sawDot = true
+        continue
+      }
+      return false
+    }
+    return true
+  })()
+  return firstThreeAreNumbers && lastIsDecimal
 }
 
 const isSupportedMusicFont = (tokenValues, customMusicFonts) => {
@@ -715,6 +815,14 @@ const isUpHigherDownLower = (string) => {
     (string === HIGHER)
 }
 
+export const replaceMany = (text, steps) => {
+  let result = text
+  for (const [ entry, callback ] of steps) {
+    result = entry.replace(result, callback)
+  }
+  return result
+}
+
 export default {
   punctuation: {
     test: (tokenValues) => {
@@ -733,8 +841,35 @@ export default {
       return [ Number(tokenValues[0]) ]
     }
   },
-  stringHighlight: /(['"])(.+)\1/,
-  numberHighlight: /(\d+)/,
+  stringHighlight: {
+    replace: (text, callback) => {
+      let firstQuote = -1
+      let quote = ''
+      for (let i = 0; i < text.length; i++) {
+        if (text[i] === '"' || text[i] === "'") {
+          firstQuote = i
+          quote = text[i]
+          break
+        }
+      }
+      if (firstQuote === -1) return text
+      const lastQuote = text.lastIndexOf(quote)
+      if (lastQuote <= firstQuote) return text
+      const match = text.slice(firstQuote, lastQuote + 1)
+      return text.slice(0, firstQuote) + callback(match) + text.slice(lastQuote + 1)
+    }
+  },
+  numberHighlight: {
+    replace: (text, callback) => {
+      const tokens = tokenize(text)
+      for (const token of tokens) {
+        if (token.value.length > 0 && [ ...token.value ].every((ch) => ch >= '0' && ch <= '9')) {
+          return text.slice(0, token.start) + callback(token.value) + text.slice(token.end)
+        }
+      }
+      return text
+    }
+  },
   globalCommandDelimiter: {
     replaceAllWithEmptyString: (tokens) => {
       const result = []
@@ -787,7 +922,19 @@ export default {
       return [ tokenValues[0], tokenValues[1] ]
     }
   },
-  verticalCorrectionHighlight: /(\d*\.?\d*)(\s+)(up|down)/,
+  verticalCorrectionHighlight: {
+    replace: (text, callback) => {
+      const tokens = tokenize(text)
+      for (let i = 0; i + 1 < tokens.length; i++) {
+        if ((tokens[i + 1].value === 'up' || tokens[i + 1].value === 'down') && tokens[i].value.length > 0) {
+          const start = tokens[i].start
+          const finish = tokens[i + 1].end
+          return text.slice(0, start) + callback(text.slice(start, finish)) + text.slice(finish)
+        }
+      }
+      return text
+    }
+  },
   horizontalCorrection: {
     test: (tokenValues) => {
       if (
@@ -805,7 +952,19 @@ export default {
       return [ tokenValues[2], tokenValues[0] ]
     }
   },
-  horizontalCorrectionHighlight: /(left|right)(\s+)(by)(\s+)(\d*\.?\d*)/,
+  horizontalCorrectionHighlight: {
+    replace: (text, callback) => {
+      const tokens = tokenize(text)
+      for (let i = 0; i + 2 < tokens.length; i++) {
+        if ((tokens[i].value === 'left' || tokens[i].value === 'right') && tokens[i + 1].value === 'by') {
+          const start = tokens[i].start
+          const finish = tokens[i + 2].end
+          return text.slice(0, start) + callback(text.slice(start, finish)) + text.slice(finish)
+        }
+      }
+      return text
+    }
+  },
   styleName: {
     test: (tokenValues) => {
       return doesFirstArrayContainSecondArray(configurableStyleNamesAsTokens, tokenValues)
@@ -824,8 +983,8 @@ export default {
       if (!styleValueTests[styleKey]) {
         return false
       }
-      if (['musicFont', 'chordLettersFont', 'textFont'].indexOf(styleKey) !== -1) {
-        return styleValueTests[styleKey](tokenValues, customFonts) 
+      if ([ 'musicFont', 'chordLettersFont', 'textFont' ].indexOf(styleKey) !== -1) {
+        return styleValueTests[styleKey](tokenValues, customFonts)
       }
       return styleValueTests[styleKey](tokenValues)
     },
@@ -878,7 +1037,19 @@ export default {
       return areTwoArraysEqual(tokenValues, MEASURE_NUMBERS)
     }
   },
-  measureNumbersHighlight: /measure(\s+)numbers/,
+  measureNumbersHighlight: {
+    replace: (text, callback) => {
+      const tokens = tokenize(text)
+      for (let i = 0; i + 1 < tokens.length; i++) {
+        if (tokens[i + 0].value === 'measure' && tokens[i + 1].value === 'numbers') {
+          const start = tokens[i].start
+          const finish = tokens[i + 1].end
+          return text.slice(0, start) + callback(text.slice(start, finish)) + text.slice(finish)
+        }
+      }
+      return text
+    }
+  },
   applicationOfMeasureNumbers: {
     test: (tokenValues) => {
       return (tokenValues[0] === FOR) &&
@@ -889,7 +1060,22 @@ export default {
       return [ tokenValues.slice(1, tokenValues.length - 1).join(SPACE) ]
     }
   },
-  applicationOfMeasureNumbersHighlight: new RegExp(`(${applicationOfMeasureNumbersNames.join(VERTICAL_LINE)}) measures`.replaceAll(SPACE, SPACE_REGEXP)),
+  applicationOfMeasureNumbersHighlight: {
+    replace: (text, callback) => {
+      const tokens = tokenize(text)
+      for (let i = 0; i < tokens.length; i++) {
+        for (const name of applicationOfMeasureNumbersNames) {
+          const nameTokens = name.split(' ')
+          if (nameTokens.every((w, j) => tokens[i + j] && tokens[i + j].value === w) && tokens[i + nameTokens.length + 0] && tokens[i + nameTokens.length + 0].value === 'measures') {
+            const start = tokens[i].start
+            const finish = tokens[i + nameTokens.length + 0].end
+            return text.slice(0, start) + callback(text.slice(start, finish)) + text.slice(finish)
+          }
+        }
+      }
+      return text
+    }
+  },
   measure: {
     test: (tokenValues) => {
       return (tokenValues[0] === MEASURE) &&
@@ -956,20 +1142,82 @@ export default {
       }
     }
   },
-  staveIndexHighlight: /(((stave|staff)((\w|\s)+\w))|(((\w|\s)+\s)(stave|staff)))/,
-  measureIndexHighlight: /(((measure)((\w|\s)+\w))|(((\w|\s)+\s)(measure)))/,
+  staveIndexHighlight: {
+    replace: (text, callback) => {
+      const tokens = tokenize(text)
+      for (let i = 0; i < tokens.length; i++) {
+        if (tokens[i].value === 'stave' || tokens[i].value === 'staff') {
+          if (tokens[i + 1]) {
+            const start = tokens[i].start
+            const finish = tokens[i + 1].end
+            return text.slice(0, start) + callback(text.slice(start, finish)) + text.slice(finish)
+          }
+        }
+        if (tokens[i + 1] && (tokens[i + 1].value === 'stave' || tokens[i + 1].value === 'staff')) {
+          const start = tokens[i].start
+          const finish = tokens[i + 1].end
+          return text.slice(0, start) + callback(text.slice(start, finish)) + text.slice(finish)
+        }
+      }
+      return text
+    }
+  },
+  measureIndexHighlight: {
+    replace: (text, callback) => {
+      const tokens = tokenize(text)
+      for (let i = 0; i < tokens.length; i++) {
+        if (tokens[i].value === 'measure') {
+          if (tokens[i + 1]) {
+            const start = tokens[i].start
+            const finish = tokens[i + 1].end
+            return text.slice(0, start) + callback(text.slice(start, finish)) + text.slice(finish)
+          }
+        }
+        if (tokens[i + 1] && tokens[i + 1].value === 'measure') {
+          const start = tokens[i].start
+          const finish = tokens[i + 1].end
+          return text.slice(0, start) + callback(text.slice(start, finish)) + text.slice(finish)
+        }
+      }
+      return text
+    }
+  },
   withoutStartBarLine: {
     test: (tokenValues) => {
       return doesFirstArrayContainSecondArray(WITHOUT_START_BARLINE, tokenValues)
     }
   },
-  withoutStartBarLineHighlight: /without(\s+)(opening|start)(\s+)(bar(\s+)line|barline)/,
+  withoutStartBarLineHighlight: {
+    replace: (text, callback) => {
+      const tokens = tokenize(text)
+      for (let i = 0; i + 2 < tokens.length; i++) {
+        if (tokens[i + 0].value === 'without' && [ 'opening', 'start' ].includes(tokens[i + 1].value) && [ 'barline', 'bar' ].includes(tokens[i + 2].value)) {
+          const start = tokens[i].start
+          const finish = tokens[i + 2].end
+          return text.slice(0, start) + callback(text.slice(start, finish)) + text.slice(finish)
+        }
+      }
+      return text
+    }
+  },
   noStartBarLine: {
     test: (tokenValues) => {
       return doesFirstArrayContainSecondArray(NO_START_BARLINE, tokenValues)
     }
   },
-  noStartBarLineHighlight: /no(\s+)(opening|start)(\s+)(bar(\s+)line|barline)/,
+  noStartBarLineHighlight: {
+    replace: (text, callback) => {
+      const tokens = tokenize(text)
+      for (let i = 0; i + 2 < tokens.length; i++) {
+        if (tokens[i + 0].value === 'no' && [ 'opening', 'start' ].includes(tokens[i + 1].value) && [ 'barline', 'bar' ].includes(tokens[i + 2].value)) {
+          const start = tokens[i].start
+          const finish = tokens[i + 2].end
+          return text.slice(0, start) + callback(text.slice(start, finish)) + text.slice(finish)
+        }
+      }
+      return text
+    }
+  },
   opensWithBarLine: {
     test: (tokenValues) => {
       return (STARTS_BEGINS_OPENS.indexOf(tokenValues[0]) !== -1) &&
@@ -1006,8 +1254,38 @@ export default {
       return [ tokenValues.slice(1).join(SPACE) ]
     }
   },
-  openingBarLineHighlight: new RegExp(`((${START}|${OPENING}) )?(${openingBarLineNames.join(VERTICAL_LINE)})`.replaceAll(SPACE, SPACE_REGEXP)),
-  closingBarLineHighlight: new RegExp(`(${CLOSING} )?(${closingBarLineNames.join(VERTICAL_LINE)})`.replaceAll(SPACE, SPACE_REGEXP)),
+  openingBarLineHighlight: {
+    replace: (text, callback) => {
+      const tokens = tokenize(text)
+      for (let i = 0; i < tokens.length; i++) {
+        for (const name of openingBarLineNames) {
+          const nameTokens = name.split(' ')
+          if (nameTokens.every((w, j) => tokens[i + j] && tokens[i + j].value === w)) {
+            const start = (tokens[i - 1] && (tokens[i - 1].value === 'start' || tokens[i - 1].value === 'opening')) ? tokens[i - 1].start : tokens[i].start
+            const finish = tokens[i + nameTokens.length - 1].end
+            return text.slice(0, start) + callback(text.slice(start, finish)) + text.slice(finish)
+          }
+        }
+      }
+      return text
+    }
+  },
+  closingBarLineHighlight: {
+    replace: (text, callback) => {
+      const tokens = tokenize(text)
+      for (let i = 0; i < tokens.length; i++) {
+        for (const name of closingBarLineNames) {
+          const nameTokens = name.split(' ')
+          if (nameTokens.every((w, j) => tokens[i + j] && tokens[i + j].value === w)) {
+            const start = (tokens[i - 1] && tokens[i - 1].value === 'closing') ? tokens[i - 1].start : tokens[i].start
+            const finish = tokens[i + nameTokens.length - 1].end
+            return text.slice(0, start) + callback(text.slice(start, finish)) + text.slice(finish)
+          }
+        }
+      }
+      return text
+    }
+  },
   withRepeatSign: {
     test: (tokenValues) => {
       return doesFirstArrayContainSecondArray(WITH_REPEAT_SIGN, tokenValues)
@@ -1018,31 +1296,112 @@ export default {
       return doesFirstArrayContainSecondArray(REPEAT_SIGN, tokenValues)
     }
   },
-  withRepeatSignHighlight: /((repeat(\s+)sign)|colon)/,
+  withRepeatSignHighlight: {
+    replace: (text, callback) => {
+      const tokens = tokenize(text)
+      for (let i = 0; i < tokens.length; i++) {
+        if (tokens[i].value === 'colon') {
+          return text.slice(0, tokens[i].start) + callback(tokens[i].value) + text.slice(tokens[i].end)
+        }
+        if (tokens[i].value === 'repeat' && tokens[i + 1] && tokens[i + 1].value === 'sign') {
+          const start = tokens[i].start
+          const finish = tokens[i + 1].end
+          return text.slice(0, start) + callback(text.slice(start, finish)) + text.slice(finish)
+        }
+      }
+      return text
+    }
+  },
   atTheStart: {
     test: (tokenValues) => {
       return doesFirstArrayContainSecondArray(AT_THE_START, tokenValues)
     }
   },
-  atTheStartHighlight: /(at(\s+))?(the(\s+))?start/,
+  atTheStartHighlight: {
+    replace: (text, callback) => {
+      const tokens = tokenize(text)
+      for (let i = 0; i < tokens.length; i++) {
+        if (tokens[i].value === 'start') {
+          let j = i
+          if (tokens[j - 1] && tokens[j - 1].value === 'the') j--
+          if (tokens[j - 1] && tokens[j - 1].value === 'at') j--
+          const start = tokens[j].start
+          const finish = tokens[i].end
+          return text.slice(0, start) + callback(text.slice(start, finish)) + text.slice(finish)
+        }
+      }
+      return text
+    }
+  },
   atTheEnd: {
     test: (tokenValues) => {
       return doesFirstArrayContainSecondArray(AT_THE_END, tokenValues)
     }
   },
-  atTheEndHighlight: /(at(\s+))?(the(\s+))?end/,
+  atTheEndHighlight: {
+    replace: (text, callback) => {
+      const tokens = tokenize(text)
+      for (let i = 0; i < tokens.length; i++) {
+        if (tokens[i].value === 'end') {
+          let j = i
+          if (tokens[j - 1] && tokens[j - 1].value === 'the') j--
+          if (tokens[j - 1] && tokens[j - 1].value === 'at') j--
+          const start = tokens[j].start
+          const finish = tokens[i].end
+          return text.slice(0, start) + callback(text.slice(start, finish)) + text.slice(finish)
+        }
+      }
+      return text
+    }
+  },
   atTheStartOfTheMeasure: {
     test: (tokenValues) => {
       return doesFirstArrayContainSecondArray(AT_THE_START_OF_THE_MEASURE, tokenValues)
     }
   },
-  atTheStartOfTheMeasureHighlight: /(at(\s+))?(the(\s+))?start((\s+)of)?((\s+)the)?((\s+)measure)?/,
+  atTheStartOfTheMeasureHighlight: {
+    replace: (text, callback) => {
+      const tokens = tokenize(text)
+      for (let i = 0; i < tokens.length; i++) {
+        if (tokens[i].value === 'start') {
+          let j = i
+          if (tokens[j - 1] && tokens[j - 1].value === 'measure') j--
+          if (tokens[j - 1] && tokens[j - 1].value === 'the') j--
+          if (tokens[j - 1] && tokens[j - 1].value === 'of') j--
+          if (tokens[j - 1] && tokens[j - 1].value === 'the') j--
+          if (tokens[j - 1] && tokens[j - 1].value === 'at') j--
+          const start = tokens[j].start
+          const finish = tokens[i].end
+          return text.slice(0, start) + callback(text.slice(start, finish)) + text.slice(finish)
+        }
+      }
+      return text
+    }
+  },
   atTheEndOfTheMeasure: {
     test: (tokenValues) => {
       return doesFirstArrayContainSecondArray(AT_THE_END_OF_THE_MEASURE, tokenValues)
     }
   },
-  atTheEndOfTheMeasureHighlight: /(at(\s+))?(the(\s+))?end((\s+)of)?((\s+)the)?((\s+)measure)?/,
+  atTheEndOfTheMeasureHighlight: {
+    replace: (text, callback) => {
+      const tokens = tokenize(text)
+      for (let i = 0; i < tokens.length; i++) {
+        if (tokens[i].value === 'end') {
+          let j = i
+          if (tokens[j - 1] && tokens[j - 1].value === 'measure') j--
+          if (tokens[j - 1] && tokens[j - 1].value === 'the') j--
+          if (tokens[j - 1] && tokens[j - 1].value === 'of') j--
+          if (tokens[j - 1] && tokens[j - 1].value === 'the') j--
+          if (tokens[j - 1] && tokens[j - 1].value === 'at') j--
+          const start = tokens[j].start
+          const finish = tokens[i].end
+          return text.slice(0, start) + callback(text.slice(start, finish)) + text.slice(finish)
+        }
+      }
+      return text
+    }
+  },
   withMeasureRest: {
     test: (tokenValues) => {
       return doesFirstArrayContainSecondArray(WITH_MEASURE_REST, tokenValues)
@@ -1053,7 +1412,19 @@ export default {
       return doesFirstArrayContainSecondArray(MEASURE_REST, tokenValues)
     }
   },
-  measureRestHighlight: /(multi\s+)?measure(\s+)rest/,
+  measureRestHighlight: {
+    replace: (text, callback) => {
+      const tokens = tokenize(text)
+      for (let i = 0; i < tokens.length; i++) {
+        if (tokens[i].value === 'measure' && tokens[i + 1] && tokens[i + 1].value === 'rest') {
+          const start = (tokens[i - 1] && tokens[i - 1].value === 'multi') ? tokens[i - 1].start : tokens[i].start
+          const finish = tokens[i + 1].end
+          return text.slice(0, start) + callback(text.slice(start, finish)) + text.slice(finish)
+        }
+      }
+      return text
+    }
+  },
   multiMeasureRestCount: {
     test: (tokenValues) => {
       return isPositiveInteger(tokenValues[0]) && (tokenValues[1] === TIMES)
@@ -1092,9 +1463,43 @@ export default {
       return doesFirstArrayContainSecondArray(SIMILE_OF_TWO_PREVIOUS_MEASURES, tokenValues)
     }
   },
-  simileHighlight: /(simile|repeat)/,
-  previousMeasureHighlight: /prev(.|ious)?(\s+)measure/,
-  twoPreviousMeasuresHighlight: /(two|2)(\s+)prev(.|ious)?(\s+)measures/,
+  simileHighlight: {
+    replace: (text, callback) => {
+      const tokens = tokenize(text)
+      for (const token of tokens) {
+        if (token.value === 'simile' || token.value === 'repeat') {
+          return text.slice(0, token.start) + callback(token.value) + text.slice(token.end)
+        }
+      }
+      return text
+    }
+  },
+  previousMeasureHighlight: {
+    replace: (text, callback) => {
+      const tokens = tokenize(text)
+      for (let i = 0; i + 1 < tokens.length; i++) {
+        if ([ 'prev', 'previous' ].includes(tokens[i + 0].value) && tokens[i + 1].value === 'measure') {
+          const start = tokens[i].start
+          const finish = tokens[i + 1].end
+          return text.slice(0, start) + callback(text.slice(start, finish)) + text.slice(finish)
+        }
+      }
+      return text
+    }
+  },
+  twoPreviousMeasuresHighlight: {
+    replace: (text, callback) => {
+      const tokens = tokenize(text)
+      for (let i = 0; i + 2 < tokens.length; i++) {
+        if ([ 'two', '2' ].includes(tokens[i + 0].value) && [ 'prev', 'previous' ].includes(tokens[i + 1].value) && tokens[i + 2].value === 'measures') {
+          const start = tokens[i].start
+          const finish = tokens[i + 2].end
+          return text.slice(0, start) + callback(text.slice(start, finish)) + text.slice(finish)
+        }
+      }
+      return text
+    }
+  },
   simileCount: {
     test: (tokenValues) => {
       return isPositiveInteger(tokenValues[0]) && (tokenValues[1] === TIMES)
@@ -1113,14 +1518,36 @@ export default {
       return tokenValues[0] === LINE
     }
   },
-  newHighlight: /new(\s+)/,
+  newHighlight: {
+    replace: (text, callback) => {
+      const tokens = tokenize(text)
+      for (let i = 0; i < tokens.length; i++) {
+        if (tokens[i].value === 'new') {
+          const start = tokens[i].start
+          const finish = tokens[i + 1] ? tokens[i + 1].start : text.length
+          return text.slice(0, start) + callback(text.slice(start, finish)) + text.slice(finish)
+        }
+      }
+      return text
+    }
+  },
   lineHighlight: LINE,
   crossStaveConnection: {
     test: (tokenValues) => {
       return CROSS_STAVE_CONNECTIONS.indexOf(tokenValues[0]) !== -1
     }
   },
-  crossStaveConnectionHighlight: /(bracket|brace)/,
+  crossStaveConnectionHighlight: {
+    replace: (text, callback) => {
+      const tokens = tokenize(text)
+      for (const token of tokens) {
+        if (token.value === 'bracket' || token.value === 'brace') {
+          return text.slice(0, token.start) + callback(token.value) + text.slice(token.end)
+        }
+      }
+      return text
+    }
+  },
   to: {
     test: (tokenValues) => {
       return (tokenValues[0] === TO) &&
@@ -1139,7 +1566,7 @@ export default {
         (tokenValues.length === 1)
     }
   },
-  of : {
+  of: {
     test: (tokenValues) => {
       return (tokenValues[0] === OF) &&
         (tokenValues.length === 1)
@@ -1162,7 +1589,17 @@ export default {
       return doesFirstArrayContainSecondArray(STAVE_WITH_AND_WITHOUT_DELIMITER, tokenValues)
     }
   },
-  staveHighlight: /stave|staff/,
+  staveHighlight: {
+    replace: (text, callback) => {
+      const tokens = tokenize(text)
+      for (const token of tokens) {
+        if (token.value === 'stave' || token.value === 'staff') {
+          return text.slice(0, token.start) + callback(token.value) + text.slice(token.end)
+        }
+      }
+      return text
+    }
+  },
   instrumentTitle: {
     test: (tokenValues) => {
       return (
@@ -1221,7 +1658,20 @@ export default {
       }
     }
   },
-  instrumentTitleHighlight: /instrument( title)?/,
+  instrumentTitleHighlight: {
+    replace: (text, callback) => {
+      const tokens = tokenize(text)
+      for (let i = 0; i < tokens.length; i++) {
+        if (tokens[i].value === 'instrument') {
+          const end = (tokens[i + 1] && tokens[i + 1].value === 'title') ? i + 2 : i + 1
+          const start = tokens[i].start
+          const finish = tokens[end - 1].end
+          return text.slice(0, start) + callback(text.slice(start, finish)) + text.slice(finish)
+        }
+      }
+      return text
+    }
+  },
   between: {
     test: (tokenValues) => {
       return (tokenValues[0] === BETWEEN) &&
@@ -1239,7 +1689,19 @@ export default {
       return areTwoArraysEqual(tokenValues, KEY_SIGNATURE)
     }
   },
-  keySignatureHighlight: /key(\s+)signature/,
+  keySignatureHighlight: {
+    replace: (text, callback) => {
+      const tokens = tokenize(text)
+      for (let i = 0; i + 1 < tokens.length; i++) {
+        if (tokens[i + 0].value === 'key' && tokens[i + 1].value === 'signature') {
+          const start = tokens[i].start
+          const finish = tokens[i + 1].end
+          return text.slice(0, start) + callback(text.slice(start, finish)) + text.slice(finish)
+        }
+      }
+      return text
+    }
+  },
   keySignatureName: {
     test: (tokenValues) => {
       if (tokenValues[0] === IS) {
@@ -1255,13 +1717,40 @@ export default {
       return [ joinedTokenValues ]
     }
   },
-  keySignatureNameHighlight: new RegExp(`(${allKeySignatureNamesWithDelimeter})`.replaceAll(' ', '(\\s+)')),
+  keySignatureNameHighlight: {
+    replace: (text, callback) => {
+      const tokens = tokenize(text)
+      for (let i = 0; i < tokens.length; i++) {
+        for (const name of separateKeySignatureNames) {
+          const nameTokens = name.split(' ')
+          if (nameTokens.every((w, j) => tokens[i + j] && tokens[i + j].value === w)) {
+            const start = tokens[i].start
+            const finish = tokens[i + nameTokens.length - 1].end
+            return text.slice(0, start) + callback(text.slice(start, finish)) + text.slice(finish)
+          }
+        }
+      }
+      return text
+    }
+  },
   timeSignature: {
     test: (tokenValues) => {
       return areTwoArraysEqual(tokenValues, TIME_SIGNATURE)
     }
   },
-  timeSignatureHighlight: /time(\s+)signature/,
+  timeSignatureHighlight: {
+    replace: (text, callback) => {
+      const tokens = tokenize(text)
+      for (let i = 0; i + 1 < tokens.length; i++) {
+        if (tokens[i + 0].value === 'time' && tokens[i + 1].value === 'signature') {
+          const start = tokens[i].start
+          const finish = tokens[i + 1].end
+          return text.slice(0, start) + callback(text.slice(start, finish)) + text.slice(finish)
+        }
+      }
+      return text
+    }
+  },
   color: {
     test: (tokenValues) => {
       return tokenValues.indexOf(COLOR) !== -1 ||
@@ -1366,7 +1855,27 @@ export default {
       }
     }
   },
-  timeSignatureValueHighlight: new RegExp('((\\d+:\\d+)|crossed c|c)'.replaceAll(SPACE, SPACE_REGEXP)),
+  timeSignatureValueHighlight: {
+    replace: (text, callback) => {
+      const tokens = tokenize(text)
+      for (let i = 0; i + 1 < tokens.length; i++) {
+        if (tokens[i].value === 'crossed' && tokens[i + 1].value === 'c') {
+          const start = tokens[i].start
+          const finish = tokens[i + 1].end
+          return text.slice(0, start) + callback(text.slice(start, finish)) + text.slice(finish)
+        }
+      }
+      for (const token of tokens) {
+        if (token.value === 'c') {
+          return text.slice(0, token.start) + callback(token.value) + text.slice(token.end)
+        }
+        if (token.value.length > 0 && [ ...token.value ].every((ch) => (ch >= '0' && ch <= '9') || ch === ':')) {
+          return text.slice(0, token.start) + callback(token.value) + text.slice(token.end)
+        }
+      }
+      return text
+    }
+  },
   repetitionNote: {
     test: (tokenValues) => {
       if (tokenValues[2] === IS) {
@@ -1401,7 +1910,19 @@ export default {
       return [ repeatNoteValue ]
     }
   },
-  repetitionNoteHighlight: /repetition(\s+)(mark|note|instruction)/,
+  repetitionNoteHighlight: {
+    replace: (text, callback) => {
+      const tokens = tokenize(text)
+      for (let i = 0; i + 1 < tokens.length; i++) {
+        if (tokens[i + 0].value === 'repetition' && [ 'mark', 'note', 'instruction' ].includes(tokens[i + 1].value)) {
+          const start = tokens[i].start
+          const finish = tokens[i + 1].end
+          return text.slice(0, start) + callback(text.slice(start, finish)) + text.slice(finish)
+        }
+      }
+      return text
+    }
+  },
   coda: {
     test: (tokenValues) => {
       return tokenValues[0] === CODA
@@ -1414,7 +1935,17 @@ export default {
         (tokenValues[0] === SEGNO)
     }
   },
-  signHighlight: /sign|segno/,
+  signHighlight: {
+    replace: (text, callback) => {
+      const tokens = tokenize(text)
+      for (const token of tokens) {
+        if (token.value === 'sign' || token.value === 'segno') {
+          return text.slice(0, token.start) + callback(token.value) + text.slice(token.end)
+        }
+      }
+      return text
+    }
+  },
   tempoOrMetronome: {
     test: (tokenValues) => {
       return (tokenValues[0] === TEMPO) ||
@@ -1434,7 +1965,23 @@ export default {
         areTwoArraysEqual(tokenValues, TEMPO_NOTE)
     }
   },
-  tempoMarkHighlight: /(tempo(\s+)mark|tempo(\s+)note|tempo|metronome|metro)/,
+  tempoMarkHighlight: {
+    replace: (text, callback) => {
+      const tokens = tokenize(text)
+      for (let i = 0; i < tokens.length; i++) {
+        if (tokens[i].value === 'metronome' || tokens[i].value === 'metro') {
+          return text.slice(0, tokens[i].start) + callback(tokens[i].value) + text.slice(tokens[i].end)
+        }
+        if (tokens[i].value === 'tempo') {
+          const end = (tokens[i + 1] && (tokens[i + 1].value === 'mark' || tokens[i + 1].value === 'note')) ? i + 2 : i + 1
+          const start = tokens[i].start
+          const finish = tokens[end - 1].end
+          return text.slice(0, start) + callback(text.slice(start, finish)) + text.slice(finish)
+        }
+      }
+      return text
+    }
+  },
   tempoMarkWithDotHighlight: {
     test: (string) => {
       const stringWithoutDoubleSpacesAndTrimmed = removeDoubleSpacesAndTrim(string)
@@ -1461,8 +2008,82 @@ export default {
       return [ unwrapValueFromQuotes(tokenValues) ]
     }
   },
-  tempoDurationPart: new RegExp(`(${tempoDurationPartNames.join(VERTICAL_LINE)}|dotted|with dot)`),
-  tempoDurationPartHighlight: new RegExp(`(${tempoDurationPartNames.join(VERTICAL_LINE)}|dotted|with dot)`, 'g'),
+  tempoDurationPart: {
+    split: (text) => {
+      const numericDurations = [ '1/64', '1/32', '1/16', '1/8', '1/4', '1/2', '1' ]
+      const wordDurations = [ 'thirty second', 'sixty fourth', 'whole', 'half', 'quarter', 'eighth', 'sixteenth', 'dotted', 'with dot' ]
+      const result = []
+      let lastIndex = 0
+      let index = 0
+      while (index <= text.length) {
+        let matched = null
+        for (const duration of numericDurations) {
+          if (text.startsWith(duration, index)) {
+            const after = text[index + duration.length]
+            if (after !== undefined && (isDigitChar(after) || after === '/')) {
+              continue
+            }
+            if (matched === null || duration.length > matched.length) {
+              matched = duration
+            }
+          }
+        }
+        for (const duration of wordDurations) {
+          if (text.startsWith(duration, index) && (matched === null || duration.length > matched.length)) {
+            matched = duration
+          }
+        }
+        if (matched === null) {
+          index += 1
+          continue
+        }
+        result.push(text.slice(lastIndex, index))
+        result.push(matched)
+        lastIndex = index + matched.length
+        index = lastIndex
+      }
+      result.push(text.slice(lastIndex))
+      return result
+    }
+  },
+  tempoDurationPartHighlight: {
+    replace: (text, callback) => {
+      const numericDurations = [ '1/64', '1/32', '1/16', '1/8', '1/4', '1/2', '1' ]
+      const wordDurations = [ 'thirty second', 'sixty fourth', 'whole', 'half', 'quarter', 'eighth', 'sixteenth', 'dotted', 'with dot' ]
+      let result = ''
+      let lastIndex = 0
+      let index = 0
+      while (index <= text.length) {
+        let matched = null
+        for (const duration of numericDurations) {
+          if (text.startsWith(duration, index)) {
+            const after = text[index + duration.length]
+            if (after !== undefined && (isDigitChar(after) || after === '/')) {
+              continue
+            }
+            if (matched === null || duration.length > matched.length) {
+              matched = duration
+            }
+          }
+        }
+        for (const duration of wordDurations) {
+          if (text.startsWith(duration, index) && (matched === null || duration.length > matched.length)) {
+            matched = duration
+          }
+        }
+        if (matched === null) {
+          index += 1
+          continue
+        }
+        result += text.slice(lastIndex, index)
+        result += callback(matched, matched, index, text)
+        lastIndex = index + matched.length
+        index = lastIndex
+      }
+      result += text.slice(lastIndex)
+      return result
+    }
+  },
   tempoDurationPartIsDot: {
     test: (tokenValues) => {
       return (tokenValues[0] === DOTTED) ||
@@ -1488,7 +2109,22 @@ export default {
       return [ tokenValues.slice(0, tokenValues.length - 1).join(SPACE) ]
     }
   },
-  clefHighlight: new RegExp(`(${clefNames.join(VERTICAL_LINE)}) clef`.replaceAll(SPACE, SPACE_REGEXP)),
+  clefHighlight: {
+    replace: (text, callback) => {
+      const tokens = tokenize(text)
+      for (let i = 0; i < tokens.length; i++) {
+        for (const name of clefNames) {
+          const nameTokens = name.split(' ')
+          if (nameTokens.every((w, j) => tokens[i + j] && tokens[i + j].value === w) && tokens[i + nameTokens.length + 0] && tokens[i + nameTokens.length + 0].value === 'clef') {
+            const start = tokens[i].start
+            const finish = tokens[i + nameTokens.length + 0].end
+            return text.slice(0, start) + callback(text.slice(start, finish)) + text.slice(finish)
+          }
+        }
+      }
+      return text
+    }
+  },
   voice: {
     test: (tokenValues) => {
       return tokenValues[0] === VOICE
@@ -1530,7 +2166,35 @@ export default {
     }
   },
   // a note counts only between spaces, delimiters or the ends of the text, so neither the `a` nor the `d` of `and` in `c and d` is taken for a note
-  noteWithDurationAndOctaveHighlight: new RegExp(`(?<![^\\s,;])(${noteDurationNames.join(VERTICAL_LINE)})?( *)(${noteNames.join(VERTICAL_LINE)})(\\d)?(?![^\\s,;])`),
+  noteWithDurationAndOctaveHighlight: {
+    replace: (text, callback) => {
+      for (let index = 0; index < text.length; index++) {
+        const before = index === 0 ? '' : text[index - 1]
+        if (before !== '' && before !== ' ' && before !== '\t' && before !== '\n' && before !== '\r' && before !== ',' && before !== ';') continue
+        let cursor = index
+        let matchedDuration = null
+        for (const duration of noteDurationNames) {
+          if (text.startsWith(duration, cursor) && (matchedDuration === null || duration.length > matchedDuration.length)) matchedDuration = duration
+        }
+        if (matchedDuration) {
+          cursor += matchedDuration.length
+          if (text[cursor] === ' ') cursor += 1
+        }
+        let matchedNote = null
+        for (const noteName of noteNames) {
+          if (text.startsWith(noteName, cursor) && (matchedNote === null || noteName.length > matchedNote.length)) matchedNote = noteName
+        }
+        if (!matchedNote) continue
+        cursor += matchedNote.length
+        if (text[cursor] >= '0' && text[cursor] <= '9') cursor += 1
+        const after = text[cursor] || ''
+        if (after !== '' && after !== ' ' && after !== '\t' && after !== '\n' && after !== '\r' && after !== ',' && after !== ';') continue
+        const matched = text.slice(index, cursor)
+        return text.slice(0, index) + callback(matched) + text.slice(cursor)
+      }
+      return text
+    }
+  },
   stemDirection: {
     test: (tokenValues) => {
       return (
@@ -1613,7 +2277,22 @@ export default {
       }
     }
   },
-  stavePositionHighlight: new RegExp(`(${stavePositionNames.join(VERTICAL_LINE)})(\\s+)(stave|staff)`),
+  stavePositionHighlight: {
+    replace: (text, callback) => {
+      const tokens = tokenize(text)
+      for (let i = 0; i < tokens.length; i++) {
+        for (const name of stavePositionNames) {
+          const nameTokens = name.split(' ')
+          if (nameTokens.every((w, j) => tokens[i + j] && tokens[i + j].value === w) && tokens[i + nameTokens.length] && (tokens[i + nameTokens.length].value === 'stave' || tokens[i + nameTokens.length].value === 'staff')) {
+            const start = tokens[i].start
+            const finish = tokens[i + nameTokens.length].end
+            return text.slice(0, start) + callback(text.slice(start, finish)) + text.slice(finish)
+          }
+        }
+      }
+      return text
+    }
+  },
   withNumberOfDots: {
     test: (tokenValues) => {
       return (
@@ -1628,7 +2307,21 @@ export default {
       return [ tokenValues[1] ]
     }
   },
-  withNumberOfDotsHighlight: /(with\s+)(((\w|\s)+)(\s+)dots)/,
+  withNumberOfDotsHighlight: {
+    replace: (text, callback) => {
+      const tokens = tokenize(text)
+      for (let i = 0; i + 2 < tokens.length; i++) {
+        if (tokens[i].value === 'with' && tokens[i + 2].value === 'dots') {
+          const p1 = text.slice(tokens[i].start, tokens[i + 1].start)
+          const start = tokens[i].start
+          const finish = tokens[i + 2].end
+          const p2 = text.slice(tokens[i + 1].start, finish)
+          return text.slice(0, start) + callback(text.slice(start, finish), p1, p2) + text.slice(finish)
+        }
+      }
+      return text
+    }
+  },
   dotted: {
     test: (tokenValues) => {
       return (
@@ -1656,7 +2349,21 @@ export default {
       )
     }
   },
-  withDotHighlight: /( (1|one))? dot/,
+  withDotHighlight: {
+    replace: (text, callback) => {
+      const tokens = tokenize(text)
+      for (let i = 0; i < tokens.length; i++) {
+        if (tokens[i].value === 'dot') {
+          let j = i
+          if (tokens[j - 1] && (tokens[j - 1].value === '1' || tokens[j - 1].value === 'one')) j--
+          const start = tokens[j].start
+          const finish = tokens[i].end
+          return text.slice(0, start) + callback(text.slice(start, finish)) + text.slice(finish)
+        }
+      }
+      return text
+    }
+  },
   beamed: {
     test: (tokenValues) => {
       return areTwoArraysEqual(tokenValues, IS_BEAMED) ||
@@ -1682,7 +2389,23 @@ export default {
         areTwoArraysEqual(tokenValues, WITH_ONLY_PRIMARY_LINE)
     }
   },
-  withOnlyPrimaryLineHighlight: /only(\s+)(primary|one)?(\s+)line/,
+  withOnlyPrimaryLineHighlight: {
+    replace: (text, callback) => {
+      const tokens = tokenize(text)
+      for (let i = 0; i < tokens.length; i++) {
+        if (tokens[i].value === 'line') {
+          let j = i
+          if (tokens[j - 1] && (tokens[j - 1].value === 'primary' || tokens[j - 1].value === 'one')) j--
+          if (tokens[j - 1] && tokens[j - 1].value === 'only') {
+            const start = tokens[j - 1].start
+            const finish = tokens[i].end
+            return text.slice(0, start) + callback(text.slice(start, finish)) + text.slice(finish)
+          }
+        }
+      }
+      return text
+    }
+  },
   withNoteKey: {
     test: (tokenValues) => {
       return (
@@ -1701,14 +2424,47 @@ export default {
       return [ tokenValues.slice(1, tokenValues.length - 1).join(SPACE) ]
     }
   },
-  withNoteKeyHighlight: new RegExp(`((${noteKeyNames.join(VERTICAL_LINE)})(\\s+)key)|(${mainNoteKeyNames.join(VERTICAL_LINE)})`),
+  withNoteKeyHighlight: {
+    replace: (text, callback) => {
+      const tokens = tokenize(text)
+      for (let i = 0; i < tokens.length; i++) {
+        for (const name of noteKeyNames) {
+          const nameTokens = name.split(' ')
+          if (nameTokens.every((w, j) => tokens[i + j] && tokens[i + j].value === w) && tokens[i + nameTokens.length] && tokens[i + nameTokens.length].value === 'key') {
+            const start = tokens[i].start
+            const finish = tokens[i + nameTokens.length].end
+            return text.slice(0, start) + callback(text.slice(start, finish)) + text.slice(finish)
+          }
+        }
+        for (const name of mainNoteKeyNames) {
+          const nameTokens = name.split(' ')
+          if (nameTokens.every((w, j) => tokens[i + j] && tokens[i + j].value === w)) {
+            const start = tokens[i].start
+            const finish = tokens[i + nameTokens.length - 1].end
+            return text.slice(0, start) + callback(text.slice(start, finish)) + text.slice(finish)
+          }
+        }
+      }
+      return text
+    }
+  },
   withParentheses: {
     test: (tokenValues) => {
       return areTwoArraysEqual(tokenValues, WITH_BRACKETS) ||
         areTwoArraysEqual(tokenValues, WITH_PARENTHESES)
     }
   },
-  withParenthesesHighlight: /(parentheses|brackets)/,
+  withParenthesesHighlight: {
+    replace: (text, callback) => {
+      const tokens = tokenize(text)
+      for (const token of tokens) {
+        if (token.value === 'parentheses' || token.value === 'brackets') {
+          return text.slice(0, token.start) + callback(token.value) + text.slice(token.end)
+        }
+      }
+      return text
+    }
+  },
   withText: {
     test: (tokenValues) => {
       return (
@@ -1801,7 +2557,19 @@ export default {
       return [ tokenValues[2] ]
     }
   },
-  roundnessHighlight: /(roundness|convex)(\s+)(10|[1-9])/,
+  roundnessHighlight: {
+    replace: (text, callback) => {
+      const tokens = tokenize(text)
+      for (let i = 0; i + 1 < tokens.length; i++) {
+        if ((tokens[i].value === 'roundness' || tokens[i].value === 'convex') && tokens[i + 1].value.length > 0 && [ ...tokens[i + 1].value ].every((ch) => ch >= '0' && ch <= '9')) {
+          const start = tokens[i].start
+          const finish = tokens[i + 1].end
+          return text.slice(0, start) + callback(text.slice(start, finish)) + text.slice(finish)
+        }
+      }
+      return text
+    }
+  },
   tiedWithNext: {
     test: (tokenValues) => {
       return areTwoArraysEqual(tokenValues, IS_TIED_WITH_NEXT) ||
@@ -1853,7 +2621,22 @@ export default {
       return [ null, null ]
     }
   },
-  topMidBottomRestHighlight: new RegExp(`(${noteDurationNames.join(VERTICAL_LINE)})?( *)((top|middle|mid|bottom)(\\s+))?rest`),
+  topMidBottomRestHighlight: {
+    replace: (text, callback) => {
+      const tokens = tokenize(text)
+      for (let i = 0; i < tokens.length; i++) {
+        if (tokens[i].value === 'rest') {
+          let j = i
+          if (tokens[j - 1] && [ 'top', 'middle', 'mid', 'bottom' ].includes(tokens[j - 1].value)) j--
+          if (tokens[j - 1] && noteDurationNames.includes(tokens[j - 1].value)) j--
+          const start = tokens[j].start
+          const finish = tokens[i].end
+          return text.slice(0, start) + callback(text.slice(start, finish)) + text.slice(finish)
+        }
+      }
+      return text
+    }
+  },
   isRest: {
     test: (tokenValues) => {
       return areTwoArraysEqual(tokenValues, IS_REST)
@@ -1897,7 +2680,19 @@ export default {
       return areTwoArraysEqual(tokenValues, WITH_CRUSH_LINE)
     }
   },
-  crushLineHighlight: /crush\s+line/,
+  crushLineHighlight: {
+    replace: (text, callback) => {
+      const tokens = tokenize(text)
+      for (let i = 0; i + 1 < tokens.length; i++) {
+        if (tokens[i + 0].value === 'crush' && tokens[i + 1].value === 'line') {
+          const start = tokens[i].start
+          const finish = tokens[i + 1].end
+          return text.slice(0, start) + callback(text.slice(start, finish)) + text.slice(finish)
+        }
+      }
+      return text
+    }
+  },
   measureNumber: {
     test: (tokenValues) => {
       return (tokenValues[0] === MEASURE) &&
@@ -1969,7 +2764,48 @@ export default {
       return [ breathMarkNames[0] ]
     }
   },
-  withBreathMarkBeforeHighlight: new RegExp(`breath( mark)?( (${breathMarkNames.join(VERTICAL_LINE)}))?|(${breathMarkNames.join(VERTICAL_LINE)})`.replaceAll(' ', SPACE_REGEXP), 'g'),
+  withBreathMarkBeforeHighlight: {
+    replace: (text, callback) => {
+      const tokens = tokenize(text)
+      const matchNameLength = (index) => {
+        let best = 0
+        for (const name of breathMarkNames) {
+          const nameTokens = name.split(' ')
+          if (nameTokens.every((w, k) => tokens[index + k] && tokens[index + k].value === w) && nameTokens.length > best) {
+            best = nameTokens.length
+          }
+        }
+        return best
+      }
+      let result = ''
+      let copied = 0
+      let i = 0
+      while (i < tokens.length) {
+        let end = -1
+        if (tokens[i].value === 'breath') {
+          let j = i + 1
+          if (tokens[j] && tokens[j].value === 'mark') j++
+          const nameLength = matchNameLength(j)
+          if (nameLength > 0) j += nameLength
+          end = j
+        } else {
+          const nameLength = matchNameLength(i)
+          if (nameLength > 0) end = i + nameLength
+        }
+        if (end !== -1) {
+          const start = tokens[i].start
+          const finish = tokens[end - 1].end
+          result += text.slice(copied, start)
+          result += callback(text.slice(start, finish))
+          copied = finish
+          i = end
+        } else {
+          i++
+        }
+      }
+      return result + text.slice(copied)
+    }
+  },
   withKeySignatureBefore: {
     test: (tokenValues) => {
       return (
@@ -2050,7 +2886,22 @@ export default {
       return [ tokenValues.slice(1).join(SPACE) ]
     }
   },
-  withArticulationHighlight: new RegExp(`(${articulationNames.join(VERTICAL_LINE)})`.replaceAll(SPACE, SPACE_REGEXP)),
+  withArticulationHighlight: {
+    replace: (text, callback) => {
+      const tokens = tokenize(text)
+      for (let i = 0; i < tokens.length; i++) {
+        for (const name of articulationNames) {
+          const nameTokens = name.split(' ')
+          if (nameTokens.every((w, j) => tokens[i + j] && tokens[i + j].value === w)) {
+            const start = tokens[i].start
+            const finish = tokens[i + nameTokens.length - 1].end
+            return text.slice(0, start) + callback(text.slice(start, finish)) + text.slice(finish)
+          }
+        }
+      }
+      return text
+    }
+  },
   withTurn: {
     test: (tokenValues) => {
       return areTwoArraysEqual(WITH_TURN, tokenValues)
@@ -2084,7 +2935,22 @@ export default {
       return [ tokenValues.slice(1, tokenValueWithKeyIndex).join(SPACE), tokenValues[tokenValueWithKeyIndex + 1] ]
     }
   },
-  ornamentKeyHighlight: new RegExp(`(${ornamentKeyNames.join(VERTICAL_LINE)}) key`.replaceAll(SPACE, SPACE_REGEXP)),
+  ornamentKeyHighlight: {
+    replace: (text, callback) => {
+      const tokens = tokenize(text)
+      for (let i = 0; i < tokens.length; i++) {
+        for (const name of ornamentKeyNames) {
+          const nameTokens = name.split(' ')
+          if (nameTokens.every((w, j) => tokens[i + j] && tokens[i + j].value === w) && tokens[i + nameTokens.length + 0] && tokens[i + nameTokens.length + 0].value === 'key') {
+            const start = tokens[i].start
+            const finish = tokens[i + nameTokens.length + 0].end
+            return text.slice(0, start) + callback(text.slice(start, finish)) + text.slice(finish)
+          }
+        }
+      }
+      return text
+    }
+  },
   isInverted: {
     test: (tokenValues) => {
       return ((tokenValues[0] === INVERTED) && (tokenValues.length === 1)) ||
@@ -2140,7 +3006,19 @@ export default {
     }
   },
   withChordHighlight: CHORD,
-  withChordWithDurationHighlight: new RegExp(`(${noteDurationNames.join(VERTICAL_LINE)})?( *)chord`),
+  withChordWithDurationHighlight: {
+    replace: (text, callback) => {
+      const tokens = tokenize(text)
+      for (let i = 0; i < tokens.length; i++) {
+        if (tokens[i].value === 'chord') {
+          const start = (tokens[i - 1] && noteDurationNames.includes(tokens[i - 1].value)) ? tokens[i - 1].start : tokens[i].start
+          const finish = tokens[i].end
+          return text.slice(0, start) + callback(text.slice(start, finish)) + text.slice(finish)
+        }
+      }
+      return text
+    }
+  },
   isOctaveOrTwoOctavesHigherOrLower: {
     test: (tokenValues) => {
       return (
@@ -2195,7 +3073,19 @@ export default {
       }
     }
   },
-  isOctaveOrTwoOctavesHigherOrLowerHighlight: /((2|two)(\s+))?octave(s)?/,
+  isOctaveOrTwoOctavesHigherOrLowerHighlight: {
+    replace: (text, callback) => {
+      const tokens = tokenize(text)
+      for (let i = 0; i < tokens.length; i++) {
+        if (tokens[i].value === 'octave' || tokens[i].value === 'octaves') {
+          const start = (tokens[i - 1] && (tokens[i - 1].value === '2' || tokens[i - 1].value === 'two')) ? tokens[i - 1].start : tokens[i].start
+          const finish = tokens[i].end
+          return text.slice(0, start) + callback(text.slice(start, finish)) + text.slice(finish)
+        }
+      }
+      return text
+    }
+  },
   octaveOrTwoOctavesHigherOrLower: {
     test: (tokenValues) => {
       return (
@@ -2241,7 +3131,19 @@ export default {
       return [ tokenValues[1] ]
     }
   },
-  withNumberOfStrokesHighlight: /(\w+)(\s+)stroke(s)?/,
+  withNumberOfStrokesHighlight: {
+    replace: (text, callback) => {
+      const tokens = tokenize(text)
+      for (let i = 0; i + 1 < tokens.length; i++) {
+        if (tokens[i + 1].value === 'stroke' || tokens[i + 1].value === 'strokes') {
+          const start = tokens[i].start
+          const finish = tokens[i + 1].end
+          return text.slice(0, start) + callback(text.slice(start, finish)) + text.slice(finish)
+        }
+      }
+      return text
+    }
+  },
   numberOfTimes: {
     test: (tokenValues) => {
       return (
@@ -2257,7 +3159,16 @@ export default {
       return [ tokenValues[0] ]
     }
   },
-  numberOfTimesHighlight: /^(\d+) time(s)?$/,
+  numberOfTimesHighlight: {
+    replace: (text, callback) => {
+      const tokens = tokenize(text)
+      if (tokens.length >= 2 && [ ...tokens[0].value ].every((ch) => ch >= '0' && ch <= '9') && (tokens[1].value === 'time' || tokens[1].value === 'times')) {
+        const finish = tokens[tokens.length - 1].end
+        return callback(text.slice(0, finish))
+      }
+      return text
+    }
+  },
   repeat: {
     test: (tokenValues) => {
       return tokenValues[0] === REPEAT
@@ -2288,7 +3199,17 @@ export default {
         areTwoArraysEqual(tokenValues, WITH_LYRIC)
     }
   },
-  lyricsHighlight: /lyric(s)?/,
+  lyricsHighlight: {
+    replace: (text, callback) => {
+      const tokens = tokenize(text)
+      for (const token of tokens) {
+        if (token.value === 'lyric' || token.value === 'lyrics') {
+          return text.slice(0, token.start) + callback(token.value) + text.slice(token.end)
+        }
+      }
+      return text
+    }
+  },
   textValue: {
     test: (tokenValues) => {
       return isWrappedWithQuotes(tokenValues)
@@ -2305,7 +3226,17 @@ export default {
         areTwoArraysEqual(tokenValues, FOLLOWED_BY_HYPEN)
     }
   },
-  dashHighlight: /(dash|hyphen)/,
+  dashHighlight: {
+    replace: (text, callback) => {
+      const tokens = tokenize(text)
+      for (const token of tokens) {
+        if (token.value === 'dash' || token.value === 'hyphen') {
+          return text.slice(0, token.start) + callback(token.value) + text.slice(token.end)
+        }
+      }
+      return text
+    }
+  },
   underscoreStarts: {
     test: (tokenValues) => {
       return areTwoArraysEqual(tokenValues, WHERE_UNDERSCORE_STARTS) ||
@@ -2342,7 +3273,19 @@ export default {
       return areTwoArraysEqual(tokenValues, FOR_LINES)
     }
   },
-  forEachLineHighlight: /each(\s+)line/,
+  forEachLineHighlight: {
+    replace: (text, callback) => {
+      const tokens = tokenize(text)
+      for (let i = 0; i + 1 < tokens.length; i++) {
+        if (tokens[i + 0].value === 'each' && tokens[i + 1].value === 'line') {
+          const start = tokens[i].start
+          const finish = tokens[i + 1].end
+          return text.slice(0, start) + callback(text.slice(start, finish)) + text.slice(finish)
+        }
+      }
+      return text
+    }
+  },
   forEach: {
     test: (tokenValues) => {
       return areTwoArraysEqual(tokenValues, FOR_EACH)
@@ -2534,13 +3477,42 @@ export default {
       }
     }
   },
-  noteIndexHighlight: /(((note)((\w|\s)+\w))|(((\w|\s)+\s)(note)))/,
+  noteIndexHighlight: {
+    replace: (text, callback) => {
+      const tokens = tokenize(text)
+      for (let i = 0; i < tokens.length; i++) {
+        if (tokens[i].value === 'note') {
+          if (tokens[i + 1]) {
+            const start = tokens[i].start
+            const finish = tokens[i + 1].end
+            return text.slice(0, start) + callback(text.slice(start, finish)) + text.slice(finish)
+          }
+        }
+        if (tokens[i + 1] && tokens[i + 1].value === 'note') {
+          const start = tokens[i].start
+          const finish = tokens[i + 1].end
+          return text.slice(0, start) + callback(text.slice(start, finish)) + text.slice(finish)
+        }
+      }
+      return text
+    }
+  },
   arpeggiated: {
     test: (tokenValues) => {
       return doesFirstArrayContainSecondArray(IS_ARPEGGIATED, tokenValues)
     }
   },
-  arpeggiatedHighlight: /arpeggiated|arpeggio/,
+  arpeggiatedHighlight: {
+    replace: (text, callback) => {
+      const tokens = tokenize(text)
+      for (const token of tokens) {
+        if (token.value === 'arpeggiated' || token.value === 'arpeggio') {
+          return text.slice(0, token.start) + callback(token.value) + text.slice(token.end)
+        }
+      }
+      return text
+    }
+  },
   withChordBelow: {
     test: (tokenValues) => {
       return areTwoArraysEqual(tokenValues, WITH_CHOR_BELOW)
@@ -2553,7 +3525,28 @@ export default {
     }
   },
   arrowHighlight: ARROW,
-  positionPreposition: /((in|on|at|with)(\s+))?((\w|\s)+)/g,
+  positionPreposition: {
+    replace: (text, callback) => {
+      const tokens = tokenize(text)
+      let index = 0
+      let p1
+      let p2
+      let p3
+      if (tokens[0] && (tokens[0].value === 'in' || tokens[0].value === 'on' || tokens[0].value === 'at' || tokens[0].value === 'with')) {
+        p2 = tokens[0].value
+        p3 = text.slice(tokens[0].end, tokens[1] ? tokens[1].start : tokens[0].end)
+        p1 = tokens[0].value + p3
+        index = 1
+      }
+      if (index >= tokens.length) {
+        return text
+      }
+      const start = tokens[index].start
+      const finish = tokens[tokens.length - 1].end
+      const p4 = text.slice(start, finish)
+      return callback(text.slice(0, finish), p1, p2, p3, p4) + text.slice(finish)
+    }
+  },
   unitPosition: {
     test: (tokenValues) => {
       return (
@@ -3461,7 +4454,17 @@ export default {
       return doesFirstArrayContainSecondArray(WITH_GLISSANDO, tokenValues)
     }
   },
-  glissandoHighlight: /(glissando|gliss\.|gliss|glis\.|glis)/,
+  glissandoHighlight: {
+    replace: (text, callback) => {
+      const tokens = tokenize(text)
+      for (const token of tokens) {
+        if (token.value === 'glissando' || token.value === 'gliss.' || token.value === 'gliss' || token.value === 'glis.' || token.value === 'glis') {
+          return text.slice(0, token.start) + callback(token.value) + text.slice(token.end)
+        }
+      }
+      return text
+    }
+  },
   asWaveLine: {
     test: (tokenValues) => {
       return areTwoArraysEqual(tokenValues, AS_WAVE) ||
@@ -3479,7 +4482,17 @@ export default {
       return [ LINE ]
     }
   },
-  asWaveLineHighlight: /(line|wave)(s)?/,
+  asWaveLineHighlight: {
+    replace: (text, callback) => {
+      const tokens = tokenize(text)
+      for (const token of tokens) {
+        if (token.value === 'line' || token.value === 'lines' || token.value === 'wave' || token.value === 'waves') {
+          return text.slice(0, token.start) + callback(token.value) + text.slice(token.end)
+        }
+      }
+      return text
+    }
+  },
   tupletWithValue: {
     test: (tokenValues) => {
       if ((tokenValues[0] !== TUPLET) || !tokenValues[1]) {
@@ -3500,7 +4513,17 @@ export default {
     }
   },
   tupletHighlight: TUPLET,
-  tupletValueHighlight: /((\d+)(:(\d+)))|(\d+)/,
+  tupletValueHighlight: {
+    replace: (text, callback) => {
+      const tokens = tokenize(text)
+      for (const token of tokens) {
+        if (token.value.length > 0 && [ ...token.value ].every((ch) => (ch >= '0' && ch <= '9') || ch === ':')) {
+          return text.slice(0, token.start) + callback(token.value) + text.slice(token.end)
+        }
+      }
+      return text
+    }
+  },
   withBrackets: {
     test: (tokenValues) => {
       return areTwoArraysEqual(tokenValues, WITH_BRACKETS)
@@ -3564,7 +4587,17 @@ export default {
       return [ DIMINUENDO ]
     }
   },
-  crescendoOrDiminuendoHighlight: /(crescendo|cres.|cres|cresc.|cresc|diminuendo|dim.|dim)/,
+  crescendoOrDiminuendoHighlight: {
+    replace: (text, callback) => {
+      const tokens = tokenize(text)
+      for (const token of tokens) {
+        if (token.value === 'crescendo' || token.value === 'cres.' || token.value === 'cres' || token.value === 'cresc.' || token.value === 'cresc' || token.value === 'diminuendo' || token.value === 'dim.' || token.value === 'dim') {
+          return text.slice(0, token.start) + callback(token.value) + text.slice(token.end)
+        }
+      }
+      return text
+    }
+  },
   with: {
     test: (tokenValues) => {
       return (tokenValues[0] === WITH) &&
@@ -3579,7 +4612,17 @@ export default {
       ) && (tokenValues.length === 1)
     }
   },
-  repeatSimileHighlight: /(repeat|simile)/,
+  repeatSimileHighlight: {
+    replace: (text, callback) => {
+      const tokens = tokenize(text)
+      for (const token of tokens) {
+        if (token.value === 'repeat' || token.value === 'simile') {
+          return text.slice(0, token.start) + callback(token.value) + text.slice(token.end)
+        }
+      }
+      return text
+    }
+  },
   volta: {
     test: (tokenValues) => {
       return (tokenValues[0] === VOLTA) &&
@@ -3592,7 +4635,20 @@ export default {
         areTwoArraysEqual(tokenValues, VOLTA_BRACKETS)
     }
   },
-  voltaBracketsHighlight: /volta( bracket(s)?)?/,
+  voltaBracketsHighlight: {
+    replace: (text, callback) => {
+      const tokens = tokenize(text)
+      for (let i = 0; i < tokens.length; i++) {
+        if (tokens[i].value === 'volta') {
+          const end = (tokens[i + 1] && (tokens[i + 1].value === 'bracket' || tokens[i + 1].value === 'brackets')) ? i + 2 : i + 1
+          const start = tokens[i].start
+          const finish = tokens[end - 1].end
+          return text.slice(0, start) + callback(text.slice(start, finish)) + text.slice(finish)
+        }
+      }
+      return text
+    }
+  },
   brackets: {
     test: (tokenValues) => {
       return (
@@ -3668,21 +4724,69 @@ export default {
         areTwoArraysEqual(tokenValues, WITH_RELEASE)
     }
   },
-  withReleaseHighlight: /(pedal(\s+))?release/,
+  withReleaseHighlight: {
+    replace: (text, callback) => {
+      const tokens = tokenize(text)
+      for (let i = 0; i < tokens.length; i++) {
+        if (tokens[i].value === 'release') {
+          const start = (tokens[i - 1] && tokens[i - 1].value === 'pedal') ? tokens[i - 1].start : tokens[i].start
+          const finish = tokens[i].end
+          return text.slice(0, start) + callback(text.slice(start, finish)) + text.slice(finish)
+        }
+      }
+      return text
+    }
+  },
   withVariablePeak: {
     test: (tokenValues) => {
       return areTwoArraysEqual(tokenValues, WITH_VARIABLE_PEAK)
     }
   },
-  withVariablePeakHighlight: /variable(\s+)peak/,
+  withVariablePeakHighlight: {
+    replace: (text, callback) => {
+      const tokens = tokenize(text)
+      for (let i = 0; i + 1 < tokens.length; i++) {
+        if (tokens[i + 0].value === 'variable' && tokens[i + 1].value === 'peak') {
+          const start = tokens[i].start
+          const finish = tokens[i + 1].end
+          return text.slice(0, start) + callback(text.slice(start, finish)) + text.slice(finish)
+        }
+      }
+      return text
+    }
+  },
   lines: {
     test: (tokenValues) => {
       return (tokenValues[0] === LINES) &&
         (tokenValues.length === 1)
     }
   },
-  linesHighlight: /lines/,
-  somethingIsSomethingWithDelimetersHighlight: /^(.+?)(?=(is))(.+)$/m,
+  linesHighlight: {
+    replace: (text, callback) => {
+      const tokens = tokenize(text)
+      for (const token of tokens) {
+        if (token.value === 'lines') {
+          return text.slice(0, token.start) + callback(token.value) + text.slice(token.end)
+        }
+      }
+      return text
+    }
+  },
+  somethingIsSomethingWithDelimetersHighlight: {
+    replace: (text, callback) => {
+      const tokens = tokenize(text)
+      for (let i = 0; i < tokens.length; i++) {
+        if (tokens[i].value === 'is') {
+          const start = tokens[0].start
+          const finish = tokens[tokens.length - 1].end
+          const p1 = text.slice(start, tokens[i].start)
+          const p3 = text.slice(tokens[i].end, finish)
+          return text.slice(0, start) + callback(text.slice(start, finish), p1, 'is', p3) + text.slice(finish)
+        }
+      }
+      return text
+    }
+  },
   compressUnitsByNTimes: {
     test: (tokenValues) => {
       const copressionValue = tokenValues[3] * 1
@@ -3717,7 +4821,19 @@ export default {
       return areTwoArraysEqual(HIDE_LAST_MEASURE, tokenValues)
     }
   },
-  lastMeasureHighlight: /the(\s+)last(\s+)measure/,
+  lastMeasureHighlight: {
+    replace: (text, callback) => {
+      const tokens = tokenize(text)
+      for (let i = 0; i + 2 < tokens.length; i++) {
+        if (tokens[i + 0].value === 'the' && tokens[i + 1].value === 'last' && tokens[i + 2].value === 'measure') {
+          const start = tokens[i].start
+          const finish = tokens[i + 2].end
+          return text.slice(0, start) + callback(text.slice(start, finish)) + text.slice(finish)
+        }
+      }
+      return text
+    }
+  },
   endsWithFermata: {
     test: (tokenValues) => {
       return areTwoArraysEqual(ENDS_WITH_FERMATA, tokenValues)
@@ -3728,7 +4844,17 @@ export default {
       return areTwoArraysEqual(FERMATA, tokenValues)
     }
   },
-  fermataHighlight: /fermata/,
+  fermataHighlight: {
+    replace: (text, callback) => {
+      const tokens = tokenize(text)
+      for (const token of tokens) {
+        if (token.value === 'fermata') {
+          return text.slice(0, token.start) + callback(token.value) + text.slice(token.end)
+        }
+      }
+      return text
+    }
+  },
   duration: {
     test: (tokenValues) => {
       return areTwoArraysEqual(DURATION, tokenValues)

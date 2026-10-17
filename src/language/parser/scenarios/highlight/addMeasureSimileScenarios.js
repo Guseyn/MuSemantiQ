@@ -1,19 +1,20 @@
 'use strict'
 
-import regexps from '#msq/language/parser/scenarios/static-objects/regexps.js'
+import regexps, { replaceMany } from '#msq/language/parser/scenarios/static-objects/regexps.js'
 
 export default function (scenarios) {
   scenarios['simile of previous measure'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { numberOfMeasures } }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.simileHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = replaceMany(joinedTokenValuesWithRealDelimiters, [
+        [ regexps.simileHighlight, (match) => {
           return `<span class="eh" ref-id="simile-${numberOfMeasures}">${match}</span>`
         }
-      ).replace(
-        regexps.previousMeasureHighlight, (match) => {
+        ],
+        [ regexps.previousMeasureHighlight, (match) => {
           return `<span class="cmph" ref-id="simile-prev-measure-${numberOfMeasures}">${match}</span>`
         }
-      )
+        ]
+      ])
       state.highlightsHtmlBuffer.push(
         `<span class="th" ref-id="simile-${numberOfMeasures}">${joinedTokenValuesWithRealDelimitersWithHighlightedElement}`
       )
@@ -26,15 +27,16 @@ export default function (scenarios) {
   }
   scenarios['simile of two previous measures'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { numberOfMeasures } }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.simileHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = replaceMany(joinedTokenValuesWithRealDelimiters, [
+        [ regexps.simileHighlight, (match) => {
           return `<span class="eh" ref-id="simile-${numberOfMeasures}">${match}</span>`
         }
-      ).replace(
-        regexps.twoPreviousMeasuresHighlight, (match) => {
+        ],
+        [ regexps.twoPreviousMeasuresHighlight, (match) => {
           return `<span class="cmph" ref-id="simile-two-prev-measures-${numberOfMeasures}">${match}</span>`
         }
-      )
+        ]
+      ])
       state.highlightsHtmlBuffer.push(
         `<span class="th" ref-id="simile-${numberOfMeasures}">${joinedTokenValuesWithRealDelimitersWithHighlightedElement}`
       )
@@ -47,8 +49,8 @@ export default function (scenarios) {
   }
   scenarios['simile count for previous measure'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { numberOfMeasures } }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedNumber = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.numberHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedNumber = regexps.numberHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="cnh" ref-id="simile-count-${numberOfMeasures}">${match}</span>`
         }
       )
@@ -59,8 +61,8 @@ export default function (scenarios) {
   }
   scenarios['simile count for two previous measures'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { numberOfMeasures } }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedNumber = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.numberHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedNumber = regexps.numberHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="cnh" ref-id="simile-count-${numberOfMeasures}">${match}</span>`
         }
       )

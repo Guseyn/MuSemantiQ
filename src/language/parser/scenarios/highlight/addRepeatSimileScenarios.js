@@ -62,8 +62,8 @@ const updateNoteAndRestRefIdsInHighlightsHtmlBufferThatFollowAfterSimileUnit = (
 export default function (scenarios) {
   scenarios['repeat simile'] = {
     action: ({ parserState, joinedTokenValuesWithRealDelimiters, state }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.repeatSimileHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.repeatSimileHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="eh" ref-id="simile-mark-${parserState.numberOfSimileMarks}">${match}</span>`
         }
       )
@@ -143,8 +143,8 @@ export default function (scenarios) {
   addUnitPositionScenarios(scenarios, 'repeat simile finishes', 2, {})
   scenarios['repeat simile vertical correction'] = {
     action: ({ parserState, joinedTokenValuesWithRealDelimiters, state }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.verticalCorrectionHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.verticalCorrectionHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="cnh" ref-id="simile-mark-${parserState.numberOfSimileMarks}">${match}</span>`
         }
       )

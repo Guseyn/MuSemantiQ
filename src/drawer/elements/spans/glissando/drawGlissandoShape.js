@@ -23,16 +23,16 @@ export default function (markedGlissando, glissandoMarkKey, voicesBody, voicesBo
           y: centerOfLeftNoteIsCloseToCenterOfRightNote
             ? centerOfLeftNote
             : (glissandoDirectionForCurrentNote === 'up')
-              ? markedGlissando.leftSingleUnit.notesWithCoordinates[index].top
-              : markedGlissando.leftSingleUnit.notesWithCoordinates[index].bottom
+                ? markedGlissando.leftSingleUnit.notesWithCoordinates[index].top
+                : markedGlissando.leftSingleUnit.notesWithCoordinates[index].bottom
         }
         const glissandoEndPoint = {
           x: markedGlissando.rightSingleUnit.bodyLeft - (isRightNoteOnLedgerLines ? glissandoOffsetFromNoteHeadOnLedgerLines : glissandoOffsetFromNoteHead),
           y: centerOfLeftNoteIsCloseToCenterOfRightNote
             ? centerOfRightNote
             : (glissandoDirectionForCurrentNote === 'up')
-              ? markedGlissando.rightSingleUnit.notesWithCoordinates[index].bottom
-              : markedGlissando.rightSingleUnit.notesWithCoordinates[index].top
+                ? markedGlissando.rightSingleUnit.notesWithCoordinates[index].bottom
+                : markedGlissando.rightSingleUnit.notesWithCoordinates[index].top
         }
         if (glissandoEndPoint.x < glissandoStartPoint.x) {
           glissandoEndPoint.x = glissandoStartPoint.x
@@ -74,13 +74,15 @@ export default function (markedGlissando, glissandoMarkKey, voicesBody, voicesBo
             markedGlissando.startsBeforeCertainMeasure !== undefined &&
             voicesBodiesOnPageLine[markedGlissando.startsBeforeCertainMeasure] &&
             !voicesBodiesOnPageLine[markedGlissando.startsBeforeCertainMeasure].isEmpty
-          ) ? (voicesBodiesOnPageLine[markedGlissando.startsBeforeCertainMeasure].left + leftMarginForConnectionsThatStartBefore)
+          )
+            ? (voicesBodiesOnPageLine[markedGlissando.startsBeforeCertainMeasure].left + leftMarginForConnectionsThatStartBefore)
             : (
-              markedGlissando.startsBeforeCertainMeasure !== undefined &&
+                markedGlissando.startsBeforeCertainMeasure !== undefined &&
               measuresOnPageLine[markedGlissando.startsBeforeCertainMeasure] &&
               !measuresOnPageLine[markedGlissando.startsBeforeCertainMeasure].isEmpty
-            ) ? measuresOnPageLine[markedGlissando.startsBeforeCertainMeasure].right + leftMarginForConnectionsThatStartBeforeMeasureWithEmptyVoicesBody
-              : (voicesBody.left + leftMarginForConnectionsThatStartBefore)
+              )
+                ? measuresOnPageLine[markedGlissando.startsBeforeCertainMeasure].right + leftMarginForConnectionsThatStartBeforeMeasureWithEmptyVoicesBody
+                : (voicesBody.left + leftMarginForConnectionsThatStartBefore)
         ),
         y: (markedGlissando.rightSingleUnit.notesWithCoordinates[index].top + markedGlissando.rightSingleUnit.notesWithCoordinates[index].bottom) / 2 + glissandoDirectionSign * intervalBetweenStaveLines
       }
@@ -128,13 +130,15 @@ export default function (markedGlissando, glissandoMarkKey, voicesBody, voicesBo
             markedGlissando.finishesAfterCertainMeasure !== undefined &&
             voicesBodiesOnPageLine[markedGlissando.finishesAfterCertainMeasure] &&
             !voicesBodiesOnPageLine[markedGlissando.finishesAfterCertainMeasure].isEmpty
-          ) ? voicesBodiesOnPageLine[markedGlissando.finishesAfterCertainMeasure].right
+          )
+            ? voicesBodiesOnPageLine[markedGlissando.finishesAfterCertainMeasure].right
             : (
-              markedGlissando.finishesAfterCertainMeasure !== undefined &&
+                markedGlissando.finishesAfterCertainMeasure !== undefined &&
               measuresOnPageLine[markedGlissando.finishesAfterCertainMeasure] &&
               !measuresOnPageLine[markedGlissando.finishesAfterCertainMeasure].isEmpty
-            ) ? (measuresOnPageLine[markedGlissando.finishesAfterCertainMeasure].right - rightMarginForConnectionsThatFinishAfterMeasureWithEmptyVoicesBody)
-              : voicesBody.right
+              )
+                ? (measuresOnPageLine[markedGlissando.finishesAfterCertainMeasure].right - rightMarginForConnectionsThatFinishAfterMeasureWithEmptyVoicesBody)
+                : voicesBody.right
         ),
         y: (markedGlissando.leftSingleUnit.notesWithCoordinates[index].top + markedGlissando.leftSingleUnit.notesWithCoordinates[index].bottom) / 2 + glissandoDirectionSign * intervalBetweenStaveLines
       }

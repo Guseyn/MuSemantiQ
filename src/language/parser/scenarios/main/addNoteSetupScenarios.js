@@ -53,7 +53,7 @@ const addSimileUnitsToPageSchema = (parserState, simileMark, currentNumberOfMeas
   for (let simileIndex = 0; simileIndex < simileMark.count; simileIndex++) {
     parserState.pageSchema.measuresParams[currentNumberOfMeasures - 1].stavesParams[currentNumberOfStaves - 1].voicesParams[currentNumberOfVoices - 1].splice(
       (currentNumberOfUnits - 1) + simileIndex + 1, 0,
-      { notes: [{ positionNumber: (simileMark.yCorrection || 0) + 2.0 }], isSimile: true, simileRefId: `simile-mark-${parserState.numberOfSimileMarks}`, simileCountDown: (simileMark.count - simileIndex), simileYCorrection: simileMark.yCorrection }
+      { notes: [ { positionNumber: (simileMark.yCorrection || 0) + 2.0 } ], isSimile: true, simileRefId: `simile-mark-${parserState.numberOfSimileMarks}`, simileCountDown: (simileMark.count - simileIndex), simileYCorrection: simileMark.yCorrection }
     )
   }
 }
@@ -346,7 +346,7 @@ export default function (scenarios) {
       })
       const currentNumberOfMeasures = parserState.pageSchema.measuresParams.length
       const currentNumberOfStaves = lastMeasureParamsValue.stavesParams.length
-      let stavePositionInRefId = currentNumberOfStaves
+      const stavePositionInRefId = currentNumberOfStaves
       return { stavePositionName, stavePositionInRefId, currentNumberOfStaves, currentNumberOfMeasures }
     },
     itIsNewCommandProgressionFromLevel: 1
@@ -2643,7 +2643,7 @@ export default function (scenarios) {
       return { currentNumberOfMeasures }
     },
     itIsNewCommandProgressionFromLevel: 2
-  },
+  }
   scenarios['note with horizontal correction'] = {
     requiredCommandProgression: 'note',
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,

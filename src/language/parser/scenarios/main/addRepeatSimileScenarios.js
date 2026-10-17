@@ -33,13 +33,13 @@ const addSimileUnitsToPageSchema = (parserState) => {
         (
           parserState.pageSchema.measuresParams[measureIndex].stavesParams[staveIndex].voicesParams[voiceIndex][singleChordIndex + 1] &&
           !parserState.pageSchema.measuresParams[measureIndex].stavesParams[staveIndex].voicesParams[voiceIndex][singleChordIndex + 1].isSimile
-        ) 
+        )
       )
     ) {
-      for (let simileIndex = 0; simileIndex < simileCount; simileIndex++) {      
+      for (let simileIndex = 0; simileIndex < simileCount; simileIndex++) {
         parserState.pageSchema.measuresParams[measureIndex].stavesParams[staveIndex].voicesParams[voiceIndex].splice(
           singleChordIndex + simileIndex + 1, 0,
-          { notes: [{ positionNumber: (simileYCorrection || 0) + 2.0 }], isSimile: true, simileRefId: `simile-mark-${parserState.numberOfSimileMarks}`, simileCountDown: (simileCount - simileIndex), simileYCorrection }
+          { notes: [ { positionNumber: (simileYCorrection || 0) + 2.0 } ], isSimile: true, simileRefId: `simile-mark-${parserState.numberOfSimileMarks}`, simileCountDown: (simileCount - simileIndex), simileYCorrection }
         )
       }
     }

@@ -16,7 +16,7 @@ export default function (voicesOnPageLine, voicesBodiesOnPageLine, styles) {
   const { intervalBetweenStaveLines, tupletNestedVerticalGradient, topOffsetOfTupletWithLevelZero } = styles
   const tuplets = []
   const tupletsStack = {}
-  let yByKeyForTupletStackAndDirectionAndLevel = {}
+  const yByKeyForTupletStackAndDirectionAndLevel = {}
   if (voicesOnPageLine) {
     for (let measureIndex = 0; measureIndex < voicesOnPageLine.length; measureIndex++) {
       if (voicesOnPageLine[measureIndex]) {
@@ -50,8 +50,8 @@ export default function (voicesOnPageLine, voicesBodiesOnPageLine, styles) {
                               x: currentSingleUnit.stemless
                                 ? currentSingleUnit.bodyLeft
                                 : (currentSingleUnit.stemDirection === tupletDirection)
-                                  ? currentSingleUnit.stemLeft
-                                  : currentSingleUnit.bodyLeft,
+                                    ? currentSingleUnit.stemLeft
+                                    : currentSingleUnit.bodyLeft,
                               tupletDirection,
                               level: 0,
                               mustBeWithBrackets: tupletMustBeWithBrackets,

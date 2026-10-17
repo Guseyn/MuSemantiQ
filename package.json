@@ -12,20 +12,18 @@
     "web-components:update": "node scripts/copy-web-components.js",
     "watch:src": "node scripts/watch-msq-src.js",
     "watch:web-components": "node scripts/watch-web-components.js",
-
     "test:visual:all": "node scripts/visual-tests.js",
     "test:audio:all": "node scripts/audio-tests.js",
     "test:serializer:all": "node scripts/serializer-tests.js",
     "test:all": "npm run test:visual:all && npm run test:audio:all && npm run test:serializer:all",
+    "lint": "eslint src",
     "coverage": "c8 npm run test:all",
     "coverage:report": "c8 report --reporter=html",
     "coverage:check": "c8 check-coverage --statements 87 --branches 86 --functions 82 --lines 87",
     "release": "node scripts/gh-release.js",
-
     "ehtml:update": "rsync -a --delete ../EHTML/src/ browser-app/web-app/static/js/ehtml",
     "nodes:update": "rsync -a --delete ../nodes.js/nodes/ browser-app/nodes/",
     "eui:update": "rsync -a --delete ../e-ui/static/js/e-ui/ browser-app/web-app/static/js/e-ui/ && cp -rf ../e-ui/static/css/e-ui.css browser-app/web-app/static/css/e-ui.css",
-
     "dev-tools:ehtml:update": "rsync -a --delete ../EHTML/src/ dev-tools/web-app/static/js/ehtml/",
     "dev-tools:nodes:update": "rsync -a --delete ../nodes.js/nodes/ dev-tools/nodes/",
     "dev-tools:eui:update": "rsync -a --delete ../e-ui/static/js/e-ui/ dev-tools/web-app/static/js/e-ui/ && cp -rf ../e-ui/static/css/e-ui.css dev-tools/web-app/static/css/e-ui.css",
@@ -33,7 +31,6 @@
     "dev-tools:download": "node scripts/download-dev-tools-libraries.js",
     "dev-tools:setup": "npm run dev-tools:download && npm run setup:symlinks && npm run msq:apps:update && npm run web-components:update",
     "dev-tools": "node dev-tools/web-app/main.js",
-
     "docs:ehtml:update": "rsync -a --delete ../EHTML/src/ docs/web-app/static/js/ehtml/",
     "docs:nodes:update": "rsync -a --delete ../nodes.js/nodes/ docs/nodes/ && find docs/nodes -name '*.js' -exec perl -pi -e 's|#nodes/|#docs-nodes/|g' {} +",
     "docs:eui:update": "rsync -a --delete ../e-ui/static/js/e-ui/ docs/web-app/static/js/e-ui/ && cp -rf ../e-ui/static/css/e-ui.css docs/web-app/static/css/e-ui.css",
@@ -44,7 +41,6 @@
     "docs:pipeline": "node scripts/generate-landing-pipeline.js",
     "docs:api-example": "node scripts/generate-api-example.js",
     "docs": "npm run setup:symlinks && npm run msq:apps:update && npm run web-components:update && npm run docs:check && node docs/web-app/main.js",
-
     "browser-app:setup": "npm run setup:symlinks && npm run msq:apps:update && npm run web-components:update",
     "browser-app": "node browser-app/web-app/main.js",
     "cli-app": "node cli-app/msq.js"
@@ -64,9 +60,7 @@
     "#msq/language/*": "./src/language/*",
     "#msq/midi/*": "./src/midi/*",
     "#msq/api.js": "./src/api.js",
-
     "#tools/*": "./tools/*",
-
     "#nodes/*": "./browser-app/nodes/*",
     "#dev-nodes/*": "./dev-tools/nodes/*",
     "#docs-nodes/*": "./docs/nodes/*"
@@ -86,6 +80,8 @@
     "node": ">=22"
   },
   "devDependencies": {
-    "c8": "^11.0.0"
+    "c8": "^11.0.0",
+    "eslint": "^10.13.0",
+    "neostandard": "^0.14.1"
   }
 }

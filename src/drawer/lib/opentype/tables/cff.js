@@ -3,14 +3,14 @@
 // http://download.microsoft.com/download/8/0/1/801a191c-029d-4af3-9642-555f6fe514ee/cff.pdf
 // http://download.microsoft.com/download/8/0/1/801a191c-029d-4af3-9642-555f6fe514ee/type2.pdf
 
-import {  CffEncoding, cffStandardEncoding, cffExpertEncoding, cffStandardStrings  } from '#msq/drawer/lib/opentype/encoding.js'
+import { CffEncoding, cffStandardEncoding, cffExpertEncoding, cffStandardStrings } from '#msq/drawer/lib/opentype/encoding.js'
 import glyphset from '#msq/drawer/lib/opentype/glyphset.js'
 import { getByte, getBytes, getOffset, getCard8, Parser, bytesToString, getCard16 } from '#msq/drawer/lib/opentype/parse.js'
 import Path from '#msq/drawer/lib/opentype/path.js'
 import table from '#msq/drawer/lib/opentype/table.js'
 
 // Custom equals function that can also check lists.
-function equals(a, b) {
+function equals (a, b) {
   if (a === b) {
     return true
   } else if (Array.isArray(a) && Array.isArray(b)) {
@@ -32,7 +32,7 @@ function equals(a, b) {
 
 // Subroutines are encoded using the negative half of the number space.
 // See type 2 chapter 4.7 "Subroutine operators".
-function calcCFFSubroutineBias(subrs) {
+function calcCFFSubroutineBias (subrs) {
   let bias
   if (subrs.length < 1240) {
     bias = 107
@@ -47,7 +47,7 @@ function calcCFFSubroutineBias(subrs) {
 
 // Parse a `CFF` INDEX array.
 // An index array consists of a list of offsets, then a list of objects at those offsets.
-function parseCFFIndex(data, start, conversionFn) {
+function parseCFFIndex (data, start, conversionFn) {
   const offsets = []
   const objects = []
   const count = getCard16(data, start)
@@ -77,15 +77,15 @@ function parseCFFIndex(data, start, conversionFn) {
     objects.push(value)
   }
 
-  return {objects: objects, startOffset: start, endOffset: endOffset}
+  return { objects, startOffset: start, endOffset }
 }
 
 // Parse a `CFF` DICT real value.
-function parseFloatOperand(parser) {
+function parseFloatOperand (parser) {
   let s = ''
   const eof = 15
-  const lookup = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.', 'E', 'E-', null, '-']
-  // eslint-disable-next-line no-constant-condition
+  const lookup = [ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.', 'E', 'E-', null, '-' ]
+
   while (true) {
     const b = parser.parseByte()
     const n1 = b >> 4
@@ -108,7 +108,7 @@ function parseFloatOperand(parser) {
 }
 
 // Parse a `CFF` DICT operand.
-function parseOperand(parser, b0) {
+function parseOperand (parser, b0) {
   let b1
   let b2
   let b3
@@ -150,7 +150,7 @@ function parseOperand(parser, b0) {
 
 // Convert the entries returned by `parseDict` to a proper dictionary.
 // If a value is a list of one, it is unpacked.
-function entriesToObject(entries) {
+function entriesToObject (entries) {
   const o = {}
   for (let i = 0; i < entries.length; i += 1) {
     const key = entries[i][0]
@@ -174,7 +174,7 @@ function entriesToObject(entries) {
 
 // Parse a `CFF` DICT object.
 // A dictionary contains key-value pairs in a compact tokenized format.
-function parseCFFDict(data, start, size) {
+function parseCFFDict (data, start, size) {
   start = start !== undefined ? start : 0
   const parser = new Parser(data, start)
   const entries = []
@@ -192,7 +192,7 @@ function parseCFFDict(data, start, size) {
         op = 1200 + parser.parseByte()
       }
 
-      entries.push([op, operands])
+      entries.push([ op, operands ])
       operands = []
     } else {
       // Since the operands (values) come before the operators (keys), we store all operands in a list
@@ -206,7 +206,7 @@ function parseCFFDict(data, start, size) {
 
 // Given a String Index (SID), return the value of the string.
 // Strings below index 392 are standard CFF strings and are not encoded in the font.
-function getCFFString(strings, index) {
+function getCFFString (strings, index) {
   if (index <= 390) {
     index = cffStandardStrings[index]
   } else {
@@ -218,7 +218,7 @@ function getCFFString(strings, index) {
 
 // Interpret a dictionary and return a new dictionary with readable keys and values for missing entries.
 // This function takes `meta` which is a list of objects containing `operand`, `name` and `default`.
-function interpretDict(dict, meta, strings) {
+function interpretDict (dict, meta, strings) {
   const newDict = {}
   let value
 
@@ -258,7 +258,7 @@ function interpretDict(dict, meta, strings) {
 }
 
 // Parse the CFF header.
-function parseCFFHeader(data, start) {
+function parseCFFHeader (data, start) {
   const header = {}
   header.formatMajor = getCard8(data, start)
   header.formatMinor = getCard8(data, start + 1)
@@ -270,58 +270,58 @@ function parseCFFHeader(data, start) {
 }
 
 const TOP_DICT_META = [
-  {name: 'version', op: 0, type: 'SID'},
-  {name: 'notice', op: 1, type: 'SID'},
-  {name: 'copyright', op: 1200, type: 'SID'},
-  {name: 'fullName', op: 2, type: 'SID'},
-  {name: 'familyName', op: 3, type: 'SID'},
-  {name: 'weight', op: 4, type: 'SID'},
-  {name: 'isFixedPitch', op: 1201, type: 'number', value: 0},
-  {name: 'italicAngle', op: 1202, type: 'number', value: 0},
-  {name: 'underlinePosition', op: 1203, type: 'number', value: -100},
-  {name: 'underlineThickness', op: 1204, type: 'number', value: 50},
-  {name: 'paintType', op: 1205, type: 'number', value: 0},
-  {name: 'charstringType', op: 1206, type: 'number', value: 2},
+  { name: 'version', op: 0, type: 'SID' },
+  { name: 'notice', op: 1, type: 'SID' },
+  { name: 'copyright', op: 1200, type: 'SID' },
+  { name: 'fullName', op: 2, type: 'SID' },
+  { name: 'familyName', op: 3, type: 'SID' },
+  { name: 'weight', op: 4, type: 'SID' },
+  { name: 'isFixedPitch', op: 1201, type: 'number', value: 0 },
+  { name: 'italicAngle', op: 1202, type: 'number', value: 0 },
+  { name: 'underlinePosition', op: 1203, type: 'number', value: -100 },
+  { name: 'underlineThickness', op: 1204, type: 'number', value: 50 },
+  { name: 'paintType', op: 1205, type: 'number', value: 0 },
+  { name: 'charstringType', op: 1206, type: 'number', value: 2 },
   {
     name: 'fontMatrix',
     op: 1207,
-    type: ['real', 'real', 'real', 'real', 'real', 'real'],
-    value: [0.001, 0, 0, 0.001, 0, 0]
+    type: [ 'real', 'real', 'real', 'real', 'real', 'real' ],
+    value: [ 0.001, 0, 0, 0.001, 0, 0 ]
   },
-  {name: 'uniqueId', op: 13, type: 'number'},
-  {name: 'fontBBox', op: 5, type: ['number', 'number', 'number', 'number'], value: [0, 0, 0, 0]},
-  {name: 'strokeWidth', op: 1208, type: 'number', value: 0},
-  {name: 'xuid', op: 14, type: [], value: null},
-  {name: 'charset', op: 15, type: 'offset', value: 0},
-  {name: 'encoding', op: 16, type: 'offset', value: 0},
-  {name: 'charStrings', op: 17, type: 'offset', value: 0},
-  {name: 'private', op: 18, type: ['number', 'offset'], value: [0, 0]},
-  {name: 'ros', op: 1230, type: ['SID', 'SID', 'number']},
-  {name: 'cidFontVersion', op: 1231, type: 'number', value: 0},
-  {name: 'cidFontRevision', op: 1232, type: 'number', value: 0},
-  {name: 'cidFontType', op: 1233, type: 'number', value: 0},
-  {name: 'cidCount', op: 1234, type: 'number', value: 8720},
-  {name: 'uidBase', op: 1235, type: 'number'},
-  {name: 'fdArray', op: 1236, type: 'offset'},
-  {name: 'fdSelect', op: 1237, type: 'offset'},
-  {name: 'fontName', op: 1238, type: 'SID'}
+  { name: 'uniqueId', op: 13, type: 'number' },
+  { name: 'fontBBox', op: 5, type: [ 'number', 'number', 'number', 'number' ], value: [ 0, 0, 0, 0 ] },
+  { name: 'strokeWidth', op: 1208, type: 'number', value: 0 },
+  { name: 'xuid', op: 14, type: [], value: null },
+  { name: 'charset', op: 15, type: 'offset', value: 0 },
+  { name: 'encoding', op: 16, type: 'offset', value: 0 },
+  { name: 'charStrings', op: 17, type: 'offset', value: 0 },
+  { name: 'private', op: 18, type: [ 'number', 'offset' ], value: [ 0, 0 ] },
+  { name: 'ros', op: 1230, type: [ 'SID', 'SID', 'number' ] },
+  { name: 'cidFontVersion', op: 1231, type: 'number', value: 0 },
+  { name: 'cidFontRevision', op: 1232, type: 'number', value: 0 },
+  { name: 'cidFontType', op: 1233, type: 'number', value: 0 },
+  { name: 'cidCount', op: 1234, type: 'number', value: 8720 },
+  { name: 'uidBase', op: 1235, type: 'number' },
+  { name: 'fdArray', op: 1236, type: 'offset' },
+  { name: 'fdSelect', op: 1237, type: 'offset' },
+  { name: 'fontName', op: 1238, type: 'SID' }
 ]
 
 const PRIVATE_DICT_META = [
-  {name: 'subrs', op: 19, type: 'offset', value: 0},
-  {name: 'defaultWidthX', op: 20, type: 'number', value: 0},
-  {name: 'nominalWidthX', op: 21, type: 'number', value: 0}
+  { name: 'subrs', op: 19, type: 'offset', value: 0 },
+  { name: 'defaultWidthX', op: 20, type: 'number', value: 0 },
+  { name: 'nominalWidthX', op: 21, type: 'number', value: 0 }
 ]
 
 // Parse the CFF top dictionary. A CFF table can contain multiple fonts, each with their own top dictionary.
 // The top dictionary contains the essential metadata for the font, together with the private dictionary.
-function parseCFFTopDict(data, strings) {
+function parseCFFTopDict (data, strings) {
   const dict = parseCFFDict(data, 0, data.byteLength)
   return interpretDict(dict, TOP_DICT_META, strings)
 }
 
 // Parse the CFF private dictionary. We don't fully parse out all the values, only the ones we need.
-function parseCFFPrivateDict(data, start, size, strings) {
+function parseCFFPrivateDict (data, start, size, strings) {
   const dict = parseCFFDict(data, start, size)
   return interpretDict(dict, PRIVATE_DICT_META, strings)
 }
@@ -341,7 +341,7 @@ function parseCFFPrivateDict(data, start, size, strings) {
 //    _nominalWidthX   bias added to width embedded within glyph description
 //
 //    _privateDict     saved copy of parsed Private DICT from Top DICT
-function gatherCFFTopDicts(data, start, cffIndex, strings) {
+function gatherCFFTopDicts (data, start, cffIndex, strings) {
   const topDictArray = []
   for (let iTopDict = 0; iTopDict < cffIndex.length; iTopDict += 1) {
     const topDictData = new DataView(new Uint8Array(cffIndex[iTopDict]).buffer)
@@ -370,14 +370,14 @@ function gatherCFFTopDicts(data, start, cffIndex, strings) {
 // Parse the CFF charset table, which contains internal names for all the glyphs.
 // This function will return a list of glyph names.
 // See Adobe TN #5176 chapter 13, "Charsets".
-function parseCFFCharset(data, start, nGlyphs, strings) {
+function parseCFFCharset (data, start, nGlyphs, strings) {
   let sid
   let count
   const parser = new Parser(data, start)
 
   // The .notdef glyph is not included, so subtract 1.
   nGlyphs -= 1
-  const charset = ['.notdef']
+  const charset = [ '.notdef' ]
 
   const format = parser.parseCard8()
   if (format === 0) {
@@ -412,7 +412,7 @@ function parseCFFCharset(data, start, nGlyphs, strings) {
 
 // Parse the CFF encoding data. Only one encoding can be specified per font.
 // See Adobe TN #5176 chapter 12, "Encodings".
-function parseCFFEncoding(data, start, charset) {
+function parseCFFEncoding (data, start, charset) {
   let code
   const enc = {}
   const parser = new Parser(data, start)
@@ -444,7 +444,7 @@ function parseCFFEncoding(data, start, charset) {
 // Take in charstring code and return a Glyph object.
 // The encoding is described in the Type 2 Charstring Format
 // https://www.microsoft.com/typography/OTSPEC/charstr2.htm
-function parseCFFCharstring(font, glyph, code) {
+function parseCFFCharstring (font, glyph, code) {
   let c1x
   let c1y
   let c2x
@@ -475,7 +475,7 @@ function parseCFFCharstring(font, glyph, code) {
   }
   let width = defaultWidthX
 
-  function newContour(x, y) {
+  function newContour (x, y) {
     if (open) {
       p.closePath()
     }
@@ -484,7 +484,7 @@ function parseCFFCharstring(font, glyph, code) {
     open = true
   }
 
-  function parseStems() {
+  function parseStems () {
     let hasWidthArg
 
     // The number of stem operators on the stack is always even.
@@ -499,7 +499,7 @@ function parseCFFCharstring(font, glyph, code) {
     haveWidth = true
   }
 
-  function parse(code) {
+  function parse (code) {
     let b1
     let b2
     let b3
@@ -595,8 +595,8 @@ function parseCFFCharstring(font, glyph, code) {
           switch (v) {
             case 35: // flex
               // |- dx1 dy1 dx2 dy2 dx3 dy3 dx4 dy4 dx5 dy5 dx6 dy6 fd flex (12 35) |-
-              c1x = x   + stack.shift()    // dx1
-              c1y = y   + stack.shift()    // dy1
+              c1x = x + stack.shift()    // dx1
+              c1y = y + stack.shift()    // dy1
               c2x = c1x + stack.shift()    // dx2
               c2y = c1y + stack.shift()    // dy2
               jpx = c2x + stack.shift()    // dx3
@@ -605,15 +605,15 @@ function parseCFFCharstring(font, glyph, code) {
               c3y = jpy + stack.shift()    // dy4
               c4x = c3x + stack.shift()    // dx5
               c4y = c3y + stack.shift()    // dy5
-              x = c4x   + stack.shift()    // dx6
-              y = c4y   + stack.shift()    // dy6
+              x = c4x + stack.shift()    // dx6
+              y = c4y + stack.shift()    // dy6
               stack.shift()                // flex depth
               p.curveTo(c1x, c1y, c2x, c2y, jpx, jpy)
               p.curveTo(c3x, c3y, c4x, c4y, x, y)
               break
             case 34: // hflex
               // |- dx1 dx2 dy2 dx3 dx4 dx5 dx6 hflex (12 34) |-
-              c1x = x   + stack.shift()    // dx1
+              c1x = x + stack.shift()    // dx1
               c1y = y                      // dy1
               c2x = c1x + stack.shift()    // dx2
               c2y = c1y + stack.shift()    // dy2
@@ -629,8 +629,8 @@ function parseCFFCharstring(font, glyph, code) {
               break
             case 36: // hflex1
               // |- dx1 dy1 dx2 dy2 dx3 dx4 dx5 dy5 dx6 hflex1 (12 36) |-
-              c1x = x   + stack.shift()    // dx1
-              c1y = y   + stack.shift()    // dy1
+              c1x = x + stack.shift()    // dx1
+              c1y = y + stack.shift()    // dy1
               c2x = c1x + stack.shift()    // dx2
               c2y = c1y + stack.shift()    // dy2
               jpx = c2x + stack.shift()    // dx3
@@ -645,8 +645,8 @@ function parseCFFCharstring(font, glyph, code) {
               break
             case 37: // flex1
               // |- dx1 dy1 dx2 dy2 dx3 dy3 dx4 dy4 dx5 dy5 d6 flex1 (12 37) |-
-              c1x = x   + stack.shift()    // dx1
-              c1y = y   + stack.shift()    // dy1
+              c1x = x + stack.shift()    // dx1
+              c1y = y + stack.shift()    // dy1
               c2x = c1x + stack.shift()    // dx2
               c2y = c1y + stack.shift()    // dy2
               jpx = c2x + stack.shift()    // dx3
@@ -864,7 +864,7 @@ function parseCFFCharstring(font, glyph, code) {
   return p
 }
 
-function parseCFFFDSelect(data, start, nGlyphs, fdArrayCount) {
+function parseCFFFDSelect (data, start, nGlyphs, fdArrayCount) {
   const fdSelect = []
   let fdIndex
   const parser = new Parser(data, start)
@@ -910,7 +910,7 @@ function parseCFFFDSelect(data, start, nGlyphs, fdArrayCount) {
 }
 
 // Parse the `CFF` table, which contains the glyph outlines in PostScript format.
-function parseCFFTable(data, start, font) {
+function parseCFFTable (data, start, font) {
   font.tables.cff = {}
   const header = parseCFFHeader(data, start)
   const nameIndex = parseCFFIndex(data, header.endOffset, bytesToString)
@@ -993,7 +993,7 @@ function parseCFFTable(data, start, font) {
 
 // Convert a string to a String ID (SID).
 // The list of strings is modified in place.
-function encodeString(s, strings) {
+function encodeString (s, strings) {
   let sid
 
   // Is the string in the CFF standard strings?
@@ -1014,29 +1014,29 @@ function encodeString(s, strings) {
   return sid
 }
 
-function makeHeader() {
+function makeHeader () {
   return new table.Record('Header', [
-    {name: 'major', type: 'Card8', value: 1},
-    {name: 'minor', type: 'Card8', value: 0},
-    {name: 'hdrSize', type: 'Card8', value: 4},
-    {name: 'major', type: 'Card8', value: 1}
+    { name: 'major', type: 'Card8', value: 1 },
+    { name: 'minor', type: 'Card8', value: 0 },
+    { name: 'hdrSize', type: 'Card8', value: 4 },
+    { name: 'major', type: 'Card8', value: 1 }
   ])
 }
 
-function makeNameIndex(fontNames) {
+function makeNameIndex (fontNames) {
   const t = new table.Record('Name INDEX', [
-    {name: 'names', type: 'INDEX', value: []}
+    { name: 'names', type: 'INDEX', value: [] }
   ])
   t.names = []
   for (let i = 0; i < fontNames.length; i += 1) {
-    t.names.push({name: 'name_' + i, type: 'NAME', value: fontNames[i]})
+    t.names.push({ name: 'name_' + i, type: 'NAME', value: fontNames[i] })
   }
 
   return t
 }
 
 // Given a dictionary's metadata, create a DICT structure.
-function makeDict(meta, attrs, strings) {
+function makeDict (meta, attrs, strings) {
   const m = {}
   for (let i = 0; i < meta.length; i += 1) {
     const entry = meta[i]
@@ -1046,7 +1046,7 @@ function makeDict(meta, attrs, strings) {
         value = encodeString(value, strings)
       }
 
-      m[entry.op] = {name: entry.name, type: entry.type, value: value}
+      m[entry.op] = { name: entry.name, type: entry.type, value }
     }
   }
 
@@ -1054,58 +1054,58 @@ function makeDict(meta, attrs, strings) {
 }
 
 // The Top DICT houses the global font attributes.
-function makeTopDict(attrs, strings) {
+function makeTopDict (attrs, strings) {
   const t = new table.Record('Top DICT', [
-    {name: 'dict', type: 'DICT', value: {}}
+    { name: 'dict', type: 'DICT', value: {} }
   ])
   t.dict = makeDict(TOP_DICT_META, attrs, strings)
   return t
 }
 
-function makeTopDictIndex(topDict) {
+function makeTopDictIndex (topDict) {
   const t = new table.Record('Top DICT INDEX', [
-    {name: 'topDicts', type: 'INDEX', value: []}
+    { name: 'topDicts', type: 'INDEX', value: [] }
   ])
-  t.topDicts = [{name: 'topDict_0', type: 'TABLE', value: topDict}]
+  t.topDicts = [ { name: 'topDict_0', type: 'TABLE', value: topDict } ]
   return t
 }
 
-function makeStringIndex(strings) {
+function makeStringIndex (strings) {
   const t = new table.Record('String INDEX', [
-    {name: 'strings', type: 'INDEX', value: []}
+    { name: 'strings', type: 'INDEX', value: [] }
   ])
   t.strings = []
   for (let i = 0; i < strings.length; i += 1) {
-    t.strings.push({name: 'string_' + i, type: 'STRING', value: strings[i]})
+    t.strings.push({ name: 'string_' + i, type: 'STRING', value: strings[i] })
   }
 
   return t
 }
 
-function makeGlobalSubrIndex() {
+function makeGlobalSubrIndex () {
   // Currently we don't use subroutines.
   return new table.Record('Global Subr INDEX', [
-    {name: 'subrs', type: 'INDEX', value: []}
+    { name: 'subrs', type: 'INDEX', value: [] }
   ])
 }
 
-function makeCharsets(glyphNames, strings) {
+function makeCharsets (glyphNames, strings) {
   const t = new table.Record('Charsets', [
-    {name: 'format', type: 'Card8', value: 0}
+    { name: 'format', type: 'Card8', value: 0 }
   ])
   for (let i = 0; i < glyphNames.length; i += 1) {
     const glyphName = glyphNames[i]
     const glyphSID = encodeString(glyphName, strings)
-    t.fields.push({name: 'glyph_' + i, type: 'SID', value: glyphSID})
+    t.fields.push({ name: 'glyph_' + i, type: 'SID', value: glyphSID })
   }
 
   return t
 }
 
-function glyphToOps(glyph) {
+function glyphToOps (glyph) {
   const ops = []
   const path = glyph.path
-  ops.push({name: 'width', type: 'NUMBER', value: glyph.advanceWidth})
+  ops.push({ name: 'width', type: 'NUMBER', value: glyph.advanceWidth })
   let x = 0
   let y = 0
   for (let i = 0; i < path.commands.length; i += 1) {
@@ -1132,17 +1132,17 @@ function glyphToOps(glyph) {
     if (cmd.type === 'M') {
       dx = Math.round(cmd.x - x)
       dy = Math.round(cmd.y - y)
-      ops.push({name: 'dx', type: 'NUMBER', value: dx})
-      ops.push({name: 'dy', type: 'NUMBER', value: dy})
-      ops.push({name: 'rmoveto', type: 'OP', value: 21})
+      ops.push({ name: 'dx', type: 'NUMBER', value: dx })
+      ops.push({ name: 'dy', type: 'NUMBER', value: dy })
+      ops.push({ name: 'rmoveto', type: 'OP', value: 21 })
       x = Math.round(cmd.x)
       y = Math.round(cmd.y)
     } else if (cmd.type === 'L') {
       dx = Math.round(cmd.x - x)
       dy = Math.round(cmd.y - y)
-      ops.push({name: 'dx', type: 'NUMBER', value: dx})
-      ops.push({name: 'dy', type: 'NUMBER', value: dy})
-      ops.push({name: 'rlineto', type: 'OP', value: 5})
+      ops.push({ name: 'dx', type: 'NUMBER', value: dx })
+      ops.push({ name: 'dy', type: 'NUMBER', value: dy })
+      ops.push({ name: 'rlineto', type: 'OP', value: 5 })
       x = Math.round(cmd.x)
       y = Math.round(cmd.y)
     } else if (cmd.type === 'C') {
@@ -1152,13 +1152,13 @@ function glyphToOps(glyph) {
       const dy2 = Math.round(cmd.y2 - cmd.y1)
       dx = Math.round(cmd.x - cmd.x2)
       dy = Math.round(cmd.y - cmd.y2)
-      ops.push({name: 'dx1', type: 'NUMBER', value: dx1})
-      ops.push({name: 'dy1', type: 'NUMBER', value: dy1})
-      ops.push({name: 'dx2', type: 'NUMBER', value: dx2})
-      ops.push({name: 'dy2', type: 'NUMBER', value: dy2})
-      ops.push({name: 'dx', type: 'NUMBER', value: dx})
-      ops.push({name: 'dy', type: 'NUMBER', value: dy})
-      ops.push({name: 'rrcurveto', type: 'OP', value: 8})
+      ops.push({ name: 'dx1', type: 'NUMBER', value: dx1 })
+      ops.push({ name: 'dy1', type: 'NUMBER', value: dy1 })
+      ops.push({ name: 'dx2', type: 'NUMBER', value: dx2 })
+      ops.push({ name: 'dy2', type: 'NUMBER', value: dy2 })
+      ops.push({ name: 'dx', type: 'NUMBER', value: dx })
+      ops.push({ name: 'dy', type: 'NUMBER', value: dy })
+      ops.push({ name: 'rrcurveto', type: 'OP', value: 8 })
       x = Math.round(cmd.x)
       y = Math.round(cmd.y)
     }
@@ -1166,42 +1166,42 @@ function glyphToOps(glyph) {
     // Contours are closed automatically.
   }
 
-  ops.push({name: 'endchar', type: 'OP', value: 14})
+  ops.push({ name: 'endchar', type: 'OP', value: 14 })
   return ops
 }
 
-function makeCharStringsIndex(glyphs) {
+function makeCharStringsIndex (glyphs) {
   const t = new table.Record('CharStrings INDEX', [
-    {name: 'charStrings', type: 'INDEX', value: []}
+    { name: 'charStrings', type: 'INDEX', value: [] }
   ])
 
   for (let i = 0; i < glyphs.length; i += 1) {
     const glyph = glyphs.get(i)
     const ops = glyphToOps(glyph)
-    t.charStrings.push({name: glyph.name, type: 'CHARSTRING', value: ops})
+    t.charStrings.push({ name: glyph.name, type: 'CHARSTRING', value: ops })
   }
 
   return t
 }
 
-function makePrivateDict(attrs, strings) {
+function makePrivateDict (attrs, strings) {
   const t = new table.Record('Private DICT', [
-    {name: 'dict', type: 'DICT', value: {}}
+    { name: 'dict', type: 'DICT', value: {} }
   ])
   t.dict = makeDict(PRIVATE_DICT_META, attrs, strings)
   return t
 }
 
-function makeCFFTable(glyphs, options) {
+function makeCFFTable (glyphs, options) {
   const t = new table.Table('CFF ', [
-    {name: 'header', type: 'RECORD'},
-    {name: 'nameIndex', type: 'RECORD'},
-    {name: 'topDictIndex', type: 'RECORD'},
-    {name: 'stringIndex', type: 'RECORD'},
-    {name: 'globalSubrIndex', type: 'RECORD'},
-    {name: 'charsets', type: 'RECORD'},
-    {name: 'charStringsIndex', type: 'RECORD'},
-    {name: 'privateDict', type: 'RECORD'}
+    { name: 'header', type: 'RECORD' },
+    { name: 'nameIndex', type: 'RECORD' },
+    { name: 'topDictIndex', type: 'RECORD' },
+    { name: 'stringIndex', type: 'RECORD' },
+    { name: 'globalSubrIndex', type: 'RECORD' },
+    { name: 'charsets', type: 'RECORD' },
+    { name: 'charStringsIndex', type: 'RECORD' },
+    { name: 'privateDict', type: 'RECORD' }
   ])
 
   const fontScale = 1 / options.unitsPerEm
@@ -1213,12 +1213,12 @@ function makeCFFTable(glyphs, options) {
     fullName: options.fullName,
     familyName: options.familyName,
     weight: options.weightName,
-    fontBBox: options.fontBBox || [0, 0, 0, 0],
-    fontMatrix: [fontScale, 0, 0, fontScale, 0, 0],
+    fontBBox: options.fontBBox || [ 0, 0, 0, 0 ],
+    fontMatrix: [ fontScale, 0, 0, fontScale, 0, 0 ],
     charset: 999,
     encoding: 0,
     charStrings: 999,
-    private: [0, 999]
+    private: [ 0, 999 ]
   }
 
   const privateAttrs = {}
@@ -1235,7 +1235,7 @@ function makeCFFTable(glyphs, options) {
   const strings = []
 
   t.header = makeHeader()
-  t.nameIndex = makeNameIndex([options.postScriptName])
+  t.nameIndex = makeNameIndex([ options.postScriptName ])
   let topDict = makeTopDict(attrs, strings)
   t.topDictIndex = makeTopDictIndex(topDict)
   t.globalSubrIndex = makeGlobalSubrIndex()

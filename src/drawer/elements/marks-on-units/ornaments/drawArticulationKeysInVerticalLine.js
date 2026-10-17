@@ -62,7 +62,7 @@ const drawNaturalKeyShape = () => {
   }
 }
 
-const keys = { 'sharp': drawSharpKeyShape, 'flat': drawFlatKeyShape, 'natural': drawNaturalKeyShape }
+const keys = { sharp: drawSharpKeyShape, flat: drawFlatKeyShape, natural: drawNaturalKeyShape }
 
 export default function (singleUnit, articulationIndex, keyName, articulation, position, styles) {
   const { yDistanceBetweenArticulationKeysInVerticalLine, scaleFactorForArticulationKeys } = styles

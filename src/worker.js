@@ -57,7 +57,7 @@ const eventHandlers = {
         return
       }
       self['__UNILANG_FONT_SOURCES_STORAGE__'][fontSourcesReference] = supportedFontSources
-      self.postMessage({ id, 'status': 'ok' })
+      self.postMessage({ id, status: 'ok' })
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error)
       self.postMessage({
@@ -208,7 +208,6 @@ const eventHandlers = {
       svgDataSrc,
       errors
     })
-    return
   },
   'midi.generate': async (event) => {
     const id = event.data.id
@@ -254,7 +253,6 @@ const eventHandlers = {
       midiDataSrc,
       errors
     })
-    return
   },
   'svg.midi.generate': (event) => {
     const id = event.data.id
@@ -350,7 +348,6 @@ const eventHandlers = {
       customStyles,
       errors
     })
-    return
   },
   'svg.midi.text.generate': (event) => {
     const id = event.data.id
@@ -448,7 +445,6 @@ const eventHandlers = {
       highlightsHtmlBuffer,
       errors
     })
-    return
   },
   /*
   Every page of a document at once, for an editor with pages. Each page gets

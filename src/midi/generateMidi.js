@@ -1,6 +1,5 @@
 'use strict'
 
-// eslint-disable-next-line  no-undef
 const itIsBrowserEnv = typeof window !== 'undefined' || typeof process === 'undefined'
 
 import { Midi } from '#msq/midi/lib/@tonejs/Midi.js'
@@ -56,7 +55,7 @@ import PITCHES_BY_NOTE_NAMES from '#msq/midi/pitchesByNoteNames.js'
 import PITCH_ADJUSTEMENTS_BY_KEY_SIGNATURES from '#msq/midi/pitchAdjustmentsByKeySignatures.js'
 import PITCH_ADJUSTEMENTS_BY_KEY_TYPE from '#msq/midi/pitchAdjustmentsByKeyType.js'
 
-import {  clone  } from '#msq/midi/toolbox.js'
+import { clone } from '#msq/midi/toolbox.js'
 
 const VERY_SMALL_TIME_TO_SEPARATE_MEASURES_IN_DIFFERENT_TIME_FRAMES_FOR_SURE = 0.000001
 
@@ -117,7 +116,7 @@ export default function (pageSchema, midiSettingsForEachPage = []) {
   const measureIndexesWithMappedIndicatorsOfWhetherRepeatDotsAtTheStartOfMeasuresAreNotActiveAnymore = {}
   const measureIndexesMappedWithIndicatorsOfWhetherRepeatDotsAtTheEndOfMeasureAreNotActiveAnymore = {}
   let lastMeasureIndexWithRepeatDotsAtTheStart
-  
+
   const measureIndexesThatWeNeedToSkipBecauseOfVoltaBracketsAboveThem = []
   let voltaBracketsAreActive = false
 
@@ -140,7 +139,7 @@ export default function (pageSchema, midiSettingsForEachPage = []) {
 
   const measuresParams = pageSchema.measuresParams
 
-  let fermataDurationFromMidiSettings 
+  let fermataDurationFromMidiSettings
 
   for (let measureIndex = 0; measureIndex < measuresParams.length; measureIndex++) {
     if (measureIndexesThatWeNeedToSkipBecauseOfVoltaBracketsAboveThem.includes(measureIndex)) {
@@ -267,7 +266,6 @@ export default function (pageSchema, midiSettingsForEachPage = []) {
     }
 
     for (let staveIndex = 0; staveIndex < measureParams.stavesParams.length; staveIndex++) {
-
       if (!timeProgressionsForEachVoiceInEachStave[staveIndex]) {
         timeProgressionsForEachVoiceInEachStave[staveIndex] = []
       }
@@ -283,7 +281,6 @@ export default function (pageSchema, midiSettingsForEachPage = []) {
       timeProgressionsForEachVoiceInEachStave[staveIndex].splice(staveParams.voicesParams.length)
 
       for (let voiceIndex = 0; voiceIndex < staveParams.voicesParams.length; voiceIndex++) {
-
         const staveVoiceKey = `${staveIndex}-${voiceIndex}`
         timeProgressionsForEachVoiceInEachStave[staveIndex][voiceIndex] = timeProgressionsForEachVoiceInEachStave[staveIndex][voiceIndex] || timeProgressionForAllMeasures
         const voiceParams = staveParams.voicesParams[voiceIndex]
@@ -291,10 +288,9 @@ export default function (pageSchema, midiSettingsForEachPage = []) {
         let visualUnitIndex = -1
 
         for (let unitIndex = 0; unitIndex < voiceParams.length; unitIndex++) {
-
           const voiceTime = timeProgressionsForEachVoiceInEachStave[staveIndex][voiceIndex]
           const unitParams = voiceParams[unitIndex]
-          let unitHasNotesOnDifferentStaves = false
+          const unitHasNotesOnDifferentStaves = false
           let staveIndexWhereClefBeforeIsConsidered
 
           assignTremoloTypeToUnit(unitParams, measuresParams, measureParams, measureIndex, staveIndex, voiceIndex, unitIndex)
@@ -328,7 +324,7 @@ export default function (pageSchema, midiSettingsForEachPage = []) {
             note.unitIsTiedBeforeMeasure = unitParams.tiedBeforeMeasure
             note.articulationParams = unitParams.articulationParams
             note.tremoloParams = unitParams.tremoloParams
-            note.isTremolo = unitParams.tremoloParams ? true : false
+            note.isTremolo = !!unitParams.tremoloParams
             note.isSingleTremolo = unitParams.tremoloParams ? (unitParams.tremoloParams.type === 'single') : false
             note.slurMarks = unitParams.slurMarks
             note.pedalMark = unitParams.pedalMark
@@ -400,7 +396,7 @@ export default function (pageSchema, midiSettingsForEachPage = []) {
           addTimeFrameToIndicateKeysThatLastOneMeasure(unitParams.keysParams, PITCHES_BY_NOTE_NAMES, PITCH_ADJUSTEMENTS_BY_KEY_TYPE, pitchAdjustmentsAuraForEachStaveThatLastOneMeasureSplittedInTimeFrames, unitParams.isGrace, graceCountersForEachVoiceInEachStaveSplittedInTimeFrames, voiceTime, measureIndex, staveIndex, staveVoiceKey)
           addTimeFrameToIndicateDynamic(unitParams.articulationParams, unitParams.dynamicChangeMark, dynamicsAuraForEachVoiceOnEachStaveSplittedInTimeFrames, currentDynamicsAuraObjectsForEachVoiceOnEachStave, lastMentionedDynamicsForEachVoiceOnEachStave, unitParams.isGrace, graceCountersForEachVoiceInEachStaveSplittedInTimeFrames, voiceTime, staveVoiceKey, unitParams.isLastSingleUnitInVoiceOnPageLine)
           addTimeFramesToIndicateNotes(unitParams, notesSplittedInTimeFrames, actualDurationOfUnit, unitDurationInSeconds, octaveAdjustmentForUnitParams, graceCountersForEachVoiceInEachStaveSplittedInTimeFrames, voiceTime, staveVoiceKey)
-          
+
           if ((unitParams.octaveSignMark && unitParams.octaveSignMark.finish) || unitParams.isLastSingleUnitInVoiceOnPageLine) {
             indicatorsOfOctaveSignEndingsByStaveAndVoice[staveVoiceKey] = indicatorsOfOctaveSignEndingsByStaveAndVoice[staveVoiceKey] || [ staveVoiceKey ]
             unitParams.occupiedStaveIndexes.forEach(staveIndex => {
@@ -429,12 +425,12 @@ export default function (pageSchema, midiSettingsForEachPage = []) {
           }
 
           if (!unitParams.isGrace) {
-            timeProgressionsForEachVoiceInEachStave[staveIndex][voiceIndex] += unitDurationInSeconds 
+            timeProgressionsForEachVoiceInEachStave[staveIndex][voiceIndex] += unitDurationInSeconds
           }
 
-          const fermataArticulationShouldBeApplied = (unitParams.articulationParams ? true : false)
-            && (pointsOfTimeWhenFermataArticulationIsApplied.find(timePoint => Math.abs(timePoint - voiceTime) < 0.0001) === undefined)
-            && unitParams.articulationParams.some(articulationParam => articulationParam.name === 'fermata')
+          const fermataArticulationShouldBeApplied = (!!unitParams.articulationParams) &&
+            (pointsOfTimeWhenFermataArticulationIsApplied.find(timePoint => Math.abs(timePoint - voiceTime) < 0.0001) === undefined) &&
+            unitParams.articulationParams.some(articulationParam => articulationParam.name === 'fermata')
 
           if (fermataArticulationShouldBeApplied) {
             pointsOfTimeWhenFermataArticulationIsApplied.push(voiceTime)
@@ -443,7 +439,7 @@ export default function (pageSchema, midiSettingsForEachPage = []) {
       }
     }
 
-    let minTimeAmongTimeProgressionsForEachVoiceInEachStave = calculateMinTimeAmongTimeProgressionsForEachVoiceInEachStave(
+    const minTimeAmongTimeProgressionsForEachVoiceInEachStave = calculateMinTimeAmongTimeProgressionsForEachVoiceInEachStave(
       timeProgressionsForEachVoiceInEachStave,
       timeOfTheLastSoundsThatStartPlayingInThisMeasure,
       measureParams.endsWithFermata,
@@ -494,7 +490,7 @@ export default function (pageSchema, midiSettingsForEachPage = []) {
     if (measureParams.repetitionNote && !weAreLookingForFineMark && !weAreLookingForFirstCodaMark) {
       weAreLookingForFineMark = measureParams.repetitionNote.value === 'D.C. al Fine'
       weAreLookingForFirstCodaMark = measureParams.repetitionNote.value === 'D.C. al Coda' || measureParams.repetitionNote.value === 'D.S. al Coda'
-      weWantToJumpToSegnoMark = measureParams.repetitionNote.value === 'D.S. al Fine'|| measureParams.repetitionNote.value === 'D.S. al Coda'
+      weWantToJumpToSegnoMark = measureParams.repetitionNote.value === 'D.S. al Fine' || measureParams.repetitionNote.value === 'D.S. al Coda'
 
       measureIndex = (weAreLookingForFineMark || weAreLookingForFirstCodaMark || weWantToJumpToSegnoMark)
         ? -1
@@ -576,7 +572,7 @@ export default function (pageSchema, midiSettingsForEachPage = []) {
       }
 
       if (!note.isGrace && note.arpeggiated) {
-        groupsOfArpeggiatedNotesInCurrentTimeFrameForEachCrossStaveUnit[0] = groupsOfArpeggiatedNotesInCurrentTimeFrameForEachCrossStaveUnit[0] || [ [] ]        
+        groupsOfArpeggiatedNotesInCurrentTimeFrameForEachCrossStaveUnit[0] = groupsOfArpeggiatedNotesInCurrentTimeFrameForEachCrossStaveUnit[0] || [ [] ]
       }
 
       if (
@@ -636,7 +632,7 @@ export default function (pageSchema, midiSettingsForEachPage = []) {
       }
 
       if (note.isGrace && note.arpeggiated) {
-        groupsOfArpeggiatedNotesInCurrentTimeFrameForEachCrossStaveUnit[note.normalizedGraceCount + 1] = groupsOfArpeggiatedNotesInCurrentTimeFrameForEachCrossStaveUnit[note.normalizedGraceCount + 1] || [ [] ]        
+        groupsOfArpeggiatedNotesInCurrentTimeFrameForEachCrossStaveUnit[note.normalizedGraceCount + 1] = groupsOfArpeggiatedNotesInCurrentTimeFrameForEachCrossStaveUnit[note.normalizedGraceCount + 1] || [ [] ]
       }
 
       if (
@@ -730,7 +726,6 @@ export default function (pageSchema, midiSettingsForEachPage = []) {
           }
         })
       }
-
     }
 
     for (let noteTimeIndex = 0; noteTimeIndex < notesSplittedInTimeFrames[orderedTimeFramesFromNotesSplittedInTimeFrames[timeIndex]].length; noteTimeIndex++) {
@@ -1184,7 +1179,7 @@ export default function (pageSchema, midiSettingsForEachPage = []) {
       ) {
         const lastTurnedNote = Object.assign({}, note)
         deleteArticulationsWithName(lastTurnedNote, 'turn')
-        lastTurnedNote.numberOfTurnNotes= undefined
+        lastTurnedNote.numberOfTurnNotes = undefined
         lastTurnedNote.durationOfEachTurnNoteInSeconds = undefined
         lastTurnedNote.isTurned = false
         lastTurnedNote.durationInSeconds = note.durationOfEachTurnNoteInSeconds

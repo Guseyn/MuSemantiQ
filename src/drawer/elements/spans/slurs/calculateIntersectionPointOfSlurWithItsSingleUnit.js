@@ -12,7 +12,7 @@ export default function (singleUnit, slurSplinePoints, slurDirection, styles) {
   const p3 = { x: slurSplinePoints[15], y: slurSplinePoints[16] }
 
   const sx = calculateSlurJunctionPointForSingleUnit(singleUnit, slurDirection, 'middle', null, styles).x
-  let t = calculateTimeInSlurSplinePointsBySomeXPointThere(sx, slurStartX, slurEndX)
+  const t = calculateTimeInSlurSplinePointsBySomeXPointThere(sx, slurStartX, slurEndX)
   return {
     singleUnit,
     x: sx,

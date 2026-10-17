@@ -2,13 +2,13 @@
 // https://www.microsoft.com/typography/OTSPEC/gpos.htm
 
 import check from '#msq/drawer/lib/opentype/check.js'
-import {  decode  } from '#msq/drawer/lib/opentype/types.js'
+import { decode } from '#msq/drawer/lib/opentype/types.js'
 import { Parser } from '#msq/drawer/lib/opentype/parse.js'
 import table from '#msq/drawer/lib/opentype/table.js'
 
 // Parse the metadata `meta` table.
 // https://developer.apple.com/fonts/TrueType-Reference-Manual/RM06/Chap6meta.html
-function parseMetaTable(data, start) {
+function parseMetaTable (data, start) {
   const p = new Parser(data, start)
   const tableVersion = p.parseULong()
   check.argument(tableVersion === 1, 'Unsupported META table version.')
@@ -28,28 +28,28 @@ function parseMetaTable(data, start) {
   return tags
 }
 
-function makeMetaTable(tags) {
+function makeMetaTable (tags) {
   const numTags = Object.keys(tags).length
   let stringPool = ''
   const stringPoolOffset = 16 + numTags * 12
 
   const result = new table.Table('meta', [
-    {name: 'version', type: 'ULONG', value: 1},
-    {name: 'flags', type: 'ULONG', value: 0},
-    {name: 'offset', type: 'ULONG', value: stringPoolOffset},
-    {name: 'numTags', type: 'ULONG', value: numTags}
+    { name: 'version', type: 'ULONG', value: 1 },
+    { name: 'flags', type: 'ULONG', value: 0 },
+    { name: 'offset', type: 'ULONG', value: stringPoolOffset },
+    { name: 'numTags', type: 'ULONG', value: numTags }
   ])
 
-  for (let tag in tags) {
+  for (const tag in tags) {
     const pos = stringPool.length
     stringPool += tags[tag]
 
-    result.fields.push({name: 'tag ' + tag, type: 'TAG', value: tag})
-    result.fields.push({name: 'offset ' + tag, type: 'ULONG', value: stringPoolOffset + pos})
-    result.fields.push({name: 'length ' + tag, type: 'ULONG', value: tags[tag].length})
+    result.fields.push({ name: 'tag ' + tag, type: 'TAG', value: tag })
+    result.fields.push({ name: 'offset ' + tag, type: 'ULONG', value: stringPoolOffset + pos })
+    result.fields.push({ name: 'length ' + tag, type: 'ULONG', value: tags[tag].length })
   }
 
-  result.fields.push({name: 'stringPool', type: 'CHARARRAY', value: stringPool})
+  result.fields.push({ name: 'stringPool', type: 'CHARARRAY', value: stringPool })
 
   return result
 }

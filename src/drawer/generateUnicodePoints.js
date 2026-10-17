@@ -1,13 +1,10 @@
 'use strict'
 
-// font size(for font file) is 4.0 * intervalBetweenStaveLines
-const MUSCIC_FONT_SOURCE_SIZE = 4.0 
-
 import createText from '#msq/drawer/elements/basic/createText.js'
 import parseSvgPath from '#msq/drawer/lib/svgpath/parseSvgPath.js'
 import translateSvgPath from '#msq/drawer/lib/svgpath/translateSvgPath.js'
 
-function generateUnicodePoints(unicode, musicFontSource, textFontSource, musicFontSourceSize, intervalBetweenStaveLines) {
+function generateUnicodePoints (unicode, musicFontSource, textFontSource, musicFontSourceSize, intervalBetweenStaveLines) {
   const fontOptions = {
     source: musicFontSource,
     size: musicFontSourceSize * intervalBetweenStaveLines,

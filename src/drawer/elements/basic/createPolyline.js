@@ -34,8 +34,8 @@ export default function (points, strokeOptions, fill = true, leftOffset = 0, top
     throw new Error(`polyline includes NaN points: ${joinedPoints}`)
   }
   const properties = {
-    'points': joinedPoints,
-    'fill': fill || 'none',
+    points: joinedPoints,
+    fill: fill || 'none',
     'fill-rule': 'evenodd',
     'vector-effect': 'none'
   }
@@ -51,12 +51,12 @@ export default function (points, strokeOptions, fill = true, leftOffset = 0, top
     properties,
     transformations: (leftOffset !== 0 || topOffset !== 0)
       ? [
-        {
-          type: 'translate',
-          x: leftOffset,
-          y: topOffset
-        }
-      ]
+          {
+            type: 'translate',
+            x: leftOffset,
+            y: topOffset
+          }
+        ]
       : [],
     top: minTop + topOffset,
     right: maxRight + leftOffset,

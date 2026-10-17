@@ -6,7 +6,7 @@ import { Parser } from '#msq/drawer/lib/opentype/parse.js'
 import table from '#msq/drawer/lib/opentype/table.js'
 
 // Parse the maximum profile `maxp` table.
-function parseMaxpTable(data, start) {
+function parseMaxpTable (data, start) {
   const maxp = {}
   const p = new Parser(data, start)
   maxp.version = p.parseVersion()
@@ -30,10 +30,10 @@ function parseMaxpTable(data, start) {
   return maxp
 }
 
-function makeMaxpTable(numGlyphs) {
+function makeMaxpTable (numGlyphs) {
   return new table.Table('maxp', [
-    {name: 'version', type: 'FIXED', value: 0x00005000},
-    {name: 'numGlyphs', type: 'USHORT', value: numGlyphs}
+    { name: 'version', type: 'FIXED', value: 0x00005000 },
+    { name: 'numGlyphs', type: 'USHORT', value: numGlyphs }
   ])
 }
 

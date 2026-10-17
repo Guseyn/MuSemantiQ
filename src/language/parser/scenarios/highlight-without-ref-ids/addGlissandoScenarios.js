@@ -7,8 +7,8 @@ import addLineMeasureStaveVoicePositionScenarios from '#msq/language/parser/scen
 export default function (scenarios) {
   scenarios['glissando'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.glissandoHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.glissandoHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="eh">${match}</span>`
         }
       )
@@ -57,8 +57,8 @@ export default function (scenarios) {
   }
   scenarios['glissando form'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.asWaveLineHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.asWaveLineHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="th">${match}</span>`
         }
       )

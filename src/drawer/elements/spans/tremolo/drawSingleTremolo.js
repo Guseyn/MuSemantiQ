@@ -22,13 +22,13 @@ export default function (singleUnit, styles) {
       : singleUnit.stemDirection === 'up'
         ? singleUnit.withFlags
           ? (singleUnit.numberOfTremoloStrokes === 1)
-            ? singleUnit.bodyTop - singleTremoloStrokesYStartOffsetFromSingleUnitNoteHeadsWithOneTopFlag * graceFactor
-            : singleUnit.bodyTop - singleTremoloStrokesYStartOffsetFromSingleUnitNoteHeadsWithTopFlags * graceFactor
+              ? singleUnit.bodyTop - singleTremoloStrokesYStartOffsetFromSingleUnitNoteHeadsWithOneTopFlag * graceFactor
+              : singleUnit.bodyTop - singleTremoloStrokesYStartOffsetFromSingleUnitNoteHeadsWithTopFlags * graceFactor
           : singleUnit.bodyTop - singleTremoloStrokesStartOffsetFromBody * graceFactor
         : singleUnit.withFlags
           ? (singleUnit.numberOfTremoloStrokes === 1)
-            ? singleUnit.bodyBottom + (singleTremoloStrokesYStartOffsetFromSingleUnitNoteHeadsWithOneBottomFlag + beamLineHeightNormal) * graceFactor
-            : singleUnit.bodyBottom + (singleTremoloStrokesYStartOffsetFromSingleUnitNoteHeadsWithBottomFlags + beamLineHeightNormal) * graceFactor
+              ? singleUnit.bodyBottom + (singleTremoloStrokesYStartOffsetFromSingleUnitNoteHeadsWithOneBottomFlag + beamLineHeightNormal) * graceFactor
+              : singleUnit.bodyBottom + (singleTremoloStrokesYStartOffsetFromSingleUnitNoteHeadsWithBottomFlags + beamLineHeightNormal) * graceFactor
           : singleUnit.bodyBottom + (singleTremoloStrokesStartOffsetFromBody + beamLineHeightNormal) * graceFactor
     const tremoloYDirectionSing = (singleUnit.beamedWithNext || singleUnit.beamedWithPrevious)
       ? singleUnit.stemDirection === 'up' ? +1 : -1

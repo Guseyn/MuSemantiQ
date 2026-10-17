@@ -6,7 +6,6 @@ import createSvg from '#msq/drawer/elements/basic/createSvg.js'
 import drawPage from '#msq/drawer/elements/the-page/page-lines/drawPage.js'
 import generateMidi from '#msq/midi/generateMidi.js'
 
-
 /**
  * ⟅━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━⟆
  *                1. setupFonts
@@ -142,8 +141,7 @@ import generateMidi from '#msq/midi/generateMidi.js'
  *
  * -----------------------------------------------------------------------------------------------
  */
-export async function setupFonts(fontConfig) {
-
+export async function setupFonts (fontConfig) {
   /*
   --------------------------------------------------------------------------------------------------
   ENVIRONMENT DETECTION
@@ -169,24 +167,24 @@ export async function setupFonts(fontConfig) {
       'gentium plus': './src/drawer/font/chord-letters/GentiumPlus-Regular.ttf',
       'gothic a1': './src/drawer/font/chord-letters/GothicA1-Regular.ttf'
     },
-    'text': {
+    text: {
       'noto-serif': {
-        'regular': './src/drawer/font/text/NotoSerif-Regular.ttf',
-        'bold': './src/drawer/font/text/NotoSerif-Bold.ttf'
+        regular: './src/drawer/font/text/NotoSerif-Regular.ttf',
+        bold: './src/drawer/font/text/NotoSerif-Bold.ttf'
       },
       'noto-sans': {
-        'regular': './src/drawer/font/text/NotoSans-Regular.ttf',
-        'bold': './src/drawer/font/text/NotoSans-Bold.ttf'
+        regular: './src/drawer/font/text/NotoSans-Regular.ttf',
+        bold: './src/drawer/font/text/NotoSans-Bold.ttf'
       }
     },
-    'music': {
-      'bravura': {
-        'font': './src/drawer/font/music/Bravura.otf',
-        'js': '#msq/drawer/font/music-js/bravura.js'
+    music: {
+      bravura: {
+        font: './src/drawer/font/music/Bravura.otf',
+        js: '#msq/drawer/font/music-js/bravura.js'
       },
-      'leland': {
-        'font': './src/drawer/font/music/Leland.otf',
-        'js': '#msq/drawer/font/music-js/leland.js'
+      leland: {
+        font: './src/drawer/font/music/Leland.otf',
+        js: '#msq/drawer/font/music-js/leland.js'
       }
       /*
       Only the fonts that have a music-js table are named here, and only bravura
@@ -259,10 +257,9 @@ Every path must be a valid URL, not a local filesystem path.
     // Start with completely empty config (browser requires explicit definitions)
     finalFontConfig = {
       'chord-letters': {},
-      'text': {},
-      'music': {}
+      text: {},
+      music: {}
     }
-
   } else {
     // Node.js — initialize with fully working default config
     finalFontConfig = structuredClone(defaultNodeFontConfig)
@@ -299,7 +296,7 @@ Every path must be a valid URL, not a local filesystem path.
       "fontConfig['text'] must map name → {regular, bold}"
     )
 
-    for (const [fontName, fontPaths] of Object.entries(fontConfig['text'])) {
+    for (const [ fontName, fontPaths ] of Object.entries(fontConfig['text'])) {
       assert(isPlainObject(fontPaths),
         `fontConfig['text']['${fontName}'] must be {regular, bold}`)
       assert(fontPaths['regular'], `"regular" missing for text font '${fontName}'`)
@@ -316,7 +313,7 @@ Every path must be a valid URL, not a local filesystem path.
       "fontConfig['music'] must map name → {font, js}"
     )
 
-    for (const [fontName, fontPaths] of Object.entries(fontConfig['music'])) {
+    for (const [ fontName, fontPaths ] of Object.entries(fontConfig['music'])) {
       assert(isPlainObject(fontPaths),
         `fontConfig['music']['${fontName}'] must contain {font, js}`)
       assert(fontPaths['font'], `"font" missing for music font '${fontName}'`)
@@ -402,9 +399,9 @@ Every path must be a valid URL, not a local filesystem path.
 
   const supportedFontSources = {
     'chord-letters': {},
-    'music': {},
+    music: {},
     'music-js': {},
-    'text': { 'regular': {}, 'bold': {} }
+    text: { regular: {}, bold: {} }
   }
 
   const chordLetterFontNames = Object.keys(finalFontConfig['chord-letters'])
@@ -414,29 +411,29 @@ Every path must be a valid URL, not a local filesystem path.
   let fontSourcesAssignCount = 0
 
   // Assign chord-letter fonts
-  for (let name of chordLetterFontNames) {
+  for (const name of chordLetterFontNames) {
     supportedFontSources['chord-letters'][name] =
       fontSources[fontSourcesAssignCount++]
   }
 
   // Assign text regular
-  for (let name of textFontNames) {
+  for (const name of textFontNames) {
     supportedFontSources['text']['regular'][name] =
       fontSources[fontSourcesAssignCount++]
   }
 
   // Assign text bold
-  for (let name of textFontNames) {
+  for (const name of textFontNames) {
     supportedFontSources['text']['bold'][name] =
       fontSources[fontSourcesAssignCount++]
   }
 
-  for (let name of musicFontNames) {
+  for (const name of musicFontNames) {
     supportedFontSources['music'][name] =
       fontSources[fontSourcesAssignCount++]
   }
 
-  for (let name of musicFontNames) {
+  for (const name of musicFontNames) {
     supportedFontSources['music-js'][name] =
       fontSources[fontSourcesAssignCount++].default
   }
@@ -463,11 +460,11 @@ Every path must be a valid URL, not a local filesystem path.
  * @param {SupportedFonts} supportedFontSources  what setupFonts() returned
  * @returns {{ 'chord-letters': string[], music: string[], text: string[] }}
  */
-export function supportedFontNamesFrom(supportedFontSources) {
+export function supportedFontNamesFrom (supportedFontSources) {
   return {
     'chord-letters': Object.keys(supportedFontSources['chord-letters']),
-    'music': Object.keys(supportedFontSources['music']),
-    'text': [
+    music: Object.keys(supportedFontSources['music']),
+    text: [
       ...new Set([
         ...Object.keys(supportedFontSources['text']['regular']),
         ...Object.keys(supportedFontSources['text']['bold'])
@@ -502,8 +499,8 @@ export {
  *
  * This function is **synchronous**.
  *
- * It takes the `customStyles` produced earlier by `generateIntermediateStructuresForSinglePage()`  
- * and merges them with the resolved font sources returned by `setupFonts()`.  
+ * It takes the `customStyles` produced earlier by `generateIntermediateStructuresForSinglePage()`
+ * and merges them with the resolved font sources returned by `setupFonts()`.
  *
  * The result is a deterministic, renderer-ready style configuration.
  *
@@ -604,11 +601,11 @@ export {
  *
  * The high-level pipeline is:
  *
- *   1. **Font setup → `setupFonts()`**  
+ *   1. **Font setup → `setupFonts()`**
  *      Loads fonts and returns a fully resolved
  *      `supportedFontSources`.
  *
- *   2. **Model generation → `generateIntermediateStructuresForSinglePage()`**  
+ *   2. **Model generation → `generateIntermediateStructuresForSinglePage()`**
  *      Parses MuSemantiQ text and produces:
  *      - `pageSchema`
  *      - `customStyles`
@@ -616,36 +613,36 @@ export {
  *      - `highlightsHtmlBuffer`
  *      - `errors`
  *
- *   3. **Style generation → `generateStylesForSinglePage()` (this function)**  
+ *   3. **Style generation → `generateStylesForSinglePage()` (this function)**
  *      Combines:
- *      - `customStyles` from Stage 2  
- *      - `supportedFontSources` from Stage 1  
+ *      - `customStyles` from Stage 2
+ *      - `supportedFontSources` from Stage 1
  *      to produce the final engraving style object containing spacing rules,
  *      font assignments, stroke options, text sizes, offsets, and all
  *      rendering-related measurements.
  *
- *   4. **Rendering (SVG)**  
+ *   4. **Rendering (SVG)**
  *      See the rendering functions in the next section.
  *
- *   5. **MIDI generation**  
+ *   5. **MIDI generation**
  *      See MIDI output functions further in the documentation.
  *
- * In short:  
- *   `setupFonts()` prepares fonts →  
- *   `generateIntermediateStructuresForSinglePage()` prepares content →  
+ * In short:
+ *   `setupFonts()` prepares fonts →
+ *   `generateIntermediateStructuresForSinglePage()` prepares content →
  *   `generateStylesForSinglePage()` prepares engraving.
  *
- * It does not perform rendering.  
+ * It does not perform rendering.
  * It only consolidates layout, typographic, and engraving rules into one object.
- * 
+ *
  * ### Purpose
- * 
- * While `generateIntermediateStructuresForSinglePage()` defines *what* to draw,  
+ *
+ * While `generateIntermediateStructuresForSinglePage()` defines *what* to draw,
  * `generateStylesForSinglePage()` defines *how* it should look.
  *
  * ----------------------------------------------------------------------------
  */
-export function generateStylesForSinglePage({
+export function generateStylesForSinglePage ({
   customStyles,
   supportedFontSources
 }) {
@@ -728,7 +725,7 @@ export function generateStylesForSinglePage({
  *
  * // svgPage now contains a full SVG of the rendered score page.
  */
-export function generateSvgForSinglePage({
+export function generateSvgForSinglePage ({
   pageSchema,
   pageStyles,
   left,
@@ -790,30 +787,30 @@ export function generateSvgForSinglePage({
  *
  *          Properties:
  *
- *          - **data**  
+ *          - **data**
  *            A `Uint8Array` (browser) or `Buffer` (Node.js) containing the raw
  *            MIDI binary. This is the actual audio payload that can be saved
  *            as `.mid`, streamed, or passed directly to a MIDI player.
  *
- *          - **timeStampsMappedWithRefsOn**  
- *            A forward-lookup map:  
- *            `{ [timestampInSeconds]: string[] }`  
+ *          - **timeStampsMappedWithRefsOn**
+ *            A forward-lookup map:
+ *            `{ [timestampInSeconds]: string[] }`
  *            For each playback timestamp, lists all MuSemantiQ reference IDs
  *            (note heads) that *become active* at that
- *            moment.  
+ *            moment.
  *            Used for:
- *            - cursor-following  
- *            - real-time highlighting  
+ *            - cursor-following
+ *            - real-time highlighting
  *            - synchronizing SVG engraving with audio
  *
- *          - **refsOnMappedWithTimeStamps**  
- *            A reverse-lookup map:  
- *            `{ [refId: string]: timestampInSeconds }`  
+ *          - **refsOnMappedWithTimeStamps**
+ *            A reverse-lookup map:
+ *            `{ [refId: string]: timestampInSeconds }`
  *            For any engraved element (notehead, articulation, slur), tells you
- *            precisely *when* it starts sounding.  
+ *            precisely *when* it starts sounding.
  *            Used for:
- *            - clicking notation → jumping audio  
- *            - selecting a note in UI and auto-scrolling the player  
+ *            - clicking notation → jumping audio
+ *            - selecting a note in UI and auto-scrolling the player
  *            - building interactive practice tools
  *
  *          Both maps allow the UI to maintain **perfect bidirectional sync**
@@ -850,7 +847,7 @@ export function generateSvgForSinglePage({
  * // midiPage.timeStampsMappedWithRefsOn → audio → engraving sync
  * // midiPage.refsOnMappedWithTimeStamps → engraving → audio sync
  */
-export function generateMidiForSinglePage({
+export function generateMidiForSinglePage ({
   pageSchema,
   midiSettings
 }) {
@@ -859,8 +856,6 @@ export function generateMidiForSinglePage({
     [ midiSettings ]
   )
 }
-
-
 
 /**
  * ⟅━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━⟆
@@ -970,7 +965,7 @@ export function generateMidiForSinglePage({
  *
  * ----------------------------------------------------------------------------
  */
-export function generateStylesForMultiplePages({
+export function generateStylesForMultiplePages ({
   customStylesForEachPage,
   supportedFontSources
 }) {
@@ -1082,7 +1077,7 @@ export function generateStylesForMultiplePages({
  *
  * // svgDocument now contains a single SVG with all pages stacked vertically.
  */
-export function generateSvgForMultiplePages({
+export function generateSvgForMultiplePages ({
   pageSchemaForEachPage,
   pageStylesForEachPage,
   left,
@@ -1090,7 +1085,7 @@ export function generateSvgForMultiplePages({
   intervalBetweenPages
 }) {
   const allSvgPages = []
-  let currentPageLeftOffset = left || 0
+  const currentPageLeftOffset = left || 0
   let currentPageTopOffset = top || 0
   intervalBetweenPages = intervalBetweenPages || 15
 
@@ -1098,7 +1093,6 @@ export function generateSvgForMultiplePages({
     const svgPage = drawPage(
       pageSchema
     )(pageStylesForEachPage[pageIndex], currentPageLeftOffset, currentPageTopOffset)
-    svgPage.bottom
     allSvgPages.push(svgPage)
     currentPageTopOffset = svgPage.bottom + intervalBetweenPages
   })
@@ -1174,19 +1168,19 @@ export function generateSvgForMultiplePages({
  *
  *          The returned object contains:
  *
- *          - **data**  
+ *          - **data**
  *            A `Uint8Array` (browser) or `Buffer` (Node.js) containing the raw
  *            MIDI binary for the **entire document**.
  *
- *          - **timeStampsMappedWithRefsOn**  
- *            A forward-lookup map:  
- *            `{ [timestampInSeconds]: string[] }`  
+ *          - **timeStampsMappedWithRefsOn**
+ *            A forward-lookup map:
+ *            `{ [timestampInSeconds]: string[] }`
  *            Mapping playback timestamps to all reference IDs that become active
  *            at that moment — across all pages.
  *
- *          - **refsOnMappedWithTimeStamps**  
- *            A reverse-lookup map:  
- *            `{ [refId: string]: timestampInSeconds }`  
+ *          - **refsOnMappedWithTimeStamps**
+ *            A reverse-lookup map:
+ *            `{ [refId: string]: timestampInSeconds }`
  *            Mapping any engraved element (from any page) to its exact playback
  *            start time in the global MIDI timeline.
  *
@@ -1222,7 +1216,7 @@ export function generateSvgForMultiplePages({
  *   in the MuSemantiQ input.
  * - Visual pagination and audio sequencing are intentionally decoupled.
  */
-export function generateMidiForMultiplePages({
+export function generateMidiForMultiplePages ({
   pageSchemaForEachPage,
   midiSettingsForEachPage
 }) {
@@ -1292,7 +1286,7 @@ export function generateMidiForMultiplePages({
  *
  * ---------------------------------------------------------------------------
  */
-export function isPageSchemaValid(pageSchema) {
+export function isPageSchemaValid (pageSchema) {
   // The validator returns a result object, which is always truthy; the answer is its `valid`
   return validatePageSchema(pageSchema).valid
 }
@@ -1362,7 +1356,7 @@ export function isPageSchemaValid(pageSchema) {
  *
  * ---------------------------------------------------------------------------
  */
-export function areAllPageSchemasValid(pageSchemas) {
+export function areAllPageSchemasValid (pageSchemas) {
   // The validator returns a result object, which is always truthy; the answer is its `valid`
   return pageSchemas.every(pageSchema => validatePageSchema(pageSchema).valid)
 }
@@ -1371,11 +1365,10 @@ export function areAllPageSchemasValid(pageSchemas) {
 //               HELPERS
 // ⟅━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━⟆
 
-function isPlainObject(o) {
+function isPlainObject (o) {
   return o !== null && typeof o === 'object' && o.constructor === Object
 }
 
-function assert(condition, message) {
-  if (!condition) throw new Error(message || "Assertion failed")
+function assert (condition, message) {
+  if (!condition) throw new Error(message || 'Assertion failed')
 }
-

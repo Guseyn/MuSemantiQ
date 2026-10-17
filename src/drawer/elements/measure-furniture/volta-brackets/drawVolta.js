@@ -37,7 +37,7 @@ export default function (voltaStructure, styles) {
     voltaBrackets
   )
   if (voltaStructure.value) {
-    let voltaValueText = createText(voltaStructure.value, voltaValueFontOptions)(
+    const voltaValueText = createText(voltaStructure.value, voltaValueFontOptions)(
       styles,
       voltaStructure.left + voltaValueLeftOffset,
       voltaStructure.top

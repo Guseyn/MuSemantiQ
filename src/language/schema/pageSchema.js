@@ -157,7 +157,7 @@ const pageSchema = {
                 forEachLineId: { type: 'number', isPositiveInteger: true }
               },
               firstNumberIsGreaterThanOrEqualToSecondOne: [ 'staveEndNumber', 'staveStartNumber' ],
-              required: ['name', 'staveStartNumber', 'staveEndNumber']
+              required: [ 'name', 'staveStartNumber', 'staveEndNumber' ]
             }
           },
           instrumentTitlesParams: {
@@ -172,7 +172,7 @@ const pageSchema = {
                 forEachLineId: { type: 'number', isPositiveInteger: true }
               },
               firstNumberIsGreaterThanOrEqualToSecondOne: [ 'staveEndNumber', 'staveStartNumber' ],
-              required: ['value']
+              required: [ 'value' ]
             }
           },
           keySignatureName: { type: 'string', possibleValues: keySignatureNames },
@@ -310,7 +310,7 @@ const pageSchema = {
                           }
                         },
                         arpeggiated: {
-                          type: ['object', 'boolean'],
+                          type: [ 'object', 'boolean' ],
                           properties: {
                             isConnectedWithNextChord: { type: 'boolean' },
                             arrow: { type: 'string', possibleValues: directions }

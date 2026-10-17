@@ -24,8 +24,8 @@ export default function (scenarios) {
     action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { unitLinePosition } }) => {
       state.highlightsHtmlBuffer[state.highlightsHtmlBuffer.length - 1] = state.highlightsHtmlBuffer[state.highlightsHtmlBuffer.length - 1].replaceAll('all-units', `all-units-on-line-${unitLinePosition + 1}`)
       const tokensWithNumbersInsteadOfWordsWithTrimmedEnd = joinedTokenValuesWithRealDelimiters.trimEnd()
-      const tokensWithNumbersInsteadOfWordsWithTrimmedEndWithHighlightedPosition = tokensWithNumbersInsteadOfWordsWithTrimmedEnd.replace(
-        regexps.positionPreposition, (match, p1, p2, p3, p4) => {
+      const tokensWithNumbersInsteadOfWordsWithTrimmedEndWithHighlightedPosition = regexps.positionPreposition.replace(
+        tokensWithNumbersInsteadOfWordsWithTrimmedEnd, (match, p1, p2, p3, p4) => {
           return `${p1 || ''}<span class="clph" ref-id="line-${unitLinePosition + 1}">${p4}</span>`
         }
       )
@@ -38,8 +38,8 @@ export default function (scenarios) {
     action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { unitLinePosition } }) => {
       state.highlightsHtmlBuffer[state.highlightsHtmlBuffer.length - 1] = state.highlightsHtmlBuffer[state.highlightsHtmlBuffer.length - 1].replaceAll('all-units', `all-units-on-line-${unitLinePosition + 1}`)
       const tokensWithNumbersInsteadOfWordsWithTrimmedEnd = joinedTokenValuesWithRealDelimiters.trimEnd()
-      const tokensWithNumbersInsteadOfWordsWithTrimmedEndWithHighlightedPosition = tokensWithNumbersInsteadOfWordsWithTrimmedEnd.replace(
-        regexps.positionPreposition, (match, p1, p2, p3, p4) => {
+      const tokensWithNumbersInsteadOfWordsWithTrimmedEndWithHighlightedPosition = regexps.positionPreposition.replace(
+        tokensWithNumbersInsteadOfWordsWithTrimmedEnd, (match, p1, p2, p3, p4) => {
           return `${p1 || ''}<span class="clph" ref-id="line-${unitLinePosition + 1}">${p4}</span>`
         }
       )
@@ -69,8 +69,8 @@ export default function (scenarios) {
     action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { unitLinePosition } }) => {
       state.highlightsHtmlBuffer[state.highlightsHtmlBuffer.length - 1] = state.highlightsHtmlBuffer[state.highlightsHtmlBuffer.length - 1].replaceAll('all-units', `all-units-on-line-${unitLinePosition + 1}`)
       const tokensWithNumbersInsteadOfWordsWithTrimmedEnd = joinedTokenValuesWithRealDelimiters.trimEnd()
-      const tokensWithNumbersInsteadOfWordsWithTrimmedEndWithHighlightedPosition = tokensWithNumbersInsteadOfWordsWithTrimmedEnd.replace(
-        regexps.positionPreposition, (match, p1, p2, p3, p4) => {
+      const tokensWithNumbersInsteadOfWordsWithTrimmedEndWithHighlightedPosition = regexps.positionPreposition.replace(
+        tokensWithNumbersInsteadOfWordsWithTrimmedEnd, (match, p1, p2, p3, p4) => {
           return `${p1 || ''}<span class="clph" ref-id="line-${unitLinePosition + 1}">${p4}</span>`
         }
       )
@@ -83,8 +83,8 @@ export default function (scenarios) {
     action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { unitLinePosition } }) => {
       state.highlightsHtmlBuffer[state.highlightsHtmlBuffer.length - 1] = state.highlightsHtmlBuffer[state.highlightsHtmlBuffer.length - 1].replaceAll('all-units', `all-units-on-line-${unitLinePosition + 1}`)
       const tokensWithNumbersInsteadOfWordsWithTrimmedEnd = joinedTokenValuesWithRealDelimiters.trimEnd()
-      const tokensWithNumbersInsteadOfWordsWithTrimmedEndWithHighlightedPosition = tokensWithNumbersInsteadOfWordsWithTrimmedEnd.replace(
-        regexps.positionPreposition, (match, p1, p2, p3, p4) => {
+      const tokensWithNumbersInsteadOfWordsWithTrimmedEndWithHighlightedPosition = regexps.positionPreposition.replace(
+        tokensWithNumbersInsteadOfWordsWithTrimmedEnd, (match, p1, p2, p3, p4) => {
           return `${p1 || ''}<span class="clph" ref-id="line-${unitLinePosition + 1}">${p4}</span>`
         }
       )

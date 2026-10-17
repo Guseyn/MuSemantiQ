@@ -17,11 +17,11 @@ export default function (radiusX, radiusY, strokeOptions, fill, angle = 0, leftO
   const left = centerX - width / 2
   // const box = `<polyline points="${left} ${top} ${right} ${top} ${right} ${bottom} ${left} ${bottom} ${left} ${top}" fill="none" stroke-width="1.0" stroke-color="black"></polyline>`
   const properties = {
-    'rx': radiusX,
-    'ry': radiusY,
-    'fill': fill || 'none',
-    'cx': centerX,
-    'cy': centerY,
+    rx: radiusX,
+    ry: radiusY,
+    fill: fill || 'none',
+    cx: centerX,
+    cy: centerY,
     'vector-effect': 'none'
   }
   if (strokeOptions) {

@@ -5,8 +5,8 @@ import regexps from '#msq/language/parser/scenarios/static-objects/regexps.js'
 export default function (scenarios) {
   scenarios['hide the last measure on a page'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.lastMeasureHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.lastMeasureHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="cmph" ref-id="last-measure-on-page">${match}</span>`
         }
       )

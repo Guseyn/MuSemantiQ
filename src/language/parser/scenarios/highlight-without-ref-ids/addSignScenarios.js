@@ -5,8 +5,8 @@ import regexps from '#msq/language/parser/scenarios/static-objects/regexps.js'
 export default function (scenarios) {
   scenarios['sign'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.signHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.signHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="eh">${match}</span>`
         }
       )
@@ -41,8 +41,8 @@ export default function (scenarios) {
   }
   scenarios['sign vertical correction'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedNumber = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.verticalCorrectionHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedNumber = regexps.verticalCorrectionHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="th">${match}</span>`
         }
       )

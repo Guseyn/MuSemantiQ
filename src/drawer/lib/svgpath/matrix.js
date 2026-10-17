@@ -3,7 +3,7 @@
 // combine 2 matrixes
 // m1, m2 - [a, b, c, d, e, g]
 //
-function combine(m1, m2) {
+function combine (m1, m2) {
   return [
     m1[0] * m2[0] + m1[2] * m2[1],
     m1[1] * m2[0] + m1[3] * m2[1],
@@ -14,13 +14,11 @@ function combine(m1, m2) {
   ]
 }
 
-
-function Matrix() {
+function Matrix () {
   if (!(this instanceof Matrix)) { return new Matrix() }
   this.queue = []   // list of matrixes to apply
   this.cache = null // combined matrix cache
 }
-
 
 Matrix.prototype.matrix = function (m) {
   if (m[0] === 1 && m[1] === 0 && m[2] === 0 && m[3] === 1 && m[4] === 0 && m[5] === 0) {
@@ -31,7 +29,6 @@ Matrix.prototype.matrix = function (m) {
   return this
 }
 
-
 Matrix.prototype.translate = function (tx, ty) {
   if (tx !== 0 || ty !== 0) {
     this.cache = null
@@ -39,7 +36,6 @@ Matrix.prototype.translate = function (tx, ty) {
   }
   return this
 }
-
 
 Matrix.prototype.scale = function (sx, sy) {
   if (sx !== 1 || sy !== 1) {
@@ -49,9 +45,8 @@ Matrix.prototype.scale = function (sx, sy) {
   return this
 }
 
-
 Matrix.prototype.rotate = function (angle, rx, ry) {
-  var rad, cos, sin
+  let rad, cos, sin
 
   if (angle !== 0) {
     this.translate(rx, ry)
@@ -68,7 +63,6 @@ Matrix.prototype.rotate = function (angle, rx, ry) {
   return this
 }
 
-
 Matrix.prototype.skewX = function (angle) {
   if (angle !== 0) {
     this.cache = null
@@ -77,7 +71,6 @@ Matrix.prototype.skewX = function (angle) {
   return this
 }
 
-
 Matrix.prototype.skewY = function (angle) {
   if (angle !== 0) {
     this.cache = null
@@ -85,7 +78,6 @@ Matrix.prototype.skewY = function (angle) {
   }
   return this
 }
-
 
 // Flatten queue
 //
@@ -105,19 +97,18 @@ Matrix.prototype.toArray = function () {
     return this.cache
   }
 
-  for (var i = 1; i < this.queue.length; i++) {
+  for (let i = 1; i < this.queue.length; i++) {
     this.cache = combine(this.cache, this.queue[i])
   }
 
   return this.cache
 }
 
-
 // Apply list of matrixes to (x,y) point.
 // If `isRelative` set, `translate` component of matrix will be skipped
 //
 Matrix.prototype.calc = function (x, y, isRelative) {
-  var m
+  let m
 
   // Don't change point on empty transforms queue
   if (!this.queue.length) { return [ x, y ] }
@@ -139,6 +130,5 @@ Matrix.prototype.calc = function (x, y, isRelative) {
     x * m[1] + y * m[3] + (isRelative ? 0 : m[5])
   ]
 }
-
 
 export default Matrix

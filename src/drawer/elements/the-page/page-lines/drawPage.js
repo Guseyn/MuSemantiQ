@@ -10,10 +10,10 @@ import addPropertiesToElement from '#msq/drawer/elements/basic/addPropertiesToEl
 import drawMeasures from '#msq/drawer/elements/the-page/measures/drawMeasures.js'
 
 const pageFormats = {
-  'c4': [ 9, 12.8 ],
-  'a3': [ 11.7, 16.5 ],
-  'b4': [ 9.8, 13.9 ],
-  'a4': [ 8.3, 11.7 ]
+  c4: [ 9, 12.8 ],
+  a3: [ 11.7, 16.5 ],
+  b4: [ 9.8, 13.9 ],
+  a4: [ 8.3, 11.7 ]
 }
 
 const CSS_INCH_IN_PIXELS = 96
@@ -178,7 +178,7 @@ export default function (pageParamsOnInput) {
       let maxLineWidth = 0
       const drawnLines = []
       lines.forEach((line, index) => {
-        let rightSubtitleLine = createText(
+        const rightSubtitleLine = createText(
           line.trim(), rightSubtitleFontOptions
         )(styles, leftOffset + pageLeftAndRightPadding + pageLineMaxWidthConsideringFormat, ((index === 0) ? 0 : drawnLines[index - 1].bottom))
         drawnLines.push(
@@ -256,8 +256,8 @@ export default function (pageParamsOnInput) {
     const pageWidth = (leftColumn.right - leftColumn.left) + pageLineMaxWidthConsideringFormat + (rightColumn.right - rightColumn.left)
     const finalPageHeight = (pageFormat === 'none')
       ? (pageHeight !== null)
-        ? pageHeight
-        : ((measures.bottomOfLastPageLineConsideringOnlyStaves - topOffset) + pageBottomPadding)
+          ? pageHeight
+          : ((measures.bottomOfLastPageLineConsideringOnlyStaves - topOffset) + pageBottomPadding)
       : (pageFormats[pageFormat][1] * CSS_INCH_IN_PIXELS)
 
     /* Let's draw page numbers (if needed). */

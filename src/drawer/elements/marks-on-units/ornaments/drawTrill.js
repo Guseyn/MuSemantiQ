@@ -62,7 +62,7 @@ export default function (singleUnit, articulationIndex, nextDrawnSingleUnit, cur
       wave
     )
   }
-  let groupedTrill = createGroup(
+  const groupedTrill = createGroup(
     'trill',
     components
   )

@@ -41,7 +41,7 @@ export default function (numberOfSimileStrokes, simileYCorrection) {
       const strokes = []
       let strokeWidth
       for (let index = 0; index < numberOfSimileStrokes; index++) {
-        let currentStroke = createPath(
+        const currentStroke = createPath(
           simile.points,
           null,
           fontColor,

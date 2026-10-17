@@ -38,16 +38,16 @@ const validators = (attribute.validators = {})
  * @param ctx
  * @return {ValidatorResult|null}
  */
-validators.type = function validateType(instance, schema, options, ctx) {
+validators.type = function validateType (instance, schema, options, ctx) {
   // Ignore undefined instances
   if (instance === undefined) {
     return null
   }
   const result = new ValidatorResult(instance, schema, options, ctx)
-  const types = Array.isArray(schema.type) ? schema.type : [schema.type]
+  const types = Array.isArray(schema.type) ? schema.type : [ schema.type ]
   if (!types.some(this.testType.bind(this, instance, schema, options, ctx))) {
     const list = types.map(v => {
-      if (!v) return
+      if (!v) return undefined
       const id = v.$id || v.id
       return id ? '<' + id + '>' : v + ''
     })
@@ -60,7 +60,7 @@ validators.type = function validateType(instance, schema, options, ctx) {
   return result
 }
 
-function testSchemaNoThrow(instance, options, ctx, callback, schema) {
+function testSchemaNoThrow (instance, options, ctx, callback, schema) {
   const throwError = options.throwError
   const throwAll = options.throwAll
   options.throwError = false
@@ -83,7 +83,7 @@ function testSchemaNoThrow(instance, options, ctx, callback, schema) {
  * @param ctx
  * @return {ValidatorResult|null}
  */
-validators.anyOf = function validateAnyOf(instance, schema, options, ctx) {
+validators.anyOf = function validateAnyOf (instance, schema, options, ctx) {
   // Ignore undefined instances
   if (instance === undefined) {
     return null
@@ -129,7 +129,7 @@ validators.anyOf = function validateAnyOf(instance, schema, options, ctx) {
  * @param ctx
  * @return {String|null}
  */
-validators.allOf = function validateAllOf(instance, schema, options, ctx) {
+validators.allOf = function validateAllOf (instance, schema, options, ctx) {
   // Ignore undefined instances
   if (instance === undefined) {
     return null
@@ -172,7 +172,7 @@ validators.allOf = function validateAllOf(instance, schema, options, ctx) {
  * @param ctx
  * @return {String|null}
  */
-validators.oneOf = function validateOneOf(instance, schema, options, ctx) {
+validators.oneOf = function validateOneOf (instance, schema, options, ctx) {
   // Ignore undefined instances
   if (instance === undefined) {
     return null
@@ -217,11 +217,10 @@ validators.oneOf = function validateOneOf(instance, schema, options, ctx) {
  * @param ctx
  * @return {String|null}
  */
-validators.if = function validateIf(instance, schema, options, ctx) {
+validators.if = function validateIf (instance, schema, options, ctx) {
   // Ignore undefined instances
   if (instance === undefined) return null
-  if (!helpers.isSchema(schema.if))
-    throw new Error('Expected "if" keyword to be a schema')
+  if (!helpers.isSchema(schema.if)) { throw new Error('Expected "if" keyword to be a schema') }
   const ifValid = testSchemaNoThrow.call(
     this,
     instance,
@@ -234,8 +233,7 @@ validators.if = function validateIf(instance, schema, options, ctx) {
   let res
   if (ifValid) {
     if (schema.then === undefined) return
-    if (!helpers.isSchema(schema.then))
-      throw new Error('Expected "then" keyword to be a schema')
+    if (!helpers.isSchema(schema.then)) { throw new Error('Expected "then" keyword to be a schema') }
     res = this.validateSchema(
       instance,
       schema.then,
@@ -245,8 +243,7 @@ validators.if = function validateIf(instance, schema, options, ctx) {
     result.importErrors(res)
   } else {
     if (schema.else === undefined) return
-    if (!helpers.isSchema(schema.else))
-      throw new Error('Expected "else" keyword to be a schema')
+    if (!helpers.isSchema(schema.else)) { throw new Error('Expected "else" keyword to be a schema') }
     res = this.validateSchema(
       instance,
       schema.else,
@@ -258,14 +255,14 @@ validators.if = function validateIf(instance, schema, options, ctx) {
   return result
 }
 
-function getEnumerableProperty(object, key) {
+function getEnumerableProperty (object, key) {
   // Determine if `key` shows up in `for (var key in object)`
   // First test Object.hasOwnProperty.call as an optimization: that guarantees it does
   if (Object.hasOwnProperty.call(object, key)) return object[key]
   // Test `key in object` as an optimization; false means it won't
   if (!(key in object)) return
   // Walk the prototype chain and check enumerability
-  // eslint-disable-next-line no-cond-assign
+
   while ((object = Object.getPrototypeOf(object))) {
     if (Object.propertyIsEnumerable.call(object, key)) return object[key]
   }
@@ -279,7 +276,7 @@ function getEnumerableProperty(object, key) {
  * @param ctx
  * @return {String|null|ValidatorResult}
  */
-validators.propertyNames = function validatePropertyNames(
+validators.propertyNames = function validatePropertyNames (
   instance,
   schema,
   options,
@@ -289,12 +286,12 @@ validators.propertyNames = function validatePropertyNames(
   const result = new ValidatorResult(instance, schema, options, ctx)
   const subschema =
     schema.propertyNames !== undefined ? schema.propertyNames : {}
-  if (!helpers.isSchema(subschema))
+  if (!helpers.isSchema(subschema)) {
     throw new SchemaError(
       'Expected "propertyNames" to be a schema (object or boolean)'
     )
+  }
 
-  // eslint-disable-next-line guard-for-in
   for (const property in instance) {
     if (getEnumerableProperty(instance, property) !== undefined) {
       const res = this.validateSchema(
@@ -318,7 +315,7 @@ validators.propertyNames = function validatePropertyNames(
  * @param ctx
  * @return {String|null|ValidatorResult}
  */
-validators.properties = function validateProperties(
+validators.properties = function validateProperties (
   instance,
   schema,
   options,
@@ -327,7 +324,7 @@ validators.properties = function validateProperties(
   if (!this.types.object(instance)) return
   const result = new ValidatorResult(instance, schema, options, ctx)
   const properties = schema.properties || {}
-  // eslint-disable-next-line guard-for-in
+
   for (const property in properties) {
     const subschema = properties[property]
     if (subschema === undefined) {
@@ -347,8 +344,7 @@ validators.properties = function validateProperties(
       options,
       ctx.makeChild(subschema, property)
     )
-    if (res.instance !== result.instance[property])
-      result.instance[property] = res.instance
+    if (res.instance !== result.instance[property]) { result.instance[property] = res.instance }
     result.importErrors(res)
   }
   return result
@@ -361,7 +357,7 @@ validators.properties = function validateProperties(
  * @private
  * @return {boolean}
  */
-function testAdditionalProperty(
+function testAdditionalProperty (
   instance,
   schema,
   options,
@@ -400,8 +396,7 @@ function testAdditionalProperty(
       options,
       ctx.makeChild(additionalProperties, property)
     )
-    if (res.instance !== result.instance[property])
-      result.instance[property] = res.instance
+    if (res.instance !== result.instance[property]) { result.instance[property] = res.instance }
     result.importErrors(res)
   }
 }
@@ -414,7 +409,7 @@ function testAdditionalProperty(
  * @param ctx
  * @return {String|null|ValidatorResult}
  */
-validators.patternProperties = function validatePatternProperties(
+validators.patternProperties = function validatePatternProperties (
   instance,
   schema,
   options,
@@ -424,10 +419,9 @@ validators.patternProperties = function validatePatternProperties(
   const result = new ValidatorResult(instance, schema, options, ctx)
   const patternProperties = schema.patternProperties || {}
 
-  // eslint-disable-next-line guard-for-in
   for (const property in instance) {
     let test = true
-    // eslint-disable-next-line guard-for-in
+
     for (const pattern in patternProperties) {
       const subschema = patternProperties[pattern]
       if (subschema === undefined) {
@@ -460,8 +454,7 @@ validators.patternProperties = function validatePatternProperties(
         options,
         ctx.makeChild(subschema, property)
       )
-      if (res.instance !== result.instance[property])
-        result.instance[property] = res.instance
+      if (res.instance !== result.instance[property]) { result.instance[property] = res.instance }
       result.importErrors(res)
     }
     if (test) {
@@ -488,7 +481,7 @@ validators.patternProperties = function validatePatternProperties(
  * @param ctx
  * @return {String|null|ValidatorResult}
  */
-validators.additionalProperties = function validateAdditionalProperties(
+validators.additionalProperties = function validateAdditionalProperties (
   instance,
   schema,
   options,
@@ -500,7 +493,7 @@ validators.additionalProperties = function validateAdditionalProperties(
     return null
   }
   const result = new ValidatorResult(instance, schema, options, ctx)
-  // eslint-disable-next-line guard-for-in
+
   for (const property in instance) {
     testAdditionalProperty.call(
       this,
@@ -521,7 +514,7 @@ validators.additionalProperties = function validateAdditionalProperties(
  * @param schema
  * @return {String|null}
  */
-validators.minProperties = function validateMinProperties(
+validators.minProperties = function validateMinProperties (
   instance,
   schema,
   options,
@@ -547,7 +540,7 @@ validators.minProperties = function validateMinProperties(
  * @param schema
  * @return {String|null}
  */
-validators.maxProperties = function validateMaxProperties(
+validators.maxProperties = function validateMaxProperties (
   instance,
   schema,
   options,
@@ -575,7 +568,7 @@ validators.maxProperties = function validateMaxProperties(
  * @param ctx
  * @return {String|null|ValidatorResult}
  */
-validators.items = function validateItems(instance, schema, options, ctx) {
+validators.items = function validateItems (instance, schema, options, ctx) {
   const self = this
   if (!this.types.array(instance)) return
   if (schema.items === undefined) return
@@ -618,12 +611,11 @@ validators.items = function validateItems(instance, schema, options, ctx) {
  * @param ctx
  * @return {String|null|ValidatorResult}
  */
-validators.contains = function validateContains(instance, schema, options, ctx) {
+validators.contains = function validateContains (instance, schema, options, ctx) {
   const self = this
   if (!this.types.array(instance)) return
   if (schema.contains === undefined) return
-  if (!helpers.isSchema(schema.contains))
-    throw new Error('Expected "contains" keyword to be a schema')
+  if (!helpers.isSchema(schema.contains)) { throw new Error('Expected "contains" keyword to be a schema') }
   const result = new ValidatorResult(instance, schema, options, ctx)
   const count = instance.some((value, i) => {
     const res = self.validateSchema(
@@ -650,7 +642,7 @@ validators.contains = function validateContains(instance, schema, options, ctx) 
  * @param schema
  * @return {String|null}
  */
-validators.minimum = function validateMinimum(instance, schema, options, ctx) {
+validators.minimum = function validateMinimum (instance, schema, options, ctx) {
   if (!this.types.number(instance)) return
   const result = new ValidatorResult(instance, schema, options, ctx)
   if (schema.exclusiveMinimum && schema.exclusiveMinimum === true) {
@@ -679,7 +671,7 @@ validators.minimum = function validateMinimum(instance, schema, options, ctx) {
  * @param schema
  * @return {String|null}
  */
-validators.maximum = function validateMaximum(instance, schema, options, ctx) {
+validators.maximum = function validateMaximum (instance, schema, options, ctx) {
   if (!this.types.number(instance)) return
   const result = new ValidatorResult(instance, schema, options, ctx)
   if (schema.exclusiveMaximum && schema.exclusiveMaximum === true) {
@@ -708,7 +700,7 @@ validators.maximum = function validateMaximum(instance, schema, options, ctx) {
  * @param schema
  * @return {String|null}
  */
-validators.exclusiveMinimum = function validateExclusiveMinimum(
+validators.exclusiveMinimum = function validateExclusiveMinimum (
   instance,
   schema,
   options,
@@ -735,7 +727,7 @@ validators.exclusiveMinimum = function validateExclusiveMinimum(
  * @param schema
  * @return {String|null}
  */
-validators.exclusiveMaximum = function validateExclusiveMaximum(
+validators.exclusiveMaximum = function validateExclusiveMaximum (
   instance,
   schema,
   options,
@@ -764,7 +756,7 @@ validators.exclusiveMaximum = function validateExclusiveMaximum(
  * @param errorMessage
  * @returns {String|null}
  */
-function validateMultipleOfOrDivisbleBy(
+function validateMultipleOfOrDivisbleBy (
   instance,
   schema,
   options,
@@ -808,7 +800,7 @@ function validateMultipleOfOrDivisbleBy(
  * @param schema
  * @return {String|null}
  */
-validators.multipleOf = function validateMultipleOf(
+validators.multipleOf = function validateMultipleOf (
   instance,
   schema,
   options,
@@ -831,7 +823,7 @@ validators.multipleOf = function validateMultipleOf(
  * @param schema
  * @return {String|null}
  */
-validators.divisibleBy = function validateDivisibleBy(
+validators.divisibleBy = function validateDivisibleBy (
   instance,
   schema,
   options,
@@ -854,7 +846,7 @@ validators.divisibleBy = function validateDivisibleBy(
  * @param schema
  * @return {String|null}
  */
-validators.required = function validateRequired(
+validators.required = function validateRequired (
   instance,
   schema,
   options,
@@ -887,7 +879,7 @@ validators.required = function validateRequired(
  * @param schema
  * @return {String|null}
  */
-validators.pattern = function validatePattern(instance, schema, options, ctx) {
+validators.pattern = function validatePattern (instance, schema, options, ctx) {
   if (!this.types.string(instance)) return
   const result = new ValidatorResult(instance, schema, options, ctx)
   const pattern = schema.pattern
@@ -931,7 +923,7 @@ validators.pattern = function validatePattern(instance, schema, options, ctx) {
  * @param [ctx]
  * @return {String|null}
  */
-validators.format = function validateFormat(instance, schema, options, ctx) {
+validators.format = function validateFormat (instance, schema, options, ctx) {
   if (instance === undefined) return
   const result = new ValidatorResult(instance, schema, options, ctx)
   if (!result.disableFormat && !helpers.isFormat(instance, schema.format, this)) {
@@ -953,7 +945,7 @@ validators.format = function validateFormat(instance, schema, options, ctx) {
  * @param schema
  * @return {String|null}
  */
-validators.minLength = function validateMinLength(
+validators.minLength = function validateMinLength (
   instance,
   schema,
   options,
@@ -979,7 +971,7 @@ validators.minLength = function validateMinLength(
  * @param schema
  * @return {String|null}
  */
-validators.maxLength = function validateMaxLength(
+validators.maxLength = function validateMaxLength (
   instance,
   schema,
   options,
@@ -1005,7 +997,7 @@ validators.maxLength = function validateMaxLength(
  * @param schema
  * @return {String|null}
  */
-validators.minItems = function validateMinItems(
+validators.minItems = function validateMinItems (
   instance,
   schema,
   options,
@@ -1029,7 +1021,7 @@ validators.minItems = function validateMinItems(
  * @param schema
  * @return {String|null}
  */
-validators.maxItems = function validateMaxItems(
+validators.maxItems = function validateMaxItems (
   instance,
   schema,
   options,
@@ -1055,7 +1047,7 @@ validators.maxItems = function validateMaxItems(
  * @private
  * @return {boolean}
  */
-function testArrays(v, i, a) {
+function testArrays (v, i, a) {
   const len = a.length
   for (let j = i + 1; j < len; j++) {
     if (helpers.deepCompareStrict(v, a[j])) {
@@ -1070,7 +1062,7 @@ function testArrays(v, i, a) {
  * @param instance
  * @return {String|null}
  */
-validators.uniqueItems = function validateUniqueItems(
+validators.uniqueItems = function validateUniqueItems (
   instance,
   schema,
   options,
@@ -1096,7 +1088,7 @@ validators.uniqueItems = function validateUniqueItems(
  * @param ctx
  * @return {null|ValidatorResult}
  */
-validators.dependencies = function validateDependencies(
+validators.dependencies = function validateDependencies (
   instance,
   schema,
   options,
@@ -1104,7 +1096,7 @@ validators.dependencies = function validateDependencies(
 ) {
   if (!this.types.object(instance)) return
   const result = new ValidatorResult(instance, schema, options, ctx)
-  // eslint-disable-next-line guard-for-in
+
   for (const property in schema.dependencies) {
     if (instance[property] === undefined) {
       continue
@@ -1112,7 +1104,7 @@ validators.dependencies = function validateDependencies(
     let dep = schema.dependencies[property]
     const childContext = ctx.makeChild(dep, property)
     if (typeof dep === 'string') {
-      dep = [dep]
+      dep = [ dep ]
     }
     if (Array.isArray(dep)) {
       dep.forEach(prop => {
@@ -1154,7 +1146,7 @@ validators.dependencies = function validateDependencies(
  * @param schema
  * @return {ValidatorResult|null}
  */
-validators.enum = function validateEnum(instance, schema, options, ctx) {
+validators.enum = function validateEnum (instance, schema, options, ctx) {
   if (instance === undefined) {
     return null
   }
@@ -1180,7 +1172,7 @@ validators.enum = function validateEnum(instance, schema, options, ctx) {
  * @param schema
  * @return {ValidatorResult|null}
  */
-validators.const = function validateConst(instance, schema, options, ctx) {
+validators.const = function validateConst (instance, schema, options, ctx) {
   if (instance === undefined) {
     return null
   }
@@ -1204,7 +1196,7 @@ validators.const = function validateConst(instance, schema, options, ctx) {
  * @param ctx
  * @return {null|ValidatorResult}
  */
-validators.not = validators.disallow = function validateNot(
+validators.not = validators.disallow = function validateNot (
   instance,
   schema,
   options,
@@ -1215,7 +1207,7 @@ validators.not = validators.disallow = function validateNot(
   const result = new ValidatorResult(instance, schema, options, ctx)
   let notTypes = schema.not || schema.disallow
   if (!notTypes) return null
-  if (!Array.isArray(notTypes)) notTypes = [notTypes]
+  if (!Array.isArray(notTypes)) notTypes = [ notTypes ]
   notTypes.forEach(type => {
     if (self.testType(instance, schema, options, ctx, type)) {
       const id = type && (type.$id || type.id)

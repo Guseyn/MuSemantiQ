@@ -9,7 +9,7 @@ import BoundingBox from '#msq/drawer/lib/opentype/bbox.js'
  * @class
  * @constructor
  */
-function Path() {
+function Path () {
   this.commands = []
   this.fill = 'black'
   this.stroke = null
@@ -20,11 +20,11 @@ function Path() {
  * @param  {number} x
  * @param  {number} y
  */
-Path.prototype.moveTo = function(x, y) {
+Path.prototype.moveTo = function (x, y) {
   this.commands.push({
     type: 'M',
-    x: x,
-    y: y
+    x,
+    y
   })
 }
 
@@ -32,11 +32,11 @@ Path.prototype.moveTo = function(x, y) {
  * @param  {number} x
  * @param  {number} y
  */
-Path.prototype.lineTo = function(x, y) {
+Path.prototype.lineTo = function (x, y) {
   this.commands.push({
     type: 'L',
-    x: x,
-    y: y
+    x,
+    y
   })
 }
 
@@ -66,15 +66,15 @@ Path.prototype.lineTo = function(x, y) {
  * @param  {number} y - y of path point
  * @see curveTo
  */
-Path.prototype.curveTo = Path.prototype.bezierCurveTo = function(x1, y1, x2, y2, x, y) {
+Path.prototype.curveTo = Path.prototype.bezierCurveTo = function (x1, y1, x2, y2, x, y) {
   this.commands.push({
     type: 'C',
-    x1: x1,
-    y1: y1,
-    x2: x2,
-    y2: y2,
-    x: x,
-    y: y
+    x1,
+    y1,
+    x2,
+    y2,
+    x,
+    y
   })
 }
 
@@ -99,13 +99,13 @@ Path.prototype.curveTo = Path.prototype.bezierCurveTo = function(x1, y1, x2, y2,
  * @param  {number} x - x of path point
  * @param  {number} y - y of path point
  */
-Path.prototype.quadTo = Path.prototype.quadraticCurveTo = function(x1, y1, x, y) {
+Path.prototype.quadTo = Path.prototype.quadraticCurveTo = function (x1, y1, x, y) {
   this.commands.push({
     type: 'Q',
-    x1: x1,
-    y1: y1,
-    x: x,
-    y: y
+    x1,
+    y1,
+    x,
+    y
   })
 }
 
@@ -120,7 +120,7 @@ Path.prototype.quadTo = Path.prototype.quadraticCurveTo = function(x1, y1, x, y)
  * @function close
  * @memberof opentype.Path.prototype
  */
-Path.prototype.close = Path.prototype.closePath = function() {
+Path.prototype.close = Path.prototype.closePath = function () {
   this.commands.push({
     type: 'Z'
   })
@@ -130,7 +130,7 @@ Path.prototype.close = Path.prototype.closePath = function() {
  * Add the given path or list of commands to the commands of this path.
  * @param  {Array} pathOrCommands - another opentype.Path, an opentype.BoundingBox, or an array of commands.
  */
-Path.prototype.extend = function(pathOrCommands) {
+Path.prototype.extend = function (pathOrCommands) {
   if (pathOrCommands.commands) {
     pathOrCommands = pathOrCommands.commands
   } else if (pathOrCommands instanceof BoundingBox) {
@@ -150,7 +150,7 @@ Path.prototype.extend = function(pathOrCommands) {
  * Calculate the bounding box of the path.
  * @returns {opentype.BoundingBox}
  */
-Path.prototype.getBoundingBox = function() {
+Path.prototype.getBoundingBox = function () {
   const box = new BoundingBox()
 
   let startX = 0
@@ -198,7 +198,7 @@ Path.prototype.getBoundingBox = function() {
  * Draw the path to a 2D context.
  * @param {CanvasRenderingContext2D} ctx - A 2D drawing context.
  */
-Path.prototype.draw = function(ctx) {
+Path.prototype.draw = function (ctx) {
   ctx.beginPath()
   for (let i = 0; i < this.commands.length; i += 1) {
     const cmd = this.commands[i]
@@ -233,10 +233,10 @@ Path.prototype.draw = function(ctx) {
  * @param  {number} [decimalPlaces=2] - The amount of decimal places for floating-point values
  * @return {string}
  */
-Path.prototype.toPathData = function(decimalPlaces) {
+Path.prototype.toPathData = function (decimalPlaces) {
   decimalPlaces = decimalPlaces !== undefined ? decimalPlaces : 2
 
-  function floatToString(v) {
+  function floatToString (v) {
     if (Math.round(v) === v) {
       return '' + Math.round(v)
     } else {
@@ -244,7 +244,7 @@ Path.prototype.toPathData = function(decimalPlaces) {
     }
   }
 
-  function packValues() {
+  function packValues () {
     let s = ''
     for (let i = 0; i < arguments.length; i += 1) {
       const v = arguments[i]
@@ -282,7 +282,7 @@ Path.prototype.toPathData = function(decimalPlaces) {
  * @param  {number} [decimalPlaces=2] - The amount of decimal places for floating-point values
  * @return {string}
  */
-Path.prototype.toSVG = function(decimalPlaces) {
+Path.prototype.toSVG = function (decimalPlaces) {
   let svg = '<path d="'
   svg += this.toPathData(decimalPlaces)
   svg += '"'
@@ -307,7 +307,7 @@ Path.prototype.toSVG = function(decimalPlaces) {
  * @param  {number} [decimalPlaces=2] - The amount of decimal places for floating-point values
  * @return {SVGPathElement}
  */
-Path.prototype.toDOMElement = function(decimalPlaces) {
+Path.prototype.toDOMElement = function (decimalPlaces) {
   const temporaryPath = this.toPathData(decimalPlaces)
   const newPath = document.createElementNS('http://www.w3.org/2000/svg', 'path')
 

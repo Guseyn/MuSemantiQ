@@ -5,8 +5,8 @@ import regexps from '#msq/language/parser/scenarios/static-objects/regexps.js'
 export default function (scenarios) {
   scenarios['measure numbers'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.measureNumbersHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.measureNumbersHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="eh" ref-id="measure-numbers">${match}</span>`
         }
       )
@@ -53,26 +53,26 @@ export default function (scenarios) {
     action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { measureNumbersApplication } }) => {
       let joinedTokenValuesWithRealDelimitersWithHighlightedElement
       if (measureNumbersApplication === 'first&last') {
-        joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-          regexps.applicationOfMeasureNumbersHighlight, (match) => {
+        joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.applicationOfMeasureNumbersHighlight.replace(
+          joinedTokenValuesWithRealDelimiters, (match) => {
             return `<span class="cmph" ref-id="first-or-last-measure">${match}</span>`
           }
         )
       } else if (measureNumbersApplication === 'first') {
-        joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-          regexps.applicationOfMeasureNumbersHighlight, (match) => {
+        joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.applicationOfMeasureNumbersHighlight.replace(
+          joinedTokenValuesWithRealDelimiters, (match) => {
             return `<span class="cmph" ref-id="first-measure">${match}</span>`
           }
         )
       } else if (measureNumbersApplication === 'last') {
-        joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-          regexps.applicationOfMeasureNumbersHighlight, (match) => {
+        joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.applicationOfMeasureNumbersHighlight.replace(
+          joinedTokenValuesWithRealDelimiters, (match) => {
             return `<span class="cmph" ref-id="last-measure">${match}</span>`
           }
         )
       } else {
-        joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-          regexps.applicationOfMeasureNumbersHighlight, (match) => {
+        joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.applicationOfMeasureNumbersHighlight.replace(
+          joinedTokenValuesWithRealDelimiters, (match) => {
             return `<span class="cmph" ref-id="every-measure">${match}</span>`
           }
         )

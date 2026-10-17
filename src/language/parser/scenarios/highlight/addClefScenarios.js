@@ -5,8 +5,8 @@ import regexps from '#msq/language/parser/scenarios/static-objects/regexps.js'
 export default function (scenarios) {
   scenarios['clef'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { numberOfMeasures, currentNumberOfStaves } }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.clefHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.clefHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="eh" ref-id="clef-${numberOfMeasures}-${currentNumberOfStaves}">${match}</span>`
         }
       )

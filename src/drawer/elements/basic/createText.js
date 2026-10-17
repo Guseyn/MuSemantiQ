@@ -1,6 +1,5 @@
 'use strict'
 
-import opentype from '#msq/drawer/lib/opentype/opentype.js'
 import d from '#msq/drawer/lib/opentype/d.js'
 import calculateBboxForPath from '#msq/drawer/elements/basic/calculateBboxForPath.js'
 
@@ -30,8 +29,8 @@ export default function (text, fontOptions) {
     const { minTop, maxRight, maxBottom, minLeft } = calculateBboxForPath(textPathD)
     const propertiesForTextItself = {
       'data-name': 'text',
-      'fill': fontOptions.color,
-      'd': textPathD,
+      fill: fontOptions.color,
+      d: textPathD,
       'text-value': text,
       'vector-effect': 'none'
     }
@@ -54,10 +53,10 @@ export default function (text, fontOptions) {
         name: 'rect',
         properties: {
           'data-name': 'outline',
-          'fill': fontOptions.outlineColor,
-          'width': maxRight - minLeft + 2 * fontOptions.outlinePadding,
-          'height': maxBottom - minTop + 2 * fontOptions.outlinePadding,
-          'rx': fontOptions.outlineRadius || 0
+          fill: fontOptions.outlineColor,
+          width: maxRight - minLeft + 2 * fontOptions.outlinePadding,
+          height: maxBottom - minTop + 2 * fontOptions.outlinePadding,
+          rx: fontOptions.outlineRadius || 0
         },
         transformations: [
           {

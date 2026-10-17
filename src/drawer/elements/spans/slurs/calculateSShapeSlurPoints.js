@@ -16,7 +16,7 @@ export default function (markedSlur, slurLeftPoint, slurRightPoint, slurDirectio
   const slurMarkKey = markedSlur.slurMarkKey
   const slurParts = []
   const slurPartsDirections = []
-  const allSlurSingleUnitsDevidedInParts = [[]]
+  const allSlurSingleUnitsDevidedInParts = [ [] ]
   let currentPartIndexForAllSlurSingleUnitsOfSlurDevidedInParts = 0
   for (let singleUnitIndex = 0; singleUnitIndex < allSlurSingleUnitsOfSlur.length; singleUnitIndex++) {
     const currentSingleUnit = allSlurSingleUnitsOfSlur[singleUnitIndex]
@@ -27,7 +27,7 @@ export default function (markedSlur, slurLeftPoint, slurRightPoint, slurDirectio
       currentSingleUnit.slurMarks.some(slurMark => (slurMark.key === slurMarkKey))
     ) {
       currentPartIndexForAllSlurSingleUnitsOfSlurDevidedInParts += 1
-      allSlurSingleUnitsDevidedInParts[currentPartIndexForAllSlurSingleUnitsOfSlurDevidedInParts] = [currentSingleUnit]
+      allSlurSingleUnitsDevidedInParts[currentPartIndexForAllSlurSingleUnitsOfSlurDevidedInParts] = [ currentSingleUnit ]
     } else {
       allSlurSingleUnitsDevidedInParts[currentPartIndexForAllSlurSingleUnitsOfSlurDevidedInParts].push(currentSingleUnit)
     }

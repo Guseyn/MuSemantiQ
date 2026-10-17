@@ -1,12 +1,12 @@
-function isBrowser() {
+function isBrowser () {
   return typeof window !== 'undefined'
 }
 
-function isNode() {
+function isNode () {
   return typeof window === 'undefined'
 }
 
-function nodeBufferToArrayBuffer(buffer) {
+function nodeBufferToArrayBuffer (buffer) {
   const ab = new ArrayBuffer(buffer.length)
   const view = new Uint8Array(ab)
   for (let i = 0; i < buffer.length; ++i) {
@@ -16,7 +16,7 @@ function nodeBufferToArrayBuffer(buffer) {
   return ab
 }
 
-function arrayBufferToNodeBuffer(ab) {
+function arrayBufferToNodeBuffer (ab) {
   const buffer = Buffer.from(ab.byteLength)
   const view = new Uint8Array(ab)
   for (let i = 0; i < buffer.length; ++i) {
@@ -26,7 +26,7 @@ function arrayBufferToNodeBuffer(ab) {
   return buffer
 }
 
-function checkArgument(expression, message) {
+function checkArgument (expression, message) {
   if (!expression) {
     throw message
   }

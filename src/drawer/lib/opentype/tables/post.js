@@ -1,12 +1,12 @@
 // The `post` table stores additional PostScript information, such as glyph names.
 // https://www.microsoft.com/typography/OTSPEC/post.htm
 
-import {  standardNames  } from '#msq/drawer/lib/opentype/encoding.js'
+import { standardNames } from '#msq/drawer/lib/opentype/encoding.js'
 import { Parser } from '#msq/drawer/lib/opentype/parse.js'
 import table from '#msq/drawer/lib/opentype/table.js'
 
 // Parse the PostScript `post` table
-function parsePostTable(data, start) {
+function parsePostTable (data, start) {
   const post = {}
   const p = new Parser(data, start)
   post.version = p.parseVersion()
@@ -50,17 +50,17 @@ function parsePostTable(data, start) {
   return post
 }
 
-function makePostTable() {
+function makePostTable () {
   return new table.Table('post', [
-    {name: 'version', type: 'FIXED', value: 0x00030000},
-    {name: 'italicAngle', type: 'FIXED', value: 0},
-    {name: 'underlinePosition', type: 'FWORD', value: 0},
-    {name: 'underlineThickness', type: 'FWORD', value: 0},
-    {name: 'isFixedPitch', type: 'ULONG', value: 0},
-    {name: 'minMemType42', type: 'ULONG', value: 0},
-    {name: 'maxMemType42', type: 'ULONG', value: 0},
-    {name: 'minMemType1', type: 'ULONG', value: 0},
-    {name: 'maxMemType1', type: 'ULONG', value: 0}
+    { name: 'version', type: 'FIXED', value: 0x00030000 },
+    { name: 'italicAngle', type: 'FIXED', value: 0 },
+    { name: 'underlinePosition', type: 'FWORD', value: 0 },
+    { name: 'underlineThickness', type: 'FWORD', value: 0 },
+    { name: 'isFixedPitch', type: 'ULONG', value: 0 },
+    { name: 'minMemType42', type: 'ULONG', value: 0 },
+    { name: 'maxMemType42', type: 'ULONG', value: 0 },
+    { name: 'minMemType1', type: 'ULONG', value: 0 },
+    { name: 'maxMemType1', type: 'ULONG', value: 0 }
   ])
 }
 

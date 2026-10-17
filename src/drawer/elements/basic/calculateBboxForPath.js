@@ -7,16 +7,16 @@ const CBEZIER_MINMAX_EPSILON = 0.00000001
 
 // https://github.com/kpym/SVGPathy/blob/acd1a50c626b36d81969f6e98e8602e128ba4302/lib/box.js#L89
 const calculateMinmaxQ = (A) => {
-  const min = Math.min(A[0], A[2]), max = Math.max(A[0], A[2])
+  const min = Math.min(A[0], A[2]); const max = Math.max(A[0], A[2])
 
   if (A[1] > A[0] ? A[2] >= A[1] : A[2] <= A[1]) {
     // if no extremum in ]0,1[
-    return [min, max]
+    return [ min, max ]
   }
 
   // check if the extremum E is min or max
   const E = (A[0] * A[2] - A[1] * A[1]) / (A[0] - 2 * A[1] + A[2])
-  return E < min ? [E, max] : [min, E]
+  return E < min ? [ E, max ] : [ min, E ]
 }
 
 // https://github.com/kpym/SVGPathy/blob/acd1a50c626b36d81969f6e98e8602e128ba4302/lib/box.js#L127
@@ -26,10 +26,10 @@ const calculateMinmaxC = (A) => {
 
   if (K === 0 && A[0] === A[1] && A[0] === A[3]) {
     // no curve, point targeting same location
-    return [A[0], A[3]]
+    return [ A[0], A[3] ]
   }
   if (Math.abs(K) < CBEZIER_MINMAX_EPSILON) {
-    return calculateMinmaxQ([A[0], -0.5 * A[0] + 1.5 * A[1], A[0] - 3 * A[1] + 3 * A[2]])
+    return calculateMinmaxQ([ A[0], -0.5 * A[0] + 1.5 * A[1], A[0] - 3 * A[1] + 3 * A[2] ])
   }
 
   // the reduced discriminant of the derivative
@@ -37,12 +37,12 @@ const calculateMinmaxC = (A) => {
 
   // if the polynomial is monotone in [0,1]
   if (T <= 0) {
-    return [Math.min(A[0], A[3]), Math.max(A[0], A[3])]
+    return [ Math.min(A[0], A[3]), Math.max(A[0], A[3]) ]
   }
   const S = Math.sqrt(T)
 
   // potential extrema
-  let min = Math.min(A[0], A[3]), max = Math.max(A[0], A[3])
+  let min = Math.min(A[0], A[3]); let max = Math.max(A[0], A[3])
 
   const L = A[0] - 2 * A[1] + A[2]
   // check local extrema
@@ -62,11 +62,11 @@ const calculateMinmaxC = (A) => {
     }
   }
 
-  return [min, max]
+  return [ min, max ]
 }
 
 const calculateSvgPathBbox = (d) => {
-  const min = [Infinity, Infinity], max = [-Infinity, -Infinity]
+  const min = [ Infinity, Infinity ]; const max = [ -Infinity, -Infinity ]
   svgPath(d).abs().unarc().unshort().iterate((seg, _, x, y) => {
     switch (seg[0]) {
       case 'M':
@@ -104,7 +104,7 @@ const calculateSvgPathBbox = (d) => {
         break
       }
       case 'C': {
-        const cxMinMax = calculateMinmaxC([x, seg[1], seg[3], seg[5]])
+        const cxMinMax = calculateMinmaxC([ x, seg[1], seg[3], seg[5] ])
         if (min[0] > cxMinMax[0]) {
           min[0] = cxMinMax[0]
         }
@@ -112,7 +112,7 @@ const calculateSvgPathBbox = (d) => {
           max[0] = cxMinMax[1]
         }
 
-        const cyMinMax = calculateMinmaxC([y, seg[2], seg[4], seg[6]])
+        const cyMinMax = calculateMinmaxC([ y, seg[2], seg[4], seg[6] ])
         if (min[1] > cyMinMax[0]) {
           min[1] = cyMinMax[0]
         }
@@ -122,7 +122,7 @@ const calculateSvgPathBbox = (d) => {
         break
       }
       case 'Q': {
-        const qxMinMax = calculateMinmaxQ([x, seg[1], seg[3]])
+        const qxMinMax = calculateMinmaxQ([ x, seg[1], seg[3] ])
         if (min[0] > qxMinMax[0]) {
           min[0] = qxMinMax[0]
         }
@@ -130,7 +130,7 @@ const calculateSvgPathBbox = (d) => {
           max[0] = qxMinMax[1]
         }
 
-        const qyMinMax = calculateMinmaxQ([y, seg[2], seg[4]])
+        const qyMinMax = calculateMinmaxQ([ y, seg[2], seg[4] ])
         if (min[1] > qyMinMax[0]) {
           min[1] = qyMinMax[0]
         }
@@ -141,11 +141,11 @@ const calculateSvgPathBbox = (d) => {
       }
     }
   }, true)
-  return [min[0], min[1], max[0], max[1]]
+  return [ min[0], min[1], max[0], max[1] ]
 }
 
 const calculateBboxForPath = (path) => {
-  const [minLeft, minTop, maxRight, maxBottom] = calculateSvgPathBbox(path)
+  const [ minLeft, minTop, maxRight, maxBottom ] = calculateSvgPathBbox(path)
   return {
     minTop,
     minLeft,

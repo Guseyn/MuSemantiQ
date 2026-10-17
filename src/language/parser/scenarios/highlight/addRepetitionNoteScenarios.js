@@ -1,19 +1,20 @@
 'use strict'
 
-import regexps from '#msq/language/parser/scenarios/static-objects/regexps.js'
+import regexps, { replaceMany } from '#msq/language/parser/scenarios/static-objects/regexps.js'
 
 export default function (scenarios) {
   scenarios['repetition note'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { numberOfMeasures } }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedStringAndElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.stringHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedStringAndElement = replaceMany(joinedTokenValuesWithRealDelimiters, [
+        [ regexps.stringHighlight, (match) => {
           return `<span class="sth" ref-id="repetition-note-${numberOfMeasures}">${match}</span>`
         }
-      ).replace(
-        regexps.repetitionNoteHighlight, (match) => {
+        ],
+        [ regexps.repetitionNoteHighlight, (match) => {
           return `<span class="eh" ref-id="repetition-note-${numberOfMeasures}">${match}</span>`
         }
-      )
+        ]
+      ])
       state.highlightsHtmlBuffer.push(
         `<span class="th" ref-id="repetition-note-${numberOfMeasures}">${joinedTokenValuesWithRealDelimitersWithHighlightedStringAndElement}`
       )
@@ -50,8 +51,8 @@ export default function (scenarios) {
   }
   scenarios['repetition note vertical correction'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { numberOfMeasures } }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.verticalCorrectionHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.verticalCorrectionHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="th" ref-id="repetition-note-${numberOfMeasures}">${match}</span>`
         }
       )

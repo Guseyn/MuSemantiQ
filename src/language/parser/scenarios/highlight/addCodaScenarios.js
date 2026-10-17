@@ -46,8 +46,8 @@ export default function (scenarios) {
   }
   scenarios['coda vertical correction'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { numberOfMeasures } }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedNumber = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.verticalCorrectionHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedNumber = regexps.verticalCorrectionHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="th" ref-id="coda-${numberOfMeasures}">${match}</span>`
         }
       )

@@ -8,8 +8,8 @@ import addLineMeasureStaveVoicePositionScenarios from '#msq/language/parser/scen
 export default function (scenarios) {
   scenarios['crescendo|diminuendo'] = {
     action: ({ parserState, joinedTokenValuesWithRealDelimiters, state }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.crescendoOrDiminuendoHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.crescendoOrDiminuendoHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="eh" ref-id="crescendo-or-diminuendo-${parserState.numberOfDynamicMarks}">${match}</span>`
         }
       )
@@ -28,8 +28,8 @@ export default function (scenarios) {
     // the value before, if there is one, has its own ref-id; otherwise the span waits for the unit's position
     action: ({ tokenValues, joinedTokenValuesWithRealDelimiters, parserState, state }) => {
       if (regexps.startsWithTextValue.test(tokenValues)) {
-        const joinedTokenValuesWithRealDelimitersWithHighlightedString = joinedTokenValuesWithRealDelimiters.replace(
-          regexps.stringHighlight, (match) => {
+        const joinedTokenValuesWithRealDelimitersWithHighlightedString = regexps.stringHighlight.replace(
+          joinedTokenValuesWithRealDelimiters, (match) => {
             return `<span class="sth" ref-id="crescendo-or-diminuendo-value-before-${parserState.numberOfDynamicMarks}">${match}</span>`
           }
         )
@@ -37,8 +37,8 @@ export default function (scenarios) {
           `<span class="th" ref-id="crescendo-or-diminuendo-value-before-${parserState.numberOfDynamicMarks}">${joinedTokenValuesWithRealDelimitersWithHighlightedString}</span>`
         )
       } else if (regexps.startsWithTextValueFrom.test(tokenValues)) {
-        const joinedTokenValuesWithRealDelimitersWithHighlightedString = joinedTokenValuesWithRealDelimiters.replace(
-          regexps.stringHighlight, (match) => {
+        const joinedTokenValuesWithRealDelimitersWithHighlightedString = regexps.stringHighlight.replace(
+          joinedTokenValuesWithRealDelimiters, (match) => {
             return `<span class="sth" ref-id="crescendo-or-diminuendo-value-before-${parserState.numberOfDynamicMarks}">${match}</span>`
           }
         )
@@ -69,8 +69,8 @@ export default function (scenarios) {
     // the value after, if there is one, has its own ref-id; otherwise the span waits for the unit's position
     action: ({ tokenValues, joinedTokenValuesWithRealDelimiters, parserState, state }) => {
       if (regexps.finishesWithTextValue.test(tokenValues)) {
-        const joinedTokenValuesWithRealDelimitersWithHighlightedString = joinedTokenValuesWithRealDelimiters.replace(
-          regexps.stringHighlight, (match) => {
+        const joinedTokenValuesWithRealDelimitersWithHighlightedString = regexps.stringHighlight.replace(
+          joinedTokenValuesWithRealDelimiters, (match) => {
             return `<span class="sth" ref-id="crescendo-or-diminuendo-value-after-${parserState.numberOfDynamicMarks}">${match}</span>`
           }
         )
@@ -101,8 +101,8 @@ export default function (scenarios) {
   }
   scenarios['crescendo|diminuendo above or below stave'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { currentNumberOfMeasures } }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.staveHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.staveHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="csph" ref-id="all-staves-in-measure-${currentNumberOfMeasures}">${match}</span>`
         }
       )
@@ -113,8 +113,8 @@ export default function (scenarios) {
   }
   scenarios['crescendo|diminuendo vertical correction'] = {
     action: ({ parserState, joinedTokenValuesWithRealDelimiters, state }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.verticalCorrectionHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.verticalCorrectionHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="th" ref-id="crescendo-or-diminuendo-${parserState.numberOfDynamicMarks}">${match}</span>`
         }
       )

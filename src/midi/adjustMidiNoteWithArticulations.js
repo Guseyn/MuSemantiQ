@@ -4,13 +4,13 @@ const MIDI_CC_FACTOR = 127
 const DEFAULT_MIDI_VOLUME = 100
 
 const articulationAdjustments = {
-  'accent': (midiNote, trackForNote) => {
+  accent: (midiNote, trackForNote) => {
     midiNote.velocity = Math.min(1, midiNote.velocity + 40 / MIDI_CC_FACTOR)
   },
-  'staccato': (midiNote, trackForNote) => {
+  staccato: (midiNote, trackForNote) => {
     midiNote.duration -= midiNote.duration * 1 / 2
   },
-  'spiccato': (midiNote, trackForNote) => {
+  spiccato: (midiNote, trackForNote) => {
     midiNote.duration -= midiNote.duration * 1 / 2
     const ccEndTime = midiNote.time + midiNote.duration * 1 / 3
     trackForNote.addCC({
@@ -23,7 +23,7 @@ const articulationAdjustments = {
       time: ccEndTime
     })
   },
-  'tenuto': (midiNote, trackForNote) => {
+  tenuto: (midiNote, trackForNote) => {
     const ccEndTime = midiNote.time + midiNote.duration
     trackForNote.addCC({
       number: 65,
@@ -35,19 +35,19 @@ const articulationAdjustments = {
       time: ccEndTime
     })
   },
-  'marcato': (midiNote, trackForNote) => {
+  marcato: (midiNote, trackForNote) => {
     midiNote.velocity = Math.min(1, midiNote.velocity + 60 / MIDI_CC_FACTOR)
   },
-  'leftHandPizzicato': (midiNote, trackForNote) => {
+  leftHandPizzicato: (midiNote, trackForNote) => {
     // it's adjusted by temporary instrument change
   },
-  'snapPizzicato': (midiNote, trackForNote) => {
+  snapPizzicato: (midiNote, trackForNote) => {
     // it's adjusted by temporary instrument change
   },
-  'naturalHarmonic': () => {
+  naturalHarmonic: () => {
     // it's adjusted by temporary instrument change
   },
-  'downBow': (midiNote, trackForNote) => {
+  downBow: (midiNote, trackForNote) => {
     const ccEndTime = midiNote.time + midiNote.duration
     trackForNote.addCC({
       number: 7,
@@ -59,7 +59,7 @@ const articulationAdjustments = {
       time: ccEndTime
     })
   },
-  'upBow': (midiNote, trackForNote) => {
+  upBow: (midiNote, trackForNote) => {
     const ccEndTime = midiNote.time + midiNote.duration
     trackForNote.addCC({
       number: 7,

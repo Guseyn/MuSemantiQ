@@ -7,8 +7,8 @@ import addLineMeasureStaveVoicePositionScenarios from '#msq/language/parser/scen
 export default function (scenarios) {
   scenarios['crescendo|diminuendo'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.crescendoOrDiminuendoHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.crescendoOrDiminuendoHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="eh">${match}</span>`
         }
       )
@@ -19,8 +19,8 @@ export default function (scenarios) {
   }
   scenarios['crescendo|diminuendo starts'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedString = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.stringHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedString = regexps.stringHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="sth">${match}</span>`
         }
       )
@@ -32,8 +32,8 @@ export default function (scenarios) {
   addUnitPositionScenarios(scenarios, 'crescendo|diminuendo starts', 2, { measure: true })
   scenarios['crescendo|diminuendo finishes'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedString = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.stringHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedString = regexps.stringHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="sth">${match}</span>`
         }
       )
@@ -50,8 +50,8 @@ export default function (scenarios) {
   }
   scenarios['crescendo|diminuendo above or below stave'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.staveHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.staveHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="csph">${match}</span>`
         }
       )
@@ -62,8 +62,8 @@ export default function (scenarios) {
   }
   scenarios['crescendo|diminuendo vertical correction'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.verticalCorrectionHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.verticalCorrectionHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="th">${match}</span>`
         }
       )

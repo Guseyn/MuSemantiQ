@@ -1,8 +1,8 @@
-export default function(segments, x, y) {
+export default function (segments, x, y) {
   // y is optional
   y = y || 0
 
-  return segments.map(function(segment) {
+  return segments.map(function (segment) {
     const cmd = segment[0]
 
     // Shift coords only for commands with absolute values
@@ -10,7 +10,7 @@ export default function(segments, x, y) {
       return segment
     }
 
-    const name  = cmd.toLowerCase()
+    const name = cmd.toLowerCase()
 
     // V is the only command, with shifted coords parity
     if (name === 'v') {
@@ -27,7 +27,7 @@ export default function(segments, x, y) {
     }
 
     // All other commands have [cmd, x1, y1, x2, y2, x3, y3, ...] format
-    return segment.map(function(val, i) {
+    return segment.map(function (val, i) {
       if (!i) {
         return val
       }

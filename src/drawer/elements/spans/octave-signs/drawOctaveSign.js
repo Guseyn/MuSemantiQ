@@ -10,8 +10,8 @@ import moveElementInTheCenterBetweenPoints from '#msq/drawer/elements/basic/move
 export default function (singleUnit, articulationIndex, currentArticulationParams, topOfCurrentStave, bottomOfCurrentStave, styles) {
   const { octaveSignYOffset, octaveSignXCorrection, twoOctavesSignXCorrection } = styles
   const xCorrectionForOctaveSign = {
-    '8': octaveSignXCorrection,
-    '15': twoOctavesSignXCorrection
+    8: octaveSignXCorrection,
+    15: twoOctavesSignXCorrection
   }
   const { direction, textValue, subTextValue } = currentArticulationParams
   const shouldBeAboveOrUnderStemLine = shouldArticulationBeAboveOrUnderStemLine(singleUnit, direction)
@@ -20,7 +20,7 @@ export default function (singleUnit, articulationIndex, currentArticulationParam
   const startYPosition = direction === 'up'
     ? Math.min(singleUnit.top, topOfCurrentStave)
     : Math.max(singleUnit.bottom, bottomOfCurrentStave)
-  let octaveSignText = drawOctaveSignText(textValue, subTextValue, direction)(styles, 0, startYPosition)
+  const octaveSignText = drawOctaveSignText(textValue, subTextValue, direction)(styles, 0, startYPosition)
   if (shouldBeAboveOrUnderStemLine) {
     moveElementInTheCenterBetweenPoints(
       octaveSignText,

@@ -42,7 +42,7 @@ const ARTICULATION_WORDS = {
  * A note, with its octave when it is not the default one, and whatever is said
  * about that note alone rather than about the unit.
  */
-function serializeNote(note) {
+function serializeNote (note) {
   const parts = [ `${note.noteName}${note.octaveNumber || ''}` ]
   if (note.isGhost) {
     parts.push('is ghost')
@@ -59,7 +59,7 @@ function serializeNote(note) {
  * The schema counts downwards — a negative correction lifts the mark — so the
  * sign becomes the word and the number is always written positive.
  */
-function serializeCorrection(yCorrection) {
+function serializeCorrection (yCorrection) {
   if (typeof yCorrection !== 'number' || yCorrection === 0) {
     return ''
   }
@@ -69,7 +69,7 @@ function serializeCorrection(yCorrection) {
 /**
  * Where an articulation or mark sits, written as the language words it.
  */
-function serializePlacement(params) {
+function serializePlacement (params) {
   const words = []
   if (params.direction) {
     words.push(params.aboveBelowOverUnderStaveLines
@@ -89,7 +89,7 @@ function serializePlacement(params) {
  * An articulation, with whatever it carries: a dynamic's text, the accidentals
  * an ornament wears, a trill's wave.
  */
-function serializeArticulation(articulation) {
+function serializeArticulation (articulation) {
   /*
   An octave sign worn by a single unit is not written as an articulation at all:
   the language says what it does rather than what it draws.
@@ -131,7 +131,7 @@ function serializeArticulation(articulation) {
  * A pedal mark, which is written on the unit it lands on rather than as a span:
  * one command opens it, another releases it, and a retake is its own word.
  */
-function serializePedal(pedal) {
+function serializePedal (pedal) {
   const parts = []
   const text = pedal.textValue && pedal.textValue !== 'Ped.'
     ? ` "${pedal.textValue}"`
@@ -178,7 +178,7 @@ function serializePedal(pedal) {
  * `tied after` leave a tie hanging off one end — pointing into the previous
  * measure or out of this one — and the `measure` forms name which one.
  */
-function serializeTies(unit) {
+function serializeTies (unit) {
   const parts = []
   const serializeTie = (words, params) => {
     const said = [ words ]
@@ -215,7 +215,7 @@ function serializeTies(unit) {
  * A single-note unit says `with sharp key` and leaves the note implied; a chord
  * has to name which note each accidental is for.
  */
-function serializeKeys(unit, isChord) {
+function serializeKeys (unit, isChord) {
   if (isChord) {
     // In a chord the accidental follows its own note in the note list, so it is
     // written there rather than as a modifier of the whole unit.
@@ -231,7 +231,7 @@ function serializeKeys(unit, isChord) {
  * number, a string number — which the language writes as text rather than as a
  * key.
  */
-function serializeKey(key) {
+function serializeKey (key) {
   if (key.keyType === 'noteLetter') {
     return `with text "${key.textValue}"`
   }
@@ -243,7 +243,7 @@ function serializeKey(key) {
 /**
  * The accidental belonging to one note of a chord, written beside it.
  */
-function findKeyOfNote(unit, note) {
+function findKeyOfNote (unit, note) {
   const key = (unit.keysParams || []).find(
     (one) => one.noteName === note.noteName && (one.octaveNumber || '') === (note.octaveNumber || '')
   )
@@ -261,7 +261,7 @@ function findKeyOfNote(unit, note) {
  * Everything that attaches to this one unit, in the order the language reads
  * most naturally.
  */
-function serializeModifiers(unit, isChord, previousWasBeamed) {
+function serializeModifiers (unit, isChord, previousWasBeamed) {
   const parts = []
 
   const dots = serializeDots(unit.numberOfDots)
@@ -398,7 +398,7 @@ function serializeModifiers(unit, isChord, previousWasBeamed) {
 /**
  * A unit as the lines of MSQ that produce it.
  */
-export default function serializeUnit(unit, previousUnit) {
+export default function serializeUnit (unit, previousUnit) {
   const duration = serializeDuration(unit.unitDuration)
   const notes = unit.notes || []
   const isChord = !unit.isRest && notes.length > 1

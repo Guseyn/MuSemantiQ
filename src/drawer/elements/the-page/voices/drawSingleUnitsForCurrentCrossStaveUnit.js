@@ -85,7 +85,7 @@ const createSingleUnitParams = (params) => {
     containsKeysOnNextStave: containsKeysOnNextStave || false,
     notes: notes || [],
     unitDuration: unitDuration || 1,
-    actualDuration: actualDuration,
+    actualDuration,
     stemDirection: stemDirection || 'up',
     numberOfDots: numberOfDots || 0,
     keysParams: keysParams || [],
@@ -232,7 +232,7 @@ export default function (selectedSingleUnitsParamsToBeIncludedInNextCrossStaveUn
     const singleUnit = drawSingleUnit(
       createSingleUnitParams({
         pageLineNumber,
-        numberOfStaveLines: numberOfStaveLines,
+        numberOfStaveLines,
         measureIndexOnPageLine,
         measureIndexInGeneral,
         staveIndex,
@@ -280,7 +280,7 @@ export default function (selectedSingleUnitsParamsToBeIncludedInNextCrossStaveUn
         dynamicChangeMark: selectedSingleUnitParams.dynamicChangeMark,
         articulationParams: selectedSingleUnitParams.articulationParams,
         tremoloParams: selectedSingleUnitParams.tremoloParams,
-        isOnLastMeasureOfPageLine: isOnLastMeasureOfPageLine,
+        isOnLastMeasureOfPageLine,
         isLastSingleUnitInVoiceOnPageLine: selectedSingleUnitParams.isLastSingleUnitInVoiceOnPageLine,
         thereAreNotesInTheSameCrossStaveUnitThatTheirPositionNumberIsMoreThanMaxNotePositionNumberInCurrentSingleUnitOnTheSameStave,
         thereAreNotesInTheSameCrossStaveUnitThatTheirPositionNumberIsLessThanMinNotePositionNumberInCurrentSingleUnitOnTheSameStave

@@ -6,8 +6,8 @@ import copyScenarioWithDifferentRequiredCommandProgression from '#msq/language/p
 export default function (scenarios) {
   scenarios['bracket or brace'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { numberOfMeasures, numberOfConnections } }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.crossStaveConnectionHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.crossStaveConnectionHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="eh" ref-id="cross-stave-connection-${numberOfMeasures}-${numberOfConnections}">${match}</span>`
         }
       )
@@ -50,8 +50,8 @@ export default function (scenarios) {
       state.highlightsHtmlBuffer[state.highlightsHtmlBuffer.length - 1] = state.highlightsHtmlBuffer[state.highlightsHtmlBuffer.length - 1].replace(
         'ref-id=""', `ref-id="stave-${numberOfMeasures}-${staveIndex + 1}"`
       )
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.staveIndexHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.staveIndexHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="csph" ref-id="stave-${numberOfMeasures}-${staveIndex + 1}">${match}</span>`
         }
       )
@@ -86,8 +86,8 @@ export default function (scenarios) {
       state.highlightsHtmlBuffer[state.highlightsHtmlBuffer.length - 1] = state.highlightsHtmlBuffer[state.highlightsHtmlBuffer.length - 1].replace(
         'ref-id=""', `ref-id="stave-${numberOfMeasures}-${staveIndex + 1}"`
       )
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.staveIndexHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.staveIndexHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="csph" ref-id="stave-${numberOfMeasures}-${staveIndex + 1}">${match}</span>`
         }
       )
@@ -103,8 +103,8 @@ export default function (scenarios) {
   }
   scenarios['connection for each line'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { lastCrossStaveConnectionsParamsForEachLineId } }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.forEachLineHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.forEachLineHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="clph" ref-id="cross-stave-connection-for-each-line-${lastCrossStaveConnectionsParamsForEachLineId}">${match}</span>`
         }
       )
@@ -115,8 +115,8 @@ export default function (scenarios) {
   }
   scenarios['connection for lines below'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { lastCrossStaveConnectionsParamsForEachLineId } }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.linesHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.linesHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="clph" ref-id="cross-stave-connection-for-each-line-${lastCrossStaveConnectionsParamsForEachLineId}">${match}</span>`
         }
       )

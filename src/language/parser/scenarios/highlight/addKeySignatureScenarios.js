@@ -5,8 +5,8 @@ import regexps from '#msq/language/parser/scenarios/static-objects/regexps.js'
 export default function (scenarios) {
   scenarios['key signature'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { numberOfMeasures } }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.keySignatureHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.keySignatureHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="eh" ref-id="key-signature-${numberOfMeasures}">${match}</span>`
         }
       )
@@ -17,8 +17,8 @@ export default function (scenarios) {
   }
   scenarios['key signature name'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { numberOfMeasures } }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.keySignatureNameHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.keySignatureNameHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="sth" ref-id="key-signature-${numberOfMeasures}">${match}</span>`
         }
       )
@@ -29,8 +29,8 @@ export default function (scenarios) {
   }
   scenarios['key signature for each line'] = {
     action: ({ parserState, joinedTokenValuesWithRealDelimiters, state }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.forEachLineHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.forEachLineHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="clph" ref-id="key-signature-for-each-line-${parserState.lastKeySignatureNameForEachLineId}">${match}</span>`
         }
       )
@@ -41,8 +41,8 @@ export default function (scenarios) {
   }
   scenarios['key signature for lines below'] = {
     action: ({ parserState, joinedTokenValuesWithRealDelimiters, state }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.linesHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.linesHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="clph" ref-id="key-signature-for-each-line-${parserState.lastKeySignatureNameForEachLineId}">${match}</span>`
         }
       )

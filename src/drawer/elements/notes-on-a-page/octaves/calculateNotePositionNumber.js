@@ -4,47 +4,47 @@ const noteNames = [
   'c', 'd', 'e', 'f', 'g', 'a', 'b'
 ]
 const noteNameWithOctaveNumberForZeroPositionNumberByClefs = {
-  'treble': {
+  treble: {
     noteName: 'f',
     octaveNumber: '5'
   },
-  'bass': {
+  bass: {
     noteName: 'a',
     octaveNumber: '3'
   },
-  'alto': {
+  alto: {
     noteName: 'g',
     octaveNumber: '4'
   },
-  'baritone': {
+  baritone: {
     noteName: 'c',
     octaveNumber: '4'
   },
-  'mezzoSoprano': {
+  mezzoSoprano: {
     noteName: 'b',
     octaveNumber: '4'
   },
-  'soprano': {
+  soprano: {
     noteName: 'd',
     octaveNumber: '5'
   },
-  'tenor': {
+  tenor: {
     noteName: 'e',
     octaveNumber: '4'
   },
-  'octaveEightUp': {
+  octaveEightUp: {
     noteName: 'f',
     octaveNumber: '6'
   },
-  'octaveEightDown': {
+  octaveEightDown: {
     noteName: 'f',
     octaveNumber: '4'
   },
-  'octaveFifteenUp': {
+  octaveFifteenUp: {
     noteName: 'f',
     octaveNumber: '7'
   },
-  'octaveFifteenDown': {
+  octaveFifteenDown: {
     noteName: 'f',
     octaveNumber: '3'
   }

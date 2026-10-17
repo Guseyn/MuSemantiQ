@@ -9,13 +9,13 @@ import arabicSentenceCheck from '#msq/drawer/lib/opentype/features/arab/contextC
 import arabicPresentationForms from '#msq/drawer/lib/opentype/features/arab/arabicPresentationForms.js'
 import arabicRequiredLigatures from '#msq/drawer/lib/opentype/features/arab/arabicRequiredLigatures.js'
 
-const {  Tokenizer  } = tokenizer
+const { Tokenizer } = tokenizer
 
 /**
  * Create Bidi. features
  * @param {string} baseDir text base direction. value either 'ltr' or 'rtl'
  */
-function Bidi(baseDir) {
+function Bidi (baseDir) {
   this.baseDir = baseDir || 'ltr'
   this.tokenizer = new Tokenizer()
   this.features = []
@@ -42,7 +42,7 @@ Bidi.prototype.contextChecks = ({
 /**
  * Register arabic word check
  */
-function registerArabicWordCheck() {
+function registerArabicWordCheck () {
   const checks = this.contextChecks.arabicWordCheck
   return this.tokenizer.registerContextChecker(
     'arabicWord',
@@ -54,7 +54,7 @@ function registerArabicWordCheck() {
 /**
  * Register arabic sentence check
  */
-function registerArabicSentenceCheck() {
+function registerArabicSentenceCheck () {
   const checks = this.contextChecks.arabicSentenceCheck
   return this.tokenizer.registerContextChecker(
     'arabicSentence',
@@ -67,7 +67,7 @@ function registerArabicSentenceCheck() {
  * Perform pre tokenization procedure then
  * tokenize text input
  */
-function tokenizeText() {
+function tokenizeText () {
   registerArabicWordCheck.call(this)
   registerArabicSentenceCheck.call(this)
   return this.tokenizer.tokenize(this.text)
@@ -77,10 +77,10 @@ function tokenizeText() {
  * Reverse arabic sentence layout
  * TODO: check base dir before applying adjustments - priority low
  */
-function reverseArabicSentences() {
+function reverseArabicSentences () {
   const ranges = this.tokenizer.getContextRanges('arabicSentence')
   ranges.forEach(range => {
-    let rangeTokens = this.tokenizer.getRangeTokens(range)
+    const rangeTokens = this.tokenizer.getRangeTokens(range)
     this.tokenizer.replaceRange(
       range.startIndex,
       range.endOffset,
@@ -93,7 +93,7 @@ function reverseArabicSentences() {
  * Subscribe arabic presentation form features
  * @param {feature} feature a feature to apply
  */
-Bidi.prototype.subscribeArabicForms = function(feature) {
+Bidi.prototype.subscribeArabicForms = function (feature) {
   this.tokenizer.events.contextEnd.subscribe(
     (contextName, range) => {
       if (contextName === 'arabicWord') {
@@ -135,7 +135,7 @@ Bidi.prototype.registerModifier = function (modifierId, condition, modifier) {
 /**
  * Check if 'glyphIndex' is registered
  */
-function checkGlyphIndexStatus() {
+function checkGlyphIndexStatus () {
   if (this.tokenizer.registeredModifiers.indexOf('glyphIndex') === -1) {
     throw new Error(
       'glyphIndex modifier is required to apply ' +
@@ -147,7 +147,7 @@ function checkGlyphIndexStatus() {
 /**
  * Apply arabic presentation forms features
  */
-function applyArabicPresentationForms() {
+function applyArabicPresentationForms () {
   if (!this.features.hasOwnProperty('arab')) return
   checkGlyphIndexStatus.call(this)
   const ranges = this.tokenizer.getContextRanges('arabicWord')
@@ -159,7 +159,7 @@ function applyArabicPresentationForms() {
 /**
  * Apply required arabic ligatures
  */
-function applyArabicRequireLigatures() {
+function applyArabicRequireLigatures () {
   if (!this.features.hasOwnProperty('arab')) return
   if (!this.features.arab.hasOwnProperty('rlig')) return
   checkGlyphIndexStatus.call(this)
@@ -173,7 +173,7 @@ function applyArabicRequireLigatures() {
  * process text input
  * @param {string} text an input text
  */
-Bidi.prototype.processText = function(text) {
+Bidi.prototype.processText = function (text) {
   if (!this.text || this.text !== text) {
     this.setText(text)
     tokenizeText.call(this)
@@ -199,7 +199,7 @@ Bidi.prototype.getBidiText = function (text) {
  */
 Bidi.prototype.getTextGlyphs = function (text) {
   this.processText(text)
-  let indexes = []
+  const indexes = []
   for (let i = 0; i < this.tokenizer.tokens.length; i++) {
     const token = this.tokenizer.tokens[i]
     if (token.state.deleted) continue

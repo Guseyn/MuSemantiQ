@@ -3,13 +3,13 @@
 import sortByGraceCount from '#msq/midi/sortByGraceCount.js'
 
 const PITCHES_BY_NOTE_NAMES = {
-  'c': 0,
-  'd': 2,
-  'e': 4,
-  'f': 5,
-  'g': 7,
-  'a': 9,
-  'b': 11
+  c: 0,
+  d: 2,
+  e: 4,
+  f: 5,
+  g: 7,
+  a: 9,
+  b: 11
 }
 
 export default function (note, pitchAdjustmentsAuraForAllStavesSplittedInTimeFrames, orderedTimeFramesFromPitchAdjustmentsAuraForAllStavesSplittedInTimeFrames, pitchAdjustmentsAuraForEachStaveThatLastOneMeasureSplittedInTimeFrames, orderedTimeFramesFromPitchAdjustmentsAuraForEachStaveThatLastOneMeasureSplittedInTimeFrames, graceMaxCountForCurrentTime, graceCountersForEachVoiceInEachStaveSplittedInTimeFrames, staveVoiceKey) {
@@ -27,7 +27,6 @@ export default function (note, pitchAdjustmentsAuraForAllStavesSplittedInTimeFra
 
       sortByGraceCount(pitchAdjustmentsAuraForAllStavesSplittedInTimeFrames[pitchAdjustmentsTime])
       for (let pitchAdjustmentsTimeIndex = 0; pitchAdjustmentsTimeIndex < pitchAdjustmentsAuraForAllStavesSplittedInTimeFrames[pitchAdjustmentsTime].length; pitchAdjustmentsTimeIndex++) {
-
         if (note.isGrace && (pitchAdjustmentsAuraForAllStavesSplittedInTimeFrames[pitchAdjustmentsTime][pitchAdjustmentsTimeIndex].graceCount !== undefined)) {
           const normalizer = (graceMaxCountForCurrentTime - graceCountersForEachVoiceInEachStaveSplittedInTimeFrames[pitchAdjustmentsTime][staveVoiceKey])
           normalizedPitchAdjustmentGraceCount = normalizer + pitchAdjustmentsAuraForAllStavesSplittedInTimeFrames[pitchAdjustmentsTime][pitchAdjustmentsTimeIndex].graceCount
@@ -71,7 +70,6 @@ export default function (note, pitchAdjustmentsAuraForAllStavesSplittedInTimeFra
         sortByGraceCount(pitchAdjustmentsAuraForEachStaveThatLastOneMeasureSplittedInTimeFrames[pitchAdjustmentsTime][measureStaveIndex])
         for (let pitchAdjustmentsTimeIndex = 0; pitchAdjustmentsTimeIndex < pitchAdjustmentsAuraForEachStaveThatLastOneMeasureSplittedInTimeFrames[pitchAdjustmentsTime][measureStaveIndex].length; pitchAdjustmentsTimeIndex++) {
           if (pitchAdjustmentsAuraForEachStaveThatLastOneMeasureSplittedInTimeFrames[pitchAdjustmentsTime][measureStaveIndex][pitchAdjustmentsTimeIndex]) {
-
             if (note.isGrace && (pitchAdjustmentsAuraForEachStaveThatLastOneMeasureSplittedInTimeFrames[pitchAdjustmentsTime][measureStaveIndex][pitchAdjustmentsTimeIndex].graceCount !== undefined)) {
               const normalizer = (graceMaxCountForCurrentTime - graceCountersForEachVoiceInEachStaveSplittedInTimeFrames[pitchAdjustmentsTime][staveVoiceKey])
               normalizedPitchAdjustmentGraceCount = normalizer + pitchAdjustmentsAuraForEachStaveThatLastOneMeasureSplittedInTimeFrames[pitchAdjustmentsTime][measureStaveIndex][pitchAdjustmentsTimeIndex].graceCount
@@ -87,7 +85,7 @@ export default function (note, pitchAdjustmentsAuraForAllStavesSplittedInTimeFra
                   pitchAdjustmentForNote = pitchAdjustmentsAuraForEachStaveThatLastOneMeasureSplittedInTimeFrames[pitchAdjustmentsTime][measureStaveIndex][pitchAdjustmentsTimeIndex].pitchAdjustments[pitchAdjustmentIndex].midiPitchAdjustment
                   pitchAdjustmentByKeyIsFound = true
                   break
-                } 
+                }
               }
             }
           }

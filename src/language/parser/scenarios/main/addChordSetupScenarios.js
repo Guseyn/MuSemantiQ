@@ -25,8 +25,8 @@ export default function (scenarios) {
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     startsOnNewLine: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
-      return regexps.chordWithDuration.test(tokenValues)
-        && !regexps.letters.test(
+      return regexps.chordWithDuration.test(tokenValues) &&
+        !regexps.letters.test(
           [
             findNextTokenValueOnTheLine(
               unitext, currentToken.firstCharIndexOfNextToken
@@ -146,7 +146,6 @@ export default function (scenarios) {
       ) {
         parserState.lastBeamStatus[currentNumberOfStaves - 1][currentNumberOfVoices - 1]['grace'] = true
       }
-
     },
     activateActionWhenProgressionOfCommandsChangesIfItIsLastTokenAndActionDidntHappenBefore: true
   }
@@ -168,7 +167,7 @@ export default function (scenarios) {
         parserState.lastStavePosition[currentNumberOfStaves - 1] = {}
       }
       parserState.lastStavePosition[currentNumberOfStaves - 1][currentNumberOfVoices - 1] = stavePosition
-      let stavePositionInRefId = currentNumberOfStaves
+      const stavePositionInRefId = currentNumberOfStaves
       return { stavePositionName, stavePositionInRefId, currentNumberOfStaves, currentNumberOfMeasures }
     },
     itIsNewCommandProgressionFromLevel: 1

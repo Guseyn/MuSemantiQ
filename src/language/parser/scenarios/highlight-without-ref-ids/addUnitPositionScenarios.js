@@ -7,8 +7,8 @@ export default function (scenarios, requiredCommandProgression, commandProgressi
   scenarios[`unit position (${requiredCommandProgression})`] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state }) => {
       const tokensWithNumbersInsteadOfWordsWithTrimmedEnd = joinedTokenValuesWithRealDelimiters.trimEnd()
-      const tokensWithNumbersInsteadOfWordsWithTrimmedEndWithHighlightedPosition = tokensWithNumbersInsteadOfWordsWithTrimmedEnd.replace(
-        regexps.positionPreposition, (match, p1, p2, p3, p4) => {
+      const tokensWithNumbersInsteadOfWordsWithTrimmedEndWithHighlightedPosition = regexps.positionPreposition.replace(
+        tokensWithNumbersInsteadOfWordsWithTrimmedEnd, (match, p1, p2, p3, p4) => {
           return `${p1 || ''}<span class="cuph">${p4}</span>`
         }
       )
@@ -20,8 +20,8 @@ export default function (scenarios, requiredCommandProgression, commandProgressi
   scenarios[`position of unit (${requiredCommandProgression})`] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state }) => {
       const tokensWithNumbersInsteadOfWordsWithTrimmedEnd = joinedTokenValuesWithRealDelimiters.trimEnd()
-      const tokensWithNumbersInsteadOfWordsWithTrimmedEndWithHighlightedPosition = tokensWithNumbersInsteadOfWordsWithTrimmedEnd.replace(
-        regexps.positionPreposition, (match, p1, p2, p3, p4) => {
+      const tokensWithNumbersInsteadOfWordsWithTrimmedEndWithHighlightedPosition = regexps.positionPreposition.replace(
+        tokensWithNumbersInsteadOfWordsWithTrimmedEnd, (match, p1, p2, p3, p4) => {
           return `${p1 || ''}<span class="cuph">${p4}</span>`
         }
       )

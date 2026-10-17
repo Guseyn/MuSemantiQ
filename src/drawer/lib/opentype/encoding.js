@@ -43,7 +43,7 @@ const cffStandardStrings = [
   'Igravesmall', 'Iacutesmall', 'Icircumflexsmall', 'Idieresissmall', 'Ethsmall', 'Ntildesmall', 'Ogravesmall',
   'Oacutesmall', 'Ocircumflexsmall', 'Otildesmall', 'Odieresissmall', 'OEsmall', 'Oslashsmall', 'Ugravesmall',
   'Uacutesmall', 'Ucircumflexsmall', 'Udieresissmall', 'Yacutesmall', 'Thornsmall', 'Ydieresissmall', '001.000',
-  '001.001', '001.002', '001.003', 'Black', 'Bold', 'Book', 'Light', 'Medium', 'Regular', 'Roman', 'Semibold']
+  '001.001', '001.002', '001.003', 'Black', 'Bold', 'Book', 'Light', 'Medium', 'Regular', 'Roman', 'Semibold' ]
 
 const cffStandardEncoding = [
   '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '',
@@ -62,7 +62,7 @@ const cffStandardEncoding = [
   'macron', 'breve', 'dotaccent', 'dieresis', '', 'ring', 'cedilla', '', 'hungarumlaut', 'ogonek', 'caron',
   'emdash', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 'AE', '', 'ordfeminine', '', '', '',
   '', 'Lslash', 'Oslash', 'OE', 'ordmasculine', '', '', '', '', '', 'ae', '', '', '', 'dotlessi', '', '',
-  'lslash', 'oslash', 'oe', 'germandbls']
+  'lslash', 'oslash', 'oe', 'germandbls' ]
 
 const cffExpertEncoding = [
   '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '',
@@ -90,7 +90,7 @@ const cffExpertEncoding = [
   'Egravesmall', 'Eacutesmall', 'Ecircumflexsmall', 'Edieresissmall', 'Igravesmall', 'Iacutesmall',
   'Icircumflexsmall', 'Idieresissmall', 'Ethsmall', 'Ntildesmall', 'Ogravesmall', 'Oacutesmall',
   'Ocircumflexsmall', 'Otildesmall', 'Odieresissmall', 'OEsmall', 'Oslashsmall', 'Ugravesmall', 'Uacutesmall',
-  'Ucircumflexsmall', 'Udieresissmall', 'Yacutesmall', 'Thornsmall', 'Ydieresissmall']
+  'Ucircumflexsmall', 'Udieresissmall', 'Yacutesmall', 'Thornsmall', 'Ydieresissmall' ]
 
 const standardNames = [
   '.notdef', '.null', 'nonmarkingreturn', 'space', 'exclam', 'quotedbl', 'numbersign', 'dollar', 'percent',
@@ -117,7 +117,7 @@ const standardNames = [
   'ogonek', 'caron', 'Lslash', 'lslash', 'Scaron', 'scaron', 'Zcaron', 'zcaron', 'brokenbar', 'Eth', 'eth',
   'Yacute', 'yacute', 'Thorn', 'thorn', 'minus', 'multiply', 'onesuperior', 'twosuperior', 'threesuperior',
   'onehalf', 'onequarter', 'threequarters', 'franc', 'Gbreve', 'gbreve', 'Idotaccent', 'Scedilla', 'scedilla',
-  'Cacute', 'cacute', 'Ccaron', 'ccaron', 'dcroat']
+  'Cacute', 'cacute', 'Ccaron', 'ccaron', 'dcroat' ]
 
 /**
  * This is the encoding used for fonts created from scratch.
@@ -128,11 +128,11 @@ const standardNames = [
  * @constructor
  * @param {opentype.Font}
  */
-function DefaultEncoding(font) {
+function DefaultEncoding (font) {
   this.font = font
 }
 
-DefaultEncoding.prototype.charToGlyphIndex = function(c) {
+DefaultEncoding.prototype.charToGlyphIndex = function (c) {
   const code = c.codePointAt(0)
   const glyphs = this.font.glyphs
   if (glyphs) {
@@ -154,7 +154,7 @@ DefaultEncoding.prototype.charToGlyphIndex = function(c) {
  * @constructor
  * @param {Object} cmap - a object with the cmap encoded data
  */
-function CmapEncoding(cmap) {
+function CmapEncoding (cmap) {
   this.cmap = cmap
 }
 
@@ -162,7 +162,7 @@ function CmapEncoding(cmap) {
  * @param  {string} c - the character
  * @return {number} The glyph index.
  */
-CmapEncoding.prototype.charToGlyphIndex = function(c) {
+CmapEncoding.prototype.charToGlyphIndex = function (c) {
   return this.cmap.glyphIndexMap[c.codePointAt(0)] || 0
 }
 
@@ -173,7 +173,7 @@ CmapEncoding.prototype.charToGlyphIndex = function(c) {
  * @param {string} encoding - The encoding
  * @param {Array} charset - The character set.
  */
-function CffEncoding(encoding, charset) {
+function CffEncoding (encoding, charset) {
   this.encoding = encoding
   this.charset = charset
 }
@@ -182,7 +182,7 @@ function CffEncoding(encoding, charset) {
  * @param  {string} s - The character
  * @return {number} The index.
  */
-CffEncoding.prototype.charToGlyphIndex = function(s) {
+CffEncoding.prototype.charToGlyphIndex = function (s) {
   const code = s.codePointAt(0)
   const charName = this.encoding[code]
   return this.charset.indexOf(charName)
@@ -194,7 +194,7 @@ CffEncoding.prototype.charToGlyphIndex = function(s) {
  * @constructor
  * @param {Object} post
  */
-function GlyphNames(post) {
+function GlyphNames (post) {
   switch (post.version) {
     case 1:
       this.names = standardNames.slice()
@@ -231,7 +231,7 @@ function GlyphNames(post) {
  * @param  {string} name - The glyph name
  * @return {number} The index
  */
-GlyphNames.prototype.nameToGlyphIndex = function(name) {
+GlyphNames.prototype.nameToGlyphIndex = function (name) {
   return this.names.indexOf(name)
 }
 
@@ -239,7 +239,7 @@ GlyphNames.prototype.nameToGlyphIndex = function(name) {
  * @param  {number} gid
  * @return {string}
  */
-GlyphNames.prototype.glyphIndexToName = function(gid) {
+GlyphNames.prototype.glyphIndexToName = function (gid) {
   return this.names[gid]
 }
 
@@ -247,7 +247,7 @@ GlyphNames.prototype.glyphIndexToName = function(gid) {
  * @alias opentype.addGlyphNames
  * @param {opentype.Font}
  */
-function addGlyphNames(font) {
+function addGlyphNames (font) {
   let glyph
   const glyphIndexMap = font.tables.cmap.glyphIndexMap
   const charCodes = Object.keys(glyphIndexMap)

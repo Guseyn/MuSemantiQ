@@ -570,7 +570,7 @@ export default function ({
       dotsLeft: dotsWithCoordinates.left
     }
 
-    let singleUnit = createElementWithAdditionalInformation(
+    const singleUnit = createElementWithAdditionalInformation(
       createGroup(
         'singleUnit',
         [

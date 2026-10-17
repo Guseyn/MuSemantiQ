@@ -40,7 +40,7 @@ let execComponent
 * There ought to be exactly one
 * for each truetype font that is used for hinting.
 */
-function Hinting(font) {
+function Hinting (font) {
   // the font this hinting object is for
   this.font = font
 
@@ -49,8 +49,8 @@ function Hinting(font) {
   }
 
   // cached states
-  this._fpgmState  =
-    this._prepState  =
+  this._fpgmState =
+    this._prepState =
         undefined
 
   // errorState
@@ -66,43 +66,43 @@ function Hinting(font) {
 /*
 * Not rounding.
 */
-function roundOff(v) {
+function roundOff (v) {
   return v
 }
 
 /*
 * Rounding to grid.
 */
-function roundToGrid(v) {
-  //Rounding in TT is supposed to "symmetrical around zero"
+function roundToGrid (v) {
+  // Rounding in TT is supposed to "symmetrical around zero"
   return Math.sign(v) * Math.round(Math.abs(v))
 }
 
 /*
 * Rounding to double grid.
 */
-function roundToDoubleGrid(v) {
+function roundToDoubleGrid (v) {
   return Math.sign(v) * Math.round(Math.abs(v * 2)) / 2
 }
 
 /*
 * Rounding to half grid.
 */
-function roundToHalfGrid(v) {
+function roundToHalfGrid (v) {
   return Math.sign(v) * (Math.round(Math.abs(v) + 0.5) - 0.5)
 }
 
 /*
 * Rounding to up to grid.
 */
-function roundUpToGrid(v) {
+function roundUpToGrid (v) {
   return Math.sign(v) * Math.ceil(Math.abs(v))
 }
 
 /*
 * Rounding to down to grid.
 */
-function roundDownToGrid(v) {
+function roundDownToGrid (v) {
   return Math.sign(v) * Math.floor(Math.abs(v))
 }
 
@@ -111,7 +111,7 @@ function roundDownToGrid(v) {
 */
 const roundSuper = function (v) {
   const period = this.srPeriod
-  let phase = this.srPhase
+  const phase = this.srPhase
   const threshold = this.srThreshold
   let sign = 1
 
@@ -358,7 +358,7 @@ Object.freeze(yUnitVector)
 /*
 * Creates a unit vector that is not x- or y-axis.
 */
-function UnitVector(x, y) {
+function UnitVector (x, y) {
   this.x = x
   this.y = y
   this.axis = undefined
@@ -371,7 +371,7 @@ function UnitVector(x, y) {
 * Gets the projected distance between two points.
 * o1/o2 ... if true, respective original position is used.
 */
-UnitVector.prototype.distance = function(p1, p2, o1, o2) {
+UnitVector.prototype.distance = function (p1, p2, o1, o2) {
   return (
     this.x * xUnitVector.distance(p1, p2, o1, o2) +
         this.y * yUnitVector.distance(p1, p2, o1, o2)
@@ -385,7 +385,7 @@ UnitVector.prototype.distance = function(p1, p2, o1, o2) {
 *
 * See APPENDIX on INTERPOLATE at the bottom of this file.
 */
-UnitVector.prototype.interpolate = function(p, rp1, rp2, pv) {
+UnitVector.prototype.interpolate = function (p, rp1, rp2, pv) {
   let dm1
   let dm2
   let do1
@@ -422,7 +422,7 @@ UnitVector.prototype.interpolate = function(p, rp1, rp2, pv) {
 * pv  ... projection vector (undefined = this)
 * org ... if true, uses the original position of rp as reference.
 */
-UnitVector.prototype.setRelative = function(p, rp, d, pv, org) {
+UnitVector.prototype.setRelative = function (p, rp, d, pv, org) {
   pv = pv || this
 
   const rpx = org ? rp.xo : rp.x
@@ -443,7 +443,7 @@ UnitVector.prototype.setRelative = function(p, rp, d, pv, org) {
 /*
 * Touches the point p.
 */
-UnitVector.prototype.touch = function(p) {
+UnitVector.prototype.touch = function (p) {
   p.xTouched = true
   p.yTouched = true
 }
@@ -451,7 +451,7 @@ UnitVector.prototype.touch = function(p) {
 /*
 * Returns a unit vector with x/y coordinates.
 */
-function getUnitVector(x, y) {
+function getUnitVector (x, y) {
   const d = Math.sqrt(x * x + y * y)
 
   x /= d
@@ -465,7 +465,7 @@ function getUnitVector(x, y) {
 /*
 * Creates a point in the hinting engine.
 */
-function HPoint(
+function HPoint (
   x,
   y,
   lastPointOfContour,
@@ -489,7 +489,7 @@ function HPoint(
 *
 * v  ... unit vector to test touch axis.
 */
-HPoint.prototype.nextTouched = function(v) {
+HPoint.prototype.nextTouched = function (v) {
   let p = this.nextPointOnContour
 
   while (!v.touched(p) && p !== this) p = p.nextPointOnContour
@@ -502,7 +502,7 @@ HPoint.prototype.nextTouched = function(v) {
 *
 * v  ... unit vector to test touch axis.
 */
-HPoint.prototype.prevTouched = function(v) {
+HPoint.prototype.prevTouched = function (v) {
   let p = this.prevPointOnContour
 
   while (!v.touched(p) && p !== this) p = p.prevPointOnContour
@@ -538,7 +538,7 @@ const defaultState = {
 * env  ... 'fpgm' or 'prep' or 'glyf'
 * prog ... the program
 */
-function State(env, prog) {
+function State (env, prog) {
   this.env = env
   this.stack = []
   this.prog = prog
@@ -564,7 +564,7 @@ function State(env, prog) {
 * glyph: the glyph to hint
 * ppem: the size the glyph is rendered for
 */
-Hinting.prototype.exec = function(glyph, ppem) {
+Hinting.prototype.exec = function (glyph, ppem) {
   if (typeof ppem !== 'number') {
     throw new Error('Point size is not a number!')
   }
@@ -660,11 +660,11 @@ Hinting.prototype.exec = function(glyph, ppem) {
 /*
 * Executes the hinting program for a glyph.
 */
-execGlyph = function(glyph, prepState) {
+execGlyph = function (glyph, prepState) {
   // original point positions
   const xScale = prepState.ppem / prepState.font.unitsPerEm
   const yScale = xScale
-  let components = glyph.components
+  const components = glyph.components
   let contours
   let gZone
   let state
@@ -747,8 +747,7 @@ execGlyph = function(glyph, prepState) {
 * Executes the hinting program for a component of a multi-component glyph
 * or of the glyph itself for a non-component glyph.
 */
-execComponent = function(glyph, state, xScale, yScale)
-{
+execComponent = function (glyph, state, xScale, yScale) {
   const points = glyph.points || []
   const pLen = points.length
   const gZone = state.gZone = state.z0 = state.z1 = state.z2 = []
@@ -821,8 +820,8 @@ execComponent = function(glyph, state, xScale, yScale)
 /*
 * Executes the program loaded in state.
 */
-exec = function(state) {
-  let prog = state.prog
+exec = function (state) {
+  const prog = state.prog
 
   if (!prog) return
 
@@ -892,13 +891,11 @@ exec = function(state) {
 * This is only done if a SZPx instruction
 * refers to the twilight zone.
 */
-function initTZone(state)
-{
+function initTZone (state) {
   const tZone = state.tZone = new Array(state.gZone.length)
 
   // no idea if this is actually correct...
-  for (let i = 0; i < tZone.length; i++)
-  {
+  for (let i = 0; i < tZone.length; i++) {
     tZone[i] = new HPoint(0, 0)
   }
 }
@@ -907,8 +904,7 @@ function initTZone(state)
 * Skips the instruction pointer ahead over an IF/ELSE block.
 * handleElse .. if true breaks on matching ELSE
 */
-function skip(state, handleElse)
-{
+function skip (state, handleElse) {
   const prog = state.prog
   let ip = state.ip
   let nesting = 1
@@ -917,31 +913,25 @@ function skip(state, handleElse)
   do {
     ins = prog[++ip]
     if (ins === 0x58) // IF
-      nesting++
-    else if (ins === 0x59) // EIF
-      nesting--
-    else if (ins === 0x40) // NPUSHB
-      ip += prog[ip + 1] + 1
-    else if (ins === 0x41) // NPUSHW
-      ip += 2 * prog[ip + 1] + 1
-    else if (ins >= 0xB0 && ins <= 0xB7) // PUSHB
-      ip += ins - 0xB0 + 1
-    else if (ins >= 0xB8 && ins <= 0xBF) // PUSHW
-      ip += (ins - 0xB8 + 1) * 2
-    else if (handleElse && nesting === 1 && ins === 0x1B) // ELSE
-      break
+    { nesting++ } else if (ins === 0x59) // EIF
+    { nesting-- } else if (ins === 0x40) // NPUSHB
+    { ip += prog[ip + 1] + 1 } else if (ins === 0x41) // NPUSHW
+    { ip += 2 * prog[ip + 1] + 1 } else if (ins >= 0xB0 && ins <= 0xB7) // PUSHB
+    { ip += ins - 0xB0 + 1 } else if (ins >= 0xB8 && ins <= 0xBF) // PUSHW
+    { ip += (ins - 0xB8 + 1) * 2 } else if (handleElse && nesting === 1 && ins === 0x1B) // ELSE
+    { break }
   } while (nesting > 0)
 
   state.ip = ip
 }
 
-/*----------------------------------------------------------*
+/* ----------------------------------------------------------*
 *          And then a lot of instructions...                *
-*----------------------------------------------------------*/
+*---------------------------------------------------------- */
 
 // SVTCA[a] Set freedom and projection Vectors To Coordinate Axis
 // 0x00-0x01
-function SVTCA(v, state) {
+function SVTCA (v, state) {
   if (exports.DEBUG) console.log(state.step, 'SVTCA[' + v.axis + ']')
 
   state.fv = state.pv = state.dpv = v
@@ -949,7 +939,7 @@ function SVTCA(v, state) {
 
 // SPVTCA[a] Set Projection Vector to Coordinate Axis
 // 0x02-0x03
-function SPVTCA(v, state) {
+function SPVTCA (v, state) {
   if (exports.DEBUG) console.log(state.step, 'SPVTCA[' + v.axis + ']')
 
   state.pv = state.dpv = v
@@ -957,7 +947,7 @@ function SPVTCA(v, state) {
 
 // SFVTCA[a] Set Freedom Vector to Coordinate Axis
 // 0x04-0x05
-function SFVTCA(v, state) {
+function SFVTCA (v, state) {
   if (exports.DEBUG) console.log(state.step, 'SFVTCA[' + v.axis + ']')
 
   state.fv = v
@@ -965,7 +955,7 @@ function SFVTCA(v, state) {
 
 // SPVTL[a] Set Projection Vector To Line
 // 0x06-0x07
-function SPVTL(a, state) {
+function SPVTL (a, state) {
   const stack = state.stack
   const p2i = stack.pop()
   const p1i = stack.pop()
@@ -990,7 +980,7 @@ function SPVTL(a, state) {
 
 // SFVTL[a] Set Freedom Vector To Line
 // 0x08-0x09
-function SFVTL(a, state) {
+function SFVTL (a, state) {
   const stack = state.stack
   const p2i = stack.pop()
   const p1i = stack.pop()
@@ -1015,7 +1005,7 @@ function SFVTL(a, state) {
 
 // SPVFS[] Set Projection Vector From Stack
 // 0x0A
-function SPVFS(state) {
+function SPVFS (state) {
   const stack = state.stack
   const y = stack.pop()
   const x = stack.pop()
@@ -1027,7 +1017,7 @@ function SPVFS(state) {
 
 // SFVFS[] Set Freedom Vector From Stack
 // 0x0B
-function SFVFS(state) {
+function SFVFS (state) {
   const stack = state.stack
   const y = stack.pop()
   const x = stack.pop()
@@ -1039,7 +1029,7 @@ function SFVFS(state) {
 
 // GPV[] Get Projection Vector
 // 0x0C
-function GPV(state) {
+function GPV (state) {
   const stack = state.stack
   const pv = state.pv
 
@@ -1051,7 +1041,7 @@ function GPV(state) {
 
 // GFV[] Get Freedom Vector
 // 0x0C
-function GFV(state) {
+function GFV (state) {
   const stack = state.stack
   const fv = state.fv
 
@@ -1063,7 +1053,7 @@ function GFV(state) {
 
 // SFVTPV[] Set Freedom Vector To Projection Vector
 // 0x0E
-function SFVTPV(state) {
+function SFVTPV (state) {
   state.fv = state.pv
 
   if (exports.DEBUG) console.log(state.step, 'SFVTPV[]')
@@ -1071,8 +1061,7 @@ function SFVTPV(state) {
 
 // ISECT[] moves point p to the InterSECTion of two lines
 // 0x0F
-function ISECT(state)
-{
+function ISECT (state) {
   const stack = state.stack
   const pa0i = stack.pop()
   const pa1i = stack.pop()
@@ -1111,7 +1100,7 @@ function ISECT(state)
 
 // SRP0[] Set Reference Point 0
 // 0x10
-function SRP0(state) {
+function SRP0 (state) {
   state.rp0 = state.stack.pop()
 
   if (exports.DEBUG) console.log(state.step, 'SRP0[]', state.rp0)
@@ -1119,7 +1108,7 @@ function SRP0(state) {
 
 // SRP1[] Set Reference Point 1
 // 0x11
-function SRP1(state) {
+function SRP1 (state) {
   state.rp1 = state.stack.pop()
 
   if (exports.DEBUG) console.log(state.step, 'SRP1[]', state.rp1)
@@ -1127,7 +1116,7 @@ function SRP1(state) {
 
 // SRP1[] Set Reference Point 2
 // 0x12
-function SRP2(state) {
+function SRP2 (state) {
   state.rp2 = state.stack.pop()
 
   if (exports.DEBUG) console.log(state.step, 'SRP2[]', state.rp2)
@@ -1135,7 +1124,7 @@ function SRP2(state) {
 
 // SZP0[] Set Zone Pointer 0
 // 0x13
-function SZP0(state) {
+function SZP0 (state) {
   const n = state.stack.pop()
 
   if (exports.DEBUG) console.log(state.step, 'SZP0[]', n)
@@ -1157,7 +1146,7 @@ function SZP0(state) {
 
 // SZP1[] Set Zone Pointer 1
 // 0x14
-function SZP1(state) {
+function SZP1 (state) {
   const n = state.stack.pop()
 
   if (exports.DEBUG) console.log(state.step, 'SZP1[]', n)
@@ -1179,7 +1168,7 @@ function SZP1(state) {
 
 // SZP2[] Set Zone Pointer 2
 // 0x15
-function SZP2(state) {
+function SZP2 (state) {
   const n = state.stack.pop()
 
   if (exports.DEBUG) console.log(state.step, 'SZP2[]', n)
@@ -1201,7 +1190,7 @@ function SZP2(state) {
 
 // SZPS[] Set Zone PointerS
 // 0x16
-function SZPS(state) {
+function SZPS (state) {
   const n = state.stack.pop()
 
   if (exports.DEBUG) console.log(state.step, 'SZPS[]', n)
@@ -1223,7 +1212,7 @@ function SZPS(state) {
 
 // SLOOP[] Set LOOP variable
 // 0x17
-function SLOOP(state) {
+function SLOOP (state) {
   state.loop = state.stack.pop()
 
   if (exports.DEBUG) console.log(state.step, 'SLOOP[]', state.loop)
@@ -1231,7 +1220,7 @@ function SLOOP(state) {
 
 // RTG[] Round To Grid
 // 0x18
-function RTG(state) {
+function RTG (state) {
   if (exports.DEBUG) console.log(state.step, 'RTG[]')
 
   state.round = roundToGrid
@@ -1239,7 +1228,7 @@ function RTG(state) {
 
 // RTHG[] Round To Half Grid
 // 0x19
-function RTHG(state) {
+function RTHG (state) {
   if (exports.DEBUG) console.log(state.step, 'RTHG[]')
 
   state.round = roundToHalfGrid
@@ -1247,7 +1236,7 @@ function RTHG(state) {
 
 // SMD[] Set Minimum Distance
 // 0x1A
-function SMD(state) {
+function SMD (state) {
   const d = state.stack.pop()
 
   if (exports.DEBUG) console.log(state.step, 'SMD[]', d)
@@ -1257,7 +1246,7 @@ function SMD(state) {
 
 // ELSE[] ELSE clause
 // 0x1B
-function ELSE(state) {
+function ELSE (state) {
   // This instruction has been reached by executing a then branch
   // so it just skips ahead until matching EIF.
   //
@@ -1271,7 +1260,7 @@ function ELSE(state) {
 
 // JMPR[] JuMP Relative
 // 0x1C
-function JMPR(state) {
+function JMPR (state) {
   const o = state.stack.pop()
 
   if (exports.DEBUG) console.log(state.step, 'JMPR[]', o)
@@ -1282,7 +1271,7 @@ function JMPR(state) {
 
 // SCVTCI[] Set Control Value Table Cut-In
 // 0x1D
-function SCVTCI(state) {
+function SCVTCI (state) {
   const n = state.stack.pop()
 
   if (exports.DEBUG) console.log(state.step, 'SCVTCI[]', n)
@@ -1292,7 +1281,7 @@ function SCVTCI(state) {
 
 // DUP[] DUPlicate top stack element
 // 0x20
-function DUP(state) {
+function DUP (state) {
   const stack = state.stack
 
   if (exports.DEBUG) console.log(state.step, 'DUP[]')
@@ -1302,7 +1291,7 @@ function DUP(state) {
 
 // POP[] POP top stack element
 // 0x21
-function POP(state) {
+function POP (state) {
   if (exports.DEBUG) console.log(state.step, 'POP[]')
 
   state.stack.pop()
@@ -1310,7 +1299,7 @@ function POP(state) {
 
 // CLEAR[] CLEAR the stack
 // 0x22
-function CLEAR(state) {
+function CLEAR (state) {
   if (exports.DEBUG) console.log(state.step, 'CLEAR[]')
 
   state.stack.length = 0
@@ -1318,7 +1307,7 @@ function CLEAR(state) {
 
 // SWAP[] SWAP the top two elements on the stack
 // 0x23
-function SWAP(state) {
+function SWAP (state) {
   const stack = state.stack
 
   const a = stack.pop()
@@ -1332,7 +1321,7 @@ function SWAP(state) {
 
 // DEPTH[] DEPTH of the stack
 // 0x24
-function DEPTH(state) {
+function DEPTH (state) {
   const stack = state.stack
 
   if (exports.DEBUG) console.log(state.step, 'DEPTH[]')
@@ -1342,7 +1331,7 @@ function DEPTH(state) {
 
 // LOOPCALL[] LOOPCALL function
 // 0x2A
-function LOOPCALL(state) {
+function LOOPCALL (state) {
   const stack = state.stack
   const fn = stack.pop()
   const c = stack.pop()
@@ -1359,11 +1348,13 @@ function LOOPCALL(state) {
   for (let i = 0; i < c; i++) {
     exec(state)
 
-    if (exports.DEBUG) console.log(
-      ++state.step,
-      i + 1 < c ? 'next loopcall' : 'done loopcall',
-      i
-    )
+    if (exports.DEBUG) {
+      console.log(
+        ++state.step,
+        i + 1 < c ? 'next loopcall' : 'done loopcall',
+        i
+      )
+    }
   }
 
   // restores the callers program
@@ -1373,7 +1364,7 @@ function LOOPCALL(state) {
 
 // CALL[] CALL function
 // 0x2B
-function CALL(state) {
+function CALL (state) {
   const fn = state.stack.pop()
 
   if (exports.DEBUG) console.log(state.step, 'CALL[]', fn)
@@ -1396,7 +1387,7 @@ function CALL(state) {
 
 // CINDEX[] Copy the INDEXed element to the top of the stack
 // 0x25
-function CINDEX(state) {
+function CINDEX (state) {
   const stack = state.stack
   const k = stack.pop()
 
@@ -1409,7 +1400,7 @@ function CINDEX(state) {
 
 // MINDEX[] Move the INDEXed element to the top of the stack
 // 0x26
-function MINDEX(state) {
+function MINDEX (state) {
   const stack = state.stack
   const k = stack.pop()
 
@@ -1420,7 +1411,7 @@ function MINDEX(state) {
 
 // FDEF[] Function DEFinition
 // 0x2C
-function FDEF(state) {
+function FDEF (state) {
   if (state.env !== 'fpgm') throw new Error('FDEF not allowed here')
   const stack = state.stack
   const prog = state.prog
@@ -1439,7 +1430,7 @@ function FDEF(state) {
 
 // MDAP[a] Move Direct Absolute Point
 // 0x2E-0x2F
-function MDAP(round, state) {
+function MDAP (round, state) {
   const pi = state.stack.pop()
   const p = state.z0[pi]
   const fv = state.fv
@@ -1459,7 +1450,7 @@ function MDAP(round, state) {
 
 // IUP[a] Interpolate Untouched Points through the outline
 // 0x30
-function IUP(v, state) {
+function IUP (v, state) {
   const z2 = state.z2
   const pLen = z2.length - 2
   let cp
@@ -1494,7 +1485,7 @@ function IUP(v, state) {
 
 // SHP[] SHift Point using reference point
 // 0x32-0x33
-function SHP(a, state) {
+function SHP (a, state) {
   const stack = state.stack
   const rpi = a ? state.rp1 : state.rp2
   const rp = (a ? state.z0 : state.z1)[rpi]
@@ -1503,8 +1494,7 @@ function SHP(a, state) {
   let loop = state.loop
   const z2 = state.z2
 
-  while (loop--)
-  {
+  while (loop--) {
     const pi = stack.pop()
     const p = z2[pi]
 
@@ -1515,9 +1505,9 @@ function SHP(a, state) {
     if (exports.DEBUG) {
       console.log(
         state.step,
-        (state.loop > 1 ?
-          'loop ' + (state.loop - loop) + ': ' :
-          ''
+        (state.loop > 1
+          ? 'loop ' + (state.loop - loop) + ': '
+          : ''
         ) +
                 'SHP[' + (a ? 'rp1' : 'rp2') + ']', pi
       )
@@ -1529,7 +1519,7 @@ function SHP(a, state) {
 
 // SHC[] SHift Contour using reference point
 // 0x36-0x37
-function SHC(a, state) {
+function SHC (a, state) {
   const stack = state.stack
   const rpi = a ? state.rp1 : state.rp2
   const rp = (a ? state.z0 : state.z1)[rpi]
@@ -1551,7 +1541,7 @@ function SHC(a, state) {
 
 // SHZ[] SHift Zone using reference point
 // 0x36-0x37
-function SHZ(a, state) {
+function SHZ (a, state) {
   const stack = state.stack
   const rpi = a ? state.rp1 : state.rp2
   const rp = (a ? state.z0 : state.z1)[rpi]
@@ -1572,17 +1562,16 @@ function SHZ(a, state) {
   let p
   const d = pv.distance(rp, rp, false, true)
   const pLen = z.length - 2
-  for (let i = 0; i < pLen; i++)
-  {
+  for (let i = 0; i < pLen; i++) {
     p = z[i]
     fv.setRelative(p, p, d, pv)
-    //if (p !== rp) fv.setRelative(p, p, d, pv);
+    // if (p !== rp) fv.setRelative(p, p, d, pv);
   }
 }
 
 // SHPIX[] SHift point by a PIXel amount
 // 0x38
-function SHPIX(state) {
+function SHPIX (state) {
   const stack = state.stack
   let loop = state.loop
   const fv = state.fv
@@ -1610,7 +1599,7 @@ function SHPIX(state) {
 
 // IP[] Interpolate Point
 // 0x39
-function IP(state) {
+function IP (state) {
   const stack = state.stack
   const rp1i = state.rp1
   const rp2i = state.rp2
@@ -1643,7 +1632,7 @@ function IP(state) {
 
 // MSIRP[a] Move Stack Indirect Relative Point
 // 0x3A-0x3B
-function MSIRP(a, state) {
+function MSIRP (a, state) {
   const stack = state.stack
   const d = stack.pop() / 64
   const pi = stack.pop()
@@ -1664,7 +1653,7 @@ function MSIRP(a, state) {
 
 // ALIGNRP[] Align to reference point.
 // 0x3C
-function ALIGNRP(state) {
+function ALIGNRP (state) {
   const stack = state.stack
   const rp0i = state.rp0
   const rp0 = state.z0[rp0i]
@@ -1694,7 +1683,7 @@ function ALIGNRP(state) {
 
 // RTG[] Round To Double Grid
 // 0x3D
-function RTDG(state) {
+function RTDG (state) {
   if (exports.DEBUG) console.log(state.step, 'RTDG[]')
 
   state.round = roundToDoubleGrid
@@ -1702,14 +1691,14 @@ function RTDG(state) {
 
 // MIAP[a] Move Indirect Absolute Point
 // 0x3E-0x3F
-function MIAP(round, state) {
+function MIAP (round, state) {
   const stack = state.stack
   const n = stack.pop()
   const pi = stack.pop()
   const p = state.z0[pi]
   const fv = state.fv
   const pv = state.pv
-  let cv = state.cvt[n]
+  const cv = state.cvt[n]
 
   if (exports.DEBUG) {
     console.log(
@@ -1741,7 +1730,7 @@ function MIAP(round, state) {
 
 // NPUSB[] PUSH N Bytes
 // 0x40
-function NPUSHB(state) {
+function NPUSHB (state) {
   const prog = state.prog
   let ip = state.ip
   const stack = state.stack
@@ -1757,7 +1746,7 @@ function NPUSHB(state) {
 
 // NPUSHW[] PUSH N Words
 // 0x41
-function NPUSHW(state) {
+function NPUSHW (state) {
   let ip = state.ip
   const prog = state.prog
   const stack = state.stack
@@ -1776,7 +1765,7 @@ function NPUSHW(state) {
 
 // WS[] Write Store
 // 0x42
-function WS(state) {
+function WS (state) {
   const stack = state.stack
   let store = state.store
 
@@ -1792,7 +1781,7 @@ function WS(state) {
 
 // RS[] Read Store
 // 0x43
-function RS(state) {
+function RS (state) {
   const stack = state.stack
   const store = state.store
 
@@ -1807,7 +1796,7 @@ function RS(state) {
 
 // WCVTP[] Write Control Value Table in Pixel units
 // 0x44
-function WCVTP(state) {
+function WCVTP (state) {
   const stack = state.stack
 
   const v = stack.pop()
@@ -1820,7 +1809,7 @@ function WCVTP(state) {
 
 // RCVT[] Read Control Value Table entry
 // 0x45
-function RCVT(state) {
+function RCVT (state) {
   const stack = state.stack
   const cvte = stack.pop()
 
@@ -1831,7 +1820,7 @@ function RCVT(state) {
 
 // GC[] Get Coordinate projected onto the projection vector
 // 0x46-0x47
-function GC(a, state) {
+function GC (a, state) {
   const stack = state.stack
   const pi = stack.pop()
   const p = state.z2[pi]
@@ -1843,7 +1832,7 @@ function GC(a, state) {
 
 // MD[a] Measure Distance
 // 0x49-0x4A
-function MD(a, state) {
+function MD (a, state) {
   const stack = state.stack
   const pi2 = stack.pop()
   const pi1 = stack.pop()
@@ -1858,21 +1847,21 @@ function MD(a, state) {
 
 // MPPEM[] Measure Pixels Per EM
 // 0x4B
-function MPPEM(state) {
+function MPPEM (state) {
   if (exports.DEBUG) console.log(state.step, 'MPPEM[]')
   state.stack.push(state.ppem)
 }
 
 // FLIPON[] set the auto FLIP Boolean to ON
 // 0x4D
-function FLIPON(state) {
+function FLIPON (state) {
   if (exports.DEBUG) console.log(state.step, 'FLIPON[]')
   state.autoFlip = true
 }
 
 // LT[] Less Than
 // 0x50
-function LT(state) {
+function LT (state) {
   const stack = state.stack
   const e2 = stack.pop()
   const e1 = stack.pop()
@@ -1884,7 +1873,7 @@ function LT(state) {
 
 // LTEQ[] Less Than or EQual
 // 0x53
-function LTEQ(state) {
+function LTEQ (state) {
   const stack = state.stack
   const e2 = stack.pop()
   const e1 = stack.pop()
@@ -1896,7 +1885,7 @@ function LTEQ(state) {
 
 // GTEQ[] Greater Than
 // 0x52
-function GT(state) {
+function GT (state) {
   const stack = state.stack
   const e2 = stack.pop()
   const e1 = stack.pop()
@@ -1908,7 +1897,7 @@ function GT(state) {
 
 // GTEQ[] Greater Than or EQual
 // 0x53
-function GTEQ(state) {
+function GTEQ (state) {
   const stack = state.stack
   const e2 = stack.pop()
   const e1 = stack.pop()
@@ -1920,7 +1909,7 @@ function GTEQ(state) {
 
 // EQ[] EQual
 // 0x54
-function EQ(state) {
+function EQ (state) {
   const stack = state.stack
   const e2 = stack.pop()
   const e1 = stack.pop()
@@ -1932,7 +1921,7 @@ function EQ(state) {
 
 // NEQ[] Not EQual
 // 0x55
-function NEQ(state) {
+function NEQ (state) {
   const stack = state.stack
   const e2 = stack.pop()
   const e1 = stack.pop()
@@ -1944,7 +1933,7 @@ function NEQ(state) {
 
 // ODD[] ODD
 // 0x56
-function ODD(state) {
+function ODD (state) {
   const stack = state.stack
   const n = stack.pop()
 
@@ -1955,7 +1944,7 @@ function ODD(state) {
 
 // EVEN[] EVEN
 // 0x57
-function EVEN(state) {
+function EVEN (state) {
   const stack = state.stack
   const n = stack.pop()
 
@@ -1966,8 +1955,8 @@ function EVEN(state) {
 
 // IF[] IF test
 // 0x58
-function IF(state) {
-  let test = state.stack.pop()
+function IF (state) {
+  const test = state.stack.pop()
   let ins
 
   if (exports.DEBUG) console.log(state.step, 'IF[]', test)
@@ -1983,7 +1972,7 @@ function IF(state) {
 
 // EIF[] End IF
 // 0x59
-function EIF(state) {
+function EIF (state) {
   // this can be reached normally when
   // executing an else branch.
   // -> just ignore it
@@ -1993,7 +1982,7 @@ function EIF(state) {
 
 // AND[] logical AND
 // 0x5A
-function AND(state) {
+function AND (state) {
   const stack = state.stack
   const e2 = stack.pop()
   const e1 = stack.pop()
@@ -2005,7 +1994,7 @@ function AND(state) {
 
 // OR[] logical OR
 // 0x5B
-function OR(state) {
+function OR (state) {
   const stack = state.stack
   const e2 = stack.pop()
   const e1 = stack.pop()
@@ -2017,7 +2006,7 @@ function OR(state) {
 
 // NOT[] logical NOT
 // 0x5C
-function NOT(state) {
+function NOT (state) {
   const stack = state.stack
   const e = stack.pop()
 
@@ -2030,7 +2019,7 @@ function NOT(state) {
 // DELTAP2[] DELTA exception P2
 // DELTAP3[] DELTA exception P3
 // 0x5D, 0x71, 0x72
-function DELTAP123(b, state) {
+function DELTAP123 (b, state) {
   const stack = state.stack
   const n = stack.pop()
   const fv = state.fv
@@ -2059,7 +2048,7 @@ function DELTAP123(b, state) {
 
 // SDB[] Set Delta Base in the graphics state
 // 0x5E
-function SDB(state) {
+function SDB (state) {
   const stack = state.stack
   const n = stack.pop()
 
@@ -2070,7 +2059,7 @@ function SDB(state) {
 
 // SDS[] Set Delta Shift in the graphics state
 // 0x5F
-function SDS(state) {
+function SDS (state) {
   const stack = state.stack
   const n = stack.pop()
 
@@ -2081,7 +2070,7 @@ function SDS(state) {
 
 // ADD[] ADD
 // 0x60
-function ADD(state) {
+function ADD (state) {
   const stack = state.stack
   const n2 = stack.pop()
   const n1 = stack.pop()
@@ -2093,7 +2082,7 @@ function ADD(state) {
 
 // SUB[] SUB
 // 0x61
-function SUB(state) {
+function SUB (state) {
   const stack = state.stack
   const n2 = stack.pop()
   const n1 = stack.pop()
@@ -2105,7 +2094,7 @@ function SUB(state) {
 
 // DIV[] DIV
 // 0x62
-function DIV(state) {
+function DIV (state) {
   const stack = state.stack
   const n2 = stack.pop()
   const n1 = stack.pop()
@@ -2117,7 +2106,7 @@ function DIV(state) {
 
 // MUL[] MUL
 // 0x63
-function MUL(state) {
+function MUL (state) {
   const stack = state.stack
   const n2 = stack.pop()
   const n1 = stack.pop()
@@ -2129,7 +2118,7 @@ function MUL(state) {
 
 // ABS[] ABSolute value
 // 0x64
-function ABS(state) {
+function ABS (state) {
   const stack = state.stack
   const n = stack.pop()
 
@@ -2140,9 +2129,9 @@ function ABS(state) {
 
 // NEG[] NEGate
 // 0x65
-function NEG(state) {
+function NEG (state) {
   const stack = state.stack
-  let n = stack.pop()
+  const n = stack.pop()
 
   if (exports.DEBUG) console.log(state.step, 'NEG[]', n)
 
@@ -2151,7 +2140,7 @@ function NEG(state) {
 
 // FLOOR[] FLOOR
 // 0x66
-function FLOOR(state) {
+function FLOOR (state) {
   const stack = state.stack
   const n = stack.pop()
 
@@ -2162,7 +2151,7 @@ function FLOOR(state) {
 
 // CEILING[] CEILING
 // 0x67
-function CEILING(state) {
+function CEILING (state) {
   const stack = state.stack
   const n = stack.pop()
 
@@ -2173,7 +2162,7 @@ function CEILING(state) {
 
 // ROUND[ab] ROUND value
 // 0x68-0x6B
-function ROUND(dt, state) {
+function ROUND (dt, state) {
   const stack = state.stack
   const n = stack.pop()
 
@@ -2184,7 +2173,7 @@ function ROUND(dt, state) {
 
 // WCVTF[] Write Control Value Table in Funits
 // 0x70
-function WCVTF(state) {
+function WCVTF (state) {
   const stack = state.stack
   const v = stack.pop()
   const l = stack.pop()
@@ -2198,7 +2187,7 @@ function WCVTF(state) {
 // DELTAC2[] DELTA exception C2
 // DELTAC3[] DELTA exception C3
 // 0x73, 0x74, 0x75
-function DELTAC123(b, state) {
+function DELTAC123 (b, state) {
   const stack = state.stack
   const n = stack.pop()
   const ppem = state.ppem
@@ -2226,7 +2215,7 @@ function DELTAC123(b, state) {
 
 // SROUND[] Super ROUND
 // 0x76
-function SROUND(state) {
+function SROUND (state) {
   let n = state.stack.pop()
 
   if (exports.DEBUG) console.log(state.step, 'SROUND[]', n)
@@ -2259,7 +2248,7 @@ function SROUND(state) {
       state.srPhase = 0.25 * period
       break
     case 0x20:
-      state.srPhase = 0.5  * period
+      state.srPhase = 0.5 * period
       break
     case 0x30:
       state.srPhase = 0.75 * period
@@ -2275,7 +2264,7 @@ function SROUND(state) {
 
 // S45ROUND[] Super ROUND 45 degrees
 // 0x77
-function S45ROUND(state) {
+function S45ROUND (state) {
   let n = state.stack.pop()
 
   if (exports.DEBUG) console.log(state.step, 'S45ROUND[]', n)
@@ -2308,7 +2297,7 @@ function S45ROUND(state) {
       state.srPhase = 0.25 * period
       break
     case 0x20:
-      state.srPhase = 0.5  * period
+      state.srPhase = 0.5 * period
       break
     case 0x30:
       state.srPhase = 0.75 * period
@@ -2325,7 +2314,7 @@ function S45ROUND(state) {
 
 // ROFF[] Round Off
 // 0x7A
-function ROFF(state) {
+function ROFF (state) {
   if (exports.DEBUG) console.log(state.step, 'ROFF[]')
 
   state.round = roundOff
@@ -2333,7 +2322,7 @@ function ROFF(state) {
 
 // RUTG[] Round Up To Grid
 // 0x7C
-function RUTG(state) {
+function RUTG (state) {
   if (exports.DEBUG) console.log(state.step, 'RUTG[]')
 
   state.round = roundUpToGrid
@@ -2341,7 +2330,7 @@ function RUTG(state) {
 
 // RDTG[] Round Down To Grid
 // 0x7D
-function RDTG(state) {
+function RDTG (state) {
   if (exports.DEBUG) console.log(state.step, 'RDTG[]')
 
   state.round = roundDownToGrid
@@ -2349,7 +2338,7 @@ function RDTG(state) {
 
 // SCANCTRL[] SCAN conversion ConTRoL
 // 0x85
-function SCANCTRL(state) {
+function SCANCTRL (state) {
   const n = state.stack.pop()
 
   // ignored by opentype.js
@@ -2359,7 +2348,7 @@ function SCANCTRL(state) {
 
 // SDPVTL[a] Set Dual Projection Vector To Line
 // 0x86-0x87
-function SDPVTL(a, state) {
+function SDPVTL (a, state) {
   const stack = state.stack
   const p2i = stack.pop()
   const p1i = stack.pop()
@@ -2384,7 +2373,7 @@ function SDPVTL(a, state) {
 
 // GETINFO[] GET INFOrmation
 // 0x88
-function GETINFO(state) {
+function GETINFO (state) {
   const stack = state.stack
   const sel = stack.pop()
   let r = 0
@@ -2405,7 +2394,7 @@ function GETINFO(state) {
 
 // ROLL[] ROLL the top three stack elements
 // 0x8A
-function ROLL(state) {
+function ROLL (state) {
   const stack = state.stack
   const a = stack.pop()
   const b = stack.pop()
@@ -2420,7 +2409,7 @@ function ROLL(state) {
 
 // MAX[] MAXimum of top two stack elements
 // 0x8B
-function MAX(state) {
+function MAX (state) {
   const stack = state.stack
   const e2 = stack.pop()
   const e1 = stack.pop()
@@ -2432,7 +2421,7 @@ function MAX(state) {
 
 // MIN[] MINimum of top two stack elements
 // 0x8C
-function MIN(state) {
+function MIN (state) {
   const stack = state.stack
   const e2 = stack.pop()
   const e1 = stack.pop()
@@ -2444,7 +2433,7 @@ function MIN(state) {
 
 // SCANTYPE[] SCANTYPE
 // 0x8D
-function SCANTYPE(state) {
+function SCANTYPE (state) {
   const n = state.stack.pop()
   // ignored by opentype.js
   if (exports.DEBUG) console.log(state.step, 'SCANTYPE[]', n)
@@ -2452,9 +2441,9 @@ function SCANTYPE(state) {
 
 // INSTCTRL[] INSTCTRL
 // 0x8D
-function INSTCTRL(state) {
+function INSTCTRL (state) {
   const s = state.stack.pop()
-  let v = state.stack.pop()
+  const v = state.stack.pop()
 
   if (exports.DEBUG) console.log(state.step, 'INSTCTRL[]', s, v)
 
@@ -2467,7 +2456,7 @@ function INSTCTRL(state) {
 
 // PUSHB[abc] PUSH Bytes
 // 0xB0-0xB7
-function PUSHB(n, state) {
+function PUSHB (n, state) {
   const stack = state.stack
   const prog = state.prog
   let ip = state.ip
@@ -2481,7 +2470,7 @@ function PUSHB(n, state) {
 
 // PUSHW[abc] PUSH Words
 // 0xB8-0xBF
-function PUSHW(n, state) {
+function PUSHW (n, state) {
   let ip = state.ip
   const prog = state.prog
   const stack = state.stack
@@ -2507,7 +2496,7 @@ function PUSHW(n, state) {
 // 0xE0-0xFF
 // (if indirect is 1)
 
-function MDRP_MIRP(indirect, setRp0, keepD, ro, dt, state) {
+function MDRP_MIRP (indirect, setRp0, keepD, ro, dt, state) {
   const stack = state.stack
   const cvte = indirect && stack.pop()
   const pi = stack.pop()
@@ -2551,9 +2540,9 @@ function MDRP_MIRP(indirect, setRp0, keepD, ro, dt, state) {
             (ro ? 'R' : '_') +
             (dt === 0 ? 'Gr' : (dt === 1 ? 'Bl' : (dt === 2 ? 'Wh' : ''))) +
             ']',
-      indirect ?
-        cvte + '(' + state.cvt[cvte] + ',' +  cv + ')' :
-        '',
+      indirect
+        ? cvte + '(' + state.cvt[cvte] + ',' + cv + ')'
+        : '',
       pi,
       '(d =', od, '->', sign * d, ')'
     )
@@ -2869,7 +2858,6 @@ case freedom vector == x-axis:
 
    x = rpdx + ( p.y - rpdy ) / pvns
 
-
 case freedom vector == y-axis:
 ------------------------------
 
@@ -2905,11 +2893,8 @@ case freedom vector == y-axis:
 
    y = rpdy +  pvns * (p.x - rpdx)
 
-
-
 generic case:
 -------------
-
 
                               .'(fv)
                             .'
@@ -2941,7 +2926,6 @@ generic case:
 
     y - py = fvs * (x - px)
 
-
   on pm both equations are true for same x/y
 
     y - rpdy = pvns * (x - rpdx)
@@ -2964,8 +2948,6 @@ generic case:
 
     fvs * x - pvns * x = fvs * px - pvns * rpdx - py + rpdy
 
-
-
           fvs * px - pvns * rpdx + rpdy - py
     x =  -----------------------------------
                  fvs - pvns
@@ -2973,8 +2955,6 @@ generic case:
   and:
 
     y = fvs * (x - px) + py
-
-
 
 INTERPOLATE:
 ============
@@ -2988,9 +2968,6 @@ original distance of the other point by the sum of both distances.
 
 If the sum of both distances is 0, then move the point by the
 arithmetic average of the movement of both reference points.
-
-
-
 
            (+6)
     rp1o *---->*rp1
@@ -3008,10 +2985,7 @@ arithmetic average of the movement of both reference points.
                |...........|.......................|
                                   36
 
-
 -------
-
-
 
            (+10)
     rp1o *-------->*rp1
@@ -3029,9 +3003,7 @@ arithmetic average of the movement of both reference points.
                    |....|..............|
                      5        15
 
-
 -------
-
 
            (+10)
     rp1o *-------->*rp1
@@ -3039,12 +3011,10 @@ arithmetic average of the movement of both reference points.
          .         .
     rp2o *-------->*rp2
 
-
                                (+10)
                           po *-------->* p
 
 -------
-
 
            (+10)
     rp1o *-------->*rp1
@@ -3052,11 +3022,8 @@ arithmetic average of the movement of both reference points.
          .         .(+30)
     rp2o *---------------------------->*rp2
 
-
                                         (+25)
                           po *----------------------->* p
-
-
 
 vim: set ts=4 sw=4 expandtab:
 *****/

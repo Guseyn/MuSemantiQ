@@ -76,7 +76,7 @@ export default function (markedSlur, slurLeftPoint, slurRightPoint, slurDirectio
   const unitsOnTheWay = units.slice(extendedFromLeftSide ? 0 : 1, extendedToRightSide ? units.length : units.length - 1)
   const clearance = styles.minSpaceBetweenSingleUnitExtremePointAndSlur
   const intrusion = (height) => {
-    const [c1, c2] = controlPointsAt(height)
+    const [ c1, c2 ] = controlPointsAt(height)
     let deepest = 0
     for (const unit of unitsOnTheWay) {
       const edge = sign < 0 ? unit.top : unit.bottom
@@ -110,7 +110,7 @@ export default function (markedSlur, slurLeftPoint, slurRightPoint, slurDirectio
     }
     controlHeight = high
   }
-  const [c1, c2] = controlPointsAt(controlHeight)
+  const [ c1, c2 ] = controlPointsAt(controlHeight)
 
   for (const unit of units) {
     const x = Math.min(Math.max((unit.left + unit.right) / 2, start.x), end.x)

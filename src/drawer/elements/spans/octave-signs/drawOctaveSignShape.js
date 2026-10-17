@@ -16,10 +16,10 @@ export default function (octaveSignParams, styles) {
   const shouldBeAboveOrUnderStemLine = shouldArticulationBeAboveOrUnderStemLine(octaveSignParams.leftSingleUnit, octaveSignParams.direction)
   const leftEdge = octaveSignParams.leftSingleUnit.nonDisplacedPartOfSingleUnitWithCoordinates.left
   const rightEdge = octaveSignParams.leftSingleUnit.nonDisplacedPartOfSingleUnitWithCoordinates.right
-  let octaveSignText = drawOctaveSignText(octaveSignParams.octaveNumber, octaveSignParams.octavePostfix, octaveSignParams.direction)(styles, 0, octaveSignParams.y)
+  const octaveSignText = drawOctaveSignText(octaveSignParams.octaveNumber, octaveSignParams.octavePostfix, octaveSignParams.direction)(styles, 0, octaveSignParams.y)
   const xCorrectionForOctaveSign = {
-    '8': octaveSignXCorrection,
-    '15': twoOctavesSignXCorrection
+    8: octaveSignXCorrection,
+    15: twoOctavesSignXCorrection
   }
   if (shouldBeAboveOrUnderStemLine) {
     moveElementInTheCenterBetweenPoints(

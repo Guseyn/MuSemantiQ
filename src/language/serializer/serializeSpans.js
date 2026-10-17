@@ -13,13 +13,13 @@
 /**
  * `1st`, `2nd`, `3rd`, `4th` — what the language uses to name a unit.
  */
-function serializeOrdinal(index) {
+function serializeOrdinal (index) {
   const number = index + 1
   const teen = number % 100
   if (teen >= 11 && teen <= 13) {
     return `${number}th`
   }
-  return `${number}${ { 1: 'st', 2: 'nd', 3: 'rd' }[number % 10] || 'th' }`
+  return `${number}${{ 1: 'st', 2: 'nd', 3: 'rd' }[number % 10] || 'th'}`
 }
 
 const serializeUnitNumber = (index) => `${index + 1}`
@@ -30,7 +30,7 @@ const serializeUnitNumber = (index) => `${index + 1}`
  * Returns, per key, the index of the first and last unit it appears on, and the
  * parameters as the first unit stated them.
  */
-function collectSpans(units, field) {
+function collectSpans (units, field) {
   const spans = new Map()
   units.forEach((unit, index) => {
     const marks = unit[field]
@@ -60,7 +60,7 @@ function collectSpans(units, field) {
  * before the note it is written on, a tuplet bracket closing after the last one
  * — which the language says in place of `from` and `to`.
  */
-function serializeRange(span) {
+function serializeRange (span) {
   const opens = span.params.before
     ? `starts before unit ${serializeUnitNumber(span.from)}`
     : `from unit ${serializeUnitNumber(span.from)}`
@@ -73,14 +73,14 @@ function serializeRange(span) {
 /**
  * A vertical nudge, as the distance and the way it goes.
  */
-function serializeCorrection(yCorrection) {
+function serializeCorrection (yCorrection) {
   if (typeof yCorrection !== 'number' || yCorrection === 0) {
     return ''
   }
   return `${Math.abs(yCorrection)} ${yCorrection < 0 ? 'up' : 'down'}`
 }
 
-function serializePlacement(params) {
+function serializePlacement (params) {
   const words = []
   if (params.aboveBelowOverUnderStaveLines && params.direction) {
     words.push(params.direction === 'up' ? 'above stave' : 'below stave')
@@ -93,7 +93,7 @@ function serializePlacement(params) {
 /**
  * Every span command a voice needs, in the order they read best.
  */
-export default function serializeSpans(units) {
+export default function serializeSpans (units) {
   const commands = []
 
   for (const span of collectSpans(units, 'tupletMarks')) {

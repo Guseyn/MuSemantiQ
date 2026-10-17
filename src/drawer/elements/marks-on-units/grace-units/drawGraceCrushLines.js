@@ -22,8 +22,8 @@ export default function (voicesOnPageLine, styles) {
               const crashLinePoints = []
               const crushGraceLineXPadding = currentSingleUnit.withFlags
                 ? (currentSingleUnit.stemDirection === 'up')
-                  ? crushGraceLineXPaddingForUnitwithFlagsAndStemUp
-                  : crushGraceLineXPaddingForUnitwithFlagsAndStemDown
+                    ? crushGraceLineXPaddingForUnitwithFlagsAndStemUp
+                    : crushGraceLineXPaddingForUnitwithFlagsAndStemDown
                 : currentSingleUnit.beamed
                   ? crushGraceLineXPaddingForBeamedUnit
                   : crushGraceLineXPaddingForUnitWithoutFlags

@@ -7,7 +7,7 @@ export default function (element, point, angle, newCoordinates = null) {
         type: 'rotate',
         cx: point.x,
         cy: point.y,
-        angle: angle
+        angle
       }
     )
     if (newCoordinates) {

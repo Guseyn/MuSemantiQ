@@ -6,7 +6,7 @@ import tempoDurationParts from '#msq/language/parser/scenarios/static-objects/te
 const numericDurations = [ '1', '1/2', '1/4', '1/8', '1/16', '1/32', '1/64' ]
 
 export default function (tempoValue) {
-  const rowTempoValueParts = tempoValue.split(regexps.tempoDurationPart)
+  const rowTempoValueParts = regexps.tempoDurationPart.split(tempoValue)
   const tempoValueParts = []
   for (let index = 0; index < rowTempoValueParts.length; index++) {
     const tempoValuePart = rowTempoValueParts[index]

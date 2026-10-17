@@ -21,7 +21,9 @@ export default function (unitParams, measuresParams, measureParams, measureIndex
         measuresParams[measureIndex + 1].stavesParams[staveIndex] &&
         measuresParams[measureIndex + 1].stavesParams[staveIndex].voicesParams &&
         measuresParams[measureIndex + 1].stavesParams[staveIndex].voicesParams[voiceIndex]
-      ) ? measuresParams[measureIndex + 1].stavesParams[staveIndex].voicesParams[voiceIndex][0] : undefined
+      )
+        ? measuresParams[measureIndex + 1].stavesParams[staveIndex].voicesParams[voiceIndex][0]
+        : undefined
 
       if (
         !nextUnitInThisMeasure &&
@@ -31,7 +33,7 @@ export default function (unitParams, measuresParams, measureParams, measureIndex
         firstUnitInNextMeasure.tremoloParams = Object.assign({}, unitParams.tremoloParams)
         firstUnitInNextMeasure.tremoloParams.type = 'withPrevious'
         untieUnitWithNotes(unitParams)
-      } 
+      }
       if (!nextUnitInThisMeasure && !firstUnitInNextMeasure) {
         unitParams.tremoloParams.type = 'single'
       }

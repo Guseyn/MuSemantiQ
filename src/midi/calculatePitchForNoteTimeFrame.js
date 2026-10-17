@@ -3,13 +3,13 @@
 import calculatePitchAdjustmentForNoteTimeFrame from '#msq/midi/calculatePitchAdjustmentForNoteTimeFrame.js'
 
 const PITCHES_BY_NOTE_NAMES = {
-  'c': 0,
-  'd': 2,
-  'e': 4,
-  'f': 5,
-  'g': 7,
-  'a': 9,
-  'b': 11
+  c: 0,
+  d: 2,
+  e: 4,
+  f: 5,
+  g: 7,
+  a: 9,
+  b: 11
 }
 
 export default function (note, pitchAdjustmentsAuraForAllStavesSplittedInTimeFrames, orderedTimeFramesFromPitchAdjustmentsAuraForAllStavesSplittedInTimeFrames, pitchAdjustmentsAuraForEachStaveThatLastOneMeasureSplittedInTimeFrames, orderedTimeFramesFromPitchAdjustmentsAuraForEachStaveThatLastOneMeasureSplittedInTimeFrames, graceMaxCountForCurrentTime, graceCountersForEachVoiceInEachStaveSplittedInTimeFrames, staveVoiceKey) {

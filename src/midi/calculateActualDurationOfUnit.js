@@ -3,14 +3,14 @@
 import calculateMidiTremoloDurationFactor from '#msq/midi/calculateMidiTremoloDurationFactor.js'
 
 const DEFAULT_TUPLET_RATIOS = {
-  '1': 1,
-  '3': 2,
-  '2': 3,
-  '5': 4,
-  '6': 4,
-  '7': 4,
-  '9': 8,
-  '12': 8
+  1: 1,
+  3: 2,
+  2: 3,
+  5: 4,
+  6: 4,
+  7: 4,
+  9: 8,
+  12: 8
 }
 
 export default function (tupletValuesAuraForEachVoiceInEachStave, unitParams, staveVoiceKey) {

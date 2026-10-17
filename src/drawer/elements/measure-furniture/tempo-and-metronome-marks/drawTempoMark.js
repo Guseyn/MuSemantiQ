@@ -47,10 +47,10 @@ const drawTempoElementsByTheirTextValue = (tempoTextValueParts, measureIndex) =>
               lastElementIsNote
                 ? tempoSpaceOfNoteAfterNote * scaleNoteSizeToFontSize
                 : (
-                  lastTextChar === '('
-                    ? tempoSpaceOfNoteAfterOpeningBracket * scaleNoteSizeToFontSize
-                    : tempoSpaceOfNoteAfterText * scaleNoteSizeToFontSize
-                )
+                    lastTextChar === '('
+                      ? tempoSpaceOfNoteAfterOpeningBracket * scaleNoteSizeToFontSize
+                      : tempoSpaceOfNoteAfterText * scaleNoteSizeToFontSize
+                  )
             ),
             0
           )
@@ -59,16 +59,16 @@ const drawTempoElementsByTheirTextValue = (tempoTextValueParts, measureIndex) =>
           lastElementIsNote = true
         } else {
           if (tempoTextValueParts[index].trim().length > 0) {
-            let justText = createText(tempoTextValueParts[index], tempoMarkFontOptions)(styles, currentLeftOffset, topOffset)
+            const justText = createText(tempoTextValueParts[index], tempoMarkFontOptions)(styles, currentLeftOffset, topOffset)
             moveElement(
               justText,
               currentLeftOffset - justText.left + (
                 lastElementIsNote
                   ? (
-                    tempoTextValueParts[index].startsWith(')')
-                      ? tempoSpaceOfTextThatStartsWithClosingBracketAfterNote * scaleNoteSizeToFontSize
-                      : tempoSpaceOfTextAfterNote * scaleNoteSizeToFontSize
-                  )
+                      tempoTextValueParts[index].startsWith(')')
+                        ? tempoSpaceOfTextThatStartsWithClosingBracketAfterNote * scaleNoteSizeToFontSize
+                        : tempoSpaceOfTextAfterNote * scaleNoteSizeToFontSize
+                    )
                   : tempoSpaceOfTextAfterText * scaleNoteSizeToFontSize
               )
             )
@@ -91,7 +91,7 @@ export default function (measure, measureIndex, voicesBody, styles) {
     (voicesBody && !voicesBody.isEmpty) ? voicesBody.left : (measure.stavesLeft || measure.left),
     0
   )
-  let tempoMark = createGroup(
+  const tempoMark = createGroup(
     'tempoMark',
     tempoMarkElements
   )

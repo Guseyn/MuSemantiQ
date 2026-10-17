@@ -241,7 +241,7 @@ export default function ({
       }
     }
     if (isLastMeasureOnPageLine) {
-      let rightPositionOfElementsThatSupposedToBeAtTheEndOfLastMeasureOnPageLineButDrawnFirstForPrecisePageLineWidthMeasure = nextLeftOffset
+      const rightPositionOfElementsThatSupposedToBeAtTheEndOfLastMeasureOnPageLineButDrawnFirstForPrecisePageLineWidthMeasure = nextLeftOffset
       if (repeatDotsMarkAtTheEnd) {
         finishRepeatDots = drawRepeatDots(numberOfStaves, numberOfStaveLines)(styles, nextLeftOffset, topOffset)
         addPropertiesToElement(

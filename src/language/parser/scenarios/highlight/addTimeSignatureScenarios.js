@@ -5,8 +5,8 @@ import regexps from '#msq/language/parser/scenarios/static-objects/regexps.js'
 export default function (scenarios) {
   scenarios['time signature'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { numberOfMeasures } }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.timeSignatureHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.timeSignatureHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="eh" ref-id="time-signature-${numberOfMeasures}">${match}</span>`
         }
       )
@@ -17,8 +17,8 @@ export default function (scenarios) {
   }
   scenarios['time signature value'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { numberOfMeasures } }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.timeSignatureValueHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.timeSignatureValueHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="cnh" ref-id="time-signature-${numberOfMeasures}">${match}</span>`
         }
       )
@@ -29,8 +29,8 @@ export default function (scenarios) {
   }
   scenarios['time signature for each line'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { lastTimeSignatureValueForEachLineId } }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.forEachLineHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.forEachLineHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="clph" ref-id="time-signature-for-each-line-${lastTimeSignatureValueForEachLineId}">${match}</span>`
         }
       )
@@ -41,8 +41,8 @@ export default function (scenarios) {
   }
   scenarios['time signature for lines below'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { lastTimeSignatureValueForEachLineId } }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.linesHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.linesHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="clph" ref-id="time-signature-for-each-line-${lastTimeSignatureValueForEachLineId}">${match}</span>`
         }
       )

@@ -6,8 +6,8 @@ import copyScenarioWithDifferentRequiredCommandProgression from '#msq/language/p
 export default function (scenarios) {
   scenarios['bracket or brace'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.crossStaveConnectionHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.crossStaveConnectionHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="eh">${match}</span>`
         }
       )
@@ -32,8 +32,8 @@ export default function (scenarios) {
   }
   scenarios['connection for stave index'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.staveIndexHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.staveIndexHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="csph">${match}</span>`
         }
       )
@@ -55,8 +55,8 @@ export default function (scenarios) {
   }
   scenarios['connection to stave index'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.staveIndexHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.staveIndexHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="csph">${match}</span>`
         }
       )
@@ -67,8 +67,8 @@ export default function (scenarios) {
   }
   scenarios['connection for each line'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.forEachLineHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.forEachLineHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="clph">${match}</span>`
         }
       )
@@ -79,8 +79,8 @@ export default function (scenarios) {
   }
   scenarios['connection for lines below'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.linesHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.linesHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="clph">${match}</span>`
         }
       )

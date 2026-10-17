@@ -22,7 +22,7 @@ const convertSvgToString = (element, boxesAsBuffers = [], isFirstCall = true) =>
     if (element.wrapWithBox && debugMode) {
       boxesAsBuffers.push(
         convertSvgToString(
-          createPolyline([element.left, element.top, element.right, element.top, element.right, element.bottom, element.left, element.bottom, element.left, element.top], { width: 1, color: (typeof element.wrapWithBox === 'string' ? element.wrapWithBox : 'red'), linecap: 'round', linejoin: 'miter' }, false),
+          createPolyline([ element.left, element.top, element.right, element.top, element.right, element.bottom, element.left, element.bottom, element.left, element.top ], { width: 1, color: (typeof element.wrapWithBox === 'string' ? element.wrapWithBox : 'red'), linecap: 'round', linejoin: 'miter' }, false),
           [],
           false
         )

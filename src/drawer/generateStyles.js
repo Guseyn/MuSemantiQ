@@ -33,7 +33,7 @@ export default function (
     emptyMeasureWidth,
     fontSources
   },
-  defaultIntervalBetweenStaveLines = 8.5,
+  defaultIntervalBetweenStaveLines = 8.5
 ) {
   if (!fontSources) {
     throw new Error(`
@@ -128,7 +128,7 @@ expected format is: {
 
   const warningColor = '#E23D28'
   const textFontSource = textFont ? fontSources['text']['regular'][textFont.toLowerCase()] : Object.values(fontSources['text']['regular'])[0]
-  const textBoldFontSource =  textFont ? fontSources['text']['bold'][textFont.toLowerCase()] : Object.values(fontSources['text']['bold'])[0]
+  const textBoldFontSource = textFont ? fontSources['text']['bold'][textFont.toLowerCase()] : Object.values(fontSources['text']['bold'])[0]
   const chordLettersFontSource = chordLettersFont ? fontSources['chord-letters'][chordLettersFont.toLowerCase()] : Object.values(fontSources['chord-letters'])[0]
   const musicFontSource = musicFont ? fontSources['music'][musicFont.toLowerCase()] : Object.values(fontSources['music'])[0]
   const musicJSFont = musicFont ? fontSources['music-js'][musicFont.toLowerCase()] : Object.values(fontSources['music-js'])[0]
@@ -557,47 +557,47 @@ expected format is: {
     offsetForNoteParenthesesFromRightSideOfWave: -0.0 * intervalBetweenStaveLines,
     offsetForNoteParenthesesThatAreOnLedgerLinesFromBothSides: 0.85 * intervalBetweenStaveLines,
     offsetForKeyParenthesesFromBothSides: {
-      'doubleFlatKey': {
+      doubleFlatKey: {
         left: 0.36 * intervalBetweenStaveLines,
         right: 0.16 * intervalBetweenStaveLines
       },
-      'doubleSharpKey': {
+      doubleSharpKey: {
         left: 0.24 * intervalBetweenStaveLines,
         right: 0.24 * intervalBetweenStaveLines
       },
-      'flatKey': {
+      flatKey: {
         left: 0.36 * intervalBetweenStaveLines,
         right: 0.16 * intervalBetweenStaveLines
       },
-      'naturalKey': {
+      naturalKey: {
         left: 0.24 * intervalBetweenStaveLines,
         right: 0.24 * intervalBetweenStaveLines
       },
-      'sharpKey': {
+      sharpKey: {
         left: 0.2 * intervalBetweenStaveLines,
         right: 0.2 * intervalBetweenStaveLines
       },
-      'demiflatKey': {
+      demiflatKey: {
         left: 0.16 * intervalBetweenStaveLines,
         right: 0.34 * intervalBetweenStaveLines
       },
-      'sesquiflatKey': {
+      sesquiflatKey: {
         left: 0.2 * intervalBetweenStaveLines,
         right: 0.2 * intervalBetweenStaveLines
       },
-      'demisharpKey': {
+      demisharpKey: {
         left: 0.2 * intervalBetweenStaveLines,
         right: 0.2 * intervalBetweenStaveLines
       },
-      'sesquisharpKey': {
+      sesquisharpKey: {
         left: 0.2 * intervalBetweenStaveLines,
         right: 0.2 * intervalBetweenStaveLines
       },
-      'noteLetter': {
+      noteLetter: {
         left: 0.2 * intervalBetweenStaveLines,
         right: 0.2 * intervalBetweenStaveLines
       },
-      'default': {
+      default: {
         left: 0.2 * intervalBetweenStaveLines,
         right: 0.2 * intervalBetweenStaveLines
       }

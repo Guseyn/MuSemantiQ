@@ -26,7 +26,7 @@ const DURATIONS = [
  * The written form of a base duration, or null for one the language has no
  * word for — which should not happen, since the parser only ever produces these.
  */
-export function serializeDuration(unitDuration) {
+export function serializeDuration (unitDuration) {
   const found = DURATIONS.find(([ value ]) => Math.abs(value - unitDuration) < 1e-9)
   return found ? found[1] : null
 }
@@ -34,7 +34,7 @@ export function serializeDuration(unitDuration) {
 /**
  * How a unit's dots are written: one is `dotted`, more are counted out.
  */
-export function serializeDots(numberOfDots) {
+export function serializeDots (numberOfDots) {
   if (!numberOfDots) {
     return null
   }

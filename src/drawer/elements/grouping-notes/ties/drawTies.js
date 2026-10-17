@@ -82,8 +82,8 @@ export default function (voicesOnPageLine, voicesBodiesOnPageLine, styles) {
                   if (currentSingleUnit.tiedWithNext) {
                     if (!tiesStack[keyForTie]) {
                       tiesStack[keyForTie] = {
-                        staveIndex: staveIndex,
-                        voiceIndex: voiceIndex,
+                        staveIndex,
+                        voiceIndex,
                         leftJunctionPoints: [],
                         leftSingleUnit: currentSingleUnit,
                         roundCoefficientFactor: currentSingleUnit.tiedWithNext.roundCoefficientFactor

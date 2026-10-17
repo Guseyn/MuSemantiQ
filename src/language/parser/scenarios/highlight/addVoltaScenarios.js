@@ -7,8 +7,8 @@ import addLineMeasureStaveVoicePositionScenarios from '#msq/language/parser/scen
 export default function (scenarios) {
   scenarios['volta'] = {
     action: ({ parserState, joinedTokenValuesWithRealDelimiters, state }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.voltaBracketsHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.voltaBracketsHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="eh" ref-id="volta-mark-${parserState.numberOfVoltaMarks}">${match}</span>`
         }
       )
@@ -25,8 +25,8 @@ export default function (scenarios) {
   }
   scenarios['volta with text'] = {
     action: ({ parserState, joinedTokenValuesWithRealDelimiters, state }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedString = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.stringHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedString = regexps.stringHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="sth" ref-id="volta-mark-text-${parserState.numberOfVoltaMarks}">${match}</span>`
         }
       )
@@ -105,8 +105,8 @@ export default function (scenarios) {
   addLineMeasureStaveVoicePositionScenarios(scenarios, 'volta finishes at', [], 2, false, { measure: true })
   scenarios['volta vertical correction'] = {
     action: ({ parserState, joinedTokenValuesWithRealDelimiters, state }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.verticalCorrectionHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.verticalCorrectionHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="th" ref-id="volta-mark-${parserState.numberOfVoltaMarks}">${match}</span>`
         }
       )

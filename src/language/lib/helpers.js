@@ -4,7 +4,7 @@
 /*  ValidationError                                             */
 /* ─────────────────────────────────────────────────────────── */
 
-export function ValidationError(message, instance, schema, path, name, argument) {
+export function ValidationError (message, instance, schema, path, name, argument) {
   if (Array.isArray(path)) {
     this.path = path
     this.property = path.reduce((sum, item) => {
@@ -32,12 +32,11 @@ ValidationError.prototype.toString = function () {
   return this.property + ' ' + this.message
 }
 
-
 /* ─────────────────────────────────────────────────────────── */
 /*  ValidatorResult                                             */
 /* ─────────────────────────────────────────────────────────── */
 
-export function ValidatorResult(instance, schema, options, ctx) {
+export function ValidatorResult (instance, schema, options, ctx) {
   this.instance = instance
   this.schema = schema
   this.options = options
@@ -92,17 +91,16 @@ ValidatorResult.prototype.toString = function () {
 }
 
 Object.defineProperty(ValidatorResult.prototype, 'valid', {
-  get() {
+  get () {
     return !this.errors.length
   }
 })
-
 
 /* ─────────────────────────────────────────────────────────── */
 /*  ValidatorResultError                                        */
 /* ─────────────────────────────────────────────────────────── */
 
-export function ValidatorResultError(result) {
+export function ValidatorResultError (result) {
   if (typeof Error.captureStackTrace === 'function') {
     Error.captureStackTrace(this, ValidatorResultError)
   }
@@ -117,12 +115,11 @@ ValidatorResultError.prototype = new Error()
 ValidatorResultError.prototype.constructor = ValidatorResultError
 ValidatorResultError.prototype.name = 'Validation Error'
 
-
 /* ─────────────────────────────────────────────────────────── */
 /*  SchemaError                                                 */
 /* ─────────────────────────────────────────────────────────── */
 
-export function SchemaError(msg, schema) {
+export function SchemaError (msg, schema) {
   this.message = msg
   this.schema = schema
 
@@ -138,12 +135,11 @@ SchemaError.prototype = Object.create(Error.prototype, {
   name: { value: 'SchemaError', enumerable: false }
 })
 
-
 /* ─────────────────────────────────────────────────────────── */
 /*  SchemaContext                                               */
 /* ─────────────────────────────────────────────────────────── */
 
-export function SchemaContext(schema, options, path, base, schemas) {
+export function SchemaContext (schema, options, path, base, schemas) {
   this.schema = schema
   this.options = options
 
@@ -166,7 +162,7 @@ SchemaContext.prototype.resolve = function (target) {
 
 SchemaContext.prototype.makeChild = function (schema, propertyName) {
   const path =
-    propertyName === undefined ? this.path : this.path.concat([propertyName])
+    propertyName === undefined ? this.path : this.path.concat([ propertyName ])
 
   const id = schema.$id || schema.id
   const base = resolveUrl(this.base, id || '')
@@ -186,7 +182,6 @@ SchemaContext.prototype.makeChild = function (schema, propertyName) {
   return ctx
 }
 
-
 /* ─────────────────────────────────────────────────────────── */
 /*  FORMAT REGEXPS                                              */
 /* ─────────────────────────────────────────────────────────── */
@@ -198,7 +193,7 @@ export const FORMAT_REGEXPS = {
   duration: /P(T\d+(H(\d+M(\d+S)?)?|M(\d+S)?|S)|\d+(D|M(\d+D)?|Y(\d+M(\d+D)?)?)(T\d+(H(\d+M(\d+S)?)?|M(\d+S)?|S))?|\d+W)/i,
 
   // Email
-  email: /^(?:[\w!#$%&'*+\-\/=?^`{|}~]+\.)*[\w!#$%&'*+\-\/=?^`{|}~]+@(?:(?:(?:[a-zA-Z0-9](?:[a-zA-Z0-9\-](?!\.)){0,61}[a-zA-Z0-9]?\.)+[a-zA-Z0-9](?:[a-zA-Z0-9\-](?!$)){0,61}[a-zA-Z0-9]?)|(?:\[(?:(?:[01]?\d{1,2}|2[0-4]\d|25[0-5])\.){3}(?:[01]?\d{1,2}|2[0-4]\d|25[0-5])\]))$/,
+  email: /^(?:[\w!#$%&'*+\-/=?^`{|}~]+\.)*[\w!#$%&'*+\-/=?^`{|}~]+@(?:(?:(?:[a-zA-Z0-9](?:[a-zA-Z0-9-](?!\.)){0,61}[a-zA-Z0-9]?\.)+[a-zA-Z0-9](?:[a-zA-Z0-9-](?!$)){0,61}[a-zA-Z0-9]?)|(?:\[(?:(?:[01]?\d{1,2}|2[0-4]\d|25[0-5])\.){3}(?:[01]?\d{1,2}|2[0-4]\d|25[0-5])\]))$/,
 
   // IP and others
   'ip-address': /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/,
@@ -214,7 +209,7 @@ export const FORMAT_REGEXPS = {
 
   regex: input => {
     try {
-      new RegExp(input)
+      RegExp(input)
       return true
     } catch {
       return false
@@ -228,12 +223,11 @@ FORMAT_REGEXPS.regexp = FORMAT_REGEXPS.regex
 FORMAT_REGEXPS.pattern = FORMAT_REGEXPS.regex
 FORMAT_REGEXPS.ipv4 = FORMAT_REGEXPS['ip-address']
 
-
 /* ─────────────────────────────────────────────────────────── */
 /*  isFormat                                                   */
 /* ─────────────────────────────────────────────────────────── */
 
-export function isFormat(input, format, validator) {
+export function isFormat (input, format, validator) {
   if (typeof input === 'string' && FORMAT_REGEXPS[format] !== undefined) {
     const item = FORMAT_REGEXPS[format]
     if (item instanceof RegExp) return item.test(input)
@@ -248,26 +242,24 @@ export function isFormat(input, format, validator) {
   return true
 }
 
-
 /* ─────────────────────────────────────────────────────────── */
 /*  makeSuffix                                                 */
 /* ─────────────────────────────────────────────────────────── */
 
-export function makeSuffix(key) {
+export function makeSuffix (key) {
   key = key.toString()
 
-  if (!key.match(/[.\s\[\]]/) && !key.match(/^[\d]/)) return '.' + key
+  if (!key.match(/[.\s[\]]/) && !key.match(/^[\d]/)) return '.' + key
   if (key.match(/^\d+$/)) return '[' + key + ']'
 
   return '[' + JSON.stringify(key) + ']'
 }
 
-
 /* ─────────────────────────────────────────────────────────── */
 /*  deepCompareStrict                                           */
 /* ─────────────────────────────────────────────────────────── */
 
-export function deepCompareStrict(a, b) {
+export function deepCompareStrict (a, b) {
   if (typeof a !== typeof b) return false
 
   if (Array.isArray(a)) {
@@ -291,12 +283,11 @@ export function deepCompareStrict(a, b) {
   return a === b
 }
 
-
 /* ─────────────────────────────────────────────────────────── */
 /*  deepMerge                                                   */
 /* ─────────────────────────────────────────────────────────── */
 
-function deepMerger(target, dst, e, i) {
+function deepMerger (target, dst, e, i) {
   if (typeof e === 'object') {
     dst[i] = deepMerge(target[i], e)
   } else {
@@ -304,11 +295,11 @@ function deepMerger(target, dst, e, i) {
   }
 }
 
-function copyist(src, dst, key) {
+function copyist (src, dst, key) {
   dst[key] = src[key]
 }
 
-function copyistWithDeepMerge(target, src, dst, key) {
+function copyistWithDeepMerge (target, src, dst, key) {
   if (typeof src[key] !== 'object' || !src[key]) {
     dst[key] = src[key]
   } else {
@@ -317,7 +308,7 @@ function copyistWithDeepMerge(target, src, dst, key) {
   }
 }
 
-export function deepMerge(target, src) {
+export function deepMerge (target, src) {
   const array = Array.isArray(src)
   let dst = array ? [] : {}
 
@@ -335,12 +326,11 @@ export function deepMerge(target, src) {
   return dst
 }
 
-
 /* ─────────────────────────────────────────────────────────── */
 /*  objectGetPath                                               */
 /* ─────────────────────────────────────────────────────────── */
 
-export function objectGetPath(o, s) {
+export function objectGetPath (o, s) {
   const parts = s.split('/').slice(1)
   let k
 
@@ -353,25 +343,23 @@ export function objectGetPath(o, s) {
   return o
 }
 
-
 /* ─────────────────────────────────────────────────────────── */
 /*  encodePath                                                  */
 /* ─────────────────────────────────────────────────────────── */
 
-function pathEncoder(v) {
+function pathEncoder (v) {
   return '/' + encodeURIComponent(v).replace(/~/g, '%7E')
 }
 
-export function encodePath(a) {
+export function encodePath (a) {
   return a.map(pathEncoder).join('')
 }
-
 
 /* ─────────────────────────────────────────────────────────── */
 /*  getDecimalPlaces                                            */
 /* ─────────────────────────────────────────────────────────── */
 
-export function getDecimalPlaces(number) {
+export function getDecimalPlaces (number) {
   let decimalPlaces = 0
   if (isNaN(number)) return decimalPlaces
 
@@ -391,21 +379,19 @@ export function getDecimalPlaces(number) {
   return decimalPlaces
 }
 
-
 /* ─────────────────────────────────────────────────────────── */
 /*  isSchema                                                    */
 /* ─────────────────────────────────────────────────────────── */
 
-export function isSchema(val) {
+export function isSchema (val) {
   return (typeof val === 'object' && val) || typeof val === 'boolean'
 }
-
 
 /* ─────────────────────────────────────────────────────────── */
 /*  resolveUrl                                                  */
 /* ─────────────────────────────────────────────────────────── */
 
-export function resolveUrl(from, to) {
+export function resolveUrl (from, to) {
   const resolvedUrl = new URL(to, new URL(from, 'resolve://'))
 
   if (resolvedUrl.protocol === 'resolve:') {

@@ -173,13 +173,13 @@ export default function (numberOfStaveLines, styles, sortedNotes, withFlags, num
       xPosition,
       isNotBeamedAndWithoutConnectedTremolo
         ? (
-          chordBodyTop - (
-            stemHeight + (
-              calculateAdditionalStemHeightForSingleUnitWithTremoloStrokesAndNoFlags(numberOfTremoloStrokes, withFlags, styles) +
+            chordBodyTop - (
+              stemHeight + (
+                calculateAdditionalStemHeightForSingleUnitWithTremoloStrokesAndNoFlags(numberOfTremoloStrokes, withFlags, styles) +
               calculateAdditionalStemHeightForUnitWithFlags(numberOfStaveLines, stemDirection, unitDuration, numberOfTremoloStrokes, firstTwoNotesWithFlagsASecondApartAndFirstOneIsDisplaced, firstTwoNoteswithFlagsASecondApartAndFirstOneIsNotDisplaced, false, false, noteOnEdgeInSingleUnitwithFlagsIsOnStaveLine, noteOnEdgeInSingleUnitWithFlagsIsBetweenStaveLines, thereAreDrawnStaveLinesIncludingAdditionalOnesAboveFirstNote, false, isGrace, styles)
-            )
-          ) * (isGrace ? graceElementsScaleFactor : 1)
-        )
+              )
+            ) * (isGrace ? graceElementsScaleFactor : 1)
+          )
         : chordBodyTop - calculateAdditionalStemHeightForSingleUnitWithConnectedTremoloAndUnitDurationIsQuarterOrHalf(hasConnectedTremolo, numberOfTremoloStrokes, unitDuration, styles) * (isGrace ? graceElementsScaleFactor : 1),
       xPosition,
       bottomPoint,
@@ -199,13 +199,13 @@ export default function (numberOfStaveLines, styles, sortedNotes, withFlags, num
       xPosition,
       isNotBeamedAndWithoutConnectedTremolo
         ? (
-          chordBodyBottom + (
-            stemHeight + (
-              calculateAdditionalStemHeightForSingleUnitWithTremoloStrokesAndNoFlags(numberOfTremoloStrokes, withFlags, styles) +
+            chordBodyBottom + (
+              stemHeight + (
+                calculateAdditionalStemHeightForSingleUnitWithTremoloStrokesAndNoFlags(numberOfTremoloStrokes, withFlags, styles) +
               calculateAdditionalStemHeightForUnitWithFlags(numberOfStaveLines, stemDirection, unitDuration, numberOfTremoloStrokes, false, false, lastTwoNoteswithFlagsASecondApartAndLastOneIsDisplaced, lastTwoNoteswithFlagsASecondApartAndLastOneIsNotDisplaced, noteOnEdgeInSingleUnitwithFlagsIsOnStaveLine, noteOnEdgeInSingleUnitWithFlagsIsBetweenStaveLines, false, thereAreDrawnStaveLinesIncludingAdditionalOnesBelowLastNote, isGrace, styles)
-            )
-          ) * (isGrace ? graceElementsScaleFactor : 1)
-        )
+              )
+            ) * (isGrace ? graceElementsScaleFactor : 1)
+          )
         : chordBodyBottom + calculateAdditionalStemHeightForSingleUnitWithConnectedTremoloAndUnitDurationIsQuarterOrHalf(hasConnectedTremolo, numberOfTremoloStrokes, unitDuration, styles) * (isGrace ? graceElementsScaleFactor : 1),
       tunedNoteStemStrokeOptions, 0, 0, 'stem'
     )

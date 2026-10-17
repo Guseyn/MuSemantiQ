@@ -1,7 +1,7 @@
 // Table metadata
 
 import check from '#msq/drawer/lib/opentype/check.js'
-import {  encode, sizeOf  } from '#msq/drawer/lib/opentype/types.js'
+import { encode, sizeOf } from '#msq/drawer/lib/opentype/types.js'
 
 /**
  * @exports opentype.Table
@@ -11,7 +11,7 @@ import {  encode, sizeOf  } from '#msq/drawer/lib/opentype/types.js'
  * @param {Object} options
  * @constructor
  */
-function Table(tableName, fields, options) {
+function Table (tableName, fields, options) {
   for (let i = 0; i < fields.length; i += 1) {
     const field = fields[i]
     this[field.name] = field.value
@@ -35,7 +35,7 @@ function Table(tableName, fields, options) {
  * Encodes the table and returns an array of bytes
  * @return {Array}
  */
-Table.prototype.encode = function() {
+Table.prototype.encode = function () {
   return encode.TABLE(this)
 }
 
@@ -43,21 +43,21 @@ Table.prototype.encode = function() {
  * Get the size of the table.
  * @return {number}
  */
-Table.prototype.sizeOf = function() {
+Table.prototype.sizeOf = function () {
   return sizeOf.TABLE(this)
 }
 
 /**
  * @private
  */
-function ushortList(itemName, list, count) {
+function ushortList (itemName, list, count) {
   if (count === undefined) {
     count = list.length
   }
   const fields = new Array(list.length + 1)
-  fields[0] = {name: itemName + 'Count', type: 'USHORT', value: count}
+  fields[0] = { name: itemName + 'Count', type: 'USHORT', value: count }
   for (let i = 0; i < list.length; i++) {
-    fields[i + 1] = {name: itemName + i, type: 'USHORT', value: list[i]}
+    fields[i + 1] = { name: itemName + i, type: 'USHORT', value: list[i] }
   }
   return fields
 }
@@ -65,12 +65,12 @@ function ushortList(itemName, list, count) {
 /**
  * @private
  */
-function tableList(itemName, records, itemCallback) {
+function tableList (itemName, records, itemCallback) {
   const count = records.length
   const fields = new Array(count + 1)
-  fields[0] = {name: itemName + 'Count', type: 'USHORT', value: count}
+  fields[0] = { name: itemName + 'Count', type: 'USHORT', value: count }
   for (let i = 0; i < count; i++) {
-    fields[i + 1] = {name: itemName + i, type: 'TABLE', value: itemCallback(records[i], i)}
+    fields[i + 1] = { name: itemName + i, type: 'TABLE', value: itemCallback(records[i], i) }
   }
   return fields
 }
@@ -78,10 +78,10 @@ function tableList(itemName, records, itemCallback) {
 /**
  * @private
  */
-function recordList(itemName, records, itemCallback) {
+function recordList (itemName, records, itemCallback) {
   const count = records.length
   let fields = []
-  fields[0] = {name: itemName + 'Count', type: 'USHORT', value: count}
+  fields[0] = { name: itemName + 'Count', type: 'USHORT', value: count }
   for (let i = 0; i < count; i++) {
     fields = fields.concat(itemCallback(records[i], i))
   }
@@ -97,10 +97,10 @@ function recordList(itemName, records, itemCallback) {
  * @constructor
  * @extends opentype.Table
  */
-function Coverage(coverageTable) {
+function Coverage (coverageTable) {
   if (coverageTable.format === 1) {
     Table.call(this, 'coverageTable',
-      [{name: 'coverageFormat', type: 'USHORT', value: 1}]
+      [ { name: 'coverageFormat', type: 'USHORT', value: 1 } ]
         .concat(ushortList('glyph', coverageTable.glyphs))
     )
   } else {
@@ -110,29 +110,41 @@ function Coverage(coverageTable) {
 Coverage.prototype = Object.create(Table.prototype)
 Coverage.prototype.constructor = Coverage
 
-function ScriptList(scriptListTable) {
+function ScriptList (scriptListTable) {
   Table.call(this, 'scriptListTable',
-    recordList('scriptRecord', scriptListTable, function(scriptRecord, i) {
+    recordList('scriptRecord', scriptListTable, function (scriptRecord, i) {
       const script = scriptRecord.script
-      let defaultLangSys = script.defaultLangSys
+      const defaultLangSys = script.defaultLangSys
       check.assert(!!defaultLangSys, 'Unable to write GSUB: script ' + scriptRecord.tag + ' has no default language system.')
       return [
-        {name: 'scriptTag' + i, type: 'TAG', value: scriptRecord.tag},
-        {name: 'script' + i, type: 'TABLE', value: new Table('scriptTable', [
-          {name: 'defaultLangSys', type: 'TABLE', value: new Table('defaultLangSys', [
-            {name: 'lookupOrder', type: 'USHORT', value: 0},
-            {name: 'reqFeatureIndex', type: 'USHORT', value: defaultLangSys.reqFeatureIndex}]
-            .concat(ushortList('featureIndex', defaultLangSys.featureIndexes)))}
-        ].concat(recordList('langSys', script.langSysRecords, function(langSysRecord, i) {
-          const langSys = langSysRecord.langSys
-          return [
-            {name: 'langSysTag' + i, type: 'TAG', value: langSysRecord.tag},
-            {name: 'langSys' + i, type: 'TABLE', value: new Table('langSys', [
-              {name: 'lookupOrder', type: 'USHORT', value: 0},
-              {name: 'reqFeatureIndex', type: 'USHORT', value: langSys.reqFeatureIndex}
-            ].concat(ushortList('featureIndex', langSys.featureIndexes)))}
-          ]
-        })))}
+        { name: 'scriptTag' + i, type: 'TAG', value: scriptRecord.tag },
+        {
+          name: 'script' + i,
+          type: 'TABLE',
+          value: new Table('scriptTable', [
+            {
+              name: 'defaultLangSys',
+              type: 'TABLE',
+              value: new Table('defaultLangSys', [
+                { name: 'lookupOrder', type: 'USHORT', value: 0 },
+                { name: 'reqFeatureIndex', type: 'USHORT', value: defaultLangSys.reqFeatureIndex } ]
+                .concat(ushortList('featureIndex', defaultLangSys.featureIndexes)))
+            }
+          ].concat(recordList('langSys', script.langSysRecords, function (langSysRecord, i) {
+            const langSys = langSysRecord.langSys
+            return [
+              { name: 'langSysTag' + i, type: 'TAG', value: langSysRecord.tag },
+              {
+                name: 'langSys' + i,
+                type: 'TABLE',
+                value: new Table('langSys', [
+                  { name: 'lookupOrder', type: 'USHORT', value: 0 },
+                  { name: 'reqFeatureIndex', type: 'USHORT', value: langSys.reqFeatureIndex }
+                ].concat(ushortList('featureIndex', langSys.featureIndexes)))
+              }
+            ]
+          })))
+        }
       ]
     })
   )
@@ -147,15 +159,19 @@ ScriptList.prototype.constructor = ScriptList
  * @constructor
  * @extends opentype.Table
  */
-function FeatureList(featureListTable) {
+function FeatureList (featureListTable) {
   Table.call(this, 'featureListTable',
-    recordList('featureRecord', featureListTable, function(featureRecord, i) {
+    recordList('featureRecord', featureListTable, function (featureRecord, i) {
       const feature = featureRecord.feature
       return [
-        {name: 'featureTag' + i, type: 'TAG', value: featureRecord.tag},
-        {name: 'feature' + i, type: 'TABLE', value: new Table('featureTable', [
-          {name: 'featureParams', type: 'USHORT', value: feature.featureParams},
-        ].concat(ushortList('lookupListIndex', feature.lookupListIndexes)))}
+        { name: 'featureTag' + i, type: 'TAG', value: featureRecord.tag },
+        {
+          name: 'feature' + i,
+          type: 'TABLE',
+          value: new Table('featureTable', [
+            { name: 'featureParams', type: 'USHORT', value: feature.featureParams },
+          ].concat(ushortList('lookupListIndex', feature.lookupListIndexes)))
+        }
       ]
     })
   )
@@ -171,13 +187,13 @@ FeatureList.prototype.constructor = FeatureList
  * @constructor
  * @extends opentype.Table
  */
-function LookupList(lookupListTable, subtableMakers) {
-  Table.call(this, 'lookupListTable', tableList('lookup', lookupListTable, function(lookupTable) {
-    let subtableCallback = subtableMakers[lookupTable.lookupType]
+function LookupList (lookupListTable, subtableMakers) {
+  Table.call(this, 'lookupListTable', tableList('lookup', lookupListTable, function (lookupTable) {
+    const subtableCallback = subtableMakers[lookupTable.lookupType]
     check.assert(!!subtableCallback, 'Unable to write GSUB lookup type ' + lookupTable.lookupType + ' tables.')
     return new Table('lookupTable', [
-      {name: 'lookupType', type: 'USHORT', value: lookupTable.lookupType},
-      {name: 'lookupFlag', type: 'USHORT', value: lookupTable.lookupFlag}
+      { name: 'lookupType', type: 'USHORT', value: lookupTable.lookupType },
+      { name: 'lookupFlag', type: 'USHORT', value: lookupTable.lookupFlag }
     ].concat(tableList('subtable', lookupTable.subtables, subtableCallback)))
   }))
 }

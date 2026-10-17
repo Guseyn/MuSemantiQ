@@ -8,11 +8,11 @@ import check from '#msq/drawer/lib/opentype/check.js'
 import { Parser } from '#msq/drawer/lib/opentype/parse.js'
 import table from '#msq/drawer/lib/opentype/table.js'
 
-function makeLtagTable(tags) {
+function makeLtagTable (tags) {
   const result = new table.Table('ltag', [
-    {name: 'version', type: 'ULONG', value: 1},
-    {name: 'flags', type: 'ULONG', value: 0},
-    {name: 'numTags', type: 'ULONG', value: tags.length}
+    { name: 'version', type: 'ULONG', value: 1 },
+    { name: 'flags', type: 'ULONG', value: 0 },
+    { name: 'numTags', type: 'ULONG', value: tags.length }
   ])
 
   let stringPool = ''
@@ -24,15 +24,15 @@ function makeLtagTable(tags) {
       stringPool += tags[i]
     }
 
-    result.fields.push({name: 'offset ' + i, type: 'USHORT', value: stringPoolOffset + pos})
-    result.fields.push({name: 'length ' + i, type: 'USHORT', value: tags[i].length})
+    result.fields.push({ name: 'offset ' + i, type: 'USHORT', value: stringPoolOffset + pos })
+    result.fields.push({ name: 'length ' + i, type: 'USHORT', value: tags[i].length })
   }
 
-  result.fields.push({name: 'stringPool', type: 'CHARARRAY', value: stringPool})
+  result.fields.push({ name: 'stringPool', type: 'CHARARRAY', value: stringPool })
   return result
 }
 
-function parseLtagTable(data, start) {
+function parseLtagTable (data, start) {
   const p = new Parser(data, start)
   const tableVersion = p.parseULong()
   check.argument(tableVersion === 1, 'Unsupported ltag table version.')

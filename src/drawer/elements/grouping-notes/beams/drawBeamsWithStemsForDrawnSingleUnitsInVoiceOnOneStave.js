@@ -79,10 +79,10 @@ export default function (singleUnitsInVoice, styles) {
         maxNumberOfBeamsForCurrentBeamedSingleUnits === numberOfBeamsThatCanBeIntersectedInStemVertical
           ? maxNumberOfBeamsForCurrentBeamedSingleUnits - (numberOfBeamsThatCanBeIntersectedInStemVertical - 1)
           : (
-            maxNumberOfBeamsForCurrentBeamedSingleUnits > numberOfBeamsThatCanBeIntersectedInStemVertical
-              ? maxNumberOfBeamsForCurrentBeamedSingleUnits - numberOfBeamsThatCanBeIntersectedInStemVertical
-              : maxNumberOfBeamsForCurrentBeamedSingleUnits
-          )
+              maxNumberOfBeamsForCurrentBeamedSingleUnits > numberOfBeamsThatCanBeIntersectedInStemVertical
+                ? maxNumberOfBeamsForCurrentBeamedSingleUnits - numberOfBeamsThatCanBeIntersectedInStemVertical
+                : maxNumberOfBeamsForCurrentBeamedSingleUnits
+            )
       )
       const allBeamsHeightNormalWhereAllStemsWithSameDirection = (beamLineHeightNormal + tunedHeightOfBeamedStemExtension) * numberOfCommonBeams
 

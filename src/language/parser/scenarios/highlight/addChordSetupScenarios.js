@@ -6,8 +6,8 @@ import regexps from '#msq/language/parser/scenarios/static-objects/regexps.js'
 export default function (scenarios) {
   scenarios['chord'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { currentNumberOfMeasures, currentNumberOfStaves, currentNumberOfVoices, currentNumberOfUnits } }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.withChordWithDurationHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.withChordWithDurationHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="cuph" ref-id="unit-${currentNumberOfMeasures}-${currentNumberOfStaves}-${currentNumberOfVoices}-${currentNumberOfUnits}">${match}</span>`
         }
       )
@@ -23,8 +23,8 @@ export default function (scenarios) {
   }
   scenarios['chord stave position'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { stavePositionName, stavePositionInRefId, currentNumberOfStaves, currentNumberOfMeasures } }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.stavePositionHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.stavePositionHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           if (stavePositionName === 'next') {
             stavePositionInRefId = currentNumberOfStaves + 1
           } else if (stavePositionName === 'prev') {
@@ -40,8 +40,8 @@ export default function (scenarios) {
   }
   scenarios['chord with parentheses'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { currentNumberOfMeasures, currentNumberOfStaves, currentNumberOfVoices, currentNumberOfUnits, currentNumberOfParentheses } }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.withParenthesesHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.withParenthesesHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="eh" ref-id="unit-parentheses-${currentNumberOfMeasures}-${currentNumberOfStaves}-${currentNumberOfVoices}-${currentNumberOfUnits}-${currentNumberOfParentheses}">${match}</span>`
         }
       )
@@ -74,8 +74,8 @@ export default function (scenarios) {
   }
   scenarios['chord with parentheses from note index'] = {
     action: ({ parserState, joinedTokenValuesWithRealDelimiters, state, fromMain: { currentNumberOfMeasures, currentNumberOfStaves, currentNumberOfVoices, currentNumberOfUnits } }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.noteIndexHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.noteIndexHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="cuph" ref-id="note-with-index-${currentNumberOfMeasures}-${currentNumberOfStaves}-${currentNumberOfVoices}-${currentNumberOfUnits}-${parserState.lastMentionedNoteIndex + 1}">${match}</span>`
         }
       )
@@ -103,8 +103,8 @@ export default function (scenarios) {
   }
   scenarios['chord with parentheses to note index'] = {
     action: ({ parserState, joinedTokenValuesWithRealDelimiters, state, fromMain: { currentNumberOfMeasures, currentNumberOfStaves, currentNumberOfVoices, currentNumberOfUnits } }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.noteIndexHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.noteIndexHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="cuph" ref-id="note-with-index-${currentNumberOfMeasures}-${currentNumberOfStaves}-${currentNumberOfVoices}-${currentNumberOfUnits}-${parserState.lastMentionedNoteIndex + 1}">${match}</span>`
         }
       )
@@ -125,8 +125,8 @@ export default function (scenarios) {
   }
   scenarios['chord is arpeggiated'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { currentNumberOfMeasures, currentNumberOfStaves, currentNumberOfVoices, currentNumberOfUnits } }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.arpeggiatedHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.arpeggiatedHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="eh" ref-id="arpeggiated-wave-${currentNumberOfMeasures}-${currentNumberOfStaves}-${currentNumberOfVoices}-${currentNumberOfUnits}">${match}</span>`
         }
       )
@@ -171,8 +171,8 @@ export default function (scenarios) {
   }
   scenarios['chord with text'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedString = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.stringHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedString = regexps.stringHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="sth" ref-id="">${match}</span>`
         }
       )

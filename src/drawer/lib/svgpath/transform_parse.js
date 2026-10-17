@@ -2,7 +2,7 @@
 
 import Matrix from '#msq/drawer/lib/svgpath/matrix.js'
 
-var operations = {
+const operations = {
   matrix: true,
   scale: true,
   rotate: true,
@@ -11,17 +11,15 @@ var operations = {
   skewY: true
 }
 
-var CMD_SPLIT_RE    = /\s*(matrix|translate|scale|rotate|skewX|skewY)\s*\(\s*(.+?)\s*\)[\s,]*/
-var PARAMS_SPLIT_RE = /[\s,]+/
+const CMD_SPLIT_RE = /\s*(matrix|translate|scale|rotate|skewX|skewY)\s*\(\s*(.+?)\s*\)[\s,]*/
+const PARAMS_SPLIT_RE = /[\s,]+/
 
-
-export default function transformParse(transformString) {
-  var matrix = new Matrix()
-  var cmd, params
+export default function transformParse (transformString) {
+  const matrix = new Matrix()
+  let cmd, params
 
   // Split value into ['', 'translate', '10 50', '', 'scale', '2', '', 'rotate',  '-45', '']
   transformString.split(CMD_SPLIT_RE).forEach(function (item) {
-
     // Skip empty elements
     if (!item.length) { return }
 
@@ -78,7 +76,6 @@ export default function transformParse(transformString) {
         if (params.length === 1) {
           matrix.skewY(params[0])
         }
-        return
     }
   })
 

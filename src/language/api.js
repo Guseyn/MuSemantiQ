@@ -1,7 +1,7 @@
 import parseLanguage from '#msq/language/parser/parseLanguage.js'
 
 // The two highlighting flags as the parser's options: which scenarios run, and which adapters with them
-function parserOptions({ applyHighlighting, applyOnlyHighlightingWithoutRefIds, supportedFontNames }) {
+function parserOptions ({ applyHighlighting, applyOnlyHighlightingWithoutRefIds, supportedFontNames }) {
   const highlightsOnly = (applyHighlighting ?? true) && (applyOnlyHighlightingWithoutRefIds || false)
   return {
     runMain: !highlightsOnly,
@@ -9,9 +9,9 @@ function parserOptions({ applyHighlighting, applyOnlyHighlightingWithoutRefIds, 
       ? [ 'highlight-without-ref-ids' ]
       : ((applyHighlighting ?? true) ? [ 'highlight' ] : []),
     fonts: supportedFontNames || {
-      'chord-letters': ['gentium plus', 'gothic a1'],
-      'music': ['bravura', 'leland'],
-      'text': ['noto-sans', 'noto-serif']
+      'chord-letters': [ 'gentium plus', 'gothic a1' ],
+      music: [ 'bravura', 'leland' ],
+      text: [ 'noto-sans', 'noto-serif' ]
     }
   }
 }
@@ -162,7 +162,7 @@ const NEW_LINE = '\n'
  *
  * ---------------------------------------------------------------------------
  */
-export function generateIntermediateStructuresForSinglePage({
+export function generateIntermediateStructuresForSinglePage ({
   pageText,
   applyHighlighting,
   applyOnlyHighlightingWithoutRefIds,
@@ -193,7 +193,7 @@ export function generateIntermediateStructuresForSinglePage({
     comments,
     midiSettings
   }
-} 
+}
 
 /**
  * ⟅━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━⟆
@@ -311,7 +311,7 @@ export function generateIntermediateStructuresForSinglePage({
  *
  * ---------------------------------------------------------------------------
  */
-export function generateIntermediateStructuresForMultiplePages({
+export function generateIntermediateStructuresForMultiplePages ({
   multiplePagesText,
   applyHighlighting,
   applyOnlyHighlightingWithoutRefIds,
@@ -327,8 +327,6 @@ export function generateIntermediateStructuresForMultiplePages({
   const commentsForEachPage = []
 
   multiplePagesText.forEach((textForCurrentPage, pageIndex) => {
-    const thisIsLastPage = pageIndex === multiplePagesText.length - 1
-
     const {
       pageSchema,
       highlightsHtmlBuffer,
@@ -376,7 +374,7 @@ export function generateIntermediateStructuresForMultiplePages({
 //               HELPERS
 // ⟅━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━⟆
 
-function normalizeMuSemantiQText(repertoireText) {
+function normalizeMuSemantiQText (repertoireText) {
   if (repertoireText[repertoireText.length - 1] === NEW_LINE) {
     repertoireText += NEW_LINE
   }

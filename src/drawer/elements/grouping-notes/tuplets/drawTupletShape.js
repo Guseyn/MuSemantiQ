@@ -15,13 +15,13 @@ export default function (lastLeftTupletPoint, voicesBody, belongsToComplexTuplet
   const tupletLeftXPoint = leftSingeUnitOfTuplet.stemless
     ? leftSingeUnitOfTuplet.bodyLeft
     : (leftSingeUnitOfTuplet.stemDirection === lastLeftTupletPoint.tupletDirection)
-      ? leftSingeUnitOfTuplet.stemRight
-      : leftSingeUnitOfTuplet.bodyLeft
+        ? leftSingeUnitOfTuplet.stemRight
+        : leftSingeUnitOfTuplet.bodyLeft
   const tupletRightXPoint = rightSingleUnitOfTuplet.stemless
     ? rightSingleUnitOfTuplet.bodyRight
     : (rightSingleUnitOfTuplet.stemDirection === lastLeftTupletPoint.tupletDirection)
-      ? rightSingleUnitOfTuplet.stemLeft
-      : rightSingleUnitOfTuplet.bodyRight
+        ? rightSingleUnitOfTuplet.stemLeft
+        : rightSingleUnitOfTuplet.bodyRight
   const centerOfTupletLine = {
     x: (
       (extendedToRightSide ? (voicesBody.right - styles.tupletMarginFromMeasureRightPoint) : tupletRightXPoint) +

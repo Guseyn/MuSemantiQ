@@ -44,7 +44,7 @@ export default function (numberOfStaves, numberOfStaveLines, numberOfMeasures, s
         topOffsetForCurrentStave + measureRest.rightYCorrection
       )
       multiRestShapeElements.push(rightSide)
-      let multiRestShape = createGroup(
+      const multiRestShape = createGroup(
         'multiRestShape',
         multiRestShapeElements
       )

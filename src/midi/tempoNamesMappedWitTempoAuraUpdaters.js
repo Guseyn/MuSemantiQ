@@ -3,23 +3,14 @@
 import durationsValuesInTempoExpressedInQuarters from '#msq/midi/durationsValuesInTempoExpressedInQuarters.js'
 
 export default {
-  'default': (tempoValuePartWhereCertaintTempoDurationIsSpecified, tempoValuePartWhereCertainTempoNumberIsSpecified, tempoAura, unitDurationInQuarters, thisIsFirstUnitInMeasure) => {
+  default: (tempoValuePartWhereCertaintTempoDurationIsSpecified, tempoValuePartWhereCertainTempoNumberIsSpecified, tempoAura, unitDurationInQuarters, thisIsFirstUnitInMeasure) => {
     if (thisIsFirstUnitInMeasure) {
       if (tempoValuePartWhereCertaintTempoDurationIsSpecified && tempoValuePartWhereCertainTempoNumberIsSpecified) {
         tempoAura.quartersPerMinute = durationsValuesInTempoExpressedInQuarters[tempoValuePartWhereCertaintTempoDurationIsSpecified] * tempoValuePartWhereCertainTempoNumberIsSpecified
       }
     }
   },
-  'larghissimo': (tempoValuePartWhereCertaintTempoDurationIsSpecified, tempoValuePartWhereCertainTempoNumberIsSpecified, tempoAura, unitDurationInQuarters, thisIsFirstUnitInMeasure) => {
-    if (thisIsFirstUnitInMeasure) {
-      if (tempoValuePartWhereCertaintTempoDurationIsSpecified && tempoValuePartWhereCertainTempoNumberIsSpecified) {
-        tempoAura.quartersPerMinute = durationsValuesInTempoExpressedInQuarters[tempoValuePartWhereCertaintTempoDurationIsSpecified] * tempoValuePartWhereCertainTempoNumberIsSpecified
-      } else {
-        tempoAura.quartersPerMinute = 20
-      }
-    }
-  },
-  'grave': (tempoValuePartWhereCertaintTempoDurationIsSpecified, tempoValuePartWhereCertainTempoNumberIsSpecified, tempoAura, unitDurationInQuarters, thisIsFirstUnitInMeasure) => {
+  larghissimo: (tempoValuePartWhereCertaintTempoDurationIsSpecified, tempoValuePartWhereCertainTempoNumberIsSpecified, tempoAura, unitDurationInQuarters, thisIsFirstUnitInMeasure) => {
     if (thisIsFirstUnitInMeasure) {
       if (tempoValuePartWhereCertaintTempoDurationIsSpecified && tempoValuePartWhereCertainTempoNumberIsSpecified) {
         tempoAura.quartersPerMinute = durationsValuesInTempoExpressedInQuarters[tempoValuePartWhereCertaintTempoDurationIsSpecified] * tempoValuePartWhereCertainTempoNumberIsSpecified
@@ -28,7 +19,16 @@ export default {
       }
     }
   },
-  'solenne': (tempoValuePartWhereCertaintTempoDurationIsSpecified, tempoValuePartWhereCertainTempoNumberIsSpecified, tempoAura, unitDurationInQuarters, thisIsFirstUnitInMeasure) => {
+  grave: (tempoValuePartWhereCertaintTempoDurationIsSpecified, tempoValuePartWhereCertainTempoNumberIsSpecified, tempoAura, unitDurationInQuarters, thisIsFirstUnitInMeasure) => {
+    if (thisIsFirstUnitInMeasure) {
+      if (tempoValuePartWhereCertaintTempoDurationIsSpecified && tempoValuePartWhereCertainTempoNumberIsSpecified) {
+        tempoAura.quartersPerMinute = durationsValuesInTempoExpressedInQuarters[tempoValuePartWhereCertaintTempoDurationIsSpecified] * tempoValuePartWhereCertainTempoNumberIsSpecified
+      } else {
+        tempoAura.quartersPerMinute = 20
+      }
+    }
+  },
+  solenne: (tempoValuePartWhereCertaintTempoDurationIsSpecified, tempoValuePartWhereCertainTempoNumberIsSpecified, tempoAura, unitDurationInQuarters, thisIsFirstUnitInMeasure) => {
     if (thisIsFirstUnitInMeasure) {
       if (tempoValuePartWhereCertaintTempoDurationIsSpecified && tempoValuePartWhereCertainTempoNumberIsSpecified) {
         tempoAura.quartersPerMinute = durationsValuesInTempoExpressedInQuarters[tempoValuePartWhereCertaintTempoDurationIsSpecified] * tempoValuePartWhereCertainTempoNumberIsSpecified
@@ -37,66 +37,66 @@ export default {
       }
     }
   },
-  'lento': (tempoValuePartWhereCertaintTempoDurationIsSpecified, tempoValuePartWhereCertainTempoNumberIsSpecified, tempoAura, unitDurationInQuarters, thisIsFirstUnitInMeasure) => {
+  lento: (tempoValuePartWhereCertaintTempoDurationIsSpecified, tempoValuePartWhereCertainTempoNumberIsSpecified, tempoAura, unitDurationInQuarters, thisIsFirstUnitInMeasure) => {
     if (thisIsFirstUnitInMeasure) {
       if (tempoValuePartWhereCertaintTempoDurationIsSpecified && tempoValuePartWhereCertainTempoNumberIsSpecified) {
         tempoAura.quartersPerMinute = durationsValuesInTempoExpressedInQuarters[tempoValuePartWhereCertaintTempoDurationIsSpecified] * tempoValuePartWhereCertainTempoNumberIsSpecified
       } else {
-        tempoAura.quartersPerMinute = 40 
+        tempoAura.quartersPerMinute = 40
       }
     }
   },
-  'lentissimo': (tempoValuePartWhereCertaintTempoDurationIsSpecified, tempoValuePartWhereCertainTempoNumberIsSpecified, tempoAura, unitDurationInQuarters, thisIsFirstUnitInMeasure) => {
+  lentissimo: (tempoValuePartWhereCertaintTempoDurationIsSpecified, tempoValuePartWhereCertainTempoNumberIsSpecified, tempoAura, unitDurationInQuarters, thisIsFirstUnitInMeasure) => {
     if (thisIsFirstUnitInMeasure) {
       if (tempoValuePartWhereCertaintTempoDurationIsSpecified && tempoValuePartWhereCertainTempoNumberIsSpecified) {
         tempoAura.quartersPerMinute = durationsValuesInTempoExpressedInQuarters[tempoValuePartWhereCertaintTempoDurationIsSpecified] * tempoValuePartWhereCertainTempoNumberIsSpecified
       } else {
-        tempoAura.quartersPerMinute = 48 
+        tempoAura.quartersPerMinute = 48
       }
     }
   },
-  'largo': (tempoValuePartWhereCertaintTempoDurationIsSpecified, tempoValuePartWhereCertainTempoNumberIsSpecified, tempoAura, unitDurationInQuarters, thisIsFirstUnitInMeasure) => {
+  largo: (tempoValuePartWhereCertaintTempoDurationIsSpecified, tempoValuePartWhereCertainTempoNumberIsSpecified, tempoAura, unitDurationInQuarters, thisIsFirstUnitInMeasure) => {
     if (thisIsFirstUnitInMeasure) {
       if (tempoValuePartWhereCertaintTempoDurationIsSpecified && tempoValuePartWhereCertainTempoNumberIsSpecified) {
         tempoAura.quartersPerMinute = durationsValuesInTempoExpressedInQuarters[tempoValuePartWhereCertaintTempoDurationIsSpecified] * tempoValuePartWhereCertainTempoNumberIsSpecified
       } else {
-        tempoAura.quartersPerMinute = 40 
+        tempoAura.quartersPerMinute = 40
       }
     }
   },
-  'larghetto': (tempoValuePartWhereCertaintTempoDurationIsSpecified, tempoValuePartWhereCertainTempoNumberIsSpecified, tempoAura, unitDurationInQuarters, thisIsFirstUnitInMeasure) => {
+  larghetto: (tempoValuePartWhereCertaintTempoDurationIsSpecified, tempoValuePartWhereCertainTempoNumberIsSpecified, tempoAura, unitDurationInQuarters, thisIsFirstUnitInMeasure) => {
     if (thisIsFirstUnitInMeasure) {
       if (tempoValuePartWhereCertaintTempoDurationIsSpecified && tempoValuePartWhereCertainTempoNumberIsSpecified) {
         tempoAura.quartersPerMinute = durationsValuesInTempoExpressedInQuarters[tempoValuePartWhereCertaintTempoDurationIsSpecified] * tempoValuePartWhereCertainTempoNumberIsSpecified
       } else {
-        tempoAura.quartersPerMinute = 60 
+        tempoAura.quartersPerMinute = 60
       }
     }
   },
-  'adagio': (tempoValuePartWhereCertaintTempoDurationIsSpecified, tempoValuePartWhereCertainTempoNumberIsSpecified, tempoAura, unitDurationInQuarters, thisIsFirstUnitInMeasure) => {
+  adagio: (tempoValuePartWhereCertaintTempoDurationIsSpecified, tempoValuePartWhereCertainTempoNumberIsSpecified, tempoAura, unitDurationInQuarters, thisIsFirstUnitInMeasure) => {
     if (thisIsFirstUnitInMeasure) {
       if (tempoValuePartWhereCertaintTempoDurationIsSpecified && tempoValuePartWhereCertainTempoNumberIsSpecified) {
         tempoAura.quartersPerMinute = durationsValuesInTempoExpressedInQuarters[tempoValuePartWhereCertaintTempoDurationIsSpecified] * tempoValuePartWhereCertainTempoNumberIsSpecified
       } else {
-        tempoAura.quartersPerMinute = 66 
+        tempoAura.quartersPerMinute = 66
       }
     }
   },
-  'adagietto': (tempoValuePartWhereCertaintTempoDurationIsSpecified, tempoValuePartWhereCertainTempoNumberIsSpecified, tempoAura, unitDurationInQuarters, thisIsFirstUnitInMeasure) => {
+  adagietto: (tempoValuePartWhereCertaintTempoDurationIsSpecified, tempoValuePartWhereCertainTempoNumberIsSpecified, tempoAura, unitDurationInQuarters, thisIsFirstUnitInMeasure) => {
     if (thisIsFirstUnitInMeasure) {
       if (tempoValuePartWhereCertaintTempoDurationIsSpecified && tempoValuePartWhereCertainTempoNumberIsSpecified) {
         tempoAura.quartersPerMinute = durationsValuesInTempoExpressedInQuarters[tempoValuePartWhereCertaintTempoDurationIsSpecified] * tempoValuePartWhereCertainTempoNumberIsSpecified
       } else {
-        tempoAura.quartersPerMinute = 70 
+        tempoAura.quartersPerMinute = 70
       }
     }
   },
-  'tranquillo': (tempoValuePartWhereCertaintTempoDurationIsSpecified, tempoValuePartWhereCertainTempoNumberIsSpecified, tempoAura, unitDurationInQuarters, thisIsFirstUnitInMeasure) => {
+  tranquillo: (tempoValuePartWhereCertaintTempoDurationIsSpecified, tempoValuePartWhereCertainTempoNumberIsSpecified, tempoAura, unitDurationInQuarters, thisIsFirstUnitInMeasure) => {
     if (thisIsFirstUnitInMeasure) {
       if (tempoValuePartWhereCertaintTempoDurationIsSpecified && tempoValuePartWhereCertainTempoNumberIsSpecified) {
         tempoAura.quartersPerMinute = durationsValuesInTempoExpressedInQuarters[tempoValuePartWhereCertaintTempoDurationIsSpecified] * tempoValuePartWhereCertainTempoNumberIsSpecified
       } else {
-        tempoAura.quartersPerMinute = 80 
+        tempoAura.quartersPerMinute = 80
       }
     }
   },
@@ -105,43 +105,43 @@ export default {
       if (tempoValuePartWhereCertaintTempoDurationIsSpecified && tempoValuePartWhereCertainTempoNumberIsSpecified) {
         tempoAura.quartersPerMinute = durationsValuesInTempoExpressedInQuarters[tempoValuePartWhereCertaintTempoDurationIsSpecified] * tempoValuePartWhereCertainTempoNumberIsSpecified
       } else {
-        tempoAura.quartersPerMinute = 92 
+        tempoAura.quartersPerMinute = 92
       }
     }
   },
-  'andante': (tempoValuePartWhereCertaintTempoDurationIsSpecified, tempoValuePartWhereCertainTempoNumberIsSpecified, tempoAura, unitDurationInQuarters, thisIsFirstUnitInMeasure) => {
+  andante: (tempoValuePartWhereCertaintTempoDurationIsSpecified, tempoValuePartWhereCertainTempoNumberIsSpecified, tempoAura, unitDurationInQuarters, thisIsFirstUnitInMeasure) => {
     if (thisIsFirstUnitInMeasure) {
       if (tempoValuePartWhereCertaintTempoDurationIsSpecified && tempoValuePartWhereCertainTempoNumberIsSpecified) {
         tempoAura.quartersPerMinute = durationsValuesInTempoExpressedInQuarters[tempoValuePartWhereCertaintTempoDurationIsSpecified] * tempoValuePartWhereCertainTempoNumberIsSpecified
       } else {
-        tempoAura.quartersPerMinute = 72 
+        tempoAura.quartersPerMinute = 72
       }
     }
   },
-  'andantino': (tempoValuePartWhereCertaintTempoDurationIsSpecified, tempoValuePartWhereCertainTempoNumberIsSpecified, tempoAura, unitDurationInQuarters, thisIsFirstUnitInMeasure) => {
+  andantino: (tempoValuePartWhereCertaintTempoDurationIsSpecified, tempoValuePartWhereCertainTempoNumberIsSpecified, tempoAura, unitDurationInQuarters, thisIsFirstUnitInMeasure) => {
     if (thisIsFirstUnitInMeasure) {
       if (tempoValuePartWhereCertaintTempoDurationIsSpecified && tempoValuePartWhereCertainTempoNumberIsSpecified) {
         tempoAura.quartersPerMinute = durationsValuesInTempoExpressedInQuarters[tempoValuePartWhereCertaintTempoDurationIsSpecified] * tempoValuePartWhereCertainTempoNumberIsSpecified
       } else {
-        tempoAura.quartersPerMinute = 73 
+        tempoAura.quartersPerMinute = 73
       }
     }
   },
-  'moderato': (tempoValuePartWhereCertaintTempoDurationIsSpecified, tempoValuePartWhereCertainTempoNumberIsSpecified, tempoAura, unitDurationInQuarters, thisIsFirstUnitInMeasure) => {
+  moderato: (tempoValuePartWhereCertaintTempoDurationIsSpecified, tempoValuePartWhereCertainTempoNumberIsSpecified, tempoAura, unitDurationInQuarters, thisIsFirstUnitInMeasure) => {
     if (thisIsFirstUnitInMeasure) {
       if (tempoValuePartWhereCertaintTempoDurationIsSpecified && tempoValuePartWhereCertainTempoNumberIsSpecified) {
         tempoAura.quartersPerMinute = durationsValuesInTempoExpressedInQuarters[tempoValuePartWhereCertaintTempoDurationIsSpecified] * tempoValuePartWhereCertainTempoNumberIsSpecified
       } else {
-        tempoAura.quartersPerMinute = 108 
+        tempoAura.quartersPerMinute = 108
       }
     }
   },
-  'allegretto': (tempoValuePartWhereCertaintTempoDurationIsSpecified, tempoValuePartWhereCertainTempoNumberIsSpecified, tempoAura, unitDurationInQuarters, thisIsFirstUnitInMeasure) => {
+  allegretto: (tempoValuePartWhereCertaintTempoDurationIsSpecified, tempoValuePartWhereCertainTempoNumberIsSpecified, tempoAura, unitDurationInQuarters, thisIsFirstUnitInMeasure) => {
     if (thisIsFirstUnitInMeasure) {
       if (tempoValuePartWhereCertaintTempoDurationIsSpecified && tempoValuePartWhereCertainTempoNumberIsSpecified) {
         tempoAura.quartersPerMinute = durationsValuesInTempoExpressedInQuarters[tempoValuePartWhereCertaintTempoDurationIsSpecified] * tempoValuePartWhereCertainTempoNumberIsSpecified
       } else {
-        tempoAura.quartersPerMinute = 110 
+        tempoAura.quartersPerMinute = 110
       }
     }
   },
@@ -150,43 +150,43 @@ export default {
       if (tempoValuePartWhereCertaintTempoDurationIsSpecified && tempoValuePartWhereCertainTempoNumberIsSpecified) {
         tempoAura.quartersPerMinute = durationsValuesInTempoExpressedInQuarters[tempoValuePartWhereCertaintTempoDurationIsSpecified] * tempoValuePartWhereCertainTempoNumberIsSpecified
       } else {
-        tempoAura.quartersPerMinute = 116 
+        tempoAura.quartersPerMinute = 116
       }
     }
   },
-  'allegro': (tempoValuePartWhereCertaintTempoDurationIsSpecified, tempoValuePartWhereCertainTempoNumberIsSpecified, tempoAura, unitDurationInQuarters, thisIsFirstUnitInMeasure) => {
+  allegro: (tempoValuePartWhereCertaintTempoDurationIsSpecified, tempoValuePartWhereCertainTempoNumberIsSpecified, tempoAura, unitDurationInQuarters, thisIsFirstUnitInMeasure) => {
     if (thisIsFirstUnitInMeasure) {
       if (tempoValuePartWhereCertaintTempoDurationIsSpecified && tempoValuePartWhereCertainTempoNumberIsSpecified) {
         tempoAura.quartersPerMinute = durationsValuesInTempoExpressedInQuarters[tempoValuePartWhereCertaintTempoDurationIsSpecified] * tempoValuePartWhereCertainTempoNumberIsSpecified
       } else {
-        tempoAura.quartersPerMinute = 120 
+        tempoAura.quartersPerMinute = 120
       }
     }
   },
-  'vivace': (tempoValuePartWhereCertaintTempoDurationIsSpecified, tempoValuePartWhereCertainTempoNumberIsSpecified, tempoAura, unitDurationInQuarters, thisIsFirstUnitInMeasure) => {
+  vivace: (tempoValuePartWhereCertaintTempoDurationIsSpecified, tempoValuePartWhereCertainTempoNumberIsSpecified, tempoAura, unitDurationInQuarters, thisIsFirstUnitInMeasure) => {
     if (thisIsFirstUnitInMeasure) {
       if (tempoValuePartWhereCertaintTempoDurationIsSpecified && tempoValuePartWhereCertainTempoNumberIsSpecified) {
         tempoAura.quartersPerMinute = durationsValuesInTempoExpressedInQuarters[tempoValuePartWhereCertaintTempoDurationIsSpecified] * tempoValuePartWhereCertainTempoNumberIsSpecified
       } else {
-        tempoAura.quartersPerMinute = 156 
+        tempoAura.quartersPerMinute = 156
       }
     }
   },
-  'vivacissimo': (tempoValuePartWhereCertaintTempoDurationIsSpecified, tempoValuePartWhereCertainTempoNumberIsSpecified, tempoAura, unitDurationInQuarters, thisIsFirstUnitInMeasure) => {
+  vivacissimo: (tempoValuePartWhereCertaintTempoDurationIsSpecified, tempoValuePartWhereCertainTempoNumberIsSpecified, tempoAura, unitDurationInQuarters, thisIsFirstUnitInMeasure) => {
     if (thisIsFirstUnitInMeasure) {
       if (tempoValuePartWhereCertaintTempoDurationIsSpecified && tempoValuePartWhereCertainTempoNumberIsSpecified) {
         tempoAura.quartersPerMinute = durationsValuesInTempoExpressedInQuarters[tempoValuePartWhereCertaintTempoDurationIsSpecified] * tempoValuePartWhereCertainTempoNumberIsSpecified
       } else {
-        tempoAura.quartersPerMinute = 172 
+        tempoAura.quartersPerMinute = 172
       }
     }
   },
-  'allegrissimo': (tempoValuePartWhereCertaintTempoDurationIsSpecified, tempoValuePartWhereCertainTempoNumberIsSpecified, tempoAura, unitDurationInQuarters, thisIsFirstUnitInMeasure) => {
+  allegrissimo: (tempoValuePartWhereCertaintTempoDurationIsSpecified, tempoValuePartWhereCertainTempoNumberIsSpecified, tempoAura, unitDurationInQuarters, thisIsFirstUnitInMeasure) => {
     if (thisIsFirstUnitInMeasure) {
       if (tempoValuePartWhereCertaintTempoDurationIsSpecified && tempoValuePartWhereCertainTempoNumberIsSpecified) {
         tempoAura.quartersPerMinute = durationsValuesInTempoExpressedInQuarters[tempoValuePartWhereCertaintTempoDurationIsSpecified] * tempoValuePartWhereCertainTempoNumberIsSpecified
       } else {
-        tempoAura.quartersPerMinute = 172 
+        tempoAura.quartersPerMinute = 172
       }
     }
   },
@@ -195,29 +195,29 @@ export default {
       if (tempoValuePartWhereCertaintTempoDurationIsSpecified && tempoValuePartWhereCertainTempoNumberIsSpecified) {
         tempoAura.quartersPerMinute = durationsValuesInTempoExpressedInQuarters[tempoValuePartWhereCertaintTempoDurationIsSpecified] * tempoValuePartWhereCertainTempoNumberIsSpecified
       } else {
-        tempoAura.quartersPerMinute = 172 
+        tempoAura.quartersPerMinute = 172
       }
     }
   },
-  'presto': (tempoValuePartWhereCertaintTempoDurationIsSpecified, tempoValuePartWhereCertainTempoNumberIsSpecified, tempoAura, unitDurationInQuarters, thisIsFirstUnitInMeasure) => {
+  presto: (tempoValuePartWhereCertaintTempoDurationIsSpecified, tempoValuePartWhereCertainTempoNumberIsSpecified, tempoAura, unitDurationInQuarters, thisIsFirstUnitInMeasure) => {
     if (thisIsFirstUnitInMeasure) {
       if (tempoValuePartWhereCertaintTempoDurationIsSpecified && tempoValuePartWhereCertainTempoNumberIsSpecified) {
         tempoAura.quartersPerMinute = durationsValuesInTempoExpressedInQuarters[tempoValuePartWhereCertaintTempoDurationIsSpecified] * tempoValuePartWhereCertainTempoNumberIsSpecified
       } else {
-        tempoAura.quartersPerMinute = 168 
+        tempoAura.quartersPerMinute = 168
       }
     }
   },
-  'prestissimo': (tempoValuePartWhereCertaintTempoDurationIsSpecified, tempoValuePartWhereCertainTempoNumberIsSpecified, tempoAura, unitDurationInQuarters, thisIsFirstUnitInMeasure) => {
+  prestissimo: (tempoValuePartWhereCertaintTempoDurationIsSpecified, tempoValuePartWhereCertainTempoNumberIsSpecified, tempoAura, unitDurationInQuarters, thisIsFirstUnitInMeasure) => {
     if (thisIsFirstUnitInMeasure) {
       if (tempoValuePartWhereCertaintTempoDurationIsSpecified && tempoValuePartWhereCertainTempoNumberIsSpecified) {
         tempoAura.quartersPerMinute = durationsValuesInTempoExpressedInQuarters[tempoValuePartWhereCertaintTempoDurationIsSpecified] * tempoValuePartWhereCertainTempoNumberIsSpecified
       } else {
-        tempoAura.quartersPerMinute = 200 
+        tempoAura.quartersPerMinute = 200
       }
     }
   },
-  'accelerando': (tempoValuePartWhereCertaintTempoDurationIsSpecified, tempoValuePartWhereCertainTempoNumberIsSpecified, tempoAura, unitDurationInQuarters, thisIsFirstUnitInMeasure) => {
+  accelerando: (tempoValuePartWhereCertaintTempoDurationIsSpecified, tempoValuePartWhereCertainTempoNumberIsSpecified, tempoAura, unitDurationInQuarters, thisIsFirstUnitInMeasure) => {
     const accelerandoStepPerQuarter = 20
     if (thisIsFirstUnitInMeasure) {
       let aimingToQuartersPerMinute = tempoAura.quartersPerMinute + 100
@@ -232,7 +232,7 @@ export default {
       tempoAura.quartersPerMinute += accelerandoStepPerQuarter * unitDurationInQuarters
     }
   },
-  'allargando': (tempoValuePartWhereCertaintTempoDurationIsSpecified, tempoValuePartWhereCertainTempoNumberIsSpecified, tempoAura, unitDurationInQuarters, thisIsFirstUnitInMeasure) => {
+  allargando: (tempoValuePartWhereCertaintTempoDurationIsSpecified, tempoValuePartWhereCertainTempoNumberIsSpecified, tempoAura, unitDurationInQuarters, thisIsFirstUnitInMeasure) => {
     const allargandoStepPerQuarter = 20
     if (thisIsFirstUnitInMeasure) {
       let aimingToQuartersPerMinute = tempoAura.quartersPerMinute - 100
@@ -247,7 +247,7 @@ export default {
       tempoAura.quartersPerMinute -= allargandoStepPerQuarter * unitDurationInQuarters
     }
   },
-  'calando': (tempoValuePartWhereCertaintTempoDurationIsSpecified, tempoValuePartWhereCertainTempoNumberIsSpecified, tempoAura, unitDurationInQuarters, thisIsFirstUnitInMeasure) => {
+  calando: (tempoValuePartWhereCertaintTempoDurationIsSpecified, tempoValuePartWhereCertainTempoNumberIsSpecified, tempoAura, unitDurationInQuarters, thisIsFirstUnitInMeasure) => {
     if (thisIsFirstUnitInMeasure) {
       if (tempoValuePartWhereCertaintTempoDurationIsSpecified && tempoValuePartWhereCertainTempoNumberIsSpecified) {
         tempoAura.quartersPerMinute = durationsValuesInTempoExpressedInQuarters[tempoValuePartWhereCertaintTempoDurationIsSpecified] * tempoValuePartWhereCertainTempoNumberIsSpecified
@@ -283,7 +283,7 @@ export default {
       }
     }
   },
-  'lentando': (tempoValuePartWhereCertaintTempoDurationIsSpecified, tempoValuePartWhereCertainTempoNumberIsSpecified, tempoAura, unitDurationInQuarters, thisIsFirstUnitInMeasure) => {
+  lentando: (tempoValuePartWhereCertaintTempoDurationIsSpecified, tempoValuePartWhereCertainTempoNumberIsSpecified, tempoAura, unitDurationInQuarters, thisIsFirstUnitInMeasure) => {
     const lentandoStepPerQuarter = 20
     if (thisIsFirstUnitInMeasure) {
       let aimingToQuartersPerMinute = tempoAura.quartersPerMinute - 80
@@ -291,7 +291,7 @@ export default {
         aimingToQuartersPerMinute = durationsValuesInTempoExpressedInQuarters[tempoValuePartWhereCertaintTempoDurationIsSpecified] * tempoValuePartWhereCertainTempoNumberIsSpecified
       }
       if (aimingToQuartersPerMinute < tempoAura.quartersPerMinute) {
-        tempoAura.aimingToQuartersPerMinute = aimingToQuartersPerMinute 
+        tempoAura.aimingToQuartersPerMinute = aimingToQuartersPerMinute
       }
     }
     if (tempoAura.quartersPerMinute > tempoAura.aimingToQuartersPerMinute && unitDurationInQuarters) {
@@ -325,7 +325,7 @@ export default {
       }
     }
   },
-  'mosso': (tempoValuePartWhereCertaintTempoDurationIsSpecified, tempoValuePartWhereCertainTempoNumberIsSpecified, tempoAura, unitDurationInQuarters, thisIsFirstUnitInMeasure) => {
+  mosso: (tempoValuePartWhereCertaintTempoDurationIsSpecified, tempoValuePartWhereCertainTempoNumberIsSpecified, tempoAura, unitDurationInQuarters, thisIsFirstUnitInMeasure) => {
     if (thisIsFirstUnitInMeasure) {
       if (tempoValuePartWhereCertaintTempoDurationIsSpecified && tempoValuePartWhereCertainTempoNumberIsSpecified) {
         tempoAura.quartersPerMinute = durationsValuesInTempoExpressedInQuarters[tempoValuePartWhereCertaintTempoDurationIsSpecified] * tempoValuePartWhereCertainTempoNumberIsSpecified
@@ -334,7 +334,7 @@ export default {
       }
     }
   },
-  'precipitando': (tempoValuePartWhereCertaintTempoDurationIsSpecified, tempoValuePartWhereCertainTempoNumberIsSpecified, tempoAura, unitDurationInQuarters, thisIsFirstUnitInMeasure) => {
+  precipitando: (tempoValuePartWhereCertaintTempoDurationIsSpecified, tempoValuePartWhereCertainTempoNumberIsSpecified, tempoAura, unitDurationInQuarters, thisIsFirstUnitInMeasure) => {
     if (thisIsFirstUnitInMeasure) {
       if (tempoValuePartWhereCertaintTempoDurationIsSpecified && tempoValuePartWhereCertainTempoNumberIsSpecified) {
         tempoAura.quartersPerMinute = durationsValuesInTempoExpressedInQuarters[tempoValuePartWhereCertaintTempoDurationIsSpecified] * tempoValuePartWhereCertainTempoNumberIsSpecified
@@ -343,7 +343,7 @@ export default {
       }
     }
   },
-  'rallentando': (tempoValuePartWhereCertaintTempoDurationIsSpecified, tempoValuePartWhereCertainTempoNumberIsSpecified, tempoAura, unitDurationInQuarters, thisIsFirstUnitInMeasure) => {
+  rallentando: (tempoValuePartWhereCertaintTempoDurationIsSpecified, tempoValuePartWhereCertainTempoNumberIsSpecified, tempoAura, unitDurationInQuarters, thisIsFirstUnitInMeasure) => {
     const rallentandoStepPerQuarter = 20
     if (thisIsFirstUnitInMeasure) {
       let aimingToQuartersPerMinute = tempoAura.quartersPerMinute - 80
@@ -351,7 +351,7 @@ export default {
         aimingToQuartersPerMinute = durationsValuesInTempoExpressedInQuarters[tempoValuePartWhereCertaintTempoDurationIsSpecified] * tempoValuePartWhereCertainTempoNumberIsSpecified
       }
       if (aimingToQuartersPerMinute < tempoAura.quartersPerMinute) {
-        tempoAura.aimingToQuartersPerMinute = aimingToQuartersPerMinute 
+        tempoAura.aimingToQuartersPerMinute = aimingToQuartersPerMinute
       }
     }
     if (tempoAura.quartersPerMinute > tempoAura.aimingToQuartersPerMinute && unitDurationInQuarters) {
@@ -366,14 +366,14 @@ export default {
         aimingToQuartersPerMinute = durationsValuesInTempoExpressedInQuarters[tempoValuePartWhereCertaintTempoDurationIsSpecified] * tempoValuePartWhereCertainTempoNumberIsSpecified
       }
       if (aimingToQuartersPerMinute < tempoAura.quartersPerMinute) {
-        tempoAura.aimingToQuartersPerMinute = aimingToQuartersPerMinute 
+        tempoAura.aimingToQuartersPerMinute = aimingToQuartersPerMinute
       }
     }
     if (tempoAura.quartersPerMinute > tempoAura.aimingToQuartersPerMinute && unitDurationInQuarters) {
       tempoAura.quartersPerMinute -= rallentandoStepPerQuarter * unitDurationInQuarters
     }
   },
-  'ritardando': (tempoValuePartWhereCertaintTempoDurationIsSpecified, tempoValuePartWhereCertainTempoNumberIsSpecified, tempoAura, unitDurationInQuarters, thisIsFirstUnitInMeasure) => {
+  ritardando: (tempoValuePartWhereCertaintTempoDurationIsSpecified, tempoValuePartWhereCertainTempoNumberIsSpecified, tempoAura, unitDurationInQuarters, thisIsFirstUnitInMeasure) => {
     const ritardandoStepPerQuarter = 20
     if (thisIsFirstUnitInMeasure) {
       let aimingToQuartersPerMinute = tempoAura.quartersPerMinute - 80
@@ -381,7 +381,7 @@ export default {
         aimingToQuartersPerMinute = durationsValuesInTempoExpressedInQuarters[tempoValuePartWhereCertaintTempoDurationIsSpecified] * tempoValuePartWhereCertainTempoNumberIsSpecified
       }
       if (aimingToQuartersPerMinute < tempoAura.quartersPerMinute) {
-        tempoAura.aimingToQuartersPerMinute = aimingToQuartersPerMinute 
+        tempoAura.aimingToQuartersPerMinute = aimingToQuartersPerMinute
       }
     }
     if (tempoAura.quartersPerMinute > tempoAura.aimingToQuartersPerMinute && unitDurationInQuarters) {
@@ -396,14 +396,14 @@ export default {
         aimingToQuartersPerMinute = durationsValuesInTempoExpressedInQuarters[tempoValuePartWhereCertaintTempoDurationIsSpecified] * tempoValuePartWhereCertainTempoNumberIsSpecified
       }
       if (aimingToQuartersPerMinute < tempoAura.quartersPerMinute) {
-        tempoAura.aimingToQuartersPerMinute = aimingToQuartersPerMinute 
+        tempoAura.aimingToQuartersPerMinute = aimingToQuartersPerMinute
       }
     }
     if (tempoAura.quartersPerMinute > tempoAura.aimingToQuartersPerMinute && unitDurationInQuarters) {
       tempoAura.quartersPerMinute -= ritardandoStepPerQuarter * unitDurationInQuarters
     }
   },
-  'ritenuto': (tempoValuePartWhereCertaintTempoDurationIsSpecified, tempoValuePartWhereCertainTempoNumberIsSpecified, tempoAura, unitDurationInQuarters, thisIsFirstUnitInMeasure) => {
+  ritenuto: (tempoValuePartWhereCertaintTempoDurationIsSpecified, tempoValuePartWhereCertainTempoNumberIsSpecified, tempoAura, unitDurationInQuarters, thisIsFirstUnitInMeasure) => {
     const ritenutoStepPerQuarter = 40
     if (thisIsFirstUnitInMeasure) {
       let aimingToQuartersPerMinute = tempoAura.quartersPerMinute - 120
@@ -411,14 +411,14 @@ export default {
         aimingToQuartersPerMinute = durationsValuesInTempoExpressedInQuarters[tempoValuePartWhereCertaintTempoDurationIsSpecified] * tempoValuePartWhereCertainTempoNumberIsSpecified
       }
       if (aimingToQuartersPerMinute < tempoAura.quartersPerMinute) {
-        tempoAura.aimingToQuartersPerMinute = aimingToQuartersPerMinute 
+        tempoAura.aimingToQuartersPerMinute = aimingToQuartersPerMinute
       }
     }
     if (tempoAura.quartersPerMinute > tempoAura.aimingToQuartersPerMinute && unitDurationInQuarters) {
       tempoAura.quartersPerMinute -= ritenutoStepPerQuarter * unitDurationInQuarters
     }
   },
-  'stringendo': (tempoValuePartWhereCertaintTempoDurationIsSpecified, tempoValuePartWhereCertainTempoNumberIsSpecified, tempoAura, unitDurationInQuarters, thisIsFirstUnitInMeasure) => {
+  stringendo: (tempoValuePartWhereCertaintTempoDurationIsSpecified, tempoValuePartWhereCertainTempoNumberIsSpecified, tempoAura, unitDurationInQuarters, thisIsFirstUnitInMeasure) => {
     if (thisIsFirstUnitInMeasure) {
       if (tempoValuePartWhereCertaintTempoDurationIsSpecified && tempoValuePartWhereCertainTempoNumberIsSpecified) {
         tempoAura.quartersPerMinute = durationsValuesInTempoExpressedInQuarters[tempoValuePartWhereCertaintTempoDurationIsSpecified] * tempoValuePartWhereCertainTempoNumberIsSpecified
@@ -427,7 +427,7 @@ export default {
       }
     }
   },
-  'tardando': (tempoValuePartWhereCertaintTempoDurationIsSpecified, tempoValuePartWhereCertainTempoNumberIsSpecified, tempoAura, unitDurationInQuarters, thisIsFirstUnitInMeasure) => {
+  tardando: (tempoValuePartWhereCertaintTempoDurationIsSpecified, tempoValuePartWhereCertainTempoNumberIsSpecified, tempoAura, unitDurationInQuarters, thisIsFirstUnitInMeasure) => {
     const tardandoStepPerQuarter = 20
     if (thisIsFirstUnitInMeasure) {
       let aimingToQuartersPerMinute = tempoAura.quartersPerMinute - 80
@@ -435,7 +435,7 @@ export default {
         aimingToQuartersPerMinute = durationsValuesInTempoExpressedInQuarters[tempoValuePartWhereCertaintTempoDurationIsSpecified] * tempoValuePartWhereCertainTempoNumberIsSpecified
       }
       if (aimingToQuartersPerMinute < tempoAura.quartersPerMinute) {
-        tempoAura.aimingToQuartersPerMinute = aimingToQuartersPerMinute 
+        tempoAura.aimingToQuartersPerMinute = aimingToQuartersPerMinute
       }
     }
     if (tempoAura.quartersPerMinute > tempoAura.aimingToQuartersPerMinute && unitDurationInQuarters) {

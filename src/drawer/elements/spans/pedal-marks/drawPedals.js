@@ -43,7 +43,7 @@ export default function (voicesOnPageLine, measuresOnPageLine, styles) {
               for (let singleUnitIndex = 0; singleUnitIndex < currentCrossVoiceUnitInCurrentCrossStaveUnit.length; singleUnitIndex++) {
                 const currentSingleUnit = currentCrossVoiceUnitInCurrentCrossStaveUnit[singleUnitIndex]
                 const pedalMark = currentSingleUnit.pedalMark
-                for (let key in pedalsStack) {
+                for (const key in pedalsStack) {
                   const markedPedal = pedalsStack[key]
                   markedPedal.underStaveIndex = markedPedal.underStaveIndex || 0
                   if (currentSingleUnit.staveIndex === markedPedal.underStaveIndex) {
@@ -208,7 +208,7 @@ export default function (voicesOnPageLine, measuresOnPageLine, styles) {
                   }
                 }
                 if (isLastCrossStaveUnitOnPageLine && currentCrossVoiceUnitIsLastInCurrentCrossStaveUnit && (singleUnitIndex === (currentCrossVoiceUnitInCurrentCrossStaveUnit.length - 1))) {
-                  for (let key in pedalsStack) {
+                  for (const key in pedalsStack) {
                     pedalsStack[key].rightPoint = measuresOnPageLine[currentSingleUnit.measureIndexOnPageLine]
                       ? measuresOnPageLine[currentSingleUnit.measureIndexOnPageLine].right - pedalBracketRightOffsetFinishesBeforeEndOfMeasure
                       : currentSingleUnit.right

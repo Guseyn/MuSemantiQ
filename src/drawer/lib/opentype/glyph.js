@@ -5,12 +5,12 @@ import draw from '#msq/drawer/lib/opentype/draw.js'
 import Path from '#msq/drawer/lib/opentype/path.js'
 // import glyf from './tables/glyf.js' Can't be imported here, because it's a circular dependency
 
-function getPathDefinition(glyph, path) {
+function getPathDefinition (glyph, path) {
   let _path = path || new Path()
   return {
     configurable: true,
 
-    get: function() {
+    get: function () {
       if (typeof _path === 'function') {
         _path = _path()
       }
@@ -18,7 +18,7 @@ function getPathDefinition(glyph, path) {
       return _path
     },
 
-    set: function(p) {
+    set: function (p) {
       _path = p
     }
   }
@@ -47,7 +47,7 @@ function getPathDefinition(glyph, path) {
  * @param {GlyphOptions}
  * @constructor
  */
-function Glyph(options) {
+function Glyph (options) {
   // By putting all the code on a prototype function (which is only declared once)
   // we reduce the memory requirements for larger fonts by some 2%
   this.bindConstructorValues(options)
@@ -56,13 +56,13 @@ function Glyph(options) {
 /**
  * @param  {GlyphOptions}
  */
-Glyph.prototype.bindConstructorValues = function(options) {
+Glyph.prototype.bindConstructorValues = function (options) {
   this.index = options.index || 0
 
   // These three values cannot be deferred for memory optimization:
   this.name = options.name || null
   this.unicode = options.unicode || undefined
-  this.unicodes = options.unicodes || options.unicode !== undefined ? [options.unicode] : []
+  this.unicodes = options.unicodes || options.unicode !== undefined ? [ options.unicode ] : []
 
   // But by binding these values only when necessary, we reduce can
   // the memory requirements by almost 3% for larger fonts.
@@ -95,7 +95,7 @@ Glyph.prototype.bindConstructorValues = function(options) {
 /**
  * @param {number}
  */
-Glyph.prototype.addUnicode = function(unicode) {
+Glyph.prototype.addUnicode = function (unicode) {
   if (this.unicodes.length === 0) {
     this.unicode = unicode
   }
@@ -107,7 +107,7 @@ Glyph.prototype.addUnicode = function(unicode) {
  * Calculate the minimum bounding box for this glyph.
  * @return {opentype.BoundingBox}
  */
-Glyph.prototype.getBoundingBox = function() {
+Glyph.prototype.getBoundingBox = function () {
   return this.path.getBoundingBox()
 }
 
@@ -120,7 +120,7 @@ Glyph.prototype.getBoundingBox = function() {
  * @param  {opentype.Font} if hinting is to be used, the font
  * @return {opentype.Path}
  */
-Glyph.prototype.getPath = function(x, y, fontSize, options, font) {
+Glyph.prototype.getPath = function (x, y, fontSize, options, font) {
   x = x !== undefined ? x : 0
   y = y !== undefined ? y : 0
   fontSize = fontSize !== undefined ? fontSize : 72
@@ -180,7 +180,7 @@ Glyph.prototype.getPath = function(x, y, fontSize, options, font) {
  * provide raw access to the TrueType glyph outlines.
  * @return {Array}
  */
-Glyph.prototype.getContours = function() {
+Glyph.prototype.getContours = function () {
   if (this.points === undefined) {
     return []
   }
@@ -204,7 +204,7 @@ Glyph.prototype.getContours = function() {
  * Calculate the xMin/yMin/xMax/yMax/lsb/rsb for a Glyph.
  * @return {Object}
  */
-Glyph.prototype.getMetrics = function() {
+Glyph.prototype.getMetrics = function () {
   const commands = this.path.commands
   const xCoords = []
   const yCoords = []
@@ -262,7 +262,7 @@ Glyph.prototype.getMetrics = function() {
  * @param  {number} [fontSize=72] - Font size in pixels. We scale the glyph units by `1 / unitsPerEm * fontSize`.
  * @param  {Object=} options - xScale, yScale to stretch the glyph.
  */
-Glyph.prototype.draw = function(ctx, x, y, fontSize, options) {
+Glyph.prototype.draw = function (ctx, x, y, fontSize, options) {
   this.getPath(x, y, fontSize, options).draw(ctx)
 }
 
@@ -274,8 +274,8 @@ Glyph.prototype.draw = function(ctx, x, y, fontSize, options) {
  * @param  {number} [y=0] - Vertical position of the *baseline* of the text.
  * @param  {number} [fontSize=72] - Font size in pixels. We scale the glyph units by `1 / unitsPerEm * fontSize`.
  */
-Glyph.prototype.drawPoints = function(ctx, x, y, fontSize) {
-  function drawCircles(l, x, y, scale) {
+Glyph.prototype.drawPoints = function (ctx, x, y, fontSize) {
+  function drawCircles (l, x, y, scale) {
     const PI_SQ = Math.PI * 2
     ctx.beginPath()
     for (let j = 0; j < l.length; j += 1) {
@@ -298,15 +298,15 @@ Glyph.prototype.drawPoints = function(ctx, x, y, fontSize) {
   for (let i = 0; i < path.commands.length; i += 1) {
     const cmd = path.commands[i]
     if (cmd.x !== undefined) {
-      blueCircles.push({x: cmd.x, y: -cmd.y})
+      blueCircles.push({ x: cmd.x, y: -cmd.y })
     }
 
     if (cmd.x1 !== undefined) {
-      redCircles.push({x: cmd.x1, y: -cmd.y1})
+      redCircles.push({ x: cmd.x1, y: -cmd.y1 })
     }
 
     if (cmd.x2 !== undefined) {
-      redCircles.push({x: cmd.x2, y: -cmd.y2})
+      redCircles.push({ x: cmd.x2, y: -cmd.y2 })
     }
   }
 
@@ -326,7 +326,7 @@ Glyph.prototype.drawPoints = function(ctx, x, y, fontSize) {
  * @param  {number} [y=0] - Vertical position of the *baseline* of the text.
  * @param  {number} [fontSize=72] - Font size in pixels. We scale the glyph units by `1 / unitsPerEm * fontSize`.
  */
-Glyph.prototype.drawMetrics = function(ctx, x, y, fontSize) {
+Glyph.prototype.drawMetrics = function (ctx, x, y, fontSize) {
   let scale
   x = x !== undefined ? x : 0
   y = y !== undefined ? y : 0
@@ -342,9 +342,9 @@ Glyph.prototype.drawMetrics = function(ctx, x, y, fontSize) {
   // This code is here due to memory optimization: by not using
   // defaults in the constructor, we save a notable amount of memory.
   const xMin = this.xMin || 0
-  let yMin = this.yMin || 0
+  const yMin = this.yMin || 0
   const xMax = this.xMax || 0
-  let yMax = this.yMax || 0
+  const yMax = this.yMax || 0
   const advanceWidth = this.advanceWidth || 0
 
   // Draw the glyph box

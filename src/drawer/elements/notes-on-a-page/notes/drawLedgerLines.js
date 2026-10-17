@@ -83,7 +83,7 @@ export default function (voicesOnPageLine, styles) {
               }
             }
           }
-          for (let staveIndex in informationThatHelpsToDrawLedgerLines) {
+          for (const staveIndex in informationThatHelpsToDrawLedgerLines) {
             const ledgerLineStrokeOptionsForUnit = Object.assign({}, ledgerLinesStrokeOptions)
             let ledgerLinesOffsetFromNoteHead = ledgerLinesRadiusFromNoteHead
             if (topOffsetsForEachStave[staveIndex] !== undefined) {

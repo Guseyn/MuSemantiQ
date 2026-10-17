@@ -16,7 +16,7 @@ const anonymousBase = '/'
  * @name Validator
  * @constructor
  */
-function Validator() {
+function Validator () {
   // Allow a validator instance to override global custom formats or to have their
   // own custom formats.
   this.customFormats = Object.create(Validator.prototype.customFormats)
@@ -43,7 +43,7 @@ Validator.prototype.unresolvedRefs = null
  * @param urn
  * @return {Object}
  */
-Validator.prototype.addSchema = function addSchema(schema, base) {
+Validator.prototype.addSchema = function addSchema (schema, base) {
   const self = this
   if (!schema) {
     return null
@@ -68,16 +68,16 @@ Validator.prototype.addSchema = function addSchema(schema, base) {
   return this.schemas[ourUri]
 }
 
-Validator.prototype.addSubSchemaArray = function addSubSchemaArray(baseuri, schemas) {
+Validator.prototype.addSubSchemaArray = function addSubSchemaArray (baseuri, schemas) {
   if (!Array.isArray(schemas)) return
   for (let i = 0; i < schemas.length; i++) {
     this.addSubSchema(baseuri, schemas[i])
   }
 }
 
-Validator.prototype.addSubSchemaObject = function addSubSchemaArray(baseuri, schemas) {
-  if (!schemas || typeof schemas != 'object') return
-  // eslint-disable-next-line guard-for-in
+Validator.prototype.addSubSchemaObject = function addSubSchemaArray (baseuri, schemas) {
+  if (!schemas || typeof schemas !== 'object') return
+
   for (const p in schemas) {
     this.addSubSchema(baseuri, schemas[p])
   }
@@ -87,7 +87,7 @@ Validator.prototype.addSubSchemaObject = function addSubSchemaArray(baseuri, sch
  * Sets all the schemas of the Validator instance.
  * @param schemas
  */
-Validator.prototype.setSchemas = function setSchemas(schemas) {
+Validator.prototype.setSchemas = function setSchemas (schemas) {
   this.schemas = schemas
 }
 
@@ -95,7 +95,7 @@ Validator.prototype.setSchemas = function setSchemas(schemas) {
  * Returns the schema of a certain urn
  * @param urn
  */
-Validator.prototype.getSchema = function getSchema(urn) {
+Validator.prototype.getSchema = function getSchema (urn) {
   return this.schemas[urn]
 }
 
@@ -107,7 +107,7 @@ Validator.prototype.getSchema = function getSchema(urn) {
  * @param [ctx]
  * @return {Array}
  */
-Validator.prototype.validate = function validate(instance, schema, options, ctx) {
+Validator.prototype.validate = function validate (instance, schema, options, ctx) {
   if ((typeof schema !== 'boolean' && typeof schema !== 'object') || schema === null) {
     throw new SchemaError('Expected `schema` to be an object or boolean')
   }
@@ -151,9 +151,9 @@ Validator.prototype.validate = function validate(instance, schema, options, ctx)
  * @param Object schema
  * @return mixed schema uri or false
  */
-function shouldResolve(schema) {
+function shouldResolve (schema) {
   const ref = typeof schema === 'string' ? schema : schema.$ref
-  if (typeof ref == 'string') return ref
+  if (typeof ref === 'string') return ref
   return false
 }
 
@@ -166,7 +166,7 @@ function shouldResolve(schema) {
  * @private
  * @return {ValidatorResult}
  */
-Validator.prototype.validateSchema = function validateSchema(instance, schema, options, ctx) {
+Validator.prototype.validateSchema = function validateSchema (instance, schema, options, ctx) {
   const result = new ValidatorResult(instance, schema, options, ctx)
 
   // Support for the true/false schemas
@@ -212,7 +212,7 @@ Validator.prototype.validateSchema = function validateSchema(instance, schema, o
   const skipAttributes = (options && options.skipAttributes) || []
 
   // Validate each schema attribute against the instance
-  // eslint-disable-next-line guard-for-in
+
   for (const key in schema) {
     if (!attribute.ignoreProperties[key] && skipAttributes.indexOf(key) < 0) {
       let validatorErr = null
@@ -229,7 +229,7 @@ Validator.prototype.validateSchema = function validateSchema(instance, schema, o
     }
   }
 
-  if (typeof options.rewrite == 'function') {
+  if (typeof options.rewrite === 'function') {
     const value = options.rewrite.call(this, instance, schema, options, ctx)
     result.instance = value
   }
@@ -242,7 +242,7 @@ Validator.prototype.validateSchema = function validateSchema(instance, schema, o
  * @param SchemaContext ctx
  * @returns Object schema or resolved schema
  */
-Validator.prototype.schemaTraverser = function schemaTraverser(schemaobj, s) {
+Validator.prototype.schemaTraverser = function schemaTraverser (schemaobj, s) {
   schemaobj.schema = helpers.deepMerge(schemaobj.schema, this.superResolve(s, schemaobj.ctx))
 }
 
@@ -252,7 +252,7 @@ Validator.prototype.schemaTraverser = function schemaTraverser(schemaobj, s) {
  * @param SchemaContext ctx
  * @returns Object schema or resolved schema
  */
-Validator.prototype.superResolve = function superResolve(schema, ctx) {
+Validator.prototype.superResolve = function superResolve (schema, ctx) {
   const ref = shouldResolve(schema)
   if (ref) {
     return this.resolve(schema, ref, ctx).subschema
@@ -268,7 +268,7 @@ Validator.prototype.superResolve = function superResolve(schema, ctx) {
  * @return Object resolved schemas {subschema:String, switchSchema: String}
  * @throws SchemaError
  */
-Validator.prototype.resolve = function resolve(schema, switchSchema, ctx) {
+Validator.prototype.resolve = function resolve (schema, switchSchema, ctx) {
   switchSchema = ctx.resolve(switchSchema)
 
   // First see if the schema exists under the provided URI
@@ -305,16 +305,16 @@ Validator.prototype.resolve = function resolve(schema, switchSchema, ctx) {
  * @param type
  * @return {boolean}
  */
-Validator.prototype.testType = function validateType(instance, schema, options, ctx, type) {
+Validator.prototype.testType = function validateType (instance, schema, options, ctx, type) {
   if (type === undefined) {
     return
   } else if (type === null) {
     throw new SchemaError('Unexpected null in "type" keyword')
   }
-  if (typeof this.types[type] == 'function') {
+  if (typeof this.types[type] === 'function') {
     return this.types[type].call(this, instance)
   }
-  if (type && typeof type == 'object') {
+  if (type && typeof type === 'object') {
     const res = this.validateSchema(instance, type, options, ctx)
     return res === undefined || !(res && res.errors.length)
   }
@@ -324,40 +324,40 @@ Validator.prototype.testType = function validateType(instance, schema, options, 
 
 const types = (Validator.prototype.types = {})
 
-types.string = function testString(instance) {
-  return typeof instance == 'string'
+types.string = function testString (instance) {
+  return typeof instance === 'string'
 }
 
-types.number = function testNumber(instance) {
+types.number = function testNumber (instance) {
   // isFinite returns false for NaN, Infinity, and -Infinity
-  return typeof instance == 'number' && isFinite(instance)
+  return typeof instance === 'number' && isFinite(instance)
 }
 
-types.integer = function testInteger(instance) {
-  return typeof instance == 'number' && instance % 1 === 0
+types.integer = function testInteger (instance) {
+  return typeof instance === 'number' && instance % 1 === 0
 }
 
-types.boolean = function testBoolean(instance) {
-  return typeof instance == 'boolean'
+types.boolean = function testBoolean (instance) {
+  return typeof instance === 'boolean'
 }
 
-types.array = function testArray(instance) {
+types.array = function testArray (instance) {
   return Array.isArray(instance)
 }
 
-types.null = function testNull(instance) {
+types.null = function testNull (instance) {
   return instance === null
 }
 
-types.date = function testDate(instance) {
+types.date = function testDate (instance) {
   return instance instanceof Date
 }
 
-types.any = function testAny(instance) {
+types.any = function testAny (instance) {
   return true
 }
 
-types.object = function testObject(instance) {
+types.object = function testObject (instance) {
   // TODO: fix this - see #15
   return (
     instance &&

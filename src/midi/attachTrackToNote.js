@@ -27,7 +27,7 @@ export default function (midi, note, midiSettings, instrumentTitleParamsForCurre
     tracksForEachInstrumentOnEachStaveInEachVoice[instrumentStaveVoiceKey].name = `track-${instrumentStaveVoiceKey}`
     const trackChannelNumber = instrumentsMappedWithChannels[trackInstrumentMidiNumber]
     if (trackChannelNumber !== undefined) {
-      tracksForEachInstrumentOnEachStaveInEachVoice[instrumentStaveVoiceKey].channel = trackChannelNumber 
+      tracksForEachInstrumentOnEachStaveInEachVoice[instrumentStaveVoiceKey].channel = trackChannelNumber
     } else {
       for (let channelIndex = 0; channelIndex < 16; channelIndex++) {
         if ((channelIndex === 9) || (channelIndex === 10)) {

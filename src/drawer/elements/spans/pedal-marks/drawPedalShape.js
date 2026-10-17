@@ -307,7 +307,7 @@ export default function (pedalStructure, styles) {
       )
     })
   }
-  let pedalMarksWithLines = createGroup(
+  const pedalMarksWithLines = createGroup(
     'pedalMarksWithLines',
     [
       groupedStandAloneTextsAndEmptyPoints,
@@ -329,7 +329,7 @@ export default function (pedalStructure, styles) {
     chordsWithVariablePeaksAndTextsOnThem.forEach(
       chordWithMark => {
         if (chordWithMark.drawnVariablePeak) {
-          let xPoint = (chordWithMark.drawnVariablePeak.left + chordWithMark.drawnVariablePeak.right) / 2
+          const xPoint = (chordWithMark.drawnVariablePeak.left + chordWithMark.drawnVariablePeak.right) / 2
           let textOnVariablePeak
           if (pedalLetters[chordWithMark.textValue]) {
             textOnVariablePeak = createPath(

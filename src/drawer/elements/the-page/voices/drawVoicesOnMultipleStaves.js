@@ -135,7 +135,7 @@ export default function ({
           {
             measureIndexOnPageLine,
             singleUnitsByStaveIndexes: singleUnitsForCurrentCrossStaveUnit,
-            crossVoiceUnitsOnAllStavesInCrossStaveUnit: crossVoiceUnitsOnAllStavesInCrossStaveUnit,
+            crossVoiceUnitsOnAllStavesInCrossStaveUnit,
             minDurationAmongAccumulatorsForEachVoiceConsideringCasesWhenItIsGraceCrossStaveUnit: isCurrentCrossStaveUnitGrace ? 0 : calculatedMinDurationAmongAccumulatorsForEachVoice,
             chordLetter: findChordLetterValueForCurrentCrossStaveUnit(selectedSingleUnitsParamsToBeIncludedInNextCrossStaveUnit),
             lyrics: findLyricsValueForCurrentCrossStaveUnit(selectedSingleUnitsParamsToBeIncludedInNextCrossStaveUnit)

@@ -3,31 +3,31 @@
 import check from '#msq/drawer/lib/opentype/check.js'
 
 // Retrieve an unsigned byte from the DataView.
-function getByte(dataView, offset) {
+function getByte (dataView, offset) {
   return dataView.getUint8(offset)
 }
 
 // Retrieve an unsigned 16-bit short from the DataView.
 // The value is stored in big endian.
-function getUShort(dataView, offset) {
+function getUShort (dataView, offset) {
   return dataView.getUint16(offset, false)
 }
 
 // Retrieve a signed 16-bit short from the DataView.
 // The value is stored in big endian.
-function getShort(dataView, offset) {
+function getShort (dataView, offset) {
   return dataView.getInt16(offset, false)
 }
 
 // Retrieve an unsigned 32-bit long from the DataView.
 // The value is stored in big endian.
-function getULong(dataView, offset) {
+function getULong (dataView, offset) {
   return dataView.getUint32(offset, false)
 }
 
 // Retrieve a 32-bit signed fixed-point number (16.16) from the DataView.
 // The value is stored in big endian.
-function getFixed(dataView, offset) {
+function getFixed (dataView, offset) {
   const decimal = dataView.getInt16(offset, false)
   const fraction = dataView.getUint16(offset + 2, false)
   return decimal + fraction / 65535
@@ -35,7 +35,7 @@ function getFixed(dataView, offset) {
 
 // Retrieve a 4-character tag from the DataView.
 // Tags are used to identify tables.
-function getTag(dataView, offset) {
+function getTag (dataView, offset) {
   let tag = ''
   for (let i = offset; i < offset + 4; i += 1) {
     tag += String.fromCharCode(dataView.getInt8(i))
@@ -46,7 +46,7 @@ function getTag(dataView, offset) {
 
 // Retrieve an offset from the DataView.
 // Offsets are 1 to 4 bytes in length, depending on the offSize argument.
-function getOffset(dataView, offset, offSize) {
+function getOffset (dataView, offset, offSize) {
   let v = 0
   for (let i = 0; i < offSize; i += 1) {
     v <<= 8
@@ -57,7 +57,7 @@ function getOffset(dataView, offset, offSize) {
 }
 
 // Retrieve a number of bytes from start offset to the end offset from the DataView.
-function getBytes(dataView, startOffset, endOffset) {
+function getBytes (dataView, startOffset, endOffset) {
   const bytes = []
   for (let i = startOffset; i < endOffset; i += 1) {
     bytes.push(dataView.getUint8(i))
@@ -67,7 +67,7 @@ function getBytes(dataView, startOffset, endOffset) {
 }
 
 // Convert the list of bytes to a string.
-function bytesToString(bytes) {
+function bytesToString (bytes) {
   let s = ''
   for (let i = 0; i < bytes.length; i += 1) {
     s += String.fromCharCode(bytes[i])
@@ -88,19 +88,19 @@ const typeOffsets = {
 
 // A stateful parser that changes the offset whenever a value is retrieved.
 // The data is a DataView.
-function Parser(data, offset) {
+function Parser (data, offset) {
   this.data = data
   this.offset = offset
   this.relativeOffset = 0
 }
 
-Parser.prototype.parseByte = function() {
+Parser.prototype.parseByte = function () {
   const v = this.data.getUint8(this.offset + this.relativeOffset)
   this.relativeOffset += 1
   return v
 }
 
-Parser.prototype.parseChar = function() {
+Parser.prototype.parseChar = function () {
   const v = this.data.getInt8(this.offset + this.relativeOffset)
   this.relativeOffset += 1
   return v
@@ -108,7 +108,7 @@ Parser.prototype.parseChar = function() {
 
 Parser.prototype.parseCard8 = Parser.prototype.parseByte
 
-Parser.prototype.parseUShort = function() {
+Parser.prototype.parseUShort = function () {
   const v = this.data.getUint16(this.offset + this.relativeOffset)
   this.relativeOffset += 2
   return v
@@ -118,19 +118,19 @@ Parser.prototype.parseCard16 = Parser.prototype.parseUShort
 Parser.prototype.parseSID = Parser.prototype.parseUShort
 Parser.prototype.parseOffset16 = Parser.prototype.parseUShort
 
-Parser.prototype.parseShort = function() {
+Parser.prototype.parseShort = function () {
   const v = this.data.getInt16(this.offset + this.relativeOffset)
   this.relativeOffset += 2
   return v
 }
 
-Parser.prototype.parseF2Dot14 = function() {
+Parser.prototype.parseF2Dot14 = function () {
   const v = this.data.getInt16(this.offset + this.relativeOffset) / 16384
   this.relativeOffset += 2
   return v
 }
 
-Parser.prototype.parseULong = function() {
+Parser.prototype.parseULong = function () {
   const v = getULong(this.data, this.offset + this.relativeOffset)
   this.relativeOffset += 4
   return v
@@ -138,13 +138,13 @@ Parser.prototype.parseULong = function() {
 
 Parser.prototype.parseOffset32 = Parser.prototype.parseULong
 
-Parser.prototype.parseFixed = function() {
+Parser.prototype.parseFixed = function () {
   const v = getFixed(this.data, this.offset + this.relativeOffset)
   this.relativeOffset += 4
   return v
 }
 
-Parser.prototype.parseString = function(length) {
+Parser.prototype.parseString = function (length) {
   const dataView = this.data
   const offset = this.offset + this.relativeOffset
   let string = ''
@@ -156,7 +156,7 @@ Parser.prototype.parseString = function(length) {
   return string
 }
 
-Parser.prototype.parseTag = function() {
+Parser.prototype.parseTag = function () {
   return this.parseString(4)
 }
 
@@ -164,7 +164,7 @@ Parser.prototype.parseTag = function() {
 // JavaScript and unix timestamps traditionally use 32 bits, so we
 // only take the last 32 bits.
 // + Since until 2038 those bits will be filled by zeros we can ignore them.
-Parser.prototype.parseLongDateTime = function() {
+Parser.prototype.parseLongDateTime = function () {
   let v = getULong(this.data, this.offset + this.relativeOffset + 4)
   // Subtract seconds between 01/01/1904 and 01/01/1970
   // to convert Apple Mac timestamp to Standard Unix timestamp
@@ -173,7 +173,7 @@ Parser.prototype.parseLongDateTime = function() {
   return v
 }
 
-Parser.prototype.parseVersion = function(minorBase) {
+Parser.prototype.parseVersion = function (minorBase) {
   const major = getUShort(this.data, this.offset + this.relativeOffset)
 
   // How to interpret the minor version is very vague in the spec. 0x5000 is 5, 0x1000 is 1
@@ -185,7 +185,7 @@ Parser.prototype.parseVersion = function(minorBase) {
   return major + minor / minorBase / 10
 }
 
-Parser.prototype.skip = function(type, amount) {
+Parser.prototype.skip = function (type, amount) {
   if (amount === undefined) {
     amount = 1
   }
@@ -193,10 +193,10 @@ Parser.prototype.skip = function(type, amount) {
   this.relativeOffset += typeOffsets[type] * amount
 }
 
-///// Parsing lists and records ///////////////////////////////
+/// // Parsing lists and records ///////////////////////////////
 
 // Parse a list of 32 bit unsigned integers.
-Parser.prototype.parseULongList = function(count) {
+Parser.prototype.parseULongList = function (count) {
   if (count === undefined) { count = this.parseULong() }
   const offsets = new Array(count)
   const dataView = this.data
@@ -213,7 +213,7 @@ Parser.prototype.parseULongList = function(count) {
 // Parse a list of 16 bit unsigned integers. The length of the list can be read on the stream
 // or provided as an argument.
 Parser.prototype.parseOffset16List =
-Parser.prototype.parseUShortList = function(count) {
+Parser.prototype.parseUShortList = function (count) {
   if (count === undefined) { count = this.parseUShort() }
   const offsets = new Array(count)
   const dataView = this.data
@@ -228,7 +228,7 @@ Parser.prototype.parseUShortList = function(count) {
 }
 
 // Parses a list of 16 bit signed integers.
-Parser.prototype.parseShortList = function(count) {
+Parser.prototype.parseShortList = function (count) {
   const list = new Array(count)
   const dataView = this.data
   let offset = this.offset + this.relativeOffset
@@ -242,7 +242,7 @@ Parser.prototype.parseShortList = function(count) {
 }
 
 // Parses a list of bytes.
-Parser.prototype.parseByteList = function(count) {
+Parser.prototype.parseByteList = function (count) {
   const list = new Array(count)
   const dataView = this.data
   let offset = this.offset + this.relativeOffset
@@ -259,7 +259,7 @@ Parser.prototype.parseByteList = function(count) {
  * Record count is optional, if omitted it is read from the stream.
  * itemCallback is one of the Parser methods.
  */
-Parser.prototype.parseList = function(count, itemCallback) {
+Parser.prototype.parseList = function (count, itemCallback) {
   if (!itemCallback) {
     itemCallback = count
     count = this.parseUShort()
@@ -271,7 +271,7 @@ Parser.prototype.parseList = function(count, itemCallback) {
   return list
 }
 
-Parser.prototype.parseList32 = function(count, itemCallback) {
+Parser.prototype.parseList32 = function (count, itemCallback) {
   if (!itemCallback) {
     itemCallback = count
     count = this.parseULong()
@@ -288,7 +288,7 @@ Parser.prototype.parseList32 = function(count, itemCallback) {
  * Record count is optional, if omitted it is read from the stream.
  * Example of recordDescription: { sequenceIndex: Parser.uShort, lookupListIndex: Parser.uShort }
  */
-Parser.prototype.parseRecordList = function(count, recordDescription) {
+Parser.prototype.parseRecordList = function (count, recordDescription) {
   // If the count argument is absent, read it in the stream.
   if (!recordDescription) {
     recordDescription = count
@@ -308,7 +308,7 @@ Parser.prototype.parseRecordList = function(count, recordDescription) {
   return records
 }
 
-Parser.prototype.parseRecordList32 = function(count, recordDescription) {
+Parser.prototype.parseRecordList32 = function (count, recordDescription) {
   // If the count argument is absent, read it in the stream.
   if (!recordDescription) {
     recordDescription = count
@@ -330,7 +330,7 @@ Parser.prototype.parseRecordList32 = function(count, recordDescription) {
 
 // Parse a data structure into an object
 // Example of description: { sequenceIndex: Parser.uShort, lookupListIndex: Parser.uShort }
-Parser.prototype.parseStruct = function(description) {
+Parser.prototype.parseStruct = function (description) {
   if (typeof description === 'function') {
     return description.call(this)
   } else {
@@ -350,7 +350,7 @@ Parser.prototype.parseStruct = function(description) {
  * https://docs.microsoft.com/en-us/typography/opentype/spec/gpos#value-record
  * valueFormat is optional, if omitted it is read from the stream.
  */
-Parser.prototype.parseValueRecord = function(valueFormat) {
+Parser.prototype.parseValueRecord = function (valueFormat) {
   if (valueFormat === undefined) {
     valueFormat = this.parseUShort()
   }
@@ -381,7 +381,7 @@ Parser.prototype.parseValueRecord = function(valueFormat) {
  * https://docs.microsoft.com/en-us/typography/opentype/spec/gpos#value-record
  * valueFormat and valueCount are read from the stream.
  */
-Parser.prototype.parseValueRecordList = function() {
+Parser.prototype.parseValueRecordList = function () {
   const valueFormat = this.parseUShort()
   const valueCount = this.parseUShort()
   const values = new Array(valueCount)
@@ -391,7 +391,7 @@ Parser.prototype.parseValueRecordList = function() {
   return values
 }
 
-Parser.prototype.parsePointer = function(description) {
+Parser.prototype.parsePointer = function (description) {
   const structOffset = this.parseOffset16()
   if (structOffset > 0) {
     // NULL offset => return undefined
@@ -400,7 +400,7 @@ Parser.prototype.parsePointer = function(description) {
   return undefined
 }
 
-Parser.prototype.parsePointer32 = function(description) {
+Parser.prototype.parsePointer32 = function (description) {
   const structOffset = this.parseOffset32()
   if (structOffset > 0) {
     // NULL offset => return undefined
@@ -416,7 +416,7 @@ Parser.prototype.parsePointer32 = function(description) {
  * If provided, itemCallback is called on each item and must parse the item.
  * See examples in tables/gsub.js
  */
-Parser.prototype.parseListOfLists = function(itemCallback) {
+Parser.prototype.parseListOfLists = function (itemCallback) {
   const offsets = this.parseOffset16List()
   const count = offsets.length
   const relativeOffset = this.relativeOffset
@@ -446,12 +446,12 @@ Parser.prototype.parseListOfLists = function(itemCallback) {
   return list
 }
 
-///// Complex tables parsing //////////////////////////////////
+/// // Complex tables parsing //////////////////////////////////
 
 // Parse a coverage table in a GSUB, GPOS or GDEF table.
 // https://www.microsoft.com/typography/OTSPEC/chapter2.htm
 // parser.offset must point to the start of the table containing the coverage.
-Parser.prototype.parseCoverage = function() {
+Parser.prototype.parseCoverage = function () {
   const startOffset = this.offset + this.relativeOffset
   const format = this.parseUShort()
   const count = this.parseUShort()
@@ -471,7 +471,7 @@ Parser.prototype.parseCoverage = function() {
     }
     return {
       format: 2,
-      ranges: ranges
+      ranges
     }
   }
   throw new Error('0x' + startOffset.toString(16) + ': Coverage format must be 1 or 2.')
@@ -479,7 +479,7 @@ Parser.prototype.parseCoverage = function() {
 
 // Parse a Class Definition Table in a GSUB, GPOS or GDEF table.
 // https://www.microsoft.com/typography/OTSPEC/chapter2.htm
-Parser.prototype.parseClassDef = function() {
+Parser.prototype.parseClassDef = function () {
   const startOffset = this.offset + this.relativeOffset
   const format = this.parseUShort()
   if (format === 1) {
@@ -501,41 +501,41 @@ Parser.prototype.parseClassDef = function() {
   throw new Error('0x' + startOffset.toString(16) + ': ClassDef format must be 1 or 2.')
 }
 
-///// Static methods ///////////////////////////////////
+/// // Static methods ///////////////////////////////////
 // These convenience methods can be used as callbacks and should be called with "this" context set to a Parser instance.
 
-Parser.list = function(count, itemCallback) {
-  return function() {
+Parser.list = function (count, itemCallback) {
+  return function () {
     return this.parseList(count, itemCallback)
   }
 }
 
-Parser.list32 = function(count, itemCallback) {
-  return function() {
+Parser.list32 = function (count, itemCallback) {
+  return function () {
     return this.parseList32(count, itemCallback)
   }
 }
 
-Parser.recordList = function(count, recordDescription) {
-  return function() {
+Parser.recordList = function (count, recordDescription) {
+  return function () {
     return this.parseRecordList(count, recordDescription)
   }
 }
 
-Parser.recordList32 = function(count, recordDescription) {
-  return function() {
+Parser.recordList32 = function (count, recordDescription) {
+  return function () {
     return this.parseRecordList32(count, recordDescription)
   }
 }
 
-Parser.pointer = function(description) {
-  return function() {
+Parser.pointer = function (description) {
+  return function () {
     return this.parsePointer(description)
   }
 }
 
-Parser.pointer32 = function(description) {
-  return function() {
+Parser.pointer32 = function (description) {
+  return function () {
     return this.parsePointer32(description)
   }
 }
@@ -550,7 +550,7 @@ Parser.struct = Parser.prototype.parseStruct
 Parser.coverage = Parser.prototype.parseCoverage
 Parser.classDef = Parser.prototype.parseClassDef
 
-///// Script, Feature, Lookup lists ///////////////////////////////////////////////
+/// // Script, Feature, Lookup lists ///////////////////////////////////////////////
 // https://www.microsoft.com/typography/OTSPEC/chapter2.htm
 
 const langSysTable = {
@@ -559,7 +559,7 @@ const langSysTable = {
   featureIndexes: Parser.uShortList
 }
 
-Parser.prototype.parseScriptList = function() {
+Parser.prototype.parseScriptList = function () {
   return this.parsePointer(Parser.recordList({
     tag: Parser.tag,
     script: Parser.pointer({
@@ -572,7 +572,7 @@ Parser.prototype.parseScriptList = function() {
   })) || []
 }
 
-Parser.prototype.parseFeatureList = function() {
+Parser.prototype.parseFeatureList = function () {
   return this.parsePointer(Parser.recordList({
     tag: Parser.tag,
     feature: Parser.pointer({
@@ -582,23 +582,23 @@ Parser.prototype.parseFeatureList = function() {
   })) || []
 }
 
-Parser.prototype.parseLookupList = function(lookupTableParsers) {
-  return this.parsePointer(Parser.list(Parser.pointer(function() {
+Parser.prototype.parseLookupList = function (lookupTableParsers) {
+  return this.parsePointer(Parser.list(Parser.pointer(function () {
     const lookupType = this.parseUShort()
-    check.argument(1 <= lookupType && lookupType <= 9, 'GPOS/GSUB lookup type ' + lookupType + ' unknown.')
+    check.argument(lookupType >= 1 && lookupType <= 9, 'GPOS/GSUB lookup type ' + lookupType + ' unknown.')
     const lookupFlag = this.parseUShort()
     const useMarkFilteringSet = lookupFlag & 0x10
     return {
-      lookupType: lookupType,
-      lookupFlag: lookupFlag,
+      lookupType,
+      lookupFlag,
       subtables: this.parseList(Parser.pointer(lookupTableParsers[lookupType])),
       markFilteringSet: useMarkFilteringSet ? this.parseUShort() : undefined
     }
   }))) || []
 }
 
-Parser.prototype.parseFeatureVariationsList = function() {
-  return this.parsePointer32(function() {
+Parser.prototype.parseFeatureVariationsList = function () {
+  return this.parsePointer32(function () {
     const majorVersion = this.parseUShort()
     const minorVersion = this.parseUShort()
     check.argument(majorVersion === 1 && minorVersion < 1, 'GPOS/GSUB feature variations table unknown.')

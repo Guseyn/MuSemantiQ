@@ -6,10 +6,10 @@ export default function (articulation, styles) {
     name: 'rect',
     properties: {
       'data-name': 'outline',
-      'fill': backgroundColor,
-      'width': articulation.right - articulation.left + 2 * articulationOutlinePadding,
-      'height': articulation.bottom - articulation.top + 2 * articulationOutlinePadding,
-      'rx': articulationOutlineRadius
+      fill: backgroundColor,
+      width: articulation.right - articulation.left + 2 * articulationOutlinePadding,
+      height: articulation.bottom - articulation.top + 2 * articulationOutlinePadding,
+      rx: articulationOutlineRadius
     },
     transformations: [
       {

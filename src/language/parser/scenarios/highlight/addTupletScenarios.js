@@ -12,8 +12,8 @@ export default function (scenarios) {
       const joinedTokenValuesWithRealDelimitersFirstPart = joinedTokenValuesWithRealDelimitersWithSplittedParts[0]
       const joinedTokenValuesWithRealDelimitersSecondPart = joinedTokenValuesWithRealDelimitersWithSplittedParts[1]
       const joinedTokenValuesWithRealDelimitersFirstPartWithHighlightedElement = `${joinedTokenValuesWithRealDelimitersFirstPart}<span class="eh" ref-id="tuplet-${parserState.numberOfTuplets}">tuplet</span>`
-      const joinedTokenValuesWithRealDelimitersSecondPartWithHighlightedElement = joinedTokenValuesWithRealDelimitersSecondPart.replace(
-        regexps.tupletValueHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersSecondPartWithHighlightedElement = regexps.tupletValueHighlight.replace(
+        joinedTokenValuesWithRealDelimitersSecondPart, (match) => {
           return `<span class="cnh" ref-id="tuplet-value-${parserState.numberOfTuplets}">${match}</span>`
         }
       )
@@ -109,8 +109,8 @@ export default function (scenarios) {
   }
   scenarios['tuplet is above or below stave lines'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { currentNumberOfMeasures } }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.staveHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.staveHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="csph" ref-id="all-staves-in-measure-${currentNumberOfMeasures}">${match}</span>`
         }
       )
@@ -133,8 +133,8 @@ export default function (scenarios) {
   }
   scenarios['tuplet with vertical correction'] = {
     action: ({ parserState, joinedTokenValuesWithRealDelimiters, state }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.verticalCorrectionHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.verticalCorrectionHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="th" ref-id="tuplet-${parserState.numberOfTuplets}">${match}</span>`
         }
       )

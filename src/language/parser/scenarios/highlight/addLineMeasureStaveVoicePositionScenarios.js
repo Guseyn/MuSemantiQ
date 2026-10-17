@@ -14,8 +14,8 @@ export default function (
     scenarios[`line position (${requiredCommandProgression})`] = {
       action: ({ joinedTokenValuesWithRealDelimiters, state }) => {
         const tokensWithNumbersInsteadOfWordsWithTrimmedEnd = joinedTokenValuesWithRealDelimiters.trimEnd()
-        const tokensWithNumbersInsteadOfWordsWithTrimmedEndWithHighlightedPosition = tokensWithNumbersInsteadOfWordsWithTrimmedEnd.replace(
-          regexps.positionPreposition, (match, p1, p2, p3, p4) => {
+        const tokensWithNumbersInsteadOfWordsWithTrimmedEndWithHighlightedPosition = regexps.positionPreposition.replace(
+          tokensWithNumbersInsteadOfWordsWithTrimmedEnd, (match, p1, p2, p3, p4) => {
             return `${p1 || ''}<span class="clph" ref-id="">${p4}</span>`
           }
         )
@@ -36,8 +36,8 @@ export default function (
     scenarios[`position of line (${requiredCommandProgression})`] = {
       action: ({ joinedTokenValuesWithRealDelimiters, state }) => {
         const tokensWithNumbersInsteadOfWordsWithTrimmedEnd = joinedTokenValuesWithRealDelimiters.trimEnd()
-        const tokensWithNumbersInsteadOfWordsWithTrimmedEndWithHighlightedPosition = tokensWithNumbersInsteadOfWordsWithTrimmedEnd.replace(
-          regexps.positionPreposition, (match, p1, p2, p3, p4) => {
+        const tokensWithNumbersInsteadOfWordsWithTrimmedEndWithHighlightedPosition = regexps.positionPreposition.replace(
+          tokensWithNumbersInsteadOfWordsWithTrimmedEnd, (match, p1, p2, p3, p4) => {
             return `${p1 || ''}<span class="clph" ref-id="">${p4}</span>`
           }
         )
@@ -60,8 +60,8 @@ export default function (
     scenarios[`measure position (${requiredCommandProgression})`] = {
       action: ({ joinedTokenValuesWithRealDelimiters, state }) => {
         const tokensWithNumbersInsteadOfWordsWithTrimmedEnd = joinedTokenValuesWithRealDelimiters.trimEnd()
-        const tokensWithNumbersInsteadOfWordsWithTrimmedEndWithHighlightedPosition = tokensWithNumbersInsteadOfWordsWithTrimmedEnd.replace(
-          regexps.positionPreposition, (match, p1, p2, p3, p4) => {
+        const tokensWithNumbersInsteadOfWordsWithTrimmedEndWithHighlightedPosition = regexps.positionPreposition.replace(
+          tokensWithNumbersInsteadOfWordsWithTrimmedEnd, (match, p1, p2, p3, p4) => {
             return `${p1 || ''}<span class="cmph" ref-id="">${p4}</span>`
           }
         )
@@ -82,8 +82,8 @@ export default function (
     scenarios[`position of measure (${requiredCommandProgression})`] = {
       action: ({ joinedTokenValuesWithRealDelimiters, state }) => {
         const tokensWithNumbersInsteadOfWordsWithTrimmedEnd = joinedTokenValuesWithRealDelimiters.trimEnd()
-        const tokensWithNumbersInsteadOfWordsWithTrimmedEndWithHighlightedPosition = tokensWithNumbersInsteadOfWordsWithTrimmedEnd.replace(
-          regexps.positionPreposition, (match, p1, p2, p3, p4) => {
+        const tokensWithNumbersInsteadOfWordsWithTrimmedEndWithHighlightedPosition = regexps.positionPreposition.replace(
+          tokensWithNumbersInsteadOfWordsWithTrimmedEnd, (match, p1, p2, p3, p4) => {
             return `${p1 || ''}<span class="cmph" ref-id="">${p4}</span>`
           }
         )
@@ -106,8 +106,8 @@ export default function (
     scenarios[`stave position (${requiredCommandProgression})`] = {
       action: ({ joinedTokenValuesWithRealDelimiters, state }) => {
         const tokensWithNumbersInsteadOfWordsWithTrimmedEnd = joinedTokenValuesWithRealDelimiters.trimEnd()
-        const tokensWithNumbersInsteadOfWordsWithTrimmedEndWithHighlightedPosition = tokensWithNumbersInsteadOfWordsWithTrimmedEnd.replace(
-          regexps.positionPreposition, (match, p1, p2, p3, p4) => {
+        const tokensWithNumbersInsteadOfWordsWithTrimmedEndWithHighlightedPosition = regexps.positionPreposition.replace(
+          tokensWithNumbersInsteadOfWordsWithTrimmedEnd, (match, p1, p2, p3, p4) => {
             return `${p1 || ''}<span class="csph" ref-id="">${p4}</span>`
           }
         )
@@ -128,8 +128,8 @@ export default function (
     scenarios[`position of stave (${requiredCommandProgression})`] = {
       action: ({ joinedTokenValuesWithRealDelimiters, state }) => {
         const tokensWithNumbersInsteadOfWordsWithTrimmedEnd = joinedTokenValuesWithRealDelimiters.trimEnd()
-        const tokensWithNumbersInsteadOfWordsWithTrimmedEndWithHighlightedPosition = tokensWithNumbersInsteadOfWordsWithTrimmedEnd.replace(
-          regexps.positionPreposition, (match, p1, p2, p3, p4) => {
+        const tokensWithNumbersInsteadOfWordsWithTrimmedEndWithHighlightedPosition = regexps.positionPreposition.replace(
+          tokensWithNumbersInsteadOfWordsWithTrimmedEnd, (match, p1, p2, p3, p4) => {
             return `${p1 || ''}<span class="csph" ref-id="">${p4}</span>`
           }
         )
@@ -152,8 +152,8 @@ export default function (
     scenarios[`voice position (${requiredCommandProgression})`] = {
       action: ({ joinedTokenValuesWithRealDelimiters, state }) => {
         const tokensWithNumbersInsteadOfWordsWithTrimmedEnd = joinedTokenValuesWithRealDelimiters.trimEnd()
-        const tokensWithNumbersInsteadOfWordsWithTrimmedEndWithHighlightedPosition = tokensWithNumbersInsteadOfWordsWithTrimmedEnd.replace(
-          regexps.positionPreposition, (match, p1, p2, p3, p4) => {
+        const tokensWithNumbersInsteadOfWordsWithTrimmedEndWithHighlightedPosition = regexps.positionPreposition.replace(
+          tokensWithNumbersInsteadOfWordsWithTrimmedEnd, (match, p1, p2, p3, p4) => {
             return `${p1 || ''}<span class="cvph" ref-id="">${p4}</span>`
           }
         )
@@ -174,8 +174,8 @@ export default function (
     scenarios[`position of voice (${requiredCommandProgression})`] = {
       action: ({ joinedTokenValuesWithRealDelimiters, state }) => {
         const tokensWithNumbersInsteadOfWordsWithTrimmedEnd = joinedTokenValuesWithRealDelimiters.trimEnd()
-        const tokensWithNumbersInsteadOfWordsWithTrimmedEndWithHighlightedPosition = tokensWithNumbersInsteadOfWordsWithTrimmedEnd.replace(
-          regexps.positionPreposition, (match, p1, p2, p3, p4) => {
+        const tokensWithNumbersInsteadOfWordsWithTrimmedEndWithHighlightedPosition = regexps.positionPreposition.replace(
+          tokensWithNumbersInsteadOfWordsWithTrimmedEnd, (match, p1, p2, p3, p4) => {
             return `${p1 || ''}<span class="cvph" ref-id="">${p4}</span>`
           }
         )

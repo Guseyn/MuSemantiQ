@@ -49,7 +49,7 @@ export default function (singleUnit, slurSplinePoints, slurDirection, styles) {
     p2 = { x: slurSplinePoints[20], y: slurSplinePoints[21] + additionalYCorrectionForEachSlurJunctionPoint }
     p3 = { x: slurSplinePoints[22], y: slurSplinePoints[23] + additionalYCorrectionForEachSlurJunctionPoint }
   }
-  let t = calculateTimeInSlurSplinePointsBySomeXPointThere(sx, slurStartX, slurEndX)
+  const t = calculateTimeInSlurSplinePointsBySomeXPointThere(sx, slurStartX, slurEndX)
   return {
     singleUnit,
     x: sx,

@@ -15,17 +15,17 @@ It asks what goes into the changelog and what kind of release it is, then:
   5. creates a GitHub release with your changes and every commit since the
      previous tag
 
-It needs a clean working tree, because the release commit must contain only the
-version and the changelog. It also needs `gh`, logged in.
+The changelog entry is written in $VISUAL or $EDITOR (vi by default), the way a
+commit message is. The release needs a clean working tree and `gh`, logged in.
 */
 
 import fs from 'fs'
 import path from 'path'
+import os from 'os'
 import { execFileSync } from 'child_process'
 import { fileURLToPath } from 'url'
-import { select } from '../cli-app/lib/select.js'
-import { pasteBlock } from '../cli-app/lib/paste.js'
-import { isAbort } from '../cli-app/lib/errors.js'
+import { createInterface } from 'readline/promises'
+import { stdin as input, stdout as output } from 'process'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const projectRoot = path.resolve(__dirname, '..')
@@ -44,6 +44,15 @@ const git = (...args) => run('git', args)
 function fail(message) {
   console.error(message)
   process.exit(1)
+}
+
+async function ask(question) {
+  const rl = createInterface({ input, output })
+  try {
+    return (await rl.question(question)).trim()
+  } finally {
+    rl.close()
+  }
 }
 
 function checkThatReleaseIsPossible() {
@@ -118,30 +127,55 @@ function releaseNotes(changes, commits, tag, newTag, repository) {
   return lines.join('\n')
 }
 
+// The changelog entry is edited in a file, the way git writes a commit message.
+function editChangelogEntry() {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'msq-release-'))
+  const file = path.join(dir, 'CHANGELOG.md')
+  fs.writeFileSync(file, '')
+  const editor = process.env.VISUAL || process.env.EDITOR || 'vi'
+  try {
+    execFileSync(editor, [ file ], { stdio: 'inherit' })
+  } catch (error) {
+    // ENOENT means the editor is not installed; a non-zero status just means
+    // the editor was closed without saving, so read whatever it left anyway.
+    if (error.code === 'ENOENT') {
+      fail(`The editor "${editor}" could not be run. Set $VISUAL or $EDITOR.`)
+    }
+  }
+  const text = fs.readFileSync(file, 'utf-8').trim()
+  fs.rmSync(dir, { recursive: true, force: true })
+  return text
+}
+
+async function chooseReleaseType(version) {
+  for (const type of [ 'patch', 'minor', 'major' ]) {
+    console.log(`  ${type.padEnd(5)}  →  ${nextVersion(version, type)}`)
+  }
+  const type = await ask('  Release type? [patch] ')
+  const chosen = type === '' ? 'patch' : type
+  if (![ 'patch', 'minor', 'major' ].includes(chosen)) {
+    fail(`"${chosen}" is not patch, minor or major.`)
+  }
+  return chosen
+}
+
 async function main() {
   const branch = checkThatReleaseIsPossible()
   const tag = previousTag()
   const commits = commitsSince(tag)
   if (commits.length === 0) {
-    fail(`There are no commits since ${tag}.`)
+    fail(`There are no commits since ${tag || 'the beginning'}.`)
   }
   console.log(`${commits.length} commits since ${tag || 'the beginning'}.\n`)
 
-  const changes = (await pasteBlock({ message: 'What goes into the changelog?' })).trim()
+  const changes = editChangelogEntry()
   if (changes === '') {
     fail('The changelog can\'t be empty.')
   }
 
   const packageJsonText = fs.readFileSync(packageJsonPath, 'utf-8')
   const version = JSON.parse(packageJsonText).version
-  const type = await select({
-    message: `What kind of release? (now ${version})`,
-    choices: [ 'patch', 'minor', 'major' ].map((type) => ({
-      label: type,
-      value: type,
-      hint: nextVersion(version, type)
-    }))
-  })
+  const type = await chooseReleaseType(version)
   const newVersion = nextVersion(version, type)
   const newTag = `v${newVersion}`
   const date = new Date().toISOString().slice(0, 10)
@@ -155,11 +189,8 @@ async function main() {
     return
   }
 
-  const isConfirmed = await select({
-    message: `Commit, tag and push ${newTag}, and create the GitHub release?`,
-    choices: [ { label: 'no', value: false }, { label: 'yes', value: true } ]
-  })
-  if (!isConfirmed) {
+  const confirmed = await ask('Commit, tag and push, and create the GitHub release? [y/N] ')
+  if (confirmed !== 'y' && confirmed !== 'yes') {
     console.log('Nothing was changed.')
     return
   }
@@ -186,10 +217,6 @@ async function main() {
 try {
   await main()
 } catch (error) {
-  if (isAbort(error)) {
-    console.error('\nCancelled. Nothing was changed.')
-    process.exitCode = 130
-  } else {
-    throw error
-  }
+  console.error(error.stderr || error.message || error)
+  process.exit(1)
 }

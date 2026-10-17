@@ -25,7 +25,6 @@ export default function (note, dynamicsAuraForEachVoiceOnEachStaveSplittedInTime
         sortByGraceCount(dynamicAuraForCurrentDynamicTimeForCurrentStaveAndVoice)
         for (let dynamicTimeIndex = 0; dynamicTimeIndex < dynamicAuraForCurrentDynamicTimeForCurrentStaveAndVoice.length; dynamicTimeIndex++) {
           if (dynamicAuraForCurrentDynamicTimeForCurrentStaveAndVoice[dynamicTimeIndex] !== undefined) {
-
             if (note.isGrace && (dynamicAuraForCurrentDynamicTimeForCurrentStaveAndVoice[dynamicTimeIndex].graceCount !== undefined)) {
               const normalizer = (graceMaxCountForCurrentTime - graceCountersForEachVoiceInEachStaveSplittedInTimeFrames[dynamicTime][staveVoiceKey])
               normalizedDynamicGraceCount = normalizer + dynamicAuraForCurrentDynamicTimeForCurrentStaveAndVoice[dynamicTimeIndex].graceCount

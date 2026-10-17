@@ -46,7 +46,7 @@ export default function (singleUnit, articulationIndex, currentArticulationParam
       drawArticulationKeysInVerticalLine(singleUnit, articulationIndex, keyBelow, mordentSymbol, 'below', styles)
     )
   }
-  let groupedMordent = createGroup(
+  const groupedMordent = createGroup(
     'upMordent',
     components
   )

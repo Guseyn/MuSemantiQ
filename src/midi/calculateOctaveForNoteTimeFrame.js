@@ -4,17 +4,17 @@ import sortByGraceCount from '#msq/midi/sortByGraceCount.js'
 import sortByGraceCountAndMidMeasureClef from '#msq/midi/sortByGraceCountAndMidMeasureClef.js'
 
 const DEFAULT_OCTAVE_NUMBER_BY_CLEFS = {
-  'treble': 4,
-  'bass': 2,
-  'alto': 3,
-  'baritone': 4,
-  'mezzoSoprano': 3,
-  'soprano': 4,
-  'tenor': 3,
-  'octaveEightUp': 5,
-  'octaveEightDown': 3,
-  'octaveFifteenUp': 6,
-  'octaveFifteenDown': 2
+  treble: 4,
+  bass: 2,
+  alto: 3,
+  baritone: 4,
+  mezzoSoprano: 3,
+  soprano: 4,
+  tenor: 3,
+  octaveEightUp: 5,
+  octaveEightDown: 3,
+  octaveFifteenUp: 6,
+  octaveFifteenDown: 2
 }
 
 const NUMBER_OF_NORMALIZED_PITCHES = 12
@@ -33,7 +33,6 @@ export default function (note, pitchForNote, clefAurasForEachStaveSplittedInTime
         sortByGraceCountAndMidMeasureClef(clefAurasForEachStaveSplittedInTimeFrames[clefTime][note.staveIndexConsideringStavePosition])
         for (let clefTimeIndex = 0; clefTimeIndex < clefAurasForEachStaveSplittedInTimeFrames[clefTime][note.staveIndexConsideringStavePosition].length; clefTimeIndex++) {
           if (clefAurasForEachStaveSplittedInTimeFrames[clefTime][note.staveIndexConsideringStavePosition][clefTimeIndex]) {
-
             if (note.isGrace && (clefAurasForEachStaveSplittedInTimeFrames[clefTime][note.staveIndexConsideringStavePosition][clefTimeIndex].graceCount !== undefined)) {
               const normalizer = (graceMaxCountForCurrentTime - graceCountersForEachVoiceInEachStaveSplittedInTimeFrames[clefTime][staveVoiceKey])
               normalizedClefGraceCount = normalizer + clefAurasForEachStaveSplittedInTimeFrames[clefTime][note.staveIndexConsideringStavePosition][clefTimeIndex].graceCount
@@ -70,7 +69,6 @@ export default function (note, pitchForNote, clefAurasForEachStaveSplittedInTime
         sortByGraceCount(octaveSignAuraForEachVoiceOnEachStaveSplittedInTimeFrames[octaveSignTime][stavePositionVoiceKey])
         for (let octaveSignTimeIndex = 0; octaveSignTimeIndex < octaveSignAuraForEachVoiceOnEachStaveSplittedInTimeFrames[octaveSignTime][stavePositionVoiceKey].length; octaveSignTimeIndex++) {
           if (octaveSignAuraForEachVoiceOnEachStaveSplittedInTimeFrames[octaveSignTime][stavePositionVoiceKey][octaveSignTimeIndex] !== undefined) {
-
             if (note.isGrace && (octaveSignAuraForEachVoiceOnEachStaveSplittedInTimeFrames[octaveSignTime][stavePositionVoiceKey][octaveSignTimeIndex].graceCount !== undefined)) {
               const normalizer = (graceMaxCountForCurrentTime - graceCountersForEachVoiceInEachStaveSplittedInTimeFrames[octaveSignTime][staveVoiceKey])
               normalizedOctaveSignGraceCount = normalizer + octaveSignAuraForEachVoiceOnEachStaveSplittedInTimeFrames[octaveSignTime][stavePositionVoiceKey][octaveSignTimeIndex].graceCount

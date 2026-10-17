@@ -173,7 +173,7 @@ export default function (dynamicChangeParams, styles) {
           dynamicChangeParams.leftSingleUnit.left,
           dynamicAfterTextYCenter - dynamicChangeSignDefaultHeight / 2,
           dynamicChangeParams.leftSingleUnit.left,
-          dynamicAfterTextYCenter + dynamicChangeSignDefaultHeight / 2,
+          dynamicAfterTextYCenter + dynamicChangeSignDefaultHeight / 2
         )
       } else {
         dynamicChangePoints.push(
@@ -212,7 +212,7 @@ export default function (dynamicChangeParams, styles) {
       )
     )
   }
-  let dynamicChange = createElementWithAdditionalInformation(
+  const dynamicChange = createElementWithAdditionalInformation(
     createGroup(
       'dynamicChange',
       components

@@ -1,35 +1,35 @@
 'use strict'
 
 const DYNAMICS_MAPPED_WITH_MIDI_VELOCITIES = {
-  'pppppp': 20,
-  'ppppp': 25,
-  'pppp': 30,
-  'ppp': 35,
-  'pp': 45,
-  'p': 50,
-  'mp': 55,
-  'm': 60,
-  'mf': 70,
-  'pf': 75,
-  'f': 80,
-  'ff': 90,
-  'fff': 110,
-  'ffff': 115,
-  'fffff': 120,
-  'ffffff': 125,
-  'fp': 55,
-  'fz': 65,
-  'sf': 85,
-  'sfp': 95,
-  'sfpp': 105,
-  'sfz': 112,
-  'sfzp': 117,
-  's': 120,
-  'sffz': 122,
-  'r': 100,
-  'rf': 47,
-  'rfz': 57,
-  'z': 127,
+  pppppp: 20,
+  ppppp: 25,
+  pppp: 30,
+  ppp: 35,
+  pp: 45,
+  p: 50,
+  mp: 55,
+  m: 60,
+  mf: 70,
+  pf: 75,
+  f: 80,
+  ff: 90,
+  fff: 110,
+  ffff: 115,
+  fffff: 120,
+  ffffff: 125,
+  fp: 55,
+  fz: 65,
+  sf: 85,
+  sfp: 95,
+  sfpp: 105,
+  sfz: 112,
+  sfzp: 117,
+  s: 120,
+  sffz: 122,
+  r: 100,
+  rf: 47,
+  rfz: 57,
+  z: 127,
 }
 
 const ORDERED_DYNAMIC_VALUES = [
@@ -88,7 +88,7 @@ export default function (articulationParams, dynamicChangeMark, dynamicsAuraForE
       newDynamicAuraObject.count = currentDynamicsAuraObjectsForEachVoiceOnEachStave[staveVoiceKey].length
       const startVelocity = currentDynamicsAuraObjectsForEachVoiceOnEachStave[staveVoiceKey][0].startVelocity
       const endVelocity = currentDynamicsAuraObjectsForEachVoiceOnEachStave[staveVoiceKey][0].endVelocity
-      const dynamicChangeStep = Math.abs(endVelocity  - startVelocity) / newDynamicAuraObject.count
+      const dynamicChangeStep = Math.abs(endVelocity - startVelocity) / newDynamicAuraObject.count
       for (let dynamicIndex = 0; dynamicIndex < currentDynamicsAuraObjectsForEachVoiceOnEachStave[staveVoiceKey].length; dynamicIndex++) {
         const dynamicAuraObject = currentDynamicsAuraObjectsForEachVoiceOnEachStave[staveVoiceKey][dynamicIndex]
         if (newDynamicAuraObject.type === 'crescendo') {

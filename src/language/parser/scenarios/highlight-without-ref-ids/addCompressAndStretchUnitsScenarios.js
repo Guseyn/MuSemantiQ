@@ -18,8 +18,8 @@ export default function (scenarios) {
   scenarios['compress units by n times in line position'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state }) => {
       const tokensWithNumbersInsteadOfWordsWithTrimmedEnd = joinedTokenValuesWithRealDelimiters.trimEnd()
-      const tokensWithNumbersInsteadOfWordsWithTrimmedEndWithHighlightedPosition = tokensWithNumbersInsteadOfWordsWithTrimmedEnd.replace(
-        regexps.positionPreposition, (match, p1, p2, p3, p4) => {
+      const tokensWithNumbersInsteadOfWordsWithTrimmedEndWithHighlightedPosition = regexps.positionPreposition.replace(
+        tokensWithNumbersInsteadOfWordsWithTrimmedEnd, (match, p1, p2, p3, p4) => {
           return `${p1 || ''}<span class="clph">${p4}</span>`
         }
       )
@@ -31,8 +31,8 @@ export default function (scenarios) {
   scenarios['compress units by n times in position of line'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state }) => {
       const tokensWithNumbersInsteadOfWordsWithTrimmedEnd = joinedTokenValuesWithRealDelimiters.trimEnd()
-      const tokensWithNumbersInsteadOfWordsWithTrimmedEndWithHighlightedPosition = tokensWithNumbersInsteadOfWordsWithTrimmedEnd.replace(
-        regexps.positionPreposition, (match, p1, p2, p3, p4) => {
+      const tokensWithNumbersInsteadOfWordsWithTrimmedEndWithHighlightedPosition = regexps.positionPreposition.replace(
+        tokensWithNumbersInsteadOfWordsWithTrimmedEnd, (match, p1, p2, p3, p4) => {
           return `${p1 || ''}<span class="clph">${p4}</span>`
         }
       )
@@ -56,8 +56,8 @@ export default function (scenarios) {
   scenarios['stretch units by n times in line'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state }) => {
       const tokensWithNumbersInsteadOfWordsWithTrimmedEnd = joinedTokenValuesWithRealDelimiters.trimEnd()
-      const tokensWithNumbersInsteadOfWordsWithTrimmedEndWithHighlightedPosition = tokensWithNumbersInsteadOfWordsWithTrimmedEnd.replace(
-        regexps.positionPreposition, (match, p1, p2, p3, p4) => {
+      const tokensWithNumbersInsteadOfWordsWithTrimmedEndWithHighlightedPosition = regexps.positionPreposition.replace(
+        tokensWithNumbersInsteadOfWordsWithTrimmedEnd, (match, p1, p2, p3, p4) => {
           return `${p1 || ''}<span class="clph">${p4}</span>`
         }
       )
@@ -69,8 +69,8 @@ export default function (scenarios) {
   scenarios['stretch units by n times in position of line'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state }) => {
       const tokensWithNumbersInsteadOfWordsWithTrimmedEnd = joinedTokenValuesWithRealDelimiters.trimEnd()
-      const tokensWithNumbersInsteadOfWordsWithTrimmedEndWithHighlightedPosition = tokensWithNumbersInsteadOfWordsWithTrimmedEnd.replace(
-        regexps.positionPreposition, (match, p1, p2, p3, p4) => {
+      const tokensWithNumbersInsteadOfWordsWithTrimmedEndWithHighlightedPosition = regexps.positionPreposition.replace(
+        tokensWithNumbersInsteadOfWordsWithTrimmedEnd, (match, p1, p2, p3, p4) => {
           return `${p1 || ''}<span class="clph">${p4}</span>`
         }
       )

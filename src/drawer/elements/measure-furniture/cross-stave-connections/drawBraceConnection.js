@@ -33,7 +33,7 @@ export default function (staveStartNumber, staveEndNumber, numberOfAllStaves, nu
       (height <= curlyLargerBrace.maxHeight)
     ) {
       unicodeOfBraceShape = curlyLargerBrace.unicode
-    } else if  (
+    } else if (
       (height > curlyFlatBrace.minHeight) &&
       (height <= curlyFlatBrace.maxHeight)
     ) {

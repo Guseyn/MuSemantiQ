@@ -4,20 +4,20 @@ import createText from '#msq/drawer/elements/basic/createText.js'
 import createGroup from '#msq/drawer/elements/basic/createGroup.js'
 // C♯♭oøΔ
 const chordLetterSigns = {
-  'sharp': '♯',
+  sharp: '♯',
   '#': '♯',
-  'flat': '♭',
+  flat: '♭',
   'half-diminished': 'ø',
   'half-dim': 'ø',
   'half dim': 'ø',
-  'halfdim': 'ø',
+  halfdim: 'ø',
   'hf dim': 'ø',
-  'hfdim': 'ø',
-  'diminished': 'o',
-  'dim': 'o',
+  hfdim: 'ø',
+  diminished: 'o',
+  dim: 'o',
   'major sign': 'Δ',
-  'major': 'Δ',
-  'maj': 'Δ'
+  major: 'Δ',
+  maj: 'Δ'
 }
 
 const chordLetterRegex = new RegExp(`${Object.keys(chordLetterSigns).join('|')}`, 'ig')

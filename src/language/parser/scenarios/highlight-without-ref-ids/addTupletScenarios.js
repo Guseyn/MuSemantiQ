@@ -11,8 +11,8 @@ export default function (scenarios) {
       const joinedTokenValuesWithRealDelimitersFirstPart = joinedTokenValuesWithRealDelimitersWithSplittedParts[0]
       const joinedTokenValuesWithRealDelimitersSecondPart = joinedTokenValuesWithRealDelimitersWithSplittedParts[1]
       const joinedTokenValuesWithRealDelimitersFirstPartWithHighlightedElement = `${joinedTokenValuesWithRealDelimitersFirstPart}<span class="eh">tuplet</span>`
-      const joinedTokenValuesWithRealDelimitersSecondPartWithHighlightedElement = joinedTokenValuesWithRealDelimitersSecondPart.replace(
-        regexps.tupletValueHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersSecondPartWithHighlightedElement = regexps.tupletValueHighlight.replace(
+        joinedTokenValuesWithRealDelimitersSecondPart, (match) => {
           return `<span class="cnh">${match}</span>`
         }
       )
@@ -68,8 +68,8 @@ export default function (scenarios) {
   }
   scenarios['tuplet is above or below stave lines'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.staveHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.staveHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="csph">${match}</span>`
         }
       )
@@ -92,8 +92,8 @@ export default function (scenarios) {
   }
   scenarios['tuplet with vertical correction'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.verticalCorrectionHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.verticalCorrectionHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="th">${match}</span>`
         }
       )

@@ -2,7 +2,7 @@
 
 import * as helpers from '#msq/language/lib/helpers.js'
 
-export function SchemaScanResult(found, ref) {
+export function SchemaScanResult (found, ref) {
   this.id = found
   this.ref = ref
 }
@@ -13,9 +13,9 @@ export function SchemaScanResult(found, ref) {
  * @param object schema
  * @return {Object}
  */
-export function scan(base, schema) {
-  function scanSchema(baseuri, schema) {
-    if (!schema || typeof schema != 'object') return
+export function scan (base, schema) {
+  function scanSchema (baseuri, schema) {
+    if (!schema || typeof schema !== 'object') return
 
     // Mark referenced schemas
     if (schema.$ref) {
@@ -49,8 +49,8 @@ export function scan(base, schema) {
       }
     }
 
-    scanArray(ourBase + '/items', Array.isArray(schema.items) ? schema.items : [schema.items])
-    scanArray(ourBase + '/extends', Array.isArray(schema.extends) ? schema.extends : [schema.extends])
+    scanArray(ourBase + '/items', Array.isArray(schema.items) ? schema.items : [ schema.items ])
+    scanArray(ourBase + '/extends', Array.isArray(schema.extends) ? schema.extends : [ schema.extends ])
 
     scanSchema(ourBase + '/additionalItems', schema.additionalItems)
 
@@ -68,15 +68,15 @@ export function scan(base, schema) {
     scanSchema(ourBase + '/not', schema.not)
   }
 
-  function scanArray(baseuri, schemas) {
+  function scanArray (baseuri, schemas) {
     if (!Array.isArray(schemas)) return
     for (let i = 0; i < schemas.length; i++) {
       scanSchema(baseuri + '/' + i, schemas[i])
     }
   }
 
-  function scanObject(baseuri, schemas) {
-    if (!schemas || typeof schemas != 'object') return
+  function scanObject (baseuri, schemas) {
+    if (!schemas || typeof schemas !== 'object') return
     for (const p in schemas) {
       scanSchema(baseuri + '/' + p, schemas[p])
     }

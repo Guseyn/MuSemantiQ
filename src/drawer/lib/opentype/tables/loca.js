@@ -9,7 +9,7 @@ import { Parser } from '#msq/drawer/lib/opentype/parse.js'
 // The loca table has two versions: a short version where offsets are stored as uShorts, and a long
 // version where offsets are stored as uLongs. The `head` table specifies which version to use
 // (under indexToLocFormat).
-function parseLocaTable(data, start, numGlyphs, shortVersion) {
+function parseLocaTable (data, start, numGlyphs, shortVersion) {
   const p = new Parser(data, start)
   const parseFn = shortVersion ? p.parseUShort : p.parseULong
   // There is an extra entry after the last index element to compute the length of the last glyph.

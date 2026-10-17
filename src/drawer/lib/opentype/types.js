@@ -23,8 +23,8 @@ const encode = {}
 const sizeOf = {}
 
 // Return a function that always returns the same value.
-function constant(v) {
-  return function() {
+function constant (v) {
+  return function () {
     return v
   }
 }
@@ -36,9 +36,9 @@ function constant(v) {
  * @param {number}
  * @returns {Array}
  */
-encode.BYTE = function(v) {
+encode.BYTE = function (v) {
   check.argument(v >= 0 && v <= 255, 'Byte value should be between 0 and 255.')
-  return [v]
+  return [ v ]
 }
 /**
  * @constant
@@ -51,8 +51,8 @@ sizeOf.BYTE = constant(1)
  * @param {string}
  * @returns {Array}
  */
-encode.CHAR = function(v) {
-  return [v.charCodeAt(0)]
+encode.CHAR = function (v) {
+  return [ v.charCodeAt(0) ]
 }
 
 /**
@@ -66,7 +66,7 @@ sizeOf.CHAR = constant(1)
  * @param {string}
  * @returns {Array}
  */
-encode.CHARARRAY = function(v) {
+encode.CHARARRAY = function (v) {
   const b = []
   for (let i = 0; i < v.length; i += 1) {
     b[i] = v.charCodeAt(i)
@@ -79,7 +79,7 @@ encode.CHARARRAY = function(v) {
  * @param {Array}
  * @returns {number}
  */
-sizeOf.CHARARRAY = function(v) {
+sizeOf.CHARARRAY = function (v) {
   return v.length
 }
 
@@ -88,8 +88,8 @@ sizeOf.CHARARRAY = function(v) {
  * @param {number}
  * @returns {Array}
  */
-encode.USHORT = function(v) {
-  return [(v >> 8) & 0xFF, v & 0xFF]
+encode.USHORT = function (v) {
+  return [ (v >> 8) & 0xFF, v & 0xFF ]
 }
 
 /**
@@ -103,13 +103,13 @@ sizeOf.USHORT = constant(2)
  * @param {number}
  * @returns {Array}
  */
-encode.SHORT = function(v) {
+encode.SHORT = function (v) {
   // Two's complement
   if (v >= LIMIT16) {
     v = -(2 * LIMIT16 - v)
   }
 
-  return [(v >> 8) & 0xFF, v & 0xFF]
+  return [ (v >> 8) & 0xFF, v & 0xFF ]
 }
 
 /**
@@ -123,8 +123,8 @@ sizeOf.SHORT = constant(2)
  * @param {number}
  * @returns {Array}
  */
-encode.UINT24 = function(v) {
-  return [(v >> 16) & 0xFF, (v >> 8) & 0xFF, v & 0xFF]
+encode.UINT24 = function (v) {
+  return [ (v >> 16) & 0xFF, (v >> 8) & 0xFF, v & 0xFF ]
 }
 
 /**
@@ -138,8 +138,8 @@ sizeOf.UINT24 = constant(3)
  * @param {number}
  * @returns {Array}
  */
-encode.ULONG = function(v) {
-  return [(v >> 24) & 0xFF, (v >> 16) & 0xFF, (v >> 8) & 0xFF, v & 0xFF]
+encode.ULONG = function (v) {
+  return [ (v >> 24) & 0xFF, (v >> 16) & 0xFF, (v >> 8) & 0xFF, v & 0xFF ]
 }
 
 /**
@@ -153,13 +153,13 @@ sizeOf.ULONG = constant(4)
  * @param {number}
  * @returns {Array}
  */
-encode.LONG = function(v) {
+encode.LONG = function (v) {
   // Two's complement
   if (v >= LIMIT32) {
     v = -(2 * LIMIT32 - v)
   }
 
-  return [(v >> 24) & 0xFF, (v >> 16) & 0xFF, (v >> 8) & 0xFF, v & 0xFF]
+  return [ (v >> 24) & 0xFF, (v >> 16) & 0xFF, (v >> 8) & 0xFF, v & 0xFF ]
 }
 
 /**
@@ -182,8 +182,8 @@ sizeOf.UFWORD = sizeOf.USHORT
  * @param {number}
  * @returns {Array}
  */
-encode.LONGDATETIME = function(v) {
-  return [0, 0, 0, 0, (v >> 24) & 0xFF, (v >> 16) & 0xFF, (v >> 8) & 0xFF, v & 0xFF]
+encode.LONGDATETIME = function (v) {
+  return [ 0, 0, 0, 0, (v >> 24) & 0xFF, (v >> 16) & 0xFF, (v >> 8) & 0xFF, v & 0xFF ]
 }
 
 /**
@@ -197,12 +197,12 @@ sizeOf.LONGDATETIME = constant(8)
  * @param {string}
  * @returns {Array}
  */
-encode.TAG = function(v) {
+encode.TAG = function (v) {
   check.argument(v.length === 4, 'Tag should be exactly 4 ASCII characters.')
-  return [v.charCodeAt(0),
+  return [ v.charCodeAt(0),
     v.charCodeAt(1),
     v.charCodeAt(2),
-    v.charCodeAt(3)]
+    v.charCodeAt(3) ]
 }
 
 /**
@@ -231,15 +231,15 @@ sizeOf.SID = sizeOf.USHORT
  * @param {number}
  * @returns {Array}
  */
-encode.NUMBER = function(v) {
+encode.NUMBER = function (v) {
   if (v >= -107 && v <= 107) {
-    return [v + 139]
+    return [ v + 139 ]
   } else if (v >= 108 && v <= 1131) {
     v = v - 108
-    return [(v >> 8) + 247, v & 0xFF]
+    return [ (v >> 8) + 247, v & 0xFF ]
   } else if (v >= -1131 && v <= -108) {
     v = -v - 108
-    return [(v >> 8) + 251, v & 0xFF]
+    return [ (v >> 8) + 251, v & 0xFF ]
   } else if (v >= -32768 && v <= 32767) {
     return encode.NUMBER16(v)
   } else {
@@ -251,7 +251,7 @@ encode.NUMBER = function(v) {
  * @param {number}
  * @returns {number}
  */
-sizeOf.NUMBER = function(v) {
+sizeOf.NUMBER = function (v) {
   return encode.NUMBER(v).length
 }
 
@@ -261,8 +261,8 @@ sizeOf.NUMBER = function(v) {
  * @param {number}
  * @returns {Array}
  */
-encode.NUMBER16 = function(v) {
-  return [28, (v >> 8) & 0xFF, v & 0xFF]
+encode.NUMBER16 = function (v) {
+  return [ 28, (v >> 8) & 0xFF, v & 0xFF ]
 }
 
 /**
@@ -278,8 +278,8 @@ sizeOf.NUMBER16 = constant(3)
  * @param {number}
  * @returns {Array}
  */
-encode.NUMBER32 = function(v) {
-  return [29, (v >> 24) & 0xFF, (v >> 16) & 0xFF, (v >> 8) & 0xFF, v & 0xFF]
+encode.NUMBER32 = function (v) {
+  return [ 29, (v >> 24) & 0xFF, (v >> 16) & 0xFF, (v >> 8) & 0xFF, v & 0xFF ]
 }
 
 /**
@@ -292,7 +292,7 @@ sizeOf.NUMBER32 = constant(5)
  * @param {number}
  * @returns {Array}
  */
-encode.REAL = function(v) {
+encode.REAL = function (v) {
   let value = v.toString()
 
   // Some numbers use an epsilon to encode the value. (e.g. JavaScript will store 0.0000001 as 1e-7)
@@ -318,7 +318,7 @@ encode.REAL = function(v) {
   }
 
   nibbles += (nibbles.length & 1) ? 'f' : 'ff'
-  const out = [30]
+  const out = [ 30 ]
   for (let i = 0, ii = nibbles.length; i < ii; i += 2) {
     out.push(parseInt(nibbles.substr(i, 2), 16))
   }
@@ -330,7 +330,7 @@ encode.REAL = function(v) {
  * @param {number}
  * @returns {number}
  */
-sizeOf.REAL = function(v) {
+sizeOf.REAL = function (v) {
   return encode.REAL(v).length
 }
 
@@ -346,7 +346,7 @@ sizeOf.STRING = sizeOf.CHARARRAY
  * @param {number} numBytes
  * @returns {string}
  */
-decode.UTF8 = function(data, offset, numBytes) {
+decode.UTF8 = function (data, offset, numBytes) {
   const codePoints = []
   const numChars = numBytes
   for (let j = 0; j < numChars; j++, offset += 1) {
@@ -362,7 +362,7 @@ decode.UTF8 = function(data, offset, numBytes) {
  * @param {number} numBytes
  * @returns {string}
  */
-decode.UTF16 = function(data, offset, numBytes) {
+decode.UTF16 = function (data, offset, numBytes) {
   const codePoints = []
   const numChars = numBytes / 2
   for (let j = 0; j < numChars; j++, offset += 2) {
@@ -377,7 +377,7 @@ decode.UTF16 = function(data, offset, numBytes) {
  * @param {string}
  * @returns {Array}
  */
-encode.UTF16 = function(v) {
+encode.UTF16 = function (v) {
   const b = []
   for (let i = 0; i < v.length; i += 1) {
     const codepoint = v.charCodeAt(i)
@@ -392,7 +392,7 @@ encode.UTF16 = function(v) {
  * @param {string}
  * @returns {number}
  */
-sizeOf.UTF16 = function(v) {
+sizeOf.UTF16 = function (v) {
   return v.length * 2
 }
 
@@ -410,34 +410,34 @@ sizeOf.UTF16 = function(v) {
  * @private
  */
 const eightBitMacEncodings = {
-  'x-mac-croatian':  // Python: 'mac_croatian'
+  'x-mac-croatian': // Python: 'mac_croatian'
     'ÄÅÇÉÑÖÜáàâäãåçéèêëíìîïñóòôöõúùûü†°¢£§•¶ß®Š™´¨≠ŽØ∞±≤≥∆µ∂∑∏š∫ªºΩžø' +
     '¿¡¬√ƒ≈Ć«Č… ÀÃÕŒœĐ—“”‘’÷◊©⁄€‹›Æ»–·‚„‰ÂćÁčÈÍÎÏÌÓÔđÒÚÛÙıˆ˜¯πË˚¸Êæˇ',
-  'x-mac-cyrillic':  // Python: 'mac_cyrillic'
+  'x-mac-cyrillic': // Python: 'mac_cyrillic'
     'АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ†°Ґ£§•¶І®©™Ђђ≠Ѓѓ∞±≤≥іµґЈЄєЇїЉљЊњ' +
     'јЅ¬√ƒ≈∆«»… ЋћЌќѕ–—“”‘’÷„ЎўЏџ№Ёёяабвгдежзийклмнопрстуфхцчшщъыьэю',
   'x-mac-gaelic': // http://unicode.org/Public/MAPPINGS/VENDORS/APPLE/GAELIC.TXT
     'ÄÅÇÉÑÖÜáàâäãåçéèêëíìîïñóòôöõúùûü†°¢£§•¶ß®©™´¨≠ÆØḂ±≤≥ḃĊċḊḋḞḟĠġṀæø' +
     'ṁṖṗɼƒſṠ«»… ÀÃÕŒœ–—“”‘’ṡẛÿŸṪ€‹›Ŷŷṫ·Ỳỳ⁊ÂÊÁËÈÍÎÏÌÓÔ♣ÒÚÛÙıÝýŴŵẄẅẀẁẂẃ',
-  'x-mac-greek':  // Python: 'mac_greek'
+  'x-mac-greek': // Python: 'mac_greek'
     'Ä¹²É³ÖÜ΅àâä΄¨çéèêë£™îï•½‰ôö¦€ùûü†ΓΔΘΛΞΠß®©ΣΪ§≠°·Α±≤≥¥ΒΕΖΗΙΚΜΦΫΨΩ' +
     'άΝ¬ΟΡ≈Τ«»… ΥΧΆΈœ–―“”‘’÷ΉΊΌΎέήίόΏύαβψδεφγηιξκλμνοπώρστθωςχυζϊϋΐΰ\u00AD',
-  'x-mac-icelandic':  // Python: 'mac_iceland'
+  'x-mac-icelandic': // Python: 'mac_iceland'
     'ÄÅÇÉÑÖÜáàâäãåçéèêëíìîïñóòôöõúùûüÝ°¢£§•¶ß®©™´¨≠ÆØ∞±≤≥¥µ∂∑∏π∫ªºΩæø' +
     '¿¡¬√ƒ≈∆«»… ÀÃÕŒœ–—“”‘’÷◊ÿŸ⁄€ÐðÞþý·‚„‰ÂÊÁËÈÍÎÏÌÓÔÒÚÛÙıˆ˜¯˘˙˚¸˝˛ˇ',
   'x-mac-inuit': // http://unicode.org/Public/MAPPINGS/VENDORS/APPLE/INUIT.TXT
     'ᐃᐄᐅᐆᐊᐋᐱᐲᐳᐴᐸᐹᑉᑎᑏᑐᑑᑕᑖᑦᑭᑮᑯᑰᑲᑳᒃᒋᒌᒍᒎᒐᒑ°ᒡᒥᒦ•¶ᒧ®©™ᒨᒪᒫᒻᓂᓃᓄᓅᓇᓈᓐᓯᓰᓱᓲᓴᓵᔅᓕᓖᓗ' +
     'ᓘᓚᓛᓪᔨᔩᔪᔫᔭ… ᔮᔾᕕᕖᕗ–—“”‘’ᕘᕙᕚᕝᕆᕇᕈᕉᕋᕌᕐᕿᖀᖁᖂᖃᖄᖅᖏᖐᖑᖒᖓᖔᖕᙱᙲᙳᙴᙵᙶᖖᖠᖡᖢᖣᖤᖥᖦᕼŁł',
-  'x-mac-ce':  // Python: 'mac_latin2'
+  'x-mac-ce': // Python: 'mac_latin2'
     'ÄĀāÉĄÖÜáąČäčĆćéŹźĎíďĒēĖóėôöõúĚěü†°Ę£§•¶ß®©™ę¨≠ģĮįĪ≤≥īĶ∂∑łĻļĽľĹĺŅ' +
     'ņŃ¬√ńŇ∆«»… ňŐÕőŌ–—“”‘’÷◊ōŔŕŘ‹›řŖŗŠ‚„šŚśÁŤťÍŽžŪÓÔūŮÚůŰűŲųÝýķŻŁżĢˇ',
-  macintosh:  // Python: 'mac_roman'
+  macintosh: // Python: 'mac_roman'
     'ÄÅÇÉÑÖÜáàâäãåçéèêëíìîïñóòôöõúùûü†°¢£§•¶ß®©™´¨≠ÆØ∞±≤≥¥µ∂∑∏π∫ªºΩæø' +
     '¿¡¬√ƒ≈∆«»… ÀÃÕŒœ–—“”‘’÷◊ÿŸ⁄€‹›ﬁﬂ‡·‚„‰ÂÊÁËÈÍÎÏÌÓÔÒÚÛÙıˆ˜¯˘˙˚¸˝˛ˇ',
-  'x-mac-romanian':  // Python: 'mac_romanian'
+  'x-mac-romanian': // Python: 'mac_romanian'
     'ÄÅÇÉÑÖÜáàâäãåçéèêëíìîïñóòôöõúùûü†°¢£§•¶ß®©™´¨≠ĂȘ∞±≤≥¥µ∂∑∏π∫ªºΩăș' +
     '¿¡¬√ƒ≈∆«»… ÀÃÕŒœ–—“”‘’÷◊ÿŸ⁄€‹›Țț‡·‚„‰ÂÊÁËÈÍÎÏÌÓÔÒÚÛÙıˆ˜¯˘˙˚¸˝˛ˇ',
-  'x-mac-turkish':  // Python: 'mac_turkish'
+  'x-mac-turkish': // Python: 'mac_turkish'
     'ÄÅÇÉÑÖÜáàâäãåçéèêëíìîïñóòôöõúùûü†°¢£§•¶ß®©™´¨≠ÆØ∞±≤≥¥µ∂∑∏π∫ªºΩæø' +
     '¿¡¬√ƒ≈∆«»… ÀÃÕŒœ–—“”‘’÷◊ÿŸĞğİıŞş‡·‚„‰ÂÊÁËÈÍÎÏÌÓÔÒÚÛÙˆ˜¯˘˙˚¸˝˛ˇ'
 }
@@ -453,7 +453,7 @@ const eightBitMacEncodings = {
  * @param {string} encoding
  * @returns {string}
  */
-decode.MACSTRING = function(dataView, offset, dataLength, encoding) {
+decode.MACSTRING = function (dataView, offset, dataLength, encoding) {
   const table = eightBitMacEncodings[encoding]
   if (table === undefined) {
     return undefined
@@ -486,8 +486,8 @@ const getMacEncodingTable = function (encoding) {
   // WeakMap requires that the same String instance is passed for cache hits.
   if (!macEncodingCacheKeys) {
     macEncodingCacheKeys = {}
-    for (let e in eightBitMacEncodings) {
-      /*jshint -W053 */  // Suppress "Do not use String as a constructor."
+    for (const e in eightBitMacEncodings) {
+      /* jshint -W053 */  // Suppress "Do not use String as a constructor."
       macEncodingCacheKeys[e] = new String(e)
     }
   }
@@ -534,7 +534,7 @@ const getMacEncodingTable = function (encoding) {
  * @param {string} encoding
  * @returns {Array}
  */
-encode.MACSTRING = function(str, encoding) {
+encode.MACSTRING = function (str, encoding) {
   const table = getMacEncodingTable(encoding)
   if (table === undefined) {
     return undefined
@@ -566,7 +566,7 @@ encode.MACSTRING = function(str, encoding) {
  * @param {string} encoding
  * @returns {number}
  */
-sizeOf.MACSTRING = function(str, encoding) {
+sizeOf.MACSTRING = function (str, encoding) {
   const b = encode.MACSTRING(str, encoding)
   if (b !== undefined) {
     return b.length
@@ -576,12 +576,12 @@ sizeOf.MACSTRING = function(str, encoding) {
 }
 
 // Helper for encode.VARDELTAS
-function isByteEncodable(value) {
+function isByteEncodable (value) {
   return value >= -128 && value <= 127
 }
 
 // Helper for encode.VARDELTAS
-function encodeVarDeltaRunAsZeroes(deltas, pos, result) {
+function encodeVarDeltaRunAsZeroes (deltas, pos, result) {
   let runLength = 0
   const numDeltas = deltas.length
   while (pos < numDeltas && runLength < 64 && deltas[pos] === 0) {
@@ -593,7 +593,7 @@ function encodeVarDeltaRunAsZeroes(deltas, pos, result) {
 }
 
 // Helper for encode.VARDELTAS
-function encodeVarDeltaRunAsBytes(deltas, offset, result) {
+function encodeVarDeltaRunAsBytes (deltas, offset, result) {
   let runLength = 0
   const numDeltas = deltas.length
   let pos = offset
@@ -625,7 +625,7 @@ function encodeVarDeltaRunAsBytes(deltas, offset, result) {
 }
 
 // Helper for encode.VARDELTAS
-function encodeVarDeltaRunAsWords(deltas, offset, result) {
+function encodeVarDeltaRunAsWords (deltas, offset, result) {
   let runLength = 0
   const numDeltas = deltas.length
   let pos = offset
@@ -675,7 +675,7 @@ function encodeVarDeltaRunAsWords(deltas, offset, result) {
  * @param {Array}
  * @return {Array}
  */
-encode.VARDELTAS = function(deltas) {
+encode.VARDELTAS = function (deltas) {
   let pos = 0
   const result = []
   while (pos < deltas.length) {
@@ -697,14 +697,14 @@ encode.VARDELTAS = function(deltas) {
  * @param {Array} l
  * @returns {Array}
  */
-encode.INDEX = function(l) {
-  //var offset, offsets, offsetEncoder, encodedOffsets, encodedOffset, data,
+encode.INDEX = function (l) {
+  // var offset, offsets, offsetEncoder, encodedOffsets, encodedOffset, data,
   //    i, v;
   // Because we have to know which data type to use to encode the offsets,
   // we have to go through the values twice: once to encode the data and
   // calculate the offsets, then again to encode the offsets using the fitting data type.
   let offset = 1 // First offset is always 1.
-  const offsets = [offset]
+  const offsets = [ offset ]
   const data = []
   for (let i = 0; i < l.length; i += 1) {
     const v = encode.OBJECT(l[i])
@@ -714,12 +714,12 @@ encode.INDEX = function(l) {
   }
 
   if (data.length === 0) {
-    return [0, 0]
+    return [ 0, 0 ]
   }
 
   const encodedOffsets = []
   const offSize = (1 + Math.floor(Math.log(offset) / Math.log(2)) / 8) | 0
-  const offsetEncoder = [undefined, encode.BYTE, encode.USHORT, encode.UINT24, encode.ULONG][offSize]
+  const offsetEncoder = [ undefined, encode.BYTE, encode.USHORT, encode.UINT24, encode.ULONG ][offSize]
   for (let i = 0; i < offsets.length; i += 1) {
     const encodedOffset = offsetEncoder(offsets[i])
     Array.prototype.push.apply(encodedOffsets, encodedOffset)
@@ -735,7 +735,7 @@ encode.INDEX = function(l) {
  * @param {Array}
  * @returns {number}
  */
-sizeOf.INDEX = function(v) {
+sizeOf.INDEX = function (v) {
   return encode.INDEX(v).length
 }
 
@@ -746,7 +746,7 @@ sizeOf.INDEX = function(v) {
  * @param {Object} m
  * @returns {Array}
  */
-encode.DICT = function(m) {
+encode.DICT = function (m) {
   let d = []
   const keys = Object.keys(m)
   const length = keys.length
@@ -767,7 +767,7 @@ encode.DICT = function(m) {
  * @param {Object}
  * @returns {number}
  */
-sizeOf.DICT = function(m) {
+sizeOf.DICT = function (m) {
   return encode.DICT(m).length
 }
 
@@ -775,11 +775,11 @@ sizeOf.DICT = function(m) {
  * @param {number}
  * @returns {Array}
  */
-encode.OPERATOR = function(v) {
+encode.OPERATOR = function (v) {
   if (v < 1200) {
-    return [v]
+    return [ v ]
   } else {
-    return [12, v - 1200]
+    return [ 12, v - 1200 ]
   }
 }
 
@@ -788,7 +788,7 @@ encode.OPERATOR = function(v) {
  * @param {string}
  * @returns {Array}
  */
-encode.OPERAND = function(v, type) {
+encode.OPERAND = function (v, type) {
   let d = []
   if (Array.isArray(type)) {
     for (let i = 0; i < type.length; i += 1) {
@@ -826,7 +826,7 @@ const wmm = typeof WeakMap === 'function' && new WeakMap()
  * @param {Array}
  * @returns {Array}
  */
-encode.CHARSTRING = function(ops) {
+encode.CHARSTRING = function (ops) {
   // See encode.MACSTRING for why we don't do "if (wmm && wmm.has(ops))".
   if (wmm) {
     const cachedValue = wmm.get(ops)
@@ -854,7 +854,7 @@ encode.CHARSTRING = function(ops) {
  * @param {Array}
  * @returns {number}
  */
-sizeOf.CHARSTRING = function(ops) {
+sizeOf.CHARSTRING = function (ops) {
   return encode.CHARSTRING(ops).length
 }
 
@@ -865,7 +865,7 @@ sizeOf.CHARSTRING = function(ops) {
  * @param {Object}
  * @returns {Array}
  */
-encode.OBJECT = function(v) {
+encode.OBJECT = function (v) {
   const encodingFunction = encode[v.type]
   check.argument(encodingFunction !== undefined, 'No encoding function for type ' + v.type)
   return encodingFunction(v.value)
@@ -875,7 +875,7 @@ encode.OBJECT = function(v) {
  * @param {Object}
  * @returns {number}
  */
-sizeOf.OBJECT = function(v) {
+sizeOf.OBJECT = function (v) {
   const sizeOfFunction = sizeOf[v.type]
   check.argument(sizeOfFunction !== undefined, 'No sizeOf function for type ' + v.type)
   return sizeOfFunction(v.value)
@@ -888,7 +888,7 @@ sizeOf.OBJECT = function(v) {
  * @param {opentype.Table}
  * @returns {Array}
  */
-encode.TABLE = function(table) {
+encode.TABLE = function (table) {
   let d = []
   const length = table.fields.length
   const subtables = []
@@ -907,7 +907,7 @@ encode.TABLE = function(table) {
 
     if (field.type === 'TABLE') {
       subtableOffsets.push(d.length)
-      d = d.concat([0, 0])
+      d = d.concat([ 0, 0 ])
       subtables.push(bytes)
     } else {
       d = d.concat(bytes)
@@ -930,7 +930,7 @@ encode.TABLE = function(table) {
  * @param {opentype.Table}
  * @returns {number}
  */
-sizeOf.TABLE = function(table) {
+sizeOf.TABLE = function (table) {
   let numBytes = 0
   const length = table.fields.length
 
@@ -958,11 +958,11 @@ encode.RECORD = encode.TABLE
 sizeOf.RECORD = sizeOf.TABLE
 
 // Merge in a list of bytes.
-encode.LITERAL = function(v) {
+encode.LITERAL = function (v) {
   return v
 }
 
-sizeOf.LITERAL = function(v) {
+sizeOf.LITERAL = function (v) {
   return v.length
 }
 

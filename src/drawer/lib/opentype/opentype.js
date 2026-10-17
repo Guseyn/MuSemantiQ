@@ -6,11 +6,11 @@
 import inflate from '#msq/drawer/lib/opentype/tiny-inflate.js'
 import Font from '#msq/drawer/lib/opentype/font.js'
 import Glyph from '#msq/drawer/lib/opentype/glyph.js'
-import {  CmapEncoding, GlyphNames, addGlyphNames  } from '#msq/drawer/lib/opentype/encoding.js'
+import { CmapEncoding, GlyphNames, addGlyphNames } from '#msq/drawer/lib/opentype/encoding.js'
 import { Parser, getULong, getTag, getUShort, getCard16 } from '#msq/drawer/lib/opentype/parse.js'
 import BoundingBox from '#msq/drawer/lib/opentype/bbox.js'
 import Path from '#msq/drawer/lib/opentype/path.js'
-import {  nodeBufferToArrayBuffer  } from '#msq/drawer/lib/opentype/util.js'
+import { nodeBufferToArrayBuffer } from '#msq/drawer/lib/opentype/util.js'
 import cmap from '#msq/drawer/lib/opentype/tables/cmap.js'
 import cff from '#msq/drawer/lib/opentype/tables/cff.js'
 import fvar from '#msq/drawer/lib/opentype/tables/fvar.js'
@@ -29,7 +29,7 @@ import os2 from '#msq/drawer/lib/opentype/tables/os2.js'
 import post from '#msq/drawer/lib/opentype/tables/post.js'
 import meta from '#msq/drawer/lib/opentype/tables/meta.js'
 
-import * as parse from '#msq/drawer/lib/opentype/parse.js' 
+import * as parse from '#msq/drawer/lib/opentype/parse.js'
 
 /**
  * The opentype library.
@@ -41,7 +41,7 @@ import * as parse from '#msq/drawer/lib/opentype/parse.js'
  * Loads a font from a file.
  * @param  {string} path - The path of the file
  */
-async function loadFromFile(path, callback) {
+async function loadFromFile (path, callback) {
   const fs = await import('fs')
   const buffer = await fs.promises.readFile(path)
   return nodeBufferToArrayBuffer(buffer)
@@ -51,13 +51,13 @@ async function loadFromFile(path, callback) {
  * Loads a font from a URL.
  * @param  {string} url - The URL of the font file.
  */
-export async function loadFromUrl(url) {
+export async function loadFromUrl (url) {
   return new Promise((resolve, reject) => {
     const request = new XMLHttpRequest()
     request.open('get', url, true)
     request.responseType = 'arraybuffer'
 
-    request.onload = function() {
+    request.onload = function () {
       if (request.status >= 200 && request.status < 300 && request.response) {
         resolve(request.response)
       } else {
@@ -65,7 +65,7 @@ export async function loadFromUrl(url) {
       }
     }
 
-    request.onerror = function() {
+    request.onerror = function () {
       reject(new Error('Font could not be loaded'))
     }
 
@@ -80,7 +80,7 @@ export async function loadFromUrl(url) {
  * @param  {Number}
  * @return {Object[]}
  */
-function parseOpenTypeTableEntries(data, numTables) {
+function parseOpenTypeTableEntries (data, numTables) {
   const tableEntries = []
   let p = 12
   for (let i = 0; i < numTables; i += 1) {
@@ -88,7 +88,7 @@ function parseOpenTypeTableEntries(data, numTables) {
     const checksum = getULong(data, p + 4)
     const offset = getULong(data, p + 8)
     const length = getULong(data, p + 12)
-    tableEntries.push({tag: tag, checksum: checksum, offset: offset, length: length, compression: false})
+    tableEntries.push({ tag, checksum, offset, length, compression: false })
     p += 16
   }
 
@@ -101,7 +101,7 @@ function parseOpenTypeTableEntries(data, numTables) {
  * @param  {Number}
  * @return {Object[]}
  */
-function parseWOFFTableEntries(data, numTables) {
+function parseWOFFTableEntries (data, numTables) {
   const tableEntries = []
   let p = 44 // offset to the first table directory entry.
   for (let i = 0; i < numTables; i += 1) {
@@ -116,8 +116,13 @@ function parseWOFFTableEntries(data, numTables) {
       compression = false
     }
 
-    tableEntries.push({tag: tag, offset: offset, compression: compression,
-      compressedLength: compLength, length: origLength})
+    tableEntries.push({
+      tag,
+      offset,
+      compression,
+      compressedLength: compLength,
+      length: origLength
+    })
     p += 20
   }
 
@@ -136,7 +141,7 @@ function parseWOFFTableEntries(data, numTables) {
  * @param  {Object}
  * @return {TableData}
  */
-function uncompressTable(data, tableEntry) {
+function uncompressTable (data, tableEntry) {
   if (tableEntry.compression === 'WOFF') {
     const inBuffer = new Uint8Array(data.buffer, tableEntry.offset + 2, tableEntry.compressedLength - 2)
     const outBuffer = new Uint8Array(tableEntry.length)
@@ -146,9 +151,9 @@ function uncompressTable(data, tableEntry) {
     }
 
     const view = new DataView(outBuffer.buffer, 0)
-    return {data: view, offset: 0}
+    return { data: view, offset: 0 }
   } else {
-    return {data: data, offset: tableEntry.offset}
+    return { data, offset: tableEntry.offset }
   }
 }
 
@@ -160,13 +165,13 @@ function uncompressTable(data, tableEntry) {
  * @param  {ArrayBuffer}
  * @return {opentype.Font}
  */
-function parseBuffer(buffer) {
+function parseBuffer (buffer) {
   let indexToLocFormat
   let ltagTable
 
   // Since the constructor can also be called to create new fonts from scratch, we indicate this
   // should be an empty font that we'll fill with our own data.
-  const font = new Font({empty: true})
+  const font = new Font({ empty: true })
 
   // OpenType fonts use big endian byte ordering.
   // We can't rely on typed array view types, because they operate with the endianness of the host computer.
@@ -357,8 +362,7 @@ function parseBuffer(buffer) {
  * @alias opentype.load
  * @param  {string} url - The URL of the font to load.
  */
-async function load(url) {
-  // eslint-disable-next-line no-undef
+async function load (url) {
   const isNode = typeof process !== 'undefined' && process.versions != null && process.versions.node != null
   const loadFn = isNode ? loadFromFile : loadFromUrl
   try {
@@ -376,8 +380,7 @@ async function load(url) {
  * @param  {string} url - The URL of the font to load.
  * @return {opentype.Font}
  */
-async function loadSyncIfOnlyItIsNodeJSEnv(path) {
-  // eslint-disable-next-line no-undef
+async function loadSyncIfOnlyItIsNodeJSEnv (path) {
   const isNode = typeof process !== 'undefined' && process.versions != null && process.versions.node != null
   if (isNode) {
     const fs = await import('fs')
@@ -387,9 +390,9 @@ async function loadSyncIfOnlyItIsNodeJSEnv(path) {
   return null
 }
 
-function accessPreloadedSourceInBrowser(path, cacheNameWithPreloadedSourcesInBrowser) {
-  const isBrowser = typeof window !== 'undefined' && typeof window.document !== 'undefined';
-  const isWebWorker = typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope;
+function accessPreloadedSourceInBrowser (path, cacheNameWithPreloadedSourcesInBrowser) {
+  const isBrowser = typeof window !== 'undefined' && typeof window.document !== 'undefined'
+  const isWebWorker = typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope
   const pathParts = path.split('/')
   const fontKey = pathParts[pathParts.length - 1]
   if (isBrowser) {

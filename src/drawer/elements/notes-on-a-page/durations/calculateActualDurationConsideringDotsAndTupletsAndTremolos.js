@@ -3,14 +3,14 @@
 import calculateActualDurationConsideringDotsAndTremolos from '#msq/drawer/elements/notes-on-a-page/durations/calculateActualDurationConsideringDotsAndTremolos.js'
 
 const defaultTupletRatios = {
-  '1': 1,
-  '3': 2,
-  '2': 3,
-  '5': 4,
-  '6': 4,
-  '7': 4,
-  '9': 8,
-  '12': 8
+  1: 1,
+  3: 2,
+  2: 3,
+  5: 4,
+  6: 4,
+  7: 4,
+  9: 8,
+  12: 8
 }
 
 export default function (duration, numberOfDots, tupletValues, tremoloDurationFactor) {

@@ -7,7 +7,7 @@ import { Parser } from '#msq/drawer/lib/opentype/parse.js'
 import Path from '#msq/drawer/lib/opentype/path.js'
 
 // Parse the coordinate data for a glyph.
-function parseGlyphCoordinate(p, flag, previousValue, shortVectorBitMask, sameBitMask) {
+function parseGlyphCoordinate (p, flag, previousValue, shortVectorBitMask, sameBitMask) {
   let v
   if ((flag & shortVectorBitMask) > 0) {
     // The coordinate is 1 byte long.
@@ -33,7 +33,7 @@ function parseGlyphCoordinate(p, flag, previousValue, shortVectorBitMask, sameBi
 }
 
 // Parse a TrueType glyph.
-function parseGlyph(glyph, data, start) {
+function parseGlyph (glyph, data, start) {
   const p = new Parser(data, start)
   glyph.numberOfContours = p.parseShort()
   glyph._xMin = p.parseShort()
@@ -133,9 +133,8 @@ function parseGlyph(glyph, data, start) {
           component.dy = p.parseShort()
         } else {
           // values are matched points
-          component.matchedPoints = [p.parseUShort(), p.parseUShort()]
+          component.matchedPoints = [ p.parseUShort(), p.parseUShort() ]
         }
-
       } else {
         // The arguments are bytes
         if ((flags & 2) > 0) {
@@ -144,7 +143,7 @@ function parseGlyph(glyph, data, start) {
           component.dy = p.parseChar()
         } else {
           // values are matched points
-          component.matchedPoints = [p.parseByte(), p.parseByte()]
+          component.matchedPoints = [ p.parseByte(), p.parseByte() ]
         }
       }
 
@@ -178,7 +177,7 @@ function parseGlyph(glyph, data, start) {
 }
 
 // Transform an array of points and return a new array.
-function transformPoints(points, transform) {
+function transformPoints (points, transform) {
   const newPoints = []
   for (let i = 0; i < points.length; i += 1) {
     const pt = points[i]
@@ -194,7 +193,7 @@ function transformPoints(points, transform) {
   return newPoints
 }
 
-function getContours(points) {
+function getContours (points) {
   const contours = []
   let currentContour = []
   for (let i = 0; i < points.length; i += 1) {
@@ -211,7 +210,7 @@ function getContours(points) {
 }
 
 // Convert the TrueType glyph outline to a Path.
-function getPath(points) {
+function getPath (points) {
   const p = new Path()
   if (!points) {
     return p
@@ -233,7 +232,7 @@ function getPath(points) {
         p.moveTo(next.x, next.y)
       } else {
         // If both first and last points are off-curve, start at their middle.
-        const start = {x: (curr.x + next.x) * 0.5, y: (curr.y + next.y) * 0.5}
+        const start = { x: (curr.x + next.x) * 0.5, y: (curr.y + next.y) * 0.5 }
         p.moveTo(start.x, start.y)
       }
     }
@@ -269,7 +268,7 @@ function getPath(points) {
   return p
 }
 
-function buildPath(glyphs, glyph) {
+function buildPath (glyphs, glyph) {
   if (glyph.isComposite) {
     for (let j = 0; j < glyph.components.length; j += 1) {
       const component = glyph.components[j]
@@ -290,11 +289,14 @@ function buildPath(glyphs, glyph) {
           const firstPt = glyph.points[component.matchedPoints[0]]
           let secondPt = componentGlyph.points[component.matchedPoints[1]]
           const transform = {
-            xScale: component.xScale, scale01: component.scale01,
-            scale10: component.scale10, yScale: component.yScale,
-            dx: 0, dy: 0
+            xScale: component.xScale,
+            scale01: component.scale01,
+            scale10: component.scale10,
+            yScale: component.yScale,
+            dx: 0,
+            dy: 0
           }
-          secondPt = transformPoints([secondPt], transform)[0]
+          secondPt = transformPoints([ secondPt ], transform)[0]
           transform.dx = firstPt.x - secondPt.x
           transform.dy = firstPt.y - secondPt.y
           transformedPoints = transformPoints(componentGlyph.points, transform)
@@ -308,7 +310,7 @@ function buildPath(glyphs, glyph) {
 }
 
 // Parse all the glyphs according to the offsets from the `loca` table.
-function parseGlyfTable(data, start, loca, font) {
+function parseGlyfTable (data, start, loca, font) {
   const glyphs = new glyphset.GlyphSet(font)
 
   // The last element of the loca table is invalid.

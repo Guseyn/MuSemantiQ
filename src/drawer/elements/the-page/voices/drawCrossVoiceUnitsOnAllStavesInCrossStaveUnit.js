@@ -23,13 +23,13 @@ export default function (singleUnitsForCurrentCrossStaveUnit, stavesParams, cont
             if (singleUnitsForCurrentCrossStaveUnit[staveIndex][singleUnitIndex].notesWithCoordinates[noteIndex].isOnTheLeftSideOfUnit) {
               if (singleUnitsForCurrentCrossStaveUnit[staveIndex][singleUnitIndex].notesWithCoordinates[noteIndex].positionNumber <= -1) {
                 areasWithLedgerLinesForNotesInTheFirstVertical.push({
-                  actualStaveIndex: actualStaveIndex,
+                  actualStaveIndex,
                   minY: singleUnitsForCurrentCrossStaveUnit[staveIndex][singleUnitIndex].notesWithCoordinates[noteIndex].top,
                   maxY: topOffsetsForEachStave[actualStaveIndex] - halfOfIntervalBetweenStaveLines
                 })
               } else if (singleUnitsForCurrentCrossStaveUnit[staveIndex][singleUnitIndex].notesWithCoordinates[noteIndex].positionNumber >= numberOfStaveLines) {
                 areasWithLedgerLinesForNotesInTheFirstVertical.push({
-                  actualStaveIndex: actualStaveIndex,
+                  actualStaveIndex,
                   minY: topOffsetsForEachStave[actualStaveIndex] + (numberOfStaveLines - 1) * intervalBetweenStaveLines + halfOfIntervalBetweenStaveLines,
                   maxY: singleUnitsForCurrentCrossStaveUnit[staveIndex][singleUnitIndex].notesWithCoordinates[noteIndex].bottom
                 })

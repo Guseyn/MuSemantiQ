@@ -3,7 +3,7 @@
 
 import check from '#msq/drawer/lib/opentype/check.js'
 
-function searchTag(arr, tag) {
+function searchTag (arr, tag) {
   /* jshint bitwise: false */
   let imin = 0
   let imax = arr.length - 1
@@ -20,7 +20,7 @@ function searchTag(arr, tag) {
   return -imin - 1
 }
 
-function binSearch(arr, value) {
+function binSearch (arr, value) {
   /* jshint bitwise: false */
   let imin = 0
   let imax = arr.length - 1
@@ -38,7 +38,7 @@ function binSearch(arr, value) {
 }
 
 // binary search in a list of ranges (coverage, class definition)
-function searchRange(ranges, value) {
+function searchRange (ranges, value) {
   // jshint bitwise: false
   let range
   let imin = 0
@@ -64,7 +64,7 @@ function searchRange(ranges, value) {
  * @exports opentype.Layout
  * @class
  */
-function Layout(font, tableName) {
+function Layout (font, tableName) {
   this.font = font
   this.tableName = tableName
 }
@@ -80,7 +80,7 @@ Layout.prototype = {
      * @param  {string} tag
      * @return {number}
      */
-  searchTag: searchTag,
+  searchTag,
 
   /**
      * Binary search in a list of numbers
@@ -91,14 +91,14 @@ Layout.prototype = {
      * @param  {number} value
      * @return {number}
      */
-  binSearch: binSearch,
+  binSearch,
 
   /**
      * Get or create the Layout table (GSUB, GPOS etc).
      * @param  {boolean} create - Whether to create a new one.
      * @return {Object} The GSUB or GPOS table.
      */
-  getTable: function(create) {
+  getTable: function (create) {
     let layout = this.font.tables[this.tableName]
     if (!layout && create) {
       layout = this.font.tables[this.tableName] = this.createDefaultTable()
@@ -111,10 +111,10 @@ Layout.prototype = {
      * @instance
      * @return {Array}
      */
-  getScriptNames: function() {
-    let layout = this.getTable()
+  getScriptNames: function () {
+    const layout = this.getTable()
     if (!layout) { return [] }
-    return layout.scripts.map(function(script) {
+    return layout.scripts.map(function (script) {
       return script.tag
     })
   },
@@ -125,8 +125,8 @@ Layout.prototype = {
      * If not, returns 'latn' if it exists.
      * If neither exist, returns undefined.
      */
-  getDefaultScriptName: function() {
-    let layout = this.getTable()
+  getDefaultScriptName: function () {
+    const layout = this.getTable()
     if (!layout) { return }
     let hasLatn = false
     for (let i = 0; i < layout.scripts.length; i++) {
@@ -144,7 +144,7 @@ Layout.prototype = {
      * @param {boolean} create - forces the creation of this script table if it doesn't exist.
      * @return {Object} An object with tag and script properties.
      */
-  getScriptTable: function(script, create) {
+  getScriptTable: function (script, create) {
     const layout = this.getTable(create)
     if (layout) {
       script = script || 'DFLT'
@@ -156,7 +156,7 @@ Layout.prototype = {
         const scr = {
           tag: script,
           script: {
-            defaultLangSys: {reserved: 0, reqFeatureIndex: 0xffff, featureIndexes: []},
+            defaultLangSys: { reserved: 0, reqFeatureIndex: 0xffff, featureIndexes: [] },
             langSysRecords: []
           }
         }
@@ -174,7 +174,7 @@ Layout.prototype = {
      * @param {boolean} create - forces the creation of this langSysTable if it doesn't exist.
      * @return {Object}
      */
-  getLangSysTable: function(script, language, create) {
+  getLangSysTable: function (script, language, create) {
     const scriptTable = this.getScriptTable(script, create)
     if (scriptTable) {
       if (!language || language === 'dflt' || language === 'DFLT') {
@@ -186,7 +186,7 @@ Layout.prototype = {
       } else if (create) {
         const langSysRecord = {
           tag: language,
-          langSys: {reserved: 0, reqFeatureIndex: 0xffff, featureIndexes: []}
+          langSys: { reserved: 0, reqFeatureIndex: 0xffff, featureIndexes: [] }
         }
         scriptTable.langSysRecords.splice(-1 - pos, 0, langSysRecord)
         return langSysRecord.langSys
@@ -203,7 +203,7 @@ Layout.prototype = {
      * @param {boolean} create - forces the creation of the feature table if it doesn't exist.
      * @return {Object}
      */
-  getFeatureTable: function(script, language, feature, create) {
+  getFeatureTable: function (script, language, feature, create) {
     const langSysTable = this.getLangSysTable(script, language, create)
     if (langSysTable) {
       let featureRecord
@@ -242,7 +242,7 @@ Layout.prototype = {
      * @param {boolean} create - forces the creation of the lookup table if it doesn't exist, with no subtables.
      * @return {Object[]}
      */
-  getLookupTables: function(script, language, feature, lookupType, create) {
+  getLookupTables: function (script, language, feature, lookupType, create) {
     const featureTable = this.getFeatureTable(script, language, feature, create)
     const tables = []
     if (featureTable) {
@@ -258,7 +258,7 @@ Layout.prototype = {
       }
       if (tables.length === 0 && create) {
         lookupTable = {
-          lookupType: lookupType,
+          lookupType,
           lookupFlag: 0,
           subtables: [],
           markFilteringSet: undefined
@@ -266,7 +266,7 @@ Layout.prototype = {
         const index = allLookups.length
         allLookups.push(lookupTable)
         lookupListIndexes.push(index)
-        return [lookupTable]
+        return [ lookupTable ]
       }
     }
     return tables
@@ -279,7 +279,7 @@ Layout.prototype = {
      * @param {number} glyphIndex - the index of the glyph to find
      * @returns {number} -1 if not found
      */
-  getGlyphClass: function(classDefTable, glyphIndex) {
+  getGlyphClass: function (classDefTable, glyphIndex) {
     switch (classDefTable.format) {
       case 1:
         if (classDefTable.startGlyph <= glyphIndex && glyphIndex < classDefTable.startGlyph + classDefTable.classes.length) {
@@ -299,7 +299,7 @@ Layout.prototype = {
      * @param {number} glyphIndex - the index of the glyph to find
      * @returns {number} -1 if not found
      */
-  getCoverageIndex: function(coverageTable, glyphIndex) {
+  getCoverageIndex: function (coverageTable, glyphIndex) {
     switch (coverageTable.format) {
       case 1:
         const index = binSearch(coverageTable.glyphs, glyphIndex)
@@ -318,7 +318,7 @@ Layout.prototype = {
      * @param  {Object} coverageTable
      * @return {Array}
      */
-  expandCoverage: function(coverageTable) {
+  expandCoverage: function (coverageTable) {
     if (coverageTable.format === 1) {
       return coverageTable.glyphs
     } else {

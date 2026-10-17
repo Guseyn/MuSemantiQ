@@ -20,11 +20,11 @@ import post from '#msq/drawer/lib/opentype/tables/post.js'
 import gsub from '#msq/drawer/lib/opentype/tables/gsub.js'
 import meta from '#msq/drawer/lib/opentype/tables/meta.js'
 
-function log2(v) {
+function log2 (v) {
   return Math.log(v) / Math.log(2) | 0
 }
 
-function computeCheckSum(bytes) {
+function computeCheckSum (bytes) {
   while (bytes.length % 4 !== 0) {
     bytes.push(0)
   }
@@ -41,22 +41,22 @@ function computeCheckSum(bytes) {
   return sum
 }
 
-function makeTableRecord(tag, checkSum, offset, length) {
+function makeTableRecord (tag, checkSum, offset, length) {
   return new table.Record('Table Record', [
-    {name: 'tag', type: 'TAG', value: tag !== undefined ? tag : ''},
-    {name: 'checkSum', type: 'ULONG', value: checkSum !== undefined ? checkSum : 0},
-    {name: 'offset', type: 'ULONG', value: offset !== undefined ? offset : 0},
-    {name: 'length', type: 'ULONG', value: length !== undefined ? length : 0}
+    { name: 'tag', type: 'TAG', value: tag !== undefined ? tag : '' },
+    { name: 'checkSum', type: 'ULONG', value: checkSum !== undefined ? checkSum : 0 },
+    { name: 'offset', type: 'ULONG', value: offset !== undefined ? offset : 0 },
+    { name: 'length', type: 'ULONG', value: length !== undefined ? length : 0 }
   ])
 }
 
-function makeSfntTable(tables) {
+function makeSfntTable (tables) {
   const sfnt = new table.Table('sfnt', [
-    {name: 'version', type: 'TAG', value: 'OTTO'},
-    {name: 'numTables', type: 'USHORT', value: 0},
-    {name: 'searchRange', type: 'USHORT', value: 0},
-    {name: 'entrySelector', type: 'USHORT', value: 0},
-    {name: 'rangeShift', type: 'USHORT', value: 0}
+    { name: 'version', type: 'TAG', value: 'OTTO' },
+    { name: 'numTables', type: 'USHORT', value: 0 },
+    { name: 'searchRange', type: 'USHORT', value: 0 },
+    { name: 'entrySelector', type: 'USHORT', value: 0 },
+    { name: 'rangeShift', type: 'USHORT', value: 0 }
   ])
   sfnt.tables = tables
   sfnt.numTables = tables.length
@@ -71,7 +71,7 @@ function makeSfntTable(tables) {
   let offset = sfnt.sizeOf() + (makeTableRecord().sizeOf() * sfnt.numTables)
   while (offset % 4 !== 0) {
     offset += 1
-    tableFields.push({name: 'padding', type: 'BYTE', value: 0})
+    tableFields.push({ name: 'padding', type: 'BYTE', value: 0 })
   }
 
   for (let i = 0; i < tables.length; i += 1) {
@@ -79,18 +79,18 @@ function makeSfntTable(tables) {
     check.argument(t.tableName.length === 4, 'Table name' + t.tableName + ' is invalid.')
     const tableLength = t.sizeOf()
     const tableRecord = makeTableRecord(t.tableName, computeCheckSum(t.encode()), offset, tableLength)
-    recordFields.push({name: tableRecord.tag + ' Table Record', type: 'RECORD', value: tableRecord})
-    tableFields.push({name: t.tableName + ' table', type: 'RECORD', value: t})
+    recordFields.push({ name: tableRecord.tag + ' Table Record', type: 'RECORD', value: tableRecord })
+    tableFields.push({ name: t.tableName + ' table', type: 'RECORD', value: t })
     offset += tableLength
     check.argument(!isNaN(offset), 'Something went wrong calculating the offset.')
     while (offset % 4 !== 0) {
       offset += 1
-      tableFields.push({name: 'padding', type: 'BYTE', value: 0})
+      tableFields.push({ name: 'padding', type: 'BYTE', value: 0 })
     }
   }
 
   // Table records need to be sorted alphabetically.
-  recordFields.sort(function(r1, r2) {
+  recordFields.sort(function (r1, r2) {
     if (r1.value.tag > r2.value.tag) {
       return 1
     } else {
@@ -106,7 +106,7 @@ function makeSfntTable(tables) {
 // Get the metrics for a character. If the string has more than one character
 // this function returns metrics for the first available character.
 // You can provide optional fallback metrics if no characters are available.
-function metricsForChar(font, chars, notFoundMetrics) {
+function metricsForChar (font, chars, notFoundMetrics) {
   for (let i = 0; i < chars.length; i += 1) {
     const glyphIndex = font.charToGlyphIndex(chars[i])
     if (glyphIndex > 0) {
@@ -118,7 +118,7 @@ function metricsForChar(font, chars, notFoundMetrics) {
   return notFoundMetrics
 }
 
-function average(vs) {
+function average (vs) {
   let sum = 0
   for (let i = 0; i < vs.length; i += 1) {
     sum += vs[i]
@@ -129,7 +129,7 @@ function average(vs) {
 
 // Convert the font object to a SFNT data structure.
 // This structure contains all the necessary tables and metadata to create a binary OTF file.
-function fontToSfntTable(font) {
+function fontToSfntTable (font) {
   const xMins = []
   const yMins = []
   const xMaxs = []
@@ -230,10 +230,10 @@ function fontToSfntTable(font) {
     usWidthClass: font.tables.os2.usWidthClass,
     usFirstCharIndex: firstCharIndex,
     usLastCharIndex: lastCharIndex,
-    ulUnicodeRange1: ulUnicodeRange1,
-    ulUnicodeRange2: ulUnicodeRange2,
-    ulUnicodeRange3: ulUnicodeRange3,
-    ulUnicodeRange4: ulUnicodeRange4,
+    ulUnicodeRange1,
+    ulUnicodeRange2,
+    ulUnicodeRange3,
+    ulUnicodeRange4,
     fsSelection: font.tables.os2.fsSelection, // REGULAR
     // See http://typophile.com/node/13081 for more info on vertical metrics.
     // We get metrics for typical characters (such as "x" for xHeight).
@@ -245,7 +245,7 @@ function fontToSfntTable(font) {
     usWinAscent: globals.yMax,
     usWinDescent: Math.abs(globals.yMin),
     ulCodePageRange1: 1, // FIXME: hard-code Latin 1 support for now
-    sxHeight: metricsForChar(font, 'xyvw', {yMax: Math.round(globals.ascender / 2)}).yMax,
+    sxHeight: metricsForChar(font, 'xyvw', { yMax: Math.round(globals.ascender / 2) }).yMax,
     sCapHeight: metricsForChar(font, 'HIKLEFJMNTZBDPRAGOQSUVWXY', globals).yMax,
     usDefaultChar: font.hasChar(' ') ? 32 : 0, // Use space as the default character, if available.
     usBreakChar: font.hasChar(' ') ? 32 : 0 // Use space as the break character, if available.
@@ -263,16 +263,16 @@ function fontToSfntTable(font) {
   }
 
   const names = {}
-  for (let n in font.names) {
+  for (const n in font.names) {
     names[n] = font.names[n]
   }
 
   if (!names.uniqueID) {
-    names.uniqueID = {en: font.getEnglishName('manufacturer') + ':' + englishFullName}
+    names.uniqueID = { en: font.getEnglishName('manufacturer') + ':' + englishFullName }
   }
 
   if (!names.postScriptName) {
-    names.postScriptName = {en: postScriptName}
+    names.postScriptName = { en: postScriptName }
   }
 
   if (!names.preferredFamily) {
@@ -293,15 +293,15 @@ function fontToSfntTable(font) {
     fullName: englishFullName,
     familyName: englishFamilyName,
     weightName: englishStyleName,
-    postScriptName: postScriptName,
+    postScriptName,
     unitsPerEm: font.unitsPerEm,
-    fontBBox: [0, globals.yMin, globals.ascender, globals.advanceWidthMax]
+    fontBBox: [ 0, globals.yMin, globals.ascender, globals.advanceWidthMax ]
   })
 
   const metaTable = (font.metas && Object.keys(font.metas).length > 0) ? meta.make(font.metas) : undefined
 
   // The order does not matter because makeSfntTable() will sort them.
-  const tables = [headTable, hheaTable, maxpTable, os2Table, nameTable, cmapTable, postTable, cffTable, hmtxTable]
+  const tables = [ headTable, hheaTable, maxpTable, os2Table, nameTable, cmapTable, postTable, cffTable, hmtxTable ]
   if (ltagTable) {
     tables.push(ltagTable)
   }

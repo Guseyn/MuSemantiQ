@@ -1,7 +1,7 @@
 // The `name` naming table.
 // https://www.microsoft.com/typography/OTSPEC/name.htm
 
-import {  decode, encode  } from '#msq/drawer/lib/opentype/types.js'
+import { decode, encode } from '#msq/drawer/lib/opentype/types.js'
 import { Parser } from '#msq/drawer/lib/opentype/parse.js'
 import table from '#msq/drawer/lib/opentype/table.js'
 
@@ -523,7 +523,7 @@ const windowsLanguages = {
 
 // Returns a IETF BCP 47 language code, for example 'zh-Hant'
 // for 'Chinese in the traditional script'.
-function getLanguageCode(platformID, languageID, ltag) {
+function getLanguageCode (platformID, languageID, ltag) {
   switch (platformID) {
     case 0:  // Unicode
       if (languageID === 0xFFFF) {
@@ -604,7 +604,7 @@ const macLanguageEncodings = {
   146: 'x-mac-gaelic'       // langIrishGaelicScript
 }
 
-function getEncoding(platformID, encodingID, languageID) {
+function getEncoding (platformID, encodingID, languageID) {
   switch (platformID) {
     case 0:  // Unicode
       return utf16
@@ -626,7 +626,7 @@ function getEncoding(platformID, encodingID, languageID) {
 // Parse the naming `name` table.
 // FIXME: Format 1 additional fields are not supported yet.
 // ltag is the content of the `ltag' table, such as ['en', 'zh-Hans', 'de-CH-1904'].
-function parseNameTable(data, start, ltag) {
+function parseNameTable (data, start, ltag) {
   const name = {}
   const p = new Parser(data, start)
   // const format = p.parseUShort()
@@ -672,29 +672,29 @@ function parseNameTable(data, start, ltag) {
 
 // {23: 'foo'} → {'foo': 23}
 // ['bar', 'baz'] → {'bar': 0, 'baz': 1}
-function reverseDict(dict) {
+function reverseDict (dict) {
   const result = {}
-  for (let key in dict) {
+  for (const key in dict) {
     result[dict[key]] = parseInt(key)
   }
 
   return result
 }
 
-function makeNameRecord(platformID, encodingID, languageID, nameID, length, offset) {
+function makeNameRecord (platformID, encodingID, languageID, nameID, length, offset) {
   return new table.Record('NameRecord', [
-    {name: 'platformID', type: 'USHORT', value: platformID},
-    {name: 'encodingID', type: 'USHORT', value: encodingID},
-    {name: 'languageID', type: 'USHORT', value: languageID},
-    {name: 'nameID', type: 'USHORT', value: nameID},
-    {name: 'length', type: 'USHORT', value: length},
-    {name: 'offset', type: 'USHORT', value: offset}
+    { name: 'platformID', type: 'USHORT', value: platformID },
+    { name: 'encodingID', type: 'USHORT', value: encodingID },
+    { name: 'languageID', type: 'USHORT', value: languageID },
+    { name: 'nameID', type: 'USHORT', value: nameID },
+    { name: 'length', type: 'USHORT', value: length },
+    { name: 'offset', type: 'USHORT', value: offset }
   ])
 }
 
 // Finds the position of needle in haystack, or -1 if not there.
 // Like String.indexOf(), but for arrays.
-function findSubArray(needle, haystack) {
+function findSubArray (needle, haystack) {
   const needleLength = needle.length
   const limit = haystack.length - needleLength + 1
 
@@ -714,7 +714,7 @@ function findSubArray(needle, haystack) {
   return -1
 }
 
-function addStringToPool(s, pool) {
+function addStringToPool (s, pool) {
   let offset = findSubArray(s, pool)
   if (offset < 0) {
     offset = pool.length
@@ -723,19 +723,18 @@ function addStringToPool(s, pool) {
     for (; i < len; ++i) {
       pool.push(s[i])
     }
-
   }
 
   return offset
 }
 
-function makeNameTable(names, ltag) {
+function makeNameTable (names, ltag) {
   let nameID
   const nameIDs = []
 
   const namesWithNumericKeys = {}
   const nameTableIds = reverseDict(nameTableNames)
-  for (let key in names) {
+  for (const key in names) {
     let id = nameTableIds[key]
     if (id === undefined) {
       id = key
@@ -760,7 +759,7 @@ function makeNameTable(names, ltag) {
   for (let i = 0; i < nameIDs.length; i++) {
     nameID = nameIDs[i]
     const translations = namesWithNumericKeys[nameID]
-    for (let lang in translations) {
+    for (const lang in translations) {
       const text = translations[lang]
 
       // For MacOS, we try to emit the name in the form that was introduced
@@ -808,7 +807,7 @@ function makeNameTable(names, ltag) {
     }
   }
 
-  nameRecords.sort(function(a, b) {
+  nameRecords.sort(function (a, b) {
     return ((a.platformID - b.platformID) ||
                 (a.encodingID - b.encodingID) ||
                 (a.languageID - b.languageID) ||
@@ -816,16 +815,16 @@ function makeNameTable(names, ltag) {
   })
 
   const t = new table.Table('name', [
-    {name: 'format', type: 'USHORT', value: 0},
-    {name: 'count', type: 'USHORT', value: nameRecords.length},
-    {name: 'stringOffset', type: 'USHORT', value: 6 + nameRecords.length * 12}
+    { name: 'format', type: 'USHORT', value: 0 },
+    { name: 'count', type: 'USHORT', value: nameRecords.length },
+    { name: 'stringOffset', type: 'USHORT', value: 6 + nameRecords.length * 12 }
   ])
 
   for (let r = 0; r < nameRecords.length; r++) {
-    t.fields.push({name: 'record_' + r, type: 'RECORD', value: nameRecords[r]})
+    t.fields.push({ name: 'record_' + r, type: 'RECORD', value: nameRecords[r] })
   }
 
-  t.fields.push({name: 'strings', type: 'LITERAL', value: stringPool})
+  t.fields.push({ name: 'strings', type: 'LITERAL', value: stringPool })
   return t
 }
 

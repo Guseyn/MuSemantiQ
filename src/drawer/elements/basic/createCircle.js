@@ -6,10 +6,10 @@ export default function (radius, fill, leftOffset = 0, topOffset = 0) {
   return {
     name: 'circle',
     properties: {
-      'r': radius,
-      'fill': fill || '',
-      'cx': centerX,
-      'cy': centerY,
+      r: radius,
+      fill: fill || '',
+      cx: centerX,
+      cy: centerY,
       'vector-effect': 'none'
     },
     transformations: [],

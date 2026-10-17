@@ -6,8 +6,8 @@ import regexps from '#msq/language/parser/scenarios/static-objects/regexps.js'
 export default function (scenarios) {
   scenarios['chord'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.withChordWithDurationHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.withChordWithDurationHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="cuph">${match}</span>`
         }
       )
@@ -18,8 +18,8 @@ export default function (scenarios) {
   }
   scenarios['chord stave position'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.stavePositionHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.stavePositionHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="csph">${match}</span>`
         }
       )
@@ -30,8 +30,8 @@ export default function (scenarios) {
   }
   scenarios['chord with parentheses'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.withParenthesesHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.withParenthesesHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="eh">${match}</span>`
         }
       )
@@ -49,8 +49,8 @@ export default function (scenarios) {
   }
   scenarios['chord with parentheses from note index'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.noteIndexHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.noteIndexHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="cuph">${match}</span>`
         }
       )
@@ -68,8 +68,8 @@ export default function (scenarios) {
   }
   scenarios['chord with parentheses to note index'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.noteIndexHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.noteIndexHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="cuph">${match}</span>`
         }
       )
@@ -92,8 +92,8 @@ export default function (scenarios) {
   }
   scenarios['chord is arpeggiated'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.arpeggiatedHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.arpeggiatedHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="eh">${match}</span>`
         }
       )
@@ -134,8 +134,8 @@ export default function (scenarios) {
   }
   scenarios['chord with text'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedString = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.stringHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedString = regexps.stringHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="sth">${match}</span>`
         }
       )

@@ -11,8 +11,8 @@ const addMidiNoteToTrackInCommonCase = (note, duration, time, slurMarksMappedWit
     pitch: note.midiPitch,
     octave: note.midiOctave,
     velocity: note.midiVelocity,
-    duration: duration,
-    time: time
+    duration,
+    time
   }
   adjustMidiNoteWithArticulations(
     note,
@@ -380,7 +380,7 @@ export default function (note, noteWithTremoloWithNextOnEachStaveInEachVoice, sl
         addMidiNoteToTrackInCommonCase(
           note,
           note.durationOfEachTrillNoteInSeconds * TURN_DURATION_FACTOR_FOR_TRILL_NOTES,
-          note.timeWithAdjustments + (numberOfTrillNotes - 4) * note.durationOfEachTrillNoteInSeconds +  2 * note.durationOfEachTrillNoteInSeconds * TURN_DURATION_FACTOR_FOR_TRILL_NOTES,
+          note.timeWithAdjustments + (numberOfTrillNotes - 4) * note.durationOfEachTrillNoteInSeconds + 2 * note.durationOfEachTrillNoteInSeconds * TURN_DURATION_FACTOR_FOR_TRILL_NOTES,
           slurMarksMappedWithTracks,
           tracksForEachInstrumentOnEachStaveInEachVoice,
           index === firstTrillNoteIndex,

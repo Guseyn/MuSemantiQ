@@ -5,8 +5,8 @@
 import tokenizer from '#msq/drawer/lib/opentype/tokenizer.js'
 import char from '#msq/drawer/lib/opentype/char.js'
 
-const {  ContextParams  } = tokenizer
-const {  isTashkeelArabicChar  } = char
+const { ContextParams } = tokenizer
+const { isTashkeelArabicChar } = char
 
 // DEFAULT TEXT BASE DIRECTION
 let BASE_DIR = 'ltr'
@@ -16,10 +16,10 @@ let BASE_DIR = 'ltr'
  * @param {Font} font opentype font instance
  * @param {string} baseDir text base direction
  */
-function FeatureQuery(font, baseDir) {
+function FeatureQuery (font, baseDir) {
   this.font = font
   this.features = {}
-  BASE_DIR = baseDir ? baseDir : BASE_DIR
+  BASE_DIR = baseDir || BASE_DIR
 }
 
 /**
@@ -29,7 +29,7 @@ function FeatureQuery(font, baseDir) {
  * @param {FeatureLookups} feature lookups associated with this feature
  * @param {string} script gsub script tag
  */
-function Feature(tag, feature, featureLookups, script) {
+function Feature (tag, feature, featureLookups, script) {
   this.tag = tag
   this.featureRef = feature
   this.lookups = featureLookups.lookups
@@ -40,7 +40,7 @@ function Feature(tag, feature, featureLookups, script) {
  * Create a coverage table lookup
  * @param {any} coverageTable gsub coverage table
  */
-function Coverage(coverageTable) {
+function Coverage (coverageTable) {
   this.table = coverageTable
 }
 
@@ -48,7 +48,7 @@ function Coverage(coverageTable) {
  * Create a ligature set lookup
  * @param {any} ligatureSets gsub ligature set
  */
-function LigatureSets(ligatureSets) {
+function LigatureSets (ligatureSets) {
   this.ligatureSets = ligatureSets
 }
 
@@ -88,7 +88,7 @@ LigatureSets.prototype.lookup = function (contextParams, ligSetIndex) {
  * @param {Lookuptable} lookupTable a feature lookup table
  * @param {any} subtable substitution table
  */
-function Substitution(lookups, lookupTable, subtable) {
+function Substitution (lookups, lookupTable, subtable) {
   this.lookups = lookups
   this.subtable = subtable
   this.lookupTable = lookupTable
@@ -122,7 +122,7 @@ function Substitution(lookups, lookupTable, subtable) {
  * @param {number} index table index at gsub lookups
  * @param {any} lookups a reference to gsub lookups
  */
-function LookupTable(index, lookups) {
+function LookupTable (index, lookups) {
   this.index = index
   this.subtables = lookups[index].subtables.map(
     subtable => new Substitution(
@@ -131,7 +131,7 @@ function LookupTable(index, lookups) {
   )
 }
 
-function FeatureLookups(lookups, lookupListIndexes) {
+function FeatureLookups (lookups, lookupListIndexes) {
   this.lookups = lookupListIndexes.map(
     index => new LookupTable(index, lookups)
   )
@@ -145,7 +145,7 @@ LookupTable.prototype.lookup = function (contextParams) {
   let substitutions = []
   for (let i = 0; i < this.subtables.length; i++) {
     const subsTable = this.subtables[i]
-    let substitution = subsTable.lookup(contextParams)
+    const substitution = subsTable.lookup(contextParams)
     if (substitution !== null || substitution.length) {
       substitutions = substitutions.concat(substitution)
     }
@@ -157,12 +157,12 @@ LookupTable.prototype.lookup = function (contextParams) {
  * Handle a single substitution - format 2
  * @param {ContextParams} contextParams context params to lookup
  */
-function singleSubstitutionFormat2(contextParams) {
+function singleSubstitutionFormat2 (contextParams) {
   let glyphIndex = contextParams.current.activeState.value
   glyphIndex = Array.isArray(glyphIndex) ? glyphIndex[0] : glyphIndex
-  let substituteIndex = this.coverage.lookup(glyphIndex)
+  const substituteIndex = this.coverage.lookup(glyphIndex)
   if (substituteIndex === -1) return []
-  return [this.subtable.substitute[substituteIndex]]
+  return [ this.subtable.substitute[substituteIndex] ]
 }
 
 /**
@@ -170,8 +170,8 @@ function singleSubstitutionFormat2(contextParams) {
  * @param {any} coverageList a list of coverage tables
  * @param {any} contextParams context params to lookup
  */
-function lookupCoverageList(coverageList, contextParams) {
-  let lookupList = []
+function lookupCoverageList (coverageList, contextParams) {
+  const lookupList = []
   for (let i = 0; i < coverageList.length; i++) {
     const coverage = coverageList[i]
     let glyphIndex = contextParams.current.activeState.value
@@ -189,7 +189,7 @@ function lookupCoverageList(coverageList, contextParams) {
  * Handle chaining context substitution - format 3
  * @param {any} contextParams context params to lookup
  */
-function chainingSubstitutionFormat3(contextParams) {
+function chainingSubstitutionFormat3 (contextParams) {
   const lookupsCount = (
     this.inputCoverage.length +
         this.lookaheadCoverage.length +
@@ -197,30 +197,30 @@ function chainingSubstitutionFormat3(contextParams) {
   )
   if (contextParams.context.length < lookupsCount) return []
   // INPUT LOOKUP //
-  let inputLookups = lookupCoverageList(
+  const inputLookups = lookupCoverageList(
     this.inputCoverage, contextParams
   )
   if (inputLookups === -1) return []
   // LOOKAHEAD LOOKUP //
   const lookaheadOffset = this.inputCoverage.length - 1
   if (contextParams.lookahead.length < this.lookaheadCoverage.length) return []
-  let lookaheadContext = contextParams.lookahead.slice(lookaheadOffset)
+  const lookaheadContext = contextParams.lookahead.slice(lookaheadOffset)
   while (lookaheadContext.length && isTashkeelArabicChar(lookaheadContext[0].char)) {
     lookaheadContext.shift()
   }
   const lookaheadParams = new ContextParams(lookaheadContext, 0)
-  let lookaheadLookups = lookupCoverageList(
+  const lookaheadLookups = lookupCoverageList(
     this.lookaheadCoverage, lookaheadParams
   )
   // BACKTRACK LOOKUP //
-  let backtrackContext = [].concat(contextParams.backtrack)
+  const backtrackContext = [].concat(contextParams.backtrack)
   backtrackContext.reverse()
   while (backtrackContext.length && isTashkeelArabicChar(backtrackContext[0].char)) {
     backtrackContext.shift()
   }
   if (backtrackContext.length < this.backtrackCoverage.length) return []
   const backtrackParams = new ContextParams(backtrackContext, 0)
-  let backtrackLookups = lookupCoverageList(
+  const backtrackLookups = lookupCoverageList(
     this.backtrackCoverage, backtrackParams
   )
   const contextRulesMatch = (
@@ -230,14 +230,14 @@ function chainingSubstitutionFormat3(contextParams) {
   )
   let substitutions = []
   if (contextRulesMatch) {
-    let lookupRecords = this.subtable.lookupRecords
+    const lookupRecords = this.subtable.lookupRecords
     for (let i = 0; i < lookupRecords.length; i++) {
       const lookupRecord = lookupRecords[i]
       for (let j = 0; j < inputLookups.length; j++) {
-        const inputContext = new ContextParams([contextParams.get(j)], 0)
-        let lookupIndex = lookupRecord.lookupListIndex
+        const inputContext = new ContextParams([ contextParams.get(j) ], 0)
+        const lookupIndex = lookupRecord.lookupListIndex
         const lookupTable = new LookupTable(lookupIndex, this.lookups)
-        let lookup = lookupTable.lookup(inputContext)
+        const lookup = lookupTable.lookup(inputContext)
         substitutions = substitutions.concat(lookup)
       }
     }
@@ -249,14 +249,14 @@ function chainingSubstitutionFormat3(contextParams) {
  * Handle ligature substitution - format 1
  * @param {any} contextParams context params to lookup
  */
-function ligatureSubstitutionFormat1(contextParams) {
+function ligatureSubstitutionFormat1 (contextParams) {
   // COVERAGE LOOKUP //
-  let glyphIndex = contextParams.current.activeState.value
-  let ligSetIndex = this.coverage.lookup(glyphIndex)
+  const glyphIndex = contextParams.current.activeState.value
+  const ligSetIndex = this.coverage.lookup(glyphIndex)
   if (ligSetIndex === -1) return []
   // COMPONENTS LOOKUP * note that components is logically ordered
-  let ligGlyphs = this.ligatureSets.lookup(contextParams, ligSetIndex)
-  return ligGlyphs ? [ligGlyphs] : []
+  const ligGlyphs = this.ligatureSets.lookup(contextParams, ligSetIndex)
+  return ligGlyphs ? [ ligGlyphs ] : []
 }
 
 /**
@@ -278,7 +278,7 @@ Substitution.prototype.lookup = function (contextParams) {
   const lookupType = this.lookupTable.lookupType
   const substFormat = this.subtable.substFormat
   if (lookupType === 1 && substFormat === 2) {
-    let substitution = singleSubstitutionFormat2.call(this, contextParams)
+    const substitution = singleSubstitutionFormat2.call(this, contextParams)
     if (substitution.length > 0) {
       substitutions.push({ id: 12, substitution })
     }
@@ -309,11 +309,11 @@ Coverage.prototype.lookup = function (glyphIndex) {
       return this.table.glyphs.indexOf(glyphIndex)
 
     case 2:
-      let ranges = this.table.ranges
+      const ranges = this.table.ranges
       for (let i = 0; i < ranges.length; i++) {
         const range = ranges[i]
         if (glyphIndex >= range.start && glyphIndex <= range.end) {
-          let offset = glyphIndex - range.start
+          const offset = glyphIndex - range.start
           return range.index + offset
         }
       }
@@ -328,11 +328,11 @@ Coverage.prototype.lookup = function (glyphIndex) {
  * Lookup a feature for a substitution or more
  * @param {any} contextParams context params to lookup
  */
-Feature.prototype.lookup = function(contextParams) {
+Feature.prototype.lookup = function (contextParams) {
   let lookups = []
   for (let i = 0; i < this.lookups.length; i++) {
     const lookupTable = this.lookups[i]
-    let lookup = lookupTable.lookup(contextParams)
+    const lookup = lookupTable.lookup(contextParams)
     if (lookup !== null || lookup.length) {
       lookups = lookups.concat(lookup)
     }
@@ -344,7 +344,7 @@ Feature.prototype.lookup = function(contextParams) {
  * Get feature indexes of a specific script
  * @param {string} scriptTag script tag
  */
-FeatureQuery.prototype.getScriptFeaturesIndexes = function(scriptTag) {
+FeatureQuery.prototype.getScriptFeaturesIndexes = function (scriptTag) {
   if (!scriptTag) return []
   const tables = this.font.tables
   if (!tables.gsub) return []
@@ -352,15 +352,15 @@ FeatureQuery.prototype.getScriptFeaturesIndexes = function(scriptTag) {
   for (let i = 0; i < scripts.length; i++) {
     const script = scripts[i]
     if (script.tag === scriptTag) {
-      let defaultLangSys = script.script.defaultLangSys
+      const defaultLangSys = script.script.defaultLangSys
       return defaultLangSys.featureIndexes
     } else {
-      let langSysRecords = script.langSysRecords
+      const langSysRecords = script.langSysRecords
       if (langSysRecords) {
         for (let j = 0; j < langSysRecords.length; j++) {
           const langSysRecord = langSysRecords[j]
           if (langSysRecord.tag === scriptTag) {
-            let langSys = langSysRecord.langSys
+            const langSys = langSysRecord.langSys
             return langSys.featureIndexes
           }
         }
@@ -376,7 +376,7 @@ FeatureQuery.prototype.getScriptFeaturesIndexes = function(scriptTag) {
  * @param {*} scriptTag script tag
  */
 FeatureQuery.prototype.mapTagsToFeatures = function (features, scriptTag) {
-  let tags = {}
+  const tags = {}
   for (let i = 0; i < features.length; i++) {
     const feature = features[i].feature
     const tag = features[i].tag
@@ -408,7 +408,7 @@ FeatureQuery.prototype.getScriptFeatures = function (scriptTag) {
  * @param {any} query an object that describes the properties of a query
  */
 FeatureQuery.prototype.getFeature = function (query) {
-  if (!this.font) return { FAIL: 'No font was found'}
+  if (!this.font) return { FAIL: 'No font was found' }
   if (!this.features.hasOwnProperty(query.script)) {
     this.getScriptFeatures(query.script)
   }

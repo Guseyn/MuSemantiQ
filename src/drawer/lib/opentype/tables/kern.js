@@ -5,7 +5,7 @@
 import check from '#msq/drawer/lib/opentype/check.js'
 import { Parser } from '#msq/drawer/lib/opentype/parse.js'
 
-function parseWindowsKernTable(p) {
+function parseWindowsKernTable (p) {
   const pairs = {}
   // Skip nTables.
   p.skip('uShort')
@@ -25,13 +25,13 @@ function parseWindowsKernTable(p) {
   return pairs
 }
 
-function parseMacKernTable(p) {
+function parseMacKernTable (p) {
   const pairs = {}
   // The Mac kern table stores the version as a fixed (32 bits) but we only loaded the first 16 bits.
   // Skip the rest.
   p.skip('uShort')
   const nTables = p.parseULong()
-  //check.argument(nTables === 1, 'Only 1 subtable is supported (got ' + nTables + ').');
+  // check.argument(nTables === 1, 'Only 1 subtable is supported (got ' + nTables + ').');
   if (nTables > 1) {
     console.warn('Only the first kern subtable is supported.')
   }
@@ -54,7 +54,7 @@ function parseMacKernTable(p) {
 }
 
 // Parse the `kern` table which contains kerning pairs.
-function parseKernTable(data, start) {
+function parseKernTable (data, start) {
   const p = new Parser(data, start)
   const tableVersion = p.parseUShort()
   if (tableVersion === 0) {

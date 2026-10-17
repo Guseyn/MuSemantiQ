@@ -3,7 +3,7 @@
  * @type {Object}
  */
 
-const length = {a: 7, c: 6, h: 1, l: 2, m: 2, q: 4, s: 4, t: 2, v: 1, z: 0}
+const length = { a: 7, c: 6, h: 1, l: 2, m: 2, q: 4, s: 4, t: 2, v: 1, z: 0 }
 
 /**
  * segment pattern
@@ -21,15 +21,15 @@ const segment = /([astvzqmhlc])([^astvzqmhlc]*)/ig
  * @return {Array}
  */
 
-export default function parse(path) {
+export default function parse (path) {
   const data = []
-  path.replace(segment, function(_, command, args){
+  path.replace(segment, function (_, command, args) {
     let type = command.toLowerCase()
     args = parseValues(args)
 
     // overloaded moveTo
     if (type == 'm' && args.length > 2) {
-      data.push([command].concat(args.splice(0, 2)))
+      data.push([ command ].concat(args.splice(0, 2)))
       type = 'l'
       command = command == 'm' ? 'l' : 'L'
     }
@@ -40,7 +40,7 @@ export default function parse(path) {
         return data.push(args)
       }
       if (args.length < length[type]) throw new Error('malformed path data')
-      data.push([command].concat(args.splice(0, length[type])))
+      data.push([ command ].concat(args.splice(0, length[type])))
     }
   })
   return data
@@ -48,7 +48,7 @@ export default function parse(path) {
 
 const number = /-?[0-9]*\.?[0-9]+(?:e[-+]?\d+)?/ig
 
-function parseValues(args) {
+function parseValues (args) {
   const numbers = args.match(number)
   return numbers ? numbers.map(Number) : []
 }

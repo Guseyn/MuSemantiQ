@@ -1,6 +1,6 @@
 'use strict'
 
-import regexps from '#msq/language/parser/scenarios/static-objects/regexps.js'
+import regexps, { replaceMany } from '#msq/language/parser/scenarios/static-objects/regexps.js'
 import copyScenarioWithDifferentRequiredCommandProgression from '#msq/language/parser/scenarios/copyScenarioWithDifferentRequiredCommandProgression.js'
 
 export default function (scenarios) {
@@ -12,8 +12,8 @@ export default function (scenarios) {
       } else if (regexps.topMidBottomRest.test(tokenValues)) {
         elementHighlightRegexp = regexps.topMidBottomRestHighlight
       }
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        elementHighlightRegexp, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = elementHighlightRegexp.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="cuph" ref-id="">${match}</span>`
         }
       )
@@ -59,8 +59,8 @@ export default function (scenarios) {
   }
   scenarios['note stave position'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { stavePositionName, stavePositionInRefId, currentNumberOfStaves, currentNumberOfMeasures } }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.stavePositionHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.stavePositionHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           if (stavePositionName === 'next') {
             stavePositionInRefId = currentNumberOfStaves + 1
           } else if (stavePositionName === 'prev') {
@@ -76,8 +76,8 @@ export default function (scenarios) {
   }
   scenarios['note with number of dots'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { currentNumberOfMeasures, currentNumberOfStaves, currentNumberOfVoices, currentNumberOfUnits } }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.withNumberOfDotsHighlight, (match, p1, p2) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.withNumberOfDotsHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match, p1, p2) => {
           return `${p1}<span class="eh" ref-id="dots-${currentNumberOfMeasures}-${currentNumberOfStaves}-${currentNumberOfVoices}-${currentNumberOfUnits}">${p2}</span>`
         }
       )
@@ -94,8 +94,8 @@ export default function (scenarios) {
             return `<span class="eh" ref-id="dots-${currentNumberOfMeasures}-${currentNumberOfStaves}-${currentNumberOfVoices}-${currentNumberOfUnits}">${match}</span>`
           }
         )
-        : joinedTokenValuesWithRealDelimiters.replace(
-          regexps.withDotHighlight, (match) => {
+        : regexps.withDotHighlight.replace(
+          joinedTokenValuesWithRealDelimiters, (match) => {
             return `<span class="eh" ref-id="dots-${currentNumberOfMeasures}-${currentNumberOfStaves}-${currentNumberOfVoices}-${currentNumberOfUnits}">${match}</span>`
           }
         )
@@ -157,8 +157,8 @@ export default function (scenarios) {
   }
   scenarios['note beamed with only primary line'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { currentNumberOfMeasures, currentNumberOfStaves, currentNumberOfVoices, currentNumberOfUnits } }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.withOnlyPrimaryLineHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.withOnlyPrimaryLineHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="eh" ref-id="beam-${currentNumberOfMeasures}-${currentNumberOfStaves}-${currentNumberOfVoices}-${currentNumberOfUnits}">${match}</span>`
         }
       )
@@ -169,8 +169,8 @@ export default function (scenarios) {
   }
   scenarios['note with key'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { currentNumberOfMeasures, currentNumberOfStaves, currentNumberOfVoices, currentNumberOfUnits, currentNumberOfNoteKeys } }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.withNoteKeyHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.withNoteKeyHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="eh" ref-id="note-key-${currentNumberOfMeasures}-${currentNumberOfStaves}-${currentNumberOfVoices}-${currentNumberOfUnits}-${currentNumberOfNoteKeys}">${match}</span>`
         }
       )
@@ -186,8 +186,8 @@ export default function (scenarios) {
   }
   scenarios['note with key with parentheses'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { currentNumberOfMeasures, currentNumberOfStaves, currentNumberOfVoices, currentNumberOfUnits, currentNumberOfNoteKeys } }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.withParenthesesHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.withParenthesesHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="eh" ref-id="note-key-parentheses-${currentNumberOfMeasures}-${currentNumberOfStaves}-${currentNumberOfVoices}-${currentNumberOfUnits}-${currentNumberOfNoteKeys}">${match}</span>`
         }
       )
@@ -198,8 +198,8 @@ export default function (scenarios) {
   }
   scenarios['note with parentheses'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { currentNumberOfMeasures, currentNumberOfStaves, currentNumberOfVoices, currentNumberOfUnits, currentNumberOfNotes } }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.withParenthesesHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.withParenthesesHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="eh" ref-id="note-parentheses-${currentNumberOfMeasures}-${currentNumberOfStaves}-${currentNumberOfVoices}-${currentNumberOfUnits}-${currentNumberOfNotes}">${match}</span>`
         }
       )
@@ -210,8 +210,8 @@ export default function (scenarios) {
   }
   scenarios['note with text'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedString = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.stringHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedString = regexps.stringHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="sth" ref-id="">${match}</span>`
         }
       )
@@ -271,8 +271,8 @@ export default function (scenarios) {
       state.highlightsHtmlBuffer[state.highlightsHtmlBuffer.length - 1] = state.highlightsHtmlBuffer[state.highlightsHtmlBuffer.length - 1].replaceAll(
         'ref-id=""', `ref-id="articulation-${currentNumberOfMeasures}-${currentNumberOfStaves}-${currentNumberOfVoices}-${currentNumberOfUnits}-${currentNumberOfArticulations}"`
       )
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.staveHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.staveHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="csph" ref-id="all-staves-in-measure-${currentNumberOfMeasures}">${match}</span>`
         }
       )
@@ -283,8 +283,8 @@ export default function (scenarios) {
   }
   scenarios['note with text up or down vertical correction'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { currentNumberOfMeasures, currentNumberOfStaves, currentNumberOfVoices, currentNumberOfUnits, currentNumberOfArticulations } }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.verticalCorrectionHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.verticalCorrectionHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="th" ref-id="articulation-${currentNumberOfMeasures}-${currentNumberOfStaves}-${currentNumberOfVoices}-${currentNumberOfUnits}-${currentNumberOfArticulations}">${match}</span>`
         }
       )
@@ -341,8 +341,8 @@ export default function (scenarios) {
   }
   scenarios['note is tied before measure number'] = {
     action: ({ parserState, joinedTokenValuesWithRealDelimiters, state, fromMain: { measureNumberValue } }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.measureIndexHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.measureIndexHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="cmph" ref-id="measure-${parserState.numberOfPageLines}-${measureNumberValue}">${match}</span>`
         }
       )
@@ -370,8 +370,8 @@ export default function (scenarios) {
   }
   scenarios['note is tied after measure number'] = {
     action: ({ parserState, joinedTokenValuesWithRealDelimiters, state, fromMain: { measureNumberValue } }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.measureIndexHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.measureIndexHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="cmph" ref-id="measure-${parserState.numberOfPageLines}-${measureNumberValue}">${match}</span>`
         }
       )
@@ -412,8 +412,8 @@ export default function (scenarios) {
   }
   scenarios['note tied with next roundness'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { currentNumberOfMeasures, currentNumberOfStaves, currentNumberOfVoices, currentNumberOfUnits } }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.roundnessHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.roundnessHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="th" ref-id="tie-${currentNumberOfMeasures}-${currentNumberOfStaves}-${currentNumberOfVoices}-${currentNumberOfUnits}">${match}</span>`
         }
       )
@@ -424,8 +424,8 @@ export default function (scenarios) {
   }
   scenarios['note tied before roundness'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { currentNumberOfMeasures, currentNumberOfStaves, currentNumberOfVoices, currentNumberOfUnits } }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.roundnessHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.roundnessHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="th" ref-id="tie-before-${currentNumberOfMeasures}-${currentNumberOfStaves}-${currentNumberOfVoices}-${currentNumberOfUnits}">${match}</span>`
         }
       )
@@ -436,8 +436,8 @@ export default function (scenarios) {
   }
   scenarios['note tied after roundness'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { currentNumberOfMeasures, currentNumberOfStaves, currentNumberOfVoices, currentNumberOfUnits } }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.roundnessHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.roundnessHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="th" ref-id="tie-after-${currentNumberOfMeasures}-${currentNumberOfStaves}-${currentNumberOfVoices}-${currentNumberOfUnits}">${match}</span>`
         }
       )
@@ -448,8 +448,8 @@ export default function (scenarios) {
   }
   scenarios['note with glissando'] = {
     action: ({ parserState, joinedTokenValuesWithRealDelimiters, state }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.glissandoHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.glissandoHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="eh" ref-id="glissando-${parserState.numberOfGlissandos}">${match}</span>`
         }
       )
@@ -480,8 +480,8 @@ export default function (scenarios) {
   }
   scenarios['note with glissando after measure number'] = {
     action: ({ parserState, joinedTokenValuesWithRealDelimiters, state, fromMain: { measureNumberValue } }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.measureIndexHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.measureIndexHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="cmph" ref-id="measure-${parserState.numberOfPageLines}-${measureNumberValue}">${match}</span>`
         }
       )
@@ -492,8 +492,8 @@ export default function (scenarios) {
   }
   scenarios['note with glissando before measure number'] = {
     action: ({ parserState, joinedTokenValuesWithRealDelimiters, state, fromMain: { measureNumberValue } }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.measureIndexHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.measureIndexHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="cmph" ref-id="measure-${parserState.numberOfPageLines}-${measureNumberValue}">${match}</span>`
         }
       )
@@ -531,8 +531,8 @@ export default function (scenarios) {
   }
   scenarios['note with crushed grace'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { currentNumberOfMeasures, currentNumberOfStaves, currentNumberOfVoices, currentNumberOfUnits } }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.crushLineHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.crushLineHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="eh" ref-id="grace-crush-line-${currentNumberOfMeasures}-${currentNumberOfStaves}-${currentNumberOfVoices}-${currentNumberOfUnits}">${match}</span>`
         }
       )
@@ -548,8 +548,8 @@ export default function (scenarios) {
   }
   scenarios['note with breath mark before'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { currentNumberOfMeasures, currentNumberOfStaves, currentNumberOfVoices, currentNumberOfUnits } }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.withBreathMarkBeforeHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.withBreathMarkBeforeHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="eh" ref-id="breath-mark-before-${currentNumberOfMeasures}-${currentNumberOfStaves}-${currentNumberOfVoices}-${currentNumberOfUnits}">${match}</span>`
         }
       )
@@ -565,8 +565,8 @@ export default function (scenarios) {
   }
   scenarios['note with breath mark before vertical correction'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { currentNumberOfMeasures, currentNumberOfStaves, currentNumberOfVoices, currentNumberOfUnits } }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedNumber = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.verticalCorrectionHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedNumber = regexps.verticalCorrectionHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="th" ref-id="breath-mark-before-${currentNumberOfMeasures}-${currentNumberOfStaves}-${currentNumberOfVoices}-${currentNumberOfUnits}">${match}</span>`
         }
       )
@@ -577,13 +577,13 @@ export default function (scenarios) {
   }
   scenarios['note with key signature before'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { currentNumberOfMeasures, currentNumberOfStaves, currentNumberOfVoices, currentNumberOfUnits } }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.keySignatureHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.keySignatureHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="eh" ref-id="key-signature-before-${currentNumberOfMeasures}-${currentNumberOfStaves}-${currentNumberOfVoices}-${currentNumberOfUnits}">${match}</span>`
         }
       )
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElementAndString = joinedTokenValuesWithRealDelimitersWithHighlightedElement.replace(
-        regexps.keySignatureNameHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElementAndString = regexps.keySignatureNameHighlight.replace(
+        joinedTokenValuesWithRealDelimitersWithHighlightedElement, (match) => {
           return `<span class="sth" ref-id="key-signature-before-${currentNumberOfMeasures}-${currentNumberOfStaves}-${currentNumberOfVoices}-${currentNumberOfUnits}">${match}</span>`
         }
       )
@@ -594,8 +594,8 @@ export default function (scenarios) {
   }
   scenarios['note with clef before'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { currentNumberOfMeasures, currentNumberOfStaves, currentNumberOfVoices, currentNumberOfUnits } }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.clefHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.clefHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="eh" ref-id="clef-before-${currentNumberOfMeasures}-${currentNumberOfStaves}-${currentNumberOfVoices}-${currentNumberOfUnits}">${match}</span>`
         }
       )
@@ -606,17 +606,18 @@ export default function (scenarios) {
   }
   scenarios['note with clef and key signature before'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { currentNumberOfMeasures, currentNumberOfStaves, currentNumberOfVoices, currentNumberOfUnits } }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.keySignatureHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = replaceMany(joinedTokenValuesWithRealDelimiters, [
+        [ regexps.keySignatureHighlight, (match) => {
           return `<span class="eh" ref-id="key-signature-before-${currentNumberOfMeasures}-${currentNumberOfStaves}-${currentNumberOfVoices}-${currentNumberOfUnits}">${match}</span>`
         }
-      ).replace(
-        regexps.clefHighlight, (match) => {
+        ],
+        [ regexps.clefHighlight, (match) => {
           return `<span class="eh" ref-id="clef-before-${currentNumberOfMeasures}-${currentNumberOfStaves}-${currentNumberOfVoices}-${currentNumberOfUnits}">${match}</span>`
         }
-      )
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElementAndString = joinedTokenValuesWithRealDelimitersWithHighlightedElement.replace(
-        regexps.keySignatureNameHighlight, (match) => {
+        ]
+      ])
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElementAndString = regexps.keySignatureNameHighlight.replace(
+        joinedTokenValuesWithRealDelimitersWithHighlightedElement, (match) => {
           return `<span class="sth" ref-id="key-signature-before-${currentNumberOfMeasures}-${currentNumberOfStaves}-${currentNumberOfVoices}-${currentNumberOfUnits}">${match}</span>`
         }
       )
@@ -627,8 +628,8 @@ export default function (scenarios) {
   }
   scenarios['note with articulation'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { currentNumberOfMeasures, currentNumberOfStaves, currentNumberOfVoices, currentNumberOfUnits, currentNumberOfArticulations } }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.withArticulationHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.withArticulationHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="eh" ref-id="articulation-${currentNumberOfMeasures}-${currentNumberOfStaves}-${currentNumberOfVoices}-${currentNumberOfUnits}-${currentNumberOfArticulations}">${match}</span>`
         }
       )
@@ -723,8 +724,8 @@ export default function (scenarios) {
   )
   scenarios['note with articulation above or below stave'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { currentNumberOfMeasures } }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.staveHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.staveHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="csph" ref-id="all-staves-in-measure-${currentNumberOfMeasures}">${match}</span>`
         }
       )
@@ -744,8 +745,8 @@ export default function (scenarios) {
   )
   scenarios['note with turn key above or below'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { ornamentKeyPositionValue, currentNumberOfMeasures, currentNumberOfStaves, currentNumberOfVoices, currentNumberOfUnits, currentNumberOfArticulations } }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.ornamentKeyHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.ornamentKeyHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="eh" ref-id="articulation-key-${ornamentKeyPositionValue}-${currentNumberOfMeasures}-${currentNumberOfStaves}-${currentNumberOfVoices}-${currentNumberOfUnits}-${currentNumberOfArticulations}">${match}</span>`
         }
       )
@@ -787,8 +788,8 @@ export default function (scenarios) {
   }
   scenarios['note with articulation vertical correction'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { currentNumberOfMeasures, currentNumberOfStaves, currentNumberOfVoices, currentNumberOfUnits, currentNumberOfArticulations } }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.verticalCorrectionHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.verticalCorrectionHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="th" ref-id="articulation-${currentNumberOfMeasures}-${currentNumberOfStaves}-${currentNumberOfVoices}-${currentNumberOfUnits}-${currentNumberOfArticulations}">${match}</span>`
         }
       )
@@ -812,8 +813,8 @@ export default function (scenarios) {
       const joinedTokenValuesWithRealDelimitersFirstPart = joinedTokenValuesWithRealDelimitersWithSplittedParts[0]
       const joinedTokenValuesWithRealDelimitersSecondPart = joinedTokenValuesWithRealDelimitersWithSplittedParts[1]
       const joinedTokenValuesWithRealDelimitersFirstPartWithHighlightedElement = `${joinedTokenValuesWithRealDelimitersFirstPart}<span class="eh" ref-id="chord-letter-${currentNumberOfMeasures}-${currentNumberOfStaves}-${currentNumberOfVoices}-${currentNumberOfUnits}">chord</span>`
-      const joinedTokenValuesWithRealDelimitersSecondPartWithHighlightedElement = joinedTokenValuesWithRealDelimitersSecondPart.replace(
-        regexps.stringHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersSecondPartWithHighlightedElement = regexps.stringHighlight.replace(
+        joinedTokenValuesWithRealDelimitersSecondPart, (match) => {
           return `<span class="sth" ref-id="chord-letter-${currentNumberOfMeasures}-${currentNumberOfStaves}-${currentNumberOfVoices}-${currentNumberOfUnits}">${match}</span>`
         }
       )
@@ -859,8 +860,8 @@ export default function (scenarios) {
   }
   scenarios['note with chord letter vertical correction'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { currentNumberOfMeasures, currentNumberOfStaves, currentNumberOfVoices, currentNumberOfUnits } }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.verticalCorrectionHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.verticalCorrectionHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="th" ref-id="chord-letter-${currentNumberOfMeasures}-${currentNumberOfStaves}-${currentNumberOfVoices}-${currentNumberOfUnits}">${match}</span>`
         }
       )
@@ -871,8 +872,8 @@ export default function (scenarios) {
   }
   scenarios['note with octave sign'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { currentNumberOfMeasures, currentNumberOfStaves, currentNumberOfVoices, currentNumberOfUnits, currentNumberOfArticulations } }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.isOctaveOrTwoOctavesHigherOrLowerHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.isOctaveOrTwoOctavesHigherOrLowerHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="eh" ref-id="articulation-${currentNumberOfMeasures}-${currentNumberOfStaves}-${currentNumberOfVoices}-${currentNumberOfUnits}-${currentNumberOfArticulations}">${match}</span>`
         }
       )
@@ -888,8 +889,8 @@ export default function (scenarios) {
   }
   scenarios['note with octave sign vertical correction'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { currentNumberOfMeasures, currentNumberOfStaves, currentNumberOfVoices, currentNumberOfUnits, currentNumberOfArticulations } }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.verticalCorrectionHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.verticalCorrectionHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="th" ref-id="articulation-${currentNumberOfMeasures}-${currentNumberOfStaves}-${currentNumberOfVoices}-${currentNumberOfUnits}-${currentNumberOfArticulations}">${match}</span>`
         }
       )
@@ -929,8 +930,8 @@ export default function (scenarios) {
   }
   scenarios['note with tremolo number of strokes'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { currentNumberOfMeasures, currentNumberOfStaves, currentNumberOfVoices, currentNumberOfUnits } }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.withNumberOfStrokesHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.withNumberOfStrokesHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="eh" ref-id="tremolo-${currentNumberOfMeasures}-${currentNumberOfStaves}-${currentNumberOfVoices}-${currentNumberOfUnits}">${match}</span>`
         }
       )
@@ -975,8 +976,8 @@ export default function (scenarios) {
   }
   scenarios['repeat note vertical correction'] = {
     action: ({ parserState, joinedTokenValuesWithRealDelimiters, state }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.verticalCorrectionHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.verticalCorrectionHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="th" ref-id="simile-mark-${parserState.numberOfSimileMarks}">${match}</span>`
         }
       )
@@ -991,8 +992,8 @@ export default function (scenarios) {
       const joinedTokenValuesWithRealDelimitersFirstPart = joinedTokenValuesWithRealDelimitersWithSplittedParts[0]
       const joinedTokenValuesWithRealDelimitersSecondPart = joinedTokenValuesWithRealDelimitersWithSplittedParts[1]
       const joinedTokenValuesWithRealDelimitersFirstPartWithHighlightedElement = `${joinedTokenValuesWithRealDelimitersFirstPart}<span class="eh" ref-id="articulation-${currentNumberOfMeasures}-${currentNumberOfStaves}-${currentNumberOfVoices}-${currentNumberOfUnits}-${currentNumberOfArticulations}">dynamic</span>`
-      const joinedTokenValuesWithRealDelimitersSecondPartWithHighlightedElement = joinedTokenValuesWithRealDelimitersSecondPart.replace(
-        regexps.stringHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersSecondPartWithHighlightedElement = regexps.stringHighlight.replace(
+        joinedTokenValuesWithRealDelimitersSecondPart, (match) => {
           return `<span class="sth" ref-id="articulation-${currentNumberOfMeasures}-${currentNumberOfStaves}-${currentNumberOfVoices}-${currentNumberOfUnits}-${currentNumberOfArticulations}">${match}</span>`
         }
       )
@@ -1014,8 +1015,8 @@ export default function (scenarios) {
   }
   scenarios['note with dynamic above or below stave'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { currentNumberOfMeasures } }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.staveHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.staveHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="csph" ref-id="all-staves-in-measure-${currentNumberOfMeasures}">${match}</span>`
         }
       )
@@ -1031,8 +1032,8 @@ export default function (scenarios) {
   }
   scenarios['note dynamic vertical correction'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { currentNumberOfMeasures, currentNumberOfStaves, currentNumberOfVoices, currentNumberOfUnits, currentNumberOfArticulations } }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.verticalCorrectionHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.verticalCorrectionHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="th" ref-id="articulation-${currentNumberOfMeasures}-${currentNumberOfStaves}-${currentNumberOfVoices}-${currentNumberOfUnits}-${currentNumberOfArticulations}">${match}</span>`
         }
       )
@@ -1043,8 +1044,8 @@ export default function (scenarios) {
   }
   scenarios['note with lyrics'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { currentNumberOfMeasures, currentNumberOfStaves, currentNumberOfVoices, currentNumberOfUnits, currentNumberOfLyrics } }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.lyricsHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.lyricsHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="eh" ref-id="lyrics-${currentNumberOfMeasures}-${currentNumberOfStaves}-${currentNumberOfVoices}-${currentNumberOfUnits}-${currentNumberOfLyrics}">${match}</span>`
         }
       )
@@ -1060,8 +1061,8 @@ export default function (scenarios) {
   }
   scenarios['note with lyrics text value'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { currentNumberOfMeasures, currentNumberOfStaves, currentNumberOfVoices, currentNumberOfUnits, currentNumberOfLyrics } }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedString = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.stringHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedString = regexps.stringHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="sth" ref-id="lyrics-text-${currentNumberOfMeasures}-${currentNumberOfStaves}-${currentNumberOfVoices}-${currentNumberOfUnits}-${currentNumberOfLyrics}">${match}</span>`
         }
       )
@@ -1072,8 +1073,8 @@ export default function (scenarios) {
   }
   scenarios['note with lyrics followed by dash'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { currentNumberOfMeasures, currentNumberOfStaves, currentNumberOfVoices, currentNumberOfUnits, currentNumberOfLyrics } }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.dashHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.dashHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="eh" ref-id="lyrics-dash-${currentNumberOfMeasures}-${currentNumberOfStaves}-${currentNumberOfVoices}-${currentNumberOfUnits}-${currentNumberOfLyrics}">${match}</span>`
         }
       )
@@ -1108,8 +1109,8 @@ export default function (scenarios) {
   }
   scenarios['note with lyrics with vertical correction'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { currentNumberOfMeasures, currentNumberOfStaves, currentNumberOfVoices, currentNumberOfUnits, currentNumberOfLyrics } }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedNumber = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.verticalCorrectionHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedNumber = regexps.verticalCorrectionHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="th" ref-id="lyrics-${currentNumberOfMeasures}-${currentNumberOfStaves}-${currentNumberOfVoices}-${currentNumberOfUnits}-${currentNumberOfLyrics}">${match}</span>`
         }
       )
@@ -1148,8 +1149,8 @@ export default function (scenarios) {
   }
   scenarios['note with pedal under stave index'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { numberOfMeasures, staveIndex } }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.staveIndexHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.staveIndexHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="csph" ref-id="stave-${numberOfMeasures}-${staveIndex + 1}">${match}</span>`
         }
       )
@@ -1160,8 +1161,8 @@ export default function (scenarios) {
   }
   scenarios['note with pedal vertical correction'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { currentNumberOfMeasures, currentNumberOfStaves, currentNumberOfVoices, currentNumberOfUnits } }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.verticalCorrectionHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.verticalCorrectionHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="th" ref-id="pedal-${currentNumberOfMeasures}-${currentNumberOfStaves}-${currentNumberOfVoices}-${currentNumberOfUnits}">${match}</span>`
         }
       )
@@ -1172,8 +1173,8 @@ export default function (scenarios) {
   }
   scenarios['note with pedal text'] = {
     action: ({ parserState, joinedTokenValuesWithRealDelimiters, state }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedString = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.stringHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedString = regexps.stringHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="sth" ref-id="pedal-text-${parserState.numberOfPedalMarks}">${match}</span>`
         }
       )
@@ -1201,8 +1202,8 @@ export default function (scenarios) {
   }
   scenarios['note with variable peak'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { currentNumberOfMeasures, currentNumberOfStaves, currentNumberOfVoices, currentNumberOfUnits } }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.withVariablePeakHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.withVariablePeakHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="eh" ref-id="variable-peak-${currentNumberOfMeasures}-${currentNumberOfStaves}-${currentNumberOfVoices}-${currentNumberOfUnits}">${match}</span>`
         }
       )
@@ -1223,8 +1224,8 @@ export default function (scenarios) {
   }
   scenarios['note with variable peak text'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { currentNumberOfMeasures, currentNumberOfStaves, currentNumberOfVoices, currentNumberOfUnits } }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedString = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.stringHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedString = regexps.stringHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="sth" ref-id="variable-peak-text-${currentNumberOfMeasures}-${currentNumberOfStaves}-${currentNumberOfVoices}-${currentNumberOfUnits}">${match}</span>`
         }
       )
@@ -1235,8 +1236,8 @@ export default function (scenarios) {
   }
   scenarios['note with release'] = {
     action: ({ parserState, joinedTokenValuesWithRealDelimiters, state }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedString = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.withReleaseHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedString = regexps.withReleaseHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="eh" ref-id="release-${parserState.numberOfPedalMarks}">${match}</span>`
         }
       )
@@ -1290,11 +1291,11 @@ export default function (scenarios) {
         `<span class="th" ref-id="measure-${currentNumberOfMeasures}">${joinedTokenValuesWithRealDelimitersWithHighlightedString}</span>`
       )
     }
-  },
+  }
   scenarios['note with horizontal correction'] = {
     action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { currentNumberOfMeasures, currentNumberOfStaves, currentNumberOfVoices, currentNumberOfUnits } }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = joinedTokenValuesWithRealDelimiters.replace(
-        regexps.horizontalCorrectionHighlight, (match) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.horizontalCorrectionHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
           return `<span class="th" ref-id="unit-${currentNumberOfMeasures}-${currentNumberOfStaves}-${currentNumberOfVoices}-${currentNumberOfUnits}">${match}</span>`
         }
       )

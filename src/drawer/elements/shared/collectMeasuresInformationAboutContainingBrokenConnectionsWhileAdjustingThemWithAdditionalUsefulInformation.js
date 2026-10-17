@@ -205,7 +205,7 @@ export default function (measuresParams) {
                   currentUnitParams.tremoloParams
                 )
               }
-              let actualUnitDurationIfItHasDotsOrTupletMarksOrTremolosAndEvenIfItDoesNotButStillAffectedByThoseThingsItDoesNotMatterAsWeNeedThisValueJustToDetermineMinUnitDurationOnPageLineSoItIsEnoughToHaveSomeOfSuchDurations = calculateActualDurationConsideringDotsAndTupletsAndTremolos(
+              const actualUnitDurationIfItHasDotsOrTupletMarksOrTremolosAndEvenIfItDoesNotButStillAffectedByThoseThingsItDoesNotMatterAsWeNeedThisValueJustToDetermineMinUnitDurationOnPageLineSoItIsEnoughToHaveSomeOfSuchDurations = calculateActualDurationConsideringDotsAndTupletsAndTremolos(
                 currentUnitParams.unitDuration,
                 currentUnitParams.numberOfDots || 0,
                 currentUnitParams.tupletMarks

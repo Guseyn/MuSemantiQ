@@ -13,17 +13,17 @@ import drawHundredTwentyEighthRest from '#msq/drawer/elements/notes-on-a-page/re
 import drawTwoHundredFiftySixthRest from '#msq/drawer/elements/notes-on-a-page/rests/drawTwoHundredFiftySixthRest.js'
 
 const rests = {
-  '4': drawQuadrupleWholeRest,
-  '2': drawDoubleWholeRest,
-  '1': drawWholeRest,
-  '0.5': drawHalfRest,
-  '0.25': drawQuarterRest,
-  '0.125': drawEighthRest,
-  '0.0625': drawSixteenthRest,
-  '0.03125': drawThirtySecondRest,
-  '0.015625': drawSixtyFourthRest,
-  '0.0078125': drawHundredTwentyEighthRest,
-  '0.00390625': drawTwoHundredFiftySixthRest
+  4: drawQuadrupleWholeRest,
+  2: drawDoubleWholeRest,
+  1: drawWholeRest,
+  0.5: drawHalfRest,
+  0.25: drawQuarterRest,
+  0.125: drawEighthRest,
+  0.0625: drawSixteenthRest,
+  0.03125: drawThirtySecondRest,
+  0.015625: drawSixtyFourthRest,
+  0.0078125: drawHundredTwentyEighthRest,
+  0.00390625: drawTwoHundredFiftySixthRest
 }
 
 export default function (duration, restPositionNumber) {

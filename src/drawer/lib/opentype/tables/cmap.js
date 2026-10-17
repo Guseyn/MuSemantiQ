@@ -5,8 +5,8 @@ import check from '#msq/drawer/lib/opentype/check.js'
 import { Parser, getUShort, getULong } from '#msq/drawer/lib/opentype/parse.js'
 import table from '#msq/drawer/lib/opentype/table.js'
 
-function parseCmapTableFormat12(cmap, p) {
-  //Skip reserved.
+function parseCmapTableFormat12 (cmap, p) {
+  // Skip reserved.
   p.parseUShort()
 
   // Length in bytes of the sub-tables.
@@ -29,7 +29,7 @@ function parseCmapTableFormat12(cmap, p) {
   }
 }
 
-function parseCmapTableFormat4(cmap, p, data, start, offset) {
+function parseCmapTableFormat4 (cmap, p, data, start, offset) {
   // Length in bytes of the sub-tables.
   cmap.length = p.parseUShort()
   cmap.language = p.parseUShort()
@@ -81,7 +81,7 @@ function parseCmapTableFormat4(cmap, p, data, start, offset) {
 // Parse the `cmap` table. This table stores the mappings from characters to glyphs.
 // There are many available formats, but we only support the Windows format 4 and 12.
 // This function returns a `CmapEncoding` object or null if no supported format could be found.
-function parseCmapTable(data, start) {
+function parseCmapTable (data, start) {
   const cmap = {}
   cmap.version = getUShort(data, start)
   check.argument(cmap.version === 0, 'cmap table version should be 0.')
@@ -119,17 +119,17 @@ function parseCmapTable(data, start) {
   return cmap
 }
 
-function addSegment(t, code, glyphIndex) {
+function addSegment (t, code, glyphIndex) {
   t.segments.push({
     end: code,
     start: code,
     delta: -(code - glyphIndex),
     offset: 0,
-    glyphIndex: glyphIndex
+    glyphIndex
   })
 }
 
-function addTerminatorSegment(t) {
+function addTerminatorSegment (t) {
   t.segments.push({
     end: 0xFFFF,
     start: 0xFFFF,
@@ -139,7 +139,7 @@ function addTerminatorSegment(t) {
 }
 
 // Make cmap table, format 4 by default, 12 if needed only
-function makeCmapTable(glyphs) {
+function makeCmapTable (glyphs) {
   // Plan 0 is the base Unicode Plan but emojis, for example are on another plan, and needs cmap 12 format (with 32bit)
   let isPlan0Only = true
   let i
@@ -155,32 +155,33 @@ function makeCmapTable(glyphs) {
   }
 
   let cmapTable = [
-    {name: 'version', type: 'USHORT', value: 0},
-    {name: 'numTables', type: 'USHORT', value: isPlan0Only ? 1 : 2},
+    { name: 'version', type: 'USHORT', value: 0 },
+    { name: 'numTables', type: 'USHORT', value: isPlan0Only ? 1 : 2 },
 
     // CMAP 4 header
-    {name: 'platformID', type: 'USHORT', value: 3},
-    {name: 'encodingID', type: 'USHORT', value: 1},
-    {name: 'offset', type: 'ULONG', value: isPlan0Only ? 12 : (12 + 8)}
+    { name: 'platformID', type: 'USHORT', value: 3 },
+    { name: 'encodingID', type: 'USHORT', value: 1 },
+    { name: 'offset', type: 'ULONG', value: isPlan0Only ? 12 : (12 + 8) }
   ]
 
-  if (!isPlan0Only)
+  if (!isPlan0Only) {
     cmapTable = cmapTable.concat([
-      // CMAP 12 header
-      {name: 'cmap12PlatformID', type: 'USHORT', value: 3}, // We encode only for PlatformID = 3 (Windows) because it is supported everywhere
-      {name: 'cmap12EncodingID', type: 'USHORT', value: 10},
-      {name: 'cmap12Offset', type: 'ULONG', value: 0}
+    // CMAP 12 header
+      { name: 'cmap12PlatformID', type: 'USHORT', value: 3 }, // We encode only for PlatformID = 3 (Windows) because it is supported everywhere
+      { name: 'cmap12EncodingID', type: 'USHORT', value: 10 },
+      { name: 'cmap12Offset', type: 'ULONG', value: 0 }
     ])
+  }
 
   cmapTable = cmapTable.concat([
     // CMAP 4 Subtable
-    {name: 'format', type: 'USHORT', value: 4},
-    {name: 'cmap4Length', type: 'USHORT', value: 0},
-    {name: 'language', type: 'USHORT', value: 0},
-    {name: 'segCountX2', type: 'USHORT', value: 0},
-    {name: 'searchRange', type: 'USHORT', value: 0},
-    {name: 'entrySelector', type: 'USHORT', value: 0},
-    {name: 'rangeShift', type: 'USHORT', value: 0}
+    { name: 'format', type: 'USHORT', value: 4 },
+    { name: 'cmap4Length', type: 'USHORT', value: 0 },
+    { name: 'language', type: 'USHORT', value: 0 },
+    { name: 'segCountX2', type: 'USHORT', value: 0 },
+    { name: 'searchRange', type: 'USHORT', value: 0 },
+    { name: 'entrySelector', type: 'USHORT', value: 0 },
+    { name: 'rangeShift', type: 'USHORT', value: 0 }
   ])
 
   const t = new table.Table('cmap', cmapTable)
@@ -222,12 +223,12 @@ function makeCmapTable(glyphs) {
 
     // CMAP 4
     if (segment.end <= 65535 && segment.start <= 65535) {
-      endCounts = endCounts.concat({name: 'end_' + i, type: 'USHORT', value: segment.end})
-      startCounts = startCounts.concat({name: 'start_' + i, type: 'USHORT', value: segment.start})
-      idDeltas = idDeltas.concat({name: 'idDelta_' + i, type: 'SHORT', value: segment.delta})
-      idRangeOffsets = idRangeOffsets.concat({name: 'idRangeOffset_' + i, type: 'USHORT', value: segment.offset})
+      endCounts = endCounts.concat({ name: 'end_' + i, type: 'USHORT', value: segment.end })
+      startCounts = startCounts.concat({ name: 'start_' + i, type: 'USHORT', value: segment.start })
+      idDeltas = idDeltas.concat({ name: 'idDelta_' + i, type: 'SHORT', value: segment.delta })
+      idRangeOffsets = idRangeOffsets.concat({ name: 'idRangeOffset_' + i, type: 'USHORT', value: segment.offset })
       if (segment.glyphId !== undefined) {
-        glyphIds = glyphIds.concat({name: 'glyph_' + i, type: 'USHORT', value: segment.glyphId})
+        glyphIds = glyphIds.concat({ name: 'glyph_' + i, type: 'USHORT', value: segment.glyphId })
       }
     } else {
       // Skip Unicode > 65535 (16bit unsigned max) for CMAP 4, will be added in CMAP 12
@@ -237,9 +238,9 @@ function makeCmapTable(glyphs) {
     // CMAP 12
     // Skip Terminator Segment
     if (!isPlan0Only && segment.glyphIndex !== undefined) {
-      cmap12Groups = cmap12Groups.concat({name: 'cmap12Start_' + i, type: 'ULONG', value: segment.start})
-      cmap12Groups = cmap12Groups.concat({name: 'cmap12End_' + i, type: 'ULONG', value: segment.end})
-      cmap12Groups = cmap12Groups.concat({name: 'cmap12Glyph_' + i, type: 'ULONG', value: segment.glyphIndex})
+      cmap12Groups = cmap12Groups.concat({ name: 'cmap12Start_' + i, type: 'ULONG', value: segment.start })
+      cmap12Groups = cmap12Groups.concat({ name: 'cmap12End_' + i, type: 'ULONG', value: segment.end })
+      cmap12Groups = cmap12Groups.concat({ name: 'cmap12Glyph_' + i, type: 'ULONG', value: segment.glyphIndex })
     }
   }
 
@@ -250,7 +251,7 @@ function makeCmapTable(glyphs) {
   t.rangeShift = t.segCountX2 - t.searchRange
 
   t.fields = t.fields.concat(endCounts)
-  t.fields.push({name: 'reservedPad', type: 'USHORT', value: 0})
+  t.fields.push({ name: 'reservedPad', type: 'USHORT', value: 0 })
   t.fields = t.fields.concat(startCounts)
   t.fields = t.fields.concat(idDeltas)
   t.fields = t.fields.concat(idRangeOffsets)
@@ -271,11 +272,11 @@ function makeCmapTable(glyphs) {
 
     t.cmap12Offset = 12 + (2 * 2) + 4 + t.cmap4Length
     t.fields = t.fields.concat([
-      {name: 'cmap12Format', type: 'USHORT', value: 12},
-      {name: 'cmap12Reserved', type: 'USHORT', value: 0},
-      {name: 'cmap12Length', type: 'ULONG', value: cmap12Length},
-      {name: 'cmap12Language', type: 'ULONG', value: 0},
-      {name: 'cmap12nGroups', type: 'ULONG', value: cmap12Groups.length / 3}
+      { name: 'cmap12Format', type: 'USHORT', value: 12 },
+      { name: 'cmap12Reserved', type: 'USHORT', value: 0 },
+      { name: 'cmap12Length', type: 'ULONG', value: cmap12Length },
+      { name: 'cmap12Language', type: 'ULONG', value: 0 },
+      { name: 'cmap12nGroups', type: 'ULONG', value: cmap12Groups.length / 3 }
     ])
 
     t.fields = t.fields.concat(cmap12Groups)

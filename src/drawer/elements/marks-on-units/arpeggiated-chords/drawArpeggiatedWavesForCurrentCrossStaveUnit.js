@@ -131,7 +131,7 @@ export default function (selectedSingleUnitsParamsToBeIncludedInNextCrossStaveUn
   containsDrawnCrossStaveElementsBesideCrossStaveUnits.value = true
   const groupedApregiatedWavesForCrossStaveUnit = createGroup(
     'arpeggiatedWavesForCrossStaveUnit',
-    [...waves ]
+    [ ...waves ]
   )
   return createElementWithAdditionalInformation(
     groupedApregiatedWavesForCrossStaveUnit,

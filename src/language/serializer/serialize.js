@@ -39,7 +39,7 @@ const OPENING_BAR_LINE_WORDS = {
  * writes. Deriving it from the parser's own table is what keeps the two from
  * drifting apart.
  */
-function createCommandForEachKey(table) {
+function createCommandForEachKey (table) {
   const commands = {}
   for (const [ command, key ] of Object.entries(table)) {
     if (!(key in commands)) {
@@ -73,7 +73,7 @@ const serializeCorrection = (yCorrection) =>
 /**
  * The page's styles and midi settings, each as `<name> is <value>`.
  */
-function serializeSettings(values, commands) {
+function serializeSettings (values, commands) {
   return Object.entries(values || {})
     .filter(([ key, value ]) => commands[key] && value !== undefined && value !== null && value !== '')
     .map(([ key, value ]) => `${commands[key]} is ${value}`)
@@ -82,7 +82,7 @@ function serializeSettings(values, commands) {
 /**
  * The page-wide settings, which live beside the schema rather than in it.
  */
-function serializePageMeta(schema) {
+function serializePageMeta (schema) {
   const lines = []
   const writeCommand = (command, value) => {
     if (value !== undefined && value !== null && value !== '') {
@@ -131,7 +131,7 @@ function serializePageMeta(schema) {
 /**
  * The commands that belong to a measure rather than to any note in it.
  */
-function serializeMeasureCommands(measure) {
+function serializeMeasureCommands (measure) {
   const lines = []
 
   /*
@@ -236,7 +236,7 @@ function serializeMeasureCommands(measure) {
  * A volta runs from one measure to another, so it is written once for the page
  * rather than on each measure it covers.
  */
-function serializeVoltas(measures) {
+function serializeVoltas (measures) {
   const marked = measures.findIndex((one) => one.voltaMark && one.voltaMark.value !== undefined)
   if (marked === -1) {
     return []
@@ -268,7 +268,7 @@ function serializeVoltas(measures) {
 /**
  * One voice: its units, then the marks that span them.
  */
-function serializeVoice(units) {
+function serializeVoice (units) {
   /*
   The units a simile stands for are produced by the simile command itself, so
   writing them out as well would say the same thing twice.
@@ -288,7 +288,7 @@ function serializeVoice(units) {
  * them. Each block is laid into the lines it claims, and the page is padded with
  * blank lines when a comment sits past the end of the music.
  */
-function addComments(lines, comments) {
+function addComments (lines, comments) {
   const placed = [ ...lines ]
   for (const comment of comments || []) {
     const quote = comment.startQuote || '"'
@@ -311,7 +311,7 @@ function addComments(lines, comments) {
  * @param {Array}  [comments]     the page's comments, each with the lines it sat on
  * @returns {string} MSQ source that parses to the same page
  */
-export default function serialize(pageSchema, customStyles, midiSettings, comments) {
+export default function serialize (pageSchema, customStyles, midiSettings, comments) {
   const schema = pageSchema || {}
   const lines = [
     ...serializeSettings(customStyles, STYLE_COMMANDS),

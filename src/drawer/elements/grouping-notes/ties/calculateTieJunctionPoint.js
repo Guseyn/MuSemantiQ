@@ -89,9 +89,9 @@ function calculateXBeforeNote (singleUnit, noteHead, note, hasSecondNearby, hasS
   const leftNoteIsInner = !(leftPoint && leftPoint.isFirst) && !(leftPoint && leftPoint.isLast)
   const leftUnitMissesANeighbourOfThisNote = leftPoint
     ? (
-      (nextNote ? leftPoint.singleUnit.sortedNotesPositionNumbers.indexOf(nextNote.positionNumber) === -1 : false) ||
+        (nextNote ? leftPoint.singleUnit.sortedNotesPositionNumbers.indexOf(nextNote.positionNumber) === -1 : false) ||
       (prevNote ? leftPoint.singleUnit.sortedNotesPositionNumbers.indexOf(prevNote.positionNumber) === -1 : false)
-    )
+      )
     : false
   const onOrNearLedgerLines = onLedgerLines || hasSecondNearbyOnLedgerLines
   if (hasSecondNearby && (noteIsInner || leftNoteIsInner || leftUnitMissesANeighbourOfThisNote)) {
@@ -202,12 +202,12 @@ export default function (singleUnit, topOffsetsForEachStave, staveIndex, positio
   return {
     isFirst: noteIsFirst,
     isLast: noteIsLast,
-    positionIndex: positionIndex,
+    positionIndex,
     isInNonDisplacedPartOfUnitWithCoordinates: !note.displaced,
-    yPosition: yPosition,
-    xPosition: xPosition,
+    yPosition,
+    xPosition,
     tiedFromTopOrBottomOfNote,
-    singleUnit: singleUnit,
+    singleUnit,
     numberOfNotes,
     isOnLedgerLines: onLedgerLines,
     notePositionNumber: positionNumber,

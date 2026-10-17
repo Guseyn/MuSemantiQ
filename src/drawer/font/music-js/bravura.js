@@ -1,7 +1,7 @@
 'use strict'
 
 // font size(for font file) is 4.0 * intervalBetweenStaveLines
-const MUSCIC_FONT_SOURCE_SIZE = 4.0 
+const MUSCIC_FONT_SOURCE_SIZE = 4.0
 
 export default function ({
   defaultIntervalBetweenStaveLines,
@@ -2339,17 +2339,17 @@ export default function ({
       yCorrection: -4.95 * intervalBetweenStaveLines
     },
     yCorrectionsForMidMeasureClefs: {
-      treble: 1.5  * intervalBetweenStaveLines,
-      bass: 0.34  * intervalBetweenStaveLines,
-      alto: 0.68  * intervalBetweenStaveLines,
-      baritone: -1.32  * intervalBetweenStaveLines,
-      mezzoSoprano: 1.68  * intervalBetweenStaveLines,
-      soprano: 2.68  * intervalBetweenStaveLines,
-      tenor: -0.32  * intervalBetweenStaveLines,
-      octaveEightUp: 1.7  * intervalBetweenStaveLines,
-      octaveEightDown: 1.5  * intervalBetweenStaveLines,
-      octaveFifteenUp: 1.7  * intervalBetweenStaveLines,
-      octaveFifteenDown: 1.5  * intervalBetweenStaveLines
+      treble: 1.5 * intervalBetweenStaveLines,
+      bass: 0.34 * intervalBetweenStaveLines,
+      alto: 0.68 * intervalBetweenStaveLines,
+      baritone: -1.32 * intervalBetweenStaveLines,
+      mezzoSoprano: 1.68 * intervalBetweenStaveLines,
+      soprano: 2.68 * intervalBetweenStaveLines,
+      tenor: -0.32 * intervalBetweenStaveLines,
+      octaveEightUp: 1.7 * intervalBetweenStaveLines,
+      octaveEightDown: 1.5 * intervalBetweenStaveLines,
+      octaveFifteenUp: 1.7 * intervalBetweenStaveLines,
+      octaveFifteenDown: 1.5 * intervalBetweenStaveLines
     },
     blackNoteHead: {
       unicode: '',
@@ -3449,30 +3449,30 @@ export default function ({
     spaceAfterKeysForSingleUnits: 0.45 * intervalBetweenStaveLines,
     spaceAfterKeysForSingleUnitsBeforeCrossStaveUnitThatContainsNotesOnLedgerLines: 0.9 * intervalBetweenStaveLines,
     graceKeyOnStaveLineCenterYCorrections: {
-      'doubleFlatKey': 0.5 * intervalBetweenStaveLines,
-      'doubleSharpKey': 0.0 * intervalBetweenStaveLines,
-      'flatKey': 0.5 * intervalBetweenStaveLines,
-      'naturalKey': 0.0 * intervalBetweenStaveLines,
-      'sharpKey': 0.0 * intervalBetweenStaveLines,
-      'demiflatKey': 0.5 * intervalBetweenStaveLines,
-      'sesquiflatKey': 0.5 * intervalBetweenStaveLines,
-      'demisharpKey': 0.0 * intervalBetweenStaveLines,
-      'sesquisharpKey': 0.0 * intervalBetweenStaveLines,
-      'noteLetter': 0.0 * intervalBetweenStaveLines,
-      'default': 0.0 * intervalBetweenStaveLines
+      doubleFlatKey: 0.5 * intervalBetweenStaveLines,
+      doubleSharpKey: 0.0 * intervalBetweenStaveLines,
+      flatKey: 0.5 * intervalBetweenStaveLines,
+      naturalKey: 0.0 * intervalBetweenStaveLines,
+      sharpKey: 0.0 * intervalBetweenStaveLines,
+      demiflatKey: 0.5 * intervalBetweenStaveLines,
+      sesquiflatKey: 0.5 * intervalBetweenStaveLines,
+      demisharpKey: 0.0 * intervalBetweenStaveLines,
+      sesquisharpKey: 0.0 * intervalBetweenStaveLines,
+      noteLetter: 0.0 * intervalBetweenStaveLines,
+      default: 0.0 * intervalBetweenStaveLines
     },
     graceKeyBetweenStaveLinesCenterYCorrections: {
-      'doubleFlatKey': 0.4 * intervalBetweenStaveLines,
-      'doubleSharpKey': 0.0 * intervalBetweenStaveLines,
-      'flatKey': 0.4 * intervalBetweenStaveLines,
-      'naturalKey': 0.0 * intervalBetweenStaveLines,
-      'sharpKey': 0.0 * intervalBetweenStaveLines,
-      'demiflatKey': 0.4 * intervalBetweenStaveLines,
-      'sesquiflatKey': 0.4 * intervalBetweenStaveLines,
-      'demisharpKey': 0.0 * intervalBetweenStaveLines,
-      'sesquisharpKey': 0.0 * intervalBetweenStaveLines,
-      'noteLetter': 0.0 * intervalBetweenStaveLines,
-      'default': 0.0 * intervalBetweenStaveLines
+      doubleFlatKey: 0.4 * intervalBetweenStaveLines,
+      doubleSharpKey: 0.0 * intervalBetweenStaveLines,
+      flatKey: 0.4 * intervalBetweenStaveLines,
+      naturalKey: 0.0 * intervalBetweenStaveLines,
+      sharpKey: 0.0 * intervalBetweenStaveLines,
+      demiflatKey: 0.4 * intervalBetweenStaveLines,
+      sesquiflatKey: 0.4 * intervalBetweenStaveLines,
+      demisharpKey: 0.0 * intervalBetweenStaveLines,
+      sesquisharpKey: 0.0 * intervalBetweenStaveLines,
+      noteLetter: 0.0 * intervalBetweenStaveLines,
+      default: 0.0 * intervalBetweenStaveLines
     },
     coda: {
       unicode: '',
@@ -5972,7 +5972,7 @@ export default function ({
     leftOffsetForDotsInSingleUnitWithNotesOnStaveLinesAndStemDirectionIsUpAndUnitDurationIsLessThanEighth: 1.4 * intervalBetweenStaveLines,
     leftOffsetForDotsInSingleUnit: 0.5 * intervalBetweenStaveLines,
     noteLetters: {
-      '0': {
+      0: {
         unicode: '',
         points: [
           'M',
@@ -5999,7 +5999,7 @@ export default function ({
           'Z'
         ]
       },
-      '1': {
+      1: {
         unicode: '',
         points: [
           'M',
@@ -6047,7 +6047,7 @@ export default function ({
           'Z'
         ]
       },
-      '2': {
+      2: {
         unicode: '',
         points: [
           'M',
@@ -6109,7 +6109,7 @@ export default function ({
           'Z'
         ]
       },
-      '3': {
+      3: {
         unicode: '',
         points: [
           'M',
@@ -6193,7 +6193,7 @@ export default function ({
           'Z'
         ]
       },
-      '4': {
+      4: {
         unicode: '',
         points: [
           'M',
@@ -6261,7 +6261,7 @@ export default function ({
           'Z'
         ]
       },
-      '5': {
+      5: {
         unicode: '',
         points: [
           'M',
@@ -6321,7 +6321,7 @@ export default function ({
           'Z'
         ]
       },
-      '6': {
+      6: {
         unicode: '',
         points: [
           'M',
@@ -6388,7 +6388,7 @@ export default function ({
           'Z'
         ]
       },
-      '7': {
+      7: {
         unicode: '',
         points: [
           'M',
@@ -6444,7 +6444,7 @@ export default function ({
           'Z'
         ]
       },
-      '8': {
+      8: {
         unicode: '',
         points: [
           'M',
@@ -6490,7 +6490,7 @@ export default function ({
           'Z'
         ]
       },
-      '9': {
+      9: {
         unicode: '',
         points: [
           'M',
@@ -6551,7 +6551,7 @@ export default function ({
           'Z'
         ]
       },
-      'T': {
+      T: {
         unicode: '',
         points: [
           'M',
@@ -6593,7 +6593,7 @@ export default function ({
           'Z'
         ]
       },
-      't': {
+      t: {
         unicode: '',
         points: [
           'M',
@@ -6635,7 +6635,7 @@ export default function ({
           'Z'
         ]
       },
-      'p': {
+      p: {
         unicode: '',
         points: [
           'M',
@@ -6692,7 +6692,7 @@ export default function ({
           'Z'
         ]
       },
-      'i': {
+      i: {
         unicode: '',
         points: [
           'M',
@@ -6737,7 +6737,7 @@ export default function ({
           'Z'
         ]
       },
-      'm': {
+      m: {
         unicode: '',
         points: [
           'M',
@@ -6803,7 +6803,7 @@ export default function ({
           'Z'
         ]
       },
-      'a': {
+      a: {
         unicode: '',
         points: [
           'M',
@@ -6850,7 +6850,7 @@ export default function ({
           'Z'
         ]
       },
-      'c': {
+      c: {
         unicode: '',
         points: [
           'M',
@@ -6884,7 +6884,7 @@ export default function ({
           'Z'
         ]
       },
-      'x': {
+      x: {
         unicode: '',
         points: [
           'M',
@@ -6942,7 +6942,7 @@ export default function ({
           'Z'
         ]
       },
-      'e': {
+      e: {
         unicode: '',
         points: [
           'M',
@@ -6977,7 +6977,7 @@ export default function ({
           'Z'
         ]
       },
-      'o': {
+      o: {
         unicode: '',
         points: [
           'M',
@@ -7018,7 +7018,7 @@ export default function ({
       }
     },
     dynamicLetters: {
-      'p': {
+      p: {
         unicode: '',
         points: [
           'M',
@@ -7097,7 +7097,7 @@ export default function ({
           'Z'
         ]
       },
-      'm': {
+      m: {
         unicode: '',
         points: [
           'M',
@@ -7189,7 +7189,7 @@ export default function ({
           'Z'
         ]
       },
-      'f': {
+      f: {
         unicode: '',
         points: [
           'M',
@@ -7261,7 +7261,7 @@ export default function ({
           'Z'
         ]
       },
-      'r': {
+      r: {
         unicode: '',
         points: [
           'M',
@@ -7315,7 +7315,7 @@ export default function ({
           'Z'
         ]
       },
-      's': {
+      s: {
         unicode: '',
         points: [
           'M',
@@ -7363,7 +7363,7 @@ export default function ({
           'Z'
         ]
       },
-      'z': {
+      z: {
         unicode: '',
         points: [
           'M',
@@ -7437,7 +7437,7 @@ export default function ({
           'Z'
         ]
       },
-      'pppppp': {
+      pppppp: {
         unicode: '',
         points: [
           'M',
@@ -7896,7 +7896,7 @@ export default function ({
           'Z'
         ]
       },
-      'ppppp': {
+      ppppp: {
         unicode: '',
         points: [
           'M',
@@ -8279,7 +8279,7 @@ export default function ({
           'Z'
         ]
       },
-      'pppp': {
+      pppp: {
         unicode: '',
         points: [
           'M',
@@ -8586,7 +8586,7 @@ export default function ({
           'Z'
         ]
       },
-      'ppp': {
+      ppp: {
         unicode: '',
         points: [
           'M',
@@ -8817,7 +8817,7 @@ export default function ({
           'Z'
         ]
       },
-      'pp': {
+      pp: {
         unicode: '',
         points: [
           'M',
@@ -8972,7 +8972,7 @@ export default function ({
           'Z'
         ]
       },
-      'mp': {
+      mp: {
         unicode: '',
         points: [
           'M',
@@ -9125,7 +9125,7 @@ export default function ({
           'Z'
         ]
       },
-      'mf': {
+      mf: {
         unicode: '',
         points: [
           'M',
@@ -9284,7 +9284,7 @@ export default function ({
           'Z'
         ]
       },
-      'pf': {
+      pf: {
         unicode: '',
         points: [
           'M',
@@ -9430,7 +9430,7 @@ export default function ({
           'Z'
         ]
       },
-      'ff': {
+      ff: {
         unicode: '',
         points: [
           'M',
@@ -9552,7 +9552,7 @@ export default function ({
           'Z'
         ]
       },
-      'fff': {
+      fff: {
         unicode: '',
         points: [
           'M',
@@ -9724,7 +9724,7 @@ export default function ({
           'Z'
         ]
       },
-      'ffff': {
+      ffff: {
         unicode: '',
         points: [
           'M',
@@ -9946,7 +9946,7 @@ export default function ({
           'Z'
         ]
       },
-      'fffff': {
+      fffff: {
         unicode: '',
         points: [
           'M',
@@ -10218,7 +10218,7 @@ export default function ({
           'Z'
         ]
       },
-      'ffffff': {
+      ffffff: {
         unicode: '',
         points: [
           'M',
@@ -10540,7 +10540,7 @@ export default function ({
           'Z'
         ]
       },
-      'fp': {
+      fp: {
         unicode: '',
         points: [
           'M',
@@ -10686,7 +10686,7 @@ export default function ({
           'Z'
         ]
       },
-      'fz': {
+      fz: {
         unicode: '',
         points: [
           'M',
@@ -10827,7 +10827,7 @@ export default function ({
           'Z'
         ]
       },
-      'sf': {
+      sf: {
         unicode: '',
         points: [
           'M',
@@ -10942,7 +10942,7 @@ export default function ({
           'Z'
         ]
       },
-      'sfp': {
+      sfp: {
         unicode: '',
         points: [
           'M',
@@ -11131,7 +11131,7 @@ export default function ({
           'Z'
         ]
       },
-      'sfpp': {
+      sfpp: {
         unicode: '',
         points: [
           'M',
@@ -11396,7 +11396,7 @@ export default function ({
           'Z'
         ]
       },
-      'sfz': {
+      sfz: {
         unicode: '',
         points: [
           'M',
@@ -11580,7 +11580,7 @@ export default function ({
           'Z'
         ]
       },
-      'sfzp': {
+      sfzp: {
         unicode: '',
         points: [
           'M',
@@ -11838,7 +11838,7 @@ export default function ({
           'Z'
         ]
       },
-      'sffz': {
+      sffz: {
         unicode: '',
         points: [
           'M',
@@ -12072,7 +12072,7 @@ export default function ({
           'Z'
         ]
       },
-      'rf': {
+      rf: {
         unicode: '',
         points: [
           'M',
@@ -12193,7 +12193,7 @@ export default function ({
           'Z'
         ]
       },
-      'rfz': {
+      rfz: {
         unicode: '',
         points: [
           'M',
@@ -13417,7 +13417,7 @@ export default function ({
           'Z'
         ]
       },
-      'Ped': {
+      Ped: {
         unicode: '',
         points: [
           'M',
@@ -13594,7 +13594,7 @@ export default function ({
           'Z'
         ]
       },
-      'P': {
+      P: {
         unicode: '',
         points: [
           'M',
@@ -13696,7 +13696,7 @@ export default function ({
           'Z'
         ]
       },
-      'e': {
+      e: {
         unicode: '',
         points: [
           'M',
@@ -13747,7 +13747,7 @@ export default function ({
           'Z'
         ]
       },
-      'd': {
+      d: {
         unicode: '',
         points: [
           'M',
@@ -13999,7 +13999,7 @@ export default function ({
           'Z'
         ]
       },
-      'Soft': {
+      Soft: {
         unicode: '',
         points: [
           'M',
@@ -14204,7 +14204,7 @@ export default function ({
           'Z'
         ]
       },
-      'S': {
+      S: {
         unicode: '',
         points: [
           'M',
@@ -14443,7 +14443,7 @@ export default function ({
       ]
     },
     tupletLetters: {
-      '0': {
+      0: {
         unicode: '',
         points: [
           'M',
@@ -14470,7 +14470,7 @@ export default function ({
           'Z'
         ]
       },
-      '1': {
+      1: {
         unicode: '',
         points: [
           'M',
@@ -14526,7 +14526,7 @@ export default function ({
           'Z'
         ]
       },
-      '2': {
+      2: {
         unicode: '',
         points: [
           'M',
@@ -14586,7 +14586,7 @@ export default function ({
           'Z'
         ]
       },
-      '3': {
+      3: {
         unicode: '',
         points: [
           'M',
@@ -14646,7 +14646,7 @@ export default function ({
           'Z'
         ]
       },
-      '4': {
+      4: {
         unicode: '',
         points: [
           'M',
@@ -14732,7 +14732,7 @@ export default function ({
           'Z'
         ]
       },
-      '5': {
+      5: {
         unicode: '',
         points: [
           'M',
@@ -14796,7 +14796,7 @@ export default function ({
           'Z'
         ]
       },
-      '6': {
+      6: {
         unicode: '',
         points: [
           'M',
@@ -14841,7 +14841,7 @@ export default function ({
           'Z'
         ]
       },
-      '7': {
+      7: {
         unicode: '',
         points: [
           'M',
@@ -14905,7 +14905,7 @@ export default function ({
           'Z'
         ]
       },
-      '8': {
+      8: {
         unicode: '',
         points: [
           'M',
@@ -14959,7 +14959,7 @@ export default function ({
           'Z'
         ]
       },
-      '9': {
+      9: {
         unicode: '',
         points: [
           'M',
@@ -15034,7 +15034,7 @@ export default function ({
       }
     },
     timeSignatureLetters: {
-      '0': {
+      0: {
         unicode: '',
         points: [
           'M',
@@ -15061,7 +15061,7 @@ export default function ({
           'Z'
         ]
       },
-      '1': {
+      1: {
         unicode: '',
         points: [
           'M',
@@ -15113,7 +15113,7 @@ export default function ({
           'Z'
         ]
       },
-      '2': {
+      2: {
         unicode: '',
         points: [
           'M',
@@ -15171,7 +15171,7 @@ export default function ({
           'Z'
         ]
       },
-      '3': {
+      3: {
         unicode: '',
         points: [
           'M',
@@ -15257,7 +15257,7 @@ export default function ({
           'Z'
         ]
       },
-      '4': {
+      4: {
         unicode: '',
         points: [
           'M',
@@ -15329,7 +15329,7 @@ export default function ({
           'Z'
         ]
       },
-      '5': {
+      5: {
         unicode: '',
         points: [
           'M',
@@ -15397,7 +15397,7 @@ export default function ({
           'Z'
         ]
       },
-      '6': {
+      6: {
         unicode: '',
         points: [
           'M',
@@ -15456,7 +15456,7 @@ export default function ({
           'Z'
         ]
       },
-      '7': {
+      7: {
         unicode: '',
         points: [
           'M',
@@ -15512,7 +15512,7 @@ export default function ({
           'Z'
         ]
       },
-      '8': {
+      8: {
         unicode: '',
         points: [
           'M',
@@ -15558,7 +15558,7 @@ export default function ({
           'Z'
         ]
       },
-      '9': {
+      9: {
         unicode: '',
         points: [
           'M',
@@ -15617,7 +15617,7 @@ export default function ({
           'Z'
         ]
       },
-      'c': {
+      c: {
         unicode: '',
         points: [
           'M',
@@ -15655,7 +15655,7 @@ export default function ({
           'Z'
         ]
       },
-      'crossedC': {
+      crossedC: {
         unicode: '',
         points: [
           'M',
@@ -15745,11 +15745,11 @@ export default function ({
     },
     cTimeTopOffset: 0.0 * intervalBetweenStaveLines,
     crossedCTimeTopOffset: -0.88 * intervalBetweenStaveLines,
-    numeratorTopOffset: -0.9 * intervalBetweenStaveLines ,
+    numeratorTopOffset: -0.9 * intervalBetweenStaveLines,
     denominatorTopOffset: 1.1 * intervalBetweenStaveLines,
     tempoLetters: {
-      'fontSize': 2.5, // for font-viewer (except whole)
-      'whole': {
+      fontSize: 2.5, // for font-viewer (except whole)
+      whole: {
         unicode: '',
         points: [
           'M',
@@ -15777,7 +15777,7 @@ export default function ({
         ],
         yCorrection: -0.9 * intervalBetweenStaveLines
       },
-      'half': {
+      half: {
         unicode: '',
         points: [
           'M',
@@ -15813,7 +15813,7 @@ export default function ({
         ],
         yCorrection: -2 * intervalBetweenStaveLines
       },
-      'quarter': {
+      quarter: {
         unicode: '',
         points: [
           'M',
@@ -15836,7 +15836,7 @@ export default function ({
         ],
         yCorrection: -2 * intervalBetweenStaveLines
       },
-      'eighth': {
+      eighth: {
         unicode: '',
         points: [
           'M',
@@ -15881,7 +15881,7 @@ export default function ({
         ],
         yCorrection: -2 * intervalBetweenStaveLines
       },
-      'sixteenth': {
+      sixteenth: {
         unicode: '',
         points: [
           'M',
@@ -15961,7 +15961,7 @@ export default function ({
         ],
         yCorrection: -2 * intervalBetweenStaveLines
       },
-      'thirtySecond': {
+      thirtySecond: {
         unicode: '',
         points: [
           'M',
@@ -16056,7 +16056,7 @@ export default function ({
         ],
         yCorrection: -2.3 * intervalBetweenStaveLines
       },
-      'sixtyFourth': {
+      sixtyFourth: {
         unicode: '',
         points: [
           'M',
@@ -16172,7 +16172,7 @@ export default function ({
         ],
         yCorrection: -2.75 * intervalBetweenStaveLines
       },
-      'wholeDotted': {
+      wholeDotted: {
         unicode: ' ',
         points: [
           'M',
@@ -16211,7 +16211,7 @@ export default function ({
         ],
         yCorrection: -0.9 * intervalBetweenStaveLines
       },
-      'halfDotted': {
+      halfDotted: {
         unicode: ' ',
         points: [
           'M',
@@ -16258,7 +16258,7 @@ export default function ({
         ],
         yCorrection: -2 * intervalBetweenStaveLines
       },
-      'quarterDotted': {
+      quarterDotted: {
         unicode: ' ',
         points: [
           'M',
@@ -16292,7 +16292,7 @@ export default function ({
         ],
         yCorrection: -2 * intervalBetweenStaveLines
       },
-      'eighthDotted': {
+      eighthDotted: {
         unicode: ' ',
         points: [
           'M',
@@ -16348,7 +16348,7 @@ export default function ({
         ],
         yCorrection: -2 * intervalBetweenStaveLines
       },
-      'sixteenthDotted': {
+      sixteenthDotted: {
         unicode: ' ',
         points: [
           'M',
@@ -16439,7 +16439,7 @@ export default function ({
         ],
         yCorrection: -2 * intervalBetweenStaveLines
       },
-      'thirtySecondDotted': {
+      thirtySecondDotted: {
         unicode: ' ',
         points: [
           'M',
@@ -16545,7 +16545,7 @@ export default function ({
         ],
         yCorrection: -2.3 * intervalBetweenStaveLines
       },
-      'sixtyFourthDotted': {
+      sixtyFourthDotted: {
         unicode: ' ',
         points: [
           'M',
@@ -16776,7 +16776,7 @@ export default function ({
     },
     repeatDotsPadding: 0.4 * intervalBetweenStaveLines,
     trillWavePeriod: {
-      'unicode': '',
+      unicode: '',
       points: [
         'M',
         0.00 * intervalBetweenStaveLines, -0.06 * intervalBetweenStaveLines,
@@ -16814,7 +16814,7 @@ export default function ({
       yCorrection: 0 * intervalBetweenStaveLines
     },
     glissandoWavePeriod: {
-      'unicode': '',
+      unicode: '',
       points: [
         'M',
         0.00 * intervalBetweenStaveLines, -0.06 * intervalBetweenStaveLines,
