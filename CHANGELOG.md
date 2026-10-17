@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.4 (2026-10-17)
+
+Parser optimized
+
 ## 1.0.3 (2026-10-14)
 
 Added font size setting
