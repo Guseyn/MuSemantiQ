@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.6 (2026-10-19)
+
+Release petaluma support
+
 ## 1.0.5 (2026-10-17)
 
 Changed fonts location
