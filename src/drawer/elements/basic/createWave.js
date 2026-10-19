@@ -5,7 +5,7 @@ import createGroup from '#msq/drawer/elements/basic/createGroup.js'
 import rotateElementAroundPoint from '#msq/drawer/elements/basic/rotateElementAroundPoint.js'
 import scaleElementAroundPoint from '#msq/drawer/elements/basic/scaleElementAroundPoint.js'
 
-export default function (startPoint, endPoint, wavePeriodSymbol, fontColor, graceElementsScaleFactor, isGrace, minNumberOfWavePeriods = 2, lastWavePeriodSymbol = null) {
+export default function (startPoint, endPoint, wavePeriodSymbol, fontColor, graceElementsScaleFactor, isGrace, arpeggioWaveWithArrowXCorrection = 0, minNumberOfWavePeriods = 2, lastWavePeriodSymbol = null) {
   const waveXLength = endPoint.x - startPoint.x
   const waveYLength = endPoint.y - startPoint.y
   const waveLength = Math.sqrt(Math.pow(waveXLength, 2) + Math.pow(waveYLength, 2))
@@ -74,7 +74,7 @@ export default function (startPoint, endPoint, wavePeriodSymbol, fontColor, grac
         null,
         fontColor,
         leftOffsetOfWavePeriod + wavePeriodSymbol.intersectionLength - lastWavePeriodSymbol.intersectionLength,
-        startPoint.y + lastWavePeriodSymbol.yCorrection
+        startPoint.y + lastWavePeriodSymbol.yCorrection + arpeggioWaveWithArrowXCorrection // arpeggioWaveWithArrowXCorrection here is because we rotate below
       )
       if (isGrace) {
         scaleElementAroundPoint(

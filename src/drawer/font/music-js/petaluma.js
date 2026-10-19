@@ -20498,6 +20498,7 @@ export default function ({
       ],
       intersectionLength: 0.325 * intervalBetweenStaveLines,
       yCorrection: -0.85 * intervalBetweenStaveLines
-    }
+    },
+    arpeggioWaveWithArrowXCorrection: 0.425 * intervalBetweenStaveLines
   }
 }

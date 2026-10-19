@@ -7,9 +7,10 @@ import createGroup from '#msq/drawer/elements/basic/createGroup.js'
 import scaleElementAroundPoint from '#msq/drawer/elements/basic/scaleElementAroundPoint.js'
 import createElementWithAdditionalInformation from '#msq/drawer/elements/basic/createElementWithAdditionalInformation.js'
 import addPropertiesToElement from '#msq/drawer/elements/basic/addPropertiesToElement.js'
+import moveElement from '#msq/drawer/elements/basic/moveElement.js'
 
 export default function (selectedSingleUnitsParamsToBeIncludedInNextCrossStaveUnit, onlyNoteLettersBeforeArpeggiatedWavesForCrossStaveUnits, styles, leftOffset, topOffsetsForEachStave, numberOfStaveLines, containsDrawnCrossStaveElementsBesideCrossStaveUnits) {
-  const { fontColor, intervalBetweenStaveLines, arpeggioWavePeriod, arpeggioWaveWithArrowPeriod, spaceAfterBreathMark, spaceAfterOnlyLettersForArpeggiatedWaves, graceElementsScaleFactor } = styles
+  const { fontColor, intervalBetweenStaveLines, arpeggioWavePeriod, arpeggioWaveWithArrowPeriod, spaceAfterBreathMark, spaceAfterOnlyLettersForArpeggiatedWaves, arpeggioWaveWithArrowXCorrection, graceElementsScaleFactor } = styles
   const waves = []
   let currentWaveParams
   const positionalPaddingForWave = 0.5
@@ -94,6 +95,7 @@ export default function (selectedSingleUnitsParamsToBeIncludedInNextCrossStaveUn
           fontColor,
           graceElementsScaleFactor,
           isGrace,
+          arpeggioWaveWithArrowXCorrection,
           1,
           currentWaveParams.arrow ? arpeggioWaveWithArrowPeriod : null
         )
