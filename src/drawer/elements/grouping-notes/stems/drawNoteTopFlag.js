@@ -14,7 +14,7 @@ export default function (numberOfFlags) {
           topFlags[numberOfFlags - 1].points,
           null,
           fontColor,
-          leftOffset,
+          leftOffset + (topFlags[numberOfFlags - 1].xCorrection || 0),
           topOffset + topFlags[numberOfFlags - 1].yCorrection
         )
       ]
