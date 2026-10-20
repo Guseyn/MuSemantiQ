@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.7 (2026-10-20)
+
+Parser for the language is optimized
+
 ## 1.0.6 (2026-10-19)
 
 Release petaluma support
