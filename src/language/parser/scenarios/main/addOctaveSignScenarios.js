@@ -14,6 +14,7 @@ import addLineMeasureStaveVoicePositionScenarios from '#msq/language/parser/scen
 
 export default function (scenarios) {
   scenarios['octave sign'] = {
+    leadingTokens: [ '2', 'two', 'octave' ],
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     startsOnNewLine: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {

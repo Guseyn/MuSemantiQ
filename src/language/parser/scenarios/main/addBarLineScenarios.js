@@ -8,6 +8,7 @@ import regexps from '#msq/language/parser/scenarios/static-objects/regexps.js'
 
 export default function (scenarios) {
   scenarios['no start bar line'] = {
+    leadingTokens: [ 'no' ],
     startsOnNewLine: true,
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
@@ -23,6 +24,7 @@ export default function (scenarios) {
     itIsNewCommandProgressionFromLevel: 0
   }
   scenarios['opening bar line'] = {
+    leadingTokens: [ 'opening', 'start' ],
     startsOnNewLine: true,
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
@@ -40,6 +42,7 @@ export default function (scenarios) {
     itIsNewCommandProgressionFromLevel: 1
   }
   scenarios['closing bar line'] = {
+    leadingTokens: [ 'closing' ],
     startsOnNewLine: true,
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {

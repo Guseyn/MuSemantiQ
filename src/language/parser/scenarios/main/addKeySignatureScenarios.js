@@ -8,6 +8,7 @@ import findKeySignatureThatUserMeant from '#msq/language/parser/scenarios/page-s
 
 export default function (scenarios) {
   scenarios['key signature'] = {
+    leadingTokens: [ 'key' ],
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       return regexps.keySignature.test(tokenValues)
     },

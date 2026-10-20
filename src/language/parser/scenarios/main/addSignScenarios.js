@@ -8,6 +8,7 @@ import parseVerticalCorrection from '#msq/language/parser/scenarios/token/parseV
 
 export default function (scenarios) {
   scenarios['sign'] = {
+    leadingTokens: [ 'sign', 'segno' ],
     startsOnNewLine: true,
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {

@@ -6,6 +6,7 @@ import getLastMeasureParams from '#msq/language/parser/scenarios/page-schema/get
 
 export default function (scenarios) {
   scenarios['time signature'] = {
+    leadingTokens: [ 'time' ],
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       return regexps.timeSignature.test(tokenValues)

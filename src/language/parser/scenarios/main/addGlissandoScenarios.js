@@ -13,6 +13,7 @@ import addLineMeasureStaveVoicePositionScenarios from '#msq/language/parser/scen
 
 export default function (scenarios) {
   scenarios['glissando'] = {
+    leadingTokens: [ 'gliss', 'gliss.', 'glissando' ],
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     startsOnNewLine: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {

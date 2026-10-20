@@ -9,6 +9,7 @@ import findNextTokenValueOnTheLine from '#msq/language/parser/scenarios/token/fi
 
 export default function (scenarios) {
   scenarios['stave'] = {
+    leadingTokens: [ 'stave', 'staff' ],
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       return currentToken.firstOnTheLine &&

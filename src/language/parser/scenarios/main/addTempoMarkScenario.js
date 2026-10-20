@@ -10,6 +10,7 @@ import findNextTokenValueOnTheLine from '#msq/language/parser/scenarios/token/fi
 
 export default function (scenarios) {
   scenarios['tempo mark'] = {
+    leadingTokens: [ 'tempo', 'metronome', 'metro' ],
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       return (
         regexps.tempoOrMetronome.test(tokenValues) &&

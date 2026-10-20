@@ -299,6 +299,7 @@ export default function (scenarios) {
     itIsNewCommandProgressionFromLevel: 0
   }
   scenarios['note stem direction'] = {
+    leadingTokens: [ 'with', 'stem', 'up', 'down' ],
     requiredCommandProgression: 'note',
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
@@ -327,6 +328,7 @@ export default function (scenarios) {
     itIsNewCommandProgressionFromLevel: 1
   }
   scenarios['note stave position'] = {
+    leadingTokens: [ 'is', 'on', 'in', 'at' ],
     requiredCommandProgression: 'note',
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
@@ -352,6 +354,7 @@ export default function (scenarios) {
     itIsNewCommandProgressionFromLevel: 1
   }
   scenarios['note with number of dots'] = {
+    leadingTokens: [ 'with' ],
     requiredCommandProgression: 'note',
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
@@ -377,6 +380,7 @@ export default function (scenarios) {
     itIsNewCommandProgressionFromLevel: 1
   }
   scenarios['dotted note'] = {
+    leadingTokens: [ 'is', 'dotted', 'with' ],
     requiredCommandProgression: 'note',
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
@@ -397,6 +401,7 @@ export default function (scenarios) {
     itIsNewCommandProgressionFromLevel: 1
   }
   scenarios['note beamed'] = {
+    leadingTokens: [ 'is', 'beamed' ],
     requiredCommandProgression: 'note',
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
@@ -418,6 +423,7 @@ export default function (scenarios) {
     activateActionWhenProgressionOfCommandsChangesIfItIsLastTokenAndActionDidntHappenBefore: true
   }
   scenarios['note not beamed'] = {
+    leadingTokens: [ 'is', 'not' ],
     requiredCommandProgression: 'note',
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
@@ -493,6 +499,7 @@ export default function (scenarios) {
     itIsNewCommandProgressionFromLevel: 2
   }
   scenarios['note with key'] = {
+    leadingTokens: [ 'with', 'sharp', 'flat', 'natural', 'double', 'demisharp', 'sesquisharp', 'demiflat', 'sesquiflat' ],
     requiredCommandProgression: 'note',
     prohibitedCommandProgressions: [ 'note with turn', 'note with mordent', 'note with trill' ],
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
@@ -553,6 +560,7 @@ export default function (scenarios) {
     itIsNewCommandProgressionFromLevel: 1
   }
   scenarios['note with parentheses'] = {
+    leadingTokens: [ 'with' ],
     requiredCommandProgression: 'note',
     prohibitedCommandProgressions: [ 'note with key' ],
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
@@ -581,6 +589,7 @@ export default function (scenarios) {
     itIsNewCommandProgressionFromLevel: 1
   }
   scenarios['note with text'] = {
+    leadingTokens: [ 'with' ],
     requiredCommandProgression: 'note',
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
@@ -791,6 +800,7 @@ export default function (scenarios) {
     'note with text above or below stave'
   )
   scenarios['note is tied with next'] = {
+    leadingTokens: [ 'is', 'tied' ],
     requiredCommandProgression: 'note',
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
@@ -812,6 +822,7 @@ export default function (scenarios) {
     activateActionWhenProgressionOfCommandsChangesIfItIsLastTokenAndActionDidntHappenBefore: true
   }
   scenarios['note is tied before'] = {
+    leadingTokens: [ 'is', 'tied' ],
     requiredCommandProgression: 'note',
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
@@ -854,6 +865,7 @@ export default function (scenarios) {
     itIsNewCommandProgressionFromLevel: 2
   }
   scenarios['note is tied after'] = {
+    leadingTokens: [ 'is', 'tied' ],
     requiredCommandProgression: 'note',
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
@@ -1079,6 +1091,7 @@ export default function (scenarios) {
     itIsNewCommandProgressionFromLevel: 2
   }
   scenarios['note with glissando'] = {
+    leadingTokens: [ 'with' ],
     requiredCommandProgression: 'note',
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
@@ -1196,6 +1209,7 @@ export default function (scenarios) {
     itIsNewCommandProgressionFromLevel: 2
   }
   scenarios['note is rest'] = {
+    leadingTokens: [ 'is' ],
     requiredCommandProgression: 'note',
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
@@ -1216,6 +1230,7 @@ export default function (scenarios) {
     itIsNewCommandProgressionFromLevel: 1
   }
   scenarios['note is ghost'] = {
+    leadingTokens: [ 'is', 'ghost' ],
     requiredCommandProgression: 'note',
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
@@ -1241,6 +1256,7 @@ export default function (scenarios) {
     itIsNewCommandProgressionFromLevel: 1
   }
   scenarios['note is not ghost'] = {
+    leadingTokens: [ 'is', 'not' ],
     requiredCommandProgression: 'note',
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
@@ -1266,6 +1282,7 @@ export default function (scenarios) {
     itIsNewCommandProgressionFromLevel: 1
   }
   scenarios['note is grace'] = {
+    leadingTokens: [ 'is', 'crushed', 'grace' ],
     requiredCommandProgression: 'note',
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
@@ -1305,6 +1322,7 @@ export default function (scenarios) {
     itIsNewCommandProgressionFromLevel: 1
   }
   scenarios['note is centralized'] = {
+    leadingTokens: [ 'is', 'in', 'centralized' ],
     requiredCommandProgression: 'note',
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
@@ -1320,6 +1338,7 @@ export default function (scenarios) {
     itIsNewCommandProgressionFromLevel: 1
   }
   scenarios['note with breath mark before'] = {
+    leadingTokens: [ 'with' ],
     requiredCommandProgression: 'note',
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
@@ -1366,6 +1385,7 @@ export default function (scenarios) {
     itIsNewCommandProgressionFromLevel: 2
   }
   scenarios['note with key signature before'] = {
+    leadingTokens: [ 'with' ],
     requiredCommandProgression: 'note',
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
@@ -1394,6 +1414,7 @@ export default function (scenarios) {
     itIsNewCommandProgressionFromLevel: 1
   }
   scenarios['note with clef before'] = {
+    leadingTokens: [ 'with' ],
     requiredCommandProgression: 'note',
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
@@ -1417,6 +1438,7 @@ export default function (scenarios) {
     itIsNewCommandProgressionFromLevel: 1
   }
   scenarios['note with clef and key signature before'] = {
+    leadingTokens: [ 'with' ],
     requiredCommandProgression: 'note',
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
@@ -1444,6 +1466,7 @@ export default function (scenarios) {
     itIsNewCommandProgressionFromLevel: 1
   }
   scenarios['note with articulation'] = {
+    leadingTokens: [ 'with' ],
     requiredCommandProgression: 'note',
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
@@ -1472,6 +1495,7 @@ export default function (scenarios) {
     activateActionWhenProgressionOfCommandsChangesIfItIsLastTokenAndActionDidntHappenBefore: true
   }
   scenarios['note with turn'] = {
+    leadingTokens: [ 'with' ],
     requiredCommandProgression: 'note',
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
@@ -1499,6 +1523,7 @@ export default function (scenarios) {
     activateActionWhenProgressionOfCommandsChangesIfItIsLastTokenAndActionDidntHappenBefore: true
   }
   scenarios['note with mordent'] = {
+    leadingTokens: [ 'with' ],
     requiredCommandProgression: 'note',
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
@@ -1526,6 +1551,7 @@ export default function (scenarios) {
     activateActionWhenProgressionOfCommandsChangesIfItIsLastTokenAndActionDidntHappenBefore: true
   }
   scenarios['note with trill'] = {
+    leadingTokens: [ 'with' ],
     requiredCommandProgression: 'note',
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
@@ -1767,6 +1793,7 @@ export default function (scenarios) {
     scenarios['note with articulation vertical correction'], 'note with trill'
   )
   scenarios['note with chord letter'] = {
+    leadingTokens: [ 'with' ],
     requiredCommandProgression: 'note',
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
@@ -1868,6 +1895,7 @@ export default function (scenarios) {
     itIsNewCommandProgressionFromLevel: 2
   }
   scenarios['note with octave sign'] = {
+    leadingTokens: [ 'is', '2', 'two', 'octave' ],
     requiredCommandProgression: 'note',
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
@@ -1932,6 +1960,7 @@ export default function (scenarios) {
     itIsNewCommandProgressionFromLevel: 2
   }
   scenarios['note with tremolo'] = {
+    leadingTokens: [ 'with' ],
     requiredCommandProgression: 'note',
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
@@ -1997,6 +2026,7 @@ export default function (scenarios) {
     itIsNewCommandProgressionFromLevel: 2
   }
   scenarios['repeat note'] = {
+    leadingTokens: [ 'repeat' ],
     requiredCommandProgression: 'note',
     prohibitedCommandProgressions: [ 'empty line after note' ],
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
@@ -2071,6 +2101,7 @@ export default function (scenarios) {
     itIsNewCommandProgressionFromLevel: 2
   }
   scenarios['note with dynamic'] = {
+    leadingTokens: [ 'with' ],
     requiredCommandProgression: 'note',
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
@@ -2183,6 +2214,7 @@ export default function (scenarios) {
     itIsNewCommandProgressionFromLevel: 2
   }
   scenarios['note with lyrics'] = {
+    leadingTokens: [ 'with' ],
     requiredCommandProgression: 'note',
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
@@ -2316,6 +2348,7 @@ export default function (scenarios) {
     }
   }
   scenarios['note with pedal'] = {
+    leadingTokens: [ 'with' ],
     requiredCommandProgression: 'note',
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
@@ -2455,6 +2488,7 @@ export default function (scenarios) {
     itIsNewCommandProgressionFromLevel: 2
   }
   scenarios['note with variable peak'] = {
+    leadingTokens: [ 'with' ],
     requiredCommandProgression: 'note',
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
@@ -2526,6 +2560,7 @@ export default function (scenarios) {
     itIsNewCommandProgressionFromLevel: 2
   }
   scenarios['note with release'] = {
+    leadingTokens: [ 'with' ],
     requiredCommandProgression: 'note',
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
@@ -2645,6 +2680,7 @@ export default function (scenarios) {
     itIsNewCommandProgressionFromLevel: 2
   }
   scenarios['note with horizontal correction'] = {
+    leadingTokens: [ 'is', 'left', 'right' ],
     requiredCommandProgression: 'note',
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {

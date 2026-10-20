@@ -12,6 +12,7 @@ import copyScenarioWithDifferentRequiredCommandProgression from '#msq/language/p
 
 export default function (scenarios) {
   scenarios['instrument title'] = {
+    leadingTokens: [ 'instrument' ],
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       return regexps.instrumentTitle.test(tokenValues)

@@ -11,6 +11,7 @@ import copyScenarioWithDifferentRequiredCommandProgression from '#msq/language/p
 
 export default function (scenarios) {
   scenarios['bracket or brace'] = {
+    leadingTokens: [ 'bracket', 'brace' ],
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       return currentToken.firstOnTheLine &&

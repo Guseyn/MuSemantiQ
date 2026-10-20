@@ -14,8 +14,13 @@ const parserScenarios = createParserScenarios()
 // scenarios are candidates to check next, given the progression in progress.
 const scenariosByRequiredProgression = mapWithScenariosAndScenariosWhereItIsRequired(parserScenarios)
 
-const NEW_LINE_REGEXP = /[\r\n|\r|\n]/
-const SPACE_REGEXP = /[\s]/
+// Whitespace is tested once per character in the hot scan loop, so use plain
+// comparisons instead of a regexp. `\s` also matches a few exotic characters
+// (`\u00a0`, `\u1680`, `\u2000`-`\u200a`, `\u2028`, `\u2029`, `\u202f`, `\u205f`,
+// `\u3000`, `\ufeff`) that never appear in MSQ text, so they are omitted here.
+const isWhitespace = (char) => (
+  char === ' ' || char === '\t' || char === '\n' || char === '\r' || char === '\f' || char === '\v'
+)
 const EMPTY_STRING = ''
 const REGULAR = 'regular'
 const ON_EMPTY_LINE = 'on empty line'
@@ -138,12 +143,15 @@ const runActionOnProgressionOfCommandsChange = (queuedAction, parserState, chang
 // accumulated tokens, and runs the first one that matches.
 const runParserScenarios = (createParserScenarios, typeOfScenarios, numberOfActivatedScenarios, progressionOfCommandsFromScenarios, lastScenarioLineNumber, unitext, lineNumber, isLastChar, currentToken, tokenAccumulator, delimitersBeforeFirstTokenOnTheLine, delimitersAfterEachToken, parserState, progressionChangeQueue, run) => {
   const tokenValues = extractTokenValuesFromTokens(tokenAccumulator)
-  const tokenValuesWithoutCommandDelimiters = removeCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem(tokenAccumulator)
+  // Computed lazily: only scenarios with
+  // `considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem`
+  // need it, and most tokens never match one of those.
+  let tokenValuesWithoutCommandDelimiters
   const joinedTokenValuesWithRealDelimiters = joinTokensWithRealDelimiters(tokenAccumulator, delimitersBeforeFirstTokenOnTheLine, delimitersAfterEachToken)
 
   // which scenarios could match next: those that require any progression now in
   // progress, followed by the ones that require nothing.
-  const candidateScenarioNames = []
+  let candidateScenarioNames = []
   if (progressionOfCommandsFromScenarios.length > 0) {
     for (let scenarioNameIndex = 0; scenarioNameIndex < progressionOfCommandsFromScenarios.length; scenarioNameIndex++) {
       const scenarioName = progressionOfCommandsFromScenarios[scenarioNameIndex]
@@ -153,6 +161,44 @@ const runParserScenarios = (createParserScenarios, typeOfScenarios, numberOfActi
     }
   }
   candidateScenarioNames.push(...scenariosByRequiredProgression.common)
+
+  // Fast dispatch: a scenario may declare which first token can start it
+  // (`leadingTokens`). Only those scenarios (plus every untagged one) then have
+  // their `condition` evaluated, which is the dominant cost of parsing. Order is
+  // preserved, and untagged scenarios are always checked, so tagging is safe to
+  // roll out incrementally.
+  if (scenariosByRequiredProgression.hasLeadingTokens) {
+    // The key is the first token that is not a command delimiter (`and`, `,`,
+    // `;`) with any trailing delimiter stripped off — the same value that a
+    // scenario with `considerJoinedTokenAccumulatorWithoutCommandDelimiters…`
+    // sees as its first token. A scenario whose leading token doesn't match can
+    // never have its condition met, so it is skipped here.
+    let firstTokenValue
+    for (const tokenValue of tokenValues) {
+      let value = tokenValue
+      let end = value.length
+      while (end > 0 && (value[end - 1] === ',' || value[end - 1] === ';')) {
+        end -= 1
+      }
+      if (end !== value.length) {
+        value = value.slice(0, end)
+      }
+      if (value !== '' && value !== 'and' && value !== ',' && value !== ';') {
+        firstTokenValue = value
+        break
+      }
+    }
+    if (firstTokenValue !== undefined) {
+      const filtered = []
+      for (const scenarioName of candidateScenarioNames) {
+        const scenario = createParserScenarios[scenarioName]
+        if (!scenario.leadingTokens || scenario.leadingTokens.indexOf(firstTokenValue) !== -1) {
+          filtered.push(scenarioName)
+        }
+      }
+      candidateScenarioNames = filtered
+    }
+  }
 
   for (let scenarioNameIndex = 0; scenarioNameIndex < candidateScenarioNames.length; scenarioNameIndex++) {
     const scenarioName = candidateScenarioNames[scenarioNameIndex]
@@ -186,7 +232,7 @@ const runParserScenarios = (createParserScenarios, typeOfScenarios, numberOfActi
     }
 
     const finalTokenValues = scenario.considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem
-      ? tokenValuesWithoutCommandDelimiters
+      ? (tokenValuesWithoutCommandDelimiters ??= removeCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem(tokenAccumulator))
       : tokenValues
     scenario.type = scenario.type || REGULAR
     if (currentToken) {
@@ -288,6 +334,7 @@ export default function (
   {
     runMain = true,
     adapterNames = [],
+    mapCharIndexes = true,
     fonts = {
       'chord-letters': [ 'gentium plus', 'gothic a1' ],
       'music': [ 'bravura', 'leland' ],
@@ -340,9 +387,9 @@ export default function (
     const currentChar = unitext[charIndex]
     const nextChar = unitext[charIndex + 1]
     const isLastChar = !nextChar
-    const isNewLineChar = NEW_LINE_REGEXP.test(currentChar)
-    const isDelimiter = SPACE_REGEXP.test(currentChar)
-    const nextIsDelimiter = nextChar && SPACE_REGEXP.test(nextChar)
+    const isNewLineChar = currentChar === '\n' || currentChar === '\r' || currentChar === '|'
+    const isDelimiter = isWhitespace(currentChar)
+    const nextIsDelimiter = nextChar !== undefined && isWhitespace(nextChar)
 
     if (!isDelimiter) {
       // a non-delimiter char belongs to the token being built
@@ -350,7 +397,7 @@ export default function (
       currentTokenChars.push(currentChar)
       currentLineChars.push(currentChar)
       if (!isLastChar) {
-        progressionByCharIndex[charIndex] = progressionOfCommandsFromScenarios.slice()
+        if (mapCharIndexes) progressionByCharIndex[charIndex] = progressionOfCommandsFromScenarios.slice()
         continue
       }
     } else if (!lineStarted) {
@@ -421,7 +468,9 @@ export default function (
       tokenAccumulator.length = 0
     }
 
-    progressionByCharIndex[charIndex] = progressionOfCommandsFromScenarios.slice()
+    if (mapCharIndexes) {
+      progressionByCharIndex[charIndex] = progressionOfCommandsFromScenarios.slice()
+    }
   }
 
   // run any progression-change actions still queued that want the last token

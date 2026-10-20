@@ -8,6 +8,7 @@ import getLastStaveParams from '#msq/language/parser/scenarios/page-schema/getLa
 
 export default function (scenarios) {
   scenarios['voice'] = {
+    leadingTokens: [ 'voice' ],
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       return currentToken.firstOnTheLine &&

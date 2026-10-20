@@ -17,6 +17,7 @@ import addLineMeasureStaveVoicePositionScenarios from '#msq/language/parser/scen
 
 export default function (scenarios) {
   scenarios['crescendo|diminuendo'] = {
+    leadingTokens: [ 'crescendo', 'cresc.', 'cresc', 'cres.', 'cres', 'diminuendo', 'dim.', 'dim' ],
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     startsOnNewLine: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {

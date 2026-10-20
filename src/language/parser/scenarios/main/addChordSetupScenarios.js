@@ -150,6 +150,7 @@ export default function (scenarios) {
     activateActionWhenProgressionOfCommandsChangesIfItIsLastTokenAndActionDidntHappenBefore: true
   }
   scenarios['chord stave position'] = {
+    leadingTokens: [ 'is', 'on', 'in', 'at' ],
     requiredCommandProgression: 'chord',
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
@@ -173,6 +174,7 @@ export default function (scenarios) {
     itIsNewCommandProgressionFromLevel: 1
   }
   scenarios['chord with parentheses'] = {
+    leadingTokens: [ 'with' ],
     requiredCommandProgression: 'chord',
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
@@ -290,6 +292,7 @@ export default function (scenarios) {
     itIsNewCommandProgressionFromLevel: 3
   }
   scenarios['chord is ghost'] = {
+    leadingTokens: [ 'is', 'ghost' ],
     requiredCommandProgression: 'chord',
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
@@ -308,6 +311,7 @@ export default function (scenarios) {
     itIsNewCommandProgressionFromLevel: 1
   }
   scenarios['chord is not ghost'] = {
+    leadingTokens: [ 'is', 'not' ],
     requiredCommandProgression: 'chord',
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
@@ -326,6 +330,7 @@ export default function (scenarios) {
     itIsNewCommandProgressionFromLevel: 1
   }
   scenarios['chord is arpeggiated'] = {
+    leadingTokens: [ 'is', 'arpeggiated', 'arpeggio' ],
     requiredCommandProgression: 'chord',
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
@@ -402,6 +407,7 @@ export default function (scenarios) {
     itIsNewCommandProgressionFromLevel: 3
   }
   scenarios['chord with text'] = {
+    leadingTokens: [ 'with' ],
     requiredCommandProgression: 'chord',
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {

@@ -9,6 +9,7 @@ import applicationOfMeasureNumbers from '#msq/language/parser/scenarios/static-o
 
 export default function (scenarios) {
   scenarios['measure numbers'] = {
+    leadingTokens: [ 'measure' ],
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       return regexps.measureNumbers.test(tokenValues)

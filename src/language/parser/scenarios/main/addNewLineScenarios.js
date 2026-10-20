@@ -6,6 +6,7 @@ import getLastMeasureParams from '#msq/language/parser/scenarios/page-schema/get
 
 export default function (scenarios) {
   scenarios['new'] = {
+    leadingTokens: [ 'new' ],
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       return currentToken.firstOnTheLine &&

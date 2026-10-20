@@ -45,6 +45,7 @@ export default function (scenarios) {
   }
 
   scenarios['music font style name'] = {
+    leadingTokens: [ 'music' ],
     startsOnNewLine: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       return regexps.musicFont.test(tokenValues)
@@ -72,6 +73,7 @@ export default function (scenarios) {
   }
 
   scenarios['text font style name'] = {
+    leadingTokens: [ 'text' ],
     startsOnNewLine: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       return regexps.textFont.test(tokenValues)
@@ -99,6 +101,7 @@ export default function (scenarios) {
   }
 
   scenarios['chord letters font style name'] = {
+    leadingTokens: [ 'chord' ],
     startsOnNewLine: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       return regexps.chordLettersFont.test(tokenValues)

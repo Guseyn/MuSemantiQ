@@ -53,6 +53,7 @@ const addSlurFeaturesIfTheyAreSpecifiedBeforeItsUnitPositions = (parserState, sl
 
 export default function (scenarios) {
   scenarios['slur'] = {
+    leadingTokens: [ 'slur' ],
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     startsOnNewLine: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
