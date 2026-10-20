@@ -1,7 +1,7 @@
 'use strict'
 
 import regexps from '#msq/language/parser/scenarios/static-objects/regexps.js'
-import addLineMeasureStaveVoicePositionScenarios from '#msq/language/parser/scenarios/highlight/addLineMeasureStaveVoicePositionScenarios.js'
+import addLineMeasureStaveVoicePositionScenarios from '#msq/language/parser/scenarios/adapter-sets/highlight-without-ref-ids/addLineMeasureStaveVoicePositionScenarios.js'
 
 export default function (scenarios, requiredCommandProgression, commandProgressionLevel = 2, allowedCoordinates) {
   scenarios[`unit position (${requiredCommandProgression})`] = {
@@ -9,14 +9,11 @@ export default function (scenarios, requiredCommandProgression, commandProgressi
       const tokensWithNumbersInsteadOfWordsWithTrimmedEnd = joinedTokenValuesWithRealDelimiters.trimEnd()
       const tokensWithNumbersInsteadOfWordsWithTrimmedEndWithHighlightedPosition = regexps.positionPreposition.replace(
         tokensWithNumbersInsteadOfWordsWithTrimmedEnd, (match, p1, p2, p3, p4) => {
-          return `${p1 || ''}<span class="cuph" ref-id="">${p4}</span>`
+          return `${p1 || ''}<span class="cuph">${p4}</span>`
         }
       )
       state.highlightsHtmlBuffer.push(
-        `<span class="cupph" ref-id="">${tokensWithNumbersInsteadOfWordsWithTrimmedEndWithHighlightedPosition}</span>${joinedTokenValuesWithRealDelimiters.slice(tokensWithNumbersInsteadOfWordsWithTrimmedEnd.length)}`
-      )
-      state.indexesInHighlightsHtmlBufferWhereWeShouldFillPositionPlaceholders.push(
-        state.highlightsHtmlBuffer.length - 1
+        `${tokensWithNumbersInsteadOfWordsWithTrimmedEndWithHighlightedPosition}${joinedTokenValuesWithRealDelimiters.slice(tokensWithNumbersInsteadOfWordsWithTrimmedEnd.length)}`
       )
     }
   }
@@ -25,14 +22,11 @@ export default function (scenarios, requiredCommandProgression, commandProgressi
       const tokensWithNumbersInsteadOfWordsWithTrimmedEnd = joinedTokenValuesWithRealDelimiters.trimEnd()
       const tokensWithNumbersInsteadOfWordsWithTrimmedEndWithHighlightedPosition = regexps.positionPreposition.replace(
         tokensWithNumbersInsteadOfWordsWithTrimmedEnd, (match, p1, p2, p3, p4) => {
-          return `${p1 || ''}<span class="cuph" ref-id="">${p4}</span>`
+          return `${p1 || ''}<span class="cuph">${p4}</span>`
         }
       )
       state.highlightsHtmlBuffer.push(
-        `<span class="cupph" ref-id="">${tokensWithNumbersInsteadOfWordsWithTrimmedEndWithHighlightedPosition}</span>${joinedTokenValuesWithRealDelimiters.slice(tokensWithNumbersInsteadOfWordsWithTrimmedEnd.length)}`
-      )
-      state.indexesInHighlightsHtmlBufferWhereWeShouldFillPositionPlaceholders.push(
-        state.highlightsHtmlBuffer.length - 1
+        `${tokensWithNumbersInsteadOfWordsWithTrimmedEndWithHighlightedPosition}${joinedTokenValuesWithRealDelimiters.slice(tokensWithNumbersInsteadOfWordsWithTrimmedEnd.length)}`
       )
     }
   }

@@ -3,9 +3,9 @@
 import getMentionedPositions from '#msq/language/parser/scenarios/page-schema/getMentionedPositions.js'
 import regexps from '#msq/language/parser/scenarios/static-objects/regexps.js'
 import undefineOnlyLastMentionedUnitPosition from '#msq/language/parser/scenarios/page-schema/undefineOnlyLastMentionedUnitPosition.js'
-import fillAllPlaceholdersInHighlightsHtmlBufferWithMentionedPositionsWhereItsNeeded from '#msq/language/parser/scenarios/highlight/fillAllPlaceholdersInHighlightsHtmlBufferWithMentionedPositionsWhereItsNeeded.js'
-import addUnitPositionScenarios from '#msq/language/parser/scenarios/highlight/addUnitPositionScenarios.js'
-import addLineMeasureStaveVoicePositionScenarios from '#msq/language/parser/scenarios/highlight/addLineMeasureStaveVoicePositionScenarios.js'
+import fillAllPlaceholdersInHighlightsHtmlBufferWithMentionedPositionsWhereItsNeeded from '#msq/language/parser/scenarios/adapter-sets/highlight/fillAllPlaceholdersInHighlightsHtmlBufferWithMentionedPositionsWhereItsNeeded.js'
+import addUnitPositionScenarios from '#msq/language/parser/scenarios/adapter-sets/highlight/addUnitPositionScenarios.js'
+import addLineMeasureStaveVoicePositionScenarios from '#msq/language/parser/scenarios/adapter-sets/highlight/addLineMeasureStaveVoicePositionScenarios.js'
 
 export default function (scenarios) {
   scenarios['slur'] = {

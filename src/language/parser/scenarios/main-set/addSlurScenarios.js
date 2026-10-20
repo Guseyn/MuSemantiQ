@@ -21,8 +21,8 @@ import addRightYCorrectionToSlurMarkByKey from '#msq/language/parser/scenarios/p
 import addRightPointPlacementToSlurMarkByKey from '#msq/language/parser/scenarios/page-schema/addRightPointPlacementToSlurMarkByKey.js'
 import undefineAllMentionedPositions from '#msq/language/parser/scenarios/page-schema/undefineAllMentionedPositions.js'
 import undefineOnlyLastMentionedUnitPosition from '#msq/language/parser/scenarios/page-schema/undefineOnlyLastMentionedUnitPosition.js'
-import addUnitPositionScenarios from '#msq/language/parser/scenarios/main/addUnitPositionScenarios.js'
-import addLineMeasureStaveVoicePositionScenarios from '#msq/language/parser/scenarios/main/addLineMeasureStaveVoicePositionScenarios.js'
+import addUnitPositionScenarios from '#msq/language/parser/scenarios/main-set/addUnitPositionScenarios.js'
+import addLineMeasureStaveVoicePositionScenarios from '#msq/language/parser/scenarios/main-set/addLineMeasureStaveVoicePositionScenarios.js'
 
 const addSlurFeaturesIfTheyAreSpecifiedBeforeItsUnitPositions = (parserState, slurMarkKey) => {
   if (parserState.lastSlurDirection) {

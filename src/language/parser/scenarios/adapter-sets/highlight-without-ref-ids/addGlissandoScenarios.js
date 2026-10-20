@@ -1,8 +1,8 @@
 'use strict'
 
 import regexps from '#msq/language/parser/scenarios/static-objects/regexps.js'
-import addUnitPositionScenarios from '#msq/language/parser/scenarios/highlight-without-ref-ids/addUnitPositionScenarios.js'
-import addLineMeasureStaveVoicePositionScenarios from '#msq/language/parser/scenarios/highlight-without-ref-ids/addLineMeasureStaveVoicePositionScenarios.js'
+import addUnitPositionScenarios from '#msq/language/parser/scenarios/adapter-sets/highlight-without-ref-ids/addUnitPositionScenarios.js'
+import addLineMeasureStaveVoicePositionScenarios from '#msq/language/parser/scenarios/adapter-sets/highlight-without-ref-ids/addLineMeasureStaveVoicePositionScenarios.js'
 
 export default function (scenarios) {
   scenarios['glissando'] = {

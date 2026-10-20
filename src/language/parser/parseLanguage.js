@@ -2,7 +2,7 @@
 
 import createParserScenarios from '#msq/language/parser/scenarios/createParserScenarios.js'
 import mapWithScenariosAndScenariosWhereItIsRequired from '#msq/language/parser/scenarios/mapWithScenariosAndScenariosWhereItIsRequired.js'
-import adapters from '#msq/language/parser/scenarios/adapters.js'
+import adapters from '#msq/language/parser/scenarios/adapterDefinitions.js'
 import removeCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem from '#msq/language/parser/scenarios/token/removeCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem.js'
 import extractTokenValuesFromTokens from '#msq/language/parser/scenarios/token/extractTokenValuesFromTokens.js'
 import joinTokensWithRealDelimiters from '#msq/language/parser/scenarios/token/joinTokensWithRealDelimiters.js'
@@ -326,7 +326,7 @@ const runParserScenarios = (createParserScenarios, typeOfScenarios, numberOfActi
 /*
 runMain: whether the main scenarios run (they build the page schema, errors, comments,
 styles and MIDI settings). adapterNames: the adapters that run as well, or instead when
-runMain is false (see scenarios/adapters.js and README.md).
+runMain is false (see scenarios/adapterDefinitions.js and README.md).
 */
 export default function (
   unitext,

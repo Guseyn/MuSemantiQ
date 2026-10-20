@@ -1,7 +1,7 @@
 'use strict'
 
 import regexps from '#msq/language/parser/scenarios/static-objects/regexps.js'
-import addLineMeasureStaveVoicePositionScenarios from '#msq/language/parser/scenarios/highlight-without-ref-ids/addLineMeasureStaveVoicePositionScenarios.js'
+import addLineMeasureStaveVoicePositionScenarios from '#msq/language/parser/scenarios/adapter-sets/highlight-without-ref-ids/addLineMeasureStaveVoicePositionScenarios.js'
 
 export default function (scenarios) {
   scenarios['volta'] = {

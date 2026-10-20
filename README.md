@@ -44,9 +44,10 @@ src/
     parser/                the parser (see src/language/parser/README.md)
       parseLanguage.js
       scenarios/
-        main/              what every command does: the page schema, errors, styles…
-        highlight/         the editor's highlights, with ref-ids (an adapter)
-        highlight-without-ref-ids/   the same without ref-ids, for typing (an adapter)
+        main-set/          what every command does: the page schema, errors, styles…
+        adapter-sets/
+          highlight/       the editor's highlights, with ref-ids (an adapter)
+          highlight-without-ref-ids/   the same without ref-ids, for typing (an adapter)
     schema/                checks a page schema
     serializer/            parser output back to MSQ text
   drawer/

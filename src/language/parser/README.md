@@ -36,7 +36,7 @@ styles, MIDI settings, and, for the editor, highlights. Everything starts in
 
 ## What a scenario declares
 
-Main scenarios live in `scenarios/main/add…Scenarios.js`. Each file adds scenarios by
+Main scenarios live in `scenarios/main-set/add…Scenarios.js`. Each file adds scenarios by
 name to one object:
 
 ```js
@@ -100,9 +100,10 @@ same names as the main ones:
 
 ```
 scenarios/
-  main/                         the page schema, errors, comments, styles, MIDI settings
-  highlight/                    adapter.js, add…Scenarios.js
-  highlight-without-ref-ids/    adapter.js, add…Scenarios.js
+  main-set/                     the page schema, errors, comments, styles, MIDI settings
+  adapter-sets/
+    highlight/                  adapter.js, add…Scenarios.js
+    highlight-without-ref-ids/  adapter.js, add…Scenarios.js
   page-schema/  token/  static-objects/  string/    helpers they share
 ```
 
@@ -202,7 +203,7 @@ Let's say you want the line of every note, for a list beside the editor.
    If it needs something the main action knows, make the main action return it, and
    read it from `fromMain`.
 
-3. Add it to `scenarios/adapters.js`.
+3. Add it to `scenarios/adapterDefinitions.js`.
 4. Pass its name to the parser: `parseLanguage(text, [], { adapterNames: [ 'note-lines' ] })`.
    To make it part of the public API, choose it in `parserOptions` in `src/language/api.js`.
 5. Run `npm run test:all`. Adding an adapter must not change anything the main scenarios

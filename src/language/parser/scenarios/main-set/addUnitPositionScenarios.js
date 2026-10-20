@@ -2,7 +2,7 @@
 
 import regexps from '#msq/language/parser/scenarios/static-objects/regexps.js'
 import replaceWordsWithNumbers from '#msq/language/parser/scenarios/token/replaceWordsWithNumbers.js'
-import addLineMeasureStaveVoicePositionScenarios from '#msq/language/parser/scenarios/main/addLineMeasureStaveVoicePositionScenarios.js'
+import addLineMeasureStaveVoicePositionScenarios from '#msq/language/parser/scenarios/main-set/addLineMeasureStaveVoicePositionScenarios.js'
 
 export default function (scenarios, requiredCommandProgression, commandProgressionLevel = 2, allowedCoordinates) {
   scenarios[`unit position (${requiredCommandProgression})`] = {

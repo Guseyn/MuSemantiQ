@@ -8,7 +8,7 @@ import findNextTokenValueOnTheLine from '#msq/language/parser/scenarios/token/fi
 import findMeasureParamsByLastMentionedMeasurePosition from '#msq/language/parser/scenarios/page-schema/findMeasureParamsByLastMentionedMeasurePosition.js'
 import undefineAllMentionedPositions from '#msq/language/parser/scenarios/page-schema/undefineAllMentionedPositions.js'
 import undefineOnlyLastMentionedMeasurePosition from '#msq/language/parser/scenarios/page-schema/undefineOnlyLastMentionedMeasurePosition.js'
-import addLineMeasureStaveVoicePositionScenarios from '#msq/language/parser/scenarios/main/addLineMeasureStaveVoicePositionScenarios.js'
+import addLineMeasureStaveVoicePositionScenarios from '#msq/language/parser/scenarios/main-set/addLineMeasureStaveVoicePositionScenarios.js'
 
 export default function (scenarios) {
   scenarios['volta'] = {

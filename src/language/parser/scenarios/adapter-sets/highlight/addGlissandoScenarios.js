@@ -1,19 +1,20 @@
 'use strict'
 
 import regexps from '#msq/language/parser/scenarios/static-objects/regexps.js'
-import fillAllPlaceholdersInHighlightsHtmlBufferWithMentionedPositionsWhereItsNeeded from '#msq/language/parser/scenarios/highlight/fillAllPlaceholdersInHighlightsHtmlBufferWithMentionedPositionsWhereItsNeeded.js'
-import addLineMeasureStaveVoicePositionScenarios from '#msq/language/parser/scenarios/highlight/addLineMeasureStaveVoicePositionScenarios.js'
+import fillAllPlaceholdersInHighlightsHtmlBufferWithMentionedPositionsWhereItsNeeded from '#msq/language/parser/scenarios/adapter-sets/highlight/fillAllPlaceholdersInHighlightsHtmlBufferWithMentionedPositionsWhereItsNeeded.js'
+import addUnitPositionScenarios from '#msq/language/parser/scenarios/adapter-sets/highlight/addUnitPositionScenarios.js'
+import addLineMeasureStaveVoicePositionScenarios from '#msq/language/parser/scenarios/adapter-sets/highlight/addLineMeasureStaveVoicePositionScenarios.js'
 
 export default function (scenarios) {
-  scenarios['volta'] = {
+  scenarios['glissando'] = {
     action: ({ parserState, joinedTokenValuesWithRealDelimiters, state }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.voltaBracketsHighlight.replace(
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.glissandoHighlight.replace(
         joinedTokenValuesWithRealDelimiters, (match) => {
-          return `<span class="eh" ref-id="volta-mark-${parserState.numberOfVoltaMarks}">${match}</span>`
+          return `<span class="eh" ref-id="glissando-${parserState.numberOfGlissandos}">${match}</span>`
         }
       )
       state.highlightsHtmlBuffer.push(
-        `<span class="th" ref-id="volta-mark-${parserState.numberOfVoltaMarks}">${joinedTokenValuesWithRealDelimitersWithHighlightedElement}`
+        `<span class="th" ref-id="glissando-${parserState.numberOfGlissandos}">${joinedTokenValuesWithRealDelimitersWithHighlightedElement}`
       )
     },
     actionWhenProgressionOfCommandsChanges: ({ state, fromMain: { mentionedPositions } }) => {
@@ -23,112 +24,102 @@ export default function (scenarios) {
       )
     }
   }
-  scenarios['volta with text'] = {
+  scenarios['glissando starts before unit'] = {
+    action: ({ joinedTokenValuesWithRealDelimiters, state }) => {
+      state.highlightsHtmlBuffer.push(
+        `<span class="th" ref-id="">${joinedTokenValuesWithRealDelimiters}`
+      )
+      state.indexesInHighlightsHtmlBufferWhereWeShouldFillPositionPlaceholders.push(
+        state.highlightsHtmlBuffer.length - 1
+      )
+    },
+    actionWhenProgressionOfCommandsChanges: ({ state, fromMain: { mentionedPositions } }) => {
+      fillAllPlaceholdersInHighlightsHtmlBufferWithMentionedPositionsWhereItsNeeded(state, mentionedPositions)
+      state.highlightsHtmlBuffer.push(
+        '</span>'
+      )
+    }
+  }
+  addUnitPositionScenarios(scenarios, 'glissando starts before unit', 2, { measure: true, stave: true })
+  scenarios['glissando finishes after unit'] = {
+    action: ({ joinedTokenValuesWithRealDelimiters, state }) => {
+      state.highlightsHtmlBuffer.push(
+        `<span class="th" ref-id="">${joinedTokenValuesWithRealDelimiters}`
+      )
+      state.indexesInHighlightsHtmlBufferWhereWeShouldFillPositionPlaceholders.push(
+        state.highlightsHtmlBuffer.length - 1
+      )
+    },
+    actionWhenProgressionOfCommandsChanges: ({ state, fromMain: { mentionedPositions } }) => {
+      fillAllPlaceholdersInHighlightsHtmlBufferWithMentionedPositionsWhereItsNeeded(state, mentionedPositions)
+      state.highlightsHtmlBuffer.push(
+        '</span>'
+      )
+    }
+  }
+  addUnitPositionScenarios(scenarios, 'glissando finishes after unit', 2, { measure: true, stave: true })
+  scenarios['glissando starts at unit'] = {
+    action: ({ joinedTokenValuesWithRealDelimiters, state }) => {
+      state.highlightsHtmlBuffer.push(
+        `<span class="th" ref-id="">${joinedTokenValuesWithRealDelimiters}`
+      )
+      state.indexesInHighlightsHtmlBufferWhereWeShouldFillPositionPlaceholders.push(
+        state.highlightsHtmlBuffer.length - 1
+      )
+    },
+    actionWhenProgressionOfCommandsChanges: ({ state, fromMain: { mentionedPositions } }) => {
+      fillAllPlaceholdersInHighlightsHtmlBufferWithMentionedPositionsWhereItsNeeded(state, mentionedPositions)
+      state.highlightsHtmlBuffer.push(
+        '</span>'
+      )
+    }
+  }
+  addUnitPositionScenarios(scenarios, 'glissando starts at unit', 2, { measure: true, stave: true })
+  scenarios['glissando finishes at unit'] = {
+    action: ({ joinedTokenValuesWithRealDelimiters, state }) => {
+      state.highlightsHtmlBuffer.push(
+        `<span class="th" ref-id="">${joinedTokenValuesWithRealDelimiters}`
+      )
+      state.indexesInHighlightsHtmlBufferWhereWeShouldFillPositionPlaceholders.push(
+        state.highlightsHtmlBuffer.length - 1
+      )
+    },
+    actionWhenProgressionOfCommandsChanges: ({ state, fromMain: { mentionedPositions } }) => {
+      fillAllPlaceholdersInHighlightsHtmlBufferWithMentionedPositionsWhereItsNeeded(state, mentionedPositions)
+      state.highlightsHtmlBuffer.push(
+        '</span>'
+      )
+    }
+  }
+  addUnitPositionScenarios(scenarios, 'glissando finishes at unit', 2, { measure: true, stave: true })
+  scenarios['glissando direction'] = {
+    action: ({ joinedTokenValuesWithRealDelimiters, state }) => {
+      state.highlightsHtmlBuffer.push(joinedTokenValuesWithRealDelimiters)
+    }
+  }
+  scenarios['glissando form'] = {
     action: ({ parserState, joinedTokenValuesWithRealDelimiters, state }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedString = regexps.stringHighlight.replace(
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.asWaveLineHighlight.replace(
         joinedTokenValuesWithRealDelimiters, (match) => {
-          return `<span class="sth" ref-id="volta-mark-text-${parserState.numberOfVoltaMarks}">${match}</span>`
+          return `<span class="th" ref-id="glissando-${parserState.numberOfGlissandos}">${match}</span>`
         }
       )
       state.highlightsHtmlBuffer.push(
-        `<span class="th" ref-id="volta-mark-text-${parserState.numberOfVoltaMarks}">${joinedTokenValuesWithRealDelimitersWithHighlightedString}</span>`
-      )
-    }
-  }
-  scenarios['volta starts before'] = {
-    action: ({ joinedTokenValuesWithRealDelimiters, state }) => {
-      state.highlightsHtmlBuffer.push(
-        `<span class="th" ref-id="">${joinedTokenValuesWithRealDelimiters}`
-      )
-      state.indexesInHighlightsHtmlBufferWhereWeShouldFillPositionPlaceholders.push(
-        state.highlightsHtmlBuffer.length - 1
-      )
-    },
-    actionWhenProgressionOfCommandsChanges: ({ state, fromMain: { mentionedPositions } }) => {
-      fillAllPlaceholdersInHighlightsHtmlBufferWithMentionedPositionsWhereItsNeeded(state, mentionedPositions)
-      state.highlightsHtmlBuffer.push(
-        '</span>'
-      )
-    }
-  }
-  addLineMeasureStaveVoicePositionScenarios(scenarios, 'volta starts before', [], 2, false, { measure: true })
-  scenarios['volta finishes after'] = {
-    action: ({ joinedTokenValuesWithRealDelimiters, state }) => {
-      state.highlightsHtmlBuffer.push(
-        `<span class="th" ref-id="">${joinedTokenValuesWithRealDelimiters}`
-      )
-      state.indexesInHighlightsHtmlBufferWhereWeShouldFillPositionPlaceholders.push(
-        state.highlightsHtmlBuffer.length - 1
-      )
-    },
-    actionWhenProgressionOfCommandsChanges: ({ state, fromMain: { mentionedPositions } }) => {
-      fillAllPlaceholdersInHighlightsHtmlBufferWithMentionedPositionsWhereItsNeeded(state, mentionedPositions)
-      state.highlightsHtmlBuffer.push(
-        '</span>'
-      )
-    }
-  }
-  addLineMeasureStaveVoicePositionScenarios(scenarios, 'volta finishes after', [], 2, false, { measure: true })
-  scenarios['volta starts at'] = {
-    action: ({ joinedTokenValuesWithRealDelimiters, state }) => {
-      state.highlightsHtmlBuffer.push(
-        `<span class="th" ref-id="">${joinedTokenValuesWithRealDelimiters}`
-      )
-      state.indexesInHighlightsHtmlBufferWhereWeShouldFillPositionPlaceholders.push(
-        state.highlightsHtmlBuffer.length - 1
-      )
-    },
-    actionWhenProgressionOfCommandsChanges: ({ state, fromMain: { mentionedPositions } }) => {
-      fillAllPlaceholdersInHighlightsHtmlBufferWithMentionedPositionsWhereItsNeeded(state, mentionedPositions)
-      state.highlightsHtmlBuffer.push(
-        '</span>'
-      )
-    }
-  }
-  addLineMeasureStaveVoicePositionScenarios(scenarios, 'volta starts at', [], 2, false, { measure: true })
-  scenarios['volta finishes at'] = {
-    action: ({ joinedTokenValuesWithRealDelimiters, state }) => {
-      state.highlightsHtmlBuffer.push(
-        `<span class="th" ref-id="">${joinedTokenValuesWithRealDelimiters}`
-      )
-      state.indexesInHighlightsHtmlBufferWhereWeShouldFillPositionPlaceholders.push(
-        state.highlightsHtmlBuffer.length - 1
-      )
-    },
-    actionWhenProgressionOfCommandsChanges: ({ state, fromMain: { mentionedPositions } }) => {
-      fillAllPlaceholdersInHighlightsHtmlBufferWithMentionedPositionsWhereItsNeeded(state, mentionedPositions)
-      state.highlightsHtmlBuffer.push(
-        '</span>'
-      )
-    }
-  }
-  addLineMeasureStaveVoicePositionScenarios(scenarios, 'volta finishes at', [], 2, false, { measure: true })
-  scenarios['volta vertical correction'] = {
-    action: ({ parserState, joinedTokenValuesWithRealDelimiters, state }) => {
-      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.verticalCorrectionHighlight.replace(
-        joinedTokenValuesWithRealDelimiters, (match) => {
-          return `<span class="th" ref-id="volta-mark-${parserState.numberOfVoltaMarks}">${match}</span>`
-        }
-      )
-      state.highlightsHtmlBuffer.push(
-        `<span class="th" ref-id="volta-mark-${parserState.numberOfVoltaMarks}">${joinedTokenValuesWithRealDelimitersWithHighlightedElement}</span>`
+        `<span class="th" ref-id="glissando-${parserState.numberOfGlissandos}">${joinedTokenValuesWithRealDelimitersWithHighlightedElement}</span>`
       )
     }
   }
   addLineMeasureStaveVoicePositionScenarios(
     scenarios,
-    'volta',
+    'glissando',
     [
-      'volta with text',
-      'volta starts before',
-      'volta starts before',
-      'volta finishes after',
-      'volta starts at',
-      'volta finishes at',
-      'volta vertical correction'
+      'glissando starts before unit',
+      'glissando finishes after unit',
+      'glissando starts at unit',
+      'glissando finishes at unit'
     ],
     1,
     true,
-    { line: true }
+    { line: true, measure: true, stave: true, voice: true }
   )
 }
