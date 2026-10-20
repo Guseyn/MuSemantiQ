@@ -8,6 +8,7 @@ function parserOptions ({ applyHighlighting, applyOnlyHighlightingWithoutRefIds,
     adapterNames: highlightsOnly
       ? [ 'highlight-without-ref-ids' ]
       : ((applyHighlighting ?? true) ? [ 'highlight' ] : []),
+    mapCharIndexes: (applyHighlighting ?? true),
     fonts: supportedFontNames || {
       'chord-letters': [ 'gentium plus', 'gothic a1' ],
       music: [ 'bravura', 'leland' ],

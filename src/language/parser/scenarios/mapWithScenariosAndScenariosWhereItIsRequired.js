@@ -14,6 +14,9 @@ export default function (parserScenarios) {
     } else {
       resultMap.common.push(scenarioName)
     }
+    if (scenario.leadingTokens) {
+      resultMap.hasLeadingTokens = true
+    }
   }
   return resultMap
 }
