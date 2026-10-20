@@ -39,6 +39,7 @@ import getLastGlissandoMark from '#msq/language/parser/scenarios/page-schema/get
 import getLastLyric from '#msq/language/parser/scenarios/page-schema/getLastLyric.js'
 import findKeySignatureThatUserMeant from '#msq/language/parser/scenarios/page-schema/findKeySignatureThatUserMeant.js'
 import noteDurations from '#msq/language/parser/scenarios/static-objects/noteDurations.js'
+import noteNames from '#msq/language/parser/scenarios/static-objects/noteNames.js'
 import stavePositions from '#msq/language/parser/scenarios/static-objects/stavePositions.js'
 import noteKeys from '#msq/language/parser/scenarios/static-objects/noteKeys.js'
 import breathMarks from '#msq/language/parser/scenarios/static-objects/breathMarks.js'
@@ -48,6 +49,15 @@ import ornamentKeys from '#msq/language/parser/scenarios/static-objects/ornament
 import copyScenarioWithDifferentRequiredCommandProgression from '#msq/language/parser/scenarios/copyScenarioWithDifferentRequiredCommandProgression.js'
 
 const defaultChordDuration = 1 / 4
+
+// Every first token that can start a `note` command: a note name (optionally with
+// an octave number), a duration (for `1/4 c`), or a rest word.
+const noteLeadingTokens = [
+  ...noteNames,
+  ...noteNames.flatMap((noteName) => [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ].map((octave) => noteName + octave)),
+  ...Object.keys(noteDurations),
+  'rest', 'top', 'middle', 'mid', 'bottom'
+]
 
 const addSimileUnitsToPageSchema = (parserState, simileMark, currentNumberOfMeasures, currentNumberOfStaves, currentNumberOfVoices, currentNumberOfUnits) => {
   for (let simileIndex = 0; simileIndex < simileMark.count; simileIndex++) {
@@ -63,6 +73,7 @@ const NOTE = 'note'
 
 export default function (scenarios) {
   scenarios['note'] = {
+    leadingTokens: noteLeadingTokens,
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       const itIsNote = (

@@ -5,6 +5,7 @@ import regexps from '#msq/language/parser/scenarios/static-objects/regexps.js'
 
 export default function (scenarios) {
   scenarios['midi setting name'] = {
+    leadingTokens: [ ...new Set(Object.keys(midiSettings).map((name) => name.split(' ')[0])) ],
     startsOnNewLine: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       return regexps.midiSettingName.test(tokenValues)

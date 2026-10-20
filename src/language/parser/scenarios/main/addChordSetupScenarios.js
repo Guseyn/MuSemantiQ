@@ -22,6 +22,7 @@ const defaultChordDuration = 1 / 4
 
 export default function (scenarios) {
   scenarios['chord'] = {
+    leadingTokens: [ 'chord', ...Object.keys(noteDurations) ],
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     startsOnNewLine: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {

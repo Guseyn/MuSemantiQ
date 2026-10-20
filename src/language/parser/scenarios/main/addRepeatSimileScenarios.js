@@ -50,6 +50,7 @@ const addSimileUnitsToPageSchema = (parserState) => {
 
 export default function (scenarios) {
   scenarios['repeat simile'] = {
+    leadingTokens: [ 'repeat', 'simile' ],
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     startsOnNewLine: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {

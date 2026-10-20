@@ -9,6 +9,7 @@ import clefs from '#msq/language/parser/scenarios/static-objects/clefs.js'
 
 export default function (scenarios) {
   scenarios['clef'] = {
+    leadingTokens: [ ...new Set(Object.keys(clefs).map((name) => name.split(' ')[0])) ],
     startsOnNewLine: true,
     considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {

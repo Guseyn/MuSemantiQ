@@ -5,6 +5,7 @@ import regexps from '#msq/language/parser/scenarios/static-objects/regexps.js'
 
 export default function (scenarios) {
   scenarios['page meta'] = {
+    leadingTokens: [ ...new Set(Object.keys(pageMeta).map((name) => name.split(' ')[0])) ],
     startsOnNewLine: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       return regexps.pageMeta.test(tokenValues) && currentToken.lastOnTheLine

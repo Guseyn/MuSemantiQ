@@ -18,6 +18,7 @@ const styleValueAction = (unitext, lineNumber, currentToken, tokenValues, joined
 
 export default function (scenarios) {
   scenarios['color style name'] = {
+    leadingTokens: [ ...new Set(Object.keys(configurableStyles).map((name) => name.split(' ')[0])) ],
     startsOnNewLine: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       return regexps.styleName.test(tokenValues) && regexps.color.test(tokenValues)
@@ -129,6 +130,7 @@ export default function (scenarios) {
   }
 
   scenarios['style name'] = {
+    leadingTokens: [ ...new Set(Object.keys(configurableStyles).map((name) => name.split(' ')[0])) ],
     startsOnNewLine: true,
     condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
       return regexps.styleName.test(tokenValues)
