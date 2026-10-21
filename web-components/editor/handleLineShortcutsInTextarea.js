@@ -56,6 +56,14 @@ export default (textarea) => {
     if (!theCommandKeyIsHeld(event) || event.altKey || event.shiftKey) {
       return
     }
+    /*
+    A take still in the air is settled first. The keys can be pressed faster
+    than the copy or cut comes back, and while the selection we made for it is
+    up the caret cannot be read: that selection starts at the beginning of the
+    taken line, right after the newline before it, and keeping it as where the
+    caret was would leave the caret there once the copy is put back.
+    */
+    putTheCaretBack()
     const key = event.key.toLowerCase()
     const nothingIsSelected = textarea.selectionStart === textarea.selectionEnd
 

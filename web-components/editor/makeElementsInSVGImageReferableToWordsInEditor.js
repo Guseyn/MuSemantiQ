@@ -1,6 +1,5 @@
 import createdRefRectHoveringRefElement from '#msq/web-components/editor/createdRefRectHoveringRefElement.js'
 import scoreSvgElement from '#msq/web-components/editor/scoreSvgElement.js'
-import notifyUserToUpdateSVGImage from '#msq/web-components/editor/notifyUserToUpdateSVGImage.js'
 import theCommandKeyIsHeld from '#msq/web-components/editor/theCommandKeyIsHeld.js'
 import placeCaretInTextareaBeforeSpan from '#msq/web-components/editor/placeCaretInTextareaBeforeSpan.js'
 import scrollToSpanInEditorIfItIsOutOfView from '#msq/web-components/editor/scrollToSpanInEditorIfItIsOutOfView.js'
@@ -52,8 +51,6 @@ export default (divUnderneathTextarea, textarea, lineNumbersColumn, editTabButto
                 }, 2800)
               }
             }
-          } else {
-            notifyUserToUpdateSVGImage(svgPlaceholder)
           }
           svgElement.removeChild(refRectHoveringRefElement)
           refRectHoveringRefElement = undefined

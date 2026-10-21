@@ -1,16 +1,8 @@
 import createdRefRectHoveringRefElement from '#msq/web-components/editor/createdRefRectHoveringRefElement.js'
 import scoreSvgElement from '#msq/web-components/editor/scoreSvgElement.js'
 import notifyUserToUpdateSVGImage from '#msq/web-components/editor/notifyUserToUpdateSVGImage.js'
-import showHintMessage from '#msq/web-components/editor/showHintMessage.js'
 import theCommandKeyIsHeld from '#msq/web-components/editor/theCommandKeyIsHeld.js'
 
-
-const showHintMessageThatUserShouldRerenderPreviewInOrderToNavigateBetweenTextInDivUnderneathTeextareaToElementsInSvg = (textarea) => {
-  showHintMessage(
-    textarea.initialParentElement,
-    'You have to re-render preview to match the changes in the text to be able to navigate.'
-  )
-}
 
 export default (divUnderneathTextarea, textarea, renderPreviewTabButton) => {
   const svgPlaceholder = textarea.initialParentElement
@@ -62,11 +54,6 @@ export default (divUnderneathTextarea, textarea, renderPreviewTabButton) => {
     if (theCommandKeyIsHeld(event)) {
       if (textarea.selectionStart === textarea.selectionEnd) {
         divUnderneathTextarea.style.zIndex = '2'
-        if (event.target.tagName.toLowerCase() === 'span') {
-          if (!textarea.isRenderedWithLatestInputText) {
-            showHintMessageThatUserShouldRerenderPreviewInOrderToNavigateBetweenTextInDivUnderneathTeextareaToElementsInSvg(textarea)
-          }
-        }
         if (event.target.hasAttribute('ref-id')) {
           event.target.addEventListener('click', refClickEventInEditor)
           if (textarea.refSpanThatHovered) {
