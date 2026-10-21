@@ -32,14 +32,16 @@ export default function parsedHighlights(text, progressionOfCommandsFromScenario
   let html = highlightsHtmlBuffer.join('')
   let charIndexes = mapOfCharIndexesWithProgressionOfCommandsFromScenarios
 
+  // One entry per character, as an array. The incremental reparse splices it
+  // by character index, and an object with one key per character costs a full
+  // walk to read back and a full rebuild to merge — on every keystroke.
+  const charIndexValues = Object.values(charIndexes)
   if (text[text.length - 1] === NEW_LINE) {
     if (html[html.length - 1] === NEW_LINE) {
       html = html.slice(0, -1)
     }
-    const charIndexValues = Object.values(charIndexes)
     charIndexValues.pop()
-    charIndexes = { ...charIndexValues }
   }
 
-  return { html, charIndexes, errors }
+  return { html, charIndexes: charIndexValues, errors }
 }
