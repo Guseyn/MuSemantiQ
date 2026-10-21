@@ -18,4 +18,7 @@ export default (divUnderneathTextarea, html) => {
 
   oldTextContainer.parentNode.replaceChild(newTextContainer, oldTextContainer)
   divUnderneathTextarea.textContainer = newTextContainer
+  // The nodes of the old layer are gone, and so are the lists of which of them
+  // sat on which line.
+  divUnderneathTextarea.nodesSplitInLines = null
 }

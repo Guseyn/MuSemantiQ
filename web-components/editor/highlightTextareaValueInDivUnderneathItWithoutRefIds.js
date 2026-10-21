@@ -131,7 +131,7 @@ const parentOfNodeClosestToDivUnderneathTextareaTextContainerOrDivUnderneathText
   return divUnderneathTextareaTextContainer
 }
 
-const updateHtmlHighlightsOnCertainLines = (textarea, divUnderneathTextarea, nodesSplittedInLines, firstLineIndex, secondLineIndex, parsedLinesWithHighlights) => {
+const updateHtmlHighlightsOnCertainLines = (textarea, divUnderneathTextarea, linesOfNodes, firstLineIndex, secondLineIndex, parsedLinesWithHighlights) => {
   const wrapperTemplateReplacement = document.createElement('template')
   wrapperTemplateReplacement.innerHTML = parsedLinesWithHighlights
   /*
@@ -146,7 +146,20 @@ const updateHtmlHighlightsOnCertainLines = (textarea, divUnderneathTextarea, nod
     wrapperTemplateReplacement.content.replaceChildren(document.createTextNode(plain))
   }
   const wrapperTemplateReplacementContentNode = document.importNode(wrapperTemplateReplacement.content, true)
-  let firstNodeOnFirstLine = nodesSplittedInLines[firstLineIndex] ? nodesSplittedInLines[firstLineIndex][0] : null
+  /*
+  Which nodes sit on which line is kept from keystroke to keystroke — walking
+  the whole layer to find that out is what this replaces. The lines just
+  rewritten are the only ones whose nodes changed, so they alone are put back
+  in the lists, and the nodes that take their place are lined up before the
+  fragment holding them is emptied into the document.
+  */
+  const linesOfNewNodes = nodesSplittedInLines(wrapperTemplateReplacementContentNode)
+  for (const lineOfNodes of linesOfNewNodes) {
+    for (const node of lineOfNodes) {
+      node.isAlreadyPushedToItsLine = false
+    }
+  }
+  let firstNodeOnFirstLine = linesOfNodes[firstLineIndex] ? linesOfNodes[firstLineIndex][0] : null
   if (firstNodeOnFirstLine) {
     parentOfNodeClosestToDivUnderneathTextareaTextContainerOrDivUnderneathTextareaTextContainerItSelf(
       divUnderneathTextarea.textContainer,
@@ -159,8 +172,8 @@ const updateHtmlHighlightsOnCertainLines = (textarea, divUnderneathTextarea, nod
     divUnderneathTextarea.textContainer.appendChild(wrapperTemplateReplacementContentNode)
   }
   for (let lineIndex = firstLineIndex; lineIndex <= secondLineIndex; lineIndex++) {
-    for (let nodeIndex = 0; nodeIndex < nodesSplittedInLines[lineIndex].length; nodeIndex++) {
-      const node = nodesSplittedInLines[lineIndex][nodeIndex]
+    for (let nodeIndex = 0; nodeIndex < linesOfNodes[lineIndex].length; nodeIndex++) {
+      const node = linesOfNodes[lineIndex][nodeIndex]
       if (node.nodeType === Node.TEXT_NODE) {
         node.remove()
       } else {
@@ -169,17 +182,20 @@ const updateHtmlHighlightsOnCertainLines = (textarea, divUnderneathTextarea, nod
     }
   }
   for (let lineIndex = 0; lineIndex < firstLineIndex; lineIndex++) {
-    for (let nodeIndex = 0; nodeIndex < nodesSplittedInLines[lineIndex].length; nodeIndex++) {
-      const node = nodesSplittedInLines[lineIndex][nodeIndex]
+    for (let nodeIndex = 0; nodeIndex < linesOfNodes[lineIndex].length; nodeIndex++) {
+      const node = linesOfNodes[lineIndex][nodeIndex]
       node.isAlreadyPushedToItsLine = false
     }
   }
-  for (let lineIndex = secondLineIndex + 1; lineIndex < nodesSplittedInLines.length; lineIndex++) {
-    for (let nodeIndex = 0; nodeIndex < nodesSplittedInLines[lineIndex].length; nodeIndex++) {
-      const node = nodesSplittedInLines[lineIndex][nodeIndex]
+  for (let lineIndex = secondLineIndex + 1; lineIndex < linesOfNodes.length; lineIndex++) {
+    for (let nodeIndex = 0; nodeIndex < linesOfNodes[lineIndex].length; nodeIndex++) {
+      const node = linesOfNodes[lineIndex][nodeIndex]
       node.isAlreadyPushedToItsLine = false
     }
   }
+  // Now that the old nodes are out and the kept ones are unmarked: the lists
+  // take the lines just written in place of the ones they held.
+  linesOfNodes.splice(firstLineIndex, secondLineIndex - firstLineIndex + 1, ...linesOfNewNodes)
   divUnderneathTextarea.scrollTop = textarea.scrollTop
 }
 
@@ -211,8 +227,9 @@ export default (divUnderneathTextarea, textarea, parseWholeTextInTextarea) => {
   const linesBeforeSelectionStart = linesBeforeSelectionStartIncludingTheLineWhereSelecetionStartsAt.slice(0, linesBeforeSelectionStartIncludingTheLineWhereSelecetionStartsAt.length - 1)
   const totalNumberOfLinesBeforeSelectionStart = linesBeforeSelectionStart.length
   const lineIndexWhereCaretIsOn = totalNumberOfLinesBeforeSelectionStart
-  const currentMapOfCharIndexesWithProgressionOfCommandsFromScenarios = textarea.mapOfCharIndexesWithProgressionOfCommandsFromScenarios
-  const currentMapValuesOfCharIndexesWithProgressionOfCommandsFromScenarios = Object.values(currentMapOfCharIndexesWithProgressionOfCommandsFromScenarios)
+  // One entry per character of the whole page, as an array — the part a
+  // keystroke reparses is spliced into it in place, further down.
+  const currentMapValuesOfCharIndexesWithProgressionOfCommandsFromScenarios = textarea.mapOfCharIndexesWithProgressionOfCommandsFromScenarios
   let firstLineIndexToParse = lineIndexWhereCaretIsOn
   const caretOnLineAtTheStart = (linesBeforeSelectionStartIncludingTheLineWhereSelecetionStartsAt[linesBeforeSelectionStartIncludingTheLineWhereSelecetionStartsAt.length - 1] === EMPTY_STRING)
   if (
@@ -224,7 +241,6 @@ export default (divUnderneathTextarea, textarea, parseWholeTextInTextarea) => {
   const firstCharIndexInParsedLines = numberOfCharsInEachLineInTextarea.slice(0, firstLineIndexToParse).reduce((numberOfCharsInLines, numberOfCharsInCurrentLine) => numberOfCharsInLines + numberOfCharsInCurrentLine, 0) - 1
   const lastLineIndexToParse = extendedLastLineIndexToParse(lineIndexWhereCaretIsOn, numberOfCharsInEachLineInTextarea, currentMapValuesOfCharIndexesWithProgressionOfCommandsFromScenarios)
 
-  const currentMapValuesOfCharIndexesWithProgressionOfCommandsFromScenariosBeforeFirstCharIndexInParsedLines = currentMapValuesOfCharIndexesWithProgressionOfCommandsFromScenarios.slice(0, firstCharIndexInParsedLines + 1)
   let currentMapValuesOfCharIndexesWithProgressionOfCommandsFromScenariosAfterLastCharIndexInParsedLines = []
   if (textareaValueSplittedInLines[lastLineIndexToParse + 1] !== undefined) {
     const linesBelowLastLineToParse = numberOfCharsInEachLineInTextarea.slice(lastLineIndexToParse + 1)
@@ -234,34 +250,37 @@ export default (divUnderneathTextarea, textarea, parseWholeTextInTextarea) => {
   }
   const linesToParse = textareaValueSplittedInLines.slice(firstLineIndexToParse, lastLineIndexToParse + 1)
   const joinedLinesToParse = linesToParse.join('')
-  const progressionRightBeforeLinesToParse = (currentMapValuesOfCharIndexesWithProgressionOfCommandsFromScenariosBeforeFirstCharIndexInParsedLines[currentMapValuesOfCharIndexesWithProgressionOfCommandsFromScenariosBeforeFirstCharIndexInParsedLines.length - 1] || []).slice()
+  const progressionRightBeforeLinesToParse = (currentMapValuesOfCharIndexesWithProgressionOfCommandsFromScenarios[firstCharIndexInParsedLines] || []).slice()
   const parsedLines = parsedHighlights(
     joinedLinesToParse,
     progressionRightBeforeLinesToParse,
     textarea.supportedFontNames
   )
 
-  const mapOfCharIndexesWithProgressionOfCommandsFromScenariosFromParsedLines = parsedLines.charIndexes
-  const mapValuesOfCharIndexesWithProgressionOfCommandsFromScenariosFromParsedLines = Object.values(mapOfCharIndexesWithProgressionOfCommandsFromScenariosFromParsedLines)
-  const updatedMapOfCharIndexesWithProgressionOfCommandsFromScenarios = {}
-  let valueIndex = 0
-  for (let index = 0; index < currentMapValuesOfCharIndexesWithProgressionOfCommandsFromScenariosBeforeFirstCharIndexInParsedLines.length; index++, valueIndex++) {
-    updatedMapOfCharIndexesWithProgressionOfCommandsFromScenarios[valueIndex] = currentMapValuesOfCharIndexesWithProgressionOfCommandsFromScenariosBeforeFirstCharIndexInParsedLines[index]
-  }
-  for (let index = 0; index < mapValuesOfCharIndexesWithProgressionOfCommandsFromScenariosFromParsedLines.length; index++, valueIndex++) {
-    updatedMapOfCharIndexesWithProgressionOfCommandsFromScenarios[valueIndex] = mapValuesOfCharIndexesWithProgressionOfCommandsFromScenariosFromParsedLines[index]
-  }
-  for (let index = 0; index < currentMapValuesOfCharIndexesWithProgressionOfCommandsFromScenariosAfterLastCharIndexInParsedLines.length; index++, valueIndex++) {
-    updatedMapOfCharIndexesWithProgressionOfCommandsFromScenarios[valueIndex] = currentMapValuesOfCharIndexesWithProgressionOfCommandsFromScenariosAfterLastCharIndexInParsedLines[index]
-  }
-  textarea.mapOfCharIndexesWithProgressionOfCommandsFromScenarios = updatedMapOfCharIndexesWithProgressionOfCommandsFromScenarios
+  /*
+  One entry per character of the whole page, and it used to be rebuilt in full
+  on every keystroke — read back through Object.values() and written into a new
+  object, twice over. The lines just reparsed take the place of the range of
+  characters they stand for, in the array that is already there.
+  */
+  const replacedFrom = firstCharIndexInParsedLines + 1
+  const replacedTo = currentMapValuesOfCharIndexesWithProgressionOfCommandsFromScenarios.length -
+    currentMapValuesOfCharIndexesWithProgressionOfCommandsFromScenariosAfterLastCharIndexInParsedLines.length
+  currentMapValuesOfCharIndexesWithProgressionOfCommandsFromScenarios.splice(
+    replacedFrom,
+    replacedTo - replacedFrom,
+    ...parsedLines.charIndexes
+  )
   const parsedLinesWithHighlights = parsedLines.html
 
-  const nodesSplittedInLinesValue = nodesSplittedInLines(divUnderneathTextarea.textContainer)
+  // Which nodes sit on which line is kept on the layer between keystrokes; a
+  // walk over all of them is the first one's to pay for.
+  const linesOfNodes = divUnderneathTextarea.nodesSplitInLines ||
+    (divUnderneathTextarea.nodesSplitInLines = nodesSplittedInLines(divUnderneathTextarea.textContainer))
   updateHtmlHighlightsOnCertainLines(
     textarea,
     divUnderneathTextarea,
-    nodesSplittedInLinesValue,
+    linesOfNodes,
     firstLineIndexToParse,
     lastLineIndexToParse - numberOfLinesInTextareaAddedOrRemoved,
     parsedLinesWithHighlights
