@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.8 (2026-10-21)
+
+editor: keep the per-keystroke highlighting incremental
+
 ## 1.0.7 (2026-10-20)
 
 Parser for the language is optimized
