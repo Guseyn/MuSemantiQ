@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.9 (2026-10-22)
+
+- Improved UX for highlighting
+- MIDI regenarion on page reorder
+
 ## 1.0.8 (2026-10-21)
 
 editor: keep the per-keystroke highlighting incremental
