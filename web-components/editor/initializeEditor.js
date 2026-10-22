@@ -15,6 +15,7 @@ import fillLineNumbersColumnWhenTextareaChangesItsInput from '#msq/web-component
 import fillLineNumbersColumn from '#msq/web-components/editor/fillLineNumbersColumn.js'
 import highlightLineNumberWhenCaretIsOnIt from '#msq/web-components/editor/highlightLineNumberWhenCaretIsOnIt.js'
 import showAutocompleteListViewOnTypingIfNeeded from '#msq/web-components/editor/showAutocompleteListViewOnTypingIfNeeded.js'
+import insertAnIndentWhenTabIsPressed from '#msq/web-components/editor/insertAnIndentWhenTabIsPressed.js'
 import makeWordsInEditorReferableToElementsInSVGImage from '#msq/web-components/editor/makeWordsInEditorReferableToElementsInSVGImage.js'
 import makeElementsInSVGImageReferableToWordsInEditor from '#msq/web-components/editor/makeElementsInSVGImageReferableToWordsInEditor.js'
 import adjustUnitexareaForUserScreen from '#msq/web-components/editor/adjustUnitexareaForUserScreen.js'
@@ -78,6 +79,7 @@ export default function initializeEditor({
   fillLineNumbersColumn(lineNumbersColumn, textarea, divUnderneathTextarea)
   highlightLineNumberWhenCaretIsOnIt(shadowHost.shadowRoot, textarea, lineNumbersColumn)
   showAutocompleteListViewOnTypingIfNeeded(autocompleteListView, textarea, divUnderneathTextarea)
+  insertAnIndentWhenTabIsPressed(textarea)
   makeWordsInEditorReferableToElementsInSVGImage(divUnderneathTextarea, textarea, previewButton)
   makeElementsInSVGImageReferableToWordsInEditor(divUnderneathTextarea, textarea, lineNumbersColumn, readButton)
 

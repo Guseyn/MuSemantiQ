@@ -199,7 +199,7 @@ const updateHtmlHighlightsOnCertainLines = (textarea, divUnderneathTextarea, lin
   divUnderneathTextarea.scrollTop = textarea.scrollTop
 }
 
-export default (divUnderneathTextarea, textarea, parseWholeTextInTextarea) => {
+const applyTheColours = (divUnderneathTextarea, textarea, parseWholeTextInTextarea) => {
   const textareaValue = adjustTextareaValueToKeepScrollingAlignedWhenItsValueEndsWithNewline(
     textarea.value
   )
@@ -287,4 +287,63 @@ export default (divUnderneathTextarea, textarea, parseWholeTextInTextarea) => {
   )
 
   textarea.numberOfLinesInTextarea = totalNumberOfLines
+}
+
+const escapeForTheLayer = (text) => text
+  .replace(/&/g, '&amp;')
+  .replace(/</g, '&lt;')
+  .replace(/>/g, '&gt;')
+
+/*
+The text cannot wait for the parse; the colours can.
+
+What a change touched goes up in the layer in the default colour right away —
+the layer under the textarea has to hold the same characters as the textarea,
+or what you read and what you type drift apart — and the parse colours those
+same lines on the next frame. The keystroke never waits for the parse.
+*/
+const showTheChangedTextWithoutColours = (divUnderneathTextarea, textarea, parseWholeTextInTextarea) => {
+  if (parseWholeTextInTextarea) {
+    refreshDivUnderneathTextareaWithNewHtml(divUnderneathTextarea, escapeForTheLayer(textarea.value))
+    divUnderneathTextarea.nodesSplitInLines = null
+    return
+  }
+  const linesOfNodes = divUnderneathTextarea.nodesSplitInLines ||
+    (divUnderneathTextarea.nodesSplitInLines = nodesSplittedInLines(divUnderneathTextarea.textContainer))
+  const lines = textarea.value.split(NEW_LINE)
+  const caretLine = textarea.value.slice(0, textarea.selectionStart).split(NEW_LINE).length - 1
+  const addedLines = lines.length - (textarea.numberOfLinesInTextarea || lines.length)
+  const firstLine = Math.max(0, caretLine - 1)
+  const lastLine = Math.min(lines.length - 1, caretLine + Math.max(0, addedLines))
+  updateHtmlHighlightsOnCertainLines(
+    textarea,
+    divUnderneathTextarea,
+    linesOfNodes,
+    firstLine,
+    lastLine,
+    escapeForTheLayer(lines.slice(firstLine, lastLine + 1).join(NEW_LINE))
+  )
+}
+
+export default (divUnderneathTextarea, textarea, parseWholeTextInTextarea) => {
+  showTheChangedTextWithoutColours(divUnderneathTextarea, textarea, parseWholeTextInTextarea)
+  /*
+  The parse and its colours come on the next frame. A change that lands before
+  that frame joins it, and two together are more than one character: the
+  incremental parse splices a per-character map that is in step with exactly
+  one change, so a burst is coloured by the full parse, which rebuilds that
+  map.
+  */
+  const job = {
+    parseWholeTextInTextarea: parseWholeTextInTextarea ||
+      Boolean(textarea.theColoursToApplyIsPending)
+  }
+  textarea.theColoursToApplyIsPending = job
+  requestAnimationFrame(() => {
+    if (textarea.theColoursToApplyIsPending !== job) {
+      return
+    }
+    textarea.theColoursToApplyIsPending = null
+    applyTheColours(divUnderneathTextarea, textarea, job.parseWholeTextInTextarea)
+  })
 }
