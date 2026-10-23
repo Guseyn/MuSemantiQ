@@ -7,6 +7,9 @@
   <link rel="preload" href="/html/static-templates/dev-tools-template.html" as="fetch" crossorigin="anonymous">
   <link rel="stylesheet" href="/css/e-ui.css">
   <link rel="stylesheet" href="/css/dev-tools.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">
   <script type="importmap">
     {
       "imports": {
@@ -58,14 +61,9 @@
       font-size: var(--e-font-size-sm);
       white-space: nowrap;
     }
-    button[data-icon-button] svg {
-      width: 1.05rem;
-      height: 1.05rem;
-      fill: none;
-      stroke: currentColor;
-      stroke-width: 1.6;
-      stroke-linecap: round;
-      stroke-linejoin: round;
+    button[data-icon-button] .material-symbols-outlined {
+      font-size: 1.05rem;
+      font-variation-settings: "FILL" 0, "wght" 300, "GRAD" 0, "opsz" 24;
     }
     table[is="e-table"] td { vertical-align: middle; }
     /* An empty table says so in the middle of itself, not underneath. */
@@ -545,13 +543,7 @@
                             }
                             showError(removed.body.error || `The server answered ${removed.statusCode}.`)
                           ">
-                          <svg viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M4 7 h16"></path>
-                            <path d="M9.5 7 V5 h5 v2"></path>
-                            <path d="M6 7 l1 13 h10 l1 -13"></path>
-                            <path d="M10 11 v6"></path>
-                            <path d="M14 11 v6"></path>
-                          </svg>
+                          <span class="material-symbols-outlined" aria-hidden="true">delete</span>
                           <span>Delete the set</span>
                         </button>
                       </form>
@@ -599,13 +591,7 @@
                               }
                               showError(removed.body.error || `The server answered ${removed.statusCode}.`)
                             ">
-                            <svg viewBox="0 0 24 24" aria-hidden="true">
-                              <path d="M4 7 h16"></path>
-                              <path d="M9.5 7 V5 h5 v2"></path>
-                              <path d="M6 7 l1 13 h10 l1 -13"></path>
-                              <path d="M10 11 v6"></path>
-                              <path d="M14 11 v6"></path>
-                            </svg>
+                            <span class="material-symbols-outlined" aria-hidden="true">delete</span>
                           </button>
                         </form>
                       </td>

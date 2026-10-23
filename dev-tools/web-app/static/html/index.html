@@ -7,6 +7,9 @@
   <link rel="preload" href="/html/static-templates/dev-tools-template.html" as="fetch" crossorigin="anonymous">
   <link rel="stylesheet" href="/css/e-ui.css">
   <link rel="stylesheet" href="/css/dev-tools.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">
   <script type="importmap">
     {
       "imports": {
@@ -70,9 +73,12 @@
       place-items: center;
       width: 2.75rem;
       height: 2.75rem;
+      border: 1px solid var(--e-primary);
       border-radius: var(--e-radius-md);
       background: var(--e-primary-transparent-accent-bg);
       color: var(--e-primary);
+      font-size: 1.5rem;
+      font-variation-settings: "FILL" 0, "wght" 300, "GRAD" 0, "opsz" 24;
     }
     a[data-panel] b {
       display: block;
@@ -83,20 +89,6 @@
       font-size: var(--e-font-size-sm);
       line-height: 1.45;
     }
-    /*
-    One drawing for all of them: a 24-unit square, stroked in the current colour,
-    nothing filled but the noteheads. Anything else would read as another family.
-    */
-    a[data-panel] svg {
-      width: 1.5rem;
-      height: 1.5rem;
-      fill: none;
-      stroke: currentColor;
-      stroke-width: 1.6;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-    a[data-panel] [data-note] { fill: currentColor; stroke: none; }
   </style>
 </head>
 <body>
@@ -116,16 +108,7 @@
     <div data-panels data-margin-top="lg">
 
       <a data-panel href="/html/font-viewer.html">
-        <span data-icon>
-          <!-- a glyph under a lens: one character traced out of a font -->
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <circle cx="10.5" cy="10.5" r="7"></circle>
-            <path d="M15.6 15.6 L21 21"></path>
-            <ellipse data-note cx="9.6" cy="12.4" rx="2.2" ry="1.6"
-              transform="rotate(-20 8.8 12.4)"></ellipse>
-            <path d="M10.9 11.9 V6"></path>
-          </svg>
-        </span>
+        <span data-icon class="material-symbols-outlined" aria-hidden="true">draw</span>
         <span>
           <b is="e-b">Font viewer</b>
           <span data-says>
@@ -136,16 +119,7 @@
       </a>
 
       <a data-panel href="/html/test-viewer.html">
-        <span data-icon>
-          <!-- two panes and a tick: a run held against its baseline -->
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <rect x="2.5" y="4.5" width="8" height="15" rx="1.5"></rect>
-            <rect x="13.5" y="4.5" width="8" height="15" rx="1.5"></rect>
-            <path d="M5 9.5 H8"></path>
-            <path d="M5 12.5 H8"></path>
-            <path d="M15.3 12.2 L17 13.9 L19.9 10.6"></path>
-          </svg>
-        </span>
+        <span data-icon class="material-symbols-outlined" aria-hidden="true">fact_check</span>
         <span>
           <b is="e-b">Test viewer</b>
           <span data-says>
@@ -157,18 +131,7 @@
 
 
       <a data-panel href="/html/font-generator.html">
-        <span data-icon>
-          <!-- a font file coming down onto a stave -->
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <rect x="5" y="2.5" width="14" height="9" rx="1.5"></rect>
-            <path d="M9.4 9 L12 4.6 L14.6 9"></path>
-            <path d="M10.4 7.4 h3.2"></path>
-            <path d="M12 13 V16.4"></path>
-            <path d="M9.9 14.4 L12 16.5 L14.1 14.4"></path>
-            <path d="M3.5 19 H20.5"></path>
-            <path d="M3.5 21.5 H20.5"></path>
-          </svg>
-        </span>
+        <span data-icon class="material-symbols-outlined" aria-hidden="true">font_download</span>
         <span>
           <b is="e-b">Music font generator</b>
           <span data-says>
@@ -179,17 +142,7 @@
       </a>
 
       <a data-panel href="/html/magenta-sound-font-generator.html">
-        <span data-icon>
-          <!-- a note, and the levels it is rendered into -->
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <ellipse data-note cx="6.2" cy="16.4" rx="2.5" ry="1.9"
-              transform="rotate(-20 5.6 16.4)"></ellipse>
-            <path d="M8 15.9 V4.5"></path>
-            <path d="M12.5 10.5 V17.5"></path>
-            <path d="M16 7 V21"></path>
-            <path d="M19.5 12 V16"></path>
-          </svg>
-        </span>
+        <span data-icon class="material-symbols-outlined" aria-hidden="true">graphic_eq</span>
         <span>
           <b is="e-b">Magenta sound font generator</b>
           <span data-says>

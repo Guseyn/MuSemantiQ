@@ -427,43 +427,6 @@ are drawn at the diagram's own size and scroll with it.
   to { stroke-dashoffset: 0; }
 }
 
-/* ── The tones of the drawn icons ────────────────────────────────────── */
-
-/*
-The icons are the one place the page uses more colour than its accent: five
-tones, so they read as different things at a glance. Each drawn icon sits on a
-soft tile of its tone, and the shapes marked data-fill take a tint of it
-(data-solid ones the tone itself), so an icon is two-tone rather than an
-outline. The tones are borrowed where the product has one: crimson is a note
-while it is sounding, amber the editor's navigation box.
-*/
-[data-tone="crimson"] { --tone: #c40233; }
-[data-tone="green"]   { --tone: #2e8b57; }
-[data-tone="teal"]    { --tone: #1f7a8c; }
-[data-tone="violet"]  { --tone: #6d5bd0; }
-[data-tone="amber"]   { --tone: #c98a0b; }
-
-[data-art][data-tone] {
-  box-sizing: border-box;
-  width: 3.75rem;
-  height: 3.75rem;
-  padding: 0.3rem;
-  border-radius: 1rem;
-  color: var(--tone);
-  /* The tile takes room from the drawing, so its lines are drawn heavier */
-  stroke-width: 2.75;
-  background-color: color-mix(in srgb, var(--tone) 11%, var(--surface));
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tone) 18%, transparent);
-}
-
-[data-art][data-tone] [data-fill] {
-  fill: color-mix(in srgb, var(--tone) 28%, transparent);
-}
-
-[data-art][data-tone] [data-solid] {
-  fill: var(--tone);
-}
-
 /* ── The lists with material icons ───────────────────────────────────── */
 
 /*
@@ -500,6 +463,17 @@ the one colour the docs' diagrams use for every icon and arrow of their own.
   font-variation-settings: "FILL" 0, "wght" 300, "GRAD" 0, "opsz" 24;
 }
 
+/* The list icons sit on a bordered tile of their own, no fill. */
+[data-icon-list] > li > [data-icon] {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 1px solid var(--rule-strong);
+  border-radius: 0.75rem;
+  font-size: 1.6rem;
+}
+
 [data-icon-text] h3 {
   margin: 0 0 0.35rem;
 }
@@ -529,7 +503,13 @@ the one colour the docs' diagrams use for every icon and arrow of their own.
 }
 
 [data-icon-sublist] [data-icon] {
-  font-size: 1.35rem;
+  display: grid;
+  place-items: center;
+  width: 2.1rem;
+  height: 2.1rem;
+  border: 1px solid var(--rule-strong);
+  border-radius: 0.6rem;
+  font-size: 1.15rem;
 }
 
 /* ── Code ────────────────────────────────────────────────────────────── */
@@ -827,11 +807,14 @@ their own inside, smaller, as pills of code.
   background-color: var(--surface);
 }
 
-[data-tool] [data-art][data-tone] {
-  flex: none;
-  width: 2.75rem;
-  height: 2.75rem;
+[data-tool] [data-icon] {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 1px solid var(--rule-strong);
   border-radius: 0.75rem;
+  font-size: 1.4rem;
 }
 
 [data-tool] h4 {
