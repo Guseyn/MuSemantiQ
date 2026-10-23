@@ -343,12 +343,12 @@ next out of it.
   grid-template-rows: repeat(7, auto);
   grid-template-areas:
     "words custom styles ."
-    "words schema styles  svg"
-    "words miset  styles  svg"
-    "words hilite styles  midi"
-    "words comm   styles  edit"
-    "words errs   styles  acomp"
-    "words cmap   styles  .";
+    "words schema .      svg"
+    "words miset  .      midi"
+    "words hilite .      edit"
+    "words comm   .      acomp"
+    "words errs   .      ."
+    "words cmap   .      .";
   gap: 1.15rem 2.75rem;
   align-items: center;
   justify-items: start;
@@ -365,9 +365,7 @@ next out of it.
 
 [data-pipeline] [data-block="words"]           { grid-area: words; }
 [data-pipeline] [data-block="custom-styles"]   { grid-area: custom; }
-/* The third stage sits in the middle of the lane column, with the same gap
-   above it as below it. */
-[data-pipeline] [data-block="page-styles"]     { grid-area: styles; align-self: center; }
+[data-pipeline] [data-block="page-styles"]     { grid-area: styles; }
 [data-pipeline] [data-block="page-schema"]     { grid-area: schema; }
 [data-pipeline] [data-block="midi-settings"]   { grid-area: miset; }
 [data-pipeline] [data-block="highlights-buffer"] { grid-area: hilite; }
