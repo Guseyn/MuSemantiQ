@@ -10,6 +10,12 @@
     >
     <meta name="color-scheme" content="light">
     <link rel="stylesheet" href="/css/landing.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+    >
     <script type="importmap">
       {
         "imports": {
@@ -33,13 +39,14 @@
       import '/js/landing/landing-screen.js'
       import '/js/landing/landing-rail.js'
       import '/js/landing/landing-phrase.js'
-      import '/js/landing/landing-carousel.js'
-      import '/js/landing/landing-flow.js'
       import '/js/landing/landing-scroll-hint.js'
       import '/js/landing/landing-tabs.js'
 
       // Every code block's "copy" link (its ::before).
       import '#docs/copy-code.js'
+
+      // The one diagram of "How it works": the arrows between its blocks.
+      import '/js/landing/landing-diagram.js'
 
       import showdownHighlight from '#ehtml/showdown/extensions/highlight.js'
       import msqExtensions from '/js/showdown-extensions/msqExtensions.js'
@@ -247,159 +254,66 @@
         <section is="landing-screen" data-screen id="features" data-number="03" data-label="What you get">
           <div data-inner data-wide>
             <h2 data-reveal>What you get</h2>
-            <div is="landing-carousel" data-carousel data-reveal style="--d: 80ms">
-              <div data-carousel-viewport>
-                <ul data-cards>
-                  <li data-card>
-                    <svg data-art data-tone="crimson" viewBox="0 0 64 64" aria-hidden="true">
-                      <path data-fill d="M32 13l4.5 14.5L51 32l-14.5 4.5L32 51l-4.5-14.5L13 32l14.5-4.5z"/>
-                      <path d="M13 51L51 13"/>
-                    </svg>
-                    <h3>Deterministic</h3>
-                    <p>
-                      On each input, there is one exact output:
-                      <ul>
-                        <li>No AI</li>
-                        <li>No Large Language Models</li>
-                        <li>No Machine Learning</li>
-                        <li>You can see errors in input</li>
-                        <li>Structured, intuitive, powerful and elegant language</li>
-                      </ul>
-                    </p>
-                  </li>
-
-                  <li data-card>
-                    <svg data-art data-tone="green" viewBox="0 0 64 64" aria-hidden="true">
-                      <rect data-fill x="14" y="30" width="36" height="24" rx="2"/>
-                      <path d="M24 30v-8a8 8 0 0 1 16 0"/>
-                      <path d="M32 39v6"/>
-                    </svg>
-                    <h3>Free</h3>
-                    <p>
-                      The whole toolkit is opensourced:
-                      <ul>
-                        <li>
-                          Lanaguage and parser
-                        </li>
-                        <li>
-                          Powerful SVG rendering engine (drawer)
-                        </li>
-                        <li>
-                          Midi Generator
-                        </li>
-                        <li>
-                          Low level API
-                        </li>
-                        <li>
-                          Native web components:
-                          <ul>
-                            <li>SVG viewer</li>
-                            <li>Midi Player</li>
-                            <li>Editor with autocompletion, language highlighting, navigation between the score and text</li>
-                          </ul>
-                        </li>
-                        <li>
-                          Showdown extensions for Markdown
-                        </li>
-                        <li>
-                          CLI app
-                        </li>
-                        <li>
-                          Dev tools:
-                          <ul>
-                            <li>
-                              Music Font Generator (using <a data-link href="https://www.w3.org/2021/03/smufl14/">SMuFL</a>)
-                            </li>
-                            <li>
-                              Sound Font Generator (for <a data-link href="https://github.com/magenta/magenta-js">Magenta</a>)
-                            </li>
-                          </ul>
-                        </li>
-                      </ul>
-                    </p>
-                  </li>
-
-                  <li data-card>
-                    <svg data-art data-tone="teal" viewBox="8 20 40 40" style="stroke-width: 1.75" aria-hidden="true">
-                      <rect data-fill x="10" y="22" width="16" height="16"/>
-                      <rect data-fill x="30" y="22" width="16" height="16"/>
-                      <rect data-fill x="10" y="42" width="16" height="16"/>
-                      <rect x="30" y="42" width="16" height="16" stroke-dasharray="3 3"/>
-                      <path d="M38 47v6M35 50h6"/>
-                    </svg>
-                    <h3>Extendable</h3>
-                    <p>
-                      You can extend the toolkit:
-                      <ul>
-                        <li>
-                          Add/adjust your own fonts
-                        </li>
-                        <li>
-                          Generate your own sound fonts
-                        </li>
-                        <li>
-                          Embed scores in your web pages
-                        </li>
-                        <li>
-                          Build programs on top of MSQ
-                        </li>
-                      </ul>
-                    </p>
-                  </li>
-
-                  <li data-card>
-                    <svg data-art data-tone="violet" viewBox="0 0 64 64" aria-hidden="true">
-                      <path d="M12 22h40M12 32h40M12 42h40"/>
-                      <circle data-solid cx="24" cy="22" r="4"/>
-                      <circle data-solid cx="40" cy="32" r="4"/>
-                      <circle data-solid cx="19" cy="42" r="4"/>
-                    </svg>
-                    <h3>Customizable</h3>
-                    <p>
-                      You have control over pretty much everything:
-                      <ul>
-                        <li>
-                          How the page looks: size, background and foreground colors
-                        </li>
-                        <li>
-                          Over other 40 different style properties
-                        </li>
-                        <li>
-                          Pick/generate any graphical fonts for music glyphs, text and chord letters
-                        </li>
-                        <li>
-                          Pick/generate any soundfont you want
-                        </li>
-                      </ul>
-                    </p>
-                  </li>
-
-                  <li data-card>
-                    <svg data-art data-tone="amber" viewBox="6 12 48 48" style="stroke-width: 2" aria-hidden="true">
-                      <path d="M8 22h16M8 28h12M8 34h16M8 40h10"/>
-                      <ellipse data-solid cx="46" cy="40" rx="6" ry="4.5" transform="rotate(-20 46 40)"/>
-                      <path d="M52 39V20"/>
-                      <path d="M8 54h44M8 54l3.5-3.5M8 54l3.5 3.5M52 54l-3.5-3.5M52 54l-3.5 3.5"/>
-                    </svg>
-                    <h3>Navigable</h3>
-                    <p>
-                      You score is connected to its text description. You will never get lost, you never have to search for the line you want to change. Hold <b>⌘</b> or <b>Ctrl</b> and <b>click</b> a word to see what it drew, or click a note to find the words that drew it.<br>
-                      Similarly, you have connection between notes in your score and the MIDI player's progress bar.
-                    </p>
-                  </li>
-                </ul>
-              </div>
-
-              <div data-carousel-controls>
-                <button type="button" data-carousel-prev aria-label="Previous">
-                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
-                </button>
-                <span data-carousel-count aria-live="polite"></span>
-                <button type="button" data-carousel-next aria-label="Next">
-                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
-                </button>
-              </div>
-            </div>
+            <ul data-icon-list>
+              <li data-reveal style="--d: 60ms">
+                <span data-icon class="material-symbols-outlined" aria-hidden="true">translate</span>
+                <div data-icon-text>
+                  <h3>Language</h3>
+                  <p>One command a line, structured and readable, and every error visible in the input.</p>
+                </div>
+              </li>
+              <li data-reveal style="--d: 120ms">
+                <span data-icon class="material-symbols-outlined" aria-hidden="true">api</span>
+                <div data-icon-text>
+                  <h3>Low level API</h3>
+                  <p>Plain JavaScript modules: set up the fonts once, parse a page, then make an SVG and a MIDI file from it.</p>
+                </div>
+              </li>
+              <li data-reveal style="--d: 180ms">
+                <span data-icon class="material-symbols-outlined" aria-hidden="true">image</span>
+                <div data-icon-text>
+                  <h3>SVG Renderer</h3>
+                  <p>One engraved score per page, as an SVG that every browser can draw.</p>
+                </div>
+              </li>
+              <li data-reveal style="--d: 240ms">
+                <span data-icon class="material-symbols-outlined" aria-hidden="true">widgets</span>
+                <div data-icon-text>
+                  <h3>Native web components</h3>
+                  <p>The score, the player and the editor as elements: no build step, and nothing to configure but the fonts.</p>
+                </div>
+              </li>
+              <li data-reveal style="--d: 300ms">
+                <span data-icon class="material-symbols-outlined" aria-hidden="true">extension</span>
+                <div data-icon-text>
+                  <h3>Showdown extensions</h3>
+                  <p>MSQ inside a markdown document becomes a score, highlighted like the editor’s own text.</p>
+                </div>
+              </li>
+              <li data-reveal style="--d: 360ms">
+                <span data-icon class="material-symbols-outlined" aria-hidden="true">terminal</span>
+                <div data-icon-text>
+                  <h3>CLI app</h3>
+                  <p>The whole pipeline from a terminal: a file, some text or a pipe in; SVG, MIDI and page schemas out.</p>
+                </div>
+              </li>
+              <li data-reveal style="--d: 420ms">
+                <span data-icon class="material-symbols-outlined" aria-hidden="true">construction</span>
+                <div data-icon-text>
+                  <h3>Dev tools</h3>
+                  <ul data-icon-sublist>
+                    <li>
+                      <span data-icon class="material-symbols-outlined" aria-hidden="true">music_note</span>
+                      <span>Music Font Generator (using SMuFL)</span>
+                    </li>
+                    <li>
+                      <span data-icon class="material-symbols-outlined" aria-hidden="true">graphic_eq</span>
+                      <span>Sound Font Generator (for Magenta)</span>
+                    </li>
+                  </ul>
+                </div>
+              </li>
+            </ul>
           </div>
         </section>
 
@@ -408,192 +322,69 @@
           <div data-inner data-widest>
             <h2 data-reveal>How it works</h2>
             <p data-reveal style="--d: 60ms">
-              One small page, all the way through. Pick a step to see what the engine really makes of it.
+              One small page, all the way through: words in, and a score, a performance and the editor’s colours out.
             </p>
-            <div is="landing-flow" data-flow-layout>
-              <ol data-flow aria-label="The pipeline">
-                <li data-stage="words">
-                  <button type="button" data-stage-button data-output="words">
-                    <svg data-stage-art viewBox="0 -960 960 960" aria-hidden="true"><path d="M120-240v-80h480v80H120Zm0-200v-80h720v80H120Zm0-200v-80h720v80H120Z"/></svg>
-                    <span>Words</span>
-                  </button>
-                </li>
-                <li data-stage="structures" data-branches>
-                  <span data-branches-label>Intermediate structures</span>
-                  <button type="button" data-stage-button data-output="page-schema">
-                    <svg data-stage-art viewBox="0 -960 960 960" aria-hidden="true"><path d="M560-160v-80h120q17 0 28.5-11.5T720-280v-80q0-38 22-69t58-44v-14q-36-13-58-44t-22-69v-80q0-17-11.5-28.5T680-720H560v-80h120q50 0 85 35t35 85v80q0 17 11.5 28.5T840-560h40v160h-40q-17 0-28.5 11.5T800-360v80q0 50-35 85t-85 35H560Zm-280 0q-50 0-85-35t-35-85v-80q0-17-11.5-28.5T120-400H80v-160h40q17 0 28.5-11.5T160-600v-80q0-50 35-85t85-35h120v80H280q-17 0-28.5 11.5T240-680v80q0 38-22 69t-58 44v14q36 13 58 44t22 69v80q0 17 11.5 28.5T280-240h120v80H280Z"/></svg>
-                    <span>Page schema</span>
-                  </button>
-                  <button type="button" data-stage-button data-output="custom-styles">
-                    <svg data-stage-art viewBox="0 -960 960 960" aria-hidden="true"><path d="M480-80q-82 0-155-31.5t-127.5-86Q143-252 111.5-325T80-480q0-83 32.5-156t88-127Q256-817 330-848.5T488-880q80 0 151 27.5t124.5 76q53.5 48.5 85 115T880-518q0 115-70 176.5T640-280h-74q-9 0-12.5 5t-3.5 11q0 12 15 34.5t15 51.5q0 50-27.5 74T480-80Zm0-400Zm-220 40q26 0 43-17t17-43q0-26-17-43t-43-17q-26 0-43 17t-17 43q0 26 17 43t43 17Zm120-160q26 0 43-17t17-43q0-26-17-43t-43-17q-26 0-43 17t-17 43q0 26 17 43t43 17Zm200 0q26 0 43-17t17-43q0-26-17-43t-43-17q-26 0-43 17t-17 43q0 26 17 43t43 17Zm120 160q26 0 43-17t17-43q0-26-17-43t-43-17q-26 0-43 17t-17 43q0 26 17 43t43 17ZM480-160q9 0 14.5-5t5.5-13q0-14-15-33t-15-57q0-42 29-67t71-25h70q66 0 113-38.5T800-518q0-121-92.5-201.5T488-800q-136 0-232 93t-96 227q0 133 93.5 226.5T480-160Z"/></svg>
-                    <span>Custom styles</span>
-                  </button>
-                  <button type="button" data-stage-button data-output="midi-settings">
-                    <svg data-stage-art viewBox="0 -960 960 960" aria-hidden="true"><path d="M440-120v-240h80v80h320v80H520v80h-80Zm-320-80v-80h240v80H120Zm160-160v-80H120v-80h160v-80h80v240h-80Zm160-80v-80h400v80H440Zm160-160v-240h80v80h160v80H680v80h-80Zm-480-80v-80h400v80H120Z"/></svg>
-                    <span>MIDI settings</span>
-                  </button>
-                  <button type="button" data-stage-button data-output="comments">
-                    <svg data-stage-art viewBox="0 -960 960 960" aria-hidden="true"><path d="M160-400v-80h280v80H160Zm0-160v-80h440v80H160Zm0-160v-80h440v80H160Zm360 560v-123l221-220q9-9 20-13t22-4q12 0 23 4.5t20 13.5l37 37q8 9 12.5 20t4.5 22q0 11-4 22.5T863-380L643-160H520Zm300-263-37-37 37 37ZM580-220h38l121-122-18-19-19-18-122 121v38Zm141-141-19-18 37 37-18-19Z"/></svg>
-                    <span>Comments</span>
-                  </button>
-                  <button type="button" data-stage-button data-output="errors">
-                    <svg data-stage-art viewBox="0 -960 960 960" aria-hidden="true"><path d="M480-280q17 0 28.5-11.5T520-320q0-17-11.5-28.5T480-360q-17 0-28.5 11.5T440-320q0 17 11.5 28.5T480-280Zm-40-160h80v-240h-80v240Zm40 360q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/></svg>
-                    <span>Errors</span>
-                  </button>
-                  <button type="button" data-stage-button data-output="scenarios">
-                    <svg data-stage-art viewBox="0 -960 960 960" aria-hidden="true"><path d="M600-120v-120H440v-400h-80v120H80v-320h280v120h240v-120h280v320H600v-120h-80v320h80v-120h280v320H600ZM160-760v160-160Zm520 400v160-160Zm0-400v160-160Zm0 160h120v-160H680v160Zm0 400h120v-160H680v160ZM160-600h120v-160H160v160Z"/></svg>
-                    <span>Command map</span>
-                  </button>
-                  <button type="button" data-stage-button data-output="highlights-buffer">
-                    <svg data-stage-art viewBox="0 -960 960 960" aria-hidden="true"><path d="M600-160v-80h120v-480H600v-80h200v640H600Zm-440 0v-640h200v80H240v480h120v80H160Z"/></svg>
-                    <span>Highlights buffer</span>
-                  </button>
-                </li>
-                <li data-stage="styles">
-                  <button type="button" data-stage-button data-output="page-styles">
-                    <svg data-stage-art viewBox="0 -960 960 960" aria-hidden="true"><path d="M120-520v-320h320v320H120Zm0 400v-320h320v320H120Zm400-400v-320h320v320H520Zm0 400v-320h320v320H520ZM200-600h160v-160H200v160Zm400 0h160v-160H600v160Zm0 400h160v-160H600v160Zm-400 0h160v-160H200v160Zm400-400Zm0 240Zm-240 0Zm0-240Z"/></svg>
-                    <span>Page styles</span>
-                  </button>
-                </li>
-                <li data-stage="outputs" data-branches>
-                  <span data-branches-label>Outputs</span>
-                  <button type="button" data-stage-button data-output="svg">
-                    <svg data-stage-art viewBox="0 -960 960 960" aria-hidden="true"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-560H200v560Zm40-80h480L570-480 450-320l-90-120-120 160Zm-40 80v-560 560Z"/></svg>
-                    <span>SVG</span>
-                  </button>
-                  <button type="button" data-stage-button data-output="midi">
-                    <svg data-stage-art viewBox="0 -960 960 960" aria-hidden="true"><path d="M400-120q-66 0-113-47t-47-113q0-66 47-113t113-47q23 0 42.5 5.5T480-418v-422h240v160H560v400q0 66-47 113t-113 47Z"/></svg>
-                    <span>MIDI</span>
-                  </button>
-                  <button type="button" data-stage-button data-output="highlights">
-                    <svg data-stage-art viewBox="0 -960 960 960" aria-hidden="true"><path d="M80 0v-160h800V0H80Zm504-480L480-584 320-424l103 104 161-160Zm-47-160 103 103 160-159-104-104-159 160Zm-84-29 216 216-189 190q-24 24-56.5 24T367-263l-27 23H140l126-125q-24-24-25-57.5t23-57.5l189-189Zm0 0 187-187q24-24 56.5-24t56.5 24l104 103q24 24 24 56.5T857-640L669-453 453-669Z"/></svg>
-                    <span>Editor highlights</span>
-                  </button>
-                </li>
-              </ol>
-
-              <div data-flow-notes>
-                <div data-note-for="words">
-                  <h3>Words</h3>
-                  <p>The whole input: plain text, one command a line. A comment, a style, a MIDI setting, a clef and five notes.</p>
-                    <div data-code data-artifact>
-                      <e-markdown
-                        data-src="/md/landing/pipeline/words.md"
-                        data-internal-state="${{
-                          extensions: [
-                            showdownHighlight({ auto_detection: false })
-                          ]
-                        }}"
-                      ></e-markdown>
-                    </div>
+            <div is="landing-diagram" data-pipeline data-reveal style="--d: 120ms">
+              <svg data-arrows aria-hidden="true"></svg>
+              <div data-block="words">
+                <span data-icon class="material-symbols-outlined" aria-hidden="true">description</span>
+                <span data-name>Words</span>
+              </div>
+              <div data-block="custom-styles">
+                <span data-icon class="material-symbols-outlined" aria-hidden="true">palette</span>
+                <span data-name>Custom styles</span>
+              </div>
+              <div data-block="page-styles">
+                <span data-icon class="material-symbols-outlined" aria-hidden="true">format_paint</span>
+                <span data-name>Page styles</span>
+              </div>
+              <div data-block="page-schema">
+                <span data-icon class="material-symbols-outlined" aria-hidden="true">data_object</span>
+                <span data-name>Page schema</span>
+              </div>
+              <div data-block="midi-settings">
+                <span data-icon class="material-symbols-outlined" aria-hidden="true">piano</span>
+                <span data-name>MIDI settings</span>
+              </div>
+              <div data-block="highlights-buffer">
+                <span data-icon class="material-symbols-outlined" aria-hidden="true">highlight</span>
+                <span data-name>Highlights buffer</span>
+              </div>
+              <div data-block="svg">
+                <span data-icon class="material-symbols-outlined" aria-hidden="true">image</span>
+                <span data-name>SVG</span>
+              </div>
+              <div data-block="midi">
+                <span data-icon class="material-symbols-outlined" aria-hidden="true">music_note</span>
+                <span data-name>MIDI</span>
+              </div>
+              <div data-block="comments">
+                <span data-icon class="material-symbols-outlined" aria-hidden="true">sticky_note_2</span>
+                <span data-name>Comments</span>
+              </div>
+              <div data-block="errors">
+                <span data-icon class="material-symbols-outlined" aria-hidden="true">error</span>
+                <span data-name>Errors</span>
+              </div>
+              <div data-block="command-map">
+                <span data-icon class="material-symbols-outlined" aria-hidden="true">account_tree</span>
+                <span data-name>Command map</span>
+              </div>
+              <div data-block="editor-autocomplete">
+                <span data-icon class="material-symbols-outlined" aria-hidden="true">lightbulb</span>
+                <span data-name>Editor autocomplete</span>
+              </div>
+              <div data-block="highlights">
+                <span data-icon class="material-symbols-outlined" aria-hidden="true">edit_note</span>
+                <span data-name>Editor highlights</span>
+              </div>
+                <div data-block="errors">
+                  <span data-icon class="material-symbols-outlined" aria-hidden="true">error</span>
+                  <span data-name>Errors</span>
                 </div>
-                <div data-note-for="page-schema">
-                  <h3>Page schema</h3>
-                  <p>What the music is: measures, staves, voices and units, with nothing about how they look. Everything after this reads the schema and never the text, so it is the thing to build a tool on.</p>
-                    <div data-code data-artifact>
-                      <e-markdown
-                        data-src="/md/landing/pipeline/page-schema.md"
-                        data-internal-state="${{ extensions: [ showdownHighlight({ auto_detection: false }) ] }}"
-                      ></e-markdown>
-                    </div>
-                </div>
-                <div data-note-for="custom-styles">
-                  <h3>Custom styles</h3>
-                  <p>The styles the text set, under their internal names: <code>page line width is 300</code> is <code>pageLineMaxWidth</code>.</p>
-                    <div data-code data-artifact>
-                      <e-markdown
-                        data-src="/md/landing/pipeline/custom-styles.md"
-                        data-internal-state="${{ extensions: [ showdownHighlight({ auto_detection: false }) ] }}"
-                      ></e-markdown>
-                    </div>
-                </div>
-                <div data-note-for="midi-settings">
-                  <h3>MIDI settings</h3>
-                  <p>The settings that change only what you hear. Here, a guitar instead of the default piano.</p>
-                    <div data-code data-artifact>
-                      <e-markdown
-                        data-src="/md/landing/pipeline/midi-settings.md"
-                        data-internal-state="${{ extensions: [ showdownHighlight({ auto_detection: false }) ] }}"
-                      ></e-markdown>
-                    </div>
-                </div>
-                <div data-note-for="comments">
-                  <h3>Comments</h3>
-                  <p>Notes for whoever reads the text after you. They are kept, with their lines, and never drawn.</p>
-                    <div data-code data-artifact>
-                      <e-markdown
-                        data-src="/md/landing/pipeline/comments.md"
-                        data-internal-state="${{ extensions: [ showdownHighlight({ auto_detection: false }) ] }}"
-                      ></e-markdown>
-                    </div>
-                </div>
-                <div data-note-for="errors">
-                  <h3>Errors</h3>
-                  <p>Empty, because nothing went wrong. The parser never stops on a mistake: each one comes back here with its line number, and the rest of the page is still drawn.</p>
-                    <div data-code data-artifact>
-                      <e-markdown
-                        data-src="/md/landing/pipeline/errors.md"
-                        data-internal-state="${{ extensions: [ showdownHighlight({ auto_detection: false }) ] }}"
-                      ></e-markdown>
-                    </div>
-                </div>
-                <div data-note-for="scenarios">
-                  <h3>Command map</h3>
-                  <p>For every character of the text, the commands it belongs to. The editor reads it to suggest what can come next, and the docs check reads it to make sure every example uses only what has already been taught.</p>
-                    <div data-code data-artifact>
-                      <e-markdown
-                        data-src="/md/landing/pipeline/scenarios.md"
-                        data-internal-state="${{ extensions: [ showdownHighlight({ auto_detection: false }) ] }}"
-                      ></e-markdown>
-                    </div>
-                </div>
-                <div data-note-for="highlights-buffer">
-                  <h3>Highlights buffer</h3>
-                  <p>The text again, as pieces of HTML: every word in a span with a colour class, and a <code>ref-id</code> naming what it draws.</p>
-                    <div data-code data-artifact>
-                      <e-markdown
-                        data-src="/md/landing/pipeline/highlights-buffer.md"
-                        data-internal-state="${{ extensions: [ showdownHighlight({ auto_detection: false }) ] }}"
-                      ></e-markdown>
-                    </div>
-                </div>
-                <div data-note-for="page-styles">
-                  <h3>Page styles</h3>
-                  <p>Every measurement of the page, derived from the stave-line interval and the metrics of the fonts. These are its 316 plain values; the rest are the loaded fonts themselves.</p>
-                    <div data-code data-artifact>
-                      <e-markdown
-                        data-src="/md/landing/pipeline/page-styles.md"
-                        data-internal-state="${{ extensions: [ showdownHighlight({ auto_detection: false }) ] }}"
-                      ></e-markdown>
-                    </div>
-                </div>
-                <div data-note-for="svg">
-                  <h3>SVG</h3>
-                  <p>One image per page, engraved: the engine places every glyph, stem and beam itself. Each element carries the same <code>ref-id</code> as the word that drew it.</p>
-                  <figure data-artifact data-picture>
-                    <img src="/images/pipeline/score.svg" alt="The example engraved: a treble clef and the notes c, d, e, f and g">
-                  </figure>
-                </div>
-                <div data-note-for="midi">
-                  <h3>MIDI</h3>
-                  <p>One performance for the whole document, here on a guitar. The roll is the notes read back out of the file, and under it the maps that tie every moment to the notes that sound in it.</p>
-                  <figure data-artifact data-picture>
-                    <img src="/images/pipeline/midi.svg" alt="A piano roll: c4, d4, e4, f4 and g4, half a second each, one after another">
-                    <figcaption><a data-link href="/images/pipeline/example.mid" download>Download the MIDI file</a></figcaption>
-                  </figure>
-                    <div data-code data-artifact>
-                      <e-markdown
-                        data-src="/md/landing/pipeline/timing.md"
-                        data-internal-state="${{ extensions: [ showdownHighlight({ auto_detection: false }) ] }}"
-                      ></e-markdown>
-                    </div>
-                </div>
-                <div data-note-for="highlights">
-                  <h3>Editor highlights</h3>
-                  <p>The highlights buffer, joined: what the editor shows as you type. Its <code>ref-id</code>s are how ⌘ or Ctrl + click goes from a word to what it drew, and back.</p>
-                  <div data-artifact data-highlights-box>
-                    <e-markdown data-src="/md/landing/pipeline/highlights.md"></e-markdown>
-                  </div>
+                <div data-block="command-map">
+                  <span data-icon class="material-symbols-outlined" aria-hidden="true">account_tree</span>
+                  <span data-name>Command map</span>
                 </div>
               </div>
             </div>
@@ -886,28 +677,36 @@
 
         <!-- ── 06 ───────────────────────────────────────────────────────── -->
         <section is="landing-screen" data-screen id="who" data-number="06" data-label="Who it is for">
-          <div data-inner data-widest>
+          <div data-inner data-wide>
             <h2 data-reveal>Who it is for</h2>
-            <ul data-blocks data-audience>
-              <li data-block data-reveal style="--d: 120ms">
-                <svg data-art data-tone="crimson" viewBox="0 0 64 64" style="stroke-width: 1.6" aria-hidden="true"><g transform="translate(32 32) rotate(35) scale(1.12) translate(-32 -29.5)"><path data-fill d="M32 21c-7.5 0-10.5 4.5-9.6 9.2.5 2.7 2.6 4.4 2.1 6.4-.5 2-5.6 3.9-5.6 10.2 0 6.9 5.8 11.2 13.1 11.2s13.1-4.3 13.1-11.2c0-6.3-5.1-8.2-5.6-10.2-.5-2 1.6-3.7 2.1-6.4.9-4.7-2.1-9.2-9.6-9.2z"/><circle data-solid cx="32" cy="36" r="3.4"/><rect data-solid x="27.5" y="47.5" width="9" height="2.4" rx="1"/><rect data-fill x="30" y="7.5" width="4" height="14" stroke-width="0.9"/><path d="M30 11h4M30 14.5h4M30 18h4" stroke-width="0.8"/><path d="M31.3 7.5v41M32.7 7.5v41" stroke-width="0.5"/><path data-solid d="M29.6 7.5l-.6-6.5h6l-.6 6.5z"/><path d="M26.6 2.6h2.4M26.6 5.4h2.4M35 2.6h2.4M35 5.4h2.4" stroke-width="1.3"/></g></svg>
-                <h3>Musicians</h3>
-                <p>Easy access to their sheet music on any device: a score is a few lines of text that every browser can draw and play.</p>
+            <ul data-icon-list>
+              <li data-reveal style="--d: 120ms">
+                <span data-icon class="material-symbols-outlined" aria-hidden="true">piano</span>
+                <div data-icon-text>
+                  <h3>Musicians</h3>
+                  <p>Easy access to their sheet music on any device: a score is a few lines of text that every browser can draw and play.</p>
+                </div>
               </li>
-              <li data-block data-reveal style="--d: 180ms">
-                <svg data-art data-tone="violet" viewBox="0 0 64 64" aria-hidden="true"><path d="M6 40h30M6 46h30M6 52h30"/><ellipse data-solid cx="15" cy="46" rx="4" ry="3" transform="rotate(-20 15 46)"/><path d="M18.5 45V32"/><path data-fill d="M30 50C33 33 43 17 57 8c-1 15-9 30-23 40z"/><path d="M30 50l13-19"/></svg>
-                <h3>Composers</h3>
-                <p>Write in a state of flow, instead of getting lost among the hundreds of elements in conventional notation software.</p>
+              <li data-reveal style="--d: 180ms">
+                <span data-icon class="material-symbols-outlined" aria-hidden="true">edit_note</span>
+                <div data-icon-text>
+                  <h3>Composers</h3>
+                  <p>Write in a state of flow, instead of getting lost among the hundreds of elements in conventional notation software.</p>
+                </div>
               </li>
-              <li data-block data-reveal style="--d: 240ms">
-                <svg data-art data-tone="teal" viewBox="0 0 64 64" aria-hidden="true"><path data-fill d="M8 16c8-3 16-3 24 2v34c-8-5-16-5-24-2z"/><path d="M56 16c-8-3-16-3-24 2v34c8-5 16-5 24-2z"/><path d="M38 27h12M38 33h12M38 39h9"/><ellipse data-solid cx="17" cy="38" rx="3.6" ry="2.7" transform="rotate(-20 17 38)"/><path d="M20.4 37V25"/></svg>
-                <h3>Publishers and authors</h3>
-                <p>The flexibility to create books for both print and the web, from the same source.</p>
+              <li data-reveal style="--d: 240ms">
+                <span data-icon class="material-symbols-outlined" aria-hidden="true">menu_book</span>
+                <div data-icon-text>
+                  <h3>Publishers and authors</h3>
+                  <p>The flexibility to create books for both print and the web, from the same source.</p>
+                </div>
               </li>
-              <li data-block data-reveal style="--d: 300ms">
-                <svg data-art data-tone="green" viewBox="0 0 64 64" aria-hidden="true"><rect data-fill x="12" y="12" width="40" height="29" rx="2"/><path d="M6 47h52l-4 6H10z"/><path d="M26 21l-6 5.5 6 5.5M38 21l6 5.5-6 5.5M34.5 19l-5 15"/></svg>
-                <h3>Programmers</h3>
-                <p>A music domain to build programs and tools on, with every structure of the engine open to read and use.</p>
+              <li data-reveal style="--d: 300ms">
+                <span data-icon class="material-symbols-outlined" aria-hidden="true">code</span>
+                <div data-icon-text>
+                  <h3>Programmers</h3>
+                  <p>A music domain to build programs and tools on, with every structure of the engine open to read and use.</p>
+                </div>
               </li>
             </ul>
           </div>

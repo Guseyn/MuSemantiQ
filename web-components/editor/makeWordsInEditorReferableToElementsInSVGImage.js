@@ -1,12 +1,26 @@
 import createdRefRectHoveringRefElement from '#msq/web-components/editor/createdRefRectHoveringRefElement.js'
 import scoreSvgElement from '#msq/web-components/editor/scoreSvgElement.js'
 import notifyUserToUpdateSVGImage from '#msq/web-components/editor/notifyUserToUpdateSVGImage.js'
+import showHintMessage from '#msq/web-components/editor/showHintMessage.js'
 import theCommandKeyIsHeld from '#msq/web-components/editor/theCommandKeyIsHeld.js'
 
+
+const showHintMessageThatThePreviewIsOutOfDate = (textarea) => {
+  showHintMessage(
+    textarea.initialParentElement,
+    'You have to re-render the preview to match the changes in the text to be able to navigate.'
+  )
+}
 
 export default (divUnderneathTextarea, textarea, renderPreviewTabButton) => {
   const svgPlaceholder = textarea.initialParentElement
   const refClickEventInEditor = (event) => {
+    // The score refers only to the words it was last rendered from: navigating
+    // from words changed since then would point at the wrong place or nothing.
+    if (!textarea.isRenderedWithLatestInputText) {
+      showHintMessageThatThePreviewIsOutOfDate(textarea)
+      return
+    }
     if (event.target.hasAttribute('ref-id')) {
       event.target.style.textDecoration = 'none'
       textarea.refSpanThatHovered = undefined
@@ -122,6 +136,18 @@ export default (divUnderneathTextarea, textarea, renderPreviewTabButton) => {
       }
       textarea.refSpanThatHovered.style.textDecoration = 'none'
       textarea.refSpanThatHovered = undefined
+    }
+  })
+  // A word the current render does not cover has no ref-id, so the per-span
+  // listener above never reaches it. A Cmd/Ctrl-click on it still wants to
+  // navigate, so it is answered the same way as a stale word that kept its
+  // ref-id: say the preview has to be re-rendered first.
+  divUnderneathTextarea.addEventListener('click', (event) => {
+    if (!theCommandKeyIsHeld(event) || event.target.tagName.toLowerCase() !== 'span') {
+      return
+    }
+    if (!textarea.isRenderedWithLatestInputText && !event.target.hasAttribute('ref-id')) {
+      showHintMessageThatThePreviewIsOutOfDate(textarea)
     }
   })
 }

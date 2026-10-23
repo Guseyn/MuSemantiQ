@@ -135,11 +135,11 @@ const updateHtmlHighlightsOnCertainLines = (textarea, divUnderneathTextarea, lin
   const wrapperTemplateReplacement = document.createElement('template')
   wrapperTemplateReplacement.innerHTML = parsedLinesWithHighlights
   /*
-  This is the path typing takes — a line or two rewritten in place rather than
-  the whole layer — so switching the colouring off has to be honoured here too,
-  or the text would go back to being coloured at the next keystroke. The
-  characters are kept exactly; only the spans around them go, since the layer
-  sits under the textarea and the two must agree character for character.
+    This is the path typing takes — a line or two rewritten in place rather than
+    the whole layer — so switching the colouring off has to be honoured here too,
+    or the text would go back to being coloured at the next keystroke. The
+    characters are kept exactly; only the spans around them go, since the layer
+    sits under the textarea and the two must agree character for character.
   */
   if (divUnderneathTextarea.highlightingIsOff) {
     const plain = wrapperTemplateReplacement.content.textContent
@@ -147,11 +147,11 @@ const updateHtmlHighlightsOnCertainLines = (textarea, divUnderneathTextarea, lin
   }
   const wrapperTemplateReplacementContentNode = document.importNode(wrapperTemplateReplacement.content, true)
   /*
-  Which nodes sit on which line is kept from keystroke to keystroke — walking
-  the whole layer to find that out is what this replaces. The lines just
-  rewritten are the only ones whose nodes changed, so they alone are put back
-  in the lists, and the nodes that take their place are lined up before the
-  fragment holding them is emptied into the document.
+    Which nodes sit on which line is kept from keystroke to keystroke — walking
+    the whole layer to find that out is what this replaces. The lines just
+    rewritten are the only ones whose nodes changed, so they alone are put back
+    in the lists, and the nodes that take their place are lined up before the
+    fragment holding them is emptied into the document.
   */
   const linesOfNewNodes = nodesSplittedInLines(wrapperTemplateReplacementContentNode)
   for (const lineOfNodes of linesOfNewNodes) {
@@ -258,10 +258,10 @@ const applyTheColours = (divUnderneathTextarea, textarea, parseWholeTextInTextar
   )
 
   /*
-  One entry per character of the whole page, and it used to be rebuilt in full
-  on every keystroke — read back through Object.values() and written into a new
-  object, twice over. The lines just reparsed take the place of the range of
-  characters they stand for, in the array that is already there.
+    One entry per character of the whole page, and it used to be rebuilt in full
+    on every keystroke — read back through Object.values() and written into a new
+    object, twice over. The lines just reparsed take the place of the range of
+    characters they stand for, in the array that is already there.
   */
   const replacedFrom = firstCharIndexInParsedLines + 1
   const replacedTo = currentMapValuesOfCharIndexesWithProgressionOfCommandsFromScenarios.length -
@@ -328,15 +328,17 @@ const showTheChangedTextWithoutColours = (divUnderneathTextarea, textarea, parse
 export default (divUnderneathTextarea, textarea, parseWholeTextInTextarea) => {
   showTheChangedTextWithoutColours(divUnderneathTextarea, textarea, parseWholeTextInTextarea)
   /*
-  The parse and its colours come on the next frame. A change that lands before
-  that frame joins it, and two together are more than one character: the
-  incremental parse splices a per-character map that is in step with exactly
-  one change, so a burst is coloured by the full parse, which rebuilds that
-  map.
+    The parse and its colours come on the next frame. A change that lands before
+    that frame joins it, and two together are more than one character: the
+    incremental parse splices a per-character map that is in step with exactly
+    one change, so a burst is coloured by the full parse, which rebuilds that
+    map.
   */
   const job = {
     parseWholeTextInTextarea: parseWholeTextInTextarea ||
-      Boolean(textarea.theColoursToApplyIsPending)
+      Boolean(textarea.theColoursToApplyIsPending),
+    // The layer as it stands now, so a rebuild before this frame is seen
+    wholeLayerRebuilds: divUnderneathTextarea.wholeLayerRebuilds
   }
   textarea.theColoursToApplyIsPending = job
   requestAnimationFrame(() => {
@@ -344,6 +346,17 @@ export default (divUnderneathTextarea, textarea, parseWholeTextInTextarea) => {
       return
     }
     textarea.theColoursToApplyIsPending = null
+    /*
+      If the layer was rebuilt whole since this job was set going, whoever did it
+      is what should stand. It is how the rendered highlights arrive — the first
+      paint of an editor, and every re-render — and they are the only ones with
+      the ref-ids that navigation between the text and the score matches on.
+      Colouring over them here is what left the editor opening with nothing to
+      click through. They arrive coloured; nothing is owed here.
+    */
+    if (divUnderneathTextarea.wholeLayerRebuilds !== job.wholeLayerRebuilds) {
+      return
+    }
     applyTheColours(divUnderneathTextarea, textarea, job.parseWholeTextInTextarea)
   })
 }
