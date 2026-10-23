@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.10 (2026-10-23)
+
+- Improved docs landing
+- Bug fixes
+
 ## 1.0.9 (2026-10-22)
 
 - Improved UX for highlighting
