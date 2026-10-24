@@ -1,27 +1,27 @@
 /*
-"How it works" is a pipeline of blocks laid out as lanes: one lane per thing
-the words turn into. The blocks and where they sit belong to the page; this
-element measures them and draws the arrows between the particular blocks — the
-parser reads the words once and returns all of it, a score is made from the
-schema and the measurements of the page, a performance from the schema and the
-MIDI settings, the editor's colours from the highlights buffer.
+  "How it works" is a pipeline of blocks laid out as lanes: one lane per thing
+  the words turn into. The blocks and where they sit belong to the page; this
+  element measures them and draws the arrows between the particular blocks — the
+  parser reads the words once and returns all of it, a score is made from the
+  schema and the measurements of the page, a performance from the schema and the
+  MIDI settings, the editor's colours from the highlights buffer.
 
-Each arrow is drawn the way the docs draw theirs (the diagrams of the API
-pages): a line of dashes sliding towards the block it enters, closed by a solid
-head, all in the accent. Mermaid draws those, but lays a fan of this size out
-downwards, and this one is laid out sideways; the arrows are drawn here in the
-same language instead.
+  Each arrow is drawn the way the docs draw theirs (the diagrams of the API
+  pages): a line of dashes sliding towards the block it enters, closed by a solid
+  head, all in the accent. Mermaid draws those, but lays a fan of this size out
+  downwards, and this one is laid out sideways; the arrows are drawn here in the
+  same language instead.
 
-<div is="landing-diagram" data-pipeline>
-  <div data-block="words"> … </div>
-  …
-  <svg data-arrows aria-hidden="true"></svg>
-</div>
+  <div is="landing-diagram" data-pipeline>
+    <div data-block="words"> … </div>
+    …
+    <svg data-arrows aria-hidden="true"></svg>
+  </div>
 
-The arrows are measured rather than written down, so they follow the blocks
-wherever the page puts them, and are redrawn when it reflows or the fonts
-arrive. A head points into its block along the horizontal, so a line stops
-where its head begins and the two never overlap.
+  The arrows are measured rather than written down, so they follow the blocks
+  wherever the page puts them, and are redrawn when it reflows or the fonts
+  arrive. A head points into its block along the horizontal, so a line stops
+  where its head begins and the two never overlap.
 */
 const HEAD = 9
 

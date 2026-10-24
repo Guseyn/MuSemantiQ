@@ -135,11 +135,11 @@ function serializeMeasureCommands (measure) {
   const lines = []
 
   /*
-  The bar lines come first.
+    The bar lines come first.
 
-  Not for looks: the parser will not take `ends with …` after a connection, an
-  instrument title or even a time signature has been named, so writing them in
-  the order they are thought of produces a measure that does not read back.
+    Not for looks: the parser will not take `ends with …` after a connection, an
+    instrument title or even a time signature has been named, so writing them in
+    the order they are thought of produces a measure that does not read back.
   */
   if (measure.openingBarLineName) {
     lines.push(`starts with ${OPENING_BAR_LINE_WORDS[measure.openingBarLineName] || measure.openingBarLineName}`)
@@ -248,9 +248,9 @@ function serializeVoltas (measures) {
   const to = finished === -1 ? measures.length - 1 : finished
 
   /*
-  A bracket can hang past the measures it names — opening before the first and
-  closing after the last — which is what `startsBefore` and `finishesAfter`
-  record, and what these two clauses say back.
+    A bracket can hang past the measures it names — opening before the first and
+    closing after the last — which is what `startsBefore` and `finishesAfter`
+    record, and what these two clauses say back.
   */
   const opens = volta.startsBefore
     ? `starts before measure ${marked + 1}`
@@ -270,8 +270,8 @@ function serializeVoltas (measures) {
  */
 function serializeVoice (units) {
   /*
-  The units a simile stands for are produced by the simile command itself, so
-  writing them out as well would say the same thing twice.
+    The units a simile stands for are produced by the simile command itself, so
+    writing them out as well would say the same thing twice.
   */
   const written = units.filter((one) => !one.isSimile)
   return [

@@ -1,10 +1,10 @@
 'use strict'
 
 /*
-Fills the ref-ids of the spans that were written before their positions were known:
-"slur from note 1 in measure 2" writes its spans first, and only when the command is
-over are the line, measure, stave, voice and unit it named known. The positions come
-from the main scenarios (see getMentionedPositions), taken before they are cleared.
+  Fills the ref-ids of the spans that were written before their positions were known:
+  "slur from note 1 in measure 2" writes its spans first, and only when the command is
+  over are the line, measure, stave, voice and unit it named known. The positions come
+  from the main scenarios (see getMentionedPositions), taken before they are cleared.
 */
 export default function (state, mentionedPositions, forConnection) {
   const indexesInHighlightsHtmlBufferWhereWeShouldFillPositionPlaceholders = forConnection

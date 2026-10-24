@@ -1,16 +1,16 @@
 /*
-<div is="landing-tabs" data-tabs>
-  <div data-tab-list> <button data-tab="api">Low-level API</button> … </div>
-  <div data-tab-panel="api"> … </div> …
-</div>
+  <div is="landing-tabs" data-tabs>
+    <div data-tab-list> <button data-tab="api">Low-level API</button> … </div>
+    <div data-tab-panel="api"> … </div> …
+  </div>
 
-One panel at a time, chosen by the buttons above. The buttons and panels are
-paired by name (data-tab and data-tab-panel), and the roles, ids and keyboard
-are wired here, so the markup stays a plain list of buttons and a plain list of
-panels: ← and → move along the tabs, Home and End go to the first and last.
+  One panel at a time, chosen by the buttons above. The buttons and panels are
+  paired by name (data-tab and data-tab-panel), and the roles, ids and keyboard
+  are wired here, so the markup stays a plain list of buttons and a plain list of
+  panels: ← and → move along the tabs, Home and End go to the first and last.
 
-Without JavaScript every panel is shown, one after another, which is still the
-whole of the content.
+  Without JavaScript every panel is shown, one after another, which is still the
+  whole of the content.
 */
 let tabsOnPage = 0
 

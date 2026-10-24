@@ -1,20 +1,20 @@
 'use strict'
 
 /*
-Where one end of a tie touches one note of a unit.
+  Where one end of a tie touches one note of a unit.
 
-A tie is drawn between two such points: the left one, where the tie starts
-(after the note), and the right one, where it ends (before the note). The right
-point is always calculated with its left point at hand, and takes its height
-from it, so a tie is always horizontal.
+  A tie is drawn between two such points: the left one, where the tie starts
+  (after the note), and the right one, where it ends (before the note). The right
+  point is always calculated with its left point at hand, and takes its height
+  from it, so a tie is always horizontal.
 
-A tie meets a note in one of two ways:
-- at the top or the bottom of the note head: a single note, and the outer notes
-  of a stemless or whole-tone unit, or of a chord whose tie goes away from it;
-- at the side of the note head, between the notes of a chord.
+  A tie meets a note in one of two ways:
+  - at the top or the bottom of the note head: a single note, and the outer notes
+    of a stemless or whole-tone unit, or of a chord whose tie goes away from it;
+  - at the side of the note head, between the notes of a chord.
 
-The returned object is also read by calculateTieDirection and by the call for
-the right point, so its fields stay as they are.
+  The returned object is also read by calculateTieDirection and by the call for
+  the right point, so its fields stay as they are.
 */
 
 // Notes closer than one position are a second apart: one of their heads is

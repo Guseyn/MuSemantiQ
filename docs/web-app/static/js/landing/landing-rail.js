@@ -1,21 +1,21 @@
 import scrollToScreen from '/js/landing/scrollToScreen.js'
 
 /*
-<nav is="landing-rail" data-rail aria-label="Sections"></nav>
+  <nav is="landing-rail" data-rail aria-label="Sections"></nav>
 
-One notehead per screen, built from the screens themselves, so there is one
-list to change. The screens do not all exist at load: everything that engraves
-is inside the font loader, which is a <template> until the fonts are registered.
-So the rail is rebuilt, in document order, whenever a screen says it has
-arrived in the document, and a screen that turns up late still lands in the
-right place rather than on the end.
+  One notehead per screen, built from the screens themselves, so there is one
+  list to change. The screens do not all exist at load: everything that engraves
+  is inside the font loader, which is a <template> until the fonts are registered.
+  So the rail is rebuilt, in document order, whenever a screen says it has
+  arrived in the document, and a screen that turns up late still lands in the
+  right place rather than on the end.
 */
 class LandingRail extends HTMLElement {
   /*
-  Kept rather than read back off the dots, because the dots do not last: the
-  rail is rebuilt when the rest of the screens come in, and the first screen
-  has usually been marked current by then. It does not become current again
-  until the reader scrolls, so without this the rebuilt rail would show none.
+    Kept rather than read back off the dots, because the dots do not last: the
+    rail is rebuilt when the rest of the screens come in, and the first screen
+    has usually been marked current by then. It does not become current again
+    until the reader scrolls, so without this the rebuilt rail would show none.
   */
   #currentId = null
   #rebuildIsQueued = false

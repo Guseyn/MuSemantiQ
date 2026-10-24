@@ -26,8 +26,8 @@ const KEY_WORDS = {
 }
 
 /*
-Articulations whose written name differs from the schema's, and the ones that
-take a value rather than standing alone.
+  Articulations whose written name differs from the schema's, and the ones that
+  take a value rather than standing alone.
 */
 const ARTICULATION_WORDS = {
   leftHandPizzicato: 'left hand pizzicato',
@@ -91,8 +91,8 @@ function serializePlacement (params) {
  */
 function serializeArticulation (articulation) {
   /*
-  An octave sign worn by a single unit is not written as an articulation at all:
-  the language says what it does rather than what it draws.
+    An octave sign worn by a single unit is not written as an articulation at all:
+    the language says what it does rather than what it draws.
   */
   if (articulation.name === 'octaveSign') {
     const octave = articulation.textValue === '15' ? 'two octaves' : 'octave'
@@ -143,9 +143,9 @@ function serializePedal (pedal) {
     parts.push(`with variable peak${text}`)
   } else if (pedal.tillEndOfMeasure) {
     /*
-    A pedal that runs on past the bar line is released `after measure` rather
-    than `at the end of measure`: the first carries the line over, the second
-    stops it where the measure does.
+      A pedal that runs on past the bar line is released `after measure` rather
+      than `at the end of measure`: the first carries the line over, the second
+      stops it where the measure does.
     */
     parts.push('with release after measure')
   } else if (pedal.release || pedal.withBracketClosure) {
@@ -302,9 +302,9 @@ function serializeModifiers (unit, isChord, previousWasBeamed) {
     }
   }
   /*
-  A simile that stands for a single unit is written on that unit; one that stands
-  for a run of them counts beats instead, and becomes its own command naming the
-  run it repeats.
+    A simile that stands for a single unit is written on that unit; one that stands
+    for a run of them counts beats instead, and becomes its own command naming the
+    run it repeats.
   */
   if (unit.simileMark && unit.simileMark.count && !unit.simileMark.numberOfBeats) {
     parts.push([ `repeat ${unit.simileMark.count} times`, serializeCorrection(unit.simileMark.yCorrection) ]
@@ -319,9 +319,9 @@ function serializeModifiers (unit, isChord, previousWasBeamed) {
   }
   parts.push(...serializeTies(unit))
   /*
-  `after measure` has to be the last thing on the line: anything following it
-  reads as a command of its own rather than as more of this unit. So that one
-  release waits until the stem has been written.
+    `after measure` has to be the last thing on the line: anything following it
+    reads as a command of its own rather than as more of this unit. So that one
+    release waits until the stem has been written.
   */
   const pedal = unit.pedalMark ? serializePedal(unit.pedalMark) : []
   if (!(unit.pedalMark && unit.pedalMark.tillEndOfMeasure)) {
@@ -371,10 +371,10 @@ function serializeModifiers (unit, isChord, previousWasBeamed) {
   }
 
   /*
-  Beaming is sticky in the source: a run carries on until something stops it. So
-  the unit that starts one says `beamed`, and the unit that ends one has to say
-  `not beamed` — but only then, since saying it where no run is open changes what
-  is read back.
+    Beaming is sticky in the source: a run carries on until something stops it. So
+    the unit that starts one says `beamed`, and the unit that ends one has to say
+    `not beamed` — but only then, since saying it where no run is open changes what
+    is read back.
   */
   if (unit.beamedWithNext) {
     parts.push(unit.beamedWithNextWithJustOneBeam
@@ -411,9 +411,9 @@ export default function serializeUnit (unit, previousUnit) {
   if (isChord) {
     const head = [ [ duration, 'chord' ].filter(Boolean).join(' '), ...parts ].join(', ')
     /*
-    The list of notes under a `chord` runs on until something ends it, so a
-    blank line has to follow: without one the next unit's note is read as
-    another member of this chord.
+      The list of notes under a `chord` runs on until something ends it, so a
+      blank line has to follow: without one the next unit's note is read as
+      another member of this chord.
     */
     return [ head, notes.map((note) => `${serializeNote(note)}${findKeyOfNote(unit, note)}`).join(', '), '' ]
   }

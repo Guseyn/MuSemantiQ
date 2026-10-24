@@ -101,10 +101,10 @@ export function parseArgs(argv) {
     throw new UsageError('--input and --text cannot both be given')
   }
   /*
-   * With neither given, text is read from standard input — but only when
-   * something is actually piped in, since on a terminal that would just hang
-   * with no indication of what it was waiting for.
-   */
+    With neither given, text is read from standard input — but only when
+    something is actually piped in, since on a terminal that would just hang
+    with no indication of what it was waiting for.
+  */
   const readsStdin = input === undefined && text === undefined
   if (readsStdin && process.stdin.isTTY) {
     throw new UsageError('nothing to read — give --input <file|folder>, --text <string>, or pipe text in')

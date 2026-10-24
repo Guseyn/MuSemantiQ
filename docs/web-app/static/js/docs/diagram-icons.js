@@ -1,17 +1,17 @@
 /*
-The icons the diagrams can show, as a Mermaid icon pack: a node written as
-  pageSchema@{ icon: "material:data-object", label: "pageSchema" }
-is drawn as that icon with its label under it (see docs-diagram.js, which
-registers this pack).
+  The icons the diagrams can show, as a Mermaid icon pack: a node written as
+    pageSchema@{ icon: "material:data-object", label: "pageSchema" }
+  is drawn as that icon with its label under it (see docs-diagram.js, which
+  registers this pack).
 
-They are Google's Material Symbols, outlined, weight 400 (Apache License 2.0),
-taken from @material-symbols/svg-400. Only the ones a diagram uses are here,
-because the whole set is tens of megabytes; to use another, add its path from
-that package under its name, with underscores as dashes.
+  They are Google's Material Symbols, outlined, weight 400 (Apache License 2.0),
+  taken from @material-symbols/svg-400. Only the ones a diagram uses are here,
+  because the whole set is tens of megabytes; to use another, add its path from
+  that package under its name, with underscores as dashes.
 
-Every Material Symbol is drawn in a 960 square that starts at -960, so the pack
-says so once, for all of them. Each path is filled with currentColor, which
-Mermaid sets to the node's stroke, so `style node stroke:…` colours its icon.
+  Every Material Symbol is drawn in a 960 square that starts at -960, so the pack
+  says so once, for all of them. Each path is filled with currentColor, which
+  Mermaid sets to the node's stroke, so `style node stroke:…` colours its icon.
 */
 export default {
   prefix: 'material',

@@ -79,6 +79,22 @@ beside it.
   width: 100%;
 }
 
+/* A Material Symbol, named by data-icon rather than by Google's class. */
+[data-icon] {
+  font-family: 'Material Symbols Outlined';
+  font-weight: normal;
+  font-style: normal;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  font-feature-settings: 'liga';
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+}
+
 /*
 A block of fields is a column with room between them — the same shape e-ui's
 `e-stack` gives, applied wherever the attribute is rather than asking every card

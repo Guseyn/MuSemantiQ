@@ -1,12 +1,12 @@
 /*
-```mermaid fences as <docs-diagram>, which draws them (see docs-diagram.js).
+  ```mermaid fences as <docs-diagram>, which draws them (see docs-diagram.js).
 
-The source has to reach Mermaid exactly as written, and markdown would not leave
-it alone: `-->` and `[…]` are markdown too, and blank lines would split it. So
-it is kept out of markdown the way the msq extensions keep the music out: the
-`lang` filter, which runs before showdown parses anything, takes every such
-fence out and leaves a placeholder; the `output` filter puts the element in
-its place.
+  The source has to reach Mermaid exactly as written, and markdown would not leave
+  it alone: `-->` and `[…]` are markdown too, and blank lines would split it. So
+  it is kept out of markdown the way the msq extensions keep the music out: the
+  `lang` filter, which runs before showdown parses anything, takes every such
+  fence out and leaves a placeholder; the `output` filter puts the element in
+  its place.
 */
 const fence = /^(`{3,}|~{3,})[ \t]*mermaid[ \t]*\n([\s\S]*?)\n?\1[ \t]*$/gm
 const placeholder = /(?:<p>)?docsdiagram(\d+)end(?:<\/p>)?/g

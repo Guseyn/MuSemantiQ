@@ -37,8 +37,8 @@ import serialize from '#msq/language/serializer/serialize.js'
 const ROOT = 'test/serializer-tests'
 
 /*
-The four inputs, each named by the folder holding it and the field of the parse
-it has to come back as.
+  The four inputs, each named by the folder holding it and the field of the parse
+  it has to come back as.
 */
 const INPUTS = [
   { folder: 'page-schema', field: 'pageSchemaForEachPage' },
@@ -54,9 +54,9 @@ const only = process.argv.find((argument) => argument.startsWith('--only='))
 const pattern = only ? only.slice('--only='.length) : null
 
 /*
-The two fonts that are properly set up, named rather than left to the defaults —
-which reach for all four, and so made this suite depend on font files nothing
-here engraves with.
+  The two fonts that are properly set up, named rather than left to the defaults —
+  which reach for all four, and so made this suite depend on font files nothing
+  here engraves with.
 */
 const supportedFontSources = await setupFonts({
   'chord-letters': {
@@ -122,8 +122,8 @@ for (const testName of testNames) {
     })
 
     /*
-    Everything the run produced is written out before anything is asserted, so a
-    failing test leaves a complete set of actual files to diff against.
+      Everything the run produced is written out before anything is asserted, so a
+      failing test leaves a complete set of actual files to diff against.
     */
     const produced = INPUTS.map(({ field }) => JSON.stringify(parsed[field][0] ?? null))
     await Promise.all(

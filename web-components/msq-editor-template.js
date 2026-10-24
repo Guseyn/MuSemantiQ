@@ -159,11 +159,11 @@ class MuSemantiQEditor extends MSQTemplateElement {
     this.#applyRenderedHighlights()
 
     /*
-    data-opens-with="text" opens on the source rather than the score, for pages
-    that teach the language: what you type comes first, what it engraves is one
-    click away. It is decided here, after the score has been laid out, because
-    the text view takes its size from the score. Focus stays where it is — a
-    page of examples must not scroll to whichever one opened last.
+      data-opens-with="text" opens on the source rather than the score, for pages
+      that teach the language: what you type comes first, what it engraves is one
+      click away. It is decided here, after the score has been laid out, because
+      the text view takes its size from the score. Focus stays where it is — a
+      page of examples must not scroll to whichever one opened last.
     */
     if (this.getAttribute('data-opens-with') === 'text') {
       this.#showTextView({ focus: false })
@@ -315,9 +315,9 @@ class MuSemantiQEditor extends MSQTemplateElement {
   }
 
   /*
-  The settings sit in a view of their own rather than a panel over the score:
-  the wrapper is sized to whatever is showing, so anything laid on top of it
-  would either be clipped or would stretch the element.
+    The settings sit in a view of their own rather than a panel over the score:
+    the wrapper is sized to whatever is showing, so anything laid on top of it
+    would either be clipped or would stretch the element.
   */
   #toggleSettingsView() {
     if (!this.settingsContainer.hidden) {
@@ -338,8 +338,8 @@ class MuSemantiQEditor extends MSQTemplateElement {
   }
 
   /*
-  The controls say what is true now, which for the two colours means reading back
-  what the element was given rather than what a picker happens to default to.
+    The controls say what is true now, which for the two colours means reading back
+    what the element was given rather than what a picker happens to default to.
   */
   #fillSettings() {
     const at = (name) => this.settingsContainer.querySelector(`[data-setting="${name}"]`)
@@ -393,8 +393,8 @@ class MuSemantiQEditor extends MSQTemplateElement {
 
     at('played-colour').addEventListener('change', (event) => {
       /*
-      The highlighter takes its colour when it is attached and keeps it, so a new
-      colour means attaching again over the same player.
+        The highlighter takes its colour when it is attached and keeps it, so a new
+        colour means attaching again over the same player.
       */
       this.setAttribute('data-highlight-color', event.target.value)
       this.#attachHighlighter()
@@ -409,8 +409,8 @@ class MuSemantiQEditor extends MSQTemplateElement {
       const soundFont = event.target.value.trim()
       this.setAttribute('data-sound-font', soundFont)
       /*
-      The player lists data-sound-font among the attributes it observes, so it
-      reloads its samples itself. Nothing here has to rebuild the score.
+        The player lists data-sound-font among the attributes it observes, so it
+        reloads its samples itself. Nothing here has to rebuild the score.
       */
       if (this.midiPlayer) {
         this.midiPlayer.setAttribute('data-sound-font', soundFont)
@@ -468,10 +468,10 @@ class MuSemantiQEditor extends MSQTemplateElement {
   }
 
   /*
-  Opened on the text, the element would otherwise take the score's height, and a
-  two-line example would sit in a box the size of its engraving. So it is fitted
-  to the text instead. Collapsing the container first is what makes scrollHeight
-  report the text rather than the box it currently fills.
+    Opened on the text, the element would otherwise take the score's height, and a
+    two-line example would sit in a box the size of its engraving. So it is fitted
+    to the text instead. Collapsing the container first is what makes scrollHeight
+    report the text rather than the box it currently fills.
   */
   #fitTextViewToText() {
     const textarea = this.editor.textarea

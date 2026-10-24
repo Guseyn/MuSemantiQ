@@ -1,13 +1,13 @@
 /*
-The share link in front of every heading below a page's title, which
-e-heading-extension.js writes into the markup. A click copies the address of
-the heading, so a section, or an entry of a reference, can be sent to someone
-as it is, and puts that address in the bar too, without scrolling.
+  The share link in front of every heading below a page's title, which
+  e-heading-extension.js writes into the markup. A click copies the address of
+  the heading, so a section, or an entry of a reference, can be sent to someone
+  as it is, and puts that address in the bar too, without scrolling.
 
-The links come and go with every page the markdown renders, so this listens
-once, for the whole document, as copy-code.js does for code blocks.
+  The links come and go with every page the markdown renders, so this listens
+  once, for the whole document, as copy-code.js does for code blocks.
 
-The check mark is Google's Material Symbols check (Apache License 2.0).
+  The check mark is Google's Material Symbols check (Apache License 2.0).
 */
 import { shareIcon } from '#docs/e-heading-extension.js'
 

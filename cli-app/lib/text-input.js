@@ -39,10 +39,10 @@ export async function textInput({
   output = process.stdout
 }) {
   /*
-   * Unlike a list, this is a field being typed into, so the terminal's own
-   * caret is left visible — the frame parks it at the insertion point on every
-   * repaint.
-   */
+    Unlike a list, this is a field being typed into, so the terminal's own
+    caret is left visible — the frame parks it at the insertion point on every
+    repaint.
+  */
   const session = acquire({ input, output, flag, hideCursor: false, blinkingCaret: true })
   const frame = new Frame(output)
   let unsubscribe = () => {}

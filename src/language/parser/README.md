@@ -74,7 +74,7 @@ condition is met wins. The order is in `createParserScenarios.js`.
 `copyScenarioWithDifferentRequiredCommandProgression` makes a scenario that works the
 same way after another command, for example `chord with text` from `note with text`.
 
-The scenario names are part of the project: `docs/concepts.js`, `npm run docs:check` and
+The scenario names are part of the project: `docs/concepts.js` and
 the editor's autocomplete use them. Don't rename them.
 
 ## Adapters
@@ -214,5 +214,3 @@ Let's say you want the line of every note, for a list beside the editor.
 - The visual tests compare the highlights with `ref-id`s (`html-highlights/`) and
   without them (`html-highlights-without-ref-ids/`, `char-progressions-without-ref-ids/`)
   for every test, so both adapters are checked, with the page schema and everything else.
-- `npm run docs:check` asks the parser which scenarios each docs example used, and checks
-  that no example uses a concept before its page. See `docs/concepts.js`.

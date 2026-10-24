@@ -1,32 +1,32 @@
 /*
-The documentation, as data. One list, read by three things:
+  The documentation, as data. One list, read by three things:
 
-  the sidebar   — renders sections, groups and pages in this order
-  the router    — turns /docs/<section>/<page> into a markdown URL
-  the lint      — derives, from this order, which concepts an example on a
-                  given page is allowed to use (see docs/concepts.js)
+    the sidebar   — renders sections, groups and pages in this order
+    the router    — turns /docs/<section>/<page> into a markdown URL
+    the lint      — derives, from this order, which concepts an example on a
+                    given page is allowed to use (see docs/concepts.js)
 
-Order is meaning here. The language section is deliberately NOT in the order of
-the reference material it came from: it is in the order the language is learnt,
-because every example is gradual — no page shows a concept an earlier page has
-not introduced. Moving a page up or down re-checks every example under it.
+  Order is meaning here. The language section is deliberately NOT in the order of
+  the reference material it came from: it is in the order the language is learnt,
+  because every example is gradual — no page shows a concept an earlier page has
+  not introduced. Moving a page up or down re-checks every example under it.
 
-A section lists its `pages`, or, when it is long, `groups` of them: { title,
-pages }, each a collapsible heading in the sidebar. A page is { slug, title }.
-Its markdown lives at /md/<section.slug>/<page.slug>.md and its URL is
-/docs/<section.slug>/<page.slug>. The nesting is there because the sidebar is
-an e-for-each over this list, and a template can only follow a shape, not work
-one out.
+  A section lists its `pages`, or, when it is long, `groups` of them: { title,
+  pages }, each a collapsible heading in the sidebar. A page is { slug, title }.
+  Its markdown lives at /md/<section.slug>/<page.slug>.md and its URL is
+  /docs/<section.slug>/<page.slug>. The nesting is there because the sidebar is
+  an e-for-each over this list, and a template can only follow a shape, not work
+  one out.
 
-A section of exactly one page is that page: the sidebar shows it as a single
-link, with the section's icon and title, rather than a heading to open. Its page
-keeps a slug, so its URL is still /docs/<section.slug>/<page.slug>.
+  A section of exactly one page is that page: the sidebar shows it as a single
+  link, with the section's icon and title, rather than a heading to open. Its page
+  keeps a slug, so its URL is still /docs/<section.slug>/<page.slug>.
 
-A section may also carry `links`: { title, href, icon } entries the sidebar
-lists after its pages. They leave the site, so they are not pages — allPages
-never sees them, and neither do the router and the lint.
+  A section may also carry `links`: { title, href, icon } entries the sidebar
+  lists after its pages. They leave the site, so they are not pages — allPages
+  never sees them, and neither do the router and the lint.
 
-Each section's sidebar icon is /images/sidebar/<section.slug>.svg.
+  Each section's sidebar icon is /images/sidebar/<section.slug>.svg.
 */
 
 export const sitemap = [
@@ -209,7 +209,7 @@ export const sitemap = [
     pages: [
       { slug: 'overview', title: 'Overview' },
       { slug: 'font-viewer', title: 'Font viewer' },
-      { slug: 'font-generator', title: 'Font generator' },
+      { slug: 'music-font-generator', title: 'Music font generator' },
       { slug: 'soundfont-generator', title: 'Magenta soundfont generator' },
       { slug: 'test-viewer', title: 'Test viewer' }
     ]

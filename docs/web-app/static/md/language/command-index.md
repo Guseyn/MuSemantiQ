@@ -121,7 +121,7 @@ All the styles, with their spellings and defaults, are in [The full style refere
 
 ## 5. Keeping This List Honest
 
-The parser has a name for every construct it knows: **578** of them at the moment. `docs/concepts.js` says which page introduces each one, and `npm run docs:check` fails when a new construct has no page. So you can always print the full list from the source. Run this from the root of the repository:
+The parser has a name for every construct it knows: **578** of them at the moment. `docs/concepts.js` says which page introduces each one. So you can always print the full list from the source. Run this from the root of the repository:
 
 ```js
 // node --input-type=module -e "…this…"

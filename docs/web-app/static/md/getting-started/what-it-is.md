@@ -1,6 +1,5 @@
 # What MuSemantiQ is
 
-<!-- check-docs-examples: preview -->
 
 <span is="e-primary">M</span>u<span is="e-primary">S</span>emanti<span is="e-primary">Q</span> (<span is="e-primary">M</span>usic <span is="e-primary">S</span>emantic <span is="e-primary">Q</span>uery) is a semantic music engine and powerful toolkit that translates words to music. You write music as words, in a text language called **MSQ**, and MuSemantiQ engraves it as sheet music and plays it back.
 

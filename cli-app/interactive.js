@@ -49,9 +49,9 @@ export async function askForPlan() {
     : sourceFromText(await pasteBlock({ message: 'Paste your MuSemantiQ text (press ^D on new line to finish)' }))
 
   /*
-   * Fonts are only asked about when something will be engraved; a performance
-   * never consults them.
-   */
+    Fonts are only asked about when something will be engraved; a performance
+    never consults them.
+  */
   let fontConfig
   let fontLabel = 'built-in'
   if (formats.svg) {
@@ -65,9 +65,9 @@ export async function askForPlan() {
   const outPath = await textInput({
     message: 'Where should the output go?',
     /*
-     * Left empty rather than prefilled: a prefilled value sits before the
-     * cursor, so typing a path would append to it instead of replacing it.
-     */
+      Left empty rather than prefilled: a prefilled value sits before the
+      cursor, so typing a path would append to it instead of replacing it.
+    */
     hint: 'a folder — Tab completes, Enter alone uses the current folder',
     completePaths: true
   })

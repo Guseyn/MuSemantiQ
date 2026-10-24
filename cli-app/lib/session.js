@@ -14,12 +14,12 @@ const BRACKETED_PASTE_ON = '\x1b[?2004h'
 const BRACKETED_PASTE_OFF = '\x1b[?2004l'
 
 /*
- * Caret shape, via DECSCUSR — the space before the `q` is part of the sequence.
- * A blinking bar shows where typing will land, and letting the terminal do the
- * blinking costs nothing: no timer, no repainting. `0` hands the caret back to
- * whatever the user configured. Terminals that do not understand these ignore
- * them silently.
- */
+  Caret shape, via DECSCUSR — the space before the `q` is part of the sequence.
+  A blinking bar shows where typing will land, and letting the terminal do the
+  blinking costs nothing: no timer, no repainting. `0` hands the caret back to
+  whatever the user configured. Terminals that do not understand these ignore
+  them silently.
+*/
 const CARET_BLINKING_BAR = '\x1b[5 q'
 const CARET_TERMINAL_DEFAULT = '\x1b[0 q'
 
@@ -76,11 +76,11 @@ export function acquire({ input = process.stdin, output = process.stdout, raw = 
     input.setRawMode(true)
     session.raw = true
     /*
-     * A previous prompt's teardown unrefs stdin so the process can exit once
-     * questioning is over. Resuming does not undo that, so without this an
-     * event loop with nothing else pending would end the process mid-flow —
-     * the second question would never resolve.
-     */
+      A previous prompt's teardown unrefs stdin so the process can exit once
+      questioning is over. Resuming does not undo that, so without this an
+      event loop with nothing else pending would end the process mid-flow —
+      the second question would never resolve.
+    */
     if (typeof input.ref === 'function') {
       input.ref()
     }
@@ -127,9 +127,9 @@ export function restore() {
 
   try {
     /*
-     * Unconditional: a widget that keeps the caret visible still hides it while
-     * repainting, so the process dying mid-frame must not leave it hidden.
-     */
+      Unconditional: a widget that keeps the caret visible still hides it while
+      repainting, so the process dying mid-frame must not leave it hidden.
+    */
     let epilogue = SHOW_CURSOR
     if (session.caretStyled) {
       epilogue += CARET_TERMINAL_DEFAULT

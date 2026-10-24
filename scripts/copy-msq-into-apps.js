@@ -34,10 +34,10 @@ if (!workerImportMap) {
 const srcDir = path.join(projectRoot, 'src')
 
 /*
-Both browser apps run MuSemantiQ inside a module worker, where import maps do
-not apply, so each needs its own copy of src/ with the specifiers rewritten to
-real URLs. They get the same tree, written twice, so the watcher keeps both in
-step without knowing there is more than one.
+  Both browser apps run MuSemantiQ inside a module worker, where import maps do
+  not apply, so each needs its own copy of src/ with the specifiers rewritten to
+  real URLs. They get the same tree, written twice, so the watcher keeps both in
+  step without knowing there is more than one.
 */
 const outDirs = [
   'browser-app/web-app/static/js/msq/worker',
@@ -46,18 +46,18 @@ const outDirs = [
 ].map((relative) => path.join(projectRoot, relative))
 
 /*
-The page needs the language too — the editor colours what is typed by parsing
-it, on the main thread, between a keystroke and the next paint. So src/language
-is written out a second time, beside the worker rather than inside it:
+  The page needs the language too — the editor colours what is typed by parsing
+  it, on the main thread, between a keystroke and the next paint. So src/language
+  is written out a second time, beside the worker rather than inside it:
 
-  js/msq/language/   the parser, for the page
-  js/msq/worker/     the whole engine, for the worker
+    js/msq/language/   the parser, for the page
+    js/msq/worker/     the whole engine, for the worker
 
-Nothing in src/language imports outside itself, so this copy needs no rewriting
-at all: its `#msq/language/…` specifiers are resolved by the page's import map.
-That is also why it is a copy and not the worker's — a module worker gets no
-import map, so the worker's tree has to have those specifiers rewritten, and a
-rewritten module is no use to the page.
+  Nothing in src/language imports outside itself, so this copy needs no rewriting
+  at all: its `#msq/language/…` specifiers are resolved by the page's import map.
+  That is also why it is a copy and not the worker's — a module worker gets no
+  import map, so the worker's tree has to have those specifiers rewritten, and a
+  rewritten module is no use to the page.
 */
 const languageDir = path.join(srcDir, 'language')
 const languageOutDirs = [

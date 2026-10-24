@@ -1,12 +1,12 @@
 /*
-Mermaid draws a node written as node@{ icon: …, label: … } as the icon with its
-label under it, and aims every arrow at the middle of the two together, which is
-the gap between them: an arrow stops at the side of the label, level with the
-bottom of the icon, and a wide label leaves it well short of the icon it means.
+  Mermaid draws a node written as node@{ icon: …, label: … } as the icon with its
+  label under it, and aims every arrow at the middle of the two together, which is
+  the gap between them: an arrow stops at the side of the label, level with the
+  bottom of the icon, and a wide label leaves it well short of the icon it means.
 
-There is no setting for it, so once a diagram is drawn this moves each icon onto
-that middle, with its label under it, and the ends of every arrow onto the icon,
-each end pulled in along its own last stretch so the curve keeps its shape.
+  There is no setting for it, so once a diagram is drawn this moves each icon onto
+  that middle, with its label under it, and the ends of every arrow onto the icon,
+  each end pulled in along its own last stretch so the curve keeps its shape.
 */
 
 // Room left between an arrow and its icon; at the end the head reaches past the line, so more
@@ -23,9 +23,9 @@ function movedDown(element, by) {
 }
 
 /*
-An icon node holds, in order: an empty square where the icon goes, the label, an
-invisible box around both (what Mermaid lays out and clips arrows against), and
-the icon itself. The box is left where it is, so the layout does not change.
+  An icon node holds, in order: an empty square where the icon goes, the label, an
+  invisible box around both (what Mermaid lays out and clips arrows against), and
+  the icon itself. The box is left where it is, so the layout does not change.
 */
 function iconMovedToTheMiddle(node) {
   const position = translation(node)
@@ -74,10 +74,10 @@ function pointOnIcon(icon, towardX, towardY, gap) {
 
 export default function arrowsToIcons(svg) {
   /*
-  The title of a frame sits where arrows come into it from above. Frames are
-  drawn before arrows, so each title is moved after them, into the same group
-  (frames have no offset of their own). It gets a glow the colour of the card
-  rather than a background: a background reaches up over the frame's border.
+    The title of a frame sits where arrows come into it from above. Frames are
+    drawn before arrows, so each title is moved after them, into the same group
+    (frames have no offset of their own). It gets a glow the colour of the card
+    rather than a background: a background reaches up over the frame's border.
   */
   for (const title of svg.querySelectorAll('g.cluster-label')) {
     const frames = title.closest('g.clusters')

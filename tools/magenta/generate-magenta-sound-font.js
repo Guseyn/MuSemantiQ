@@ -44,8 +44,8 @@ const projectRoot = path.resolve(__dirname, '../..')
 
 const DEFAULT_INSTRUMENTS = '0-127'
 /*
-One place for every rendered set: each app's static folder symlinks to it, so a
-soundbank rendered once is played by all of them.
+  One place for every rendered set: each app's static folder symlinks to it, so a
+  soundbank rendered once is played by all of them.
 */
 const DEFAULT_BUILD_DIR = path.join(
   projectRoot, 'src/midi/magenta-sound-font'
@@ -280,12 +280,12 @@ function parseInstruments(spec) {
   }
 
   /*
-  Program 0 is always rendered, whether or not it was asked for.
+    Program 0 is always rendered, whether or not it was asked for.
 
-  It is the one the player falls back to — a note that names no program is
-  played as program 0 — and a set without it simply falls silent for anything it
-  does not hold, logging the miss and playing nothing. One more instrument is a
-  few minutes; a set that cannot play a plain note is useless.
+    It is the one the player falls back to — a note that names no program is
+    played as program 0 — and a set without it simply falls silent for anything it
+    does not hold, logging the miss and playing nothing. One more instrument is a
+    few minutes; a set that cannot play a plain note is useless.
   */
   programs.add(0)
 
@@ -527,12 +527,12 @@ export function writeSoundFontIndex(buildDir) {
 }
 
 /*
-Run only when this file is the program, not when something imports it.
+  Run only when this file is the program, not when something imports it.
 
-`writeSoundFontIndex` below is worth importing on its own — the dev tools use it
-to give an older set the index the player needs — and without this guard that
-import would run the whole command line, fail for want of arguments, and take
-the importing process down with it.
+  `writeSoundFontIndex` below is worth importing on its own — the dev tools use it
+  to give an older set the index the player needs — and without this guard that
+  import would run the whole command line, fail for want of arguments, and take
+  the importing process down with it.
 */
 if (process.argv[1] && pathToFileURL(process.argv[1]).href === import.meta.url) {
   main().catch((error) => {

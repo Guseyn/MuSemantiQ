@@ -35,10 +35,10 @@ export async function pasteBlock({
 
   if (interactive) {
     /*
-     * Read a fresh descriptor on the terminal rather than process.stdin.
-     * Reading stdin to end-of-file would close it permanently, and any prompt
-     * after this one would then get no input at all.
-     */
+      Read a fresh descriptor on the terminal rather than process.stdin.
+      Reading stdin to end-of-file would close it permanently, and any prompt
+      after this one would then get no input at all.
+    */
     const device = process.platform === 'win32' ? 'CONIN$' : '/dev/tty'
     const fd = openSync(device, 'r')
     source = createReadStream(null, { fd, autoClose: true })

@@ -16,20 +16,20 @@ import {
 const ROOT = 'test/visual-tests'
 
 /*
-A run can be narrowed to the tests whose name matches, the way the serializer
-runner already allows:
+  A run can be narrowed to the tests whose name matches, the way the serializer
+  runner already allows:
 
-  node scripts/visual-tests.js --only=chord
+    node scripts/visual-tests.js --only=chord
 
-It writes and compares only those, which is what lets one test be brought up to
-date without walking the whole corpus.
+  It writes and compares only those, which is what lets one test be brought up to
+  date without walking the whole corpus.
 */
 const only = process.argv.find((argument) => argument.startsWith('--only='))
 const onlyPattern = only ? only.slice('--only='.length) : null
 /*
-A test is a `.txt` file and nothing else: the folder also collects whatever the
-operating system leaves behind (`.DS_Store`), and a name taken from such a file
-is empty, so it fails against an artifact that was never written for it.
+  A test is a `.txt` file and nothing else: the folder also collects whatever the
+  operating system leaves behind (`.DS_Store`), and a name taken from such a file
+  is empty, so it fails against an artifact that was never written for it.
 */
 const wanted = (file) =>
   file.endsWith('.txt') && (!onlyPattern || file.includes(onlyPattern))
@@ -48,10 +48,10 @@ const PAGE_DELIMITER = '====next page===='
 const EMPTY_STRING = ''
 
 /*
-Every font is run before anything is thrown, and the failures are counted up
-across them. Throwing on the first font's failures would leave the rest of the
-corpus unrun — so a new test would get its artifacts under bravura and none
-under leland, which is the one state a comparison corpus must never be in.
+  Every font is run before anything is thrown, and the failures are counted up
+  across them. Throwing on the first font's failures would leave the rest of the
+  corpus unrun — so a new test would get its artifacts under bravura and none
+  under leland, which is the one state a comparison corpus must never be in.
 */
 let failedAcrossFonts = 0
 for (const visualTestDirForFont of visualTestsForEachFont) {

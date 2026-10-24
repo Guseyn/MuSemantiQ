@@ -16,16 +16,16 @@ const at = (id) => document.getElementById(id)
 const FONT_SOURCES_REFERENCE = 'magentaTestFonts'
 
 /*
-The passage, built around whatever the chosen set actually holds.
+  The passage, built around whatever the chosen set actually holds.
 
-A stave sounds as the instrument its title names, and Magenta's player simply
-skips a note whose program is not in the set — logging it and falling silent,
-with no error. So naming an instrument the set does not have is the surest way
-to hear nothing at all, and the passage asks for what is there instead.
+  A stave sounds as the instrument its title names, and Magenta's player simply
+  skips a note whose program is not in the set — logging it and falling silent,
+  with no error. So naming an instrument the set does not have is the surest way
+  to hear nothing at all, and the passage asks for what is there instead.
 
-The instrument folders are named after their General MIDI patch, lower-cased
-with underscores, which is the same name the language takes once the
-underscores are spaces.
+  The instrument folders are named after their General MIDI patch, lower-cased
+  with underscores, which is the same name the language takes once the
+  underscores are spaces.
 */
 const instrumentTitle = (folder) =>
   folder.replace(/_/g, ' ').replace(/\b[a-z]/g, (letter) => letter.toUpperCase())
@@ -76,9 +76,9 @@ async function fillSets() {
   picker.replaceChildren()
 
   /*
-  The default is Magenta's own soundfont, served from their storage. It is what
-  the player falls back to, and having it in the list is what makes a rendered
-  set comparable with something.
+    The default is Magenta's own soundfont, served from their storage. It is what
+    the player falls back to, and having it in the list is what makes a rendered
+    set comparable with something.
   */
   const theirs = document.createElement('option')
   theirs.value = ''
@@ -102,9 +102,9 @@ async function fillSets() {
 }
 
 /*
-An msq-editor cannot be re-rendered: it replaces itself with the engraved view
-and guards on having rendered once. So changing the set builds a fresh one,
-which is the element's own lifecycle.
+  An msq-editor cannot be re-rendered: it replaces itself with the engraved view
+  and guards on having rendered once. So changing the set builds a fresh one,
+  which is the element's own lifecycle.
 */
 function engrave(soundFont) {
   const chosen = sets.find((set) => `/magenta-sound-font/${set.name}` === soundFont)
@@ -127,9 +127,9 @@ function engrave(soundFont) {
 }
 
 /*
-The fonts are registered once, by letting a loader unwrap itself where the
-editor will go — the components only start asking for an engraving once the
-worker has the fonts, and the loader's unwrapping is what says so.
+  The fonts are registered once, by letting a loader unwrap itself where the
+  editor will go — the components only start asking for an engraving once the
+  worker has the fonts, and the loader's unwrapping is what says so.
 */
 async function setUpFonts() {
   const config = (await (await fetch('/dev/fonts')).json()).config
@@ -139,9 +139,9 @@ async function setUpFonts() {
   loader.setAttribute('data-font-config', JSON.stringify(config))
 
   /*
-  The loader inserts a *copy* of its content, so the marker has to be
-  recognisable by attribute — a reference to the node put in would point at the
-  original, which never reaches the document.
+    The loader inserts a *copy* of its content, so the marker has to be
+    recognisable by attribute — a reference to the node put in would point at the
+    original, which never reaches the document.
   */
   const ready = document.createElement('div')
   ready.setAttribute('data-fonts-ready', '')
@@ -163,9 +163,9 @@ at('test-sound-font').addEventListener('change', () => {
 })
 
 /*
-Nothing is engraved until the tab is opened: an editor measures itself as it
-renders, and a tab that is not showing has no size to measure. It also means
-opening the page does not pull a soundfont over the network.
+  Nothing is engraved until the tab is opened: an editor measures itself as it
+  renders, and a tab that is not showing has no size to measure. It also means
+  opening the page does not pull a soundfont over the network.
 */
 let started = false
 async function startTheBench() {
@@ -184,8 +184,8 @@ async function startTheBench() {
 }
 
 /*
-`e-tabs` builds its nav one microtask after EHTML activates it and offers no
-event when a tab is chosen, so the buttons it generates are what we listen on.
+  `e-tabs` builds its nav one microtask after EHTML activates it and offers no
+  event when a tab is chosen, so the buttons it generates are what we listen on.
 */
 async function watchTabs() {
   while (!(at('steps') && at('steps').querySelector('nav'))) {
@@ -202,9 +202,9 @@ async function watchTabs() {
     })
   })
   /*
-  Opened straight onto the bench. Which tab that is comes from e-tabs, which
-  reads the hash and records the answer — naming the hash here would be a copy
-  of the tab's title, spelled its way, to keep in step by hand.
+    Opened straight onto the bench. Which tab that is comes from e-tabs, which
+    reads the hash and records the answer — naming the hash here would be a copy
+    of the tab's title, spelled its way, to keep in step by hand.
   */
   if (Number(steps.getAttribute('data-current-tab')) === bench) {
     startTheBench()

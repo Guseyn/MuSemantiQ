@@ -55,9 +55,9 @@ const wordsIn = (fileName) =>
     .filter(Boolean)
 
 /*
-The two families spell their names differently, and both spellings are what the
-parser already accepts — `text font is noto-sans`, `chord letters font is
-gentium plus` — so each is derived the way its own family writes it.
+  The two families spell their names differently, and both spellings are what the
+  parser already accepts — `text font is noto-sans`, `chord letters font is
+  gentium plus` — so each is derived the way its own family writes it.
 */
 const textNameOf = (fileName) => wordsIn(fileName).join('-').toLowerCase()
 const chordNameOf = (fileName) => wordsIn(fileName).join(' ').toLowerCase()
@@ -88,8 +88,8 @@ async function musicFonts() {
   })
 
   /*
-  A table with no font file beside it can still be drawn with — the tracing is
-  already done — so it is listed too rather than quietly dropped.
+    A table with no font file beside it can still be drawn with — the tracing is
+    already done — so it is listed too rather than quietly dropped.
   */
   for (const name of traced) {
     if (!fonts.some((one) => one.name === name)) {
@@ -121,9 +121,9 @@ async function textFonts() {
 
   return [ ...families.values() ].map((family) => {
     /*
-    A face with no bold is still worth testing: the regular one stands in, and
-    the page says so rather than the family going missing until someone finds
-    the second file.
+      A face with no bold is still worth testing: the regular one stands in, and
+      the page says so rather than the family going missing until someone finds
+      the second file.
     */
     const standingIn = !family.bold && !!family.regular
     return {
@@ -232,9 +232,9 @@ const uploadFont = endpoint('/dev/fonts/upload', 'POST', async ({ stream }) => {
     const bytes = Buffer.from(file.content.slice(comma + 1), 'base64')
 
     /*
-    TrueType starts with 0x00010000, and an OpenType wrapper with 'OTTO' or
-    'true'. Checking it here means a file that is not a font is refused now
-    rather than breaking every engraving on the page later.
+      TrueType starts with 0x00010000, and an OpenType wrapper with 'OTTO' or
+      'true'. Checking it here means a file that is not a font is refused now
+      rather than breaking every engraving on the page later.
     */
     const tag = bytes.subarray(0, 4)
     const looksLikeAFont =
@@ -277,8 +277,8 @@ const saveGlyphExample = endpoint('/dev/glyph-example', 'POST', async ({ stream 
 
   const file = request.file
   /*
-  A glyph's file is named after its entry; the two faces are `_text` and
-  `_chord-letters`, the leading underscore marking them as not a glyph.
+    A glyph's file is named after its entry; the two faces are `_text` and
+    `_chord-letters`, the leading underscore marking them as not a glyph.
   */
   if (typeof file !== 'string' || !/^[A-Za-z0-9_][A-Za-z0-9 .:_-]*\.txt$/.test(file) || file.includes('..')) {
     return respondWith(stream, 400, { error: 'Expected { file } naming an example' })

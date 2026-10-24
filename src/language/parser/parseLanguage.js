@@ -324,9 +324,9 @@ const runParserScenarios = (createParserScenarios, typeOfScenarios, numberOfActi
 // --- parseLanguage -----------------------------------------------------------
 
 /*
-runMain: whether the main scenarios run (they build the page schema, errors, comments,
-styles and MIDI settings). adapterNames: the adapters that run as well, or instead when
-runMain is false (see scenarios/adapterDefinitions.js and README.md).
+  runMain: whether the main scenarios run (they build the page schema, errors, comments,
+  styles and MIDI settings). adapterNames: the adapters that run as well, or instead when
+  runMain is false (see scenarios/adapterDefinitions.js and README.md).
 */
 export default function (
   unitext,

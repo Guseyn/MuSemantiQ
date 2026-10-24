@@ -1,11 +1,11 @@
 /*
-The highlights div only mirrors the textarea's scroll, so the textarea is the
-one to scroll: the div and the line numbers follow it. Its scroll event comes
-later, and the span is flashed right away, so all three are set here.
+  The highlights div only mirrors the textarea's scroll, so the textarea is the
+  one to scroll: the div and the line numbers follow it. Its scroll event comes
+  later, and the span is flashed right away, so all three are set here.
 
-scrollIntoView is not used for the editor itself: it would also scroll the
-textarea's ancestors, and the word would land at the very edge. Like the
-caret, the word is put a third of the way into the view.
+  scrollIntoView is not used for the editor itself: it would also scroll the
+  textarea's ancestors, and the word would land at the very edge. Like the
+  caret, the word is put a third of the way into the view.
 */
 export default (span, divUnderneathTextarea, textarea, lineNumbersColumn) => {
   const spanRect = span.getBoundingClientRect()

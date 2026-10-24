@@ -1,20 +1,20 @@
 /*
-<docs-diagram>, a diagram written as Mermaid inside it, drawn as SVG in its
-place. diagram-extension.js turns a ```mermaid fence into one.
+  <docs-diagram>, a diagram written as Mermaid inside it, drawn as SVG in its
+  place. diagram-extension.js turns a ```mermaid fence into one.
 
-Mermaid is vendored in lib/mermaid (MIT, see its LICENSE): its ES module
-build, as it is published, readable and unbundled, found through the import
-map as #mermaid. It is several megabytes, so it is imported only when the first
-diagram on a page connects, and only once: most pages have none.
+  Mermaid is vendored in lib/mermaid (MIT, see its LICENSE): its ES module
+  build, as it is published, readable and unbundled, found through the import
+  map as #mermaid. It is several megabytes, so it is imported only when the first
+  diagram on a page connects, and only once: most pages have none.
 
-The theme is set here rather than in each diagram, so every diagram looks like
-the rest of the docs: white boxes with e-ui's border, and the interface font.
-A node can also be an icon, from the Material Symbols in diagram-icons.js,
-with arrows that meet the icon rather than its label (arrows-to-icons.js).
+  The theme is set here rather than in each diagram, so every diagram looks like
+  the rest of the docs: white boxes with e-ui's border, and the interface font.
+  A node can also be an icon, from the Material Symbols in diagram-icons.js,
+  with arrows that meet the icon rather than its label (arrows-to-icons.js).
 
-e-markdown moves its children out of itself once it has rendered them, which
-disconnects the element and connects it again, so it draws on the first
-connect only.
+  e-markdown moves its children out of itself once it has rendered them, which
+  disconnects the element and connects it again, so it draws on the first
+  connect only.
 */
 import materialIcons from '#docs/diagram-icons.js'
 import arrowsToIcons from '#docs/arrows-to-icons.js'
@@ -47,9 +47,9 @@ function loadedMermaid() {
 }
 
 /*
-Mermaid measures every label as it draws. In a tab that is not open, or anything
-else with display: none, everything measures as zero and the drawing comes out
-collapsed, so a hidden diagram waits until it first has a size of its own.
+  Mermaid measures every label as it draws. In a tab that is not open, or anything
+  else with display: none, everything measures as zero and the drawing comes out
+  collapsed, so a hidden diagram waits until it first has a size of its own.
 */
 function shown(element) {
   if (element.getClientRects().length > 0) {
@@ -85,9 +85,9 @@ class DocsDiagram extends HTMLElement {
       const drawing = this.querySelector('svg')
       arrowsToIcons(drawing)
       /*
-      A diagram shrinks to fit the card, but past three quarters of its size its
-      words get too small to read, on a phone most of all: from there the card
-      scrolls sideways instead, as a code block does.
+        A diagram shrinks to fit the card, but past three quarters of its size its
+        words get too small to read, on a phone most of all: from there the card
+        scrolls sideways instead, as a code block does.
       */
       const naturalWidth = drawing.viewBox.baseVal && drawing.viewBox.baseVal.width
       if (naturalWidth) {
@@ -95,10 +95,10 @@ class DocsDiagram extends HTMLElement {
       }
       this.setAttribute('data-drawn', '')
       /*
-      Drawn, the diagram is taller than its placeholder, which moves everything
-      below it. A page opened at a heading further down is on its way there,
-      often in a smooth scroll that has already chosen where to stop, so the
-      heading is gone to again, at once.
+        Drawn, the diagram is taller than its placeholder, which moves everything
+        below it. A page opened at a heading further down is on its way there,
+        often in a smooth scroll that has already chosen where to stop, so the
+        heading is gone to again, at once.
       */
       const target = window.location.hash && document.getElementById(decodeURIComponent(window.location.hash.slice(1)))
       if (target && (this.compareDocumentPosition(target) & Node.DOCUMENT_POSITION_FOLLOWING)) {

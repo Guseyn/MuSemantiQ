@@ -1,11 +1,11 @@
 import scrollToScreen from '/js/landing/scrollToScreen.js'
 
 /*
-<a is="landing-scroll-hint" data-scroll-hint href="#see">
+  <a is="landing-scroll-hint" data-scroll-hint href="#see">
 
-Points at the next screen, and moves there smoothly when clicked. It has said
-what it has to say as soon as the reader scrolls, so then it marks itself
-data-scrolled and the stylesheet fades it out.
+  Points at the next screen, and moves there smoothly when clicked. It has said
+  what it has to say as soon as the reader scrolls, so then it marks itself
+  data-scrolled and the stylesheet fades it out.
 */
 class LandingScrollHint extends HTMLAnchorElement {
   connectedCallback() {

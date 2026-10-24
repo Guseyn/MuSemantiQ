@@ -1,34 +1,34 @@
 /*
-A showdown extension that turns a fenced block named after a msq element into
-that element:
+  A showdown extension that turns a fenced block named after a msq element into
+  that element:
 
-  ```msq-editor opens-with=text file-name="a short piece"
-  chord
-  c e g
-  ```
+    ```msq-editor opens-with=text file-name="a short piece"
+    chord
+    c e g
+    ```
 
-becomes
+  becomes
 
-  <template is="msq-editor" data-font-sources="…" data-opens-with="text" data-file-name="a short piece">
-  chord
-  c e g
-  </template>
+    <template is="msq-editor" data-font-sources="…" data-opens-with="text" data-file-name="a short piece">
+    chord
+    c e g
+    </template>
 
-Words after the element's name are its attributes: `key=value`, `key="value
-with spaces"`, or a bare `key` for an empty one. `data-` is added unless it is
-already there. The options given when the extension is made (fontSources, and
-any other attributes) are the defaults, which the fence can override.
+  Words after the element's name are its attributes: `key=value`, `key="value
+  with spaces"`, or a bare `key` for an empty one. `data-` is added unless it is
+  already there. The options given when the extension is made (fontSources, and
+  any other attributes) are the defaults, which the fence can override.
 
-The music has to reach the element exactly as written, and markdown would not
-leave it alone: blank lines split it into paragraphs, and lines starting `-`,
-`#` or `1.` are eaten. So it never goes through markdown at all. The `lang`
-filter, which runs before showdown parses anything, takes every such fence out
-and leaves a placeholder; the `output` filter, which runs after, puts the
-element in the placeholder's place. Anything else fenced, including a fence
-that only shows msq markup (```html), is left to showdown.
+  The music has to reach the element exactly as written, and markdown would not
+  leave it alone: blank lines split it into paragraphs, and lines starting `-`,
+  `#` or `1.` are eaten. So it never goes through markdown at all. The `lang`
+  filter, which runs before showdown parses anything, takes every such fence out
+  and leaves a placeholder; the `output` filter, which runs after, puts the
+  element in the placeholder's place. Anything else fenced, including a fence
+  that only shows msq markup (```html), is left to showdown.
 
-These extensions do not import showdown: they are plain objects showdown
-calls, so a page or a Node script can pass them to whichever copy it has.
+  These extensions do not import showdown: they are plain objects showdown
+  calls, so a page or a Node script can pass them to whichever copy it has.
 */
 
 export default function msqElementExtension(elementName, defaultAttributes = {}) {
@@ -67,9 +67,9 @@ export default function msqElementExtension(elementName, defaultAttributes = {})
 }
 
 /*
-Before any `lang` filter runs, showdown escapes `¨` as `¨T` and `$` as `¨D`,
-and it only undoes that for the text it renders itself. The music is kept out
-of that text, so it is undone here.
+  Before any `lang` filter runs, showdown escapes `¨` as `¨T` and `$` as `¨D`,
+  and it only undoes that for the text it renders itself. The music is kept out
+  of that text, so it is undone here.
 */
 function unescapedByShowdown(text) {
   return text.replace(/¨D/g, '$').replace(/¨T/g, '¨')

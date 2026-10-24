@@ -1,28 +1,28 @@
 #!/usr/bin/env node
 
 /*
-Downloads nodes, EHTML and e-ui into the dev tools.
+  Downloads nodes, EHTML and e-ui into the dev tools.
 
-The dev tools run on three libraries of the same author: nodes (the server),
-EHTML (the pages) and e-ui (the design system). `npm run dev-tools:vendor`
-copies them from checkouts next to MuSemantiQ, which only the maintainer has.
-This downloads each one as a zip from GitHub instead, and puts the folders the
-app needs exactly where `dev-tools:vendor` would put them:
+  The dev tools run on three libraries of the same author: nodes (the server),
+  EHTML (the pages) and e-ui (the design system). `npm run dev-tools:vendor`
+  copies them from checkouts next to MuSemantiQ, which only the maintainer has.
+  This downloads each one as a zip from GitHub instead, and puts the folders the
+  app needs exactly where `dev-tools:vendor` would put them:
 
-  nodes   nodes/            -> dev-tools/nodes/
-  EHTML   src/              -> dev-tools/web-app/static/js/ehtml/
-  e-ui    static/js/e-ui/   -> dev-tools/web-app/static/js/e-ui/
-          static/css/e-ui.css -> dev-tools/web-app/static/css/e-ui.css
+    nodes   nodes/            -> dev-tools/nodes/
+    EHTML   src/              -> dev-tools/web-app/static/js/ehtml/
+    e-ui    static/js/e-ui/   -> dev-tools/web-app/static/js/e-ui/
+            static/css/e-ui.css -> dev-tools/web-app/static/css/e-ui.css
 
-    npm run dev-tools:download          asks before downloading
-    npm run dev-tools:download -- --yes does not ask
+      npm run dev-tools:download          asks before downloading
+      npm run dev-tools:download -- --yes does not ask
 
-It asks first, because it downloads code from the internet and replaces those
-folders. They are gitignored, so nothing committed is touched.
+  It asks first, because it downloads code from the internet and replaces those
+  folders. They are gitignored, so nothing committed is touched.
 
-Node has no unzip, and this project has no dependencies, so the zip is read
-here: the central directory at the end of the file lists every entry, and each
-entry is either stored or deflated, which zlib can inflate.
+  Node has no unzip, and this project has no dependencies, so the zip is read
+  here: the central directory at the end of the file lists every entry, and each
+  entry is either stored or deflated, which zlib can inflate.
 */
 
 import fs from 'fs'
@@ -61,9 +61,9 @@ const LIBRARIES = [
 ]
 
 /*
-Every file in the zip, as { name, data }. GitHub puts everything under one
-folder named after the repository and the branch (`EHTML-master/`), which is
-cut off, so names start from the root of the repository.
+  Every file in the zip, as { name, data }. GitHub puts everything under one
+  folder named after the repository and the branch (`EHTML-master/`), which is
+  cut off, so names start from the root of the repository.
 */
 function filesInZip(zip) {
   const END_OF_CENTRAL_DIRECTORY = 0x06054b50

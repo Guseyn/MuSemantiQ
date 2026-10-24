@@ -36,11 +36,11 @@ export default async function generate({
   pageDelimiter = DEFAULT_PAGE_DELIMITER
 }) {
   /*
-   * Engraving needs the actual glyph outlines. Playback does not — it never
-   * consults a font — so a MIDI-only run skips loading several megabytes of
-   * OpenType data and glyph tables, and takes the font *names* from the config
-   * instead. That mirrors the browser, where the MIDI element needs no fonts.
-   */
+    Engraving needs the actual glyph outlines. Playback does not — it never
+    consults a font — so a MIDI-only run skips loading several megabytes of
+    OpenType data and glyph tables, and takes the font *names* from the config
+    instead. That mirrors the browser, where the MIDI element needs no fonts.
+  */
   const needsGlyphs = formats.svg || formats.pageSchema
   let supportedFontSources = null
   let supportedFontNames
@@ -53,11 +53,11 @@ export default async function generate({
   }
 
   /*
-   * The multi-page entry point is used even for a single page. Besides handling
-   * both cases identically, it stamps each measure with its page index and
-   * position, which the MIDI stage needs to build reference ids; the
-   * single-page path leaves that to the caller.
-   */
+    The multi-page entry point is used even for a single page. Besides handling
+    both cases identically, it stamps each measure with its page index and
+    position, which the MIDI stage needs to build reference ids; the
+    single-page path leaves that to the caller.
+  */
   const intermediate = generateIntermediateStructuresForMultiplePages({
     multiplePagesText: pages,
     supportedFontNames
@@ -92,10 +92,10 @@ export default async function generate({
     switch (file.kind) {
       case 'svg':
         /*
-         * One SVG per page, rendered individually. The multi-page renderer
-         * stacks every page into a single image instead, which is not what is
-         * wanted here, and the API offers no "one image per page" call.
-         */
+          One SVG per page, rendered individually. The multi-page renderer
+          stacks every page into a single image instead, which is not what is
+          wanted here, and the API offers no "one image per page" call.
+        */
         return {
           fileName,
           content: generateSvgForSinglePage({

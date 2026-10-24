@@ -18,9 +18,9 @@ const audio = index.suites.filter((suite) => suite.kind === 'audio')
 const firstOf = (group) => (group[0] ? group[0].name : null)
 
 /*
-The visual corpus to begin with. Which tab the page actually opens on is
-e-tabs' decision — it reads the hash — and the suite is moved to match once it
-has made it, at the foot of this file.
+  The visual corpus to begin with. Which tab the page actually opens on is
+  e-tabs' decision — it reads the hash — and the suite is moved to match once it
+  has made it, at the foot of this file.
 */
 const state = { suite: firstOf(visual), test: null, artifact: null }
 
@@ -97,9 +97,9 @@ function stepTest(by) {
 async function refreshTheIndex() {
   const fresh = await (await fetch('/dev/tests')).json()
   /*
-  The suites are updated in place rather than replaced: the visual and audio
-  lists hold these very objects, and swapping the array would leave them
-  pointing at the old one.
+    The suites are updated in place rather than replaced: the visual and audio
+    lists hold these very objects, and swapping the array would leave them
+    pointing at the old one.
   */
   for (const suite of index.suites) {
     const again = fresh.suites.find((one) => one.name === suite.name)
@@ -123,9 +123,9 @@ window.testWritten = async function (name) {
 }
 
 /*
-The editor in the dialog engraves as you write, which means the worker needs the
-fonts. They are registered the first time the dialog is opened rather than on
-load: most visits to this page never write a test.
+  The editor in the dialog engraves as you write, which means the worker needs the
+  fonts. They are registered the first time the dialog is opened rather than on
+  load: most visits to this page never write a test.
 */
 const EDITOR_FONTS = 'testViewerFonts'
 let fontsAreReady = null
@@ -138,9 +138,9 @@ function readyTheFonts() {
       loader.setAttribute('data-font-sources-reference', EDITOR_FONTS)
       loader.setAttribute('data-font-config', JSON.stringify(config))
       /*
-      The loader inserts a copy of its content, so the marker has to be findable
-      by attribute — a reference to the node put in would point at the original,
-      which never reaches the document.
+        The loader inserts a copy of its content, so the marker has to be findable
+        by attribute — a reference to the node put in would point at the original,
+        which never reaches the document.
       */
       const ready = document.createElement('div')
       ready.setAttribute('data-fonts-ready', '')
@@ -161,9 +161,9 @@ function readyTheFonts() {
 }
 
 /*
-An msq-editor cannot be re-rendered — it replaces itself with the engraved view
-and guards on having rendered once — so every time the dialog opens it gets a
-fresh one.
+  An msq-editor cannot be re-rendered — it replaces itself with the engraved view
+  and guards on having rendered once — so every time the dialog opens it gets a
+  fresh one.
 */
 function engraveInTheDialog(msq) {
   const template = document.createElement('template', { is: 'msq-editor' })
@@ -214,9 +214,9 @@ async function openTheDialog({ editing }) {
 
   if (editing) {
     /*
-    The source comes from the suite that is showing, without its `music font is`
-    line: that line belongs to the suite rather than to the test, and is written
-    back on save.
+      The source comes from the suite that is showing, without its `music font is`
+      line: that line belongs to the suite rather than to the test, and is written
+      back on save.
     */
     try {
       const source = await (await fetch(
@@ -235,8 +235,8 @@ async function openTheDialog({ editing }) {
   at('new-test').showModal()
 
   /*
-  The editor measures itself as it renders, so it is built after the dialog is
-  open and has a size — before that it would lay out against nothing.
+    The editor measures itself as it renders, so it is built after the dialog is
+    open and has a size — before that it would lay out against nothing.
   */
   try {
     await readyTheFonts()
@@ -247,9 +247,9 @@ async function openTheDialog({ editing }) {
 }
 
 /*
-The tab a suite belongs to. `e-tabs` builds its nav one microtask after EHTML
-activates it, and offers no event when a tab is chosen, so the buttons it
-generates are what we listen on.
+  The tab a suite belongs to. `e-tabs` builds its nav one microtask after EHTML
+  activates it, and offers no event when a tab is chosen, so the buttons it
+  generates are what we listen on.
 */
 async function watchTabs() {
   while (!tabs.querySelector('nav')) {
@@ -340,10 +340,10 @@ function sideMarkup(artifact, side, present) {
     return `<div data-sounds><midi-player data-src="${url}" sound-font></midi-player></div>`
   }
   /*
-  The highlight artifact is markup, and what it is meant to look like is the
-  point of it — a colour that came out wrong is invisible in the source and
-  obvious on the page. The markup is kept underneath for the times the question
-  is which span carries which class.
+    The highlight artifact is markup, and what it is meant to look like is the
+    point of it — a colour that came out wrong is invisible in the source and
+    obvious on the page. The markup is kept underneath for the times the question
+    is which span carries which class.
   */
   if (artifact.extension === 'html') {
     return `<e-scrollable data-show-scrollbar data-scrolls>` +
@@ -357,9 +357,9 @@ function sideMarkup(artifact, side, present) {
 }
 
 /*
-The highlight colours, as the editor defines them, plus the two properties they
-are written against — which the editor declares on its own `:host` and so does
-not reach a page.
+  The highlight colours, as the editor defines them, plus the two properties they
+  are written against — which the editor declares on its own `:host` and so does
+  not reach a page.
 */
 const HIGHLIGHT_STYLE = /* css */`
   :host {
@@ -558,10 +558,10 @@ async function adopt(artifactName) {
     window.showToast(`Adopted ${result.adopted.join(', ') || 'nothing'} for ${result.test}.`)
 
     /*
-    The picker's "failing" label comes from the suite's failed list, which the
-    server has just rewritten if this test now matches everywhere. Nothing else
-    about the suite changed, so the label is updated in place rather than by
-    reading the whole index again.
+      The picker's "failing" label comes from the suite's failed list, which the
+      server has just rewritten if this test now matches everywhere. Nothing else
+      about the suite changed, so the label is updated in place rather than by
+      reading the whole index again.
     */
     const failing = suiteNamed(state.suite).failed
     const already = failing.indexOf(result.test)
@@ -587,8 +587,8 @@ at('previous-test').addEventListener('click', () => stepTest(-1))
 at('next-test').addEventListener('click', () => stepTest(1))
 
 /*
-Which kind is written follows the tab you are on: a visual test lands in every
-visual suite, an audio one in the audio suite.
+  Which kind is written follows the tab you are on: a visual test lands in every
+  visual suite, an audio one in the audio suite.
 */
 /**
  * Take a test out of the corpus: its source and every artifact either side of
@@ -627,8 +627,8 @@ async function deleteTest() {
     }
 
     /*
-    Where the walk lands next: the test after the one that went, by position
-    rather than by name, since the name is no longer in the list.
+      Where the walk lands next: the test after the one that went, by position
+      rather than by name, since the name is no longer in the list.
     */
     const was = suiteNamed(state.suite).tests.indexOf(going)
     await refreshTheIndex()
@@ -671,10 +671,10 @@ new MutationObserver(() => {
 }).observe(viewer, { childList: true, subtree: true })
 
 /*
-Which kind of test is showing is the tab's business, and e-tabs works it out
-from the hash and records it as `data-current-tab` — so opening the page at
-`#audio` lands on the audio corpus without anything here reading the hash, or
-knowing how a tab title becomes one.
+  Which kind of test is showing is the tab's business, and e-tabs works it out
+  from the hash and records it as `data-current-tab` — so opening the page at
+  `#audio` lands on the audio corpus without anything here reading the hash, or
+  knowing how a tab title becomes one.
 */
 const families = await watchTabs()
 const group = Number(families.getAttribute('data-current-tab')) === 1 ? audio : visual

@@ -18,13 +18,13 @@ import theCommandKeyIsHeld from '#msq/web-components/editor/theCommandKeyIsHeld.
  */
 export default (textarea) => {
   /*
-  The line we last took, and nothing more. The clipboard itself cannot be read
-  back without a permission the page may not have — and asking would be worse
-  than the feature — so what is remembered here is the claim "the clipboard
-  currently holds this line, because we just put it there".
+    The line we last took, and nothing more. The clipboard itself cannot be read
+    back without a permission the page may not have — and asking would be worse
+    than the feature — so what is remembered here is the claim "the clipboard
+    currently holds this line, because we just put it there".
 
-  It is dropped the moment anything else is copied or cut, including by another
-  editor on the page, so a stale claim cannot outlive the truth.
+    It is dropped the moment anything else is copied or cut, including by another
+    editor on the page, so a stale claim cannot outlive the truth.
   */
   let lineInHand = null
 
@@ -36,9 +36,9 @@ export default (textarea) => {
   }
 
   /*
-  A line is taken with its newline, so pasting it back cannot weld two lines
-  together. The last line of the file has none, and then the newline before it
-  is taken instead — otherwise cutting it would leave a blank line behind.
+    A line is taken with its newline, so pasting it back cannot weld two lines
+    together. The last line of the file has none, and then the newline before it
+    is taken instead — otherwise cutting it would leave a blank line behind.
   */
   const spanToTake = (position) => {
     const { start, end, value } = lineAround(position)
@@ -57,11 +57,11 @@ export default (textarea) => {
       return
     }
     /*
-    A take still in the air is settled first. The keys can be pressed faster
-    than the copy or cut comes back, and while the selection we made for it is
-    up the caret cannot be read: that selection starts at the beginning of the
-    taken line, right after the newline before it, and keeping it as where the
-    caret was would leave the caret there once the copy is put back.
+      A take still in the air is settled first. The keys can be pressed faster
+      than the copy or cut comes back, and while the selection we made for it is
+      up the caret cannot be read: that selection starts at the beginning of the
+      taken line, right after the newline before it, and keeping it as where the
+      caret was would leave the caret there once the copy is put back.
     */
     putTheCaretBack()
     const key = event.key.toLowerCase()
@@ -73,11 +73,11 @@ export default (textarea) => {
         return
       }
       /*
-      Selected, then handed to the browser: not prevented, so the native cut or
-      copy runs over this selection, and the caret is put back afterwards by the
-      listeners below. Where it was is remembered rather than worked out again —
-      the selection about to be made can start on the newline that ends the line
-      before, which no longer says where we were.
+        Selected, then handed to the browser: not prevented, so the native cut or
+        copy runs over this selection, and the caret is put back afterwards by the
+        listeners below. Where it was is remembered rather than worked out again —
+        the selection about to be made can start on the newline that ends the line
+        before, which no longer says where we were.
       */
       textarea.wasTakenAsAWholeLine = { caret: textarea.selectionStart }
       textarea.setSelectionRange(taken.from, taken.to)
@@ -92,10 +92,10 @@ export default (textarea) => {
   })
 
   /*
-  What the browser did with the selection we made for it. A copy leaves the text
-  where it was, so the caret has to be put back on the character it was on; a
-  cut removes the line, and the caret lands at the start of what followed, which
-  is where it should be.
+    What the browser did with the selection we made for it. A copy leaves the text
+    where it was, so the caret has to be put back on the character it was on; a
+    cut removes the line, and the caret lands at the start of what followed, which
+    is where it should be.
   */
   const putTheCaretBack = () => {
     const taken = textarea.wasTakenAsAWholeLine
@@ -120,9 +120,9 @@ export default (textarea) => {
   })
 
   /*
-  Anything copied that is not a whole line takes the line out of our hands, so
-  the next paste is the browser's again. `paste` is not listened for: a paste we
-  did not handle is one the browser is already handling correctly.
+    Anything copied that is not a whole line takes the line out of our hands, so
+    the next paste is the browser's again. `paste` is not listened for: a paste we
+    did not handle is one the browser is already handling correctly.
   */
   const forgetTheLine = (event) => {
     if (!textarea.wasTakenAsAWholeLine) {
@@ -148,9 +148,9 @@ export default (textarea) => {
 
     const text = line.endsWith('\n') ? line : `${line}\n`
     /*
-    The last line has no newline after it, so one is written before the pasted
-    line rather than after — the file gains a line either way, and this way it
-    does not gain a trailing blank one.
+      The last line has no newline after it, so one is written before the pasted
+      line rather than after — the file gains a line either way, and this way it
+      does not gain a trailing blank one.
     */
     const atTheEnd = end >= value.length
     const inserted = atTheEnd ? `\n${text.slice(0, -1)}` : text

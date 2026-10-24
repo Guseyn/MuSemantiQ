@@ -82,7 +82,7 @@ The one exception is the components section, where each page shows the element
 it is about.
 
 They must stay **gradual**: an example may only use what this page or an
-earlier one introduced. `npm run docs:check` enforces it.
+earlier one introduced.
 
 For code (JavaScript, shell), fenced blocks with a language, and only code that
 matches the source as it is.

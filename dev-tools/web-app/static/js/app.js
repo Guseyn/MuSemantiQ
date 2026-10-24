@@ -1,9 +1,9 @@
 /*
-Plain globals for the dev tool pages.
+  Plain globals for the dev tool pages.
 
-Not a module on purpose: HTML attributes and `onclick` strings are evaluated in
-global scope, so anything they call has to live there. This is the same shape the
-other apps on this stack use.
+  Not a module on purpose: HTML attributes and `onclick` strings are evaluated in
+  global scope, so anything they call has to live there. This is the same shape the
+  other apps on this stack use.
 */
 
 /**

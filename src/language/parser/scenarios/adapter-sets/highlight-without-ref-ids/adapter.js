@@ -1,10 +1,10 @@
 'use strict'
 
 /*
-Highlights without ref-ids: what the editor shows while you type. It runs instead of the
-main scenarios, so there is no page schema to link the text to. Its scenario files have
-the same names as the main ones and are added in the same order, so copies of scenarios
-find what they copy.
+  Highlights without ref-ids: what the editor shows while you type. It runs instead of the
+  main scenarios, so there is no page schema to link the text to. Its scenario files have
+  the same names as the main ones and are added in the same order, so copies of scenarios
+  find what they copy.
 */
 
 import addNotRecognizableCommandScenario from '#msq/language/parser/scenarios/adapter-sets/highlight-without-ref-ids/addNotRecognizableCommandScenario.js'

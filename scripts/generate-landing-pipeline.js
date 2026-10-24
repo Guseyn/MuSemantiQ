@@ -1,25 +1,25 @@
 #!/usr/bin/env node
 
 /*
-"How it works" on the landing page, as the engine really runs it.
+  "How it works" on the landing page, as the engine really runs it.
 
-The screen walks one tiny piece of MSQ through the pipeline and shows what each
-step makes of it: the intermediate structures the parser returns, the styles
-derived from them, and the outputs. None of that is drawn by hand. This script
-runs the pipeline once and writes every step's real result:
+  The screen walks one tiny piece of MSQ through the pipeline and shows what each
+  step makes of it: the intermediate structures the parser returns, the styles
+  derived from them, and the outputs. None of that is drawn by hand. This script
+  runs the pipeline once and writes every step's real result:
 
-  md/landing/pipeline/<step>.md   each structure, fenced, for e-markdown to show
-                                  (JSON, and the highlighted HTML)
-  images/pipeline/score.svg       the engraved score
-  images/pipeline/midi.svg        the performance as a piano roll, drawn from the
-                                  notes read back out of the MIDI file
-  images/pipeline/example.mid     the MIDI file itself
+    md/landing/pipeline/<step>.md   each structure, fenced, for e-markdown to show
+                                    (JSON, and the highlighted HTML)
+    images/pipeline/score.svg       the engraved score
+    images/pipeline/midi.svg        the performance as a piano roll, drawn from the
+                                    notes read back out of the MIDI file
+    images/pipeline/example.mid     the MIDI file itself
 
-    npm run docs:pipeline
+      npm run docs:pipeline
 
-Everything is committed: it changes only when this script, the example or the
-engine changes, and the landing page should not have to start the engine to
-explain it. Rerun it after any of those changes.
+  Everything is committed: it changes only when this script, the example or the
+  engine changes, and the landing page should not have to start the engine to
+  explain it. Rerun it after any of those changes.
 */
 
 import fs from 'fs'
@@ -42,11 +42,11 @@ const mdDir = path.join(staticDir, 'md', 'landing', 'pipeline')
 const imagesDir = path.join(staticDir, 'images', 'pipeline')
 
 /*
-Two lines of music, and three lines that give every structure something to
-show: a comment, a style and a MIDI setting. With the music alone, half of the
-structures would be empty, and an empty {} explains nothing. The style narrows
-the page to the music, so the engraved score is not five notes at the edge of
-an empty stave.
+  Two lines of music, and three lines that give every structure something to
+  show: a comment, a style and a MIDI setting. With the music alone, half of the
+  structures would be empty, and an empty {} explains nothing. The style narrows
+  the page to the music, so the engraved score is not five notes at the edge of
+  an empty stave.
 */
 const EXAMPLE = `comment: "A first page."
 page line width is 300
@@ -89,9 +89,9 @@ function write(file, content) {
 }
 
 /*
-The page styles hold the loaded fonts too, which are objects of their own (and
-circular), so only the plain values are shown: the numbers, names and flags
-that every measurement on the page is derived from.
+  The page styles hold the loaded fonts too, which are objects of their own (and
+  circular), so only the plain values are shown: the numbers, names and flags
+  that every measurement on the page is derived from.
 */
 function plainValuesOf(styles) {
   return Object.fromEntries(
@@ -100,8 +100,8 @@ function plainValuesOf(styles) {
 }
 
 /*
-The editor's colours, from the stylesheet the editor itself uses, scoped to the
-one block they colour here so they cannot leak into the rest of the page.
+  The editor's colours, from the stylesheet the editor itself uses, scoped to the
+  one block they colour here so they cannot leak into the rest of the page.
 */
 async function highlightsCss() {
   // web-components/ has no specifier of its own (#msq/ is src/), so it is imported by path
@@ -118,9 +118,9 @@ async function highlightsCss() {
 }
 
 /*
-The performance as a piano roll: one row per pitch that sounds, one bar per
-note, along the seconds it lasts. Drawn from the notes read back out of the
-MIDI file, so it shows what was written into the file, not what was meant to be.
+  The performance as a piano roll: one row per pitch that sounds, one bar per
+  note, along the seconds it lasts. Drawn from the notes read back out of the
+  MIDI file, so it shows what was written into the file, not what was meant to be.
 */
 const NOTE_NAMES = [ 'c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#', 'a', 'a#', 'b' ]
 
@@ -177,9 +177,9 @@ const pageStyles = generateStylesForSinglePage({
 const svg = generateSvgForSinglePage({ pageSchema: structures.pageSchema, pageStyles })
 
 /*
-Measures are numbered the way the components number them before they ask for a
-performance (see src/worker.js): the MIDI ref ids are built from these, and
-without them they come out as NaN.
+  Measures are numbered the way the components number them before they ask for a
+  performance (see src/worker.js): the MIDI ref ids are built from these, and
+  without them they come out as NaN.
 */
 structures.pageSchema.measuresParams.forEach((measureParams, measureIndex) => {
   measureParams.pageIndex = 0
@@ -211,8 +211,8 @@ write(path.join(mdDir, 'timing.md'), json({
   refsOnMappedWithTimeStamps: midi.refsOnMappedWithTimeStamps
 }))
 /*
-The highlighted source is HTML already. A <pre> is one of showdown's block
-tags, so it is passed through as written, and its colours come with it.
+  The highlighted source is HTML already. A <pre> is one of showdown's block
+  tags, so it is passed through as written, and its colours come with it.
 */
 write(
   path.join(mdDir, 'highlights.md'),

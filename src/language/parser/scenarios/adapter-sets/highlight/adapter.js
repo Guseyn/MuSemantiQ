@@ -1,10 +1,10 @@
 'use strict'
 
 /*
-Highlights with ref-ids: the spans the editor shows next to the score, each linked by its
-ref-id to what it drew. It runs with the main scenarios and reads what each main action
-returns (fromMain). Its scenario files have the same names as the main ones and are added
-in the same order, so copies of scenarios find what they copy.
+  Highlights with ref-ids: the spans the editor shows next to the score, each linked by its
+  ref-id to what it drew. It runs with the main scenarios and reads what each main action
+  returns (fromMain). Its scenario files have the same names as the main ones and are added
+  in the same order, so copies of scenarios find what they copy.
 */
 
 import addNotRecognizableCommandScenario from '#msq/language/parser/scenarios/adapter-sets/highlight/addNotRecognizableCommandScenario.js'

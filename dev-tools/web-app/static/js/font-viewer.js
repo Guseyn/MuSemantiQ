@@ -7,11 +7,11 @@ import { registerFontNames } from '#msq/web-components/utils/fontNames.js'
 // --- what the page's e-json elements hand over ------------------------------
 
 /*
-The page's two requests are made by the <e-json> elements in the markup, which
-also fill every picker from them — the option lists are templates there rather
-than loops here. What the script still needs is the answers themselves: the
-config that registers the faces with the worker, and the entry list the glyph
-walk steps through.
+  The page's two requests are made by the <e-json> elements in the markup, which
+  also fill every picker from them — the option lists are templates there rather
+  than loops here. What the script still needs is the answers themselves: the
+  config that registers the faces with the worker, and the entry list the glyph
+  walk steps through.
 */
 /**
  * Take delivery of what one of the page's e-json elements fetched.
@@ -160,13 +160,13 @@ function readUnicode(source, entryPath) {
 // --- the music each glyph is judged in -------------------------------------
 
 /*
-Each entry in the glyph table has a file of its own under dev-tools/glyph-examples,
-holding the music that glyph is judged in — an accent above and below a note, a
-flag on a stem both ways, a clef on a stave. They are files rather than generated
-strings so that a bad example can be fixed by writing music, not code.
+  Each entry in the glyph table has a file of its own under dev-tools/glyph-examples,
+  holding the music that glyph is judged in — an accent above and below a note, a
+  flag on a stem both ways, a clef on a stave. They are files rather than generated
+  strings so that a bad example can be fixed by writing music, not code.
 
-None of them names a music font: the viewer puts `music font is <name>` in front,
-so switching font rewrites that one line and nothing else.
+  None of them names a music font: the viewer puts `music font is <name>` in front,
+  so switching font rewrites that one line and nothing else.
 */
 const PLAIN_EXAMPLE = `measure
 stave with treble clef
@@ -296,13 +296,13 @@ const elements = {
 }
 
 /*
-Which faces there are, read off the disk rather than written down here.
+  Which faces there are, read off the disk rather than written down here.
 
-The page used to carry its own list of the four music fonts and the four text
-files, which meant a face added to src/drawer/font was invisible until someone
-remembered to add it here too. `/dev/fonts` walks those folders and returns both
-the faces and the config that registers them, under the names the language
-accepts.
+  The page used to carry its own list of the four music fonts and the four text
+  files, which meant a face added to src/drawer/font was invisible until someone
+  remembered to add it here too. `/dev/fonts` walks those folders and returns both
+  the faces and the config that registers them, under the names the language
+  accepts.
 */
 let faces = { music: [], text: [], 'chord-letters': [], config: {} }
 
@@ -356,13 +356,13 @@ function keepTheChoice(picker, chosen, fallback) {
 const faceNamed = (family, name) => faces[family].find((one) => one.name === name)
 
 /*
-Every glyph the scaffold defines, flattened so nested letter maps are pickable.
+  Every glyph the scaffold defines, flattened so nested letter maps are pickable.
 
-This is where the codepoint, the drawn size and the yOffset defaults come from —
-things the font files do not carry. What is *offered* is a wider list than this:
-the server merges it with whatever every traced font turns out to hold, so a
-glyph added to the fonts by hand is pickable even though the scaffold has never
-heard of it.
+  This is where the codepoint, the drawn size and the yOffset defaults come from —
+  things the font files do not carry. What is *offered* is a wider list than this:
+  the server merges it with whatever every traced font turns out to hold, so a
+  glyph added to the fonts by hand is pickable even though the scaffold has never
+  heard of it.
 */
 const glyphs = new Map()
 const collect = (nodes, prefix) => {
@@ -497,11 +497,11 @@ function fontConfig(musicJs = {}) {
 }
 
 /*
-The music-js source of each font, read from the same file Apply writes.
+  The music-js source of each font, read from the same file Apply writes.
 
-It used to come from the generated mirror under /js/msq/worker/, which is a copy
-made at build time — so an applied change appeared to revert until that copy was
-rebuilt. Reading the source directly is what makes Apply visible.
+  It used to come from the generated mirror under /js/msq/worker/, which is a copy
+  made at build time — so an applied change appeared to revert until that copy was
+  rebuilt. Reading the source directly is what makes Apply visible.
 */
 const fontSources = new Map()
 async function musicJsSource(name) {
@@ -516,11 +516,11 @@ async function musicJsSource(name) {
 }
 
 /*
-Registering a preview.
+  Registering a preview.
 
-The worker refuses a second registration under a reference it already holds, so
-each preview gets its own. The patched font goes in as a blob: the worker
-imports it like any other module, and nothing is written to disk.
+  The worker refuses a second registration under a reference it already holds, so
+  each preview gets its own. The patched font goes in as a blob: the worker
+  imports it like any other module, and nothing is written to disk.
 */
 let previewCount = 0
 const previews = new Map()
@@ -536,9 +536,9 @@ const previews = new Map()
  */
 async function referenceWithTracing(font, entry, correction) {
   /*
-  Until one of the three values has been touched, what is on screen is the font
-  as it stands — and registering a preview of it would mean re-reading every
-  font in the config for no difference at all.
+    Until one of the three values has been touched, what is on screen is the font
+    as it stands — and registering a preview of it would mean re-reading every
+    font in the config for no difference at all.
   */
   if (!tuning || !traced.length) {
     return currentReference
@@ -575,11 +575,11 @@ async function referenceWithTracing(font, entry, correction) {
 }
 
 /*
-Rendering the example.
+  Rendering the example.
 
-An msq-editor cannot be re-rendered: it replaces itself with the engraved view
-and guards on having rendered once. So each time anything changes we build a
-fresh template and let insertion drive it, which is the element's own lifecycle.
+  An msq-editor cannot be re-rendered: it replaces itself with the engraved view
+  and guards on having rendered once. So each time anything changes we build a
+  fresh template and let insertion drive it, which is the element's own lifecycle.
 */
 async function renderEditor() {
   const entry = elements.entry.value
@@ -587,15 +587,15 @@ async function renderEditor() {
   const example = await glyphExample(entry)
 
   /*
-  The interval between stave lines is what the page is measured in, and in the
-  language it is spelled `font size` — the same property, under the name the
-  style command uses. Putting it in the source is what makes the input change
-  the whole example rather than only the glyph: the traced points are written
-  against the interval, so a glyph keeps its proportions while everything around
-  it grows with the stave.
+    The interval between stave lines is what the page is measured in, and in the
+    language it is spelled `font size` — the same property, under the name the
+    style command uses. Putting it in the source is what makes the input change
+    the whole example rather than only the glyph: the traced points are written
+    against the interval, so a glyph keeps its proportions while everything around
+    it grows with the stave.
 
-  The size input above is the other half of that pair, and deliberately not this:
-  it scales the one glyph being traced, against a stave that stays put.
+    The size input above is the other half of that pair, and deliberately not this:
+    it scales the one glyph being traced, against a stave that stays put.
   */
   const interval = Number(elements.interval.value)
   const staveSize = Number.isFinite(interval) && interval > 0
@@ -739,22 +739,22 @@ function showGlyphPlace() {
 }
 
 /*
-Whether anything has been tuned since the glyph was picked.
+  Whether anything has been tuned since the glyph was picked.
 
-The preview is not free — it asks the server for a patched font and hands the
-worker a fresh registration — so it is only built once a value has actually been
-changed. Picking another glyph puts you back to looking at the font as it is.
+  The preview is not free — it asks the server for a patched font and hands the
+  worker a fresh registration — so it is only built once a value has actually been
+  changed. Picking another glyph puts you back to looking at the font as it is.
 */
 let tuning = false
 
 /*
-The controls live in the address bar.
+  The controls live in the address bar.
 
-Everything the page shows is derived from these six values, so putting them in
-the query string makes a view reloadable and shareable, and lets the back button
-walk through what was looked at. Only committed changes are recorded — picking a
-font or a glyph, or leaving a field — so a back press steps between states rather
-than between keystrokes.
+  Everything the page shows is derived from these six values, so putting them in
+  the query string makes a view reloadable and shareable, and lets the back button
+  walk through what was looked at. Only committed changes are recorded — picking a
+  font or a glyph, or leaving a field — so a back press steps between states rather
+  than between keystrokes.
 */
 const URL_FIELDS = [ 'font', 'entry', 'codepoint', 'size', 'interval', 'correction' ]
 let applyingUrl = false
@@ -830,14 +830,14 @@ for (const id of [ 'codepoint', 'size', 'interval', 'correction' ]) {
   elements[id].addEventListener('change', () => writeUrl({ push: true }))
 }
 /*
-Typing redraws but does not touch the address bar. Replacing the current entry
-on every keystroke would overwrite the very state a back press should return to,
-so the url only moves when a value is committed — on blur, on Enter, or on
-picking from a list.
+  Typing redraws but does not touch the address bar. Replacing the current entry
+  on every keystroke would overwrite the very state a back press should return to,
+  so the url only moves when a value is committed — on blur, on Enter, or on
+  picking from a list.
 */
 /*
-The codepoint and the size change the glyph itself, so they put the page into
-tuning — which is what builds a preview font for the stave to be drawn from.
+  The codepoint and the size change the glyph itself, so they put the page into
+  tuning — which is what builds a preview font for the stave to be drawn from.
 */
 for (const id of [ 'codepoint', 'size' ]) {
   elements[id].addEventListener('input', () => {
@@ -847,10 +847,10 @@ for (const id of [ 'codepoint', 'size' ]) {
 }
 
 /*
-The interval does not. A glyph is traced at `size × interval` and its numbers
-written back divided by the interval, so the interval cancels out of what is
-stored — it is the size of the stave, not of the glyph, and it reaches the
-example as `font size is …` in the source rather than through a patched font.
+  The interval does not. A glyph is traced at `size × interval` and its numbers
+  written back divided by the interval, so the interval cancels out of what is
+  stored — it is the size of the stave, not of the glyph, and it reaches the
+  example as `font size is …` in the source rather than through a patched font.
 */
 elements.interval.addEventListener('input', () => refresh())
 elements.correction.addEventListener('input', () => {
@@ -923,23 +923,23 @@ window.addEventListener('unhandledrejection', (event) => {
 // --- the text and chord-letter tabs -----------------------------------------
 
 /*
-What each face is asked to set.
+  What each face is asked to set.
 
-A face is judged where it is used, so each example is the work that face does
-and nothing else: the text one carries every piece of type on a page, and the
-chord one the figures a chord face has to cope with.
+  A face is judged where it is used, so each example is the work that face does
+  and nothing else: the text one carries every piece of type on a page, and the
+  chord one the figures a chord face has to cope with.
 
-Both are files, like the glyph examples, so a poor example can be rewritten as
-music. Neither names a font: which faces are engraved with is the business of
-the controls above, and putting them in the file would pin the example to one.
+  Both are files, like the glyph examples, so a poor example can be rewritten as
+  music. Neither names a font: which faces are engraved with is the business of
+  the controls above, and putting them in the file would pin the example to one.
 */
 const TEXT_EXAMPLE_FILE = '_text.txt'
 const CHORD_EXAMPLE_FILE = '_chord-letters.txt'
 
 /*
-An engraved example, built the way the music tab builds its own: an msq-editor
-cannot be re-rendered, so each time anything changes a fresh template is made
-and insertion drives it.
+  An engraved example, built the way the music tab builds its own: an msq-editor
+  cannot be re-rendered, so each time anything changes a fresh template is made
+  and insertion drives it.
 */
 function engrave(where, source, height = '300px') {
   const template = document.createElement('template', { is: 'msq-editor' })
@@ -982,9 +982,9 @@ async function renderChordExample() {
 // --- registering what is on disk ---------------------------------------------
 
 /*
-The worker refuses a second registration under a reference it already holds, so
-a changed set of faces is registered under a fresh one. That is also how the
-music tab previews a correction, and the two are kept apart by name.
+  The worker refuses a second registration under a reference it already holds, so
+  a changed set of faces is registered under a fresh one. That is also how the
+  music tab previews a correction, and the two are kept apart by name.
 */
 let currentReference = FONT_SOURCES_REFERENCE
 let registrations = 0
@@ -1018,10 +1018,10 @@ function registerWithWorker(reference, config) {
  */
 async function loadFaces({ choose = null, askAgain = false } = {}) {
   /*
-  What is showing now, before the pickers are emptied: EHTML refills a select by
-  clearing it, so a choice not written down here is gone by the time the new
-  options arrive. A face just added is the one you want to look at, so it wins
-  over what was showing.
+    What is showing now, before the pickers are emptied: EHTML refills a select by
+    clearing it, so a choice not written down here is gone by the time the new
+    options arrive. A face just added is the one you want to look at, so it wins
+    over what was showing.
   */
   const wasChosen = {
     font: choose || elements.font.value,
@@ -1071,15 +1071,15 @@ async function loadEntries() {
   offeredEntries = answered.entries || []
   await whenFilled(elements.entry)
   /*
-  A select with options selects its first one, so there is nothing to keep here
-  — the page opens on the treble clef, which is the glyph worth seeing first,
-  and the url overrides that a moment later if it names one.
+    A select with options selects its first one, so there is nothing to keep here
+    — the page opens on the treble clef, which is the glyph worth seeing first,
+    and the url overrides that a moment later if it names one.
   */
   keepTheChoice(elements.entry, null, 'treble')
 }
 
 /*
-Called from the upload forms, which are EHTML and know nothing of any of this.
+  Called from the upload forms, which are EHTML and know nothing of any of this.
 */
 window.fontsChanged = async function (name) {
   try {
@@ -1095,9 +1095,9 @@ window.fontsChanged = async function (name) {
 // --- which tab is showing ----------------------------------------------------
 
 /*
-An editor measures itself as it renders, and a tab that is not showing has no
-size — so each example is engraved when its tab is chosen rather than on load.
-It also means opening the page engraves one score instead of three.
+  An editor measures itself as it renders, and a tab that is not showing has no
+  size — so each example is engraved when its tab is chosen rather than on load.
+  It also means opening the page engraves one score instead of three.
 */
 let shownTab = 0
 const rendered = new Set()
@@ -1115,12 +1115,12 @@ function renderShownTab({ force = true } = {}) {
 }
 
 /*
-`e-tabs` builds its nav one microtask after EHTML activates it and offers no
-event when a tab is chosen, so the buttons it generates are what we listen on.
+  `e-tabs` builds its nav one microtask after EHTML activates it and offers no
+  event when a tab is chosen, so the buttons it generates are what we listen on.
 
-It is also what decides which tab opens, and it records that on itself — so
-this waits for the nav and then hands the element back, rather than anything
-here working out the answer a second time.
+  It is also what decides which tab opens, and it records that on itself — so
+  this waits for the nav and then hands the element back, rather than anything
+  here working out the answer a second time.
 */
 async function watchTabs() {
   const families = control('families')
@@ -1137,7 +1137,7 @@ async function watchTabs() {
 }
 
 /*
-The save button on each face tab, writing to that face's own file.
+  The save button on each face tab, writing to that face's own file.
 */
 for (const [ kind, file, editor ] of [
   [ 'text', TEXT_EXAMPLE_FILE, 'textEditor' ],
@@ -1161,17 +1161,17 @@ for (const [ picker, render ] of [
 // --- starting up --------------------------------------------------------------
 
 /*
-Nothing can be engraved until the worker has the fonts, and the fonts are not
-known until the server has been asked. So the order is: read the faces, register
-them, then draw whichever tab is showing.
+  Nothing can be engraved until the worker has the fonts, and the fonts are not
+  known until the server has been asked. So the order is: read the faces, register
+  them, then draw whichever tab is showing.
 */
 /*
-An e-json parses every answer as JSON and throws where it cannot — which is what
-a server that does not know a route looks like, since an unknown one answers
-`405 Not Allowed` in plain text. That throw happens inside EHTML, so the actions
-that would have handed a failure over here never run, and waiting on them would
-be waiting for ever. A page showing nothing and saying nothing is the worst of
-the outcomes, so the wait is bounded and says what it was waiting for.
+  An e-json parses every answer as JSON and throws where it cannot — which is what
+  a server that does not know a route looks like, since an unknown one answers
+  `405 Not Allowed` in plain text. That throw happens inside EHTML, so the actions
+  that would have handed a failure over here never run, and waiting on them would
+  be waiting for ever. A page showing nothing and saying nothing is the worst of
+  the outcomes, so the wait is bounded and says what it was waiting for.
 */
 const orGiveUp = (waiting, what) => Promise.race([
   waiting,
@@ -1190,10 +1190,10 @@ try {
     orGiveUp(loadEntries(), 'the glyph entries')
   ])
   /*
-  Which tab is open, as e-tabs itself decided — from the hash where the page
-  carries one, and the first otherwise. It writes that on the element as
-  `data-current-tab`, so the page has only to read its answer; working the
-  title-to-hash rule out again here would be a second copy of it to go stale.
+    Which tab is open, as e-tabs itself decided — from the hash where the page
+    carries one, and the first otherwise. It writes that on the element as
+    `data-current-tab`, so the page has only to read its answer; working the
+    title-to-hash rule out again here would be a second copy of it to go stale.
   */
   const families = await watchTabs()
   shownTab = Number(families.getAttribute('data-current-tab')) || 0

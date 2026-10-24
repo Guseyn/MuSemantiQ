@@ -6,11 +6,11 @@ import { muted, heading, success, failure, warning, accent } from './lib/colors.
 import { padToWidth, displayWidth } from './lib/width.js'
 
 /*
- * Parse errors come back as plain sentences with the line number written into
- * the prose, so the number has to be lifted back out to tabulate them. Same
- * expression the browser example uses, which is the only other place that
- * formats these.
- */
+  Parse errors come back as plain sentences with the line number written into
+  the prose, so the number has to be lifted back out to tabulate them. Same
+  expression the browser example uses, which is the only other place that
+  formats these.
+*/
 const LINE_CLAUSE = /\s+on the line (?:number )?(\d+)\s*$/
 
 /**

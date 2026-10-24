@@ -166,7 +166,6 @@ npm run watch:web-components                # keeps copying web-components/ whil
 npm run create:msq:worker -- -o static/js/msq/worker   # only the worker, for your own app
 
 # docs
-npm run docs:check                          # checks every example in the docs
 npm run docs:pipeline                       # redraws the "How it works" pictures on the landing page
 npm run docs:art                            # redraws the landing page art
 npm run docs:api-example                    # remakes score.svg and score.mid that the Low-Level API page links to

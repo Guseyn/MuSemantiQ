@@ -20,20 +20,20 @@ const EMPTY_STRING = ''
 const ROOT = 'test/audio-tests'
 
 /*
-A run can be narrowed to the tests whose name matches, the way the serializer
-runner already allows:
+  A run can be narrowed to the tests whose name matches, the way the serializer
+  runner already allows:
 
-  node scripts/audio-tests.js --only=chord
+    node scripts/audio-tests.js --only=chord
 
-It writes and compares only those, which is what lets one test be brought up to
-date without walking the whole corpus.
+  It writes and compares only those, which is what lets one test be brought up to
+  date without walking the whole corpus.
 */
 const only = process.argv.find((argument) => argument.startsWith('--only='))
 const onlyPattern = only ? only.slice('--only='.length) : null
 /*
-A test is a `.txt` file and nothing else: the folder also collects whatever the
-operating system leaves behind (`.DS_Store`), and a name taken from such a file
-is empty, so it fails against an artifact that was never written for it.
+  A test is a `.txt` file and nothing else: the folder also collects whatever the
+  operating system leaves behind (`.DS_Store`), and a name taken from such a file
+  is empty, so it fails against an artifact that was never written for it.
 */
 const wanted = (file) =>
   file.endsWith('.txt') && (!onlyPattern || file.includes(onlyPattern))
@@ -87,9 +87,9 @@ async function runAudioTest() {
   console.time('Total time spent for audio tests')
 
   /*
-  The two fonts that are properly set up, named rather than left to the
-  defaults — which reach for all four, and so made this suite depend on font
-  files no test asks for.
+    The two fonts that are properly set up, named rather than left to the
+    defaults — which reach for all four, and so made this suite depend on font
+    files no test asks for.
   */
   const supportedFontSources = await setupFonts({
     'chord-letters': {
@@ -178,9 +178,9 @@ async function runAudioTest() {
     let testType
     try {
       /*
-      Reading the expected files is part of the test rather than a step before
-      it: a test whose expected file is missing is a failure like any other, and
-      the actual files still get written so it can be looked at and adopted.
+        Reading the expected files is part of the test rather than a step before
+        it: a test whose expected file is missing is a failure like any other, and
+        the actual files still get written so it can be looked at and adopted.
       */
       testType = 'reading expected files';
       [

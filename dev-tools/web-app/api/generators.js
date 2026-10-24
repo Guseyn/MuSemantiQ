@@ -124,9 +124,9 @@ const generateFont = endpoint('/dev/font/generate', 'POST', async ({ stream }) =
   }
 
   /*
-  A music-js font that already exists has been tuned by hand — every yCorrection
-  in it was set in the font viewer, and the generator knows none of them. So it
-  is never replaced unless the page says to, which it only does after asking.
+    A music-js font that already exists has been tuned by hand — every yCorrection
+    in it was set in the font viewer, and the generator knows none of them. So it
+    is never replaced unless the page says to, which it only does after asking.
   */
   const replacing = fs.existsSync(musicJsAt)
   // A form field arrives as text, so both spellings of yes count.
@@ -146,10 +146,10 @@ const generateFont = endpoint('/dev/font/generate', 'POST', async ({ stream }) =
   }
 
   /*
-  A font file starts with one of a few known tags — 'OTTO' for the CFF outlines
-  every SMuFL font here carries, and the version tags for the glyf flavours.
-  Checking it means a file that is not a font is refused here rather than
-  failing somewhere deep inside the tracer.
+    A font file starts with one of a few known tags — 'OTTO' for the CFF outlines
+    every SMuFL font here carries, and the version tags for the glyf flavours.
+    Checking it means a file that is not a font is refused here rather than
+    failing somewhere deep inside the tracer.
   */
   const tag = uploaded.subarray(0, 4)
   const looksLikeAFont =
@@ -188,15 +188,15 @@ const generateFont = endpoint('/dev/font/generate', 'POST', async ({ stream }) =
 // --- the sound font generator -----------------------------------------------
 
 /*
-One render at a time, and it outlives the request that started it. What it is
-doing is read back out of its log, which is also what is left behind to look at
-when it fails.
+  One render at a time, and it outlives the request that started it. What it is
+  doing is read back out of its log, which is also what is left behind to look at
+  when it fails.
 
-It outlives this server too. The child is detached so that stopping it can take
-FluidSynth with it, which means restarting the dev server — something you do
-after every edit — leaves the render going while this module forgets all about
-it. So what it needs to pick the render back up is written down beside the log,
-and read back when nothing is in hand.
+  It outlives this server too. The child is detached so that stopping it can take
+  FluidSynth with it, which means restarting the dev server — something you do
+  after every edit — leaves the render going while this module forgets all about
+  it. So what it needs to pick the render back up is written down beside the log,
+  and read back when nothing is in hand.
 */
 let rendering = null
 
@@ -258,10 +258,10 @@ function finishRender() {
   }
 
   /*
-  The renderer writes each note's .midi and .wav beside the instrument folders
-  and removes them as it goes. Stopping it interrupts that, so the two files of
-  the note it was on are swept up here — a set folder should hold instruments
-  and nothing else.
+    The renderer writes each note's .midi and .wav beside the instrument folders
+    and removes them as it goes. Stopping it interrupts that, so the two files of
+    the note it was on are swept up here — a set folder should hold instruments
+    and nothing else.
   */
   try {
     for (const file of fs.readdirSync(outputAt)) {
@@ -274,9 +274,9 @@ function finishRender() {
   }
 
   /*
-  A set is of no use to either app until its static folder has a link to it, and
-  that is the one thing the tool does that the script does not. A stopped render
-  is worth linking too: every instrument it did finish is complete.
+    A set is of no use to either app until its static folder has a link to it, and
+    that is the one thing the tool does that the script does not. A stopped render
+    is worth linking too: every instrument it did finish is complete.
   */
   if (fs.existsSync(outputAt)) {
     spawn(process.execPath, [ path.join(REPOSITORY_ROOT, 'scripts/setup-symlinks.js') ], {
@@ -289,9 +289,9 @@ function finishRender() {
 }
 
 /*
-The renderer walks the 88 keys of a piano for each instrument — A0 up to C8 —
-and writes one line when it has finished a note at every velocity. So the lines
-it has written, against that count, is real progress rather than a guess.
+  The renderer walks the 88 keys of a piano for each instrument — A0 up to C8 —
+  and writes one line when it has finished a note at every velocity. So the lines
+  it has written, against that count, is real progress rather than a guess.
 */
 const NOTES_PER_INSTRUMENT = 88
 const A_NOTE_WAS_FINISHED = /finished for note \d+/
@@ -323,9 +323,9 @@ const uploadSoundBank = endpoint('/dev/magenta/upload?name', 'POST', async ({ st
   await fsp.mkdir(SOUND_BANK_DIRECTORY, { recursive: true })
 
   /*
-  Written straight through to disk rather than collected first: a General MIDI
-  soundbank is commonly 300 MB and more, which is not a thing to hold in memory
-  on the way past.
+    Written straight through to disk rather than collected first: a General MIDI
+    soundbank is commonly 300 MB and more, which is not a thing to hold in memory
+    on the way past.
   */
   try {
     await new Promise((resolve, reject) => {
@@ -395,9 +395,9 @@ const startRender = endpoint('/dev/magenta/generate', 'POST', async ({ stream })
       cwd: REPOSITORY_ROOT,
       stdio: [ 'ignore', log, log ],
       /*
-      Its own process group. Stopping a render has to take FluidSynth and Lame
-      with it — they are what the time is actually spent in, and killing only
-      the script would leave one of them running and the note half written.
+        Its own process group. Stopping a render has to take FluidSynth and Lame
+        with it — they are what the time is actually spent in, and killing only
+        the script would leave one of them running and the note half written.
       */
       detached: true
     }
@@ -446,8 +446,8 @@ function report(lines = 0) {
   }
 
   /*
-  A render adopted from a previous server has no child object behind it, so
-  nothing will tell us when it ends. The system is asked instead.
+    A render adopted from a previous server has no child object behind it, so
+    nothing will tell us when it ends. The system is asked instead.
   */
   if (rendering.adopted && rendering.running && !stillAlive(rendering.pid)) {
     rendering.running = false
@@ -482,8 +482,8 @@ function report(lines = 0) {
   }
 
   /*
-  What is left, from what the render has managed so far. Only worth saying once
-  there is enough of it to mean anything — a guess off two notes is noise.
+    What is left, from what the render has managed so far. Only worth saying once
+    there is enough of it to mean anything — a guess off two notes is noise.
   */
   if (rendering.running && done > 4 && done < expected) {
     const perNote = seconds / done
@@ -523,8 +523,8 @@ const stopRender = endpoint('/dev/magenta/stop', 'POST', async ({ stream }) => {
     process.kill(-rendering.pid, 'SIGTERM')
   } catch (error) {
     /*
-    The group may be gone already — it finishes between the page asking and this
-    running often enough to be worth expecting rather than reporting.
+      The group may be gone already — it finishes between the page asking and this
+      running often enough to be worth expecting rather than reporting.
     */
     if (error.code !== 'ESRCH') {
       rendering.stopped = false
@@ -572,17 +572,17 @@ const listSets = endpoint('/dev/magenta/sets', 'GET', async ({ stream }) => {
         continue
       }
       /*
-      An instrument is a directory. The renderer leaves its working .midi and
-      .wav beside them while it runs, so counting entries would count those too.
+        An instrument is a directory. The renderer leaves its working .midi and
+        .wav beside them while it runs, so counting entries would count those too.
       */
       const at = path.join(SAMPLE_SET_DIRECTORY, entry.name)
 
       /*
-      The player reads soundfont.json at the root of a set before anything else
-      — it maps a program number to the folder its samples are in, and without
-      it the set cannot be played at all. Sets rendered before the generator
-      started writing one have none, so it is written from what is on disk the
-      first time the set is looked at.
+        The player reads soundfont.json at the root of a set before anything else
+        — it maps a program number to the folder its samples are in, and without
+        it the set cannot be played at all. Sets rendered before the generator
+        started writing one have none, so it is written from what is on disk the
+        first time the set is looked at.
       */
       if (!fs.existsSync(path.join(at, 'soundfont.json'))) {
         try {
@@ -614,8 +614,8 @@ const listSets = endpoint('/dev/magenta/sets', 'GET', async ({ stream }) => {
 })
 
 /*
-General MIDI lays its 128 programs out as sixteen families of eight, and the
-families are what make the list readable — you look for "a flute", not for 73.
+  General MIDI lays its 128 programs out as sixteen families of eight, and the
+  families are what make the list readable — you look for "a flute", not for 73.
 */
 const GENERAL_MIDI_FAMILIES = [
   'Piano', 'Chromatic percussion', 'Organ', 'Guitar',
@@ -680,8 +680,8 @@ const deleteSet = endpoint('/dev/magenta/delete', 'POST', async ({ stream }) => 
   }
 
   /*
-  Deleting under a render would take away files it is in the middle of writing,
-  and leave the set half gone and half being made.
+    Deleting under a render would take away files it is in the middle of writing,
+    and leave the set half gone and half being made.
   */
   adoptRenderIfAny()
   if (rendering && rendering.running && rendering.set === set) {
@@ -697,8 +697,8 @@ const deleteSet = endpoint('/dev/magenta/delete', 'POST', async ({ stream }) => 
   }
 
   /*
-  A set that is gone leaves a link pointing at nothing in each app's static
-  folder; the symlink script is what prunes those, so it is run again.
+    A set that is gone leaves a link pointing at nothing in each app's static
+    folder; the symlink script is what prunes those, so it is run again.
   */
   if (!instrument) {
     spawn(process.execPath, [ path.join(REPOSITORY_ROOT, 'scripts/setup-symlinks.js') ], {

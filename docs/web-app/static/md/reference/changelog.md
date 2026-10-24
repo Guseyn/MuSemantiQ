@@ -15,7 +15,6 @@ Anything that breaks existing documents or existing pages is marked **Breaking**
 ### 2026-09-24
 
 - The documentation site and the landing page, as a third app beside the browser example and the dev tools: `npm run docs` at **https://127.0.0.1:8890**.
-- `npm run docs:check`, which parses every example in the documentation and fails if one is not wrapped, does not parse, or uses something its page has not introduced yet.
 - `npm run docs:art`, which engraves the two pieces of artwork on the landing page from MSQ.
 
 ### 2026-09-19

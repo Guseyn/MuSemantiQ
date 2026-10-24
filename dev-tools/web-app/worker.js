@@ -15,23 +15,23 @@ const baseFolder = path.join('dev-tools', 'web-app', 'static')
 const notFound = './dev-tools/web-app/static/html/404.html'
 
 /*
-The test viewer shows files that live in the test trees rather than under the
-app's own static folder, so those are served through a mapper instead of by
-widening the document root — which would put `.git`, the environment files and
-the TLS keys one crafted URL away.
+  The test viewer shows files that live in the test trees rather than under the
+  app's own static folder, so those are served through a mapper instead of by
+  widening the document root — which would put `.git`, the environment files and
+  the TLS keys one crafted URL away.
 
-`nodes` resolves static paths with a plain `path.join` and no traversal check,
-so the guard has to be here.
+  `nodes` resolves static paths with a plain `path.join` and no traversal check,
+  so the guard has to be here.
 */
 const TEST_TREES = [ 'visual-tests', 'audio-tests', 'serializer-tests' ]
 const testsRoot = path.join(REPOSITORY_ROOT, TEST_ROOT)
 
 /*
-The font viewer reads the SMuFL scaffold — which entries a generated font has,
-and every adjustment it starts from — and that now lives in tools/ at the root
-rather than in src/, so it is no longer carried into the generated worker tree.
-Serving it from where it is keeps the page reading the same file the generator
-writes from, instead of a copy that can drift.
+  The font viewer reads the SMuFL scaffold — which entries a generated font has,
+  and every adjustment it starts from — and that now lives in tools/ at the root
+  rather than in src/, so it is no longer carried into the generated worker tree.
+  Serving it from where it is keeps the page reading the same file the generator
+  writes from, instead of a copy that can drift.
 */
 function toolModulePath(requestUrl) {
   const parts = requestUrl
@@ -66,9 +66,9 @@ function testArtifactPath(requestUrl) {
 }
 
 /*
-The glyph examples the font viewer engraves: one MSQ file per entry in the glyph
-table, kept in dev-tools/glyph-examples so they can be edited as music rather
-than as code. Served from where they live so an edit shows on the next reload.
+  The glyph examples the font viewer engraves: one MSQ file per entry in the glyph
+  table, kept in dev-tools/glyph-examples so they can be edited as music rather
+  than as code. Served from where they live so an edit shows on the next reload.
 */
 function glyphExamplePath(requestUrl) {
   const parts = requestUrl
@@ -109,9 +109,9 @@ server(
         fileNotFound: notFound
       }),
       /*
-      `magenta-sound-font` is a folder of symlinks into src/midi, one per
-      rendered set. The test bench plays through it, so the sample files have to
-      be served from here as well as from the example app.
+        `magenta-sound-font` is a folder of symlinks into src/midi, one per
+        rendered set. The test bench plays through it, so the sample files have to
+        be served from here as well as from the example app.
       */
       src(/^\/((html\/static-templates\/)|css|js|images|font|magenta-sound-font)/, {
         baseFolder,

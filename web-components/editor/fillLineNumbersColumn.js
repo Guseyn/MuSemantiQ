@@ -3,10 +3,10 @@ import adjustUnitexareaForUserScreen from '#msq/web-components/editor/adjustUnit
 export default (lineNumbersColumn, textarea, divUnderneathTextarea) => {
   const numberOfLines = textarea.value.split('\n').length
   /*
-  Rewritten only when the number of lines changes. Every keystroke used to
-  rebuild all of it — one span per line — and re-measure the gutter, which is
-  where the text field's own width is taken from; neither changes while lines
-  are only getting longer or shorter.
+    Rewritten only when the number of lines changes. Every keystroke used to
+    rebuild all of it — one span per line — and re-measure the gutter, which is
+    where the text field's own width is taken from; neither changes while lines
+    are only getting longer or shorter.
   */
   if (lineNumbersColumn.numberOfLinesItHolds === numberOfLines) {
     return

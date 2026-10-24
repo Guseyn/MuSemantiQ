@@ -10,9 +10,9 @@ const config = JSON.parse(
 )
 
 /*
-One worker, for the same reason the dev tools take one: this serves a landing
-page and a folder of markdown to whoever is reading it, and every extra worker
-pays a five second start delay before it loads the route table.
+  One worker, for the same reason the dev tools take one: this serves a landing
+  page and a folder of markdown to whoever is reading it, and every extra worker
+  pays a five second start delay before it loads the route table.
 */
 cluster(
   'docs/web-app/primary.js',

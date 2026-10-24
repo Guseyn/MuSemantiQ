@@ -1,19 +1,19 @@
 #!/usr/bin/env node
 
 /*
-The landing page's two pieces of artwork, engraved by the engine itself.
+  The landing page's two pieces of artwork, engraved by the engine itself.
 
-A page about writing music with words should not be decorated with a drawing of
-music. Both of these come out of the same pipeline the product runs: a few words
-of MSQ in, an SVG out. So the notes on the opening screen are really engraved,
-and the notehead in the section rail is really a notehead from the music font —
-adjust the source below and the page follows.
+  A page about writing music with words should not be decorated with a drawing of
+  music. Both of these come out of the same pipeline the product runs: a few words
+  of MSQ in, an SVG out. So the notes on the opening screen are really engraved,
+  and the notehead in the section rail is really a notehead from the music font —
+  adjust the source below and the page follows.
 
-    npm run docs:art
+      npm run docs:art
 
-Writes into docs/web-app/static/images/. Both files are committed: they change
-only when this script or the fonts change, and the landing page should not have
-to wait for the engine to start before it can draw its own header.
+  Writes into docs/web-app/static/images/. Both files are committed: they change
+  only when this script or the fonts change, and the landing page should not have
+  to wait for the engine to start before it can draw its own header.
 */
 
 import fs from 'fs'
@@ -53,22 +53,22 @@ const fontConfig = {
 }
 
 /*
-The opening phrase. Beamed quavers so the shape reads as music at a glance even
-at the size the header draws it, and no clef or time signature — the screen
-wants a stave with notes on it, not a score.
+  The opening phrase. Beamed quavers so the shape reads as music at a glance even
+  at the size the header draws it, and no clef or time signature — the screen
+  wants a stave with notes on it, not a score.
 
-The page is narrow on purpose, and 260 exactly.
+  The page is narrow on purpose, and 260 exactly.
 
-A measure is ruled to the width of the page it is on while its notes keep their
-natural spacing, so on a default page these eight fill a fifth of the stave and
-the rest is an empty rule. Narrow it too far, though, and the music runs past
-the edge — at which point the engine rules a dashed line down the page width to
-say so. That dash is a warning, not an ornament. 260 is the first width that
-holds the clef and all eight notes without raising it, and they still fill 94%
-of the stave.
+  A measure is ruled to the width of the page it is on while its notes keep their
+  natural spacing, so on a default page these eight fill a fifth of the stave and
+  the rest is an empty rule. Narrow it too far, though, and the music runs past
+  the edge — at which point the engine rules a dashed line down the page width to
+  say so. That dash is a warning, not an ornament. 260 is the first width that
+  holds the clef and all eight notes without raising it, and they still fill 94%
+  of the stave.
 
-Check it after any change to the music: a dashed vertical line in the artwork
-means this number is now too small.
+  Check it after any change to the music: a dashed vertical line in the artwork
+  means this number is now too small.
 */
 const PHRASE = `
 page line width is 260
@@ -79,8 +79,8 @@ d5 beamed, c5, b, a not beamed
 `
 
 /*
-One quaver, alone, for the section rail. `no opening barline` keeps the
-barline out of it, and what is left on the page is a stave and a single note.
+  One quaver, alone, for the section rail. `no opening barline` keeps the
+  barline out of it, and what is left on the page is a stave and a single note.
 */
 const ONE_NOTE = `
 no opening barline
@@ -204,12 +204,12 @@ function bounds(fragment, margin = 2) {
 }
 
 /*
-The engine draws a page — a sheet of paper with a stave somewhere on it — and
-most of that page is empty. These two want the drawing rather than the sheet,
-so the paper is dropped and the viewBox pulled in to what was drawn.
+  The engine draws a page — a sheet of paper with a stave somewhere on it — and
+  most of that page is empty. These two want the drawing rather than the sheet,
+  so the paper is dropped and the viewBox pulled in to what was drawn.
 
-Colours go too. The artwork should follow the stylesheet, so everything is set
-to currentColor and coloured by whatever it is placed in.
+  Colours go too. The artwork should follow the stylesheet, so everything is set
+  to currentColor and coloured by whatever it is placed in.
 */
 function artwork(fragment, { margin } = {}) {
   const box = bounds(fragment, margin)
@@ -232,9 +232,9 @@ function artwork(fragment, { margin } = {}) {
 
 function write(name, svg) {
   /*
-  The engine rules a dashed line down the page width when the music runs past
-  it. On a page that is a warning to the person writing; here it would be a
-  stray dash across the artwork, so it fails the build instead of shipping.
+    The engine rules a dashed line down the page width when the music runs past
+    it. On a page that is a warning to the person writing; here it would be a
+    stray dash across the artwork, so it fails the build instead of shipping.
   */
   if (/stroke-dasharray="8\.5/.test(svg)) {
     throw new Error(
@@ -252,14 +252,14 @@ try {
   fs.mkdirSync(outDir, { recursive: true })
 
   /*
-  The phrase keeps the stave it is written on: `measures` is the stave lines,
-  the notes and the beams together, which is what the opening screen animates.
+    The phrase keeps the stave it is written on: `measures` is the stave lines,
+    the notes and the beams together, which is what the opening screen animates.
   */
   write('phrase.svg', artwork(group(await engrave(PHRASE), 'measures'), { margin: 4 }))
 
   /*
-  The rail wants the note and nothing else — no stave, no barline — so only
-  the one unit is taken out of the page around it.
+    The rail wants the note and nothing else — no stave, no barline — so only
+    the one unit is taken out of the page around it.
   */
   write('note.svg', artwork(group(await engrave(ONE_NOTE), 'singleUnit'), { margin: 0.5 }))
 } catch (error) {

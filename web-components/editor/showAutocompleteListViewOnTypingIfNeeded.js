@@ -103,37 +103,37 @@ const fillAutocompleteListViewWithOptionsForUncompletedWord = (uncompletedWord, 
 }
 
 /*
-Put the list under the word being typed.
+  Put the list under the word being typed.
 
-The editor is a fixed-height box that clips what leaves it — twice, in fact:
-both the text container and the wrapper around it hide their overflow, for the
-scrolling and the rounded corners. A list positioned inside them is cut off the
-moment it is longer than the space left below the caret, which for a list of
-completions is most of the time.
+  The editor is a fixed-height box that clips what leaves it — twice, in fact:
+  both the text container and the wrapper around it hide their overflow, for the
+  scrolling and the rounded corners. A list positioned inside them is cut off the
+  moment it is longer than the space left below the caret, which for a list of
+  completions is most of the time.
 
-So the list is taken out of that box entirely: it sits at the top of the shadow
-root and is placed in viewport coordinates, which no `overflow: hidden`
-ancestor can crop. It is drawn over the editor rather than inside it, opening
-below the word it completes and flipping above it when the room is up there
-instead. Whatever space it ends up with is what bounds its height, so it is
-always whole and always scrollable to the rest.
+  So the list is taken out of that box entirely: it sits at the top of the shadow
+  root and is placed in viewport coordinates, which no `overflow: hidden`
+  ancestor can crop. It is drawn over the editor rather than inside it, opening
+  below the word it completes and flipping above it when the room is up there
+  instead. Whatever space it ends up with is what bounds its height, so it is
+  always whole and always scrollable to the rest.
 */
 const MARGIN_ABOVE = 2.5
 const MARGIN_BELOW = 4
 const LEAST_ROOM = 96
 
 /*
-Where a line really is, measured rather than multiplied.
+  Where a line really is, measured rather than multiplied.
 
-The computed line-height is not always the pitch the lines are laid out at.
-WebKit, which is what the desktop app runs in, sets lines at a whole number of
-pixels: a line-height of 1.4em at 13px reads back as 18.2px but is drawn at 18.
-Multiplied by the line number that error grows down the text, so far enough in
-the list was opening tens of pixels below the word, and on top of it when it
-flipped above. Chromium keeps the fraction, which is why it never showed there.
+  The computed line-height is not always the pitch the lines are laid out at.
+  WebKit, which is what the desktop app runs in, sets lines at a whole number of
+  pixels: a line-height of 1.4em at 13px reads back as 18.2px but is drawn at 18.
+  Multiplied by the line number that error grows down the text, so far enough in
+  the list was opening tens of pixels below the word, and on top of it when it
+  flipped above. Chromium keeps the fraction, which is why it never showed there.
 
-So the lines up to the caret's are laid out in a hidden block with the same
-font and line-height, and its height says where the caret's line ends.
+  So the lines up to the caret's are laid out in a hidden block with the same
+  font and line-height, and its height says where the caret's line ends.
 */
 function offsetsOfLineInTextarea(textarea, lineNumber) {
   let probe = textarea.lineOffsetProbe
@@ -179,17 +179,17 @@ function positionAutocompleteListViewAtCaret(autocompleteListView, textarea, lin
   const roomAbove = topOfTheLine - MARGIN_BELOW
 
   /*
-  How tall the list wants to be: as many options as it has, up to the cap in
-  css/editor.js. The height left over from the last word is let go first, or a
-  list squeezed once would measure squeezed for good.
+    How tall the list wants to be: as many options as it has, up to the cap in
+    css/editor.js. The height left over from the last word is let go first, or a
+    list squeezed once would measure squeezed for good.
   */
   autocompleteListView.style.maxHeight = ''
   const wantedHeight = autocompleteListView.getBoundingClientRect().height
 
   /*
-  Below the word by preference — that is where the eye already is. Above it when
-  the whole list fits there and not below. When it fits on neither side, on the
-  side with more room, cut to that room.
+    Below the word by preference — that is where the eye already is. Above it when
+    the whole list fits there and not below. When it fits on neither side, on the
+    side with more room, cut to that room.
   */
   const fitsBelow = roomBelow >= wantedHeight
   const fitsAbove = roomAbove >= wantedHeight
@@ -254,8 +254,8 @@ export default (autocompleteListView, textarea, divUnderneathTextarea) => {
 
   textarea.addEventListener('keyup', (event) => {
     /*
-    Switched off in the editor's settings. The list is closed rather than merely
-    left alone, so turning it off while it is open puts it away.
+      Switched off in the editor's settings. The list is closed rather than merely
+      left alone, so turning it off while it is open puts it away.
     */
     if (textarea.autocompleteIsOff) {
       if (isAutocompleteListViewOpened(autocompleteListView)) {

@@ -1,11 +1,11 @@
 /*
-Tab with no suggestion to insert.
+  Tab with no suggestion to insert.
 
-The autocomplete owns Tab while its list is open — there it inserts the
-suggestion and marks the key handled. With no suggestion the key used to fall
-through to the browser, which moved focus on to the next control and left the
-editor. So Tab indents: one tab character where the selection is. The list's
-handler runs first, and what it has already handled is left alone.
+  The autocomplete owns Tab while its list is open — there it inserts the
+  suggestion and marks the key handled. With no suggestion the key used to fall
+  through to the browser, which moved focus on to the next control and left the
+  editor. So Tab indents: one tab character where the selection is. The list's
+  handler runs first, and what it has already handled is left alone.
 */
 export default (textarea) => {
   textarea.addEventListener('keydown', (event) => {

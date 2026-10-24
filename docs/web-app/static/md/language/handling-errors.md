@@ -4,7 +4,6 @@ Sooner or later you'll type something that MuSemantiQ doesn't understand. It doe
 
 Let's start with a simple example, a clef that doesn't exist:
 
-<!-- check-docs-examples: allow-errors -->
 ```msq-editor opens-with=text
 measure
 treble clef
@@ -31,7 +30,6 @@ The part in quotes is exactly the text the parser couldn't use, so it may end wi
 
 The sentence says "not recognizable **or applicable**" for a reason. A command can be correct, but in a wrong place. As you remember from [Fermata over barline](/docs/language/fermata-over-barline), `ends with fermata` belongs to a measure, so it has to go right after `measure`. After the units, it has nothing to attach to:
 
-<!-- check-docs-examples: allow-errors -->
 ```msq-editor opens-with=text
 measure
 treble clef
@@ -51,7 +49,6 @@ There are only a few kinds of errors.
 
 **A command that is not recognizable.** It's a typo, a word that doesn't exist, or a value that is not supported:
 
-<!-- check-docs-examples: allow-errors -->
 ```msq-editor opens-with=text
 measure
 treble clef
@@ -67,7 +64,6 @@ As you may notice, the note `g` is still drawn. Only the part of the line that w
 
 **A unit that doesn't exist.** Every word is correct, but a slur or another span names a unit that is not there. Let's take a look at the following example:
 
-<!-- check-docs-examples: allow-errors -->
 ```msq-editor opens-with=text
 measure
 treble clef
@@ -84,7 +80,6 @@ unit after command 'to' is not found on the line 5
 
 The same happens with a measure that doesn't exist, in a command that names measures, like a volta bracket:
 
-<!-- check-docs-examples: allow-errors -->
 ```msq-editor opens-with=text
 measure
 treble clef
@@ -101,7 +96,6 @@ measure after command 'to' is not found on the line 7
 
 **A start or a finish without a position.** A span needs to know where it starts and where it finishes. If the number is missing, it can't know that:
 
-<!-- check-docs-examples: allow-errors -->
 ```msq-editor opens-with=text
 measure
 treble clef

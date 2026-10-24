@@ -447,10 +447,10 @@ const eventHandlers = {
     })
   },
   /*
-  Every page of a document at once, for an editor with pages. Each page gets
-  its own score and its own MIDI, so the player under a page highlights that
-  page's notes, and the document gets one MIDI with all pages, played without
-  a break between them.
+    Every page of a document at once, for an editor with pages. Each page gets
+    its own score and its own MIDI, so the player under a page highlights that
+    page's notes, and the document gets one MIDI with all pages, played without
+    a break between them.
   */
   'pages.svg.midi.text.generate': (event) => {
     const id = event.data.id

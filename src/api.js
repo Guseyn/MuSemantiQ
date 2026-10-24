@@ -143,24 +143,24 @@ import generateMidi from '#msq/midi/generateMidi.js'
  */
 export async function setupFonts (fontConfig) {
   /*
-  --------------------------------------------------------------------------------------------------
-  ENVIRONMENT DETECTION
-  --------------------------------------------------------------------------------------------------
-  Node.js: no 'window' object
-  Browser: window + document exist
+    --------------------------------------------------------------------------------------------------
+    ENVIRONMENT DETECTION
+    --------------------------------------------------------------------------------------------------
+    Node.js: no 'window' object
+    Browser: window + document exist
 
-  This ensures we do not accidentally use filesystem paths in browser.
-  --------------------------------------------------------------------------------------------------
+    This ensures we do not accidentally use filesystem paths in browser.
+    --------------------------------------------------------------------------------------------------
   */
   const isBrowser = typeof window !== 'undefined' && typeof document !== 'undefined'
 
   /*
-  --------------------------------------------------------------------------------------------------
-  DEFAULT FONT CONFIG (NODE.JS ONLY)
-  --------------------------------------------------------------------------------------------------
-  These local paths only work in Node.js. They must not be used in browser,
-  because browsers cannot load './src/.../*.ttf' via opentype.js.
-  --------------------------------------------------------------------------------------------------
+    --------------------------------------------------------------------------------------------------
+    DEFAULT FONT CONFIG (NODE.JS ONLY)
+    --------------------------------------------------------------------------------------------------
+    These local paths only work in Node.js. They must not be used in browser,
+    because browsers cannot load './src/.../*.ttf' via opentype.js.
+    --------------------------------------------------------------------------------------------------
   */
   const defaultNodeFontConfig = {
     'chord-letters': {
@@ -187,27 +187,27 @@ export async function setupFonts (fontConfig) {
         js: '#msq/drawer/font/music-js/leland.js'
       }
       /*
-      Only the fonts that have a music-js table are named here, and only bravura
-      and leland do. Petaluma.otf and MuseJazz.otf are in src/drawer/font/music
-      waiting to be traced — naming one before its table exists makes every call
-      to setupFonts() throw on an import that cannot resolve, which takes the
-      whole library down rather than the one font.
+        Only the fonts that have a music-js table are named here, and only bravura
+        and leland do. Petaluma.otf and MuseJazz.otf are in src/drawer/font/music
+        waiting to be traced — naming one before its table exists makes every call
+        to setupFonts() throw on an import that cannot resolve, which takes the
+        whole library down rather than the one font.
       */
     }
   }
 
   /*
-  --------------------------------------------------------------------------------------------------
-  BUILD THE BASE CONFIG ACCORDING TO ENVIRONMENT
-  --------------------------------------------------------------------------------------------------
+    --------------------------------------------------------------------------------------------------
+    BUILD THE BASE CONFIG ACCORDING TO ENVIRONMENT
+    --------------------------------------------------------------------------------------------------
 
-  - In Node.js:
-      Start with defaultNodeFontConfig and then apply user overrides.
+    - In Node.js:
+        Start with defaultNodeFontConfig and then apply user overrides.
 
-  - In Browser:
-      User MUST provide full `fontConfig`.
-      We start with empty categories because defaults do not apply.
-  --------------------------------------------------------------------------------------------------
+    - In Browser:
+        User MUST provide full `fontConfig`.
+        We start with empty categories because defaults do not apply.
+    --------------------------------------------------------------------------------------------------
   */
   let finalFontConfig
 
@@ -266,18 +266,18 @@ Every path must be a valid URL, not a local filesystem path.
   }
 
   /*
-  --------------------------------------------------------------------------------------------------
-  VALIDATE & APPLY USER CONFIG (if present)
-  --------------------------------------------------------------------------------------------------
+    --------------------------------------------------------------------------------------------------
+    VALIDATE & APPLY USER CONFIG (if present)
+    --------------------------------------------------------------------------------------------------
 
-  The user can override:
-    - chord-letters (simple name → path)
-    - text (name → {regular, bold})
-    - music (name → {font, js})
+    The user can override:
+      - chord-letters (simple name → path)
+      - text (name → {regular, bold})
+      - music (name → {font, js})
 
-  Browser: this step fills the empty config.
-  Node.js: this merges with defaults.
-  --------------------------------------------------------------------------------------------------
+    Browser: this step fills the empty config.
+    Node.js: this merges with defaults.
+    --------------------------------------------------------------------------------------------------
   */
 
   // chord-letters override
@@ -324,21 +324,21 @@ Every path must be a valid URL, not a local filesystem path.
   }
 
   /*
-  --------------------------------------------------------------------------------------------------
-  EXTRACT FILE PATHS IN DETERMINISTIC ORDER
-  --------------------------------------------------------------------------------------------------
-  The loading order is extremely important for deterministic output:
+    --------------------------------------------------------------------------------------------------
+    EXTRACT FILE PATHS IN DETERMINISTIC ORDER
+    --------------------------------------------------------------------------------------------------
+    The loading order is extremely important for deterministic output:
 
-      1. chord-letter fonts
-      2. text regular fonts
-      3. text bold fonts
-      4. music fonts (OpenType)
-      5. music JS schemas (loaded separately)
+        1. chord-letter fonts
+        2. text regular fonts
+        3. text bold fonts
+        4. music fonts (OpenType)
+        5. music JS schemas (loaded separately)
 
-  This guarantees:
-  - same font indexes across environments
-  - reproducible SVG + MIDI tests
-  --------------------------------------------------------------------------------------------------
+    This guarantees:
+    - same font indexes across environments
+    - reproducible SVG + MIDI tests
+    --------------------------------------------------------------------------------------------------
   */
 
   const chordLetterFontPaths = Object.values(finalFontConfig['chord-letters'])
@@ -348,18 +348,18 @@ Every path must be a valid URL, not a local filesystem path.
   const jsMusicFonts = Object.values(finalFontConfig['music']).map(f => f['js'])
 
   /*
-  --------------------------------------------------------------------------------------------------
-  LOAD ALL FONT FILES WITH OPENTYPE.JS +
-  LOAD MUSIC JS FONT SCHEMA MODULES
-  --------------------------------------------------------------------------------------------------
-  opentype.load(pathOrUrl) works in both:
-    - Node.js (filesystem)
-    - Browser (URLs)
-  jsMusicFonts modules contain the glyph definition tables used by MuSemantiQ's
-  engraving engine. They must align 1:1 with musicFontPaths.
+    --------------------------------------------------------------------------------------------------
+    LOAD ALL FONT FILES WITH OPENTYPE.JS +
+    LOAD MUSIC JS FONT SCHEMA MODULES
+    --------------------------------------------------------------------------------------------------
+    opentype.load(pathOrUrl) works in both:
+      - Node.js (filesystem)
+      - Browser (URLs)
+    jsMusicFonts modules contain the glyph definition tables used by MuSemantiQ's
+    engraving engine. They must align 1:1 with musicFontPaths.
 
-  We load fonts exactly in the order defined above.
-  --------------------------------------------------------------------------------------------------
+    We load fonts exactly in the order defined above.
+    --------------------------------------------------------------------------------------------------
   */
 
   const fontSources = await Promise.all(
@@ -378,23 +378,23 @@ Every path must be a valid URL, not a local filesystem path.
   )
 
   /*
-  --------------------------------------------------------------------------------------------------
-  BUILD FINAL FONT SOURCE TREE (OUTPUT STRUCTURE)
-  --------------------------------------------------------------------------------------------------
-  Shape of return value:
+    --------------------------------------------------------------------------------------------------
+    BUILD FINAL FONT SOURCE TREE (OUTPUT STRUCTURE)
+    --------------------------------------------------------------------------------------------------
+    Shape of return value:
 
-  {
-    "chord-letters": { fontName: opentypeFontObject },
-    "text": {
-       "regular": { familyName: opentypeFontObject },
-       "bold":    { familyName: opentypeFontObject }
-    },
-    "music": { fontName: opentypeFontObject },
-    "music-js": { fontName: glyphSchemaObject }
-  }
+    {
+      "chord-letters": { fontName: opentypeFontObject },
+      "text": {
+         "regular": { familyName: opentypeFontObject },
+         "bold":    { familyName: opentypeFontObject }
+      },
+      "music": { fontName: opentypeFontObject },
+      "music-js": { fontName: glyphSchemaObject }
+    }
 
-  This structure is what the MuSemantiQ drawer/renderer consumes.
-  --------------------------------------------------------------------------------------------------
+    This structure is what the MuSemantiQ drawer/renderer consumes.
+    --------------------------------------------------------------------------------------------------
   */
 
   const supportedFontSources = {

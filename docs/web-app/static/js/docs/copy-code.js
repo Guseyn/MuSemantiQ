@@ -1,18 +1,18 @@
 /*
-Every <pre> offers to copy itself. The "copy" link is the block's own ::before
-(see docs.css and landing.css), so neither the markdown nor the page has to
-add anything to a code block for it to have one.
+  Every <pre> offers to copy itself. The "copy" link is the block's own ::before
+  (see docs.css and landing.css), so neither the markdown nor the page has to
+  add anything to a code block for it to have one.
 
-A pseudo-element cannot have a listener, but a click on it is a click on its
-<pre>. So this listens once, for the whole document, and asks whether the
-click landed inside the ::before's box. That box is absolutely positioned
-against the <pre>'s padding box, at the top and right it is given, so it can
-be worked out from its computed style; the stylesheets give it
-box-sizing: border-box, so its computed width and height are the whole of it.
+  A pseudo-element cannot have a listener, but a click on it is a click on its
+  <pre>. So this listens once, for the whole document, and asks whether the
+  click landed inside the ::before's box. That box is absolutely positioned
+  against the <pre>'s padding box, at the top and right it is given, so it can
+  be worked out from its computed style; the stylesheets give it
+  box-sizing: border-box, so its computed width and height are the whole of it.
 
-The copying is the textarea trick: the text goes into a textarea nobody sees,
-which is selected and copied with execCommand. It works on plain http, where
-navigator.clipboard is not available, and on every browser the page supports.
+  The copying is the textarea trick: the text goes into a textarea nobody sees,
+  which is selected and copied with execCommand. It works on plain http, where
+  navigator.clipboard is not available, and on every browser the page supports.
 */
 
 const COPIED_FOR = 1500

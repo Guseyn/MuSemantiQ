@@ -26,12 +26,12 @@ class SearchableSelect extends HTMLSelectElement {
     this.#enhance()
 
     /*
-    Options can arrive long after this — the pages fill their pickers from a
-    request, and EHTML writes the options straight into the select. The list
-    reads them fresh every time it opens, so searching is right either way; the
-    input showing the current label is not, since it is written once and has no
-    way of knowing the option behind it was replaced. So it is rewritten
-    whenever the options change.
+      Options can arrive long after this — the pages fill their pickers from a
+      request, and EHTML writes the options straight into the select. The list
+      reads them fresh every time it opens, so searching is right either way; the
+      input showing the current label is not, since it is written once and has no
+      way of knowing the option behind it was replaced. So it is rewritten
+      whenever the options change.
     */
     new MutationObserver(() => this.refresh()).observe(this, { childList: true })
   }
@@ -85,11 +85,11 @@ class SearchableSelect extends HTMLSelectElement {
     let active = -1
     let shown = []
     /*
-    Whether anything has been typed since the box was focused.
+      Whether anything has been typed since the box was focused.
 
-    Until it has, the input still holds the label of what is selected, and that
-    label must not be read as a search — focusing a list of two hundred glyphs
-    and being shown only the one already chosen is the opposite of useful.
+      Until it has, the input still holds the label of what is selected, and that
+      label must not be read as a search — focusing a list of two hundred glyphs
+      and being shown only the one already chosen is the opposite of useful.
     */
     let typed = false
 
@@ -109,14 +109,14 @@ class SearchableSelect extends HTMLSelectElement {
         item.setAttribute('aria-selected', String(current))
         if (current && scroll) {
           /*
-          Scroll the list itself rather than calling scrollIntoView, which walks
-          up the ancestors and would drag the whole page to reach an option two
-          hundred rows down.
+            Scroll the list itself rather than calling scrollIntoView, which walks
+            up the ancestors and would drag the whole page to reach an option two
+            hundred rows down.
 
-          Where the option sits is measured against the list's own scroll box.
-          `offsetTop` cannot be used directly: the list is positioned, so it is
-          its options' offsetParent here but need not be under other styling,
-          and the two cases differ by the height of the input above it.
+            Where the option sits is measured against the list's own scroll box.
+            `offsetTop` cannot be used directly: the list is positioned, so it is
+            its options' offsetParent here but need not be under other styling,
+            and the two cases differ by the height of the input above it.
           */
           const box = list.getBoundingClientRect()
           const above = item.getBoundingClientRect().top - box.top -
@@ -137,9 +137,9 @@ class SearchableSelect extends HTMLSelectElement {
       this.refresh()
       close()
       /*
-      What the input holds now is a label, not a query — the box keeps focus
-      after a choice, so without this the next click would search for the name
-      just chosen and reopen on that one option.
+        What the input holds now is a label, not a query — the box keeps focus
+        after a choice, so without this the next click would search for the name
+        just chosen and reopen on that one option.
       */
       typed = false
     }
@@ -174,9 +174,9 @@ class SearchableSelect extends HTMLSelectElement {
       input.setAttribute('aria-expanded', 'true')
 
       /*
-      Open on what is selected, not on the top of the list. A filtered list
-      starts at its best match; an unfiltered one starts where you already are,
-      scrolled into view, so the list opens showing its answer.
+        Open on what is selected, not on the top of the list. A filtered list
+        starts at its best match; an unfiltered one starts where you already are,
+        scrolled into view, so the list opens showing its answer.
       */
       const selected = this.selectedOptions[0]
       const at = selected ? shown.indexOf(selected) : -1
@@ -184,9 +184,9 @@ class SearchableSelect extends HTMLSelectElement {
     }
 
     /*
-    Select the text on focus so the first keystroke replaces the current label
-    rather than being appended to it — typing into an input already reading
-    "treble" would otherwise search for "treblea" and find nothing.
+      Select the text on focus so the first keystroke replaces the current label
+      rather than being appended to it — typing into an input already reading
+      "treble" would otherwise search for "treblea" and find nothing.
     */
     input.addEventListener('focus', () => {
       typed = false

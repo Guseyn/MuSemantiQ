@@ -25,8 +25,8 @@ export const TEST_ROOT = 'test'
  * artifacts: there is only ever one of it and nothing to adopt.
  */
 /*
-What a suite of each kind keeps. The visual runner writes seven artifacts per
-test and the audio runner eight — the same set whatever font the suite is for.
+  What a suite of each kind keeps. The visual runner writes seven artifacts per
+  test and the audio runner eight — the same set whatever font the suite is for.
 */
 const ARTIFACTS = {
   visual: [

@@ -10,13 +10,13 @@ const baseFolder = path.join('docs', 'web-app', 'static')
 const notFound = './docs/web-app/static/html/404.html'
 
 /*
-Every /docs/... URL is the same file. The shell reads location.pathname and
-renders the page the sitemap names, so the reader gets real URLs — one per
-page, linkable and reloadable — without a build step generating a page each.
+  Every /docs/... URL is the same file. The shell reads location.pathname and
+  renders the page the sitemap names, so the reader gets real URLs — one per
+  page, linkable and reloadable — without a build step generating a page each.
 
-A mapper rather than a rewrite because `nodes` has no rewrite: what a static
-mount serves is whatever path its mapper returns, so returning one constant
-path is how a shell is served under many URLs.
+  A mapper rather than a rewrite because `nodes` has no rewrite: what a static
+  mount serves is whatever path its mapper returns, so returning one constant
+  path is how a shell is served under many URLs.
 */
 const docsShell = path.join(baseFolder, 'html', 'docs.html')
 
@@ -25,12 +25,12 @@ function docsShellPath() {
 }
 
 /*
-e-dev: open a page with ?dev=true and Alt + click any element to open its line
-in the editor. Its endpoints serve html with source locations and start the
-editor, so they exist only locally (they also refuse anyone but localhost).
-The copy is vendored by docs:e-dev:update and gitignored, so a checkout
-without it still serves the docs, just without dev mode. Its settings are
-`eDev` in env/local.json.
+  e-dev: open a page with ?dev=true and Alt + click any element to open its line
+  in the editor. Its endpoints serve html with source locations and start the
+  editor, so they exist only locally (they also refuse anyone but localhost).
+  The copy is vendored by docs:e-dev:update and gitignored, so a checkout
+  without it still serves the docs, just without dev mode. Its settings are
+  `eDev` in env/local.json.
 */
 const eDevRoutes = './docs/web-app/api/e-dev/routes.js'
 const eDevApi = process.env.ENV === 'local' && fs.existsSync(eDevRoutes)
@@ -49,13 +49,13 @@ server(
         fileNotFound: notFound
       }),
       /*
-      `md` is the documentation itself, fetched by the shell's e-markdown one
-      page at a time. It is served as text/plain — `nodes` has no mime entry
-      for .md — which is what e-markdown wants anyway.
+        `md` is the documentation itself, fetched by the shell's e-markdown one
+        page at a time. It is served as text/plain — `nodes` has no mime entry
+        for .md — which is what e-markdown wants anyway.
 
-      A page the sitemap lists but nobody has written yet gets a markdown file
-      of its own rather than the 404 page: e-markdown renders whatever body
-      comes back, whatever the status, so that body has to read as a page.
+        A page the sitemap lists but nobody has written yet gets a markdown file
+        of its own rather than the 404 page: e-markdown renders whatever body
+        comes back, whatever the status, so that body has to read as a page.
       */
       src(/^\/md/, {
         baseFolder,

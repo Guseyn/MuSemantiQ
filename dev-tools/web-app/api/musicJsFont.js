@@ -267,10 +267,10 @@ const listEntries = endpoint('/dev/music-js-entries', 'GET', async ({ stream }) 
   }
 
   /*
-  The scaffold's order, which is the order the font files are written in, so
-  walking the list with the arrows goes through a family at a time rather than
-  alphabetically across unrelated signs. What only the fonts have has no place
-  in that order, so it goes on the end.
+    The scaffold's order, which is the order the font files are written in, so
+    walking the list with the arrows goes through a family at a time rather than
+    alphabetically across unrelated signs. What only the fonts have has no place
+    in that order, so it goes on the end.
   */
   const fromTheFonts = [ ...offered.values() ]
     .filter((entry) => !entry.inScaffold)
@@ -343,9 +343,9 @@ async function glyphEdit(request) {
   }
 
   /*
-  Rewrite from the bottom up so the line numbers of the edits above stay valid.
-  Only the first point field is written: the viewer traces one character at a
-  time, and an up/down pair is two separate visits.
+    Rewrite from the bottom up so the line numbers of the edits above stay valid.
+    Only the first point field is written: the viewer traces one character at a
+    time, and an up/down pair is two separate visits.
   */
   const array = found.arrays[0]
   const edits = []

@@ -47,18 +47,18 @@ function outputDirFromArgs(args) {
     process.exit(1)
   }
   /*
-  npm runs every script from the project root, so a relative -o given through
-  `npm run` would land inside this repository. INIT_CWD is where npm was
-  called from, which is what the person typing the path meant.
+    npm runs every script from the project root, so a relative -o given through
+    `npm run` would land inside this repository. INIT_CWD is where npm was
+    called from, which is what the person typing the path meant.
   */
   return path.resolve(process.env.INIT_CWD || process.cwd(), args[index + 1])
 }
 
 /*
-The output folder is emptied first, so a module removed from src/ does not
-linger in it. Since the path comes from the command line, only a folder that is
-empty or was written by this script before (it has a worker.js) is emptied;
-anything else is refused rather than deleted.
+  The output folder is emptied first, so a module removed from src/ does not
+  linger in it. Since the path comes from the command line, only a folder that is
+  empty or was written by this script before (it has a worker.js) is emptied;
+  anything else is refused rather than deleted.
 */
 function prepare(outDir) {
   if (path.resolve(outDir) === srcDir || srcDir.startsWith(path.resolve(outDir) + path.sep)) {
@@ -75,9 +75,9 @@ function prepare(outDir) {
 }
 
 /*
-`#msq/drawer/x.js`, seen from src/midi/y.js, becomes `../drawer/x.js`. A path
-that does not start with a dot is a bare specifier to the browser, so a module
-in the same folder gets `./`.
+  `#msq/drawer/x.js`, seen from src/midi/y.js, becomes `../drawer/x.js`. A path
+  that does not start with a dot is a bare specifier to the browser, so a module
+  in the same folder gets `./`.
 */
 function relativeSpecifier(specifier, fromFile) {
   const target = path.join(srcDir, specifier.slice('#msq/'.length))

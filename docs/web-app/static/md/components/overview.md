@@ -4,16 +4,16 @@
 
 ## How It Works
 
-1. Each element is a `<template>` with an `is` attribute, and you write music inside of it. The browser doesn't show what is inside of a `<template>`, so nothing appears until the element is rendered.
+1. Each web component is a `<template is="msq-*">` with an `is` attribute, and you write music inside of it. The browser doesn't show what is inside of a `<template>`, so nothing appears until the element is rendered.
 2. All elements on the page use one worker. All the heavy work happens there, so the page doesn't freeze, even if it has a lot of scores.
-3. `<msq-font-loader>` loads fonts once, under a name, and only then shows what is inside of it. This way, elements inside of it wait for the fonts, and you don't need to write any code for that.
+3. `<template is="msq-font-loader">` loads fonts once, under a name, and only then shows what is inside of it. This way, elements inside of it wait for the fonts, and you don't need to write any code for that.
 4. Each element is rendered only once, when it appears on the page. It replaces itself with `<div data-rendered-by="msq-...">` and puts the result into its shadow root, so the styles of your page don't affect it.
 5. If you make a mistake in the music, you'll see it in a panel inside of the element. If you make a mistake in the setup, for example you forget a font name, the element stays invisible, and you'll see the error in the console.
 
 Below is a diagram of how the elements, the page and the worker work together:
 
-1. `<msq-font-loader>` sends the **font config** with the `fonts.setup` message, and the worker loads the fonts and keeps them as **supported font sources**, under the name in the `data-font-sources-reference` attribute.
-2. Once the fonts are ready, the loader puts its content on the page, and each element in it sends its **MSQ text** with its own message: `<msq-svg>` with the `svg.generate` message, `<msq-midi>` with the `midi.generate` message, `<msq-svg-midi>` with the `svg.midi.generate` message and `<msq-editor>` with the `svg.midi.text.generate` message.
+1. `<template is="msq-font-loader">` sends the **font config** with the `fonts.setup` message, and the worker loads the fonts and keeps them as **supported font sources**, under the name in the `data-font-sources-reference` attribute.
+2. Once the fonts are ready, the loader puts its content on the page, and each element in it sends its **MSQ text** with its own message: `<template is="msq-svg">` with the `svg.generate` message, `<template is="msq-midi">` with the `midi.generate` message, `<template is="msq-svg-midi">` with the `svg.midi.generate` message and `<template is="msq-editor">` with the `svg.midi.text.generate` message.
 3. The worker runs the **low-level API** on the text with those fonts.
 4. Each element puts what comes back, the **score**, the **player** or both, into its own shadow root.
 
@@ -217,7 +217,7 @@ c d e f g
 
 ## Elements
 
-### 1. `<msq-font-loader>`
+### 1. `<template is="msq-font-loader">`
 
 ```html
 <template is="msq-font-loader" data-font-sources-reference data-font-config data-font-config-src>
@@ -262,7 +262,7 @@ data-font-config-src="/js/font-config.json"
 
 </details>
 
-### 2. `<msq-svg>`
+### 2. `<template is="msq-svg">`
 
 ```html
 <template is="msq-svg" data-font-sources data-file-name>
@@ -280,7 +280,7 @@ Engraves the music as an SVG score, and nothing else. It is the cheapest of the 
 <details is="e-details">
 <summary>Attributes</summary>
 
-`data-font-sources` attribute: the name a `<msq-font-loader>` registered its fonts under; required.
+`data-font-sources` attribute: the name a `<template is="msq-font-loader">` registered its fonts under; required.
 
 ```html
 data-font-sources="myFonts"
@@ -313,7 +313,7 @@ c d e f
 
 </details>
 
-### 3. `<msq-midi>`
+### 3. `<template is="msq-midi">`
 
 ```html
 <template is="msq-midi" data-sound-font data-file-name>
@@ -362,7 +362,7 @@ c d e f
 
 </details>
 
-### 4. `<msq-svg-midi>`
+### 4. `<template is="msq-svg-midi">`
 
 ```html
 <template is="msq-svg-midi" data-font-sources data-highlight-color data-sound-font data-file-name>
@@ -380,7 +380,7 @@ The score with a player under it, each note highlighted while it sounds. Click a
 <details is="e-details">
 <summary>Attributes</summary>
 
-`data-font-sources` attribute: the name a `<msq-font-loader>` registered its fonts under; required.
+`data-font-sources` attribute: the name a `<template is="msq-font-loader">` registered its fonts under; required.
 
 ```html
 data-font-sources="myFonts"
@@ -392,7 +392,7 @@ data-font-sources="myFonts"
 data-highlight-color="#1f7a8c"
 ```
 
-`data-sound-font` attribute: the URL of a Magenta-format sound font, as in `<msq-midi>`.
+`data-sound-font` attribute: the URL of a Magenta-format sound font, as in `<template is="msq-midi">`.
 
 ```html
 data-sound-font="/magenta-sound-font/FluidR3_GM"
@@ -409,8 +409,8 @@ data-file-name="two-staves"
 <details is="e-details">
 <summary>Renders</summary>
 
-- the score, with the same toolbar as `<msq-svg>`.
-- the player, with the same buttons as `<msq-midi>`.
+- the score, with the same toolbar as `<template is="msq-svg">`.
+- the player, with the same buttons as `<template is="msq-midi">`.
 - an errors panel, only when the parser had something to report.
 
 For example:
@@ -425,7 +425,7 @@ c d e f
 
 </details>
 
-### 5. `<msq-editor>`
+### 5. `<template is="msq-editor">`
 
 ```html
 <template
@@ -455,7 +455,7 @@ The score, the player and the source you can edit and render again, in one eleme
 <details is="e-details">
 <summary>Attributes</summary>
 
-`data-font-sources` attribute: the name a `<msq-font-loader>` registered its fonts under; required.
+`data-font-sources` attribute: the name a `<template is="msq-font-loader">` registered its fonts under; required.
 
 ```html
 data-font-sources="myFonts"
@@ -479,7 +479,7 @@ data-file-name="editor-example"
 data-highlight-color="#1f7a8c"
 ```
 
-`data-sound-font` attribute: the URL of a Magenta-format sound font, as in `<msq-midi>`.
+`data-sound-font` attribute: the URL of a Magenta-format sound font, as in `<template is="msq-midi">`.
 
 ```html
 data-sound-font="/magenta-sound-font/FluidR3_GM"
@@ -520,7 +520,7 @@ data-navigation-highlight-color="#f5cd79"
 <details is="e-details">
 <summary>Renders</summary>
 
-- the score, the player and the errors panel, as in `<msq-svg-midi>`.
+- the score, the player and the errors panel, as in `<template is="msq-svg-midi">`.
 - the source view, with line numbers, colours and suggestions as you type.
 - a toolbar: download the SVG, edit or render, copy the MSQ, and the settings of this one element.
 - the links between the two views: hold **⌘** or **Ctrl** and click a word to see what it drew, or click a glyph to see the words that drew it.
@@ -608,7 +608,7 @@ Styles a rendered element from your own CSS. The element lives in a shadow root,
 --error-color: #c40233; --error-bg: #fdf3f5;
 ```
 
-`--editor-font-family`, `--editor-font-size`, `--editor-line-height`, `--editor-font-color`, `--editor-height`: the source view of `<msq-editor>`; an attribute that sets the same thing wins over your CSS.
+`--editor-font-family`, `--editor-font-size`, `--editor-line-height`, `--editor-font-color`, `--editor-height`: the source view of `<template is="msq-editor">`; an attribute that sets the same thing wins over your CSS.
 
 ```css
 --editor-font-size: 1em; --editor-line-height: 1.4em; --editor-font-color: #1f2d3a; --editor-height: 270px;

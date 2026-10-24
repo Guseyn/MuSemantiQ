@@ -54,6 +54,16 @@ export default function initializeEditor({
   // accessible name the text view has.
   textarea.setAttribute('aria-label', 'MuSemantiQ source')
 
+  /*
+    The text opens on its first line. A textarea puts its caret at the end of the
+    value it was just given, and focusing it — which showing the text view does —
+    scrolls that caret into view, so a long page would open scrolled to its
+    bottom. So the caret starts at the beginning and the view with it; where the
+    caret goes afterwards is the user's.
+  */
+  textarea.setSelectionRange(0, 0)
+  textarea.scrollTop = 0
+
   // The modules reach the rendered SVG through `initialParentElement.shadowRoot`.
   textarea.initialParentElement = shadowHost
   textarea.supportedFontNames = supportedFontNames

@@ -2,15 +2,15 @@
 'use strict'
 
 /*
-Not reached today, and kept anyway.
+  Not reached today, and kept anyway.
 
-Every octave clef draws its own numeral — drawOctaveEightUpClef.js and its siblings
-place the "8" or "15" themselves — so nothing imports this. It is the general
-form of that numeral, the one an octave sign or a clef variant would use rather
-than repeating the placement, and the styles it reads
-(octaveTextFontOptions, the two top-offset margins) are still part of the style
-sheet. Marked so it neither counts against coverage nor disappears from the
-report.
+  Every octave clef draws its own numeral — drawOctaveEightUpClef.js and its siblings
+  place the "8" or "15" themselves — so nothing imports this. It is the general
+  form of that numeral, the one an octave sign or a clef variant would use rather
+  than repeating the placement, and the styles it reads
+  (octaveTextFontOptions, the two top-offset margins) are still part of the style
+  sheet. Marked so it neither counts against coverage nor disappears from the
+  report.
 */
 /* c8 ignore start */
 

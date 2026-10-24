@@ -88,9 +88,9 @@ for (const staticDir of staticDirs) {
     )
   }
   /*
-  A set deleted by hand would otherwise leave its link behind pointing at
-  nothing, and the app would go on offering a soundbank that cannot be played.
-  Only links are removed, and only ones whose target is gone.
+    A set deleted by hand would otherwise leave its link behind pointing at
+    nothing, and the app would go on offering a soundbank that cannot be played.
+    Only links are removed, and only ones whose target is gone.
   */
   for (const entry of readdirSync(soundFontDir, { withFileTypes: true })) {
     const at = join(soundFontDir, entry.name)
@@ -102,9 +102,9 @@ for (const staticDir of staticDirs) {
 }
 
 /*
-The showdown extensions that turn ```msq-svg (and the other elements') fences
-into msq elements. Only the documentation renders markdown, so only it gets
-them, linked rather than copied so there is one copy to change.
+  The showdown extensions that turn ```msq-svg (and the other elements') fences
+  into msq elements. Only the documentation renders markdown, so only it gets
+  them, linked rather than copied so there is one copy to change.
 */
 const docsStaticDir = join(projectRoot, 'docs/web-app/static')
 if (existsSync(docsStaticDir)) {

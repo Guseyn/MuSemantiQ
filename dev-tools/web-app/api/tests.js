@@ -122,9 +122,9 @@ async function recordAsPassing(suite, test) {
  */
 const testStatus = endpoint('/dev/tests/status?suite&test', 'GET', async ({ stream, queries }) => {
   /*
-  A suite name carries a slash (`visual-tests/bravura`), so it travels as a query
-  rather than as path segments — and `nodes` hands query values over exactly as
-  they arrived, so an encoded slash has to be decoded here.
+    A suite name carries a slash (`visual-tests/bravura`), so it travels as a query
+    rather than as path segments — and `nodes` hands query values over exactly as
+    they arrived, so an encoded slash has to be decoded here.
   */
   const decoded = (value) => {
     try {
@@ -218,10 +218,10 @@ const adopt = endpoint('/dev/tests/adopt', 'POST', async ({ stream }) => {
   }
 
   /*
-  The picker labels a test from the failed list, so adopting has to keep that
-  list true or the label outlives what it describes. Only when *every* artifact
-  matches — adopting one of seven leaves the test failing, and it should still
-  say so.
+    The picker labels a test from the failed list, so adopting has to keep that
+    list true or the label outlives what it describes. Only when *every* artifact
+    matches — adopting one of seven leaves the test failing, and it should still
+    say so.
   */
   const failing = !(await everythingMatches(suite, request.test))
   if (!failing) {
@@ -285,9 +285,9 @@ const addTest = endpoint('/dev/tests/new', 'POST', async ({ stream }) => {
     }
 
     /*
-    Which font a suite is for is written into the test itself, as its first
-    line. The corpus does it that way rather than passing the font in, so a test
-    file says on its face what it engraves with.
+      Which font a suite is for is written into the test itself, as its first
+      line. The corpus does it that way rather than passing the font in, so a test
+      file says on its face what it engraves with.
     */
     const font = suite.name.includes('/') ? suite.name.split('/').pop() : null
     const text = font && font !== 'bravura'
@@ -367,9 +367,9 @@ const testSource = endpoint('/dev/tests/source?suite&test', 'GET', async ({ stre
   }
 
   /*
-  The font line is the suite's, not the test's — it is prepended when the test
-  is written and would be written again on the way back, so it is taken off
-  here rather than shown as something to edit.
+    The font line is the suite's, not the test's — it is prepended when the test
+    is written and would be written again on the way back, so it is taken off
+    here rather than shown as something to edit.
   */
   const music = msq.match(/^music font is \S+\n\n/)
   respondWith(stream, 200, {
@@ -431,9 +431,9 @@ const editTest = endpoint('/dev/tests/source', 'POST', async ({ stream }) => {
     wrote: written,
     ran: ran.code === 0,
     /*
-    A failing run is not an error here. The artifacts are rewritten either way,
-    and a test that now differs from its baseline is exactly what the viewer is
-    for — it is read, not hidden.
+      A failing run is not an error here. The artifacts are rewritten either way,
+      and a test that now differs from its baseline is exactly what the viewer is
+      for — it is read, not hidden.
     */
     output: ran.output.split('\n').slice(-12).join('\n')
   })
@@ -500,8 +500,8 @@ const deleteTest = endpoint('/dev/tests/delete', 'POST', async ({ stream }) => {
   }
 
   /*
-  And out of the two lists the runners keep, which otherwise go on naming a test
-  that no longer exists until the suite is next run.
+    And out of the two lists the runners keep, which otherwise go on naming a test
+    that no longer exists until the suite is next run.
   */
   for (const suite of suites().filter((one) => one.kind === kind)) {
     for (const file of [ 'list-of-failed-tests.json', 'list-of-passed-tests.json' ]) {

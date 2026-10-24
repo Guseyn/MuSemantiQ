@@ -11,10 +11,10 @@ import path from 'node:path'
 import { InputOutputError } from './lib/errors.js'
 
 /*
- * The same delimiter the visual and audio test scripts use. It is a convention
- * of the tooling rather than part of the language, so keeping it identical
- * means CLI input and test fixtures stay interchangeable.
- */
+  The same delimiter the visual and audio test scripts use. It is a convention
+  of the tooling rather than part of the language, so keeping it identical
+  means CLI input and test fixtures stay interchangeable.
+*/
 export const DEFAULT_PAGE_DELIMITER = '====next page===='
 
 const PAGE_EXTENSIONS = new Set([ '.txt', '.msq' ])
@@ -31,9 +31,9 @@ export function splitPages(text, delimiter = DEFAULT_PAGE_DELIMITER) {
   return text
     .split(delimiter)
     /*
-     * A trailing delimiter, or two in a row, yields an empty page whose schema
-     * has no measures — and MIDI generation throws on exactly that.
-     */
+      A trailing delimiter, or two in a row, yields an empty page whose schema
+      has no measures — and MIDI generation throws on exactly that.
+    */
     .filter((page) => page.trim() !== '')
 }
 
@@ -96,9 +96,9 @@ async function sourceFromDirectory(dirPath, delimiter) {
   for (const file of files) {
     const text = await readFile(path.join(dirPath, file), 'utf8')
     /*
-     * A file may itself hold several pages. Its own name is kept for the first
-     * page and suffixed for the rest, so output names stay traceable.
-     */
+      A file may itself hold several pages. Its own name is kept for the first
+      page and suffixed for the rest, so output names stay traceable.
+    */
     const filePages = splitPages(text, delimiter)
     const base = path.basename(file, path.extname(file))
     filePages.forEach((page, index) => {

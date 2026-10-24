@@ -10,8 +10,8 @@ const config = JSON.parse(
 )
 
 /*
-One worker is enough. These are tools for one person at a keyboard, and every
-worker pays a five second start delay before it loads the route table.
+  One worker is enough. These are tools for one person at a keyboard, and every
+  worker pays a five second start delay before it loads the route table.
 */
 cluster(
   'dev-tools/web-app/primary.js',

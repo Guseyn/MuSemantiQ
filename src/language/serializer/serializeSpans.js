@@ -117,8 +117,8 @@ export default function serializeSpans (units) {
     }
     words.push(serializeRange(span))
     /*
-    A slur is a curve before it is a span, so it takes its own shaping: how far
-    it bends, whether it doubles back, and where each end lands.
+      A slur is a curve before it is a span, so it takes its own shaping: how far
+      it bends, whether it doubles back, and where each end lands.
     */
     if (span.params.sShape) {
       words.push('with s-shape')
@@ -141,8 +141,8 @@ export default function serializeSpans (units) {
   }
 
   /*
-  A glissando is written on its unit unless it was given a form, and then it
-  names both ends instead.
+    A glissando is written on its unit unless it was given a form, and then it
+    names both ends instead.
   */
   for (const span of collectSpans(units, 'glissandoMarks')) {
     if (!span.params.form) {
@@ -152,8 +152,8 @@ export default function serializeSpans (units) {
   }
 
   /*
-  A simile counting beats stands for a run of units rather than for the one it
-  is written on, so it names that run.
+    A simile counting beats stands for a run of units rather than for the one it
+    is written on, so it names that run.
   */
   for (const span of collectSpans(units, 'simileMark')) {
     if (!span.params.numberOfBeats) {

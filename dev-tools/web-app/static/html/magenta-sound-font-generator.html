@@ -61,7 +61,7 @@
       font-size: var(--e-font-size-sm);
       white-space: nowrap;
     }
-    button[data-icon-button] .material-symbols-outlined {
+    button[data-icon-button] [data-icon] {
       font-size: 1.05rem;
       font-variation-settings: "FILL" 0, "wght" 300, "GRAD" 0, "opsz" 24;
     }
@@ -543,7 +543,7 @@
                             }
                             showError(removed.body.error || `The server answered ${removed.statusCode}.`)
                           ">
-                          <span class="material-symbols-outlined" aria-hidden="true">delete</span>
+                          <span data-icon aria-hidden="true">delete</span>
                           <span>Delete the set</span>
                         </button>
                       </form>
@@ -591,7 +591,7 @@
                               }
                               showError(removed.body.error || `The server answered ${removed.statusCode}.`)
                             ">
-                            <span class="material-symbols-outlined" aria-hidden="true">delete</span>
+                            <span data-icon aria-hidden="true">delete</span>
                           </button>
                         </form>
                       </td>

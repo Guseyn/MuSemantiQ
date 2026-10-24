@@ -1,20 +1,20 @@
 #!/usr/bin/env node
 
 /*
-The files the Node.js example on the Low-level API page says you will get.
+  The files the Node.js example on the Low-level API page says you will get.
 
-The page shows a script that reads two pages of MSQ and writes score.svg and
-score.mid, and links to both, so a reader can see the result before running
-anything. This runs the same calls on the same two pages and writes:
+  The page shows a script that reads two pages of MSQ and writes score.svg and
+  score.mid, and links to both, so a reader can see the result before running
+  anything. This runs the same calls on the same two pages and writes:
 
-  images/api/score.svg   the engraved score, both pages, one under another
-  images/api/score.mid   both pages, performed as one piece
+    images/api/score.svg   the engraved score, both pages, one under another
+    images/api/score.mid   both pages, performed as one piece
 
-    npm run docs:api-example
+      npm run docs:api-example
 
-The pages are read from the page itself, from the fences after `pages/1.txt`
-and `pages/2.txt`, so the files cannot drift from the text beside them. Both
-files are committed; rerun this after changing those pages or the engine.
+  The pages are read from the page itself, from the fences after `pages/1.txt`
+  and `pages/2.txt`, so the files cannot drift from the text beside them. Both
+  files are committed; rerun this after changing those pages or the engine.
 */
 
 import fs from 'fs'

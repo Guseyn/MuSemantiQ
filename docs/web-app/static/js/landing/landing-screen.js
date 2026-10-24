@@ -1,21 +1,21 @@
 /*
-<section is="landing-screen" data-screen id="…" data-label="…">
+  <section is="landing-screen" data-screen id="…" data-label="…">
 
-One screen of the landing page. Its opacity follows how much of it is on
-screen (--vis), which is what makes two screens cross-fade instead of merely
-abut, and its contents rise into place when it arrives (data-visible).
+  One screen of the landing page. Its opacity follows how much of it is on
+  screen (--vis), which is what makes two screens cross-fade instead of merely
+  abut, and its contents rise into place when it arrives (data-visible).
 
-It says what happens to it with events, for whatever cares:
+  It says what happens to it with events, for whatever cares:
 
-  landing:screen-connected   it is in the document (the rail lists it)
-  landing:screen-current     it has come on screen (the rail marks it, the
-                             engraved phrase inside it plays)
-  landing:screen-gone        it has properly left, not merely begun to
+    landing:screen-connected   it is in the document (the rail lists it)
+    landing:screen-current     it has come on screen (the rail marks it, the
+                               engraved phrase inside it plays)
+    landing:screen-gone        it has properly left, not merely begun to
 
-All three bubble and carry { id }.
+  All three bubble and carry { id }.
 
-data-enhanced is set here, so the styles that hide anything only apply once
-this is known to be running: with no JavaScript the page is simply a page.
+  data-enhanced is set here, so the styles that hide anything only apply once
+  this is known to be running: with no JavaScript the page is simply a page.
 */
 
 const REVEAL_THRESHOLD = 0.55
@@ -24,8 +24,8 @@ const REVEAL_THRESHOLD = 0.55
 const AWAY = 0.08
 
 /*
-Enough thresholds that the opacity moves smoothly rather than in steps. One
-observer for every screen, each reporting to its own element.
+  Enough thresholds that the opacity moves smoothly rather than in steps. One
+  observer for every screen, each reporting to its own element.
 */
 const ratios = Array.from({ length: 41 }, (_, step) => step / 40)
 
@@ -50,9 +50,9 @@ class LandingScreen extends HTMLElement {
   }
 
   /*
-  Called many times a second while the screen is on its way past, because the
-  observer watches forty-one thresholds. So the events go out only when a line
-  is crossed, never on every report.
+    Called many times a second while the screen is on its way past, because the
+    observer watches forty-one thresholds. So the events go out only when a line
+    is crossed, never on every report.
   */
   showShare(ratio) {
     this.style.setProperty('--vis', String(ratio))
@@ -70,9 +70,9 @@ class LandingScreen extends HTMLElement {
     this.#isCurrent = false
 
     /*
-    Only ever set to false before a screen has arrived. Once its contents have
-    risen into place they stay there: a screen that flickered every time it was
-    half scrolled past would be unreadable.
+      Only ever set to false before a screen has arrived. Once its contents have
+      risen into place they stay there: a screen that flickered every time it was
+      half scrolled past would be unreadable.
     */
     if (this.getAttribute('data-visible') !== 'true') {
       this.setAttribute('data-visible', 'false')

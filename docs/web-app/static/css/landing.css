@@ -461,6 +461,18 @@ the one colour the docs' diagrams use for every icon and arrow of their own.
   line-height: 1;
   color: var(--accent);
   font-variation-settings: "FILL" 0, "wght" 300, "GRAD" 0, "opsz" 24;
+  /* A Material Symbol, named by data-icon rather than by Google's class. */
+  font-family: 'Material Symbols Outlined';
+  font-weight: normal;
+  font-style: normal;
+  letter-spacing: normal;
+  text-transform: none;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  font-feature-settings: 'liga';
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
 }
 
 /* The list icons sit on a bordered tile of their own, no fill. */

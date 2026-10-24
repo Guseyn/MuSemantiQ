@@ -1,22 +1,22 @@
 #!/usr/bin/env node
 
 /*
-Makes a release from your machine.
+  Makes a release from your machine.
 
-    npm run release
-    npm run release -- --dry-run    shows what would happen, changes nothing
+      npm run release
+      npm run release -- --dry-run    shows what would happen, changes nothing
 
-It asks what goes into the changelog and what kind of release it is, then:
+  It asks what goes into the changelog and what kind of release it is, then:
 
-  1. sets the new version in package.json
-  2. adds the changes to the top of CHANGELOG.md
-  3. commits both and tags the commit (v1.2.3)
-  4. pushes the commit and the tag
-  5. creates a GitHub release with your changes and every commit since the
-     previous tag
+    1. sets the new version in package.json
+    2. adds the changes to the top of CHANGELOG.md
+    3. commits both and tags the commit (v1.2.3)
+    4. pushes the commit and the tag
+    5. creates a GitHub release with your changes and every commit since the
+       previous tag
 
-The changelog entry is written in $VISUAL or $EDITOR (vi by default), the way a
-commit message is. The release needs a clean working tree and `gh`, logged in.
+  The changelog entry is written in $VISUAL or $EDITOR (vi by default), the way a
+  commit message is. The release needs a clean working tree and `gh`, logged in.
 */
 
 import fs from 'fs'

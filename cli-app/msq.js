@@ -19,17 +19,17 @@ import {
 } from './lib/errors.js'
 
 /*
- * The paste guard depends on readline reporting bracketed-paste markers as
- * named keys, which older releases do not do — without it a multi-line paste
- * would answer several questions at once.
- */
+  The paste guard depends on readline reporting bracketed-paste markers as
+  named keys, which older releases do not do — without it a multi-line paste
+  would answer several questions at once.
+*/
 const MINIMUM_MAJOR = 22
 
 /*
- * Piping into something that stops reading early — `msq --help | head` — closes
- * our stdout mid-write. That is normal shell usage, not an error worth a stack
- * trace, so it ends the process quietly instead.
- */
+  Piping into something that stops reading early — `msq --help | head` — closes
+  our stdout mid-write. That is normal shell usage, not an error worth a stack
+  trace, so it ends the process quietly instead.
+*/
 function ignoreBrokenPipe() {
   for (const stream of [ process.stdout, process.stderr ]) {
     stream.on('error', (error) => {
@@ -92,9 +92,9 @@ async function main() {
   write(formatErrors(result.errorsForEachPage, { multiPage: plan.pages.length > 1 }), process.stderr)
 
   /*
-   * Parse errors do not stop generation, but they should not look like success
-   * either — a script needs to be able to tell.
-   */
+    Parse errors do not stop generation, but they should not look like success
+    either — a script needs to be able to tell.
+  */
   if (result.errorCount > 0) {
     process.exitCode = EXIT_PARSE_ERRORS
   }

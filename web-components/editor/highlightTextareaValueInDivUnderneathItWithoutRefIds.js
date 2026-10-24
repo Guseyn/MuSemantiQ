@@ -295,12 +295,12 @@ const escapeForTheLayer = (text) => text
   .replace(/>/g, '&gt;')
 
 /*
-The text cannot wait for the parse; the colours can.
+  The text cannot wait for the parse; the colours can.
 
-What a change touched goes up in the layer in the default colour right away —
-the layer under the textarea has to hold the same characters as the textarea,
-or what you read and what you type drift apart — and the parse colours those
-same lines on the next frame. The keystroke never waits for the parse.
+  What a change touched goes up in the layer in the default colour right away —
+  the layer under the textarea has to hold the same characters as the textarea,
+  or what you read and what you type drift apart — and the parse colours those
+  same lines on the next frame. The keystroke never waits for the parse.
 */
 const showTheChangedTextWithoutColours = (divUnderneathTextarea, textarea, parseWholeTextInTextarea) => {
   if (parseWholeTextInTextarea) {

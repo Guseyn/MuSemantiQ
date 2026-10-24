@@ -1,4 +1,4 @@
-# Font Generator
+# Music Font Generator
 
 <nav is="docs-contents"></nav>
 

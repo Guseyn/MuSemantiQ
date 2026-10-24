@@ -1,18 +1,17 @@
 /*
-Which page introduces which concept.
+  Which page introduces which concept.
 
-The parser names every construct it recognises — 578 of them — and reports,
-for any source, exactly which ones fired. That makes "no example uses a concept
-before it is described" a thing a script can check rather than a thing an author
-has to remember. This file is the missing half: scenario name -> the page that
-introduces it.
+  The parser names every construct it recognises — 578 of them — and reports,
+  for any source, exactly which ones fired. That makes "no example uses a concept
+  before it is described" a thing a script can check rather than a thing an author
+  has to remember. This file is the missing half: scenario name -> the page that
+  introduces it.
 
-Rules are tried in order and the first match wins, so specific rules come before
-general ones. Every scenario name must match some rule; scripts/check-docs-examples.js
-fails if one does not, which is how a newly added language feature announces
-that the documentation has not caught up with it.
+  Rules are tried in order and the first match wins, so specific rules come before
+  general ones. Every scenario name should match some rule: a name that matches
+  none is a language feature the documentation has not caught up with.
 
-Node only. The browser never loads this.
+  Node only. The browser never loads this.
 */
 
 /** @type {Array<[RegExp, string]>} */

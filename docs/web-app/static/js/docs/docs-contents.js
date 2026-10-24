@@ -1,17 +1,17 @@
 /*
-<nav is="docs-contents"></nav>
+  <nav is="docs-contents"></nav>
 
-A page's contents, written in its markdown where the list should appear, and
-filled in from the page's own headings, so the list cannot drift from them.
-Every h2 is an entry and every h3 an entry under the h2 before it.
+  A page's contents, written in its markdown where the list should appear, and
+  filled in from the page's own headings, so the list cannot drift from them.
+  Every h2 is an entry and every h3 an entry under the h2 before it.
 
-e-markdown sets its innerHTML in one go, so by the time this connects every
-heading is already beside it. It then moves its children out of itself, which
-disconnects this and connects it again, so the list is built from scratch on
-every connect rather than added to.
+  e-markdown sets its innerHTML in one go, so by the time this connects every
+  heading is already beside it. It then moves its children out of itself, which
+  disconnects this and connects it again, so the list is built from scratch on
+  every connect rather than added to.
 
-Showdown gives every heading an id (github flavour makes them the slug of the
-text); one written as raw HTML without an id gets one here, so it can be linked.
+  Showdown gives every heading an id (github flavour makes them the slug of the
+  text); one written as raw HTML without an id gets one here, so it can be linked.
 */
 class DocsContents extends HTMLElement {
   connectedCallback() {

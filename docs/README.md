@@ -89,7 +89,7 @@ create `static/md/<section>/<page>.md`; the sidebar and the router both follow.
 **Order is meaning.** The language section is in the order the language is
 learnt rather than the order of the reference material it came from, because
 every example is gradual: no page uses a concept an earlier page has not
-introduced. Moving a page re-checks every example under it.
+introduced.
 
 ## Examples
 
@@ -141,35 +141,6 @@ as plain markdown:
 lines in, and gives the details its body `<div>`. Don't write that `<div>`
 yourself, and don't use `markdown="1"`: showdown parses such a block in a nested
 pass that runs the msq extensions again and loses the examples.
-
-## The check
-
-    npm run docs:check
-
-Runs as part of `npm run docs`, and holds every example to four things:
-
-1. it is fenced, or else wrapped in a `<div>` at column 0;
-2. **it survives the markdown pass** — each page is rendered with the very
-   converter the browser will use and the music compared with what was written;
-3. it parses, with no errors;
-4. it is gradual — the parser reports which of its 578 named constructs the
-   example used, `concepts.js` says which page introduces each, and the sitemap
-   order says which of those count as already introduced.
-
-It also names any construct no page introduces, which is how a new language
-feature says the documentation has not caught up with it.
-
-The one page that must show input that does not parse marks itself:
-
-    <!-- check-docs-examples: allow-errors -->
-
-A page that shows what is coming, before the pages that introduce it, marks
-itself too, and is then exempt from the fourth rule only — its examples are
-still held to the first three:
-
-    <!-- check-docs-examples: preview -->
-
-`what-it-is` and `your-first-page` in getting-started are the two that do.
 
 ## Still to write
 

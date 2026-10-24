@@ -10,10 +10,10 @@
 import readline from 'node:readline'
 
 /*
- * How long to wait before deciding a trailing ESC byte was a lone Escape key
- * rather than the start of a sequence. No widget here binds Escape, so this is
- * shortened purely to cap the worst-case delay before the process can exit.
- */
+  How long to wait before deciding a trailing ESC byte was a lone Escape key
+  rather than the start of a sequence. No widget here binds Escape, so this is
+  shortened purely to cap the worst-case delay before the process can exit.
+*/
 const ESCAPE_CODE_TIMEOUT = 250
 
 /**
