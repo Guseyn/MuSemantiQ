@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drawer inspector · MuSemantiQ dev tools</title>
+    <link rel="preload" href="/html/static-templates/dev-tools-template.html" as="fetch" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/e-ui.css">
+    <link rel="stylesheet" href="/css/dev-tools.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">
+    <script type="importmap">
+      {
+        "imports": {
+          "#ehtml/": "/js/ehtml/",
+          "#ehtml/main": "/js/ehtml/main.js",
+          "#e-ui/": "/js/e-ui/",
+          "#msq/web-components/": "/js/msq/web-components/",
+          "#msq/language/": "/js/msq/language/",
+          "#tools/": "/tools/"
+        }
+      }
+    </script>
+    <script type="module">
+      /*
+      Safari does not implement customized built-in elements — <template is="…">,
+      which the msq, e-ui and EHTML elements all are — so this polyfill goes first,
+      before anything defines one. EHTML imports it too, but only once main.js
+      runs, after the elements above it are defined. It is the same URL, so it
+      still runs once: it has no guard against being run twice.
+      */
+      import '#ehtml/third-party/custom-elements-polyfill.js'
+
+      import '#e-ui/e-dialog.js'
+      import '#e-ui/e-confirm.js'
+      import '#e-ui/e-toast.js'
+      import '#ehtml/main'
+    </script>
+    <script src="/js/app.js"></script>
+    <style>
+      /*
+      The structure floats over the score rather than sitting beside it: the
+      score gets the window, and the structure is dragged where it is wanted
+      and pulled to size by its corner. On a small screen it goes back to being
+      a panel in the flow — there is no window to spare there.
+      */
+      [data-inspector] {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: var(--e-spacing-md);
+        align-items: start;
+      }
+      /*
+      Both cards here have to win over e-ui's own `div[is="e-card"]`, which is
+      more specific than a plain attribute selector and sets both
+      `background-color` and `width: max-content`. Without this the
+      see-through panel comes out opaque whatever the value, and the score takes
+      the page with it.
+      */
+      div[is="e-card"][data-score] {
+        width: var(--e-main-max-width);
+        max-width: 100%;
+        overflow: auto;
+      }
+      div[is="e-card"][data-floating] {
+        position: fixed;
+        top: 7rem;
+        right: var(--e-spacing-lg);
+        width: 23rem;
+        height: 62vh;
+        z-index: 5;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        resize: both;
+        /*
+        The score is meant to show through it a little — it is a panel over the
+        engraving, not a page beside it.
+        */
+        background: color-mix(in srgb, var(--e-surface-bg) 65%, transparent);
+        backdrop-filter: blur(2px);
+        box-shadow: 0 10px 30px rgb(0 0 0 / 0.18);
+      }
+      [data-inspector-head] {
+        cursor: move;
+        user-select: none;
+        background-color: #efefef;
+        border: 1px solid var(--e-border);
+        border-radius: var(--e-radius-md);
+        padding: var(--e-spacing-sm) var(--e-spacing-md);
+      }
+      [data-structure] {
+        flex: 1;
+        min-height: 0;
+        overflow: auto;
+        margin-top: var(--e-spacing-sm);
+      }
+      @media (max-width: 700px) {
+        [data-floating] {
+          position: static;
+          width: auto;
+          height: auto;
+          max-height: 60vh;
+        }
+      }
+      [data-structure] button {
+        display: flex;
+        align-items: baseline;
+        gap: var(--e-spacing-sm);
+        width: 100%;
+        text-align: left;
+        border: 0;
+        border-left: 3px solid transparent;
+        background: transparent;
+        color: inherit;
+        font-family: var(--e-font-mono);
+        font-size: var(--e-font-size-sm);
+        padding: 0.2rem var(--e-spacing-sm) 0.2rem 0;
+        cursor: pointer;
+      }
+      [data-structure] button:hover,
+      [data-structure] button[data-selected] {
+        background: var(--e-primary-transparent-accent-bg);
+        border-left-color: var(--e-primary);
+      }
+      [data-structure] [data-count] {
+        color: var(--e-muted);
+        font-size: var(--e-font-size-xs);
+        font-variant-numeric: tabular-nums;
+      }
+      [data-structure] [data-refs] {
+        color: var(--e-muted);
+        font-size: var(--e-font-size-xs);
+        overflow-wrap: anywhere;
+      }
+      [data-says] {
+        color: var(--e-muted);
+        font-family: var(--e-font-mono);
+        font-size: var(--e-font-size-sm);
+        min-height: 1.4em;
+      }
+      [data-says] b { color: inherit; font-weight: 600; }
+    </style>
+  </head>
+  <body>
+    <template
+      is="e-wrapper"
+      data-src="/html/static-templates/dev-tools-template.html"
+      data-where-to-place="main > div > hr"
+      data-how-to-place="after">
+
+      <h1 is="e-h">Drawer inspector</h1>
+      <p is="e-p">
+        <span is="e-muted">
+          What the drawer makes of a page, side by side with the page itself.
+          Write any MSQ, render it, and the structure on the left is what came
+          out: every element, where it nests, and what it is named. Hover a row
+          to light that kind up in the score, click the score to pick the kind
+          under the cursor, and press Escape to clear.
+        </span>
+      </p>
+
+      <div data-inspector data-margin-top="lg">
+
+        <div is="e-card" data-padding="lg" data-floating>
+          <div data-inspector-head>
+            <h2 is="e-h">The structure</h2>
+            <p is="e-p">
+              <span is="e-muted" data-font-size="sm">
+                Read out of the rendered SVG: <code is="e-code">data-name</code> is
+                the kind, <code is="e-code">ref-ids</code> the word that asked for
+                it. The number is how many of that kind this page holds. Drag this
+                head to move it, its corner to resize.
+              </span>
+            </p>
+          </div>
+          <div id="structure" data-structure></div>
+        </div>
+
+        <div is="e-card" data-padding="lg" data-score data-default-main-width data-block-center>
+          <h2 is="e-h">The score</h2>
+          <p is="e-p">
+            <span is="e-muted" data-font-size="sm">
+              It opens on the first page of <b>Allegro Burlesco</b>. Change the
+              source with <b>Edit the MuSemantiQ source</b> and render it again —
+              the structure follows whatever is engraved here.
+            </span>
+          </p>
+          <div id="editor" data-editor data-margin-top="sm"></div>
+          <div id="says" data-says data-margin-top="md"></div>
+        </div>
+
+      </div>
+
+    </template>
+
+    <script type="module" src="/js/drawer-inspector.js"></script>
+  </body>
+</html>

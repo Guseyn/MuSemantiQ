@@ -1,0 +1,1820 @@
+<title>MuSemantiQ — src/midi</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: player bar on top; left = live system diagram + state, right = the MR code with the active lines lit */
+:root {
+  --bg: #f4f6f6;
+  --panel: #ffffff;
+  --code-bg: #f8faf9;
+  --fg: #142024;
+  --muted: #5a6a6e;
+  --line: #d3dcdd;
+  --accent: #0d6b6b;
+  --accent-soft: #dcefed;
+  --hot: #e0a100;
+  --err: #c43c3c;
+  --err-soft: #f7e0e0;
+  --ok: #2c8a4a;
+  --node: #ffffff;
+  --m-a: #8a5cf6;
+  --m-b: #0f9d9a;
+  --m-c: #d9861c;
+  --m-d: #2f7fd8;
+  --m-e: #d6457f;
+  --m-f: #2c8a4a;
+  --c-kw: #8a3ffc; --c-str: #1e7a3c; --c-com: #7d8b8e; --c-fn: #0f62c9; --c-type: #b25c00; --c-num: #c0306a;
+  --font-body: system-ui, -apple-system, "Segoe UI", "Helvetica Neue", sans-serif;
+  --font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1416; --panel: #152023; --code-bg: #10181b; --fg: #e3ecec; --muted: #93a6a8; --line: #2a3a3e;
+    --accent: #5cc7bd; --accent-soft: #163536; --hot: #f2c14e; --err: #ff7b7b; --err-soft: #3a1f22; --ok: #6fd28f; --node: #1a272a;
+    --c-kw: #c4a2ff; --c-str: #7fd49a; --c-com: #6f8487; --c-fn: #79b8ff; --c-type: #f0b26b; --c-num: #ff8fb8;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1416; --panel: #152023; --code-bg: #10181b; --fg: #e3ecec; --muted: #93a6a8; --line: #2a3a3e;
+  --accent: #5cc7bd; --accent-soft: #163536; --hot: #f2c14e; --err: #ff7b7b; --err-soft: #3a1f22; --ok: #6fd28f; --node: #1a272a;
+  --c-kw: #c4a2ff; --c-str: #7fd49a; --c-com: #6f8487; --c-fn: #79b8ff; --c-type: #f0b26b; --c-num: #ff8fb8;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 15px; line-height: 1.5; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+.wrap {
+  max-width: 1320px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 22px 48px; display: grid; gap: 14px;
+}
+header.top { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 16px; }
+header.top h1 { margin: 0; font-size: clamp(22px, 3vw, 30px); line-height: 1.15; font-weight: 700; }
+header.top a { font-family: var(--font-mono); font-size: 12.5px; color: var(--accent); }
+.eyebrow { font-family: var(--font-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+.intro { margin: 0; color: var(--muted); max-width: 88ch; }
+.intro code { font-family: var(--font-mono); font-size: 13px; }
+
+/* Player */
+.player {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px;
+  display: grid; gap: 10px;
+}
+.tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+.tabs button {
+  font: 500 13px var(--font-body); color: var(--muted); background: transparent; border: 1px solid var(--line);
+  border-radius: 999px; padding: 4px 12px; cursor: pointer;
+}
+.tabs button[aria-selected="true"] { background: var(--accent); border-color: var(--accent); color: var(--panel); }
+.tabs button:focus-visible, .ctrl button:focus-visible, .ctrl input:focus-visible { outline: 2px solid var(--hot); outline-offset: 2px; }
+.ctrl { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.ctrl button {
+  font: 600 13px var(--font-body); color: var(--fg); background: var(--accent-soft); border: 1px solid var(--line);
+  border-radius: 6px; padding: 6px 12px; cursor: pointer; min-width: 44px;
+}
+.ctrl button.primary { background: var(--accent); color: var(--panel); border-color: var(--accent); }
+.ctrl button:disabled { opacity: .45; cursor: default; }
+.ctrl input[type="range"] { flex: 1; min-width: 120px; accent-color: var(--accent); }
+.ctrl .count { font: 500 13px var(--font-mono); color: var(--muted); font-variant-numeric: tabular-nums; min-width: 64px; text-align: right; }
+.caption { display: grid; gap: 2px; }
+.caption b { font-size: 16px; }
+.caption span { color: var(--muted); font-size: 14px; max-width: 80ch; }
+.keys { font-size: 12px; color: var(--muted); }
+.keys kbd { font-family: var(--font-mono); font-size: 11px; border: 1px solid var(--line); border-radius: 3px; padding: 0 4px; background: var(--code-bg); }
+
+/* Stage */
+.stage { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; align-items: start; }
+@media (max-width: 900px) { .stage { grid-template-columns: 1fr; } }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; min-width: 0; }
+.card > .hd { display: flex; justify-content: space-between; gap: 8px; padding: 8px 12px; border-bottom: 1px solid var(--line); font: 500 12px var(--font-mono); color: var(--muted); }
+.card > .hd b { color: var(--accent); font-weight: 500; overflow-wrap: anywhere; }
+.left { display: grid; gap: 14px; min-width: 0; }
+
+svg.sys { display: block; width: 100%; height: auto; }
+.edge { stroke: var(--line); stroke-width: 2; fill: none; }
+.edge.on { stroke: var(--hot); stroke-width: 3; }
+.edge.lit { stroke: var(--accent); stroke-width: 2.5; stroke-dasharray: 5 4; }
+#tok.err circle, #tok.err rect { fill: var(--err); }
+.elabel { font: 500 10.5px var(--font-mono); fill: var(--muted); text-anchor: middle; }
+.node rect { fill: color-mix(in srgb, var(--own) 13%, var(--node)); stroke: color-mix(in srgb, var(--own) 65%, var(--line)); stroke-width: 1.5; transition: fill .3s, stroke .3s; }
+.node rect.band { fill: var(--own); stroke: none; }
+.node.on rect:not(.band) { stroke: var(--hot); stroke-width: 3; fill: color-mix(in srgb, var(--own) 28%, var(--node)); }
+.node.err rect:not(.band) { stroke: var(--err); stroke-width: 3; fill: var(--err-soft); }
+.owners { display: flex; flex-wrap: wrap; gap: 6px 14px; padding: 8px 12px; border-bottom: 1px solid var(--line); font-size: 12px; color: var(--muted); }
+.owners span { display: inline-flex; align-items: center; gap: 6px; }
+.owners i { width: 12px; height: 12px; border-radius: 3px; background: var(--own); display: inline-block; }
+.owners b { color: var(--fg); font-weight: 600; }
+.repo { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 11.5px; padding: 1px 8px; border-radius: 999px; background: color-mix(in srgb, var(--own) 18%, transparent); color: var(--fg); border: 1px solid var(--own); white-space: nowrap; }
+.node text { font: 600 12.5px var(--font-body); fill: var(--fg); text-anchor: middle; }
+.node text.k { font: 500 10px var(--font-mono); fill: var(--muted); }
+#tok circle { fill: var(--hot); stroke: var(--panel); stroke-width: 2; }
+#tok rect { fill: var(--fg); }
+#tok text { font: 600 11px var(--font-mono); fill: var(--panel); }
+
+.state { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0; }
+@media (max-width: 520px) { .state { grid-template-columns: 1fr; } }
+.state section { padding: 10px 12px; min-width: 0; display: grid; gap: 6px; align-content: start; }
+.state section + section { border-left: 1px solid var(--line); }
+@media (max-width: 520px) { .state section + section { border-left: 0; border-top: 1px solid var(--line); } }
+.state h3 { margin: 0; font: 500 11px var(--font-mono); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+pre.msg { margin: 0; font: 12px/1.5 var(--font-mono); background: var(--code-bg); border: 1px solid var(--line); border-radius: 5px; padding: 8px 10px; overflow-x: auto; min-height: 44px; }
+dl.kv { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; font: 12.5px var(--font-mono); font-variant-numeric: tabular-nums; }
+dl.kv dt { color: var(--muted); }
+dl.kv dd { margin: 0; overflow-wrap: anywhere; }
+.grid { display: flex; flex-wrap: wrap; gap: 3px; }
+.grid i { width: 13px; height: 13px; border-radius: 2px; border: 1.5px solid var(--line); background: var(--code-bg); transition: background .25s, border-color .25s, opacity .25s; }
+.grid i.L { border-color: var(--hot); background: color-mix(in srgb, var(--hot) 35%, transparent); }
+.grid i.D { border-color: var(--ok); background: var(--ok); }
+.grid i.F { border-color: var(--err); background: var(--err); }
+.grid i.G { opacity: .25; border-style: dashed; }
+.glegend { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 11.5px; color: var(--muted); }
+.glegend span { display: inline-flex; gap: 5px; align-items: center; }
+.glegend i { width: 10px; height: 10px; border-radius: 2px; border: 1.5px solid var(--line); display: inline-block; }
+.glegend i.L { border-color: var(--hot); background: color-mix(in srgb, var(--hot) 35%, transparent); }
+.glegend i.D { border-color: var(--ok); background: var(--ok); }
+.glegend i.F { border-color: var(--err); background: var(--err); }
+.glegend i.G { opacity: .35; border-style: dashed; }
+
+.chip { font: 500 12px var(--font-mono); padding: 3px 8px; border-radius: 4px; border: 1.5px solid var(--line); background: var(--code-bg); transition: background .25s, border-color .25s, opacity .25s; }
+.chip.L { border-color: var(--hot); background: color-mix(in srgb, var(--hot) 30%, transparent); }
+.chip.D { border-color: var(--ok); background: color-mix(in srgb, var(--ok) 25%, transparent); }
+.chip.F { border-color: var(--err); background: var(--err-soft); text-decoration: line-through; }
+.chip.G { opacity: .6; border-style: dashed; }
+.mrlinks { display: inline-flex; gap: 6px; flex-wrap: wrap; font-family: var(--font-mono); font-size: 12.5px; color: var(--muted); }
+
+/* Code */
+.codebox { max-height: min(72vh, 680px); overflow: auto; background: var(--code-bg); border-radius: 0 0 8px 8px; }
+.codebox ol { list-style: none; margin: 0; padding: 8px 0; font: 12.5px/1.6 var(--font-mono); min-width: max-content; }
+.codebox li { display: grid; grid-template-columns: 52px 1fr; padding-right: 16px; border-left: 3px solid transparent; }
+.codebox li .n { color: var(--muted); text-align: right; padding-right: 14px; user-select: none; opacity: .7; font-variant-numeric: tabular-nums; }
+.codebox li code { font: inherit; white-space: pre; color: var(--fg); }
+.codebox li.hl { background: var(--accent-soft); border-left-color: var(--accent); }
+.codebox li.hl .n { color: var(--accent); opacity: 1; }
+.codebox.dim li:not(.hl) code { opacity: .55; }
+.hljs-keyword, .hljs-literal, .hljs-built_in { color: var(--c-kw); }
+.hljs-string, .hljs-regexp, .hljs-subst { color: var(--c-str); }
+.hljs-comment { color: var(--c-com); font-style: italic; }
+.hljs-title, .hljs-title.function_ { color: var(--c-fn); }
+.hljs-type, .hljs-title.class_ { color: var(--c-type); }
+.hljs-number { color: var(--c-num); }
+.hljs-attr, .hljs-property, .hljs-variable.constant_ { color: var(--c-fn); }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <div class="eyebrow">MuSemantiQ · dev docs · src/midi</div>
+      <h1>src/midi: the tree becomes a performance</h1>
+    </div>
+    <span class="mrlinks"><a href="../docs/walkthrough.html">all three together</a> · <a href="https://github.com/Guseyn/MuSemantiQ">github.com/Guseyn/MuSemantiQ</a></span>
+  </header>
+  <p class="intro">The performance engine, in the order it runs. One pageSchema becomes a MIDI file and the two maps that tie sound back to score. The work happens in two passes — score order, then time order — and each frame lights the part that runs and shows the real code that runs it.</p>
+
+  <div class="player" role="region" aria-label="Player">
+    <div class="tabs" role="tablist" id="tabs"></div>
+    <div class="ctrl">
+      <button id="first" type="button" aria-label="First frame">⏮</button>
+      <button id="prev" type="button" aria-label="Previous frame">◀</button>
+      <button id="play" type="button" class="primary" aria-label="Play">▶ Play</button>
+      <button id="next" type="button" aria-label="Next frame">▶</button>
+      <input id="scrub" type="range" min="0" max="0" value="0" aria-label="Frame">
+      <span class="count" id="count">1 / 1</span>
+    </div>
+    <div class="caption" aria-live="polite"><b id="ctitle"></b><span id="ctext"></span></div>
+    <div class="keys"><kbd>←</kbd> <kbd>→</kbd> step · <kbd>space</kbd> play / pause</div>
+  </div>
+
+  <div class="stage">
+    <div class="left">
+      <div class="card">
+        <div class="hd"><span>system</span><b id="where"></b></div>
+        <div class="owners" id="owners" aria-label="Who owns each block"></div>
+        <svg class="sys" viewBox="0 0 820 460" role="img" aria-label="The three parts of the engine and the page around them">
+          <g id="edges"></g>
+          <g id="nodes"></g>
+          <g id="tok" style="display:none"><rect rx="4" height="18"></rect><text dy="4"></text><circle r="7"></circle></g>
+        </svg>
+      </div>
+      <div class="card">
+        <div class="state">
+          <section>
+            <h3>In flight</h3>
+            <pre class="msg" id="msg"></pre>
+            <h3>Returns</h3>
+            <pre class="msg" id="logline"></pre>
+            <h3>The page so far</h3>
+            <dl class="kv" id="worker"></dl>
+          </section>
+          <section>
+            <h3 id="gtitle">The example</h3>
+            <div class="grid" id="grid"></div>
+            <div class="glegend">
+              <span><i></i>not yet</span><span><i class="L"></i>in focus</span>
+              <span><i class="D"></i>done</span><span><i class="F"></i>failed</span><span><i class="G"></i>already there</span>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="hd"><span id="frepo" class="repo"></span><b id="fpath"></b><span id="flines"></span></div>
+      <div class="codebox dim" id="codebox"><ol id="code"></ol></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ===== Code from src/ (line numbers are the real file lines) ===== -->
+<script type="text/plain" id="src-MGEN" data-path="src/midi/generateMidi.js" data-start="68">
+export default function (pageSchema, midiSettingsForEachPage = []) {
+  if (!pageSchema.measuresParams) {
+    // a page with no measures plays nothing; keep the reply the same shape as a
+    // real one, so callers read `midi.data` and the timing maps without a branch
+    return {
+      data: itIsBrowserEnv ? [] : Buffer.alloc(0),
+      timeStampsMappedWithRefsOn: {},
+      refsOnMappedWithTimeStamps: {}
+    }
+  }
+
+  pageSchema = clone(pageSchema)
+  midiSettingsForEachPage = clone(midiSettingsForEachPage)
+
+  const midi = new Midi()
+
+  const timeStampsMappedWithRefsOn = {}
+  const refsOnMappedWithTimeStamps = {}
+
+  const instrumentsMappedWithChannels = {}
+  const tracksForEachInstrumentOnEachStaveInEachVoice = {}
+  const currentInstrumentsForEachStaveOnEachVoice = {}
+
+  const clefAurasForEachStaveSplittedInTimeFrames = {}
+  const octaveSignAuraForEachVoiceOnEachStaveSplittedInTimeFrames = {}
+  const pitchAdjustmentsAuraForAllStavesSplittedInTimeFrames = {}
+  const pitchAdjustmentsAuraForEachStaveThatLastOneMeasureSplittedInTimeFrames = {}
+  const dynamicsAuraForEachVoiceOnEachStaveSplittedInTimeFrames = {}
+  const graceTimeOffestForEachVoiceOnEachStaveSplittedInTimeFrames = {}
+  const graceTimeOffestForEachGraceUnitInEachVoiceOnEachStaveSplittedInTimeFrames = {}
+  const graceCountersForEachVoiceInEachStaveSplittedInTimeFrames = {}
+  const notesSplittedInTimeFrames = {}
+
+  let timeProgressionForAllMeasures = 0
+  const timeProgressionsForEachVoiceInEachStave = []
+
+  const tempoAura = {
+    quartersPerMinute: 120,
+    aimingToQuartersPerMinute: 120
+  }
+</script>
+<script type="text/plain" id="src-MEASLOOP" data-path="src/midi/generateMidi.js" data-start="144">
+  for (let measureIndex = 0; measureIndex < measuresParams.length; measureIndex++) {
+    if (measureIndexesThatWeNeedToSkipBecauseOfVoltaBracketsAboveThem.includes(measureIndex)) {
+      continue
+    }
+    const measureParams = clone(measuresParams[measureIndex])
+
+    let weMetFirstUnitInThisMeasure = false
+
+    lastTimeSignatureInQuarters = calculateTimeSignatureInQuarters(measureParams.timeSignatureParams)
+
+    if (measureIndex === 0 && !weAttemptedToUpdateTempoAuraInCaseIfThereIsDefaultTempoInSettings) {
+      const midiSettingsForCurrentPage = midiSettingsForEachPage[measureIndex]
+      if (!measureParams.tempoMark && midiSettingsForCurrentPage && midiSettingsForCurrentPage.defaultTempo) {
+        const unwrappedDefaultTempoValueFromQuotes = midiSettingsForCurrentPage.defaultTempo.replace(REGEXP_WITH_QUOTES, '')
+        const tempoMark = {
+          textValueParts: parseTempoValueParts(unwrappedDefaultTempoValueFromQuotes)
+        }
+        updateTempoAuraIfNeeded(tempoMark, tempoAura, null, true)
+        tempoAura.initialQuartersPerMinute = tempoAura.quartersPerMinute
+      }
+      weAttemptedToUpdateTempoAuraInCaseIfThereIsDefaultTempoInSettings = true
+    }
+
+    if (midiSettingsForEachPage[measureIndex] && midiSettingsForEachPage[measureIndex].fermataDuration) {
+      fermataDurationFromMidiSettings = midiSettingsForEachPage[measureIndex].fermataDuration * 1
+    }
+
+    if (measureParams.repeatDotsMarkAtTheStart && measureParams.stavesParams) {
+      lastMeasureIndexWithRepeatDotsAtTheStart = measureIndex
+    }
+
+    measureParams.connectionsParams = measureParams.connectionsParams || []
+</script>
+<script type="text/plain" id="src-REPEAT" data-path="src/midi/generateMidi.js" data-start="458">
+          : VERY_SMALL_TIME_TO_SEPARATE_MEASURES_IN_DIFFERENT_TIME_FRAMES_FOR_SURE)
+    )
+    fullDurationOfLastMeasure = timeProgressionForAllMeasures - oldTimeProgressionForAllMeasures
+
+    if (measureIndexesMappedWithIndicatorsOfWhetherRepeatDotsAtTheEndOfMeasureAreNotActiveAnymore[measureIndex]) {
+      measureParams.repeatDotsMarkAtTheEnd = false
+      measureIndexesMappedWithIndicatorsOfWhetherRepeatDotsAtTheEndOfMeasureAreNotActiveAnymore[measureIndex] = false
+    }
+    if (measureParams.repeatDotsMarkAtTheEnd) {
+      measureIndexesMappedWithIndicatorsOfWhetherRepeatDotsAtTheEndOfMeasureAreNotActiveAnymore[measureIndex] = true
+      lastMeasureIndexWithRepeatDotsAtTheStart = lastMeasureIndexWithRepeatDotsAtTheStart || 0
+      measureIndex = lastMeasureIndexWithRepeatDotsAtTheStart - 1
+      measureIndexesWithMappedIndicatorsOfWhetherRepeatDotsAtTheStartOfMeasuresAreNotActiveAnymore[lastMeasureIndexWithRepeatDotsAtTheStart] = true
+      voltaBracketsAreActive = false
+    }
+
+    if (measureParams.voltaMark && (measureParams.voltaMark.finishesHere || measureParams.voltaMark.finishesAfter)) {
+      voltaBracketsAreActive = false
+    }
+
+    const measureContainsFineRepetitionNote = measureParams.repetitionNote && (measureParams.repetitionNote.value === 'Fine')
+
+    if (weAreLookingForFineMark && measureContainsFineRepetitionNote) {
+      weAreLookingForFineMark = false
+      break
+    }
+
+    if (weAreLookingForFirstCodaMark && measureContainsCodaAtTheEnd && !weWantToJumpToSegnoMark && !weAreLookingForFineMark) {
+      weAreLookingForFirstCodaMark = false
+      weWantToJumpToSecondCodaMark = true
+    }
+
+    if (measureParams.repetitionNote && !weAreLookingForFineMark && !weAreLookingForFirstCodaMark) {
+      weAreLookingForFineMark = measureParams.repetitionNote.value === 'D.C. al Fine'
+      weAreLookingForFirstCodaMark = measureParams.repetitionNote.value === 'D.C. al Coda' || measureParams.repetitionNote.value === 'D.S. al Coda'
+      weWantToJumpToSegnoMark = measureParams.repetitionNote.value === 'D.S. al Fine' || measureParams.repetitionNote.value === 'D.S. al Coda'
+
+      measureIndex = (weAreLookingForFineMark || weAreLookingForFirstCodaMark || weWantToJumpToSegnoMark)
+        ? -1
+        : measureIndex
+    }
+  }
+
+  const orderedTimeFramesFromClefAurasForEachStaveSplittedInTimeFrames = orderTimeFrames(clefAurasForEachStaveSplittedInTimeFrames)
+  const orderedTimeFramesFromOctaveSignAuraForEachVoiceOnEachStaveSplittedInTimeFrames = orderTimeFrames(octaveSignAuraForEachVoiceOnEachStaveSplittedInTimeFrames)
+  const orderedTimeFramesFromPitchAdjustmentsAuraForAllStavesSplittedInTimeFrames = orderTimeFrames(pitchAdjustmentsAuraForAllStavesSplittedInTimeFrames)
+  const orderedTimeFramesFromPitchAdjustmentsAuraForEachStaveThatLastOneMeasureSplittedInTimeFrames = orderTimeFrames(pitchAdjustmentsAuraForEachStaveThatLastOneMeasureSplittedInTimeFrames)
+  const orderedTimeFramesFromDynamicsAuraForEachVoiceOnEachStaveSplittedInTimeFrames = orderTimeFrames(dynamicsAuraForEachVoiceOnEachStaveSplittedInTimeFrames)
+  const orderedTimeFramesFromNotesSplittedInTimeFrames = orderTimeFrames(notesSplittedInTimeFrames)
+</script>
+<script type="text/plain" id="src-UNITLOOP" data-path="src/midi/generateMidi.js" data-start="354">
+          markUnitParamsIfItIsLastSingleUnitInVoiceOnPageLine(measuresParams, measureParams, voiceParams, unitParams, measureIndex, staveIndex, voiceIndex, unitIndex)
+          fillTupletValuesAuraForEachVoiceInEachStave(tupletValuesAuraForEachVoiceInEachStave, unitParams, staveVoiceKey)
+          fillSimilesAuraForEachVoiceInEachStave(similesAuraForEachVoiceInEachStave, unitParams, staveVoiceKey)
+
+          const actualDurationOfUnit = calculateActualDurationOfUnit(tupletValuesAuraForEachVoiceInEachStave, unitParams, staveVoiceKey)
+          const unitDurationInQuarters = actualDurationOfUnit * 4
+
+          releaseTupletValuesAuraForEachVoiceInEachStave(tupletValuesAuraForEachVoiceInEachStave, unitParams, staveVoiceKey)
+
+          let thisIsFirstUnitInMeasure = false
+          if (!weMetFirstUnitInThisMeasure) {
+            thisIsFirstUnitInMeasure = true
+            weMetFirstUnitInThisMeasure = true
+          }
+
+          updateTempoAuraIfNeeded(measureParams.tempoMark, tempoAura, unitDurationInQuarters, thisIsFirstUnitInMeasure)
+
+          if (measureIndex === 0 && thisIsFirstUnitInMeasure) {
+            tempoAura.initialQuartersPerMinute = tempoAura.quartersPerMinute
+          }
+
+          const unitDurationInSeconds = calculateDurationInSeconds(unitDurationInQuarters, tempoAura.quartersPerMinute)
+
+          const octaveAdjustmentForUnitParams = calculateOctaveAdjustmentForUnitParams(unitParams)
+
+          if (unitParams.isGrace) {
+            graceCountersForEachVoiceInEachStaveSplittedInTimeFrames[voiceTime] = graceCountersForEachVoiceInEachStaveSplittedInTimeFrames[voiceTime] || {}
+          }
+
+          const graceCounterExistsForCurrentStaveAndVoice = graceCountersForEachVoiceInEachStaveSplittedInTimeFrames[voiceTime] && graceCountersForEachVoiceInEachStaveSplittedInTimeFrames[voiceTime][staveVoiceKey] !== undefined
+
+          if (unitParams.isGrace && graceCounterExistsForCurrentStaveAndVoice) {
+            graceCountersForEachVoiceInEachStaveSplittedInTimeFrames[voiceTime][staveVoiceKey] += 1
+          }
+
+          if (unitParams.isGrace && !graceCounterExistsForCurrentStaveAndVoice) {
+            graceCountersForEachVoiceInEachStaveSplittedInTimeFrames[voiceTime][staveVoiceKey] = 0
+          }
+
+          addTimeFrameToIndicateNewClefOnStaveBeforeUnit(unitParams.clefBefore, clefAurasForEachStaveSplittedInTimeFrames, unitParams.isGrace, graceCountersForEachVoiceInEachStaveSplittedInTimeFrames, voiceTime, staveIndexWhereClefBeforeIsConsidered, staveVoiceKey)
+          addTimeFrameToIndicateOctaveSignOnStaveInVoice(unitParams.octaveSignMark, octaveSignAuraForEachVoiceOnEachStaveSplittedInTimeFrames, indicatorsOfOctaveSignEndingsByStaveAndVoice, unitParams.isGrace, graceCountersForEachVoiceInEachStaveSplittedInTimeFrames, voiceTime, unitParams.occupiedStaveIndexes, voiceIndex, staveVoiceKey)
+          addTimeFrameToIndicateNewKeySignatureOnStaveBeforeUnit(unitParams.keySignatureBefore, pitchAdjustmentsAuraForAllStavesSplittedInTimeFrames, unitParams.isGrace, graceCountersForEachVoiceInEachStaveSplittedInTimeFrames, voiceTime, PITCH_ADJUSTEMENTS_BY_KEY_SIGNATURES, staveVoiceKey)
+          addTimeFrameToIndicateKeysThatLastOneMeasure(unitParams.keysParams, PITCHES_BY_NOTE_NAMES, PITCH_ADJUSTEMENTS_BY_KEY_TYPE, pitchAdjustmentsAuraForEachStaveThatLastOneMeasureSplittedInTimeFrames, unitParams.isGrace, graceCountersForEachVoiceInEachStaveSplittedInTimeFrames, voiceTime, measureIndex, staveIndex, staveVoiceKey)
+          addTimeFrameToIndicateDynamic(unitParams.articulationParams, unitParams.dynamicChangeMark, dynamicsAuraForEachVoiceOnEachStaveSplittedInTimeFrames, currentDynamicsAuraObjectsForEachVoiceOnEachStave, lastMentionedDynamicsForEachVoiceOnEachStave, unitParams.isGrace, graceCountersForEachVoiceInEachStaveSplittedInTimeFrames, voiceTime, staveVoiceKey, unitParams.isLastSingleUnitInVoiceOnPageLine)
+          addTimeFramesToIndicateNotes(unitParams, notesSplittedInTimeFrames, actualDurationOfUnit, unitDurationInSeconds, octaveAdjustmentForUnitParams, graceCountersForEachVoiceInEachStaveSplittedInTimeFrames, voiceTime, staveVoiceKey)
+</script>
+<script type="text/plain" id="src-PASS2F" data-path="src/midi/generateMidi.js" data-start="540">
+    for (let noteTimeIndex = 0; noteTimeIndex < notesSplittedInTimeFrames[orderedTimeFramesFromNotesSplittedInTimeFrames[timeIndex]].length; noteTimeIndex++) {
+      const note = notesSplittedInTimeFrames[orderedTimeFramesFromNotesSplittedInTimeFrames[timeIndex]][noteTimeIndex]
+
+      const trackForNote = note.track
+
+      if (!trackForNote) {
+        continue
+      }
+
+      const staveVoiceKey = `${note.staveIndex}-${note.voiceIndex}`
+
+      const pitchForNote = calculatePitchForNoteTimeFrame(note, pitchAdjustmentsAuraForAllStavesSplittedInTimeFrames, orderedTimeFramesFromPitchAdjustmentsAuraForAllStavesSplittedInTimeFrames, pitchAdjustmentsAuraForEachStaveThatLastOneMeasureSplittedInTimeFrames, orderedTimeFramesFromPitchAdjustmentsAuraForEachStaveThatLastOneMeasureSplittedInTimeFrames, graceMaxCountForCurrentTime, graceCountersForEachVoiceInEachStaveSplittedInTimeFrames, staveVoiceKey)
+      const octaveForNote = calculateOctaveForNoteTimeFrame(note, pitchForNote, clefAurasForEachStaveSplittedInTimeFrames, orderedTimeFramesFromClefAurasForEachStaveSplittedInTimeFrames, octaveSignAuraForEachVoiceOnEachStaveSplittedInTimeFrames, orderedTimeFramesFromOctaveSignAuraForEachVoiceOnEachStaveSplittedInTimeFrames, graceMaxCountForCurrentTime, graceCountersForEachVoiceInEachStaveSplittedInTimeFrames, staveVoiceKey)
+      const velocityForNote = calculateVelocityForNote(note, dynamicsAuraForEachVoiceOnEachStaveSplittedInTimeFrames, orderedTimeFramesFromDynamicsAuraForEachVoiceOnEachStaveSplittedInTimeFrames, graceMaxCountForCurrentTime, graceCountersForEachVoiceInEachStaveSplittedInTimeFrames, note.staveIndex, staveVoiceKey)
+      const graceNoteTimeAdjustment = calculateGraceNoteTimeAdjustment(note, globalCurrentGraceTimeOffset, graceTimeOffestForEachVoiceOnEachStaveSplittedInTimeFrames, graceTimeOffestForEachGraceUnitInEachVoiceOnEachStaveSplittedInTimeFrames, staveVoiceKey)
+      const breathMarkTimeAdjustment = calculateBreathMarksTimeAdjustment(note, pointsOfTimeWhenBreathMarkIsApplied)
+      const fermataArticulationTimeAdjustment = calculateFermataArticulationTimeAdjustment(note, pointsOfTimeWhenFermataArticulationIsApplied, fermataDurationFromMidiSettings)
+
+      const pitchFactor = pitchForNote % NORMALIZED_PITCHES.length
+      const absolutePitchFactor = (pitchFactor >= 0) ? pitchFactor : (NORMALIZED_PITCHES.length - Math.abs(pitchFactor))
+
+      note.midiPitch = NORMALIZED_PITCHES[absolutePitchFactor]
+      note.midiVelocity = velocityForNote
+      note.midiOctave = octaveForNote
+      note.graceTimeAdjustment = graceNoteTimeAdjustment
+      note.breathMarkTimeAjustment = breathMarkTimeAdjustment
+      note.fermataArticulationTimeAdjustment = fermataArticulationTimeAdjustment
+      note.allTimeAdjustments = note.graceTimeAdjustment + note.breathMarkTimeAjustment + note.fermataArticulationTimeAdjustment
+</script>
+<script type="text/plain" id="src-TIESF" data-path="src/midi/generateMidi.js" data-start="1232">
+      if (!thereIsNoteBeforeWhichIsTiedToCurrentNote && note.unitIsTiedFromRightSide) {
+        tiesAuraForEachVoiceInEachStave[stavePositionVoiceKey] = tiesAuraForEachVoiceInEachStave[stavePositionVoiceKey] || []
+        tiesAuraForEachVoiceInEachStave[stavePositionVoiceKey].push(note)
+        continue
+      }
+
+      if (
+        (!note.unitIsTiedFromRightSide || note.unitIsLastSingleUnitOnPageInVoice) &&
+        (thereIsNoteBeforeWhichIsTiedToCurrentNote && tiesAuraForEachVoiceInEachStave[stavePositionVoiceKey])
+      ) {
+        const noteBeforeWhichIsTiedToCurrentNoteAndReadyToBePlayedFromItsTimeWithAddedUpDurationFromAllTiedNotesTillCurrentOne = tiesAuraForEachVoiceInEachStave[stavePositionVoiceKey].splice(noteIndexBeforeWhichIsTiedToCurrentNote, 1)[0]
+        addMidiNoteToTrack(
+          noteBeforeWhichIsTiedToCurrentNoteAndReadyToBePlayedFromItsTimeWithAddedUpDurationFromAllTiedNotesTillCurrentOne,
+          noteWithTremoloWithNextOnEachStaveInEachVoice,
+          slurMarksMappedWithTracks,
+          tracksForEachInstrumentOnEachStaveInEachVoice,
+          timeStampsMappedWithRefsOn,
+          refsOnMappedWithTimeStamps
+        )
+        continue
+      }
+
+      if (tiesAuraForEachVoiceInEachStave[stavePositionVoiceKey] && tiesAuraForEachVoiceInEachStave[stavePositionVoiceKey].length === 0) {
+        delete tiesAuraForEachVoiceInEachStave[stavePositionVoiceKey]
+      }
+
+      if ((!note.unitIsTiedFromRightSide || note.unitIsLastSingleUnitOnPageInVoice) && !thereIsNoteBeforeWhichIsTiedToCurrentNote) {
+        addMidiNoteToTrack(
+          note,
+          noteWithTremoloWithNextOnEachStaveInEachVoice,
+          slurMarksMappedWithTracks,
+          tracksForEachInstrumentOnEachStaveInEachVoice,
+          timeStampsMappedWithRefsOn,
+          refsOnMappedWithTimeStamps
+        )
+      }
+</script>
+<script type="text/plain" id="src-TFN" data-path="src/midi/addTimeFramesToIndicateNotes.js" data-start="1">
+'use strict'
+
+import splitNoteInTremoloNotes from '#msq/midi/splitNoteInTremoloNotes.js'
+
+export default function (unitParams, notesSplittedInTimeFrames, unitActualDuration, unitDurationInSeconds, octaveAdjustmentForUnitParams, graceCountersForEachVoiceInEachStaveSplittedInTimeFrames, time, staveVoiceKey) {
+  if (unitParams.notes) {
+    for (let noteIndex = 0; noteIndex < unitParams.notes.length; noteIndex++) {
+      const note = unitParams.notes[noteIndex]
+      if (unitParams.isGrace) {
+        note.graceCount = graceCountersForEachVoiceInEachStaveSplittedInTimeFrames[time][staveVoiceKey]
+      }
+
+      note.time = time
+      note.actualDuration = unitActualDuration
+      note.durationInSeconds = unitDurationInSeconds
+      note.octaveSignAdjustment = octaveAdjustmentForUnitParams
+      note.unitIsLastSingleUnitInVoiceOnPageLine = unitParams.isLastSingleUnitInVoiceOnPageLine
+      note.unitIsLastSingleUnitOnPageInVoice = unitParams.isLastSingleUnitOnPageInVoice
+      splitNoteInTremoloNotes(note)
+      notesSplittedInTimeFrames[note.time] = notesSplittedInTimeFrames[note.time] || []
+      notesSplittedInTimeFrames[note.time].push(note)
+    }
+  }
+}
+</script>
+<script type="text/plain" id="src-ORDERF" data-path="src/midi/orderTimeFrames.js" data-start="1">
+'use strict'
+
+export default function (somethingSplittedInTimeFrames) {
+  return Object.keys(somethingSplittedInTimeFrames).map(time => time * 1).sort((firstValue, secondValue) => firstValue - secondValue)
+}
+</script>
+<script type="text/plain" id="src-SECONDS" data-path="src/midi/calculateDurationInSeconds.js" data-start="1">
+'use strict'
+
+export default function (durationInQuarters, quatersPerMinute = 120) {
+  const quatersPerSecond = quatersPerMinute / 60
+  return durationInQuarters / quatersPerSecond
+}
+</script>
+<script type="text/plain" id="src-AURALK" data-path="src/midi/calculatePitchAdjustmentForNoteTimeFrame.js" data-start="22">
+  for (let timeIndex = orderedTimeFramesFromPitchAdjustmentsAuraForAllStavesSplittedInTimeFrames.length - 1; timeIndex >= 0; timeIndex--) {
+    const pitchAdjustmentsTime = orderedTimeFramesFromPitchAdjustmentsAuraForAllStavesSplittedInTimeFrames[timeIndex]
+    if (pitchAdjustmentsTime <= note.time) {
+      let normalizedPitchAdjustmentGraceCount
+      let normalizedNoteGraceCount
+
+      sortByGraceCount(pitchAdjustmentsAuraForAllStavesSplittedInTimeFrames[pitchAdjustmentsTime])
+      for (let pitchAdjustmentsTimeIndex = 0; pitchAdjustmentsTimeIndex < pitchAdjustmentsAuraForAllStavesSplittedInTimeFrames[pitchAdjustmentsTime].length; pitchAdjustmentsTimeIndex++) {
+        if (note.isGrace && (pitchAdjustmentsAuraForAllStavesSplittedInTimeFrames[pitchAdjustmentsTime][pitchAdjustmentsTimeIndex].graceCount !== undefined)) {
+          const normalizer = (graceMaxCountForCurrentTime - graceCountersForEachVoiceInEachStaveSplittedInTimeFrames[pitchAdjustmentsTime][staveVoiceKey])
+          normalizedPitchAdjustmentGraceCount = normalizer + pitchAdjustmentsAuraForAllStavesSplittedInTimeFrames[pitchAdjustmentsTime][pitchAdjustmentsTimeIndex].graceCount
+          normalizedNoteGraceCount = normalizer + note.graceCount
+        }
+
+        if (!note.isGrace || (note.isGrace && (((pitchAdjustmentsTime === note.time) && (normalizedPitchAdjustmentGraceCount <= normalizedNoteGraceCount)) || (pitchAdjustmentsTime < note.time)))) {
+          for (let pitchAdjustmentIndex = 0; pitchAdjustmentIndex < pitchAdjustmentsAuraForAllStavesSplittedInTimeFrames[pitchAdjustmentsTime][pitchAdjustmentsTimeIndex].pitchAdjustments.length; pitchAdjustmentIndex++) {
+            if (pitchAdjustmentsAuraForAllStavesSplittedInTimeFrames[pitchAdjustmentsTime][pitchAdjustmentsTimeIndex].pitchAdjustments[pitchAdjustmentIndex].pitch === PITCHES_BY_NOTE_NAMES[note.noteName]) {
+              pitchAdjustmentForNote = pitchAdjustmentsAuraForAllStavesSplittedInTimeFrames[pitchAdjustmentsTime][pitchAdjustmentsTimeIndex].pitchAdjustments[pitchAdjustmentIndex].midiPitchAdjustment
+              pitchAdjustmentByKeySignatureForNoteIsFound = true
+              if (pitchAdjustmentsAuraForAllStavesSplittedInTimeFrames[pitchAdjustmentsTime][pitchAdjustmentsTimeIndex].byKeySignatureBefore) {
+                pitchAdjustmentByKeySignatureBeforeForNoteIsFound = true
+                pitchAdjustmentsTimeByKeySignatureBeforeForNote = pitchAdjustmentsTime
+                if (note.isGrace) {
+                  normalizedPitchAdjustmentGraceCountByKeySignatureBeforeForNote = normalizedPitchAdjustmentGraceCount
+                }
+              }
+              break
+            }
+          }
+        }
+        if (pitchAdjustmentByKeySignatureForNoteIsFound) {
+          break
+        }
+      }
+      // we need to consider only last key signature adjustments
+      break
+    }
+  }
+</script>
+<script type="text/plain" id="src-VELO" data-path="src/midi/calculateVelocityForNote.js" data-start="8">
+export default function (note, dynamicsAuraForEachVoiceOnEachStaveSplittedInTimeFrames, orderedTimeFramesFromDynamicsAuraForEachVoiceOnEachStaveSplittedInTimeFrames, graceMaxCountForCurrentTime, graceCountersForEachVoiceInEachStaveSplittedInTimeFrames, staveIndex, staveVoiceKey) {
+  if (note.isRest) {
+    return 1 / 127
+  }
+  let velocity = DEFAULT_VELOCITY
+  let dynamicIsFound = false
+  for (let timeIndex = orderedTimeFramesFromDynamicsAuraForEachVoiceOnEachStaveSplittedInTimeFrames.length - 1; timeIndex >= 0; timeIndex--) {
+    const dynamicTime = orderedTimeFramesFromDynamicsAuraForEachVoiceOnEachStaveSplittedInTimeFrames[timeIndex]
+    if (dynamicTime <= note.time) {
+      let normalizedDynamicGraceCount
+      let normalizedNoteGraceCount
+
+      const staveIndexWithFirstVoiceIndexInDynamicsAuraForEachVoiceOnEachStaveSplittedInTimeFramesForCurrentDynamicTime = Object.keys(dynamicsAuraForEachVoiceOnEachStaveSplittedInTimeFrames[dynamicTime]).filter(key => key.startsWith(`${staveIndex}-`)).find(key => dynamicsAuraForEachVoiceOnEachStaveSplittedInTimeFrames[dynamicTime][key] !== undefined)
+      const dynamicAuraForCurrentDynamicTimeForCurrentStaveAndVoice = dynamicsAuraForEachVoiceOnEachStaveSplittedInTimeFrames[dynamicTime][staveVoiceKey] ||
+        dynamicsAuraForEachVoiceOnEachStaveSplittedInTimeFrames[dynamicTime][staveIndexWithFirstVoiceIndexInDynamicsAuraForEachVoiceOnEachStaveSplittedInTimeFramesForCurrentDynamicTime]
+
+      if (dynamicAuraForCurrentDynamicTimeForCurrentStaveAndVoice) {
+        sortByGraceCount(dynamicAuraForCurrentDynamicTimeForCurrentStaveAndVoice)
+        for (let dynamicTimeIndex = 0; dynamicTimeIndex < dynamicAuraForCurrentDynamicTimeForCurrentStaveAndVoice.length; dynamicTimeIndex++) {
+          if (dynamicAuraForCurrentDynamicTimeForCurrentStaveAndVoice[dynamicTimeIndex] !== undefined) {
+            if (note.isGrace && (dynamicAuraForCurrentDynamicTimeForCurrentStaveAndVoice[dynamicTimeIndex].graceCount !== undefined)) {
+              const normalizer = (graceMaxCountForCurrentTime - graceCountersForEachVoiceInEachStaveSplittedInTimeFrames[dynamicTime][staveVoiceKey])
+              normalizedDynamicGraceCount = normalizer + dynamicAuraForCurrentDynamicTimeForCurrentStaveAndVoice[dynamicTimeIndex].graceCount
+              normalizedNoteGraceCount = normalizer + note.graceCount
+            }
+
+            if (!note.isGrace || (note.isGrace && (((dynamicTime === note.time) && (normalizedDynamicGraceCount <= normalizedNoteGraceCount)) || (dynamicTime < note.time)))) {
+              velocity = dynamicAuraForCurrentDynamicTimeForCurrentStaveAndVoice[dynamicTimeIndex].velocity / VELOCITY_FACTOR
+              dynamicIsFound = true
+              break
+            }
+          }
+          if (dynamicIsFound) {
+            break
+          }
+        }
+      }
+    }
+    if (dynamicIsFound) {
+      break
+    }
+  }
+  return velocity
+}
+</script>
+<script type="text/plain" id="src-ADDNOTE" data-path="src/midi/addMidiNoteToTrack.js" data-start="10">
+  const midiNote = {
+    pitch: note.midiPitch,
+    octave: note.midiOctave,
+    velocity: note.midiVelocity,
+    duration,
+    time
+  }
+  adjustMidiNoteWithArticulations(
+    note,
+    midiNote,
+    note.track
+  )
+  adjustMidiNoteWithSlur(
+    note,
+    midiNote,
+    note.track,
+    slurMarksMappedWithTracks,
+    midNoteIsAtTheStartOfOrnament,
+    midNoteIsAtTheEndOfOrnament
+  )
+  adjustMidiNoteWithPedals(
+    note,
+    midiNote,
+    tracksForEachInstrumentOnEachStaveInEachVoice,
+    midNoteIsAtTheStartOfOrnament,
+    midNoteIsAtTheEndOfOrnament
+  )
+  adjustArpeggiatedNotes(
+    note,
+    midiNote,
+    note.track,
+    midNoteIsAtTheStartOfOrnament,
+    midNoteIsAtTheEndOfOrnament
+  )
+  note.track.addNote(midiNote)
+  fillTimeStampsMappedWithRefs(
+    note,
+    time,
+    time + note.durationInSeconds,
+    timeStampsMappedWithRefsOn,
+    refsOnMappedWithTimeStamps
+  )
+</script>
+<script type="text/plain" id="src-ADJMIDI" data-path="src/midi/adjustMidiNoteWithArticulations.js" data-start="6">
+const articulationAdjustments = {
+  accent: (midiNote, trackForNote) => {
+    midiNote.velocity = Math.min(1, midiNote.velocity + 40 / MIDI_CC_FACTOR)
+  },
+  staccato: (midiNote, trackForNote) => {
+    midiNote.duration -= midiNote.duration * 1 / 2
+  },
+  spiccato: (midiNote, trackForNote) => {
+    midiNote.duration -= midiNote.duration * 1 / 2
+    const ccEndTime = midiNote.time + midiNote.duration * 1 / 3
+    trackForNote.addCC({
+      number: 7,
+      value: 127 / MIDI_CC_FACTOR,
+      time: midiNote.time
+    }).addCC({
+      number: 7,
+      value: DEFAULT_MIDI_VOLUME / MIDI_CC_FACTOR,
+      time: ccEndTime
+    })
+  },
+  tenuto: (midiNote, trackForNote) => {
+    const ccEndTime = midiNote.time + midiNote.duration
+    trackForNote.addCC({
+      number: 65,
+      value: 127 / MIDI_CC_FACTOR,
+      time: midiNote.time
+    }).addCC({
+      number: 65,
+      value: 0 / MIDI_CC_FACTOR,
+      time: ccEndTime
+    })
+  },
+  marcato: (midiNote, trackForNote) => {
+    midiNote.velocity = Math.min(1, midiNote.velocity + 60 / MIDI_CC_FACTOR)
+  },
+</script>
+<script type="text/plain" id="src-ATTACH" data-path="src/midi/attachTrackToNote.js" data-start="14">
+export default function (midi, note, midiSettings, instrumentTitleParamsForCurrentMeasure, tracksForEachInstrumentOnEachStaveInEachVoice, instrumentsMappedWithChannels, currentInstrumentsForEachStaveOnEachVoice) {
+  const staveVoiceKey = `${note.staveIndexConsideringStavePosition}-${note.voiceIndex}`
+  const defaultInstrumentInMidiFormat = 0
+  const instrumentMidiNumberByParams = findInstrumentForCurrentStaveInMidiFormat(instrumentTitleParamsForCurrentMeasure, note)
+  const instrumentMidiNumber = instrumentMidiNumberByParams ?? currentInstrumentsForEachStaveOnEachVoice[staveVoiceKey] ?? instrumentTitleInMidiFormatByInstrumentOriginalName[midiSettings.defaultInstrument] ?? defaultInstrumentInMidiFormat
+  const instrumentStaveVoiceKey = `${instrumentMidiNumber}-${note.staveIndexConsideringStavePosition}-${note.voiceIndex}`
+  if (canInstrumentBeReassigned(note) && (currentInstrumentsForEachStaveOnEachVoice[staveVoiceKey] === undefined && instrumentMidiNumber !== undefined)) {
+    currentInstrumentsForEachStaveOnEachVoice[staveVoiceKey] = instrumentMidiNumber
+  }
+  if (!tracksForEachInstrumentOnEachStaveInEachVoice[instrumentStaveVoiceKey]) {
+    tracksForEachInstrumentOnEachStaveInEachVoice[instrumentStaveVoiceKey] = midi.addTrack()
+    tracksForEachInstrumentOnEachStaveInEachVoice[instrumentStaveVoiceKey].instrument.number = instrumentMidiNumber
+    const trackInstrumentMidiNumber = tracksForEachInstrumentOnEachStaveInEachVoice[instrumentStaveVoiceKey].instrument.number
+    tracksForEachInstrumentOnEachStaveInEachVoice[instrumentStaveVoiceKey].name = `track-${instrumentStaveVoiceKey}`
+    const trackChannelNumber = instrumentsMappedWithChannels[trackInstrumentMidiNumber]
+    if (trackChannelNumber !== undefined) {
+      tracksForEachInstrumentOnEachStaveInEachVoice[instrumentStaveVoiceKey].channel = trackChannelNumber
+    } else {
+      for (let channelIndex = 0; channelIndex < 16; channelIndex++) {
+        if ((channelIndex === 9) || (channelIndex === 10)) {
+          continue
+        }
+        if (!isChannelOccupied(instrumentsMappedWithChannels, channelIndex)) {
+          instrumentsMappedWithChannels[trackInstrumentMidiNumber] = channelIndex
+          tracksForEachInstrumentOnEachStaveInEachVoice[instrumentStaveVoiceKey].channel = channelIndex
+          break
+        }
+      }
+    }
+    note.track = tracksForEachInstrumentOnEachStaveInEachVoice[instrumentStaveVoiceKey]
+  } else {
+    note.track = tracksForEachInstrumentOnEachStaveInEachVoice[instrumentStaveVoiceKey]
+  }
+}
+</script>
+<script type="text/plain" id="src-REFSF" data-path="src/midi/fillTimeStampsMappedWithRefs.js" data-start="3">
+export default function (note, startTime, endTime, timeStampsMappedWithRefsOn, refsOnMappedWithTimeStamps) {
+  const noteTimeOn = startTime.toFixed(4) * 1
+  let noteRefId
+  if (note.isRepetition) {
+    noteRefId = `unit-${note.measureIndexOnPage + 1}-${note.staveIndex + 1}-${note.voiceIndex + 1}-${note.unitIndex + 1}`
+  }
+  if (note.isRest && !note.isRepetition) {
+    noteRefId = `rest-${note.measureIndexOnPage + 1}-${note.staveIndex + 1}-${note.voiceIndex + 1}-${note.unitIndex + 1}`
+  }
+  if (!note.isRest && !note.isRepetition) {
+    noteRefId = `note-${note.measureIndexOnPage + 1}-${note.staveIndex + 1}-${note.voiceIndex + 1}-${note.unitIndex + 1}-${note.noteIndex + 1}`
+  }
+  timeStampsMappedWithRefsOn[noteTimeOn] = timeStampsMappedWithRefsOn[noteTimeOn] || []
+  timeStampsMappedWithRefsOn[noteTimeOn].push({
+    refId: noteRefId,
+    duration: endTime - startTime,
+    pageIndex: note.pageIndex,
+    measureIndexOnPage: note.measureIndexOnPage
+  })
+  refsOnMappedWithTimeStamps[note.pageIndex] = refsOnMappedWithTimeStamps[note.pageIndex] || {}
+  if (!refsOnMappedWithTimeStamps[note.pageIndex][noteRefId]) {
+    refsOnMappedWithTimeStamps[note.pageIndex][noteRefId] = noteTimeOn
+  }
+}
+</script>
+<script type="text/plain" id="src-ENCODE" data-path="src/midi/lib/@tonejs/Encode.js" data-start="160">
+export function encode(midi) {
+	const midiData = {
+		header: {
+			format: 1,
+			numTracks: midi.tracks.length + 1,
+			ticksPerBeat: midi.header.ppq,
+		},
+		tracks: [
+			[
+				{
+					absoluteTime: 0,
+					deltaTime: 0,
+					meta: true,
+					text: midi.header.name,
+					type: 'trackName',
+				},
+				...midi.header.keySignatures.map(keySig => encodeKeySignature(keySig)),
+				...midi.header.meta.map(e => encodeText(e)),
+				...midi.header.tempos.map(tempo => encodeTempo(tempo)),
+				...midi.header.timeSignatures.map(timeSig => encodeTimeSignature(timeSig)),
+			],
+			...midi.tracks.map(track => {
+				return [
+					encodeTrackName(track.name),
+					encodeInstrument(track),
+					...encodeNotes(track),
+					...encodeControlChanges(track),
+					...encodePitchBends(track),
+				];
+			}),
+		],
+	};
+</script>
+
+<script>
+(function () {
+  // ---------- What this page is about ----------
+  const NODES = {
+  "GEN": {
+    "x": 90,
+    "y": 55,
+    "t": "generateMidi",
+    "k": "the whole pipeline"
+  },
+  "CLONE": {
+    "x": 300,
+    "y": 55,
+    "t": "a copy of the tree",
+    "k": "the engine mutates"
+  },
+  "AURAS": {
+    "x": 510,
+    "y": 55,
+    "t": "auras",
+    "k": "state split in time"
+  },
+  "TEMPO": {
+    "x": 720,
+    "y": 55,
+    "t": "tempo aura",
+    "k": "120 until a mark"
+  },
+  "MEAS": {
+    "x": 90,
+    "y": 170,
+    "t": "the measure loop",
+    "k": "repeats \u00b7 jumps \u00b7 voltas"
+  },
+  "UNITS": {
+    "x": 300,
+    "y": 170,
+    "t": "units in score order",
+    "k": "durations in quarters"
+  },
+  "FRAMES": {
+    "x": 510,
+    "y": 170,
+    "t": "note time frames",
+    "k": "notesSplittedInTimeFrames"
+  },
+  "ORDER": {
+    "x": 720,
+    "y": 170,
+    "t": "orderTimeFrames",
+    "k": "keys become seconds"
+  },
+  "PASS2": {
+    "x": 90,
+    "y": 285,
+    "t": "the second pass",
+    "k": "notes in time order"
+  },
+  "PITCH": {
+    "x": 300,
+    "y": 285,
+    "t": "pitch \u00b7 octave \u00b7 velocity",
+    "k": "backwards through auras"
+  },
+  "ADJ": {
+    "x": 510,
+    "y": 285,
+    "t": "time adjustments",
+    "k": "grace \u00b7 breath \u00b7 fermata"
+  },
+  "TIES": {
+    "x": 720,
+    "y": 285,
+    "t": "the ties aura",
+    "k": "parked until they close"
+  },
+  "EMT": {
+    "x": 90,
+    "y": 400,
+    "t": "addMidiNoteToTrack",
+    "k": "one note, then notes"
+  },
+  "TRACK": {
+    "x": 300,
+    "y": 400,
+    "t": "tracks \u00b7 channels",
+    "k": "instrument \u00b7 stave \u00b7 voice"
+  },
+  "REFS": {
+    "x": 510,
+    "y": 400,
+    "t": "the two ref maps",
+    "k": "sound \u2194 score"
+  },
+  "OUT": {
+    "x": 720,
+    "y": 400,
+    "t": "bytes + maps",
+    "k": "toArray() \u2192 the file"
+  }
+};
+  const EDGES = {
+  "GEN-CLONE": {
+    "d": "M90 55 L300 55",
+    "lx": 195,
+    "ly": 44,
+    "l": "clone"
+  },
+  "CLONE-MEAS": {
+    "d": "M300 55 L90 170",
+    "lx": 188,
+    "ly": 106,
+    "l": "measuresParams"
+  },
+  "UNITS-AURAS": {
+    "d": "M300 170 L510 55",
+    "lx": 420,
+    "ly": 120,
+    "l": "the state is deposited"
+  },
+  "AURAS-TEMPO": {
+    "d": "M510 55 L720 55",
+    "lx": 615,
+    "ly": 92,
+    "l": "and the tempo"
+  },
+  "MEAS-UNITS": {
+    "d": "M90 170 L300 170",
+    "lx": 195,
+    "ly": 212,
+    "l": "one measure at a time"
+  },
+  "UNITS-FRAMES": {
+    "d": "M300 170 L510 170",
+    "lx": 405,
+    "ly": 212,
+    "l": "addTimeFramesToIndicateNotes"
+  },
+  "FRAMES-ORDER": {
+    "d": "M510 170 L720 170",
+    "lx": 615,
+    "ly": 212,
+    "l": "the keys are seconds"
+  },
+  "ORDER-PASS2": {
+    "d": "M720 170 L720 230 L210 230 L165 285",
+    "lx": 300,
+    "ly": 244,
+    "l": "sorted by time"
+  },
+  "PASS2-PITCH": {
+    "d": "M90 285 L300 285",
+    "lx": 195,
+    "ly": 320,
+    "l": "pitch, octave, velocity"
+  },
+  "PITCH-ADJ": {
+    "d": "M300 285 L510 285",
+    "lx": 405,
+    "ly": 320,
+    "l": "then the time shifts"
+  },
+  "ADJ-TIES": {
+    "d": "M510 285 L720 285",
+    "lx": 615,
+    "ly": 320,
+    "l": "and the ties"
+  },
+  "TIES-EMT": {
+    "d": "M720 285 L720 340 L210 340 L165 400",
+    "lx": 430,
+    "ly": 352,
+    "l": "when a chain closes"
+  },
+  "EMT-TRACK": {
+    "d": "M90 400 L300 400",
+    "lx": 195,
+    "ly": 436,
+    "l": "track.addNote"
+  },
+  "TRACK-REFS": {
+    "d": "M300 400 L510 400",
+    "lx": 405,
+    "ly": 436,
+    "l": "fillTimeStampsMappedWithRefs"
+  },
+  "REFS-OUT": {
+    "d": "M510 400 L720 400",
+    "lx": 615,
+    "ly": 436,
+    "l": "the reply"
+  }
+};
+  const OWNERS = {
+  "orchestrator": {
+    "name": "generateMidi.js",
+    "where": "the whole pipeline in one file",
+    "c": "var(--m-a)"
+  },
+  "auras": {
+    "name": "time frames",
+    "where": "addTimeFrameToIndicate*.js",
+    "c": "var(--m-b)"
+  },
+  "calc": {
+    "name": "calculators",
+    "where": "duration \u00b7 pitch \u00b7 velocity \u00b7 time",
+    "c": "var(--m-c)"
+  },
+  "emit": {
+    "name": "emission",
+    "where": "addMidiNoteToTrack + adjusters",
+    "c": "var(--m-d)"
+  },
+  "tracks": {
+    "name": "tracks",
+    "where": "instrument \u00b7 stave \u00b7 voice",
+    "c": "var(--m-e)"
+  },
+  "lib": {
+    "name": "lib/",
+    "where": "the vendored MIDI file writer",
+    "c": "var(--m-f)"
+  }
+};
+  const OWN = {
+  "GEN": [
+    "orchestrator",
+    "src/midi/generateMidi.js"
+  ],
+  "CLONE": [
+    "orchestrator",
+    "src/midi/toolbox.js \u2014 clone"
+  ],
+  "AURAS": [
+    "auras",
+    "src/midi/generateMidi.js:91-99 + addTimeFrameToIndicate*.js"
+  ],
+  "TEMPO": [
+    "calc",
+    "src/midi/updateTempoAuraIfNeeded.js"
+  ],
+  "MEAS": [
+    "orchestrator",
+    "src/midi/generateMidi.js \u2014 the measure loop"
+  ],
+  "UNITS": [
+    "calc",
+    "src/midi/calculateActualDurationOfUnit.js \u00b7 calculateDurationInSeconds.js"
+  ],
+  "FRAMES": [
+    "auras",
+    "src/midi/addTimeFramesToIndicateNotes.js"
+  ],
+  "ORDER": [
+    "auras",
+    "src/midi/orderTimeFrames.js"
+  ],
+  "PASS2": [
+    "orchestrator",
+    "src/midi/generateMidi.js \u2014 the second pass"
+  ],
+  "PITCH": [
+    "calc",
+    "src/midi/calculatePitchForNoteTimeFrame.js \u00b7 calculateVelocityForNote.js"
+  ],
+  "ADJ": [
+    "calc",
+    "src/midi/calculateGraceNoteTimeAdjustment.js \u00b7 breath \u00b7 fermata"
+  ],
+  "TIES": [
+    "orchestrator",
+    "src/midi/generateMidi.js \u2014 tiesAuraForEachVoiceInEachStave"
+  ],
+  "EMT": [
+    "emit",
+    "src/midi/addMidiNoteToTrack.js"
+  ],
+  "TRACK": [
+    "tracks",
+    "src/midi/attachTrackToNote.js \u00b7 isChannelOccupied.js"
+  ],
+  "REFS": [
+    "emit",
+    "src/midi/fillTimeStampsMappedWithRefs.js"
+  ],
+  "OUT": [
+    "lib",
+    "src/midi/lib/@tonejs/"
+  ]
+};
+  const FILE_OWNER = {
+  "MGEN": "orchestrator",
+  "MEASLOOP": "orchestrator",
+  "REPEAT": "orchestrator",
+  "UNITLOOP": "orchestrator",
+  "PASS2F": "orchestrator",
+  "TIESF": "orchestrator",
+  "TFN": "auras",
+  "ORDERF": "auras",
+  "SECONDS": "calc",
+  "AURALK": "calc",
+  "VELO": "calc",
+  "ADDNOTE": "emit",
+  "ADJMIDI": "emit",
+  "REFSF": "emit",
+  "ATTACH": "tracks",
+  "ENCODE": "lib"
+};
+  const S = [
+  {
+    "id": "folder",
+    "name": "The folder",
+    "cells": [
+      "generateMidi.js",
+      "time-frame builders",
+      "calculators",
+      "adjusters",
+      "track helpers",
+      "ref maps",
+      "lib/"
+    ],
+    "gt": "What is in src/midi",
+    "frames": [
+      {
+        "t": "One file runs it all",
+        "x": "generateMidi.js is the pipeline. The other 69 files are the things it calls.",
+        "f": "MGEN",
+        "l": [
+          68,
+          84
+        ],
+        "on": [
+          "GEN"
+        ],
+        "g": "L......"
+      },
+      {
+        "t": "And one idea holds it together",
+        "x": "Nine maps keyed by absolute seconds: clefs, keys, octave signs, dynamics, grace counters and the notes themselves.",
+        "f": "MGEN",
+        "l": [
+          84,
+          99
+        ],
+        "on": [
+          "AURAS"
+        ],
+        "g": ".L....."
+      },
+      {
+        "t": "The time-frame builders",
+        "x": "Ten small files, one per kind of state change. Each drops a frame at a time.",
+        "f": "TFN",
+        "l": [
+          1,
+          24
+        ],
+        "on": [
+          "AURAS",
+          "FRAMES"
+        ],
+        "g": ".L....."
+      },
+      {
+        "t": "The calculators",
+        "x": "Duration in quarters, duration in seconds, pitch, octave, velocity. Plain functions over one note.",
+        "f": "SECONDS",
+        "l": [
+          1,
+          6
+        ],
+        "on": [
+          "UNITS"
+        ],
+        "g": "..L...."
+      },
+      {
+        "t": "The second pass resolves every note",
+        "x": "Pitch, octave and velocity come from the auras, not from the score around them.",
+        "f": "PASS2F",
+        "l": [
+          540,
+          556
+        ],
+        "on": [
+          "PASS2",
+          "PITCH"
+        ],
+        "g": "..L...."
+      },
+      {
+        "t": "The adjusters",
+        "x": "Articulations, slurs, pedals and arpeggios edit the note just before it is added.",
+        "f": "ADJMIDI",
+        "l": [
+          6,
+          40
+        ],
+        "on": [
+          "EMT"
+        ],
+        "g": "...L..."
+      },
+      {
+        "t": "Tracks and channels",
+        "x": "One track per instrument, stave and voice; channels are reused per instrument.",
+        "f": "ATTACH",
+        "l": [
+          14,
+          47
+        ],
+        "on": [
+          "TRACK"
+        ],
+        "g": "....L.."
+      },
+      {
+        "t": "The ref maps",
+        "x": "One file builds the names that tie every sound back to the symbol that made it.",
+        "f": "REFSF",
+        "l": [
+          3,
+          26
+        ],
+        "on": [
+          "REFS"
+        ],
+        "g": ".....L."
+      },
+      {
+        "t": "And the vendored file writer",
+        "x": "lib/ is @tonejs: tracks, headers, and the encoder that ends in bytes.",
+        "f": "ENCODE",
+        "l": [
+          160,
+          191
+        ],
+        "on": [
+          "OUT"
+        ],
+        "g": "......L"
+      }
+    ]
+  },
+  {
+    "id": "pass1",
+    "name": "Pass one: score order",
+    "cells": [
+      "the measure loop",
+      "repeats and jumps",
+      "units",
+      "durations",
+      "auras",
+      "note frames"
+    ],
+    "gt": "What pass one does",
+    "frames": [
+      {
+        "t": "The tree is copied first",
+        "x": "The engine stamps and splices as it goes, so it works on its own copy and the caller keeps a clean schema.",
+        "f": "MGEN",
+        "l": [
+          79,
+          84
+        ],
+        "on": [
+          "GEN",
+          "CLONE"
+        ],
+        "tok": [
+          "GEN-CLONE",
+          "clone"
+        ],
+        "g": "L....."
+      },
+      {
+        "t": "A page with no measures plays nothing",
+        "x": "The answer keeps its shape, so callers never branch on it.",
+        "f": "MGEN",
+        "l": [
+          69,
+          77
+        ],
+        "on": [
+          "GEN"
+        ],
+        "log": "data: [], timeStampsMappedWithRefsOn: {}, refsOnMappedWithTimeStamps: {}",
+        "g": "L....."
+      },
+      {
+        "t": "One file, and the two maps",
+        "x": "Everything is built into one Midi object, and both maps are filled again as notes are written.",
+        "f": "MGEN",
+        "l": [
+          82,
+          99
+        ],
+        "on": [
+          "GEN",
+          "AURAS"
+        ],
+        "g": "L....."
+      },
+      {
+        "t": "Measure by measure",
+        "x": "The loop walks measures in score order, each one a copy of the schema\u2019s measure.",
+        "f": "MEASLOOP",
+        "l": [
+          144,
+          158
+        ],
+        "on": [
+          "MEAS"
+        ],
+        "tok": [
+          "CLONE-MEAS",
+          "measuresParams"
+        ],
+        "g": ".L...."
+      },
+      {
+        "t": "Repeats, jumps and voltas",
+        "x": "Repeat dots rewind the measure index, Fine stops it, D.C. and D.S. start it again.",
+        "f": "REPEAT",
+        "l": [
+          458,
+          500
+        ],
+        "on": [
+          "MEAS"
+        ],
+        "g": "..L..."
+      },
+      {
+        "t": "Durations in quarters",
+        "x": "Tuplets and dots change what a unit lasts before any second is computed.",
+        "f": "UNITLOOP",
+        "l": [
+          355,
+          365
+        ],
+        "on": [
+          "UNITS"
+        ],
+        "tok": [
+          "MEAS-UNITS",
+          "one measure at a time"
+        ],
+        "g": "...L.."
+      },
+      {
+        "t": "Quarters become seconds",
+        "x": "One small function, and the tempo aura beside it.",
+        "f": "SECONDS",
+        "l": [
+          1,
+          6
+        ],
+        "on": [
+          "UNITS"
+        ],
+        "g": "...L.."
+      },
+      {
+        "t": "The state is deposited",
+        "x": "Clefs, octave signs, keys, accidentals and dynamics become frames at this time. Nothing computes a pitch yet.",
+        "f": "UNITLOOP",
+        "l": [
+          384,
+          398
+        ],
+        "on": [
+          "UNITS",
+          "AURAS"
+        ],
+        "tok": [
+          "UNITS-AURAS",
+          "the state is deposited"
+        ],
+        "g": "....L."
+      },
+      {
+        "t": "Notes land in their time frame",
+        "x": "Each note is stamped with its time and duration, then dropped into the map for that time.",
+        "f": "TFN",
+        "l": [
+          5,
+          22
+        ],
+        "on": [
+          "FRAMES"
+        ],
+        "tok": [
+          "UNITS-FRAMES",
+          "addTimeFramesToIndicateNotes"
+        ],
+        "g": ".....L"
+      },
+      {
+        "t": "And everything is sorted by time",
+        "x": "String keys become sorted seconds. This is the whole of pass one\u2019s ending.",
+        "f": "ORDERF",
+        "l": [
+          1,
+          5
+        ],
+        "on": [
+          "FRAMES",
+          "ORDER"
+        ],
+        "tok": [
+          "FRAMES-ORDER",
+          "the keys are seconds"
+        ],
+        "g": ".....L"
+      }
+    ]
+  },
+  {
+    "id": "pass2",
+    "name": "Pass two: time order",
+    "cells": [
+      "pitch",
+      "octave",
+      "velocity",
+      "grace",
+      "breath",
+      "fermata",
+      "ties"
+    ],
+    "gt": "What pass two resolves",
+    "frames": [
+      {
+        "t": "Notes come back in time order",
+        "x": "Not score order: by absolute seconds, so every stave\u2019s state at that instant is already known.",
+        "f": "PASS2F",
+        "l": [
+          540,
+          551
+        ],
+        "on": [
+          "ORDER",
+          "PASS2"
+        ],
+        "tok": [
+          "ORDER-PASS2",
+          "sorted by time"
+        ],
+        "g": "L......"
+      },
+      {
+        "t": "Pitch from the name and the key",
+        "x": "c is 0, d is 2, and the aura is scanned backwards for the last key or accidental that applies.",
+        "f": "AURALK",
+        "l": [
+          22,
+          59
+        ],
+        "on": [
+          "PITCH"
+        ],
+        "tok": [
+          "PASS2-PITCH",
+          "pitch, octave, velocity"
+        ],
+        "g": ".L....."
+      },
+      {
+        "t": "Velocity from the dynamics",
+        "x": "The same backwards scan over the dynamics aura, falling back to the stave\u2019s first voice.",
+        "f": "VELO",
+        "l": [
+          8,
+          51
+        ],
+        "on": [
+          "PITCH"
+        ],
+        "g": "..L...."
+      },
+      {
+        "t": "Grace, breath and fermata shift the time",
+        "x": "Each note collects its own time adjustments before anything is emitted.",
+        "f": "PASS2F",
+        "l": [
+          554,
+          567
+        ],
+        "on": [
+          "ADJ"
+        ],
+        "tok": [
+          "PITCH-ADJ",
+          "then the time shifts"
+        ],
+        "g": "...L.."
+      },
+      {
+        "t": "Ties are parked until they close",
+        "x": "A note tied to the next is not emitted: it waits in the ties aura with its duration.",
+        "f": "TIESF",
+        "l": [
+          1232,
+          1250
+        ],
+        "on": [
+          "TIES"
+        ],
+        "tok": [
+          "ADJ-TIES",
+          "and the ties"
+        ],
+        "g": ".....L"
+      },
+      {
+        "t": "And then they are emitted",
+        "x": "When the chain ends, the merged note goes out, and every member of the chain keeps its ref.",
+        "f": "TIESF",
+        "l": [
+          1250,
+          1267
+        ],
+        "on": [
+          "TIES",
+          "EMT"
+        ],
+        "tok": [
+          "TIES-EMT",
+          "when a chain closes"
+        ],
+        "g": ".....L"
+      }
+    ]
+  },
+  {
+    "id": "sound",
+    "name": "Sound, and the way back to score",
+    "cells": [
+      "the note",
+      "articulations",
+      "slurs \u00b7 pedals",
+      "the track",
+      "the ref maps",
+      "the bytes"
+    ],
+    "gt": "What is emitted",
+    "frames": [
+      {
+        "t": "One score note becomes MIDI notes",
+        "x": "Each one is built as { pitch, octave, velocity, duration, time } \u2014 and for a trill, a tremolo or a glissando, several of them.",
+        "f": "ADDNOTE",
+        "l": [
+          10,
+          17
+        ],
+        "on": [
+          "EMT"
+        ],
+        "tok": [
+          "TIES-EMT",
+          "addMidiNoteToTrack"
+        ],
+        "g": "L....."
+      },
+      {
+        "t": "The four adjusters",
+        "x": "Articulations, slurs, pedals and arpeggios edit velocity, duration and controller changes.",
+        "f": "ADDNOTE",
+        "l": [
+          17,
+          44
+        ],
+        "on": [
+          "EMT"
+        ],
+        "g": ".L...."
+      },
+      {
+        "t": "Articulations, in their own file",
+        "x": "Accent, staccato, spiccato, tenuto, marcato: notation becomes numbers here.",
+        "f": "ADJMIDI",
+        "l": [
+          6,
+          40
+        ],
+        "on": [
+          "EMT"
+        ],
+        "g": ".L...."
+      },
+      {
+        "t": "track.addNote",
+        "x": "The insert goes into the vendored track, sorted by ticks.",
+        "f": "ADDNOTE",
+        "l": [
+          44,
+          51
+        ],
+        "on": [
+          "EMT",
+          "TRACK"
+        ],
+        "tok": [
+          "EMT-TRACK",
+          "track.addNote"
+        ],
+        "g": "...L.."
+      },
+      {
+        "t": "Tracks and channels",
+        "x": "One track per instrument, stave and voice; percussion channels 9 and 10 are left alone.",
+        "f": "ATTACH",
+        "l": [
+          14,
+          47
+        ],
+        "on": [
+          "TRACK"
+        ],
+        "g": "....L."
+      },
+      {
+        "t": "The names that tie sound to score",
+        "x": "note-1-1-1-1-1 is written into both maps as the note is added \u2014 the same names the drawer writes.",
+        "f": "REFSF",
+        "l": [
+          3,
+          26
+        ],
+        "on": [
+          "REFS",
+          "TRACK"
+        ],
+        "tok": [
+          "TRACK-REFS",
+          "fillTimeStampsMappedWithRefs"
+        ],
+        "g": ".....L"
+      },
+      {
+        "t": "The bytes",
+        "x": "toArray encodes a format-1 file. The maps travel back beside it.",
+        "f": "ENCODE",
+        "l": [
+          160,
+          191
+        ],
+        "on": [
+          "OUT"
+        ],
+        "tok": [
+          "REFS-OUT",
+          "the reply"
+        ],
+        "g": "DDDDDD"
+      }
+    ]
+  }
+];
+
+  // ---------- System picture ----------
+  const SVGNS = 'http://www.w3.org/2000/svg';
+  const el = (n, a, p) => { const e = document.createElementNS(SVGNS, n); for (const k in a) e.setAttribute(k, a[k]); if (p) p.appendChild(e); return e; };
+  const gE = document.getElementById('edges'), gN = document.getElementById('nodes');
+  const edgeEls = {}, nodeEls = {};
+  for (const id in EDGES) {
+    const e = EDGES[id];
+    edgeEls[id] = el('path', { d: e.d, class: 'edge' }, gE);
+    if (e.l) { const t = el('text', { x: e.lx, y: e.ly, class: 'elabel' }, gE); t.textContent = e.l; }
+  }
+  document.getElementById('owners').innerHTML = Object.values(OWNERS).map(o =>
+    `<span style="--own:${o.c}"><i></i><b>${o.name}</b> ${o.where}</span>`).join('');
+
+  for (const id in NODES) {
+    const n = NODES[id]; const [ok, path] = OWN[id];
+    const g = el('g', { class: 'node', style: `--own:${OWNERS[ok].c}` }, gN);
+    const tt = el('title', {}, g); tt.textContent = `${OWNERS[ok].name}: ${path}`;
+    el('rect', { x: n.x - 75, y: n.y - 24, width: 150, height: 48, rx: 7 }, g);
+    el('rect', { x: n.x - 75, y: n.y - 24, width: 6, height: 48, rx: 3, class: 'band' }, g);
+    const a = el('text', { x: n.x, y: n.y - 3 }, g); a.textContent = n.t;
+    const b = el('text', { x: n.x, y: n.y + 13, class: 'k' }, g); b.textContent = n.k;
+    nodeEls[id] = g;
+  }
+  const tok = document.getElementById('tok');
+  const tokRect = tok.querySelector('rect'), tokText = tok.querySelector('text');
+
+  // ---------- Code rendering ----------
+  const files = {};
+  const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const KEYWORDS = /\b(const|let|var|function|return|if|else|for|while|of|in|new|import|export|from|default|class|extends|async|await|try|catch|finally|throw|typeof|instanceof|null|undefined|true|false|this|switch|case|break|continue|delete|void|yield|static|get|set)\b/;
+  function highlightJs(src) {
+    const re = new RegExp(
+      '(\\/\\*[\\s\\S]*?\\*\\/|\\/\\/[^\\n]*)' +
+      "|('(?:\\\\.|[^'\\\\])*'|\"(?:\\\\.|[^\"\\\\])*\"|`(?:\\\\.|[^`\\\\])*`)" +
+      '|(0x[\\da-fA-F]+|\\d+(?:\\.\\d+)?)' +
+      '|' + KEYWORDS.source, 'g');
+    let out = '', last = 0, m;
+    while ((m = re.exec(src))) {
+      out += esc(src.slice(last, m.index));
+      if (m[1]) out += '<span class="hljs-comment">' + esc(m[1]) + '</span>';
+      else if (m[2]) out += '<span class="hljs-string">' + esc(m[2]) + '</span>';
+      else if (m[3]) out += '<span class="hljs-number">' + esc(m[3]) + '</span>';
+      else out += '<span class="hljs-keyword">' + esc(m[4]) + '</span>';
+      last = re.lastIndex;
+    }
+    return out + esc(src.slice(last));
+  }
+  function splitLines(html) {
+    const out = []; const open = []; let cur = '';
+    const re = /(<span[^>]*>)|(<\/span>)|(\n)|([^<\n]+)/g; let m;
+    while ((m = re.exec(html))) {
+      if (m[1]) { open.push(m[1]); cur += m[1]; }
+      else if (m[2]) { open.pop(); cur += m[2]; }
+      else if (m[3]) { cur += '</span>'.repeat(open.length); out.push(cur); cur = open.join(''); }
+      else cur += m[4];
+    }
+    out.push(cur); return out;
+  }
+  function getFile(key) {
+    if (files[key]) return files[key];
+    const s = document.getElementById('src-' + key);
+    const raw = s.textContent.replace(/^\n/, '').replace(/\n$/, '');
+    files[key] = { path: s.dataset.path, start: +s.dataset.start, lines: splitLines(highlightJs(raw)) };
+    return files[key];
+  }
+  const codeOl = document.getElementById('code'), codeBox = document.getElementById('codebox');
+  let shownFile = null;
+  function showCode(key, range) {
+    const f = getFile(key);
+    if (shownFile !== key) {
+      codeOl.innerHTML = f.lines.map((ln, i) =>
+        `<li data-n="${f.start + i}"><span class="n">${f.start + i}</span><code>${ln || ' '}</code></li>`).join('');
+      shownFile = key;
+    }
+    document.getElementById('fpath').textContent = f.path;
+    const ow = OWNERS[FILE_OWNER[key]] || Object.values(OWNERS)[0]; const rp = document.getElementById('frepo');
+    rp.textContent = ow.name; rp.style.setProperty('--own', ow.c);
+    document.getElementById('flines').textContent = range ? `lines ${range[0]}–${range[1]}` : '';
+    let first = null;
+    codeOl.querySelectorAll('li').forEach(li => {
+      const n = +li.dataset.n; const on = range && n >= range[0] && n <= range[1];
+      li.classList.toggle('hl', !!on); if (on && !first) first = li;
+    });
+    if (first) codeBox.scrollTo({ top: Math.max(0, first.offsetTop - 70), behavior: reduce ? 'auto' : 'smooth' });
+  }
+
+  // ---------- Token animation ----------
+  const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let animId = 0;
+  function placeTok(path, t, rev) {
+    const L = path.getTotalLength(); const p = path.getPointAtLength((rev ? 1 - t : t) * L);
+    tok.setAttribute('transform', `translate(${p.x},${p.y})`);
+  }
+  function runTok(spec) {
+    const my = ++animId;
+    for (const id in edgeEls) edgeEls[id].classList.remove('on', 'lit');
+    if (!spec) { tok.style.display = 'none'; return; }
+    const [edge, label, rev, bad] = spec; const path = edgeEls[edge];
+    path.classList.add('on');
+    tok.classList.toggle('err', !!bad);
+    tokText.textContent = label; tok.style.display = '';
+    const w = Math.max(30, tokText.getComputedTextLength() + 14);
+    tokRect.setAttribute('width', w); tokRect.setAttribute('x', 10); tokRect.setAttribute('y', -9);
+    tokText.setAttribute('x', 17);
+    const a = 0.1, b = 0.9;
+    if (reduce) { placeTok(path, b, rev); return; }
+    const t0 = performance.now(), dur = 1000;
+    const step = now => {
+      if (my !== animId) return;
+      const k = Math.min(1, (now - t0) / dur); const e = k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+      placeTok(path, a + (b - a) * e, rev);
+      if (k < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }
+
+  // ---------- State panels ----------
+  const msgEl = document.getElementById('msg'), workerEl = document.getElementById('worker'), gridEl = document.getElementById('grid');
+  function showState(sc, fr) {
+    msgEl.textContent = fr.msg ? JSON.stringify(fr.msg, null, 2) : '—';
+    const w = fr.w;
+    workerEl.innerHTML = w
+      ? Object.entries(w).map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(String(v))}</dd>`).join('')
+      : '<dt>—</dt><dd>nothing new in this frame</dd>';
+    const sec = gridEl.closest('section');
+    if (!sc.cells) { sec.hidden = true; return; }
+    sec.hidden = false;
+    document.getElementById('gtitle').textContent = sc.gt;
+    const codes = (fr.g || '').padEnd(sc.cells.length, '.');
+    gridEl.innerHTML = sc.cells.map((c, i) => `<span class="chip ${codes[i] === '.' ? '' : codes[i]}">${esc(c)}</span>`).join('');
+  }
+
+  // ---------- Player ----------
+  let si = 0, fi = 0, timer = null;
+  const tabs = document.getElementById('tabs'), scrub = document.getElementById('scrub');
+  S.forEach((sc, i) => {
+    const b = document.createElement('button'); b.type = 'button'; b.role = 'tab'; b.id = 'tab-' + sc.id;
+    b.textContent = sc.name; b.addEventListener('click', () => { stop(); si = i; fi = 0; render(); });
+    tabs.appendChild(b);
+  });
+  function render() {
+    const sc = S[si], fr = sc.frames[fi];
+    [...tabs.children].forEach((b, i) => b.setAttribute('aria-selected', i === si ? 'true' : 'false'));
+    scrub.max = sc.frames.length - 1; scrub.value = fi;
+    document.getElementById('count').textContent = `${fi + 1} / ${sc.frames.length}`;
+    document.getElementById('ctitle').textContent = fr.t;
+    document.getElementById('ctext').textContent = fr.x;
+    document.getElementById('where').textContent = (fr.on || []).map(k => NODES[k].t).join(' · ');
+    for (const k in nodeEls) {
+      nodeEls[k].classList.toggle('on', (fr.on || []).includes(k) && !(fr.err || []).includes(k));
+      nodeEls[k].classList.toggle('err', (fr.err || []).includes(k));
+    }
+    runTok(fr.tok);
+    (fr.lit || []).forEach(id => edgeEls[id].classList.add('lit'));
+    document.getElementById('logline').textContent = fr.log || '—';
+    showState(sc, fr);
+    showCode(fr.f, fr.l);
+    document.getElementById('prev').disabled = document.getElementById('first').disabled = fi === 0;
+    document.getElementById('next').disabled = fi === sc.frames.length - 1;
+  }
+  const go = d => { const n = S[si].frames.length; fi = Math.max(0, Math.min(n - 1, fi + d)); render(); };
+  function stop() { if (timer) { clearInterval(timer); timer = null; } const p = document.getElementById('play'); p.textContent = '▶ Play'; p.setAttribute('aria-label', 'Play'); }
+  function play() {
+    if (fi === S[si].frames.length - 1) { fi = 0; render(); }
+    const p = document.getElementById('play'); p.textContent = '❚❚ Pause'; p.setAttribute('aria-label', 'Pause');
+    timer = setInterval(() => { if (fi >= S[si].frames.length - 1) return stop(); go(1); }, 2800);
+  }
+  document.getElementById('play').addEventListener('click', () => timer ? stop() : play());
+  document.getElementById('next').addEventListener('click', () => { stop(); go(1); });
+  document.getElementById('prev').addEventListener('click', () => { stop(); go(-1); });
+  document.getElementById('first').addEventListener('click', () => { stop(); fi = 0; render(); });
+  scrub.addEventListener('input', () => { stop(); fi = +scrub.value; render(); });
+  document.addEventListener('keydown', e => {
+    if (e.target === scrub) return;
+    if (e.key === 'ArrowRight') { stop(); go(1); e.preventDefault(); }
+    else if (e.key === 'ArrowLeft') { stop(); go(-1); e.preventDefault(); }
+    else if (e.key === ' ' && e.target.tagName !== 'BUTTON') { timer ? stop() : play(); e.preventDefault(); }
+  });
+
+  render();
+})();
+</script>

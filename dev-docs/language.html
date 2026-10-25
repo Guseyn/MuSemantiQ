@@ -1,0 +1,1974 @@
+<title>MuSemantiQ — src/language</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: player bar on top; left = live system diagram + state, right = the MR code with the active lines lit */
+:root {
+  --bg: #f4f6f6;
+  --panel: #ffffff;
+  --code-bg: #f8faf9;
+  --fg: #142024;
+  --muted: #5a6a6e;
+  --line: #d3dcdd;
+  --accent: #0d6b6b;
+  --accent-soft: #dcefed;
+  --hot: #e0a100;
+  --err: #c43c3c;
+  --err-soft: #f7e0e0;
+  --ok: #2c8a4a;
+  --node: #ffffff;
+  --m-a: #8a5cf6;
+  --m-b: #0f9d9a;
+  --m-c: #d9861c;
+  --m-d: #2f7fd8;
+  --m-e: #d6457f;
+  --m-f: #2c8a4a;
+  --c-kw: #8a3ffc; --c-str: #1e7a3c; --c-com: #7d8b8e; --c-fn: #0f62c9; --c-type: #b25c00; --c-num: #c0306a;
+  --font-body: system-ui, -apple-system, "Segoe UI", "Helvetica Neue", sans-serif;
+  --font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1416; --panel: #152023; --code-bg: #10181b; --fg: #e3ecec; --muted: #93a6a8; --line: #2a3a3e;
+    --accent: #5cc7bd; --accent-soft: #163536; --hot: #f2c14e; --err: #ff7b7b; --err-soft: #3a1f22; --ok: #6fd28f; --node: #1a272a;
+    --c-kw: #c4a2ff; --c-str: #7fd49a; --c-com: #6f8487; --c-fn: #79b8ff; --c-type: #f0b26b; --c-num: #ff8fb8;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1416; --panel: #152023; --code-bg: #10181b; --fg: #e3ecec; --muted: #93a6a8; --line: #2a3a3e;
+  --accent: #5cc7bd; --accent-soft: #163536; --hot: #f2c14e; --err: #ff7b7b; --err-soft: #3a1f22; --ok: #6fd28f; --node: #1a272a;
+  --c-kw: #c4a2ff; --c-str: #7fd49a; --c-com: #6f8487; --c-fn: #79b8ff; --c-type: #f0b26b; --c-num: #ff8fb8;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 15px; line-height: 1.5; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+.wrap {
+  max-width: 1320px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 22px 48px; display: grid; gap: 14px;
+}
+header.top { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 16px; }
+header.top h1 { margin: 0; font-size: clamp(22px, 3vw, 30px); line-height: 1.15; font-weight: 700; }
+header.top a { font-family: var(--font-mono); font-size: 12.5px; color: var(--accent); }
+.eyebrow { font-family: var(--font-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+.intro { margin: 0; color: var(--muted); max-width: 88ch; }
+.intro code { font-family: var(--font-mono); font-size: 13px; }
+
+/* Player */
+.player {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px;
+  display: grid; gap: 10px;
+}
+.tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+.tabs button {
+  font: 500 13px var(--font-body); color: var(--muted); background: transparent; border: 1px solid var(--line);
+  border-radius: 999px; padding: 4px 12px; cursor: pointer;
+}
+.tabs button[aria-selected="true"] { background: var(--accent); border-color: var(--accent); color: var(--panel); }
+.tabs button:focus-visible, .ctrl button:focus-visible, .ctrl input:focus-visible { outline: 2px solid var(--hot); outline-offset: 2px; }
+.ctrl { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.ctrl button {
+  font: 600 13px var(--font-body); color: var(--fg); background: var(--accent-soft); border: 1px solid var(--line);
+  border-radius: 6px; padding: 6px 12px; cursor: pointer; min-width: 44px;
+}
+.ctrl button.primary { background: var(--accent); color: var(--panel); border-color: var(--accent); }
+.ctrl button:disabled { opacity: .45; cursor: default; }
+.ctrl input[type="range"] { flex: 1; min-width: 120px; accent-color: var(--accent); }
+.ctrl .count { font: 500 13px var(--font-mono); color: var(--muted); font-variant-numeric: tabular-nums; min-width: 64px; text-align: right; }
+.caption { display: grid; gap: 2px; }
+.caption b { font-size: 16px; }
+.caption span { color: var(--muted); font-size: 14px; max-width: 80ch; }
+.keys { font-size: 12px; color: var(--muted); }
+.keys kbd { font-family: var(--font-mono); font-size: 11px; border: 1px solid var(--line); border-radius: 3px; padding: 0 4px; background: var(--code-bg); }
+
+/* Stage */
+.stage { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; align-items: start; }
+@media (max-width: 900px) { .stage { grid-template-columns: 1fr; } }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; min-width: 0; }
+.card > .hd { display: flex; justify-content: space-between; gap: 8px; padding: 8px 12px; border-bottom: 1px solid var(--line); font: 500 12px var(--font-mono); color: var(--muted); }
+.card > .hd b { color: var(--accent); font-weight: 500; overflow-wrap: anywhere; }
+.left { display: grid; gap: 14px; min-width: 0; }
+
+svg.sys { display: block; width: 100%; height: auto; }
+.edge { stroke: var(--line); stroke-width: 2; fill: none; }
+.edge.on { stroke: var(--hot); stroke-width: 3; }
+.edge.lit { stroke: var(--accent); stroke-width: 2.5; stroke-dasharray: 5 4; }
+#tok.err circle, #tok.err rect { fill: var(--err); }
+.elabel { font: 500 10.5px var(--font-mono); fill: var(--muted); text-anchor: middle; }
+.node rect { fill: color-mix(in srgb, var(--own) 13%, var(--node)); stroke: color-mix(in srgb, var(--own) 65%, var(--line)); stroke-width: 1.5; transition: fill .3s, stroke .3s; }
+.node rect.band { fill: var(--own); stroke: none; }
+.node.on rect:not(.band) { stroke: var(--hot); stroke-width: 3; fill: color-mix(in srgb, var(--own) 28%, var(--node)); }
+.node.err rect:not(.band) { stroke: var(--err); stroke-width: 3; fill: var(--err-soft); }
+.owners { display: flex; flex-wrap: wrap; gap: 6px 14px; padding: 8px 12px; border-bottom: 1px solid var(--line); font-size: 12px; color: var(--muted); }
+.owners span { display: inline-flex; align-items: center; gap: 6px; }
+.owners i { width: 12px; height: 12px; border-radius: 3px; background: var(--own); display: inline-block; }
+.owners b { color: var(--fg); font-weight: 600; }
+.repo { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 11.5px; padding: 1px 8px; border-radius: 999px; background: color-mix(in srgb, var(--own) 18%, transparent); color: var(--fg); border: 1px solid var(--own); white-space: nowrap; }
+.node text { font: 600 12.5px var(--font-body); fill: var(--fg); text-anchor: middle; }
+.node text.k { font: 500 10px var(--font-mono); fill: var(--muted); }
+#tok circle { fill: var(--hot); stroke: var(--panel); stroke-width: 2; }
+#tok rect { fill: var(--fg); }
+#tok text { font: 600 11px var(--font-mono); fill: var(--panel); }
+
+.state { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0; }
+@media (max-width: 520px) { .state { grid-template-columns: 1fr; } }
+.state section { padding: 10px 12px; min-width: 0; display: grid; gap: 6px; align-content: start; }
+.state section + section { border-left: 1px solid var(--line); }
+@media (max-width: 520px) { .state section + section { border-left: 0; border-top: 1px solid var(--line); } }
+.state h3 { margin: 0; font: 500 11px var(--font-mono); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+pre.msg { margin: 0; font: 12px/1.5 var(--font-mono); background: var(--code-bg); border: 1px solid var(--line); border-radius: 5px; padding: 8px 10px; overflow-x: auto; min-height: 44px; }
+dl.kv { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; font: 12.5px var(--font-mono); font-variant-numeric: tabular-nums; }
+dl.kv dt { color: var(--muted); }
+dl.kv dd { margin: 0; overflow-wrap: anywhere; }
+.grid { display: flex; flex-wrap: wrap; gap: 3px; }
+.grid i { width: 13px; height: 13px; border-radius: 2px; border: 1.5px solid var(--line); background: var(--code-bg); transition: background .25s, border-color .25s, opacity .25s; }
+.grid i.L { border-color: var(--hot); background: color-mix(in srgb, var(--hot) 35%, transparent); }
+.grid i.D { border-color: var(--ok); background: var(--ok); }
+.grid i.F { border-color: var(--err); background: var(--err); }
+.grid i.G { opacity: .25; border-style: dashed; }
+.glegend { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 11.5px; color: var(--muted); }
+.glegend span { display: inline-flex; gap: 5px; align-items: center; }
+.glegend i { width: 10px; height: 10px; border-radius: 2px; border: 1.5px solid var(--line); display: inline-block; }
+.glegend i.L { border-color: var(--hot); background: color-mix(in srgb, var(--hot) 35%, transparent); }
+.glegend i.D { border-color: var(--ok); background: var(--ok); }
+.glegend i.F { border-color: var(--err); background: var(--err); }
+.glegend i.G { opacity: .35; border-style: dashed; }
+
+.chip { font: 500 12px var(--font-mono); padding: 3px 8px; border-radius: 4px; border: 1.5px solid var(--line); background: var(--code-bg); transition: background .25s, border-color .25s, opacity .25s; }
+.chip.L { border-color: var(--hot); background: color-mix(in srgb, var(--hot) 30%, transparent); }
+.chip.D { border-color: var(--ok); background: color-mix(in srgb, var(--ok) 25%, transparent); }
+.chip.F { border-color: var(--err); background: var(--err-soft); text-decoration: line-through; }
+.chip.G { opacity: .6; border-style: dashed; }
+.mrlinks { display: inline-flex; gap: 6px; flex-wrap: wrap; font-family: var(--font-mono); font-size: 12.5px; color: var(--muted); }
+
+/* Code */
+.codebox { max-height: min(72vh, 680px); overflow: auto; background: var(--code-bg); border-radius: 0 0 8px 8px; }
+.codebox ol { list-style: none; margin: 0; padding: 8px 0; font: 12.5px/1.6 var(--font-mono); min-width: max-content; }
+.codebox li { display: grid; grid-template-columns: 52px 1fr; padding-right: 16px; border-left: 3px solid transparent; }
+.codebox li .n { color: var(--muted); text-align: right; padding-right: 14px; user-select: none; opacity: .7; font-variant-numeric: tabular-nums; }
+.codebox li code { font: inherit; white-space: pre; color: var(--fg); }
+.codebox li.hl { background: var(--accent-soft); border-left-color: var(--accent); }
+.codebox li.hl .n { color: var(--accent); opacity: 1; }
+.codebox.dim li:not(.hl) code { opacity: .55; }
+.hljs-keyword, .hljs-literal, .hljs-built_in { color: var(--c-kw); }
+.hljs-string, .hljs-regexp, .hljs-subst { color: var(--c-str); }
+.hljs-comment { color: var(--c-com); font-style: italic; }
+.hljs-title, .hljs-title.function_ { color: var(--c-fn); }
+.hljs-type, .hljs-title.class_ { color: var(--c-type); }
+.hljs-number { color: var(--c-num); }
+.hljs-attr, .hljs-property, .hljs-variable.constant_ { color: var(--c-fn); }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <div class="eyebrow">MuSemantiQ · dev docs · src/language</div>
+      <h1>src/language: the words become a tree</h1>
+    </div>
+    <span class="mrlinks"><a href="../docs/walkthrough.html">all three together</a> · <a href="https://github.com/Guseyn/MuSemantiQ">github.com/Guseyn/MuSemantiQ</a></span>
+  </header>
+  <p class="intro">The parser, in the order it runs. One page of MSQ text becomes the seven structures everything else reads: the tree, the coloured source, the errors, the styles, the comments, the MIDI settings and the per-character progression. Each frame lights the part that runs and shows the real code that runs it.</p>
+
+  <div class="player" role="region" aria-label="Player">
+    <div class="tabs" role="tablist" id="tabs"></div>
+    <div class="ctrl">
+      <button id="first" type="button" aria-label="First frame">⏮</button>
+      <button id="prev" type="button" aria-label="Previous frame">◀</button>
+      <button id="play" type="button" class="primary" aria-label="Play">▶ Play</button>
+      <button id="next" type="button" aria-label="Next frame">▶</button>
+      <input id="scrub" type="range" min="0" max="0" value="0" aria-label="Frame">
+      <span class="count" id="count">1 / 1</span>
+    </div>
+    <div class="caption" aria-live="polite"><b id="ctitle"></b><span id="ctext"></span></div>
+    <div class="keys"><kbd>←</kbd> <kbd>→</kbd> step · <kbd>space</kbd> play / pause</div>
+  </div>
+
+  <div class="stage">
+    <div class="left">
+      <div class="card">
+        <div class="hd"><span>system</span><b id="where"></b></div>
+        <div class="owners" id="owners" aria-label="Who owns each block"></div>
+        <svg class="sys" viewBox="0 0 820 460" role="img" aria-label="The three parts of the engine and the page around them">
+          <g id="edges"></g>
+          <g id="nodes"></g>
+          <g id="tok" style="display:none"><rect rx="4" height="18"></rect><text dy="4"></text><circle r="7"></circle></g>
+        </svg>
+      </div>
+      <div class="card">
+        <div class="state">
+          <section>
+            <h3>In flight</h3>
+            <pre class="msg" id="msg"></pre>
+            <h3>Returns</h3>
+            <pre class="msg" id="logline"></pre>
+            <h3>The page so far</h3>
+            <dl class="kv" id="worker"></dl>
+          </section>
+          <section>
+            <h3 id="gtitle">The example</h3>
+            <div class="grid" id="grid"></div>
+            <div class="glegend">
+              <span><i></i>not yet</span><span><i class="L"></i>in focus</span>
+              <span><i class="D"></i>done</span><span><i class="F"></i>failed</span><span><i class="G"></i>already there</span>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="hd"><span id="frepo" class="repo"></span><b id="fpath"></b><span id="flines"></span></div>
+      <div class="codebox dim" id="codebox"><ol id="code"></ol></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ===== Code from src/ (line numbers are the real file lines) ===== -->
+<script type="text/plain" id="src-API" data-path="src/language/api.js" data-start="166">
+export function generateIntermediateStructuresForSinglePage ({
+  pageText,
+  applyHighlighting,
+  applyOnlyHighlightingWithoutRefIds,
+  progressionOfCommandsFromScenarios,
+  supportedFontNames
+}) {
+  const {
+    pageSchema,
+    highlightsHtmlBuffer,
+    errors,
+    customStyles,
+    mapOfCharIndexesWithProgressionOfCommandsFromScenarios,
+    comments,
+    midiSettings
+  } = parseLanguage(
+    normalizeMuSemantiQText(
+      pageText
+    ),
+    progressionOfCommandsFromScenarios || [],
+    parserOptions({ applyHighlighting, applyOnlyHighlightingWithoutRefIds, supportedFontNames })
+  )
+  return {
+    pageSchema,
+    highlightsHtmlBuffer,
+    errors,
+    customStyles,
+    mapOfCharIndexesWithProgressionOfCommandsFromScenarios,
+    comments,
+    midiSettings
+  }
+}
+</script>
+<script type="text/plain" id="src-STATE" data-path="src/language/parser/parseLanguage.js" data-start="30">
+// --- parser state -----------------------------------------------------------
+
+// The one mutable object every scenario reads and writes (the page schema, the
+// "last mentioned …" pointers, counters, etc.). Kept in one place so it's easy
+// to see what the scenarios can touch.
+const createParserState = (fonts) => ({
+  pageSchema: {},
+  fonts,
+  lastMentionedStyleKey: undefined,
+  lastMentionedMidiSettingKey: undefined,
+  lastMentionedUnitPosition: undefined,
+  lastMentionedPageLinePosition: undefined,
+  lastMentionedMeasurePosition: undefined,
+  lastMentionedStavePosition: undefined,
+  lastMentionedVoicePosition: undefined,
+  unitPageLineIndexByLastMentionedPositions: undefined,
+  unitMeasureIndexByLastMentionedPositions: undefined,
+  unitStaveIndexByLastMentionedPositions: undefined,
+  unitVoiceIndexByLastMentionedPositions: undefined,
+  unitIndexByLastMentionedPositions: undefined,
+  lastMentionedConnectionPageLinePosition: undefined,
+  lastMentionedConnectionMeasurePosition: undefined,
+  lastMentionedConnectionStavePosition: undefined,
+  lastMentionedConnectionVoicePosition: undefined,
+  lastMentionedNoteIndex: undefined,
+  lastMentionedUnitsCompression: undefined,
+  lastMentionedUnitsCompressionWasForSpecificLine: false,
+  lastMentionedUnitsStretching: undefined,
+  lastMentionedUnitsStretchingWasForAllLines: false,
+  numberOfChordsBeforeFinishingDeclaringNewOne: 0,
+  newlineAlreadyIntroducedNewMeasure: false,
+  customStyles: { },
+  midiSettings: { },
+  errors: [],
+  comments: [],
+  emptyLineNumbers: [],
+  numberOfPageLines: 0,
+  lastClef: {},
+  lastChordDuration: {},
+  lastStemDirection: {},
+  lastStavePosition: {},
+  lastBeamStatus: {},
+  keysOfLastNote: [],
+  lastNoteTextValue: undefined,
+  lastNoteTextPositionApplicationToNote: undefined,
+  lastGhostStatus: {},
+</script>
+<script type="text/plain" id="src-SCAN" data-path="src/language/parser/parseLanguage.js" data-start="386">
+  for (let charIndex = 0; charIndex < unitext.length; charIndex++) {
+    const currentChar = unitext[charIndex]
+    const nextChar = unitext[charIndex + 1]
+    const isLastChar = !nextChar
+    const isNewLineChar = currentChar === '\n' || currentChar === '\r' || currentChar === '|'
+    const isDelimiter = isWhitespace(currentChar)
+    const nextIsDelimiter = nextChar !== undefined && isWhitespace(nextChar)
+
+    if (!isDelimiter) {
+      // a non-delimiter char belongs to the token being built
+      lineStarted = true
+      currentTokenChars.push(currentChar)
+      currentLineChars.push(currentChar)
+      if (!isLastChar) {
+        if (mapCharIndexes) progressionByCharIndex[charIndex] = progressionOfCommandsFromScenarios.slice()
+        continue
+      }
+    } else if (!lineStarted) {
+      // leading whitespace before the first token on the line
+      delimitersBeforeFirstTokenOnTheLine.push(currentChar)
+    }
+
+    if (currentTokenChars.length > 0) {
+      // a token is complete: finalize it and run the scenarios against the accumulator
+      const isFirstTokenOnLine = prevTokensOnTheLine.length === 0
+      const isFirstTokenOverall = tokenNumber === 0
+      const prevTokenOnTheLine = prevTokensOnTheLine[prevTokensOnTheLine.length - 1]
+      const prevToken = allPrevTokens[allPrevTokens.length - 1]
+      const currentToken = (
+        prevTokenOnTheLine &&
+        prevTokenOnTheLine.tokenNumber === tokenNumber
+      )
+        ? prevTokenOnTheLine
+        : {
+            value: currentTokenChars.join(EMPTY_STRING),
+            tokenNumber
+          }
+      currentToken.firstOnTheLine = isFirstTokenOverall || (prevToken && prevToken.lastOnTheLine)
+      currentToken.lastOnTheLine = isNewLineChar || isLastChar
+      delimitersAfterEachToken[tokenNumber] = delimitersAfterEachToken[tokenNumber] || []
+      if (isDelimiter) {
+        delimitersAfterEachToken[tokenNumber].push(currentChar)
+      }
+      if (!nextIsDelimiter || currentToken.lastOnTheLine) {
+        currentToken.firstCharIndexOfNextToken = charIndex + 1
+        tokenAccumulator.push(currentToken)
+        runParserScenarios(parserScenarios, REGULAR, numberOfActivatedScenarios, progressionOfCommandsFromScenarios, lastScenarioLineNumber, unitext, lineNumber, isLastChar, currentToken, tokenAccumulator, delimitersBeforeFirstTokenOnTheLine, delimitersAfterEachToken, parserState, progressionChangeQueue, run)
+        const tokenIsNew = isFirstTokenOnLine
+          ? true
+          : prevTokenOnTheLine.tokenNumber !== tokenNumber
+        if (tokenIsNew) {
+          prevTokensOnTheLine.push(currentToken)
+          allPrevTokens.push(currentToken)
+        }
+        const tokenIsComplete = isNewLineChar || !nextIsDelimiter || isLastChar
+        if (tokenIsComplete) {
+          tokenNumber += 1
+          currentTokenChars.length = 0
+        }
+</script>
+<script type="text/plain" id="src-DISPATCH" data-path="src/language/parser/parseLanguage.js" data-start="152">
+  // which scenarios could match next: those that require any progression now in
+  // progress, followed by the ones that require nothing.
+  let candidateScenarioNames = []
+  if (progressionOfCommandsFromScenarios.length > 0) {
+    for (let scenarioNameIndex = 0; scenarioNameIndex < progressionOfCommandsFromScenarios.length; scenarioNameIndex++) {
+      const scenarioName = progressionOfCommandsFromScenarios[scenarioNameIndex]
+      if (scenariosByRequiredProgression[scenarioName] && (scenariosByRequiredProgression[scenarioName].length > 0)) {
+        candidateScenarioNames.push(...scenariosByRequiredProgression[scenarioName])
+      }
+    }
+  }
+  candidateScenarioNames.push(...scenariosByRequiredProgression.common)
+
+  // Fast dispatch: a scenario may declare which first token can start it
+  // (`leadingTokens`). Only those scenarios (plus every untagged one) then have
+  // their `condition` evaluated, which is the dominant cost of parsing. Order is
+  // preserved, and untagged scenarios are always checked, so tagging is safe to
+  // roll out incrementally.
+  if (scenariosByRequiredProgression.hasLeadingTokens) {
+    // The key is the first token that is not a command delimiter (`and`, `,`,
+    // `;`) with any trailing delimiter stripped off — the same value that a
+    // scenario with `considerJoinedTokenAccumulatorWithoutCommandDelimiters…`
+    // sees as its first token. A scenario whose leading token doesn't match can
+    // never have its condition met, so it is skipped here.
+    let firstTokenValue
+    for (const tokenValue of tokenValues) {
+      let value = tokenValue
+      let end = value.length
+      while (end > 0 && (value[end - 1] === ',' || value[end - 1] === ';')) {
+        end -= 1
+      }
+      if (end !== value.length) {
+        value = value.slice(0, end)
+      }
+      if (value !== '' && value !== 'and' && value !== ',' && value !== ';') {
+        firstTokenValue = value
+        break
+      }
+    }
+    if (firstTokenValue !== undefined) {
+      const filtered = []
+      for (const scenarioName of candidateScenarioNames) {
+        const scenario = createParserScenarios[scenarioName]
+        if (!scenario.leadingTokens || scenario.leadingTokens.indexOf(firstTokenValue) !== -1) {
+          filtered.push(scenarioName)
+        }
+      }
+      candidateScenarioNames = filtered
+    }
+  }
+</script>
+<script type="text/plain" id="src-IDX" data-path="src/language/parser/scenarios/mapWithScenariosAndScenariosWhereItIsRequired.js" data-start="3">
+export default function (parserScenarios) {
+  const resultMap = {
+    common: []
+  }
+  for (const scenarioName in parserScenarios) {
+    const scenario = parserScenarios[scenarioName]
+    if (scenario.requiredCommandProgression) {
+      if (!resultMap[scenario.requiredCommandProgression]) {
+        resultMap[scenario.requiredCommandProgression] = [ ]
+      }
+      resultMap[scenario.requiredCommandProgression].push(scenarioName)
+    } else {
+      resultMap.common.push(scenarioName)
+    }
+    if (scenario.leadingTokens) {
+      resultMap.hasLeadingTokens = true
+    }
+  }
+  return resultMap
+}
+</script>
+<script type="text/plain" id="src-RULE" data-path="src/language/parser/scenarios/main-set/addBarLineScenarios.js" data-start="9">
+export default function (scenarios) {
+  scenarios['no start bar line'] = {
+    leadingTokens: [ 'no' ],
+    startsOnNewLine: true,
+    considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
+    condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
+      return regexps.noStartBarLine.test(tokenValues)
+    },
+    action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
+      initNewMeasureParamsIfThereIsAlreadySuchMeasurePropertyOrNoMeasuresAtAll(parserState.pageSchema, 'withoutStartBarLine', parserState)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      lastMeasureParamsValue.withoutStartBarLine = true
+      const numberOfMeasures = parserState.pageSchema.measuresParams.length
+      return { numberOfMeasures }
+    },
+    itIsNewCommandProgressionFromLevel: 0
+  }
+  scenarios['opening bar line'] = {
+    leadingTokens: [ 'opening', 'start' ],
+    startsOnNewLine: true,
+    considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
+    condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
+      return regexps.openingBarLine.test(tokenValues)
+    },
+    action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
+      initNewMeasureParamsIfThereIsAlreadySuchMeasurePropertyOrNoMeasuresAtAll(parserState.pageSchema, 'openingBarLineName', parserState)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const openingBarLineName = regexps.openingBarLine.match(tokenValues)[0]
+      const openingBarLine = openingBarLines[openingBarLineName]
+      lastMeasureParamsValue.openingBarLineName = openingBarLine
+      const numberOfMeasures = parserState.pageSchema.measuresParams.length
+      return { numberOfMeasures }
+    },
+    itIsNewCommandProgressionFromLevel: 1
+  }
+  scenarios['closing bar line'] = {
+    leadingTokens: [ 'closing' ],
+    startsOnNewLine: true,
+    considerJoinedTokenAccumulatorWithoutCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem: true,
+    condition: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
+      return regexps.closingBarLine.test(tokenValues)
+    },
+    action: (unitext, lineNumber, currentToken, tokenValues, joinedTokenValuesWithRealDelimiters, progressionOfCommandsFromScenarios, parserState) => {
+      initNewMeasureParamsIfThereIsAlreadySuchMeasurePropertyOrNoMeasuresAtAll(parserState.pageSchema, 'closingBarLineName', parserState)
+      const lastMeasureParamsValue = getLastMeasureParams(parserState.pageSchema)
+      const closingBarLineName = regexps.closingBarLine.match(tokenValues)[0]
+      const closingBarLine = closingBarLines[closingBarLineName]
+      lastMeasureParamsValue.closingBarLineName = closingBarLine
+      const numberOfMeasures = parserState.pageSchema.measuresParams.length
+      return { numberOfMeasures }
+    },
+    itIsNewCommandProgressionFromLevel: 0
+  }
+}
+</script>
+<script type="text/plain" id="src-SCEN" data-path="src/language/parser/scenarios/createParserScenarios.js" data-start="84">
+// each adapter's scenarios hang on the main scenario with the same name, under scenario.adapters[adapterName]
+const attachAdapters = (scenarios) => {
+  for (const scenarioName in scenarios) {
+    scenarios[scenarioName].adapters = {}
+  }
+  for (const adapterName in adapters) {
+    const adapter = adapters[adapterName]
+    const adapterScenarios = {}
+    adapter.addScenarios(adapterScenarios)
+    for (const scenarioName in adapterScenarios) {
+      if (!scenarios[scenarioName]) {
+        throw new Error(`adapter '${adapterName}' has scenario '${scenarioName}', which the main scenarios don't have`)
+      }
+      scenarios[scenarioName].adapters[adapterName] = adapterScenarios[scenarioName]
+    }
+    if (adapter.coversAllScenarios) {
+      for (const scenarioName in scenarios) {
+        if (!adapterScenarios[scenarioName]) {
+          throw new Error(`adapter '${adapterName}' has no scenario '${scenarioName}'`)
+        }
+      }
+    }
+  }
+}
+
+export default function () {
+  const scenarios = {}
+  addMainScenarious(scenarios)
+  addNotRecognizableCommandScenario(scenarios)
+  attachAdapters(scenarios)
+  return scenarios
+}
+</script>
+<script type="text/plain" id="src-ACCS" data-path="src/language/parser/scenarios/page-schema/initMeasureParams.js" data-start="5">
+export default function (pageSchema, parserState) {
+  pageSchema.measuresParams = pageSchema.measuresParams || []
+  if (parserState.numberOfPageLines === 0) {
+    parserState.numberOfPageLines += 1
+  }
+  if (!parserState.newlineAlreadyIntroducedNewMeasure) {
+    pageSchema.measuresParams.push({
+      closingBarLineName: 'barLine',
+      pageLineNumber: parserState.numberOfPageLines
+    })
+  }
+  parserState.newlineAlreadyIntroducedNewMeasure = false
+  /* const updatedLastMeasureParamsValue = lastMeasureParams(pageSchema)
+  if (parserState.lastCrossStaveConnectionsParamsForEachLine) {
+    updatedLastMeasureParamsValue.connectionsParams = JSON.parse(JSON.stringify(parserState.lastCrossStaveConnectionsParamsForEachLine))
+  }
+  if (parserState.lastInstrumentTitlesParamsForEachLine) {
+    updatedLastMeasureParamsValue.instrumentTitlesParams = JSON.parse(JSON.stringify(parserState.lastInstrumentTitlesParamsForEachLine))
+  }
+  if (parserState.lastKeySignatureName) {
+    updatedLastMeasureParamsValue.keySignatureName = parserState.lastKeySignatureName
+    updatedLastMeasureParamsValue.keySignatureNameForEachLineId = parserState.lastKeySignatureNameForEachLineId
+  }
+  if (parserState.lastTimeSignatureParams) {
+    updatedLastMeasureParamsValue.timeSignatureParams = parserState.lastTimeSignatureParams
+  } */
+}
+</script>
+<script type="text/plain" id="src-VOCS" data-path="src/language/parser/scenarios/static-objects/noteKeys.js" data-start="3">
+export default {
+  '2fl': 'doubleFlatKey',
+  '2 flat': 'doubleFlatKey',
+  'double fl': 'doubleFlatKey',
+  'double flat': 'doubleFlatKey',
+
+  '2#': 'doubleSharpKey',
+  '2 sharp': 'doubleSharpKey',
+  'double #': 'doubleSharpKey',
+  'double sh': 'doubleSharpKey',
+  'double sharp': 'doubleSharpKey',
+
+  'fl': 'flatKey',
+  'flat': 'flatKey',
+
+  'n': 'naturalKey',
+  'natural': 'naturalKey',
+
+  '#': 'sharpKey',
+  'sh': 'sharpKey',
+  'sharp': 'sharpKey',
+
+  '1/2fl': 'demiflatKey',
+  '1/2 flat': 'demiflatKey',
+  'dmfl': 'demiflatKey',
+  'demiflat': 'demiflatKey',
+  'demi flat': 'demiflatKey',
+
+  '3/2fl': 'sesquiflatKey',
+  '3/2 flat': 'sesquiflatKey',
+  'sqfl': 'sesquiflatKey',
+  'sesqui flat': 'sesquiflatKey',
+  'sesquiflat': 'sesquiflatKey',
+
+  '1/2#': 'demisharpKey',
+  '1/2 sh': 'demisharpKey',
+  '1/2 sharp': 'demisharpKey',
+  'dm#': 'demisharpKey',
+  'demi#': 'demisharpKey',
+  'dmsh': 'demisharpKey',
+  'demi sharp': 'demisharpKey',
+  'demisharp': 'demisharpKey',
+
+  '3/2#': 'sesquisharpKey',
+  '3/2 sh': 'sesquisharpKey',
+  '3/2 sharp': 'sesquisharpKey',
+  'sqsh': 'sesquisharpKey',
+  'sesqui sharp': 'sesquisharpKey',
+  'sesquisharp': 'sesquisharpKey'
+}
+</script>
+<script type="text/plain" id="src-TOKENP" data-path="src/language/parser/scenarios/token/isNoteIndex.js" data-start="1">
+'use strict'
+
+import replaceWordsWithNumbers from '#msq/language/parser/scenarios/token/replaceWordsWithNumbers.js'
+import regexps from '#msq/language/parser/scenarios/static-objects/regexps.js'
+
+export default function (tokenValues, joinedTokenValues) {
+  const tokensWithNumbersInsteadOfWords = replaceWordsWithNumbers(tokenValues)
+  return regexps.noteIndex.test(tokensWithNumbersInsteadOfWords) ||
+    regexps.indexOfNote.test(tokensWithNumbersInsteadOfWords)
+}
+</script>
+<script type="text/plain" id="src-ADAPT" data-path="src/language/parser/scenarios/adapter-sets/highlight/adapter.js" data-start="49">
+export default {
+  name: 'highlight',
+  runsWithMain: true,
+  coversAllScenarios: false,
+  addScenarios: (scenarios) => {
+    addCommentScenario(scenarios)
+    addStyleScenarios(scenarios)
+    addMidiSettingsScenarios(scenarios)
+    addCompressAndStretchUnitsScenarios(scenarios)
+    addHideLastMeasureScenario(scenarios)
+    addPageMetaScenarios(scenarios)
+    addMeasureNumbersScenarios(scenarios)
+    addLyricsPositionScenarios(scenarios)
+    addMeasureSetupScenarios(scenarios)
+    addBarLineScenarios(scenarios)
+    addRepeatSignScenarios(scenarios)
+    addMeasureRestScenarios(scenarios)
+    addMeasureSimileScenarios(scenarios)
+    addMeasureFermataScenarios(scenarios)
+    addNewLineScenarios(scenarios)
+    addCrossStaveConnectionsScenarios(scenarios)
+    addInstrumentTitlesScenarios(scenarios)
+    addKeySignatureScenarios(scenarios)
+    addTimeSignatureScenarios(scenarios)
+    addRepetitionNoteScenarios(scenarios)
+    addCodaScenarios(scenarios)
+    addSignScenarios(scenarios)
+    addTempoMarkScenario(scenarios)
+    addStaveSetupScenarios(scenarios)
+    addClefScenarios(scenarios)
+    addVoiceSetupScenarios(scenarios)
+    addSlurScenarios(scenarios)
+    addGlissandoScenarios(scenarios)
+    addTupletScenarios(scenarios)
+    addOctaveSignScenarios(scenarios)
+    addCrescendoAndDiminuendoScenarios(scenarios)
+    addRepeatSimileScenarios(scenarios)
+    addVoltaScenarios(scenarios)
+    addNoteSetupScenarios(scenarios)
+    addChordSetupScenarios(scenarios)
+    addPunctuationScenario(scenarios)
+    addGeneralEmptyLineScenario(scenarios)
+    addNotRecognizableCommandScenario(scenarios)
+    addNotRecognizableCommandScenario(scenarios)
+  },
+  createState: () => ({
+    highlightsHtmlBuffer: [],
+    // spans written before the positions they link to were known (filled by fillAllPlaceholders…)
+    indexesInHighlightsHtmlBufferWhereWeShouldFillPositionPlaceholders: [],
+    indexesInHighlightsHtmlBufferWhereWeShouldFillPositionPlaceholdersForConnection: [],
+    // spans of the notes of the chord being written, which get their ref-ids when it is over
+    indexesInHighlightsHtmlBufferWithNotesDeclarationsOfLastChord: []
+  }),
+  addTrailingWhitespace: (state, whitespace) => {
+    state.highlightsHtmlBuffer.push(whitespace)
+  },
+  finish: (state) => ({
+    highlightsHtmlBuffer: state.highlightsHtmlBuffer
+  })
+}
+</script>
+<script type="text/plain" id="src-ADAPT2" data-path="src/language/parser/scenarios/adapter-sets/highlight/addBarLineScenarios.js" data-start="5">
+export default function (scenarios) {
+  scenarios['no start bar line'] = {
+    action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { numberOfMeasures } }) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.noStartBarLineHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
+          return `<span class="th" ref-id="measure-${numberOfMeasures}">${match}</span>`
+        }
+      )
+      state.highlightsHtmlBuffer.push(
+        `<span class="th" ref-id="measure-${numberOfMeasures}">${joinedTokenValuesWithRealDelimitersWithHighlightedElement}</span>`
+      )
+    }
+  }
+  scenarios['opening bar line'] = {
+    action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { numberOfMeasures } }) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.openingBarLineHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
+          return `<span class="eh" ref-id="opening-barline-${numberOfMeasures}">${match}</span>`
+        }
+      )
+      state.highlightsHtmlBuffer.push(
+        `<span class="th" ref-id="opening-barline-${numberOfMeasures}">${joinedTokenValuesWithRealDelimitersWithHighlightedElement}</span>`
+      )
+    }
+  }
+  scenarios['closing bar line'] = {
+    action: ({ joinedTokenValuesWithRealDelimiters, state, fromMain: { numberOfMeasures } }) => {
+      const joinedTokenValuesWithRealDelimitersWithHighlightedElement = regexps.closingBarLineHighlight.replace(
+        joinedTokenValuesWithRealDelimiters, (match) => {
+          return `<span class="eh" ref-id="closing-barline-${numberOfMeasures}">${match}</span>`
+        }
+      )
+      state.highlightsHtmlBuffer.push(
+        `<span class="th" ref-id="closing-barline-${numberOfMeasures}">${joinedTokenValuesWithRealDelimitersWithHighlightedElement}</span>`
+      )
+    }
+  }
+}
+</script>
+<script type="text/plain" id="src-SCH" data-path="src/language/schema/pageSchema.js" data-start="107">
+const pageSchema = {
+  type: 'object',
+  properties: {
+    title: { type: 'string', isNotEmpty: true },
+    subtitle: { type: 'string', isNotEmpty: true },
+    leftSubtitle: { type: 'string', isNotEmpty: true },
+    rightSubtitle: { type: 'string', isNotEmpty: true },
+    pageNumber: { type: 'string', isNotEmpty: true },
+    showMeasureNumbers: { type: 'string', possibleValues: [ 'all', 'first', 'last', 'first&last' ] },
+    directionOfMeasureNumbers: { type: 'string', possibleValues: directions },
+    lyricsUnderStaveIndex: { type: 'number', isPositiveInteger: true },
+    compressUnitsByNTimes: { type: 'number', greaterThanOrEqualTo: 1, lessThanOrEqualTo: 5 },
+    stretchUnitsByNTimes: { type: 'number', greaterThanOrEqualTo: 1, lessThanOrEqualTo: 5 },
+    compressUnitsByNTimesInLines: {
+      type: 'array',
+      items: {
+        greaterThanOrEqualTo: 1,
+        lessThanOrEqualTo: 5
+      },
+      isNullableNumber: true
+    },
+    stretchUnitsByNTimesInLines: {
+      type: 'array',
+      items: {
+        greaterThanOrEqualTo: 1,
+        lessThanOrEqualTo: 5
+      },
+      isNullableNumber: true
+    },
+    hideLastMeasure: { type: 'boolean' },
+    measuresParams: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          pageLineNumber: { type: 'number' },
+          isMeasureRest: { type: 'boolean' },
+          multiMeasureRestCount: { type: 'string', isNotEmpty: true, isPositiveInteger: true },
+          similePreviousMeasureCount: { type: 'string', isNotEmpty: true, isPositiveInteger: true },
+          simileTwoPreviousMeasuresCount: { type: 'string', isNotEmpty: true, isPositiveInteger: true },
+          simileYCorrection: { type: 'number' },
+          numberOfStaveLines: { type: 'number', isPositiveInteger: true, greaterThan: 0 },
+          connectionsParams: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                name: { type: 'string', possibleValues: [ 'brace', 'bracket' ] },
+                staveStartNumber: { type: 'number', isPositiveInteger: true },
+                staveEndNumber: { type: 'number', isPositiveInteger: true },
+                forEachLineId: { type: 'number', isPositiveInteger: true }
+              },
+              firstNumberIsGreaterThanOrEqualToSecondOne: [ 'staveEndNumber', 'staveStartNumber' ],
+              required: [ 'name', 'staveStartNumber', 'staveEndNumber' ]
+</script>
+<script type="text/plain" id="src-VAL" data-path="src/language/schema/validatePageSchema.js" data-start="1">
+'use strict'
+
+import pageSchema from '#msq/language/schema/pageSchema.js'
+import validator from '#msq/language/schema/tunedValidator.js'
+
+export default function (schemaOnInput) {
+  return validator.validate(schemaOnInput, pageSchema, { allowUnknownAttributes: false })
+  // TODO:// USER READABLE MESSAGE IN JSON FORMAT
+}
+</script>
+<script type="text/plain" id="src-SER" data-path="src/language/serializer/serialize.js" data-start="314">
+export default function serialize (pageSchema, customStyles, midiSettings, comments) {
+  const schema = pageSchema || {}
+  const lines = [
+    ...serializeSettings(customStyles, STYLE_COMMANDS),
+    ...serializeSettings(midiSettings, MIDI_SETTING_COMMANDS),
+    ...serializePageMeta(schema)
+  ]
+
+  let pageLineNumber = null
+  for (const measure of schema.measuresParams || []) {
+    // A new page line is its own command, not a property of the measure after it.
+    if (pageLineNumber !== null && measure.pageLineNumber !== pageLineNumber) {
+      lines.push('', 'new line')
+    }
+    pageLineNumber = measure.pageLineNumber
+
+    lines.push('', 'measure')
+    lines.push(...serializeMeasureCommands(measure))
+
+    for (const stave of measure.stavesParams || []) {
+      lines.push('stave')
+      if (stave.clef) {
+        lines.push(`${serializeClef(stave.clef)} clef`)
+      }
+      const voices = stave.voicesParams || []
+      voices.forEach((units, index) => {
+        // The first voice of a stave is implied; the rest are opened explicitly.
+        if (index > 0) {
+          lines.push('voice')
+        }
+        lines.push(...serializeVoice(units))
+      })
+    }
+  }
+
+  lines.push(...serializeVoltas(schema.measuresParams || []))
+
+  const body = lines.join('\n').trim().split('\n')
+  return `${addComments(body, comments).join('\n')}\n`
+}
+</script>
+
+<script>
+(function () {
+  // ---------- What this page is about ----------
+  const NODES = {
+  "API": {
+    "x": 90,
+    "y": 55,
+    "t": "language api",
+    "k": "the seven structures"
+  },
+  "NORM": {
+    "x": 300,
+    "y": 55,
+    "t": "normalize",
+    "k": "the text is tidied"
+  },
+  "STATE": {
+    "x": 510,
+    "y": 55,
+    "t": "parser state",
+    "k": "one mutable object"
+  },
+  "IDX": {
+    "x": 720,
+    "y": 55,
+    "t": "dispatch index",
+    "k": "who may match"
+  },
+  "PARSE": {
+    "x": 90,
+    "y": 170,
+    "t": "parseLanguage",
+    "k": "the character scan"
+  },
+  "ACC": {
+    "x": 300,
+    "y": 170,
+    "t": "token accumulator",
+    "k": "multi-word commands"
+  },
+  "CAND": {
+    "x": 510,
+    "y": 170,
+    "t": "candidates",
+    "k": "progression + common"
+  },
+  "LEAD": {
+    "x": 720,
+    "y": 170,
+    "t": "leadingTokens",
+    "k": "the fast filter"
+  },
+  "VOCS": {
+    "x": 90,
+    "y": 285,
+    "t": "vocabularies",
+    "k": "static-objects \u00b7 token"
+  },
+  "RULE": {
+    "x": 300,
+    "y": 285,
+    "t": "a rule",
+    "k": "condition + action"
+  },
+  "ACCS": {
+    "x": 510,
+    "y": 285,
+    "t": "page-schema",
+    "k": "init\u2026 \u00b7 getLast\u2026"
+  },
+  "ADAPT": {
+    "x": 720,
+    "y": 285,
+    "t": "adapters",
+    "k": "highlight \u00b7 no refs"
+  },
+  "SCH": {
+    "x": 90,
+    "y": 400,
+    "t": "pageSchema",
+    "k": "the contract"
+  },
+  "SER": {
+    "x": 300,
+    "y": 400,
+    "t": "serializer",
+    "k": "the way back"
+  },
+  "HL": {
+    "x": 510,
+    "y": 400,
+    "t": "highlights buffer",
+    "k": "the coloured source"
+  },
+  "OUT": {
+    "x": 720,
+    "y": 400,
+    "t": "seven structures",
+    "k": "what comes back"
+  }
+};
+  const EDGES = {
+  "API-NORM": {
+    "d": "M90 55 L300 55",
+    "lx": 195,
+    "ly": 44,
+    "l": "normalize"
+  },
+  "NORM-PARSE": {
+    "d": "M300 55 L90 170",
+    "lx": 188,
+    "ly": 106,
+    "l": "unitext"
+  },
+  "PARSE-ACC": {
+    "d": "M90 170 L300 170",
+    "lx": 195,
+    "ly": 212,
+    "l": "a token is done"
+  },
+  "ACC-CAND": {
+    "d": "M300 170 L510 170",
+    "lx": 405,
+    "ly": 212,
+    "l": "runParserScenarios"
+  },
+  "CAND-LEAD": {
+    "d": "M510 170 L720 170",
+    "lx": 615,
+    "ly": 212,
+    "l": "the first token"
+  },
+  "IDX-CAND": {
+    "d": "M720 55 L510 170",
+    "lx": 633,
+    "ly": 100,
+    "l": "the dispatch index"
+  },
+  "RULE-STATE": {
+    "d": "M300 285 L510 55",
+    "lx": 452,
+    "ly": 104,
+    "l": "the state is written"
+  },
+  "LEAD-RULE": {
+    "d": "M720 170 L300 285",
+    "lx": 455,
+    "ly": 235,
+    "l": "the survivors"
+  },
+  "RULE-ADAPT": {
+    "d": "M300 261 C 420 220, 600 220, 705 261",
+    "lx": 560,
+    "ly": 244,
+    "l": "fromMain"
+  },
+  "RULE-VOCS": {
+    "d": "M300 285 L90 285",
+    "lx": 190,
+    "ly": 320,
+    "l": "conditions read them"
+  },
+  "RULE-ACCS": {
+    "d": "M300 285 L510 285",
+    "lx": 405,
+    "ly": 320,
+    "l": "the action writes"
+  },
+  "ACCS-SCH": {
+    "d": "M510 285 L90 400",
+    "lx": 300,
+    "ly": 342,
+    "l": "measures, staves, voices"
+  },
+  "ADAPT-HL": {
+    "d": "M720 285 L510 400",
+    "lx": 615,
+    "ly": 343,
+    "l": "spans with ref-ids"
+  },
+  "SCH-SER": {
+    "d": "M90 400 L300 400",
+    "lx": 195,
+    "ly": 436,
+    "l": "pageSchema + settings"
+  },
+  "HL-OUT": {
+    "d": "M510 400 L720 400",
+    "lx": 615,
+    "ly": 436,
+    "l": "the seven structures"
+  }
+};
+  const OWNERS = {
+  "api": {
+    "name": "api.js",
+    "where": "the way in and the way out",
+    "c": "var(--m-a)"
+  },
+  "parser": {
+    "name": "parser/",
+    "where": "parseLanguage.js, the engine",
+    "c": "var(--m-b)"
+  },
+  "rules": {
+    "name": "scenarios/",
+    "where": "main-set, static-objects, token, page-schema",
+    "c": "var(--m-c)"
+  },
+  "adapters": {
+    "name": "adapter-sets/",
+    "where": "highlight \u00b7 highlight-without-ref-ids",
+    "c": "var(--m-d)"
+  },
+  "schema": {
+    "name": "schema/",
+    "where": "the pageSchema contract",
+    "c": "var(--m-e)"
+  },
+  "serializer": {
+    "name": "serializer/",
+    "where": "the tree back to words",
+    "c": "var(--m-f)"
+  }
+};
+  const OWN = {
+  "API": [
+    "api",
+    "src/language/api.js"
+  ],
+  "NORM": [
+    "api",
+    "src/language/api.js \u2014 normalizeMuSemantiQText"
+  ],
+  "STATE": [
+    "parser",
+    "src/language/parser/parseLanguage.js \u2014 createParserState"
+  ],
+  "IDX": [
+    "rules",
+    "src/language/parser/scenarios/mapWithScenariosAndScenariosWhereItIsRequired.js"
+  ],
+  "PARSE": [
+    "parser",
+    "src/language/parser/parseLanguage.js"
+  ],
+  "ACC": [
+    "parser",
+    "src/language/parser/parseLanguage.js \u2014 tokenAccumulator"
+  ],
+  "CAND": [
+    "parser",
+    "src/language/parser/parseLanguage.js \u2014 runParserScenarios"
+  ],
+  "LEAD": [
+    "rules",
+    "src/language/parser/scenarios \u2014 leadingTokens on every rule"
+  ],
+  "VOCS": [
+    "rules",
+    "src/language/parser/scenarios/static-objects/ + token/"
+  ],
+  "RULE": [
+    "rules",
+    "src/language/parser/scenarios/main-set/"
+  ],
+  "ACCS": [
+    "rules",
+    "src/language/parser/scenarios/page-schema/"
+  ],
+  "ADAPT": [
+    "adapters",
+    "src/language/parser/scenarios/adapter-sets/"
+  ],
+  "SCH": [
+    "schema",
+    "src/language/schema/pageSchema.js"
+  ],
+  "SER": [
+    "serializer",
+    "src/language/serializer/serialize.js"
+  ],
+  "HL": [
+    "adapters",
+    "the highlights buffer, one span per word"
+  ],
+  "OUT": [
+    "api",
+    "the seven structures"
+  ]
+};
+  const FILE_OWNER = {
+  "API": "api",
+  "STATE": "parser",
+  "SCAN": "parser",
+  "DISPATCH": "parser",
+  "IDX": "rules",
+  "RULE": "rules",
+  "SCEN": "rules",
+  "ACCS": "rules",
+  "VOCS": "rules",
+  "TOKENP": "rules",
+  "ADAPT": "adapters",
+  "ADAPT2": "adapters",
+  "SCH": "schema",
+  "VAL": "schema",
+  "SER": "serializer"
+};
+  const S = [
+  {
+    "id": "folder",
+    "name": "The folder",
+    "cells": [
+      "api.js",
+      "parseLanguage.js",
+      "scenarios/",
+      "main-set/",
+      "static-objects + token",
+      "adapters/",
+      "schema/",
+      "serializer/"
+    ],
+    "gt": "What is in src/language",
+    "frames": [
+      {
+        "t": "The way in",
+        "x": "api.js is the whole public surface: parse one page or parse many, and nothing else.",
+        "f": "API",
+        "l": [
+          166,
+          183
+        ],
+        "on": [
+          "API"
+        ],
+        "g": "L......."
+      },
+      {
+        "t": "One engine",
+        "x": "parser/parseLanguage.js is the engine: a character scan and a runner for the rules.",
+        "f": "SCAN",
+        "l": [
+          386,
+          402
+        ],
+        "on": [
+          "PARSE"
+        ],
+        "g": ".L......"
+      },
+      {
+        "t": "The rules live in a registry",
+        "x": "scenarios/ is the glue: it assembles every rule by name and hangs the adapters on them.",
+        "f": "SCEN",
+        "l": [
+          109,
+          115
+        ],
+        "on": [
+          "PARSE",
+          "RULE"
+        ],
+        "g": "..L....."
+      },
+      {
+        "t": "A rule file",
+        "x": "main-set/ holds 40 files, one family of commands each. This one is bar lines.",
+        "f": "RULE",
+        "l": [
+          9,
+          25
+        ],
+        "on": [
+          "RULE"
+        ],
+        "g": "...L...."
+      },
+      {
+        "t": "The words are tables",
+        "x": "static-objects/ is the vocabulary: every spelling a reader may use, mapped to what it means.",
+        "f": "VOCS",
+        "l": [
+          3,
+          30
+        ],
+        "on": [
+          "VOCS"
+        ],
+        "g": "....L..."
+      },
+      {
+        "t": "And small predicates",
+        "x": "token/ holds the tiny is\u2026 and parse\u2026 functions the conditions are built from.",
+        "f": "TOKENP",
+        "l": [
+          1,
+          10
+        ],
+        "on": [
+          "VOCS"
+        ],
+        "g": "....L..."
+      },
+      {
+        "t": "Adapters hang on the rules",
+        "x": "adapter-sets/ gives the same rules a second job: colouring the source for the editor.",
+        "f": "ADAPT",
+        "l": [
+          49,
+          80
+        ],
+        "on": [
+          "ADAPT"
+        ],
+        "g": ".....L.."
+      },
+      {
+        "t": "The contract",
+        "x": "schema/pageSchema.js says what the tree is, field by field.",
+        "f": "SCH",
+        "l": [
+          107,
+          130
+        ],
+        "on": [
+          "SCH"
+        ],
+        "g": "......L."
+      },
+      {
+        "t": "And the tree itself",
+        "x": "page-schema/ holds the small functions that create and reach the nodes of that tree.",
+        "f": "ACCS",
+        "l": [
+          5,
+          31
+        ],
+        "on": [
+          "ACCS",
+          "STATE"
+        ],
+        "g": "......L."
+      },
+      {
+        "t": "The way back",
+        "x": "serializer/ writes a parsed page out as MSQ again. It is the parser in reverse.",
+        "f": "SER",
+        "l": [
+          314,
+          330
+        ],
+        "on": [
+          "SER"
+        ],
+        "g": ".......L"
+      }
+    ]
+  },
+  {
+    "id": "command",
+    "name": "One command, end to end",
+    "cells": [
+      "token",
+      "accumulator",
+      "candidates",
+      "the rule",
+      "the action",
+      "adapters",
+      "the tree"
+    ],
+    "gt": "Where the command is",
+    "frames": [
+      {
+        "t": "The text is tidied first",
+        "x": "normalizeMuSemantiQText gives the scan the ending it needs, then the text goes in.",
+        "f": "API",
+        "l": [
+          181,
+          187
+        ],
+        "on": [
+          "API",
+          "NORM"
+        ],
+        "tok": [
+          "API-NORM",
+          "normalize"
+        ],
+        "g": "L......"
+      },
+      {
+        "t": "Character by character",
+        "x": "A token is built out of every non-delimiter character. A pipe counts as a new line.",
+        "f": "SCAN",
+        "l": [
+          386,
+          397
+        ],
+        "on": [
+          "NORM",
+          "PARSE"
+        ],
+        "tok": [
+          "NORM-PARSE",
+          "unitext"
+        ],
+        "g": ".L....."
+      },
+      {
+        "t": "Every character remembers the commands",
+        "x": "The progression in force at that character is copied beside it, and the editor colours from that map.",
+        "f": "SCAN",
+        "l": [
+          398,
+          402
+        ],
+        "on": [
+          "PARSE"
+        ],
+        "g": ".L....."
+      },
+      {
+        "t": "A token is complete",
+        "x": "On a delimiter the token goes to the accumulator, and the rules are run against it.",
+        "f": "SCAN",
+        "l": [
+          425,
+          433
+        ],
+        "on": [
+          "PARSE",
+          "ACC"
+        ],
+        "tok": [
+          "PARSE-ACC",
+          "a token is done"
+        ],
+        "g": "..L...."
+      },
+      {
+        "t": "Which rules may match",
+        "x": "Candidates are the rules that need a command now in progress, plus the ones that need nothing.",
+        "f": "DISPATCH",
+        "l": [
+          152,
+          163
+        ],
+        "on": [
+          "ACC",
+          "CAND"
+        ],
+        "tok": [
+          "ACC-CAND",
+          "runParserScenarios"
+        ],
+        "g": "...L..."
+      },
+      {
+        "t": "The dispatch index",
+        "x": "That lookup is built once per run: every rule filed under the progression it requires.",
+        "f": "IDX",
+        "l": [
+          3,
+          22
+        ],
+        "on": [
+          "IDX",
+          "CAND"
+        ],
+        "tok": [
+          "IDX-CAND",
+          "the index"
+        ],
+        "g": "...L..."
+      },
+      {
+        "t": "Leading tokens",
+        "x": "A rule that names its first token is skipped when the token is different. This is what made parsing fast.",
+        "f": "DISPATCH",
+        "l": [
+          170,
+          201
+        ],
+        "on": [
+          "CAND",
+          "LEAD"
+        ],
+        "tok": [
+          "CAND-LEAD",
+          "the first token"
+        ],
+        "g": "....L.."
+      },
+      {
+        "t": "The first rule whose condition holds",
+        "x": "Conditions run in order and the first match wins. Its action writes the tree.",
+        "f": "RULE",
+        "l": [
+          14,
+          23
+        ],
+        "on": [
+          "LEAD",
+          "RULE"
+        ],
+        "tok": [
+          "LEAD-RULE",
+          "the survivors"
+        ],
+        "g": ".....L."
+      },
+      {
+        "t": "What the action writes",
+        "x": "Actions go through page-schema/ accessors, and every one of them is handed the same parser state.",
+        "f": "ACCS",
+        "l": [
+          5,
+          31
+        ],
+        "on": [
+          "RULE",
+          "ACCS",
+          "STATE"
+        ],
+        "tok": [
+          "RULE-ACCS",
+          "the action writes"
+        ],
+        "g": "......L"
+      },
+      {
+        "t": "Adapters run after it",
+        "x": "The main action returns fromMain, and the adapter action reads it to write its spans.",
+        "f": "ADAPT2",
+        "l": [
+          5,
+          42
+        ],
+        "on": [
+          "RULE",
+          "ADAPT"
+        ],
+        "tok": [
+          "RULE-ADAPT",
+          "fromMain"
+        ],
+        "g": ".....L."
+      },
+      {
+        "t": "What comes back",
+        "x": "Seven things: the tree, the coloured source, the errors, the styles, the comments, the MIDI settings and the progression map.",
+        "f": "API",
+        "l": [
+          188,
+          197
+        ],
+        "on": [
+          "SCH",
+          "HL",
+          "OUT"
+        ],
+        "tok": [
+          "HL-OUT",
+          "the structures"
+        ],
+        "msg": {
+          "pageSchema": "{ measuresParams: [ \u2026 ] }",
+          "highlightsHtmlBuffer": [
+            "<span ref-id=\"unit-1-1-1-1\">c</span> \u2026"
+          ],
+          "errors": [],
+          "customStyles": {},
+          "comments": [],
+          "midiSettings": {},
+          "mapOfCharIndexesWithProgressionOfCommandsFromScenarios": "{ 0: [ \u2026 ], \u2026 }"
+        },
+        "g": "DDDDDDD"
+      }
+    ]
+  },
+  {
+    "id": "rule",
+    "name": "A rule, and what it may use",
+    "cells": [
+      "leadingTokens",
+      "startsOnNewLine",
+      "condition",
+      "action",
+      "fromMain",
+      "progression level"
+    ],
+    "gt": "The fields of one scenario",
+    "frames": [
+      {
+        "t": "One file, one family of commands",
+        "x": "A rule file exports one function that fills a name-to-scenario map. This one is bar lines.",
+        "f": "RULE",
+        "l": [
+          9,
+          13
+        ],
+        "on": [
+          "RULE"
+        ],
+        "g": "L....."
+      },
+      {
+        "t": "leadingTokens",
+        "x": "The first token that can start this rule. It is what the dispatch index filters on.",
+        "f": "RULE",
+        "l": [
+          10,
+          13
+        ],
+        "on": [
+          "RULE",
+          "LEAD"
+        ],
+        "g": "L....."
+      },
+      {
+        "t": "The condition",
+        "x": "One question: do these tokens mean this command? The vocabularies do the answering.",
+        "f": "RULE",
+        "l": [
+          14,
+          16
+        ],
+        "on": [
+          "RULE",
+          "VOCS"
+        ],
+        "g": "..L..."
+      },
+      {
+        "t": "The action",
+        "x": "What to build when the answer is yes: here a measure that knows it has no start bar line.",
+        "f": "RULE",
+        "l": [
+          17,
+          23
+        ],
+        "on": [
+          "RULE",
+          "ACCS"
+        ],
+        "g": "...L.."
+      },
+      {
+        "t": "What it returns becomes fromMain",
+        "x": "The return value is handed to the adapters, which is how they know what just happened.",
+        "f": "RULE",
+        "l": [
+          21,
+          25
+        ],
+        "on": [
+          "RULE",
+          "ADAPT"
+        ],
+        "g": "....L."
+      },
+      {
+        "t": "Progression levels",
+        "x": "A rule says which level of the command it opens. The next rule at that level closes this one.",
+        "f": "RULE",
+        "l": [
+          26,
+          45
+        ],
+        "on": [
+          "RULE"
+        ],
+        "g": ".....L"
+      },
+      {
+        "t": "What a condition may use",
+        "x": "Token predicates: words in, a boolean out. Nothing else is allowed in here.",
+        "f": "TOKENP",
+        "l": [
+          1,
+          10
+        ],
+        "on": [
+          "VOCS",
+          "RULE"
+        ],
+        "g": "..L..."
+      },
+      {
+        "t": "What an action may use",
+        "x": "The page-schema accessors create nodes and reach the last mentioned one, so rules stay short.",
+        "f": "ACCS",
+        "l": [
+          5,
+          31
+        ],
+        "on": [
+          "ACCS",
+          "STATE"
+        ],
+        "g": "...L.."
+      },
+      {
+        "t": "The state they all share",
+        "x": "One object holds the tree, the errors, the comments, the styles and every \"last mentioned\" pointer.",
+        "f": "STATE",
+        "l": [
+          30,
+          75
+        ],
+        "on": [
+          "STATE"
+        ],
+        "g": "...L.."
+      }
+    ]
+  },
+  {
+    "id": "adapters",
+    "name": "Adapters, and the way back",
+    "cells": [
+      "highlight",
+      "without ref-ids",
+      "highlights buffer",
+      "pageSchema",
+      "validate",
+      "serializer"
+    ],
+    "gt": "The second jobs",
+    "frames": [
+      {
+        "t": "An adapter is a second job",
+        "x": "It declares its name, whether it runs beside the main set, and whether it covers every rule.",
+        "f": "ADAPT",
+        "l": [
+          49,
+          70
+        ],
+        "on": [
+          "ADAPT"
+        ],
+        "g": "L....."
+      },
+      {
+        "t": "It must cover every rule",
+        "x": "The registry checks that, so a new command cannot silently go uncoloured.",
+        "f": "SCEN",
+        "l": [
+          85,
+          107
+        ],
+        "on": [
+          "RULE",
+          "ADAPT"
+        ],
+        "g": "L....."
+      },
+      {
+        "t": "Its scenarios read fromMain",
+        "x": "Same names as the main set, same order. Here the measure number comes from the bar-line action.",
+        "f": "ADAPT2",
+        "l": [
+          5,
+          30
+        ],
+        "on": [
+          "ADAPT"
+        ],
+        "g": ".L...."
+      },
+      {
+        "t": "Spans with ref-ids",
+        "x": "Each word becomes a span naming what it drew, and that name is the same one the drawer and the MIDI engine use.",
+        "f": "ADAPT2",
+        "l": [
+          30,
+          42
+        ],
+        "on": [
+          "ADAPT",
+          "HL"
+        ],
+        "tok": [
+          "ADAPT-HL",
+          "spans with ref-ids"
+        ],
+        "g": "..L..."
+      },
+      {
+        "t": "The buffer is finished at the end",
+        "x": "Whatever the adapter has collected is merged in when the text runs out.",
+        "f": "ADAPT",
+        "l": [
+          80,
+          108
+        ],
+        "on": [
+          "ADAPT",
+          "HL"
+        ],
+        "g": "..L..."
+      },
+      {
+        "t": "The tree is a contract",
+        "x": "measures hold staves, staves hold voices, voices hold units, units hold notes.",
+        "f": "SCH",
+        "l": [
+          137,
+          160
+        ],
+        "on": [
+          "SCH"
+        ],
+        "g": "...L.."
+      },
+      {
+        "t": "And it can be checked",
+        "x": "validatePageSchema asks the same contract whether a tree is well formed. The worker does this before drawing.",
+        "f": "VAL",
+        "l": [
+          1,
+          9
+        ],
+        "on": [
+          "SCH"
+        ],
+        "g": "....L."
+      },
+      {
+        "t": "And back to words",
+        "x": "The serializer walks the tree and prints MSQ again, which is how the round-trip tests read the parser.",
+        "f": "SER",
+        "l": [
+          314,
+          353
+        ],
+        "on": [
+          "SER"
+        ],
+        "tok": [
+          "SCH-SER",
+          "pageSchema + settings"
+        ],
+        "g": ".....L"
+      }
+    ]
+  }
+];
+
+  // ---------- System picture ----------
+  const SVGNS = 'http://www.w3.org/2000/svg';
+  const el = (n, a, p) => { const e = document.createElementNS(SVGNS, n); for (const k in a) e.setAttribute(k, a[k]); if (p) p.appendChild(e); return e; };
+  const gE = document.getElementById('edges'), gN = document.getElementById('nodes');
+  const edgeEls = {}, nodeEls = {};
+  for (const id in EDGES) {
+    const e = EDGES[id];
+    edgeEls[id] = el('path', { d: e.d, class: 'edge' }, gE);
+    if (e.l) { const t = el('text', { x: e.lx, y: e.ly, class: 'elabel' }, gE); t.textContent = e.l; }
+  }
+  document.getElementById('owners').innerHTML = Object.values(OWNERS).map(o =>
+    `<span style="--own:${o.c}"><i></i><b>${o.name}</b> ${o.where}</span>`).join('');
+
+  for (const id in NODES) {
+    const n = NODES[id]; const [ok, path] = OWN[id];
+    const g = el('g', { class: 'node', style: `--own:${OWNERS[ok].c}` }, gN);
+    const tt = el('title', {}, g); tt.textContent = `${OWNERS[ok].name}: ${path}`;
+    el('rect', { x: n.x - 75, y: n.y - 24, width: 150, height: 48, rx: 7 }, g);
+    el('rect', { x: n.x - 75, y: n.y - 24, width: 6, height: 48, rx: 3, class: 'band' }, g);
+    const a = el('text', { x: n.x, y: n.y - 3 }, g); a.textContent = n.t;
+    const b = el('text', { x: n.x, y: n.y + 13, class: 'k' }, g); b.textContent = n.k;
+    nodeEls[id] = g;
+  }
+  const tok = document.getElementById('tok');
+  const tokRect = tok.querySelector('rect'), tokText = tok.querySelector('text');
+
+  // ---------- Code rendering ----------
+  const files = {};
+  const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const KEYWORDS = /\b(const|let|var|function|return|if|else|for|while|of|in|new|import|export|from|default|class|extends|async|await|try|catch|finally|throw|typeof|instanceof|null|undefined|true|false|this|switch|case|break|continue|delete|void|yield|static|get|set)\b/;
+  function highlightJs(src) {
+    const re = new RegExp(
+      '(\\/\\*[\\s\\S]*?\\*\\/|\\/\\/[^\\n]*)' +
+      "|('(?:\\\\.|[^'\\\\])*'|\"(?:\\\\.|[^\"\\\\])*\"|`(?:\\\\.|[^`\\\\])*`)" +
+      '|(0x[\\da-fA-F]+|\\d+(?:\\.\\d+)?)' +
+      '|' + KEYWORDS.source, 'g');
+    let out = '', last = 0, m;
+    while ((m = re.exec(src))) {
+      out += esc(src.slice(last, m.index));
+      if (m[1]) out += '<span class="hljs-comment">' + esc(m[1]) + '</span>';
+      else if (m[2]) out += '<span class="hljs-string">' + esc(m[2]) + '</span>';
+      else if (m[3]) out += '<span class="hljs-number">' + esc(m[3]) + '</span>';
+      else out += '<span class="hljs-keyword">' + esc(m[4]) + '</span>';
+      last = re.lastIndex;
+    }
+    return out + esc(src.slice(last));
+  }
+  function splitLines(html) {
+    const out = []; const open = []; let cur = '';
+    const re = /(<span[^>]*>)|(<\/span>)|(\n)|([^<\n]+)/g; let m;
+    while ((m = re.exec(html))) {
+      if (m[1]) { open.push(m[1]); cur += m[1]; }
+      else if (m[2]) { open.pop(); cur += m[2]; }
+      else if (m[3]) { cur += '</span>'.repeat(open.length); out.push(cur); cur = open.join(''); }
+      else cur += m[4];
+    }
+    out.push(cur); return out;
+  }
+  function getFile(key) {
+    if (files[key]) return files[key];
+    const s = document.getElementById('src-' + key);
+    const raw = s.textContent.replace(/^\n/, '').replace(/\n$/, '');
+    files[key] = { path: s.dataset.path, start: +s.dataset.start, lines: splitLines(highlightJs(raw)) };
+    return files[key];
+  }
+  const codeOl = document.getElementById('code'), codeBox = document.getElementById('codebox');
+  let shownFile = null;
+  function showCode(key, range) {
+    const f = getFile(key);
+    if (shownFile !== key) {
+      codeOl.innerHTML = f.lines.map((ln, i) =>
+        `<li data-n="${f.start + i}"><span class="n">${f.start + i}</span><code>${ln || ' '}</code></li>`).join('');
+      shownFile = key;
+    }
+    document.getElementById('fpath').textContent = f.path;
+    const ow = OWNERS[FILE_OWNER[key]] || Object.values(OWNERS)[0]; const rp = document.getElementById('frepo');
+    rp.textContent = ow.name; rp.style.setProperty('--own', ow.c);
+    document.getElementById('flines').textContent = range ? `lines ${range[0]}–${range[1]}` : '';
+    let first = null;
+    codeOl.querySelectorAll('li').forEach(li => {
+      const n = +li.dataset.n; const on = range && n >= range[0] && n <= range[1];
+      li.classList.toggle('hl', !!on); if (on && !first) first = li;
+    });
+    if (first) codeBox.scrollTo({ top: Math.max(0, first.offsetTop - 70), behavior: reduce ? 'auto' : 'smooth' });
+  }
+
+  // ---------- Token animation ----------
+  const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let animId = 0;
+  function placeTok(path, t, rev) {
+    const L = path.getTotalLength(); const p = path.getPointAtLength((rev ? 1 - t : t) * L);
+    tok.setAttribute('transform', `translate(${p.x},${p.y})`);
+  }
+  function runTok(spec) {
+    const my = ++animId;
+    for (const id in edgeEls) edgeEls[id].classList.remove('on', 'lit');
+    if (!spec) { tok.style.display = 'none'; return; }
+    const [edge, label, rev, bad] = spec; const path = edgeEls[edge];
+    path.classList.add('on');
+    tok.classList.toggle('err', !!bad);
+    tokText.textContent = label; tok.style.display = '';
+    const w = Math.max(30, tokText.getComputedTextLength() + 14);
+    tokRect.setAttribute('width', w); tokRect.setAttribute('x', 10); tokRect.setAttribute('y', -9);
+    tokText.setAttribute('x', 17);
+    const a = 0.1, b = 0.9;
+    if (reduce) { placeTok(path, b, rev); return; }
+    const t0 = performance.now(), dur = 1000;
+    const step = now => {
+      if (my !== animId) return;
+      const k = Math.min(1, (now - t0) / dur); const e = k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+      placeTok(path, a + (b - a) * e, rev);
+      if (k < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }
+
+  // ---------- State panels ----------
+  const msgEl = document.getElementById('msg'), workerEl = document.getElementById('worker'), gridEl = document.getElementById('grid');
+  function showState(sc, fr) {
+    msgEl.textContent = fr.msg ? JSON.stringify(fr.msg, null, 2) : '—';
+    const w = fr.w;
+    workerEl.innerHTML = w
+      ? Object.entries(w).map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(String(v))}</dd>`).join('')
+      : '<dt>—</dt><dd>nothing new in this frame</dd>';
+    const sec = gridEl.closest('section');
+    if (!sc.cells) { sec.hidden = true; return; }
+    sec.hidden = false;
+    document.getElementById('gtitle').textContent = sc.gt;
+    const codes = (fr.g || '').padEnd(sc.cells.length, '.');
+    gridEl.innerHTML = sc.cells.map((c, i) => `<span class="chip ${codes[i] === '.' ? '' : codes[i]}">${esc(c)}</span>`).join('');
+  }
+
+  // ---------- Player ----------
+  let si = 0, fi = 0, timer = null;
+  const tabs = document.getElementById('tabs'), scrub = document.getElementById('scrub');
+  S.forEach((sc, i) => {
+    const b = document.createElement('button'); b.type = 'button'; b.role = 'tab'; b.id = 'tab-' + sc.id;
+    b.textContent = sc.name; b.addEventListener('click', () => { stop(); si = i; fi = 0; render(); });
+    tabs.appendChild(b);
+  });
+  function render() {
+    const sc = S[si], fr = sc.frames[fi];
+    [...tabs.children].forEach((b, i) => b.setAttribute('aria-selected', i === si ? 'true' : 'false'));
+    scrub.max = sc.frames.length - 1; scrub.value = fi;
+    document.getElementById('count').textContent = `${fi + 1} / ${sc.frames.length}`;
+    document.getElementById('ctitle').textContent = fr.t;
+    document.getElementById('ctext').textContent = fr.x;
+    document.getElementById('where').textContent = (fr.on || []).map(k => NODES[k].t).join(' · ');
+    for (const k in nodeEls) {
+      nodeEls[k].classList.toggle('on', (fr.on || []).includes(k) && !(fr.err || []).includes(k));
+      nodeEls[k].classList.toggle('err', (fr.err || []).includes(k));
+    }
+    runTok(fr.tok);
+    (fr.lit || []).forEach(id => edgeEls[id].classList.add('lit'));
+    document.getElementById('logline').textContent = fr.log || '—';
+    showState(sc, fr);
+    showCode(fr.f, fr.l);
+    document.getElementById('prev').disabled = document.getElementById('first').disabled = fi === 0;
+    document.getElementById('next').disabled = fi === sc.frames.length - 1;
+  }
+  const go = d => { const n = S[si].frames.length; fi = Math.max(0, Math.min(n - 1, fi + d)); render(); };
+  function stop() { if (timer) { clearInterval(timer); timer = null; } const p = document.getElementById('play'); p.textContent = '▶ Play'; p.setAttribute('aria-label', 'Play'); }
+  function play() {
+    if (fi === S[si].frames.length - 1) { fi = 0; render(); }
+    const p = document.getElementById('play'); p.textContent = '❚❚ Pause'; p.setAttribute('aria-label', 'Pause');
+    timer = setInterval(() => { if (fi >= S[si].frames.length - 1) return stop(); go(1); }, 2800);
+  }
+  document.getElementById('play').addEventListener('click', () => timer ? stop() : play());
+  document.getElementById('next').addEventListener('click', () => { stop(); go(1); });
+  document.getElementById('prev').addEventListener('click', () => { stop(); go(-1); });
+  document.getElementById('first').addEventListener('click', () => { stop(); fi = 0; render(); });
+  scrub.addEventListener('input', () => { stop(); fi = +scrub.value; render(); });
+  document.addEventListener('keydown', e => {
+    if (e.target === scrub) return;
+    if (e.key === 'ArrowRight') { stop(); go(1); e.preventDefault(); }
+    else if (e.key === 'ArrowLeft') { stop(); go(-1); e.preventDefault(); }
+    else if (e.key === ' ' && e.target.tagName !== 'BUTTON') { timer ? stop() : play(); e.preventDefault(); }
+  });
+
+  render();
+})();
+</script>

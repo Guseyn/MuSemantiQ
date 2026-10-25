@@ -1,0 +1,2083 @@
+<title>MuSemantiQ — src/drawer</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: player bar on top; left = live system diagram + state, right = the MR code with the active lines lit */
+:root {
+  --bg: #f4f6f6;
+  --panel: #ffffff;
+  --code-bg: #f8faf9;
+  --fg: #142024;
+  --muted: #5a6a6e;
+  --line: #d3dcdd;
+  --accent: #0d6b6b;
+  --accent-soft: #dcefed;
+  --hot: #e0a100;
+  --err: #c43c3c;
+  --err-soft: #f7e0e0;
+  --ok: #2c8a4a;
+  --node: #ffffff;
+  --m-a: #8a5cf6;
+  --m-b: #0f9d9a;
+  --m-c: #d9861c;
+  --m-d: #2f7fd8;
+  --m-e: #d6457f;
+  --m-f: #2c8a4a;
+  --c-kw: #8a3ffc; --c-str: #1e7a3c; --c-com: #7d8b8e; --c-fn: #0f62c9; --c-type: #b25c00; --c-num: #c0306a;
+  --font-body: system-ui, -apple-system, "Segoe UI", "Helvetica Neue", sans-serif;
+  --font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1416; --panel: #152023; --code-bg: #10181b; --fg: #e3ecec; --muted: #93a6a8; --line: #2a3a3e;
+    --accent: #5cc7bd; --accent-soft: #163536; --hot: #f2c14e; --err: #ff7b7b; --err-soft: #3a1f22; --ok: #6fd28f; --node: #1a272a;
+    --c-kw: #c4a2ff; --c-str: #7fd49a; --c-com: #6f8487; --c-fn: #79b8ff; --c-type: #f0b26b; --c-num: #ff8fb8;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1416; --panel: #152023; --code-bg: #10181b; --fg: #e3ecec; --muted: #93a6a8; --line: #2a3a3e;
+  --accent: #5cc7bd; --accent-soft: #163536; --hot: #f2c14e; --err: #ff7b7b; --err-soft: #3a1f22; --ok: #6fd28f; --node: #1a272a;
+  --c-kw: #c4a2ff; --c-str: #7fd49a; --c-com: #6f8487; --c-fn: #79b8ff; --c-type: #f0b26b; --c-num: #ff8fb8;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 15px; line-height: 1.5; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+.wrap {
+  max-width: 1320px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 22px 48px; display: grid; gap: 14px;
+}
+header.top { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 16px; }
+header.top h1 { margin: 0; font-size: clamp(22px, 3vw, 30px); line-height: 1.15; font-weight: 700; }
+header.top a { font-family: var(--font-mono); font-size: 12.5px; color: var(--accent); }
+.eyebrow { font-family: var(--font-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+.intro { margin: 0; color: var(--muted); max-width: 88ch; }
+.intro code { font-family: var(--font-mono); font-size: 13px; }
+
+/* Player */
+.player {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px;
+  display: grid; gap: 10px;
+}
+.tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+.tabs button {
+  font: 500 13px var(--font-body); color: var(--muted); background: transparent; border: 1px solid var(--line);
+  border-radius: 999px; padding: 4px 12px; cursor: pointer;
+}
+.tabs button[aria-selected="true"] { background: var(--accent); border-color: var(--accent); color: var(--panel); }
+.tabs button:focus-visible, .ctrl button:focus-visible, .ctrl input:focus-visible { outline: 2px solid var(--hot); outline-offset: 2px; }
+.ctrl { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.ctrl button {
+  font: 600 13px var(--font-body); color: var(--fg); background: var(--accent-soft); border: 1px solid var(--line);
+  border-radius: 6px; padding: 6px 12px; cursor: pointer; min-width: 44px;
+}
+.ctrl button.primary { background: var(--accent); color: var(--panel); border-color: var(--accent); }
+.ctrl button:disabled { opacity: .45; cursor: default; }
+.ctrl input[type="range"] { flex: 1; min-width: 120px; accent-color: var(--accent); }
+.ctrl .count { font: 500 13px var(--font-mono); color: var(--muted); font-variant-numeric: tabular-nums; min-width: 64px; text-align: right; }
+.caption { display: grid; gap: 2px; }
+.caption b { font-size: 16px; }
+.caption span { color: var(--muted); font-size: 14px; max-width: 80ch; }
+.keys { font-size: 12px; color: var(--muted); }
+.keys kbd { font-family: var(--font-mono); font-size: 11px; border: 1px solid var(--line); border-radius: 3px; padding: 0 4px; background: var(--code-bg); }
+
+/* Stage */
+.stage { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; align-items: start; }
+@media (max-width: 900px) { .stage { grid-template-columns: 1fr; } }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; min-width: 0; }
+.card > .hd { display: flex; justify-content: space-between; gap: 8px; padding: 8px 12px; border-bottom: 1px solid var(--line); font: 500 12px var(--font-mono); color: var(--muted); }
+.card > .hd b { color: var(--accent); font-weight: 500; overflow-wrap: anywhere; }
+.left { display: grid; gap: 14px; min-width: 0; }
+
+svg.sys { display: block; width: 100%; height: auto; }
+.edge { stroke: var(--line); stroke-width: 2; fill: none; }
+.edge.on { stroke: var(--hot); stroke-width: 3; }
+.edge.lit { stroke: var(--accent); stroke-width: 2.5; stroke-dasharray: 5 4; }
+#tok.err circle, #tok.err rect { fill: var(--err); }
+.elabel { font: 500 10.5px var(--font-mono); fill: var(--muted); text-anchor: middle; }
+.node rect { fill: color-mix(in srgb, var(--own) 13%, var(--node)); stroke: color-mix(in srgb, var(--own) 65%, var(--line)); stroke-width: 1.5; transition: fill .3s, stroke .3s; }
+.node rect.band { fill: var(--own); stroke: none; }
+.node.on rect:not(.band) { stroke: var(--hot); stroke-width: 3; fill: color-mix(in srgb, var(--own) 28%, var(--node)); }
+.node.err rect:not(.band) { stroke: var(--err); stroke-width: 3; fill: var(--err-soft); }
+.owners { display: flex; flex-wrap: wrap; gap: 6px 14px; padding: 8px 12px; border-bottom: 1px solid var(--line); font-size: 12px; color: var(--muted); }
+.owners span { display: inline-flex; align-items: center; gap: 6px; }
+.owners i { width: 12px; height: 12px; border-radius: 3px; background: var(--own); display: inline-block; }
+.owners b { color: var(--fg); font-weight: 600; }
+.repo { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 11.5px; padding: 1px 8px; border-radius: 999px; background: color-mix(in srgb, var(--own) 18%, transparent); color: var(--fg); border: 1px solid var(--own); white-space: nowrap; }
+.node text { font: 600 12.5px var(--font-body); fill: var(--fg); text-anchor: middle; }
+.node text.k { font: 500 10px var(--font-mono); fill: var(--muted); }
+#tok circle { fill: var(--hot); stroke: var(--panel); stroke-width: 2; }
+#tok rect { fill: var(--fg); }
+#tok text { font: 600 11px var(--font-mono); fill: var(--panel); }
+
+.state { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0; }
+@media (max-width: 520px) { .state { grid-template-columns: 1fr; } }
+.state section { padding: 10px 12px; min-width: 0; display: grid; gap: 6px; align-content: start; }
+.state section + section { border-left: 1px solid var(--line); }
+@media (max-width: 520px) { .state section + section { border-left: 0; border-top: 1px solid var(--line); } }
+.state h3 { margin: 0; font: 500 11px var(--font-mono); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+pre.msg { margin: 0; font: 12px/1.5 var(--font-mono); background: var(--code-bg); border: 1px solid var(--line); border-radius: 5px; padding: 8px 10px; overflow-x: auto; min-height: 44px; }
+dl.kv { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; font: 12.5px var(--font-mono); font-variant-numeric: tabular-nums; }
+dl.kv dt { color: var(--muted); }
+dl.kv dd { margin: 0; overflow-wrap: anywhere; }
+.grid { display: flex; flex-wrap: wrap; gap: 3px; }
+.grid i { width: 13px; height: 13px; border-radius: 2px; border: 1.5px solid var(--line); background: var(--code-bg); transition: background .25s, border-color .25s, opacity .25s; }
+.grid i.L { border-color: var(--hot); background: color-mix(in srgb, var(--hot) 35%, transparent); }
+.grid i.D { border-color: var(--ok); background: var(--ok); }
+.grid i.F { border-color: var(--err); background: var(--err); }
+.grid i.G { opacity: .25; border-style: dashed; }
+.glegend { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 11.5px; color: var(--muted); }
+.glegend span { display: inline-flex; gap: 5px; align-items: center; }
+.glegend i { width: 10px; height: 10px; border-radius: 2px; border: 1.5px solid var(--line); display: inline-block; }
+.glegend i.L { border-color: var(--hot); background: color-mix(in srgb, var(--hot) 35%, transparent); }
+.glegend i.D { border-color: var(--ok); background: var(--ok); }
+.glegend i.F { border-color: var(--err); background: var(--err); }
+.glegend i.G { opacity: .35; border-style: dashed; }
+
+.chip { font: 500 12px var(--font-mono); padding: 3px 8px; border-radius: 4px; border: 1.5px solid var(--line); background: var(--code-bg); transition: background .25s, border-color .25s, opacity .25s; }
+.chip.L { border-color: var(--hot); background: color-mix(in srgb, var(--hot) 30%, transparent); }
+.chip.D { border-color: var(--ok); background: color-mix(in srgb, var(--ok) 25%, transparent); }
+.chip.F { border-color: var(--err); background: var(--err-soft); text-decoration: line-through; }
+.chip.G { opacity: .6; border-style: dashed; }
+.mrlinks { display: inline-flex; gap: 6px; flex-wrap: wrap; font-family: var(--font-mono); font-size: 12.5px; color: var(--muted); }
+
+/* Code */
+.codebox { max-height: min(72vh, 680px); overflow: auto; background: var(--code-bg); border-radius: 0 0 8px 8px; }
+.codebox ol { list-style: none; margin: 0; padding: 8px 0; font: 12.5px/1.6 var(--font-mono); min-width: max-content; }
+.codebox li { display: grid; grid-template-columns: 52px 1fr; padding-right: 16px; border-left: 3px solid transparent; }
+.codebox li .n { color: var(--muted); text-align: right; padding-right: 14px; user-select: none; opacity: .7; font-variant-numeric: tabular-nums; }
+.codebox li code { font: inherit; white-space: pre; color: var(--fg); }
+.codebox li.hl { background: var(--accent-soft); border-left-color: var(--accent); }
+.codebox li.hl .n { color: var(--accent); opacity: 1; }
+.codebox.dim li:not(.hl) code { opacity: .55; }
+.hljs-keyword, .hljs-literal, .hljs-built_in { color: var(--c-kw); }
+.hljs-string, .hljs-regexp, .hljs-subst { color: var(--c-str); }
+.hljs-comment { color: var(--c-com); font-style: italic; }
+.hljs-title, .hljs-title.function_ { color: var(--c-fn); }
+.hljs-type, .hljs-title.class_ { color: var(--c-type); }
+.hljs-number { color: var(--c-num); }
+.hljs-attr, .hljs-property, .hljs-variable.constant_ { color: var(--c-fn); }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <div class="eyebrow">MuSemantiQ · dev docs · src/drawer</div>
+      <h1>src/drawer: the tree becomes a score</h1>
+    </div>
+    <span class="mrlinks"><a href="../docs/walkthrough.html">all three together</a> · <a href="https://github.com/Guseyn/MuSemantiQ">github.com/Guseyn/MuSemantiQ</a></span>
+  </header>
+  <p class="intro">The engraver, in the order it draws. One pageSchema and one styles dict become an SVG where every element knows its own box and its own name. The cascade is page, measures, voices, units — and then, at the end of every page line, everything that crosses measures. Each frame lights the part that runs and shows the real code that runs it.</p>
+
+  <div class="player" role="region" aria-label="Player">
+    <div class="tabs" role="tablist" id="tabs"></div>
+    <div class="ctrl">
+      <button id="first" type="button" aria-label="First frame">⏮</button>
+      <button id="prev" type="button" aria-label="Previous frame">◀</button>
+      <button id="play" type="button" class="primary" aria-label="Play">▶ Play</button>
+      <button id="next" type="button" aria-label="Next frame">▶</button>
+      <input id="scrub" type="range" min="0" max="0" value="0" aria-label="Frame">
+      <span class="count" id="count">1 / 1</span>
+    </div>
+    <div class="caption" aria-live="polite"><b id="ctitle"></b><span id="ctext"></span></div>
+    <div class="keys"><kbd>←</kbd> <kbd>→</kbd> step · <kbd>space</kbd> play / pause</div>
+  </div>
+
+  <div class="stage">
+    <div class="left">
+      <div class="card">
+        <div class="hd"><span>system</span><b id="where"></b></div>
+        <div class="owners" id="owners" aria-label="Who owns each block"></div>
+        <svg class="sys" viewBox="0 0 820 460" role="img" aria-label="The three parts of the engine and the page around them">
+          <g id="edges"></g>
+          <g id="nodes"></g>
+          <g id="tok" style="display:none"><rect rx="4" height="18"></rect><text dy="4"></text><circle r="7"></circle></g>
+        </svg>
+      </div>
+      <div class="card">
+        <div class="state">
+          <section>
+            <h3>In flight</h3>
+            <pre class="msg" id="msg"></pre>
+            <h3>Returns</h3>
+            <pre class="msg" id="logline"></pre>
+            <h3>The page so far</h3>
+            <dl class="kv" id="worker"></dl>
+          </section>
+          <section>
+            <h3 id="gtitle">The example</h3>
+            <div class="grid" id="grid"></div>
+            <div class="glegend">
+              <span><i></i>not yet</span><span><i class="L"></i>in focus</span>
+              <span><i class="D"></i>done</span><span><i class="F"></i>failed</span><span><i class="G"></i>already there</span>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="hd"><span id="frepo" class="repo"></span><b id="fpath"></b><span id="flines"></span></div>
+      <div class="codebox dim" id="codebox"><ol id="code"></ol></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ===== Code from src/ (line numbers are the real file lines) ===== -->
+<script type="text/plain" id="src-STYLES" data-path="src/drawer/generateStyles.js" data-start="3">
+export default function (
+  {
+    pageFormat,
+    pageHeight,
+    backgroundColor,
+    musicFont,
+    textFont,
+    chordLettersFont,
+    fontColor,
+    staveLinesColor,
+    pageBorderStrokeColor,
+    intervalBetweenStaveLines,
+    intervalBetweenStaves,
+    intervalBetweenPageLines,
+    pageLeftAndRightPadding,
+    pageLineMaxWidth,
+    pageTopPadding,
+    pageBottomPadding,
+    pageLinesTopOffset,
+    pageNumberOffsetFromBottomOfThePage,
+    titleTopOffset,
+    subtitleTopOffset,
+    leftAndRightSubtitlesTopOffset,
+    pageBorderStrokeWidth,
+    titleFontSize,
+    subtitleFontSize,
+    leftSubtitleFontSize,
+    rightSubtitleFontSize,
+    pageNumberFontSize,
+    instrumentTitleFontSize,
+    emptyMeasureWidth,
+    fontSources
+  },
+  defaultIntervalBetweenStaveLines = 8.5
+) {
+</script>
+<script type="text/plain" id="src-STYLES2" data-path="src/drawer/generateStyles.js" data-start="150">
+  return {
+    // Fixed
+    defaultIntervalBetweenStaveLines,
+
+    // Configurable
+    pageFormat,
+    pageHeight,
+    intervalBetweenStaveLines,
+    intervalBetweenStaves,
+    intervalBetweenPageLines,
+    pageLeftAndRightPadding,
+    pageTopPadding,
+    pageBottomPadding,
+    pageLinesTopOffset,
+    titleTopOffset,
+    subtitleTopOffset,
+    leftAndRightSubtitlesTopOffset,
+    pageNumberOffsetFromBottomOfThePage,
+    pageLineMaxWidth,
+    pageBorderStrokeColor,
+    pageBorderStrokeWidth,
+    backgroundColor,
+    fontColor,
+    staveLinesColor,
+    warningColor,
+    logoColor,
+    logoSize,
+    emptyMeasureWidth,
+
+    // From music font
+    ...musicFontStyles,
+
+    // Font sources
+    textFontSource,
+    textBoldFontSource,
+    chordLettersFontSource,
+    musicFontSource,
+
+    // Grace
+    graceElementsScaleFactor,
+</script>
+<script type="text/plain" id="src-DP1" data-path="src/drawer/elements/the-page/page-lines/drawPage.js" data-start="21">
+export default function (pageParamsOnInput) {
+  return (styles, leftOffset, topOffset) => {
+    const pageParams = JSON.parse(JSON.stringify(pageParamsOnInput))
+    const { pageFormat, pageHeight, intervalBetweenStaveLines, fontColor, pageLeftAndRightPadding, pageColumnStrokeOptions, pageTopPadding, pageBottomPadding, pageLinesTopOffset, titleFontOptions, subtitleFontOptions, leftSubtitleFontOptions, rightSubtitleFontOptions, titleTopOffset, subtitleTopOffset, leftAndRightSubtitlesTopOffset, pageLineMaxWidth, backgroundColor, pageBorderStrokeColor, pageBorderStrokeWidth, emptyMeasuresHeight, pageNumberFontOptions, pageNumberOffsetFromBottomOfThePage } = styles
+    const { measuresParams, showMeasureNumbers, directionOfMeasureNumbers, lyricsUnderStaveIndex, compressUnitsByNTimes, stretchUnitsByNTimes, compressUnitsByNTimesInLines, stretchUnitsByNTimesInLines, hideLastMeasure } = pageParams
+
+    const pageLineMaxWidthConsideringFormat = (pageFormat === 'none')
+      ? pageLineMaxWidth
+      : ((pageFormats[pageFormat][0] * CSS_INCH_IN_PIXELS) - 2 * pageLeftAndRightPadding)
+
+    /* Assigning some page properties to each measure. */
+    if (measuresParams) {
+      for (let measureIndex = 0; measureIndex < measuresParams.length; measureIndex++) {
+        const isLastMeasureInGeneral = measureIndex === measuresParams.length - 1
+        measuresParams[measureIndex].lyricsUnderStaveIndex = lyricsUnderStaveIndex || 0
+        measuresParams[measureIndex].compressUnitsByNTimes = (compressUnitsByNTimesInLines && compressUnitsByNTimesInLines[measuresParams[measureIndex].pageLineNumber - 1]) ? compressUnitsByNTimesInLines[measuresParams[measureIndex].pageLineNumber - 1] : compressUnitsByNTimes
+        measuresParams[measureIndex].stretchUnitsByNTimes = (stretchUnitsByNTimesInLines && stretchUnitsByNTimesInLines[measuresParams[measureIndex].pageLineNumber - 1]) ? stretchUnitsByNTimesInLines[measuresParams[measureIndex].pageLineNumber - 1] : stretchUnitsByNTimes
+        if (hideLastMeasure && isLastMeasureInGeneral) {
+          measuresParams[measureIndex].isHidden = true
+        }
+        if (showMeasureNumbers && measureIndex > 0) {
+          if (showMeasureNumbers === 'all') {
+            measuresParams[measureIndex].showMeasureNumber = true
+            measuresParams[measureIndex].directionOfMeasureNumber = directionOfMeasureNumbers || 'up'
+          } else {
+            if (measuresParams[measureIndex - 1].isLastMeasureOnPageLine) {
+              if (showMeasureNumbers === 'first' || showMeasureNumbers === 'first&last') {
+                measuresParams[measureIndex].showMeasureNumber = true
+                measuresParams[measureIndex].directionOfMeasureNumber = directionOfMeasureNumbers || 'up'
+              }
+            }
+            if (measuresParams[measureIndex].isLastMeasureOnPageLine || isLastMeasureInGeneral) {
+              if (showMeasureNumbers === 'last' || showMeasureNumbers === 'first&last') {
+                measuresParams[measureIndex].showMeasureNumber = true
+                measuresParams[measureIndex].directionOfMeasureNumber = directionOfMeasureNumbers || 'up'
+              }
+            }
+          }
+        }
+      }
+    }
+
+    const pageElements = []
+    const xPageCenter = (leftOffset + 2 * pageLeftAndRightPadding + pageLineMaxWidthConsideringFormat) / 2
+    let bottomOfMetaInfoOnPage = topOffset + pageTopPadding
+
+    /* Let's draw title if it's specified. */
+    if (pageParams.title) {
+      const lines = pageParams.title.split(/\\n/)
+      const titleElements = []
+      lines.forEach((line, index) => {
+        const titleLine = createText(
+          line.trim(), titleFontOptions
+        )(styles, xPageCenter, ((index === 0) ? 0 : titleElements[index - 1].bottom))
+        titleElements.push(
+          titleLine
+        )
+      })
+      const title = createGroup(
+        'title',
+        titleElements
+      )
+      moveElementBelowPointWithInterval(
+        title,
+        bottomOfMetaInfoOnPage,
+        titleTopOffset
+      )
+      bottomOfMetaInfoOnPage = title.bottom
+      addPropertiesToElement(
+        title, {
+          'ref-ids': 'title'
+        }
+      )
+      pageElements.push(
+        title
+</script>
+<script type="text/plain" id="src-DP2" data-path="src/drawer/elements/the-page/page-lines/drawPage.js" data-start="217">
+    /* Let's draw measures if they're are specified, otherwise let's draw empty rect. */
+    let measures
+    const pageContainsMetaInfo = pageParams.title || pageParams.subtitle || pageParams.leftSubtitle || pageParams.rightSubtitle
+    if (measuresParams && measuresParams.length > 0) {
+      measures = drawMeasures(measuresParams, pageLineMaxWidthConsideringFormat)(styles, leftOffset, bottomOfMetaInfoOnPage + (pageContainsMetaInfo ? pageLinesTopOffset : 0))
+      moveElement(
+        measures,
+        pageLeftAndRightPadding
+      )
+    } else {
+      measures = createRect(
+        pageLineMaxWidthConsideringFormat,
+        emptyMeasuresHeight,
+        {
+          color: backgroundColor,
+          width: 0
+        },
+        backgroundColor,
+        leftOffset,
+        bottomOfMetaInfoOnPage + (pageContainsMetaInfo ? pageLinesTopOffset : 0)
+      )
+      moveElement(
+        measures,
+        pageLeftAndRightPadding
+      )
+      measures.topOfFirstStave = measures.top
+      measures.bottomOfLastPageLineConsideringOnlyStaves = measures.bottom
+    }
+    pageElements.push(measures)
+</script>
+<script type="text/plain" id="src-BATCH" data-path="src/drawer/elements/the-page/measures/drawMeasures.js" data-start="158">
+          if (measureParams.isLastMeasureOnPageLine || isLastMeasureInGeneral) {
+            if (measure.pageLineInGreaterThanItShouldBe) {
+              atLeastOnePageLineInGreaterThanItShouldBe = true
+            }
+
+            elementsOnPageLineToCompleteMeasuresContent.push(
+              ...drawBarlineFermatas(measuresOnPageLine, styles),
+              ...drawBeams(voicesOnPageLine, styles),
+              ...drawGraceCrushLines(voicesOnPageLine, styles),
+              ...drawTies(voicesOnPageLine, voicesBodiesOnPageLine, styles),
+              ...drawGlissandos(voicesOnPageLine, voicesBodiesOnPageLine, measuresOnPageLine, styles),
+              ...drawSingleTremolos(voicesOnPageLine, styles),
+              ...drawArticulationsAttachedToSingleUnits(voicesOnPageLine, true, false, styles),
+              ...drawTremoloBetweenStemlessSingleUnits(voicesOnPageLine, styles),
+              ...drawTuplets(voicesOnPageLine, voicesBodiesOnPageLine, styles),
+              ...drawSlurs(voicesOnPageLine, styles),
+              ...drawOctaveSigns(voicesOnPageLine, styles),
+              ...drawArticulationsAboveOrBelowStave(voicesOnPageLine, true, false, styles)
+            )
+
+            voicesOnPageLine.forEach(voicesOnPageLineForCurrentMeasure => {
+              const { measureIndexOnPageLine, singleUnitsInVoices, withoutVoices } = voicesOnPageLineForCurrentMeasure
+              if (!withoutVoices) {
+                correctTopAndBottomOfVoicesBodyAccordingToSingleUnitsTheyContain(
+                  voicesBodiesOnPageLine[measureIndexOnPageLine],
+                  singleUnitsInVoices
+                )
+              }
+            })
+            correctTopAndBottomOfMeasuresAccordingToTheirVoicesBodies(measuresOnPageLine, voicesBodiesOnPageLine)
+
+            elementsOnPageLineToCompleteMeasuresContent.push(
+              ...drawLyrics(voicesOnPageLine, measuresOnPageLine, voicesBodiesOnPageLine, styles),
+              ...drawChordLetters(voicesOnPageLine, measuresOnPageLine, voicesBodiesOnPageLine, styles),
+              ...drawPedals(voicesOnPageLine, measuresOnPageLine, styles),
+              ...drawDynamicChanges(voicesOnPageLine, measuresOnPageLine, styles),
+              ...drawArticulationsAttachedToSingleUnits(voicesOnPageLine, false, true, styles),
+              ...drawArticulationsAboveOrBelowStave(voicesOnPageLine, false, true, styles)
+            )
+
+            voicesOnPageLine.forEach(voicesOnPageLineForCurrentMeasure => {
+              const { measureIndexOnPageLine, singleUnitsInVoices, withoutVoices } = voicesOnPageLineForCurrentMeasure
+              if (!withoutVoices) {
+                correctTopAndBottomOfVoicesBodyAccordingToSingleUnitsTheyContain(
+                  voicesBodiesOnPageLine[measureIndexOnPageLine],
+                  singleUnitsInVoices
+                )
+              }
+            })
+            correctTopAndBottomOfMeasuresAccordingToTheirVoicesBodies(measuresOnPageLine, voicesBodiesOnPageLine)
+
+            elementsOnPageLineToCompleteMeasuresContent.push(
+              ...drawRepetitionNotes(measuresOnPageLine, styles),
+              ...drawCodas(measuresOnPageLine, styles),
+              ...drawSigns(measuresOnPageLine, styles),
+              ...drawVoltas(measuresOnPageLine, voicesBodiesOnPageLine, styles),
+              ...drawTempoMarks(measuresOnPageLine, voicesBodiesOnPageLine, styles)
+            )
+</script>
+<script type="text/plain" id="src-MEASUREL" data-path="src/drawer/elements/the-page/measures/drawMeasure.js" data-start="125">
+        const startBarLine = barLines[openingBarLineName](numberOfStaves, numberOfStaveLines)(styles, nextLeftOffset + startBarLineNegativeOffset, topOffset)
+        addPropertiesToElement(
+          startBarLine,
+          {
+            'ref-ids': `opening-barline-${measureIndexInGeneral + 1}`
+          }
+        )
+        components.push(startBarLine)
+        nextLeftOffset = startBarLine.right
+        positionThatCanBeConsideredAsStartOfStaves = startBarLine.left
+      }
+    }
+    if (repeatDotsMarkAtTheStart) {
+      const repeatDots = drawRepeatDots(numberOfStaves, numberOfStaveLines)(styles, nextLeftOffset, topOffset)
+      addPropertiesToElement(
+        repeatDots,
+        {
+          'ref-ids': `repeat-sign-${measureIndexInGeneral + 1},repeat-sign-at-the-start-${measureIndexInGeneral + 1}`
+        }
+      )
+      components.push(repeatDots)
+      nextLeftOffset = repeatDots.right
+      if (positionThatCanBeConsideredAsStartOfStaves === undefined) {
+        positionThatCanBeConsideredAsStartOfStaves = repeatDots.left
+      }
+    }
+    if (showMeasureNumber) {
+      const measureNumber = drawMeasureNumber(measureIndexInGeneral, directionOfMeasureNumber, numberOfStaves, numberOfStaveLines)(styles, nextLeftOffset, topOffset)
+      components.push(measureNumber)
+      nextLeftOffset = measureNumber.right
+    }
+    const clefsNames = []
+    const voicesParamsForAllStaves = []
+    stavesParams.forEach((staveParams, staveIndex) => {
+      clefNamesAuraByStaveIndexes[staveIndex] = clefNamesAuraByStaveIndexes[staveIndex] || 'treble'
+      if (staveParams.clef) {
+        clefsNames[staveIndex] = staveParams.clef
+        clefNamesAuraByStaveIndexes[staveIndex] = staveParams.clef
+      } else if (keySignatureName) {
+        clefsNames[staveIndex] = clefNamesAuraByStaveIndexes[staveIndex]
+      }
+      voicesParamsForAllStaves.push(staveParams.voicesParams || [])
+    })
+    if (clefsNames.length !== 0) {
+      const clefsOnStaves = drawClefsOnStaves(numberOfStaves, numberOfStaveLines, clefsNames, measureIndexInGeneral)(styles, nextLeftOffset, topOffset)
+      components.push(clefsOnStaves)
+      nextLeftOffset = clefsOnStaves.right
+      if (positionThatCanBeConsideredAsStartOfStaves === undefined) {
+        positionThatCanBeConsideredAsStartOfStaves = clefsOnStaves.left
+      }
+      const keySignaturesOnStaves = drawKeySignaturesOnStaves(numberOfStaveLines, clefsNames, keySignatureName, keySignatureNameForEachLineId, measureIndexInGeneral)(styles, nextLeftOffset, topOffset)
+      components.push(keySignaturesOnStaves)
+      nextLeftOffset = keySignaturesOnStaves.right
+      if (positionThatCanBeConsideredAsStartOfStaves === undefined) {
+        positionThatCanBeConsideredAsStartOfStaves = keySignaturesOnStaves.left
+      }
+    }
+    if (timeSignatureParams && timeSignatureParams.numerator && timeSignatureParams.denominator) {
+      const isClefBefore = clefsNames.length !== 0
+      const isKeySignatureBefore = keySignatureName !== undefined && keySignatureName !== KEY_SIGNATURE_WITHOUT_KEYS
+      const timeSignaturesOnStaves = drawTimeSignaturesOnStaves(numberOfStaves, numberOfStaveLines, timeSignatureParams.numerator, timeSignatureParams.denominator, timeSignatureParams.cMode, isClefBefore, isKeySignatureBefore, isFirstMeasureOnPageLine, measureIndexInGeneral, timeSignatureParams.forEachLineId)(styles, nextLeftOffset, topOffset)
+      components.push(timeSignaturesOnStaves)
+      nextLeftOffset = timeSignaturesOnStaves.right
+      if (positionThatCanBeConsideredAsStartOfStaves === undefined) {
+        positionThatCanBeConsideredAsStartOfStaves = timeSignaturesOnStaves.left
+      }
+</script>
+<script type="text/plain" id="src-MEASUREF" data-path="src/drawer/elements/the-page/measures/drawMeasure.js" data-start="320">
+    const measure = createGroup(
+      'measure',
+      components
+    )
+    addPropertiesToElement(
+      measure,
+      {
+        'ref-ids': `measure-${measureIndexInGeneral + 1},measure-${pageLineNumber + 1}-${measureIndexOnPageLine + 1},line-${pageLineNumber + 1}`
+      }
+    )
+    if (measureIndexInGeneral > 0) {
+      addPropertiesToElement(
+        measure,
+        {
+          'ref-ids': 'every-measure'
+        }
+      )
+    }
+    addPropertiesToElement(
+      measure,
+      {
+        'ref-ids': 'every-measure-including-index-0'
+      }
+    )
+
+    if (isFirstMeasureOnPageLine) {
+      if (measureIndexInGeneral > 0) {
+        addPropertiesToElement(
+          measure,
+          {
+            'ref-ids': 'first-measure,first-or-last-measure'
+          }
+        )
+      }
+      addPropertiesToElement(
+        measure,
+        {
+          'ref-ids': 'first-measure-including-index-0'
+        }
+      )
+    }
+    if (isLastMeasureOnPageLine) {
+      addPropertiesToElement(
+        measure,
+        {
+          'ref-ids': 'last-measure,first-or-last-measure'
+        }
+      )
+    }
+    if (isLastMeasureInGeneral) {
+      addPropertiesToElement(
+        measure,
+        {
+          'ref-ids': 'last-measure-on-page'
+        }
+      )
+    }
+
+    measure.left = leftOffset
+</script>
+<script type="text/plain" id="src-SCHED" data-path="src/drawer/elements/the-page/voices/drawVoicesOnMultipleStaves.js" data-start="90">
+          numberOfUnfinishedVoices.value -= 1
+          finishedVoices[`${staveIndex}-${voiceIndex}`] = true
+        }
+      }
+    }
+
+    let crossStaveUnitCount = 0
+    let spaceForAllCrossStaveElementsForFirstCrossStaveUnit = 0
+    while (isAnyCounterForEachVoiceLessThanItsMaxValue(countersForEachVoice, voicesParamsForAllStaves)) {
+      const selectedSingleUnitsParamsToBeIncludedInNextCrossStaveUnit = selectSingleUnitsParamsToBeIncludedInNextCrossStaveUnit(measureIndexInGeneral, voicesParamsForAllStaves, durationsAccumulatorsForEachVoice, countersForEachVoice, finishedVoices, numberOfUnfinishedVoices, graceUnitsAccumulatorForEachStaveAndVoice, similesInformationByStaveAndVoiceIndexes)
+      const isCurrentCrossStaveUnitGrace = selectedSingleUnitsParamsToBeIncludedInNextCrossStaveUnit[0] && selectedSingleUnitsParamsToBeIncludedInNextCrossStaveUnit[0].isGrace
+      const allCrossStaveElementsForCurrentCrossStaveUnit = []
+      const midMeasureClefsForCurrentCrossStaveUnit = drawMidMeasureClefsForCurrentCrossStaveUnit(selectedSingleUnitsParamsToBeIncludedInNextCrossStaveUnit, numberOfStaves, clefNamesAuraByStaveIndexes, crossStaveUnits, minUnitDurationOnPageLine, compressUnitsByNTimes, stretchUnitsByNTimes, styles, leftOffset, topOffsetsForEachStave, containsDrawnCrossStaveElementsBesideCrossStaveUnits)
+      midMeasureClefsForCrossStaveUnits.push(midMeasureClefsForCurrentCrossStaveUnit)
+      allCrossStaveElementsForCurrentCrossStaveUnit.push(midMeasureClefsForCurrentCrossStaveUnit)
+      adjustNotesPositionNumbersInSelectedSingleUnitsParamsToBeIncludedInNextCrossStaveUnitByTheirNoteNamesAndOctaveNumbersAndClefNamesByStaveIndexIfNoteNamesArePresentedInNotes(selectedSingleUnitsParamsToBeIncludedInNextCrossStaveUnit, clefNamesAuraByStaveIndexes)
+      const midMeasureKeySignaturesForCurrentCrossStaveUnit = drawMidMeasureKeySignaturesForCurrentCrossStaveUnit(selectedSingleUnitsParamsToBeIncludedInNextCrossStaveUnit, midMeasureClefsForCrossStaveUnits, numberOfStaves, numberOfStaveLines, clefNamesAuraByStaveIndexes, styles, leftOffset, topOffsetsForEachStave, containsDrawnCrossStaveElementsBesideCrossStaveUnits)
+      midMeasureKeySignaturesForCrossStaveUnits.push(midMeasureKeySignaturesForCurrentCrossStaveUnit)
+      allCrossStaveElementsForCurrentCrossStaveUnit.push(midMeasureKeySignaturesForCurrentCrossStaveUnit)
+      const breathMarkBeforeCurrentCrossStaveUnit = drawBreathMarkBeforeCurrentCrossStaveUnit(selectedSingleUnitsParamsToBeIncludedInNextCrossStaveUnit, midMeasureClefsForCrossStaveUnits, midMeasureKeySignaturesForCrossStaveUnits, numberOfStaves, styles, leftOffset, topOffsetsForEachStave, containsDrawnCrossStaveElementsBesideCrossStaveUnits)
+      breathMarksBeforeCrossStaveUnits.push(breathMarkBeforeCurrentCrossStaveUnit)
+      allCrossStaveElementsForCurrentCrossStaveUnit.push(breathMarkBeforeCurrentCrossStaveUnit)
+      const onlyNoteLettersBeforeArpeggiatedWavesForCurrentCrossStaveUnit = drawKeysForCurrentCrossStaveUnit(selectedSingleUnitsParamsToBeIncludedInNextCrossStaveUnit, measureIndexInGeneral, countersForEachVoice, numberOfStaveLines, arpeggiatedWavesForCrossStaveUnits, breathMarksBeforeCrossStaveUnits, styles, leftOffset, topOffsetsForEachStave, 'before', containsDrawnCrossStaveElementsBesideCrossStaveUnits)
+      onlyNoteLettersBeforeArpeggiatedWavesForCrossStaveUnits.push(onlyNoteLettersBeforeArpeggiatedWavesForCurrentCrossStaveUnit)
+      allCrossStaveElementsForCurrentCrossStaveUnit.push(onlyNoteLettersBeforeArpeggiatedWavesForCurrentCrossStaveUnit)
+      const arpeggiatedWavesForCurrentCrossStaveUnit = drawArpeggiatedWavesForCurrentCrossStaveUnit(selectedSingleUnitsParamsToBeIncludedInNextCrossStaveUnit, onlyNoteLettersBeforeArpeggiatedWavesForCrossStaveUnits, styles, leftOffset, topOffsetsForEachStave, numberOfStaveLines, containsDrawnCrossStaveElementsBesideCrossStaveUnits)
+      arpeggiatedWavesForCrossStaveUnits.push(arpeggiatedWavesForCurrentCrossStaveUnit)
+      allCrossStaveElementsForCurrentCrossStaveUnit.push(arpeggiatedWavesForCurrentCrossStaveUnit)
+      const keysForCurrentCrossStaveUnit = drawKeysForCurrentCrossStaveUnit(selectedSingleUnitsParamsToBeIncludedInNextCrossStaveUnit, measureIndexInGeneral, countersForEachVoice, numberOfStaveLines, arpeggiatedWavesForCrossStaveUnits, breathMarksBeforeCrossStaveUnits, styles, leftOffset, topOffsetsForEachStave, 'after', containsDrawnCrossStaveElementsBesideCrossStaveUnits)
+      keysForCrossStaveUnits.push(keysForCurrentCrossStaveUnit)
+      allCrossStaveElementsForCurrentCrossStaveUnit.push(keysForCurrentCrossStaveUnit)
+      const groupedAllCrossStaveElementsForCurrentCrossStaveUnit = createGroup(
+        'allCrossStaveElementsForCurrentCrossStaveUnit',
+        allCrossStaveElementsForCurrentCrossStaveUnit
+      )
+      const singleUnitsForCurrentCrossStaveUnit = drawSingleUnitsForCurrentCrossStaveUnit(selectedSingleUnitsParamsToBeIncludedInNextCrossStaveUnit, numberOfStaves, numberOfStaveLines, pageLineNumber, measureIndexInGeneral, measureIndexOnPageLine, crossStaveUnitCount, keysForCrossStaveUnits, singleUnitsInVoices, beamingStatusesForEachVoiceOnPageLine, countersForEachVoice, durationsAccumulatorsForEachVoice, similesInformationByStaveAndVoiceIndexes, affectingTupletValuesByStaveAndVoiceIndexes, isOnLastMeasureOfPageLine, styles, topOffsetsForEachStave)
+      const crossVoiceUnitsOnAllStavesInCrossStaveUnit = drawCrossVoiceUnitsOnAllStavesInCrossStaveUnit(singleUnitsForCurrentCrossStaveUnit, voicesParamsForAllStaves, containsCollidedVoices, keysForCurrentCrossStaveUnit, arpeggiatedWavesForCurrentCrossStaveUnit, isCurrentCrossStaveUnitGrace, topOffsetsForEachStave, numberOfStaveLines, styles)
+      if (crossVoiceUnitsOnAllStavesInCrossStaveUnit.length !== 0) {
+        const calculatedMinDurationAmongAccumulatorsForEachVoice = calculateMinDurationAmongAccumulatorsForEachVoice(durationsAccumulatorsForEachVoice)
+        // const calculatedMinActualDurationAmongDrawnSingleUnitsInCrossStaveUnit = minActualDurationAmongDrawnSingleUnitsInCrossStaveUnit(drawnSingleUnitsForCurrentCrossStaveUnit)
+        const currentCrossStaveUnit = createElementWithAdditionalInformation(
+          createGroup(
+            'crossStaveUnit',
+            crossVoiceUnitsOnAllStavesInCrossStaveUnit
+          ),
+          {
+</script>
+<script type="text/plain" id="src-UNITS2" data-path="src/drawer/elements/the-page/voices/drawSingleUnitsForCurrentCrossStaveUnit.js" data-start="232">
+    const singleUnit = drawSingleUnit(
+      createSingleUnitParams({
+        pageLineNumber,
+        numberOfStaveLines,
+        measureIndexOnPageLine,
+        measureIndexInGeneral,
+        staveIndex,
+        voiceIndex,
+        crossStaveUnitIndex: crossStaveUnitCount,
+        singleUnitIndex: selectedSingleUnitParams.singleUnitIndex,
+        containsNotesOnCurrentStave: selectedSingleUnitParams.containsNotesOnCurrentStave,
+        containsNotesOnPrevStave: selectedSingleUnitParams.containsNotesOnPrevStave,
+        containsNotesOnNextStave: selectedSingleUnitParams.containsNotesOnNextStave,
+        containsKeysOnCurrentStave: selectedSingleUnitParams.containsKeysOnCurrentStave,
+        containsKeysOnPrevStave: selectedSingleUnitParams.containsKeysOnPrevStave,
+        containsKeysOnNextStave: selectedSingleUnitParams.containsKeysOnNextStave,
+        notes: selectedSingleUnitParams.notes,
+        unitDuration: selectedSingleUnitParams.unitDuration,
+        actualDuration: actualDurationOfCurrentSingleUnit,
+        stemDirection: selectedSingleUnitParams.stemDirection,
+        numberOfDots: selectedSingleUnitParams.numberOfDots,
+        keysParams: selectedSingleUnitParams.keysParams,
+        parentheses: selectedSingleUnitParams.parentheses,
+        arpeggiated: selectedSingleUnitParams.arpeggiated,
+        beamedWithNext: selectedSingleUnitParams.beamedWithNext,
+        beamedWithNextWithJustOneBeam: selectedSingleUnitParams.beamedWithNextWithJustOneBeam,
+        beamedWithPrevious: beamingStatusesForEachVoiceOnPageLine[beamKey],
+        isRest: selectedSingleUnitParams.isRest,
+        isOnlyUnitOnStaveWithoutMidMeasureElementsOrLyricsOrChordLettersOrSimilesOnThatStave: selectedSingleUnitParams.isOnlyUnitOnStaveWithoutMidMeasureElementsOrLyricsOrChordLettersOrSimilesOnThatStave,
+        isFullMeasure: selectedSingleUnitParams.isFullMeasure,
+        isFullMeasureAndShouldBeCentralizedBecauseOfThat: selectedSingleUnitParams.isFullMeasureAndShouldBeCentralizedBecauseOfThat,
+        isSimile: selectedSingleUnitParams.isSimile,
+        isGrace: selectedSingleUnitParams.isGrace,
+        isGraceUnitAndNextUnitIsNotGrace: selectedSingleUnitParams.isGraceUnitAndNextUnitIsNotGrace,
+        hasGraceCrushLine: selectedSingleUnitParams.hasGraceCrushLine,
+        simileRefId,
+        simileYCorrection: selectedSingleUnitParams.simileYCorrection,
+        numberOfSimileStrokes,
+        tiedWithNext: selectedSingleUnitParams.tiedWithNext,
+        tiedBefore: selectedSingleUnitParams.tiedBefore,
+        tiedAfter: selectedSingleUnitParams.tiedAfter,
+        tiedBeforeMeasure: selectedSingleUnitParams.tiedBeforeMeasure,
+        tiedAfterMeasure: selectedSingleUnitParams.tiedAfterMeasure,
+        slurMarks: selectedSingleUnitParams.slurMarks,
+        glissandoMarks: selectedSingleUnitParams.glissandoMarks,
+        tupletMarks: selectedSingleUnitParams.tupletMarks,
+        octaveSignMark: selectedSingleUnitParams.octaveSignMark,
+        pedalMark: selectedSingleUnitParams.pedalMark,
+        dynamicChangeMark: selectedSingleUnitParams.dynamicChangeMark,
+        articulationParams: selectedSingleUnitParams.articulationParams,
+        tremoloParams: selectedSingleUnitParams.tremoloParams,
+        isOnLastMeasureOfPageLine,
+        isLastSingleUnitInVoiceOnPageLine: selectedSingleUnitParams.isLastSingleUnitInVoiceOnPageLine,
+        thereAreNotesInTheSameCrossStaveUnitThatTheirPositionNumberIsMoreThanMaxNotePositionNumberInCurrentSingleUnitOnTheSameStave,
+        thereAreNotesInTheSameCrossStaveUnitThatTheirPositionNumberIsLessThanMinNotePositionNumberInCurrentSingleUnitOnTheSameStave
+      })
+    )(
+      styles,
+      keysForCrossStaveUnits[keysForCrossStaveUnits.length - 1].right,
+      topOffsetForCurrentStave
+    )
+</script>
+<script type="text/plain" id="src-UNITCORE" data-path="src/drawer/elements/notes-on-a-page/notes/drawSingleUnit.js" data-start="378">
+    if (anySeconds) {
+      const allNotesInNonDisplacedUnitNoteHeadsAreGhosts = (stemDirection === 'up' ? notesForNonDisplacedPartOfUnit : notesForDisplacedPartOfUnit).every(note => note.isGhost)
+      const additionalOffsetForDisplacedPartOfUnit = calculateAdditionalOffsetForDisplacedPartOfUnit(unitDuration, isGrace, allNotesInNonDisplacedUnitNoteHeadsAreGhosts, styles)
+      if (stemDirection === 'up') {
+        nonDisplacedPartOfSingleUnitWithCoordinates = drawSingleUnitNoteHeads(measureIndexInGeneral, staveIndex, voiceIndex, singleUnitIndex, numberOfStaveLines, notesForNonDisplacedPartOfUnit, unitDuration, anySeconds, stemDirection, false, isGrace)(styles, leftOffsetForUnitNoteHeads, topOffset)
+        displacedPartOfSingleUnitWithCoordinates = drawSingleUnitNoteHeads(measureIndexInGeneral, staveIndex, voiceIndex, singleUnitIndex, numberOfStaveLines, notesForDisplacedPartOfUnit, unitDuration, anySeconds, stemDirection, true, isGrace)(styles, nonDisplacedPartOfSingleUnitWithCoordinates.right + additionalOffsetForDisplacedPartOfUnit, topOffset)
+        dotsWithCoordinates = drawSingleUnitDots(numberOfStaveLines, sortedNotes, numberOfDots, unitDuration, stemDirection, anySeconds, anyNotesOnLedgerLines, withFlags, isRest, isGrace)(styles, displacedPartOfSingleUnitWithCoordinates.right, topOffset)
+        addPropertiesToElement(
+          dotsWithCoordinates,
+          {
+            'ref-ids': `dots-${measureIndexInGeneral + 1}-${staveIndex + 1}-${voiceIndex + 1}-${singleUnitIndex + 1}`
+          }
+        )
+      } else {
+        displacedPartOfSingleUnitWithCoordinates = drawSingleUnitNoteHeads(measureIndexInGeneral, staveIndex, voiceIndex, singleUnitIndex, numberOfStaveLines, notesForDisplacedPartOfUnit, unitDuration, anySeconds, stemDirection, true, isGrace)(styles, leftOffsetForUnitNoteHeads, topOffset)
+        nonDisplacedPartOfSingleUnitWithCoordinates = drawSingleUnitNoteHeads(measureIndexInGeneral, staveIndex, voiceIndex, singleUnitIndex, numberOfStaveLines, notesForNonDisplacedPartOfUnit, unitDuration, anySeconds, stemDirection, false, isGrace)(styles, displacedPartOfSingleUnitWithCoordinates.right + additionalOffsetForDisplacedPartOfUnit, topOffset)
+        dotsWithCoordinates = drawSingleUnitDots(numberOfStaveLines, sortedNotes, numberOfDots, unitDuration, stemDirection, anySeconds, anyNotesOnLedgerLines, withFlags, isRest, isGrace)(styles, nonDisplacedPartOfSingleUnitWithCoordinates.right, topOffset)
+        addPropertiesToElement(
+          dotsWithCoordinates,
+          {
+            'ref-ids': `dots-${measureIndexInGeneral + 1}-${staveIndex + 1}-${voiceIndex + 1}-${singleUnitIndex + 1}`
+          }
+        )
+      }
+      if (!stemless) {
+        stemWithCoordinates = drawStemForSingleUnit(numberOfStaveLines, styles, sortedNotes, withFlags, numberOfTremoloStrokes, hasConnectedTremolo, nonDisplacedPartOfSingleUnitWithCoordinates, displacedPartOfSingleUnitWithCoordinates, notesForNonDisplacedPartOfUnit, notesForDisplacedPartOfUnit, unitDuration, anySeconds, stemDirection, beamed, isNoteOnEdgeInSingleUnitIsOnStaveLineInUnitwithFlags, isNoteOnEdgeInSingleUnitIsBetweenStaveLinesInUnitwithFlags, thereAreNotesInTheSameCrossStaveUnitThatTheirPositionNumberIsMoreThanMaxNotePositionNumberInCurrentSingleUnitOnTheSameStave, thereAreNotesInTheSameCrossStaveUnitThatTheirPositionNumberIsLessThanMinNotePositionNumberInCurrentSingleUnitOnTheSameStave, isGrace)
+        addPropertiesToElement(
+          stemWithCoordinates,
+          {
+            'ref-ids': `stem-${measureIndexInGeneral + 1}-${staveIndex + 1}-${voiceIndex + 1}-${singleUnitIndex + 1}`
+          }
+        )
+        if (withFlags) {
+          chordFlagsWithCoordinates = drawFlagsForSingleUnit(styles, unitDuration, stemWithCoordinates, stemDirection, isGrace)
+          if (isGrace) {
+            scaleElementAroundPoint(
+              chordFlagsWithCoordinates,
+              graceElementsScaleFactor,
+              graceElementsScaleFactor,
+              {
+                x: chordFlagsWithCoordinates.left,
+                y: chordFlagsWithCoordinates.stemEndY
+              }
+            )
+          }
+        }
+      }
+</script>
+<script type="text/plain" id="src-HEADS" data-path="src/drawer/elements/notes-on-a-page/notes/drawSingleUnitNoteHeads.js" data-start="16">
+export default function (measureIndexInGeneral, staveIndex, voiceIndex, singleUnitIndex, numberOfStaveLines, notes, unitDuration, anySeconds, stemDirection, isDisplaced, isGrace) {
+  return (styles, leftOffset, topOffset) => {
+    const { graceElementsScaleFactor } = styles
+    const noteBodiesWithCoordinates = []
+    notes.forEach((note, noteIndex) => {
+      const topOffsetOfNoteConsideringItsStave = calculateTopOffsetOfElementConsideringItsStave(note, numberOfStaveLines, topOffset, styles)
+      let currentNoteHead
+      if (note.isGhost) {
+        currentNoteHead = drawGhostNoteHead(note.positionNumber, unitDuration)(styles, leftOffset, topOffsetOfNoteConsideringItsStave)
+      } else {
+        if (unitDuration === 4) {
+          currentNoteHead = drawQuadrupleWholeNoteHead(note.positionNumber)(styles, leftOffset, topOffsetOfNoteConsideringItsStave)
+        } else if (unitDuration === 2) {
+          currentNoteHead = drawDoubleWholeNoteHead(note.positionNumber)(styles, leftOffset, topOffsetOfNoteConsideringItsStave)
+        } else if (unitDuration === 1) {
+          currentNoteHead = drawWholeNoteHead(note.positionNumber)(styles, leftOffset, topOffsetOfNoteConsideringItsStave)
+        } else if (unitDuration === 1 / 2) {
+          currentNoteHead = drawHalfNoteHead(note.positionNumber)(styles, leftOffset, topOffsetOfNoteConsideringItsStave)
+        } else {
+          currentNoteHead = drawBlackNoteHead(note.positionNumber)(styles, leftOffset, topOffsetOfNoteConsideringItsStave)
+        }
+      }
+      addPropertiesToElement(
+        currentNoteHead,
+        {
+          'ref-ids': `note-${measureIndexInGeneral + 1}-${staveIndex + 1}-${voiceIndex + 1}-${singleUnitIndex + 1}-${note.id + 1}`
+        }
+      )
+</script>
+<script type="text/plain" id="src-BEAMS" data-path="src/drawer/elements/grouping-notes/beams/drawBeams.js" data-start="9">
+export default function (voicesOnPageLine, styles) {
+  const beams = []
+  const beamsStack = {}
+  if (voicesOnPageLine) {
+    for (let measureIndex = 0; measureIndex < voicesOnPageLine.length; measureIndex++) {
+      if (voicesOnPageLine[measureIndex]) {
+        const { singleUnitsInVoices, withoutVoices } = voicesOnPageLine[measureIndex]
+        if (!withoutVoices) {
+          for (let staveIndex = 0; staveIndex < singleUnitsInVoices.length; staveIndex++) {
+            if (singleUnitsInVoices[staveIndex]) {
+              for (let voiceIndex = 0; voiceIndex < singleUnitsInVoices[staveIndex].length; voiceIndex++) {
+                if (singleUnitsInVoices[staveIndex][voiceIndex]) {
+                  for (let singleUnitIndex = 0; singleUnitIndex < singleUnitsInVoices[staveIndex][voiceIndex].length; singleUnitIndex++) {
+                    const currentSingleUnit = singleUnitsInVoices[staveIndex][voiceIndex][singleUnitIndex]
+                    const beamKey = generateKeyForBeam(staveIndex, voiceIndex, currentSingleUnit.isGrace)
+                    if (!beamsStack[beamKey]) {
+                      beamsStack[beamKey] = {
+                        singleUnits: []
+                      }
+                    }
+                    beamsStack[beamKey].singleUnits.push(
+                      currentSingleUnit
+                    )
+                    if (currentSingleUnit.isLastSingleUnitInVoiceOnPageLine) {
+                      const plainKeyForBeam = generateKeyForBeam(staveIndex, voiceIndex, false)
+                      const graceKeyForBeam = generateKeyForBeam(staveIndex, voiceIndex, true)
+                      if (beamsStack[plainKeyForBeam]) {
+                        beams.push(
+                          ...drawBeamsWithStemsForDrawnSingleUnitsInVoiceOnOneStave(
+                            beamsStack[plainKeyForBeam].singleUnits, styles
+                          )
+                        )
+                        delete beamsStack[plainKeyForBeam]
+                      }
+                      if (beamsStack[graceKeyForBeam]) {
+                        beams.push(
+                          ...drawBeamsWithStemsForDrawnSingleUnitsInVoiceOnOneStave(
+                            beamsStack[graceKeyForBeam].singleUnits, styles
+                          )
+                        )
+                        delete beamsStack[graceKeyForBeam]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  return beams
+}
+</script>
+<script type="text/plain" id="src-SLURS" data-path="src/drawer/elements/spans/slurs/drawSlurs.js" data-start="19">
+              if (currentSingleUnit.slurMarks) {
+                for (let slurIndex = 0; slurIndex < currentSingleUnit.slurMarks.length; slurIndex++) {
+                  const currentSlurMark = currentSingleUnit.slurMarks[slurIndex]
+                  const currentSlurMarkKey = currentSlurMark.key
+                  if (!slursStack[currentSlurMarkKey]) {
+                    const currentSlurDirection = currentSlurMark.direction
+                    const currentSlurMarkWithSShape = currentSlurMark.sShape
+                    const currentSlurMarkRoundCoefficientFactor = currentSlurMark.roundCoefficientFactor
+                    const currentSlurMarkLeftYCorrection = currentSlurMark.leftYCorrection
+                    const currentSlurMarkRightYCorrection = currentSlurMark.rightYCorrection
+                    const rightPlacement = currentSlurMark.rightPlacement
+                    let startsBefore = false
+                    let voicesBodyThatSlurStartsBefore
+                    if (currentSlurMark.before) {
+                      startsBefore = true
+                      voicesBodyThatSlurStartsBefore = voicesBody
+                    }
+                    const allSingleUnitsOnTheWay = []
+                    if (startsBefore) {
+                      const { staveIndex, voiceIndex } = currentSingleUnit
+                      const { singleUnitsInVoices, withoutVoices } = voicesOnPageLine[measureIndex]
+                      if (!withoutVoices) {
+                        for (let singleUnitIndexBefore = 0; singleUnitIndexBefore < crossStaveUnitIndex; singleUnitIndexBefore++) {
+                          if (singleUnitsInVoices[staveIndex] && singleUnitsInVoices[staveIndex][voiceIndex] && singleUnitsInVoices[staveIndex][voiceIndex][singleUnitIndexBefore]) {
+                            const singleUnitBefore = singleUnitsInVoices[staveIndex][voiceIndex][singleUnitIndexBefore]
+                            allSingleUnitsOnTheWay.push(singleUnitBefore)
+                          }
+                        }
+                      }
+                    }
+                    slursStack[currentSlurMarkKey] = {
+                      startsBefore,
+                      finishesAfter: false,
+                      voicesBodyThatSlurStartsBefore,
+                      allSingleUnitsOnTheWay,
+                      defaultSlurDirection: currentSingleUnit.stemDirection === 'down' ? 'up' : 'down',
+                      customSlurDirection: currentSlurDirection,
+                      currentStaveIndex: currentSingleUnit.staveIndex,
+                      currentVoiceIndex: currentSingleUnit.voiceIndex,
+                      withSShape: currentSlurMarkWithSShape,
+                      roundCoefficientFactor: currentSlurMarkRoundCoefficientFactor,
+                      leftYCorrection: currentSlurMarkLeftYCorrection,
+                      rightYCorrection: currentSlurMarkRightYCorrection,
+                      slurMarkKey: currentSlurMarkKey,
+                      rightPlacement
+                    }
+</script>
+<script type="text/plain" id="src-PATH" data-path="src/drawer/elements/basic/createPath.js" data-start="10">
+  }
+  // Format numbers in points to consistent precision
+  const formattedPoints = points.map(p => typeof p === 'number' ? formatNumber(p) : p)
+  const path = formattedPoints.join(' ')
+  const { minTop, minLeft, maxRight, maxBottom } = calculateBboxForPath(path)
+  const top = minTop + topOffset
+  const right = maxRight + leftOffset
+  const bottom = maxBottom + topOffset
+  const left = minLeft + leftOffset
+  // const box = `<polyline points="${left} ${top} ${right} ${top} ${right} ${bottom} ${left} ${bottom} ${left} ${top}" fill="none" stroke-width="1.0" stroke="red"></polyline>`
+  const properties = {
+    d: path,
+    fill: fill || 'none',
+    'fill-rule': 'evenodd',
+    'vector-effect': 'none'
+  }
+  if (strokeOptions) {
+    properties['fill'] = fill ? strokeOptions.color : 'none'
+    properties['stroke'] = strokeOptions.color || ''
+    properties['stroke-width'] = strokeOptions.width
+    properties['stroke-linejoin'] = strokeOptions.linejoin || ''
+    properties['stroke-linecap'] = strokeOptions.linecap || ''
+  }
+  return {
+    name: 'path',
+    properties,
+    transformations: (leftOffset !== 0 || topOffset !== 0)
+      ? [
+          {
+            type: 'translate',
+            x: leftOffset,
+            y: topOffset
+          }
+        ]
+      : [],
+    top,
+    right,
+    bottom,
+    left
+  }
+}
+</script>
+<script type="text/plain" id="src-GROUPF" data-path="src/drawer/elements/basic/createGroup.js" data-start="5">
+export default function (dataName, elements = [], wrapWithBox = false) {
+  const { top, right, bottom, left } = calculateCoordinatesOfElements(elements)
+  const nonEmptyElements = elements.filter(element => element && !element.isEmpty)
+  if (nonEmptyElements.length === 0) {
+    return {
+      name: 'g',
+      properties: {
+        'data-name': dataName
+      },
+      elements,
+      transformations: [],
+      isEmpty: true,
+      top,
+      right,
+      bottom,
+      left
+    }
+  }
+  // const box = `<polyline data-name="${name}" points="${left} ${top} ${right} ${top} ${right} ${bottom} ${left} ${bottom} ${left} ${top}" fill="none" stroke-width="1.0" stroke="red"></polyline>`
+  return {
+    name: 'g',
+    properties: {
+      'data-name': dataName
+    },
+    wrapWithBox,
+    elements: nonEmptyElements,
+    transformations: [],
+    isEmpty: false,
+    top,
+    right,
+    bottom,
+    left
+  }
+}
+</script>
+<script type="text/plain" id="src-SERF" data-path="src/drawer/elements/basic/convertSvgToString.js" data-start="19">
+const convertSvgToString = (element, boxesAsBuffers = [], isFirstCall = true) => {
+  const buffer = []
+  if (element) {
+    if (element.wrapWithBox && debugMode) {
+      boxesAsBuffers.push(
+        convertSvgToString(
+          createPolyline([ element.left, element.top, element.right, element.top, element.right, element.bottom, element.left, element.bottom, element.left, element.top ], { width: 1, color: (typeof element.wrapWithBox === 'string' ? element.wrapWithBox : 'red'), linecap: 'round', linejoin: 'miter' }, false),
+          [],
+          false
+        )
+      )
+    }
+    buffer.push(`<${element.name}`)
+    for (const propertyName in element.properties) {
+      let propertyValue = element.properties[propertyName]
+      // Format numeric properties and viewBox values
+      if (propertyName === 'viewBox' && typeof propertyValue === 'string') {
+        const viewBoxParts = propertyValue.split(' ').map(p => {
+          const num = parseFloat(p)
+          return isNaN(num) ? p : formatNumber(num)
+        })
+        propertyValue = viewBoxParts.join(' ')
+      } else if (typeof propertyValue === 'number') {
+        propertyValue = formatNumber(propertyValue)
+      }
+      buffer.push(` ${propertyName}="${escapeSVGPropertyValueChars(propertyValue)}"`)
+      if (propertyName === 'ref-ids') {
+        buffer.push(' pointer-events="painted"')
+      }
+    }
+    buffer.push(` data-left="${formatNumber(element.left)}"`)
+    buffer.push(` data-right="${formatNumber(element.right)}"`)
+    buffer.push(` data-top="${formatNumber(element.top)}"`)
+    buffer.push(` data-bottom="${formatNumber(element.bottom)}"`)
+</script>
+<script type="text/plain" id="src-GLYPH" data-path="src/drawer/generateUnicodePoints.js" data-start="7">
+function generateUnicodePoints (unicode, musicFontSource, textFontSource, musicFontSourceSize, intervalBetweenStaveLines) {
+  const fontOptions = {
+    source: musicFontSource,
+    size: musicFontSourceSize * intervalBetweenStaveLines,
+    color: '#000', // does not matter what color is here
+    anchor: 'center baseline'
+  }
+  const text = createText(
+    JSON.parse(JSON.stringify(unicode).replace(/\\\\/g, '\\')),
+    fontOptions
+  )({ textFontSource }, 0, 0)
+  const textHeight = text.bottom - text.top
+  const textPath = parseSvgPath(text.properties.d)
+  let textPathMovedToTopLeftCorner = textPath
+  if (text.top < 0) {
+    const delta = textHeight
+    textPathMovedToTopLeftCorner = translateSvgPath(
+      textPathMovedToTopLeftCorner, 0, delta
+    )
+  }
+  if (text.left < 0) {
+    const delta = -text.left
+    textPathMovedToTopLeftCorner = translateSvgPath(
+      textPathMovedToTopLeftCorner, delta, 0
+    )
+  }
+  return textPathMovedToTopLeftCorner.flat()
+}
+</script>
+
+<script>
+(function () {
+  // ---------- What this page is about ----------
+  const NODES = {
+  "FONT": {
+    "x": 90,
+    "y": 55,
+    "t": "the fonts",
+    "k": "Bravura \u00b7 Noto \u00b7 Gentium"
+  },
+  "STY": {
+    "x": 300,
+    "y": 55,
+    "t": "generateStyles",
+    "k": "one styles dict"
+  },
+  "PAGE": {
+    "x": 510,
+    "y": 55,
+    "t": "drawPage",
+    "k": "the page skeleton"
+  },
+  "META": {
+    "x": 720,
+    "y": 55,
+    "t": "page meta",
+    "k": "title \u00b7 subtitles \u00b7 number"
+  },
+  "MEAS": {
+    "x": 90,
+    "y": 170,
+    "t": "drawMeasures",
+    "k": "the measure loop"
+  },
+  "MEASURE": {
+    "x": 300,
+    "y": 170,
+    "t": "drawMeasure",
+    "k": "barlines \u00b7 clefs \u00b7 keys"
+  },
+  "VOICES": {
+    "x": 510,
+    "y": 170,
+    "t": "voices",
+    "k": "cross-stave units"
+  },
+  "STAVE": {
+    "x": 720,
+    "y": 170,
+    "t": "the stave piece",
+    "k": "five lines behind"
+  },
+  "UNIT": {
+    "x": 90,
+    "y": 285,
+    "t": "drawSingleUnit",
+    "k": "one unit at a time"
+  },
+  "PARTS": {
+    "x": 300,
+    "y": 285,
+    "t": "the parts",
+    "k": "heads \u00b7 dots \u00b7 stem \u00b7 flags"
+  },
+  "SPANS": {
+    "x": 510,
+    "y": 285,
+    "t": "the line\u2019s spans",
+    "k": "beams \u00b7 ties \u00b7 slurs"
+  },
+  "FURN": {
+    "x": 720,
+    "y": 285,
+    "t": "measure furniture",
+    "k": "voltas \u00b7 tempo \u00b7 signs"
+  },
+  "BOX": {
+    "x": 90,
+    "y": 400,
+    "t": "every element",
+    "k": "left \u00b7 right \u00b7 top \u00b7 bottom"
+  },
+  "GROUP": {
+    "x": 300,
+    "y": 400,
+    "t": "createGroup",
+    "k": "boxes that union"
+  },
+  "SER": {
+    "x": 510,
+    "y": 400,
+    "t": "convertSvgToString",
+    "k": "markup + ref-ids"
+  },
+  "SVG": {
+    "x": 720,
+    "y": 400,
+    "t": "the score",
+    "k": "a self-describing SVG"
+  }
+};
+  const EDGES = {
+  "FONT-STY": {
+    "d": "M90 55 L300 55",
+    "lx": 195,
+    "ly": 92,
+    "l": "font sources"
+  },
+  "STY-PAGE": {
+    "d": "M300 55 L510 55",
+    "lx": 405,
+    "ly": 92,
+    "l": "one styles dict"
+  },
+  "PAGE-META": {
+    "d": "M510 55 L720 55",
+    "lx": 615,
+    "ly": 92,
+    "l": "title \u00b7 subtitles"
+  },
+  "PAGE-MEAS": {
+    "d": "M510 55 L90 170",
+    "lx": 285,
+    "ly": 106,
+    "l": "measuresParams"
+  },
+  "MEAS-MEASURE": {
+    "d": "M90 170 L300 170",
+    "lx": 195,
+    "ly": 212,
+    "l": "one measure at a time"
+  },
+  "MEASURE-VOICES": {
+    "d": "M300 170 L510 170",
+    "lx": 405,
+    "ly": 212,
+    "l": "drawVoicesOnMultipleStaves"
+  },
+  "VOICES-STAVE": {
+    "d": "M510 170 L720 170",
+    "lx": 615,
+    "ly": 212,
+    "l": "sized to the voices"
+  },
+  "VOICES-UNIT": {
+    "d": "M510 170 L90 285",
+    "lx": 255,
+    "ly": 235,
+    "l": "one unit at a time"
+  },
+  "MEAS-SPANS": {
+    "d": "M90 170 L510 285",
+    "lx": 420,
+    "ly": 255,
+    "l": "the page-line batch"
+  },
+  "UNIT-PARTS": {
+    "d": "M90 285 L300 285",
+    "lx": 195,
+    "ly": 320,
+    "l": "heads, dots, stem, flags"
+  },
+  "SPANS-FURN": {
+    "d": "M510 285 L720 285",
+    "lx": 615,
+    "ly": 320,
+    "l": "and the furniture"
+  },
+  "UNIT-BOX": {
+    "d": "M90 285 L90 400",
+    "lx": 150,
+    "ly": 343,
+    "l": "every part reports its box"
+  },
+  "BOX-GROUP": {
+    "d": "M90 400 L300 400",
+    "lx": 195,
+    "ly": 436,
+    "l": "boxes that union"
+  },
+  "GROUP-SER": {
+    "d": "M300 400 L510 400",
+    "lx": 405,
+    "ly": 436,
+    "l": "markup + ref-ids"
+  },
+  "SER-SVG": {
+    "d": "M510 400 L720 400",
+    "lx": 615,
+    "ly": 436,
+    "l": "the score"
+  }
+};
+  const OWNERS = {
+  "styles": {
+    "name": "generateStyles.js + font/",
+    "where": "one dict every drawer reads",
+    "c": "var(--m-a)"
+  },
+  "page": {
+    "name": "elements/the-page/",
+    "where": "page \u2192 measures \u2192 voices \u2192 staves",
+    "c": "var(--m-b)"
+  },
+  "units": {
+    "name": "elements/notes-on-a-page/",
+    "where": "notes, rests, dots, accidentals",
+    "c": "var(--m-c)"
+  },
+  "groups": {
+    "name": "elements/grouping-notes/ + spans/",
+    "where": "beams, ties, slurs, tuplets",
+    "c": "var(--m-d)"
+  },
+  "furn": {
+    "name": "elements/measure-furniture/ + marks-on-units/",
+    "where": "everything else on the page",
+    "c": "var(--m-e)"
+  },
+  "basic": {
+    "name": "elements/basic/",
+    "where": "boxes, groups, markup",
+    "c": "var(--m-f)"
+  }
+};
+  const OWN = {
+  "FONT": [
+    "styles",
+    "src/drawer/font/ \u2014 music, text, chord-letters"
+  ],
+  "STY": [
+    "styles",
+    "src/drawer/generateStyles.js"
+  ],
+  "PAGE": [
+    "page",
+    "src/drawer/elements/the-page/page-lines/drawPage.js"
+  ],
+  "META": [
+    "page",
+    "src/drawer/elements/the-page/page-lines/drawPage.js \u2014 the meta block"
+  ],
+  "MEAS": [
+    "page",
+    "src/drawer/elements/the-page/measures/drawMeasures.js"
+  ],
+  "MEASURE": [
+    "page",
+    "src/drawer/elements/the-page/measures/drawMeasure.js"
+  ],
+  "VOICES": [
+    "page",
+    "src/drawer/elements/the-page/voices/"
+  ],
+  "STAVE": [
+    "page",
+    "src/drawer/elements/the-page/staves/"
+  ],
+  "UNIT": [
+    "units",
+    "src/drawer/elements/notes-on-a-page/notes/drawSingleUnit.js"
+  ],
+  "PARTS": [
+    "units",
+    "noteheads \u00b7 dots \u00b7 stems \u00b7 flags"
+  ],
+  "SPANS": [
+    "groups",
+    "beams \u00b7 ties \u00b7 tuplets \u00b7 slurs"
+  ],
+  "FURN": [
+    "furn",
+    "voltas \u00b7 tempo marks \u00b7 signs \u00b7 lyrics"
+  ],
+  "BOX": [
+    "basic",
+    "every element answers with its box"
+  ],
+  "GROUP": [
+    "basic",
+    "src/drawer/elements/basic/createGroup.js"
+  ],
+  "SER": [
+    "basic",
+    "src/drawer/elements/basic/convertSvgToString.js"
+  ],
+  "SVG": [
+    "basic",
+    "the score, self-describing"
+  ]
+};
+  const FILE_OWNER = {
+  "STYLES": "styles",
+  "STYLES2": "styles",
+  "GLYPH": "styles",
+  "DP1": "page",
+  "DP2": "page",
+  "MEASUREF": "page",
+  "MEASUREL": "page",
+  "SCHED": "page",
+  "UNITS2": "page",
+  "UNITCORE": "units",
+  "HEADS": "units",
+  "BATCH": "groups",
+  "BEAMS": "groups",
+  "SLURS": "groups",
+  "PATH": "basic",
+  "GROUPF": "basic",
+  "SERF": "basic"
+};
+  const S = [
+  {
+    "id": "folder",
+    "name": "The folder",
+    "cells": [
+      "generateStyles.js",
+      "elements/the-page/",
+      "notes-on-a-page/",
+      "grouping-notes/",
+      "marks-on-units/",
+      "spans/",
+      "measure-furniture/",
+      "basic/"
+    ],
+    "gt": "What is in src/drawer",
+    "frames": [
+      {
+        "t": "One styles dict",
+        "x": "generateStyles turns the page styles and the loaded fonts into the dict every drawer is called with.",
+        "f": "STYLES",
+        "l": [
+          3,
+          37
+        ],
+        "on": [
+          "FONT",
+          "STY"
+        ],
+        "g": "L......."
+      },
+      {
+        "t": "And 8.5 is where it starts",
+        "x": "The distance between stave lines is the unit almost every measurement is multiplied by.",
+        "f": "STYLES",
+        "l": [
+          30,
+          37
+        ],
+        "on": [
+          "STY"
+        ],
+        "g": "L......."
+      },
+      {
+        "t": "What it holds",
+        "x": "Fixed numbers, configurable ones, metrics from the music font, the font sources, the grace scale.",
+        "f": "STYLES2",
+        "l": [
+          150,
+          189
+        ],
+        "on": [
+          "STY"
+        ],
+        "g": "L......."
+      },
+      {
+        "t": "the-page/ is the skeleton",
+        "x": "Page lines, measures, voices, staves, and the furniture drawn before any note.",
+        "f": "DP1",
+        "l": [
+          21,
+          45
+        ],
+        "on": [
+          "PAGE"
+        ],
+        "g": ".L......"
+      },
+      {
+        "t": "notes-on-a-page/ is the vocabulary",
+        "x": "Notes, rests, dots, accidentals, octaves \u2014 everything that sits on a stave.",
+        "f": "UNITCORE",
+        "l": [
+          378,
+          400
+        ],
+        "on": [
+          "UNIT",
+          "PARTS"
+        ],
+        "g": "..L....."
+      },
+      {
+        "t": "grouping-notes/ connects them",
+        "x": "Beams, stems and flags, ties, tuplets, and the displaced halves of clashing chords.",
+        "f": "BEAMS",
+        "l": [
+          9,
+          40
+        ],
+        "on": [
+          "SPANS"
+        ],
+        "g": "...L...."
+      },
+      {
+        "t": "marks-on-units/ adds the marks",
+        "x": "Articulations, ornaments, dynamics, lyrics, chord letters, grace units.",
+        "f": "BATCH",
+        "l": [
+          189,
+          215
+        ],
+        "on": [
+          "FURN"
+        ],
+        "g": "....L..."
+      },
+      {
+        "t": "spans/ draws what crosses",
+        "x": "Slurs, pedals, octave signs, glissandos, hairpins, tremolo.",
+        "f": "SLURS",
+        "l": [
+          19,
+          45
+        ],
+        "on": [
+          "SPANS"
+        ],
+        "g": ".....L.."
+      },
+      {
+        "t": "measure-furniture/ finishes a measure",
+        "x": "Barlines, repeat dots, measure numbers, voltas, codas, signs, tempo marks.",
+        "f": "BATCH",
+        "l": [
+          209,
+          215
+        ],
+        "on": [
+          "FURN"
+        ],
+        "g": "......L."
+      },
+      {
+        "t": "basic/ is the small vocabulary of drawing",
+        "x": "Create a path, a group, a text; move it; give it properties; turn it into markup.",
+        "f": "GROUPF",
+        "l": [
+          5,
+          38
+        ],
+        "on": [
+          "BOX",
+          "GROUP"
+        ],
+        "g": ".......L"
+      }
+    ]
+  },
+  {
+    "id": "cascade",
+    "name": "The cascade",
+    "cells": [
+      "styles",
+      "the page",
+      "measures",
+      "voices",
+      "units",
+      "parts",
+      "the line ends"
+    ],
+    "gt": "Where the drawing is",
+    "frames": [
+      {
+        "t": "Styles first",
+        "x": "Nothing is drawn until one dict answers every question about size, colour and font.",
+        "f": "STYLES",
+        "l": [
+          3,
+          37
+        ],
+        "on": [
+          "FONT",
+          "STY"
+        ],
+        "tok": [
+          "FONT-STY",
+          "font sources"
+        ],
+        "g": "L......"
+      },
+      {
+        "t": "drawPage is curried",
+        "x": "The tree first, then the styles and the offsets. So is every drawer below it.",
+        "f": "DP1",
+        "l": [
+          21,
+          25
+        ],
+        "on": [
+          "PAGE"
+        ],
+        "tok": [
+          "STY-PAGE",
+          "one styles dict"
+        ],
+        "g": ".L....."
+      },
+      {
+        "t": "The page gets its meta",
+        "x": "Title and subtitles first, each in a group of its own, each named for the word that made it.",
+        "f": "DP1",
+        "l": [
+          64,
+          93
+        ],
+        "on": [
+          "PAGE",
+          "META"
+        ],
+        "tok": [
+          "PAGE-META",
+          "title \u00b7 subtitles"
+        ],
+        "g": ".L....."
+      },
+      {
+        "t": "Handed to the measure loop",
+        "x": "drawMeasures lays measures along page lines and hands each one to drawMeasure.",
+        "f": "DP2",
+        "l": [
+          217,
+          232
+        ],
+        "on": [
+          "MEAS"
+        ],
+        "tok": [
+          "PAGE-MEAS",
+          "measuresParams"
+        ],
+        "g": "..L...."
+      },
+      {
+        "t": "One measure lays out left to right",
+        "x": "Barline, repeat dots, measure number, clefs, keys, times \u2014 each one placed after the last one\u2019s right edge.",
+        "f": "MEASUREL",
+        "l": [
+          125,
+          190
+        ],
+        "on": [
+          "MEASURE"
+        ],
+        "tok": [
+          "MEAS-MEASURE",
+          "one measure at a time"
+        ],
+        "g": "...L.."
+      },
+      {
+        "t": "Voices, slot by slot",
+        "x": "A cross-stave unit is one rhythmic slot across all staves. The scheduler walks them in order.",
+        "f": "SCHED",
+        "l": [
+          90,
+          135
+        ],
+        "on": [
+          "VOICES"
+        ],
+        "tok": [
+          "MEASURE-VOICES",
+          "drawVoicesOnMultipleStaves"
+        ],
+        "g": "....L."
+      },
+      {
+        "t": "One unit at a time",
+        "x": "Each unit is normalised, then drawn right after the accidentals of its slot.",
+        "f": "UNITS2",
+        "l": [
+          232,
+          292
+        ],
+        "on": [
+          "VOICES",
+          "UNIT"
+        ],
+        "tok": [
+          "VOICES-UNIT",
+          "one unit at a time"
+        ],
+        "g": "....L."
+      },
+      {
+        "t": "The parts of a unit",
+        "x": "Noteheads \u2014 displaced when seconds clash \u2014 then dots, stem, flag.",
+        "f": "UNITCORE",
+        "l": [
+          378,
+          424
+        ],
+        "on": [
+          "PARTS"
+        ],
+        "tok": [
+          "UNIT-PARTS",
+          "heads, dots, stem, flags"
+        ],
+        "g": ".....L"
+      },
+      {
+        "t": "The line ends",
+        "x": "Everything that can cross a measure is drawn now, for the whole line at once.",
+        "f": "BATCH",
+        "l": [
+          158,
+          215
+        ],
+        "on": [
+          "SPANS",
+          "FURN"
+        ],
+        "tok": [
+          "MEAS-SPANS",
+          "the page-line batch"
+        ],
+        "g": "......L"
+      },
+      {
+        "t": "And the line is wrapped",
+        "x": "Groups union their children\u2019s boxes, and the whole page becomes one tree.",
+        "f": "GROUPF",
+        "l": [
+          5,
+          38
+        ],
+        "on": [
+          "BOX",
+          "GROUP"
+        ],
+        "tok": [
+          "BOX-GROUP",
+          "boxes that union"
+        ],
+        "g": "......L"
+      }
+    ]
+  },
+  {
+    "id": "line",
+    "name": "Why the page line matters",
+    "cells": [
+      "beams",
+      "ties",
+      "tuplets",
+      "slurs",
+      "lyrics",
+      "the furniture"
+    ],
+    "gt": "What waits for the whole line",
+    "frames": [
+      {
+        "t": "Three passes at the end of a line",
+        "x": "First what crosses measures, then what needs the corrected bodies, then the furniture.",
+        "f": "BATCH",
+        "l": [
+          158,
+          176
+        ],
+        "on": [
+          "SPANS"
+        ],
+        "g": "L....."
+      },
+      {
+        "t": "Beams keep a stack per voice",
+        "x": "Units stack up under one key, and flush only when the voice\u2019s last unit on the line is drawn.",
+        "f": "BEAMS",
+        "l": [
+          9,
+          62
+        ],
+        "on": [
+          "SPANS"
+        ],
+        "g": "L....."
+      },
+      {
+        "t": "Slurs keep a stack per key",
+        "x": "A mark with before opens an entry; the matching finish \u2014 or the end of the line \u2014 closes it.",
+        "f": "SLURS",
+        "l": [
+          19,
+          64
+        ],
+        "on": [
+          "SPANS"
+        ],
+        "g": "...L.."
+      },
+      {
+        "t": "The bodies are re-fitted between passes",
+        "x": "Beams and ties can push a voice taller; the bodies and measures are corrected before anything else is drawn.",
+        "f": "BATCH",
+        "l": [
+          176,
+          200
+        ],
+        "on": [
+          "SPANS",
+          "FURN"
+        ],
+        "g": ".....L"
+      },
+      {
+        "t": "And the furniture comes last",
+        "x": "Repetition notes, codas, signs, voltas, tempo marks \u2014 all of them span measures too.",
+        "f": "BATCH",
+        "l": [
+          200,
+          215
+        ],
+        "on": [
+          "FURN"
+        ],
+        "g": ".....L"
+      },
+      {
+        "t": "A measure names itself",
+        "x": "measure-1, measure-1-1, line-1, every-measure, first-measure: one element, many names.",
+        "f": "MEASUREF",
+        "l": [
+          320,
+          345
+        ],
+        "on": [
+          "MEASURE"
+        ],
+        "g": ".....L"
+      }
+    ]
+  },
+  {
+    "id": "boxes",
+    "name": "Every element knows its box",
+    "cells": [
+      "a primitive",
+      "a group",
+      "ref-ids",
+      "markup",
+      "the score"
+    ],
+    "gt": "What every drawn thing carries",
+    "frames": [
+      {
+        "t": "A path answers with its box",
+        "x": "left, right, top, bottom are computed at the primitive and travel with the element.",
+        "f": "PATH",
+        "l": [
+          10,
+          50
+        ],
+        "on": [
+          "BOX"
+        ],
+        "g": "L...."
+      },
+      {
+        "t": "Groups union their children",
+        "x": "A group is the box that contains all of them, and is empty when they all are.",
+        "f": "GROUPF",
+        "l": [
+          5,
+          38
+        ],
+        "on": [
+          "BOX",
+          "GROUP"
+        ],
+        "tok": [
+          "BOX-GROUP",
+          "boxes that union"
+        ],
+        "g": ".L..."
+      },
+      {
+        "t": "And carries its names",
+        "x": "ref-ids are comma-joined and merge as they stack: measure-1,measure-1-1,line-1,every-measure.",
+        "f": "MEASUREF",
+        "l": [
+          324,
+          345
+        ],
+        "on": [
+          "BOX"
+        ],
+        "g": "..L.."
+      },
+      {
+        "t": "The markup carries both",
+        "x": "convertSvgToString writes every property, and pointer-events for every named node.",
+        "f": "SERF",
+        "l": [
+          19,
+          52
+        ],
+        "on": [
+          "SER"
+        ],
+        "tok": [
+          "GROUP-SER",
+          "markup + ref-ids"
+        ],
+        "g": "...L."
+      },
+      {
+        "t": "And the geometry leaves too",
+        "x": "data-left, data-right, data-top, data-bottom on every node: the SVG is self-describing.",
+        "f": "SERF",
+        "l": [
+          45,
+          52
+        ],
+        "on": [
+          "SER",
+          "SVG"
+        ],
+        "tok": [
+          "SER-SVG",
+          "the score"
+        ],
+        "g": "....L"
+      },
+      {
+        "t": "Glyphs are measured, not guessed",
+        "x": "The drawer asks the font for a glyph\u2019s path, then normalises it to a top-left origin.",
+        "f": "GLYPH",
+        "l": [
+          7,
+          34
+        ],
+        "on": [
+          "FONT",
+          "BOX"
+        ],
+        "g": "L...."
+      }
+    ]
+  }
+];
+
+  // ---------- System picture ----------
+  const SVGNS = 'http://www.w3.org/2000/svg';
+  const el = (n, a, p) => { const e = document.createElementNS(SVGNS, n); for (const k in a) e.setAttribute(k, a[k]); if (p) p.appendChild(e); return e; };
+  const gE = document.getElementById('edges'), gN = document.getElementById('nodes');
+  const edgeEls = {}, nodeEls = {};
+  for (const id in EDGES) {
+    const e = EDGES[id];
+    edgeEls[id] = el('path', { d: e.d, class: 'edge' }, gE);
+    if (e.l) { const t = el('text', { x: e.lx, y: e.ly, class: 'elabel' }, gE); t.textContent = e.l; }
+  }
+  document.getElementById('owners').innerHTML = Object.values(OWNERS).map(o =>
+    `<span style="--own:${o.c}"><i></i><b>${o.name}</b> ${o.where}</span>`).join('');
+
+  for (const id in NODES) {
+    const n = NODES[id]; const [ok, path] = OWN[id];
+    const g = el('g', { class: 'node', style: `--own:${OWNERS[ok].c}` }, gN);
+    const tt = el('title', {}, g); tt.textContent = `${OWNERS[ok].name}: ${path}`;
+    el('rect', { x: n.x - 75, y: n.y - 24, width: 150, height: 48, rx: 7 }, g);
+    el('rect', { x: n.x - 75, y: n.y - 24, width: 6, height: 48, rx: 3, class: 'band' }, g);
+    const a = el('text', { x: n.x, y: n.y - 3 }, g); a.textContent = n.t;
+    const b = el('text', { x: n.x, y: n.y + 13, class: 'k' }, g); b.textContent = n.k;
+    nodeEls[id] = g;
+  }
+  const tok = document.getElementById('tok');
+  const tokRect = tok.querySelector('rect'), tokText = tok.querySelector('text');
+
+  // ---------- Code rendering ----------
+  const files = {};
+  const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const KEYWORDS = /\b(const|let|var|function|return|if|else|for|while|of|in|new|import|export|from|default|class|extends|async|await|try|catch|finally|throw|typeof|instanceof|null|undefined|true|false|this|switch|case|break|continue|delete|void|yield|static|get|set)\b/;
+  function highlightJs(src) {
+    const re = new RegExp(
+      '(\\/\\*[\\s\\S]*?\\*\\/|\\/\\/[^\\n]*)' +
+      "|('(?:\\\\.|[^'\\\\])*'|\"(?:\\\\.|[^\"\\\\])*\"|`(?:\\\\.|[^`\\\\])*`)" +
+      '|(0x[\\da-fA-F]+|\\d+(?:\\.\\d+)?)' +
+      '|' + KEYWORDS.source, 'g');
+    let out = '', last = 0, m;
+    while ((m = re.exec(src))) {
+      out += esc(src.slice(last, m.index));
+      if (m[1]) out += '<span class="hljs-comment">' + esc(m[1]) + '</span>';
+      else if (m[2]) out += '<span class="hljs-string">' + esc(m[2]) + '</span>';
+      else if (m[3]) out += '<span class="hljs-number">' + esc(m[3]) + '</span>';
+      else out += '<span class="hljs-keyword">' + esc(m[4]) + '</span>';
+      last = re.lastIndex;
+    }
+    return out + esc(src.slice(last));
+  }
+  function splitLines(html) {
+    const out = []; const open = []; let cur = '';
+    const re = /(<span[^>]*>)|(<\/span>)|(\n)|([^<\n]+)/g; let m;
+    while ((m = re.exec(html))) {
+      if (m[1]) { open.push(m[1]); cur += m[1]; }
+      else if (m[2]) { open.pop(); cur += m[2]; }
+      else if (m[3]) { cur += '</span>'.repeat(open.length); out.push(cur); cur = open.join(''); }
+      else cur += m[4];
+    }
+    out.push(cur); return out;
+  }
+  function getFile(key) {
+    if (files[key]) return files[key];
+    const s = document.getElementById('src-' + key);
+    const raw = s.textContent.replace(/^\n/, '').replace(/\n$/, '');
+    files[key] = { path: s.dataset.path, start: +s.dataset.start, lines: splitLines(highlightJs(raw)) };
+    return files[key];
+  }
+  const codeOl = document.getElementById('code'), codeBox = document.getElementById('codebox');
+  let shownFile = null;
+  function showCode(key, range) {
+    const f = getFile(key);
+    if (shownFile !== key) {
+      codeOl.innerHTML = f.lines.map((ln, i) =>
+        `<li data-n="${f.start + i}"><span class="n">${f.start + i}</span><code>${ln || ' '}</code></li>`).join('');
+      shownFile = key;
+    }
+    document.getElementById('fpath').textContent = f.path;
+    const ow = OWNERS[FILE_OWNER[key]] || Object.values(OWNERS)[0]; const rp = document.getElementById('frepo');
+    rp.textContent = ow.name; rp.style.setProperty('--own', ow.c);
+    document.getElementById('flines').textContent = range ? `lines ${range[0]}–${range[1]}` : '';
+    let first = null;
+    codeOl.querySelectorAll('li').forEach(li => {
+      const n = +li.dataset.n; const on = range && n >= range[0] && n <= range[1];
+      li.classList.toggle('hl', !!on); if (on && !first) first = li;
+    });
+    if (first) codeBox.scrollTo({ top: Math.max(0, first.offsetTop - 70), behavior: reduce ? 'auto' : 'smooth' });
+  }
+
+  // ---------- Token animation ----------
+  const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let animId = 0;
+  function placeTok(path, t, rev) {
+    const L = path.getTotalLength(); const p = path.getPointAtLength((rev ? 1 - t : t) * L);
+    tok.setAttribute('transform', `translate(${p.x},${p.y})`);
+  }
+  function runTok(spec) {
+    const my = ++animId;
+    for (const id in edgeEls) edgeEls[id].classList.remove('on', 'lit');
+    if (!spec) { tok.style.display = 'none'; return; }
+    const [edge, label, rev, bad] = spec; const path = edgeEls[edge];
+    path.classList.add('on');
+    tok.classList.toggle('err', !!bad);
+    tokText.textContent = label; tok.style.display = '';
+    const w = Math.max(30, tokText.getComputedTextLength() + 14);
+    tokRect.setAttribute('width', w); tokRect.setAttribute('x', 10); tokRect.setAttribute('y', -9);
+    tokText.setAttribute('x', 17);
+    const a = 0.1, b = 0.9;
+    if (reduce) { placeTok(path, b, rev); return; }
+    const t0 = performance.now(), dur = 1000;
+    const step = now => {
+      if (my !== animId) return;
+      const k = Math.min(1, (now - t0) / dur); const e = k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+      placeTok(path, a + (b - a) * e, rev);
+      if (k < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }
+
+  // ---------- State panels ----------
+  const msgEl = document.getElementById('msg'), workerEl = document.getElementById('worker'), gridEl = document.getElementById('grid');
+  function showState(sc, fr) {
+    msgEl.textContent = fr.msg ? JSON.stringify(fr.msg, null, 2) : '—';
+    const w = fr.w;
+    workerEl.innerHTML = w
+      ? Object.entries(w).map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(String(v))}</dd>`).join('')
+      : '<dt>—</dt><dd>nothing new in this frame</dd>';
+    const sec = gridEl.closest('section');
+    if (!sc.cells) { sec.hidden = true; return; }
+    sec.hidden = false;
+    document.getElementById('gtitle').textContent = sc.gt;
+    const codes = (fr.g || '').padEnd(sc.cells.length, '.');
+    gridEl.innerHTML = sc.cells.map((c, i) => `<span class="chip ${codes[i] === '.' ? '' : codes[i]}">${esc(c)}</span>`).join('');
+  }
+
+  // ---------- Player ----------
+  let si = 0, fi = 0, timer = null;
+  const tabs = document.getElementById('tabs'), scrub = document.getElementById('scrub');
+  S.forEach((sc, i) => {
+    const b = document.createElement('button'); b.type = 'button'; b.role = 'tab'; b.id = 'tab-' + sc.id;
+    b.textContent = sc.name; b.addEventListener('click', () => { stop(); si = i; fi = 0; render(); });
+    tabs.appendChild(b);
+  });
+  function render() {
+    const sc = S[si], fr = sc.frames[fi];
+    [...tabs.children].forEach((b, i) => b.setAttribute('aria-selected', i === si ? 'true' : 'false'));
+    scrub.max = sc.frames.length - 1; scrub.value = fi;
+    document.getElementById('count').textContent = `${fi + 1} / ${sc.frames.length}`;
+    document.getElementById('ctitle').textContent = fr.t;
+    document.getElementById('ctext').textContent = fr.x;
+    document.getElementById('where').textContent = (fr.on || []).map(k => NODES[k].t).join(' · ');
+    for (const k in nodeEls) {
+      nodeEls[k].classList.toggle('on', (fr.on || []).includes(k) && !(fr.err || []).includes(k));
+      nodeEls[k].classList.toggle('err', (fr.err || []).includes(k));
+    }
+    runTok(fr.tok);
+    (fr.lit || []).forEach(id => edgeEls[id].classList.add('lit'));
+    document.getElementById('logline').textContent = fr.log || '—';
+    showState(sc, fr);
+    showCode(fr.f, fr.l);
+    document.getElementById('prev').disabled = document.getElementById('first').disabled = fi === 0;
+    document.getElementById('next').disabled = fi === sc.frames.length - 1;
+  }
+  const go = d => { const n = S[si].frames.length; fi = Math.max(0, Math.min(n - 1, fi + d)); render(); };
+  function stop() { if (timer) { clearInterval(timer); timer = null; } const p = document.getElementById('play'); p.textContent = '▶ Play'; p.setAttribute('aria-label', 'Play'); }
+  function play() {
+    if (fi === S[si].frames.length - 1) { fi = 0; render(); }
+    const p = document.getElementById('play'); p.textContent = '❚❚ Pause'; p.setAttribute('aria-label', 'Pause');
+    timer = setInterval(() => { if (fi >= S[si].frames.length - 1) return stop(); go(1); }, 2800);
+  }
+  document.getElementById('play').addEventListener('click', () => timer ? stop() : play());
+  document.getElementById('next').addEventListener('click', () => { stop(); go(1); });
+  document.getElementById('prev').addEventListener('click', () => { stop(); go(-1); });
+  document.getElementById('first').addEventListener('click', () => { stop(); fi = 0; render(); });
+  scrub.addEventListener('input', () => { stop(); fi = +scrub.value; render(); });
+  document.addEventListener('keydown', e => {
+    if (e.target === scrub) return;
+    if (e.key === 'ArrowRight') { stop(); go(1); e.preventDefault(); }
+    else if (e.key === 'ArrowLeft') { stop(); go(-1); e.preventDefault(); }
+    else if (e.key === ' ' && e.target.tagName !== 'BUTTON') { timer ? stop() : play(); e.preventDefault(); }
+  });
+
+  render();
+})();
+</script>

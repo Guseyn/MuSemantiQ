@@ -465,6 +465,15 @@ class MuSemantiQEditor extends MSQTemplateElement {
     if (focus) {
       this.editor.textarea.focus()
     }
+    /*
+    The text opens on its first line. Showing the view focuses the textarea, and
+    focus takes the view to wherever the caret happens to be — so the scroll is
+    set afterwards: the view opens at the top, and the caret stays where the
+    reader had it.
+    */
+    this.editor.textarea.scrollTop = 0
+    this.editor.divUnderneathTextarea.scrollTop = 0
+    this.editor.lineNumbersColumn.scrollTop = 0
   }
 
   /*
