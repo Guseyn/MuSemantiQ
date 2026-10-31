@@ -1,4 +1,5 @@
 import textWidthInTextarea from '#msq/web-components/editor/textWidthInTextarea.js'
+import offsetsOfLineInTextarea from '#msq/web-components/editor/offsetsOfLineInTextarea.js'
 import createdElementWithStylesAndAttributes from '#msq/web-components/editor/createdElementWithStylesAndAttributes.js'
 import {
   isAutocompleteListViewOpened,
@@ -121,48 +122,6 @@ const fillAutocompleteListViewWithOptionsForUncompletedWord = (uncompletedWord, 
 const MARGIN_ABOVE = 2.5
 const MARGIN_BELOW = 4
 const LEAST_ROOM = 96
-
-/*
-  Where a line really is, measured rather than multiplied.
-
-  The computed line-height is not always the pitch the lines are laid out at.
-  WebKit, which is what the desktop app runs in, sets lines at a whole number of
-  pixels: a line-height of 1.4em at 13px reads back as 18.2px but is drawn at 18.
-  Multiplied by the line number that error grows down the text, so far enough in
-  the list was opening tens of pixels below the word, and on top of it when it
-  flipped above. Chromium keeps the fraction, which is why it never showed there.
-
-  So the lines up to the caret's are laid out in a hidden block with the same
-  font and line-height, and its height says where the caret's line ends.
-*/
-function offsetsOfLineInTextarea(textarea, lineNumber) {
-  let probe = textarea.lineOffsetProbe
-  if (!probe) {
-    probe = document.createElement('div')
-    probe.setAttribute('aria-hidden', 'true')
-    Object.assign(probe.style, {
-      position: 'fixed',
-      top: '0',
-      left: '-10000px',
-      visibility: 'hidden',
-      pointerEvents: 'none',
-      whiteSpace: 'pre',
-      margin: '0',
-      padding: '0',
-      border: 'none'
-    })
-    textarea.getRootNode().appendChild(probe)
-    textarea.lineOffsetProbe = probe
-  }
-  // Longhands rather than `font`: WebKit can read the shorthand back empty.
-  const textareaComputedStyle = window.getComputedStyle(textarea)
-  for (const property of [ 'fontFamily', 'fontSize', 'fontWeight', 'fontStyle', 'letterSpacing', 'lineHeight' ]) {
-    probe.style[property] = textareaComputedStyle[property]
-  }
-  probe.textContent = 'x\n'.repeat(lineNumber) + 'x'
-  const bottom = probe.getBoundingClientRect().height
-  return { top: bottom * lineNumber / (lineNumber + 1), bottom }
-}
 
 function positionAutocompleteListViewAtCaret(autocompleteListView, textarea, lineNumberWhereCaretIsOn, widthOfTextBeforeTheWord) {
   const textareaBox = textarea.getBoundingClientRect()
@@ -369,7 +328,11 @@ export default (autocompleteListView, textarea, divUnderneathTextarea) => {
         // dismiss it there would be no way to Tab out of the editor at all.
         event.preventDefault()
         closeAutocompleteListView(autocompleteListView, textarea)
-      } else if (itIsTabPressed || itIsEnterPressed) {
+      } else if (itIsEnterPressed) {
+        // Enter is a new line, not a completion: the suggestion is Tab's job,
+        // and a key that starts the next command must not also finish this one.
+        closeAutocompleteListView(autocompleteListView, textarea)
+      } else if (itIsTabPressed) {
         if (enterOrTabIsUp) {
           event.preventDefault()
           completeWord(textarea, divUnderneathTextarea, autocompleteListView, columnNumberOfCharWhichIsFirstNonSpaceCharBeforeTheColumnNumberWhereCaretIsOn, lastColumnNumberOnTheLineWhereCaretIsOnForCurrentUncompletedWord, numberOfCharsIncludingNewLineCharsBeforeFirstCharInTheLineWhereCaretIsOn)

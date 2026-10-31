@@ -235,6 +235,12 @@ export default /*css*/`
     border-radius: 5px;
     scrollbar-width: none;
     box-shadow: rgba(9, 30, 66, 0.45) 0 1px 1px, rgba(9, 30, 66, 0.25) 0 0 1px 1px;
+    /*
+    A click that is not on an option belongs to the text: the list is drawn over
+    it, and swallowing the click would mean not being able to put the caret where
+    the list happens to sit. Only the options take clicks.
+    */
+    pointer-events: none;
   }
   div[data-autocomplete][hidden] {
     display: none;
@@ -248,6 +254,7 @@ export default /*css*/`
     white-space: nowrap;
     cursor: pointer;
     box-sizing: border-box;
+    pointer-events: auto;
   }
   div[data-autocomplete] div[data-option].selected {
     background: #faf0e6;

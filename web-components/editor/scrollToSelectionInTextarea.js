@@ -1,36 +1,30 @@
 import textWidthInTextarea from '#msq/web-components/editor/textWidthInTextarea.js'
+import offsetsOfLineInTextarea from '#msq/web-components/editor/offsetsOfLineInTextarea.js'
 
-export default (textarea, textareaLineHeight) => {
-  const selectionStartInTextarea = textarea.selectionStart
-  const textareaValueSplittedInLines = textarea.value.split('\n')
-  const numberOfCharsInEachLineInTextarea = textareaValueSplittedInLines.map(value => value.length)
-  const lineIndexWhereCaretIsOn = textarea.value.substr(0, selectionStartInTextarea).split('\n').length - 1
-  const numberOfCharsInEachLineBeforeTheLineWhereCaretIsOn = numberOfCharsInEachLineInTextarea.slice(0, lineIndexWhereCaretIsOn)
-  const numberOfCharsBeforeFirstCharOnTheLineWhereCaretIsOn = (numberOfCharsInEachLineBeforeTheLineWhereCaretIsOn.length >= 1)
-    ? numberOfCharsInEachLineBeforeTheLineWhereCaretIsOn.reduce((totalNumberOfChars, numberOfCharsOnTheLineWhereCaretIsOn) => totalNumberOfChars + numberOfCharsOnTheLineWhereCaretIsOn)
-    : 0
-  const totalNumberOfCharsBeforeSelectionStartInTextarea = selectionStartInTextarea
-  const numberOfNewLineCharsBeforeTheLineWhereCaretIsOn = lineIndexWhereCaretIsOn
-  const columnNumberWhereCaretIsOn = totalNumberOfCharsBeforeSelectionStartInTextarea - numberOfCharsBeforeFirstCharOnTheLineWhereCaretIsOn - numberOfNewLineCharsBeforeTheLineWhereCaretIsOn
-  const textareaValueOnTheLineWhereCarretIsOn = textareaValueSplittedInLines[lineIndexWhereCaretIsOn]
-  const textTillCurrentColumnNumberAndTheLineNumberWhereCaretIsOn = textareaValueOnTheLineWhereCarretIsOn.slice(0, columnNumberWhereCaretIsOn)
-  const widthOfTextTillCurrentColumnNumberAndTheLineNumberWhereCaretIsOn = textWidthInTextarea(textarea, textTillCurrentColumnNumberAndTheLineNumberWhereCaretIsOn)
-  const yPositionOfCaretInTextarea = textareaLineHeight * (lineIndexWhereCaretIsOn + 1)
-  const xPositionOfCaretInTextarea = widthOfTextTillCurrentColumnNumberAndTheLineNumberWhereCaretIsOn
-  const caretInTextareaIsOutOfVerticalView = (
-    (textarea.scrollTop > (yPositionOfCaretInTextarea + textareaLineHeight)) ||
-    (textarea.scrollTop < (yPositionOfCaretInTextarea - textarea.clientHeight))
-  )
-  const caretInTextareaIsOutOfHorizontalView = (
-    (textarea.scrollLeft > xPositionOfCaretInTextarea) ||
-    (textarea.scrollLeft < (xPositionOfCaretInTextarea - textarea.clientWidth))
-  )
-  if (caretInTextareaIsOutOfVerticalView) {
-    const negativeTopPaddingSoThatCaretWillBeSomewhatInTheMiddleOfVerticalView = 1 / 3
-    textarea.scrollTop = yPositionOfCaretInTextarea - textarea.clientHeight * negativeTopPaddingSoThatCaretWillBeSomewhatInTheMiddleOfVerticalView
+// Brings the caret fully into view — never a caret half cut by an edge, which
+// is what deleting a line could leave behind. The line it sits on is measured
+// rather than multiplied (see offsetsOfLineInTextarea), and the view is left
+// alone while the caret is already whole inside it. Only when it is not does
+// the view move, and then the caret goes a third of the way down, where it is
+// easiest to read from.
+export default (textarea) => {
+  const caret = textarea.selectionStart
+  const lineStart = textarea.value.lastIndexOf('\n', caret - 1) + 1
+  const lineIndex = textarea.value.slice(0, caret).split('\n').length - 1
+  const caretX = textWidthInTextarea(textarea, textarea.value.slice(lineStart, caret))
+  const { top: lineTop, bottom: lineBottom } = offsetsOfLineInTextarea(textarea, lineIndex)
+
+  const caretIsWholeAboveAndBelow =
+    lineTop >= textarea.scrollTop &&
+    lineBottom <= textarea.scrollTop + textarea.clientHeight
+  if (!caretIsWholeAboveAndBelow) {
+    textarea.scrollTop = lineTop - textarea.clientHeight / 3
   }
-  if (caretInTextareaIsOutOfHorizontalView) {
-    const negativeLeftPaddingSoThatCaretWillBeSomewhatInTheMiddleOfHorizontalView = 1 / 3
-    textarea.scrollLeft = xPositionOfCaretInTextarea - textarea.clientWidth * negativeLeftPaddingSoThatCaretWillBeSomewhatInTheMiddleOfHorizontalView
+
+  const caretIsWholeLeftAndRight =
+    caretX >= textarea.scrollLeft &&
+    caretX <= textarea.scrollLeft + textarea.clientWidth
+  if (!caretIsWholeLeftAndRight) {
+    textarea.scrollLeft = caretX - textarea.clientWidth / 3
   }
 }
