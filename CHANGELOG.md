@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.12 (2026-11-01)
+
+Fixed highlighting issues
+
 ## 1.0.11 (2026-10-31)
 
 Fixed editor bugs
