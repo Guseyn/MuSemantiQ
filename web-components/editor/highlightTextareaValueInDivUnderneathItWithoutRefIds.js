@@ -223,21 +223,19 @@ const applyTheColours = (divUnderneathTextarea, textarea, parseWholeTextInTextar
   const numberOfLinesInTextareaAddedOrRemoved = totalNumberOfLines - textarea.numberOfLinesInTextarea
   const numberOfCharsInEachLineInTextarea = textareaValueSplittedInLines.map(line => line.length)
   const selectionStartInTextarea = textarea.selectionStart
-  const linesBeforeSelectionStartIncludingTheLineWhereSelecetionStartsAt = textarea.value.substr(0, selectionStartInTextarea).split(NEW_LINE)
-  const linesBeforeSelectionStart = linesBeforeSelectionStartIncludingTheLineWhereSelecetionStartsAt.slice(0, linesBeforeSelectionStartIncludingTheLineWhereSelecetionStartsAt.length - 1)
-  const totalNumberOfLinesBeforeSelectionStart = linesBeforeSelectionStart.length
-  const lineIndexWhereCaretIsOn = totalNumberOfLinesBeforeSelectionStart
+  const linesBeforeSelectionStart = textarea.value.substr(0, selectionStartInTextarea).split(NEW_LINE).slice(0, -1)
+  const lineIndexWhereCaretIsOn = linesBeforeSelectionStart.length
   // One entry per character of the whole page, as an array — the part a
   // keystroke reparses is spliced into it in place, further down.
   const currentMapValuesOfCharIndexesWithProgressionOfCommandsFromScenarios = textarea.mapOfCharIndexesWithProgressionOfCommandsFromScenarios
-  let firstLineIndexToParse = lineIndexWhereCaretIsOn
-  const caretOnLineAtTheStart = (linesBeforeSelectionStartIncludingTheLineWhereSelecetionStartsAt[linesBeforeSelectionStartIncludingTheLineWhereSelecetionStartsAt.length - 1] === EMPTY_STRING)
-  if (
-    (firstLineIndexToParse !== 0) &&
-    caretOnLineAtTheStart
-  ) {
-    firstLineIndexToParse -= 1
-  }
+  /*
+    One line above the caret, always. The change is shown without colours on
+    that line too — showTheChangedTextWithoutColours writes what it is given —
+    and a line written without colours is only coloured back by being reparsed.
+    Starting at the caret instead left the line above it flat for good, which is
+    what the text losing its highlight looked like.
+  */
+  const firstLineIndexToParse = Math.max(0, lineIndexWhereCaretIsOn - 1)
   const firstCharIndexInParsedLines = numberOfCharsInEachLineInTextarea.slice(0, firstLineIndexToParse).reduce((numberOfCharsInLines, numberOfCharsInCurrentLine) => numberOfCharsInLines + numberOfCharsInCurrentLine, 0) - 1
   const lastLineIndexToParse = extendedLastLineIndexToParse(lineIndexWhereCaretIsOn, numberOfCharsInEachLineInTextarea, currentMapValuesOfCharIndexesWithProgressionOfCommandsFromScenarios)
 
@@ -353,8 +351,22 @@ export default (divUnderneathTextarea, textarea, parseWholeTextInTextarea) => {
       the ref-ids that navigation between the text and the score matches on.
       Colouring over them here is what left the editor opening with nothing to
       click through. They arrive coloured; nothing is owed here.
+
+      What is owed is what the incremental parse splices into: the per-character
+      map and the line count are behind the text once this job is let go, and
+      the next keystroke would splice them against what is no longer true. Both
+      are brought up to date here — over the text, not over the layer.
     */
     if (divUnderneathTextarea.wholeLayerRebuilds !== job.wholeLayerRebuilds) {
+      const textareaValue = adjustTextareaValueToKeepScrollingAlignedWhenItsValueEndsWithNewline(
+        textarea.value
+      )
+      textarea.numberOfLinesInTextarea = textareaValue.split(NEW_LINE).length
+      textarea.mapOfCharIndexesWithProgressionOfCommandsFromScenarios = parsedHighlights(
+        textareaValue,
+        [],
+        textarea.supportedFontNames
+      ).charIndexes
       return
     }
     applyTheColours(divUnderneathTextarea, textarea, job.parseWholeTextInTextarea)

@@ -77,6 +77,12 @@ export default function initializeEditor({
   synchronizeScrollOfDivUnderneathTextareaAndLineNumbersColumnByScrollChangeOfTextarea(
     divUnderneathTextarea, lineNumbersColumn, textarea
   )
+  /*
+    The autocomplete is wired before the rest of the key handling: Enter and Tab
+    are its while its list is open, and the handlers behind it leave what it has
+    handled alone.
+  */
+  showAutocompleteListViewOnTypingIfNeeded(autocompleteListView, textarea, divUnderneathTextarea)
   scrollToStartOfLineInTextareaWhenEnterIsPressed(textarea)
   scrollToBottomOfTextareaWhenEnterIsPressedAtTheBottomOfTextarea(textarea)
   makeScrollToFollowCaretInTextareaIfItIsDisappearedFromView(textarea)
@@ -88,7 +94,6 @@ export default function initializeEditor({
   fillLineNumbersColumnWhenTextareaChangesItsInput(lineNumbersColumn, textarea, divUnderneathTextarea)
   fillLineNumbersColumn(lineNumbersColumn, textarea, divUnderneathTextarea)
   highlightLineNumberWhenCaretIsOnIt(shadowHost.shadowRoot, textarea, lineNumbersColumn)
-  showAutocompleteListViewOnTypingIfNeeded(autocompleteListView, textarea, divUnderneathTextarea)
   insertAnIndentWhenTabIsPressed(textarea)
   makeWordsInEditorReferableToElementsInSVGImage(divUnderneathTextarea, textarea, previewButton)
   makeElementsInSVGImageReferableToWordsInEditor(divUnderneathTextarea, textarea, lineNumbersColumn, readButton)

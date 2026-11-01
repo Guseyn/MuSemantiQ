@@ -308,6 +308,17 @@ class MuSemantiQEditor extends MSQTemplateElement {
     if (!this.editor || !this.renderedHighlightsHtml) {
       return
     }
+    /*
+      The highlights are of the text as it was when they were generated, and the
+      text can move on while the score is being laid out. Swapping in the ones
+      of an older text would put words under words that are no longer there —
+      the layer has to hold the same characters as the textarea. The typing
+      path's own colours stand instead, and navigation already says the preview
+      is out of date.
+    */
+    if (this.editor.textarea.value !== this.msqText) {
+      return
+    }
     refreshDivUnderneathTextareaWithNewHtml(
       this.editor.divUnderneathTextarea,
       this.renderedHighlightsHtml
@@ -498,7 +509,9 @@ class MuSemantiQEditor extends MSQTemplateElement {
       this.wrapper.style.opacity = '0.5'
       try {
         this.#mountGenerated(await this.#generate(this.msqText))
-        textarea.isRenderedWithLatestInputText = true
+        // Typing goes on while the score is laid out; what came back is of the
+        // text it was asked for, and says nothing about what is there now.
+        textarea.isRenderedWithLatestInputText = textarea.value === this.msqText
       } catch (error) {
         this.updateErrors(this.host.shadowRoot, [ error.message ])
       } finally {

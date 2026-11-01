@@ -328,9 +328,14 @@ export default (autocompleteListView, textarea, divUnderneathTextarea) => {
         // dismiss it there would be no way to Tab out of the editor at all.
         event.preventDefault()
         closeAutocompleteListView(autocompleteListView, textarea)
+      } else if (itIsEnterPressed && !event.shiftKey && !event.ctrlKey && !event.altKey && !event.metaKey) {
+        // Enter takes the suggestion while there is one to take: the list
+        // being open is the editor asking whether this is the word you meant.
+        // A modifier held leaves the key alone, so turning a suggestion down
+        // and starting the next command is still one keystroke.
+        event.preventDefault()
+        completeWord(textarea, divUnderneathTextarea, autocompleteListView, columnNumberOfCharWhichIsFirstNonSpaceCharBeforeTheColumnNumberWhereCaretIsOn, lastColumnNumberOnTheLineWhereCaretIsOnForCurrentUncompletedWord, numberOfCharsIncludingNewLineCharsBeforeFirstCharInTheLineWhereCaretIsOn)
       } else if (itIsEnterPressed) {
-        // Enter is a new line, not a completion: the suggestion is Tab's job,
-        // and a key that starts the next command must not also finish this one.
         closeAutocompleteListView(autocompleteListView, textarea)
       } else if (itIsTabPressed) {
         if (enterOrTabIsUp) {
