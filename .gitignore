@@ -156,6 +156,10 @@ src/midi/magenta-sound-font/*
 
 # What a generator wrote while it ran, kept so a failed render can be read back.
 .generator-logs/
+
+# What an OMR test wrote when it failed, kept so the numbers can be read back.
+# Only failures write here, so nothing from a green run is worth tracking.
+test/omr-tests/actual/
 browser-app/web-app/static/magenta-sound-font/
 
 # Each app's static/js/msq is assembled rather than written: the components are
