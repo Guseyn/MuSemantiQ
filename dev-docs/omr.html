@@ -1,0 +1,959 @@
+<title>src/omr — image → MSQ, by hand</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+/* Plain document style: white paper, ink, one accent. Diagrams animate to show flow. */
+:root {
+  --paper: #fdfdfb;
+  --ink: #17181a;
+  --muted: #6b7076;
+  --rule: #e4e4e0;
+  --soft: #f4f3ef;
+  --accent: #a5322a;
+  --accent-soft: #f6e9e6;
+  --ok: #2f6b3c;
+  --font: system-ui, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+  --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+  --serif: Georgia, "Times New Roman", serif;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 64px; }
+body { background: var(--paper); color: var(--ink); font: 15.5px/1.6 var(--font); margin: 0; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.page { max-width: 860px; margin: 0 auto; padding: 36px 22px 120px; }
+header { margin-bottom: 4px; }
+header h1 { font: 400 34px/1.2 var(--serif); margin: 0 0 6px; }
+header .sub { color: var(--muted); max-width: 70ch; }
+hr { border: 0; border-top: 1px solid var(--rule); margin: 34px 0; }
+
+nav { position: sticky; top: 0; z-index: 10; background: var(--paper); border-bottom: 1px solid var(--rule); padding: 10px 0; margin: 22px 0 26px; display: flex; flex-wrap: wrap; gap: 4px 14px; }
+nav a { font: 500 12.5px var(--mono); color: var(--muted); }
+nav a:hover { color: var(--accent); text-decoration: none; }
+
+h2 { font: 400 25px/1.25 var(--serif); margin: 0 0 10px; }
+h2 .n { color: var(--muted); font-size: 17px; margin-right: 8px; }
+h3 { font: 600 15px var(--font); margin: 28px 0 6px; }
+h4 { font: 600 11.5px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 22px 0 4px; }
+p { max-width: 72ch; margin: 8px 0; }
+ul, ol { max-width: 72ch; padding-left: 22px; }
+li { margin: 3px 0; }
+b { font-weight: 650; }
+code { font: .87em var(--mono); background: var(--soft); padding: 0 4px; border-radius: 3px; }
+a.t { border-bottom: 1px dotted var(--muted); color: inherit; }
+a.t:hover { color: var(--accent); text-decoration: none; border-bottom-color: var(--accent); }
+
+figure { margin: 20px 0; }
+figure svg { display: block; width: 100%; height: auto; background: #fff; border: 1px solid var(--rule); border-radius: 4px; }
+figcaption { font: 12px var(--mono); color: var(--muted); margin-top: 6px; }
+
+/* formulas + variable legends */
+.f {
+  border-left: 3px solid var(--accent); background: var(--soft);
+  padding: 12px 18px; margin: 14px 0 6px; overflow-x: auto;
+  font: 17px/2 var(--serif);
+}
+.f .who { display: block; font: 11px var(--mono); color: var(--muted); margin-top: 6px; }
+table.legend { margin: 0 0 16px 24px; width: auto; min-width: 320px; font-size: 13px; }
+table.legend td { border: 0; border-bottom: 1px solid var(--rule); padding: 3px 14px 3px 0; vertical-align: top; }
+table.legend td:first-child { font-family: var(--serif); font-style: italic; white-space: nowrap; width: 56px; }
+
+pre { background: #fff; border: 1px solid var(--rule); border-radius: 4px; padding: 12px 16px; overflow-x: auto; font: 12.5px/1.7 var(--mono); margin: 12px 0; }
+pre .cm { color: var(--muted); }
+pre .kw { color: var(--accent); }
+pre .st { color: var(--ok); }
+
+table.grid { border-collapse: collapse; width: 100%; font-size: 13.5px; margin: 12px 0; }
+table.grid th { text-align: left; font: 600 11px var(--mono); text-transform: uppercase; letter-spacing: .05em; color: var(--muted); border-bottom: 2px solid var(--ink); padding: 6px 10px; }
+table.grid td { border-bottom: 1px solid var(--rule); padding: 7px 10px; vertical-align: top; }
+table.grid tr:hover td { background: var(--soft); }
+td .mini { color: var(--muted); font-size: 12px; }
+
+.tag { font: 600 10px var(--mono); padding: 1px 6px; border-radius: 3px; text-transform: uppercase; letter-spacing: .05em; white-space: nowrap; }
+.tag.v1 { background: var(--accent-soft); color: var(--accent); }
+.tag.v2 { background: var(--soft); color: var(--muted); }
+
+/* code structure */
+.folder { margin: 18px 0 26px; }
+.folder > .name { font: 600 13px var(--mono); color: var(--accent); border-bottom: 1px solid var(--rule); padding-bottom: 4px; }
+.folder .row { display: grid; grid-template-columns: 250px 1fr; gap: 4px 18px; padding: 5px 0; border-bottom: 1px dotted var(--rule); font-size: 13.5px; }
+.folder .row .f2 { font: 12.5px var(--mono); }
+.folder .row .d { color: var(--muted); }
+@media (max-width: 620px) { .folder .row { grid-template-columns: 1fr; } }
+
+/* animations */
+.flow { position: relative; }
+.dashmove { stroke-dasharray: 6 5; animation: dashmove 1.2s linear infinite; }
+@keyframes dashmove { to { stroke-dashoffset: -11; } }
+.pulse { animation: pulse 5.2s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+@keyframes pulse {
+  0%, 12% { opacity: .35; }
+  18%, 30% { opacity: 1; }
+  48%, 100% { opacity: .35; }
+}
+.flash { animation: flash 9s linear infinite; }
+@keyframes flash {
+  0%, 4% { opacity: 0; }
+  8%, 34% { opacity: 1; }
+  42%, 100% { opacity: 0; }
+}
+.typein { animation: typein 9s linear infinite; }
+@keyframes typein {
+  0%, 42% { opacity: 0; transform: translateY(3px); }
+  48%, 92% { opacity: 1; transform: none; }
+  97%, 100% { opacity: 0; transform: translateY(3px); }
+}
+.draw { stroke-dasharray: 900; stroke-dashoffset: 900; animation: draw 6s ease-in-out infinite; }
+@keyframes draw {
+  0% { stroke-dashoffset: 900; opacity: 0; }
+  8% { opacity: 1; }
+  60% { stroke-dashoffset: 0; opacity: 1; }
+  88% { opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 0; }
+}
+.spin { animation: spin 7s linear infinite; transform-origin: center; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.fadeup { opacity: 0; animation: fadeup 8s ease-in-out infinite; }
+@keyframes fadeup {
+  0% { opacity: 0; transform: translateY(2px); }
+  10%, 80% { opacity: 1; transform: none; }
+  92%, 100% { opacity: 0; }
+}
+.travel { offset-rotate: 0deg; animation: travel 5.2s linear infinite; }
+@keyframes travel { to { offset-distance: 100%; } }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .draw { stroke-dashoffset: 0; }
+  .flash, .typein, .fadeup { opacity: 1; }
+}
+
+/* training viz */
+.viz { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; margin: 14px 0; }
+.viz > div { border: 1px solid var(--rule); border-radius: 4px; padding: 12px 14px; background: #fff; }
+.viz h5 { margin: 0 0 8px; font: 600 10.5px var(--mono); text-transform: uppercase; letter-spacing: .07em; color: var(--muted); }
+.matrix { display: grid; grid-template-columns: repeat(10, 1fr); gap: 2px; }
+.matrix i { aspect-ratio: 1; background: var(--accent); border-radius: 1px; opacity: 0; animation: fadeup 8s ease-in-out infinite; }
+.gl { display: flex; flex-wrap: wrap; gap: 6px; }
+.gl figure { margin: 0; width: 58px; text-align: center; }
+.gl .crop { width: 58px; height: 58px; border: 1.5px solid var(--accent); border-radius: 3px; display: grid; place-items: center; font-size: 22px; background: #fff; }
+.gl figcaption { font-size: 9.5px; margin-top: 2px; }
+
+dl.terms { margin: 10px 0; }
+dl.terms > div { display: grid; grid-template-columns: 170px 1fr; gap: 4px 16px; padding: 6px 0; border-bottom: 1px dotted var(--rule); }
+dl.terms dt { font: 600 13px var(--mono); }
+dl.terms dd { margin: 0; color: var(--ink); font-size: 13.5px; }
+dl.terms dd em { color: var(--muted); }
+@media (max-width: 620px) { dl.terms > div { grid-template-columns: 1fr; } }
+</style>
+
+<div class="page">
+<header>
+  <h1>src/omr — an image becomes a page</h1>
+  <p class="sub">Everything implemented by hand: what each file does, the full math with every variable named, every MSQ feature it recognizes, and how training runs on a rented server. One small model; everything else is measuring pixels.</p>
+</header>
+
+<nav>
+  <a href="#overview">1 overview</a>
+  <a href="#code">2 code</a>
+  <a href="#features">3 features</a>
+  <a href="#pixels">4 pixels → numbers</a>
+  <a href="#model">5 the model</a>
+  <a href="#training">6 training</a>
+  <a href="#server">7 on a server</a>
+  <a href="#api">8 api</a>
+  <a href="#testing">9 testing</a>
+  <a href="#terms">terms</a>
+  <a href="#math">math ↔ code</a>
+</nav>
+
+<!-- ============================ 1 · OVERVIEW ============================ -->
+<section id="overview">
+<h2><span class="n">1</span>Overview</h2>
+<p>Score image in → MSQ text + a report out. The report says what the tool was unsure about, with the place in the image and the line in the text. Draft, not copy.</p>
+
+<figure>
+<svg viewBox="0 0 900 300" role="img" aria-label="Animated pipeline: image to MSQ">
+  <!-- stage boxes -->
+  <g font-family="system-ui, sans-serif" text-anchor="middle">
+    <rect class="pulse" style="animation-delay:0s"   x="14"  y="36" width="120" height="52" rx="4" fill="#fff" stroke="#c9c9c4"></rect>
+    <text x="74" y="58" font-size="12.5" font-weight="600">image</text><text x="74" y="75" font-size="10" fill="#6b7076">pixels</text>
+    <rect class="pulse" style="animation-delay:.65s" x="152" y="36" width="120" height="52" rx="4" fill="#fff" stroke="#c9c9c4"></rect>
+    <text x="212" y="58" font-size="12.5" font-weight="600">staves</text><text x="212" y="75" font-size="10" fill="#6b7076">5 lines → unit</text>
+    <rect class="pulse" style="animation-delay:1.3s" x="290" y="36" width="120" height="52" rx="4" fill="#fff" stroke="#c9c9c4"></rect>
+    <text x="350" y="58" font-size="12.5" font-weight="600">components</text><text x="350" y="75" font-size="10" fill="#6b7076">ink blobs + lines</text>
+    <rect class="pulse" style="animation-delay:1.95s" x="428" y="36" width="128" height="52" rx="4" fill="#f6e9e6" stroke="#a5322a" stroke-width="2"></rect>
+    <text x="492" y="58" font-size="12.5" font-weight="600">classify</text><text x="492" y="75" font-size="10" fill="#a5322a">the one model</text>
+    <rect class="pulse" style="animation-delay:2.6s" x="574" y="36" width="128" height="52" rx="4" fill="#fff" stroke="#c9c9c4"></rect>
+    <text x="638" y="58" font-size="12.5" font-weight="600">music model</text><text x="638" y="75" font-size="10" fill="#6b7076">rules</text>
+    <rect class="pulse" style="animation-delay:3.25s" x="720" y="36" width="164" height="52" rx="4" fill="#eef4ee" stroke="#2f6b3c"></rect>
+    <text x="802" y="58" font-size="12.5" font-weight="600">.msq + report</text><text x="802" y="75" font-size="10" fill="#2f6b3c">text you can edit</text>
+  </g>
+  <!-- flow line + traveling dot -->
+  <path id="flowpath" d="M74,120 L74,142 L492,142 L492,120 M492,142 L802,142 L802,120" fill="none" stroke="#d5d5d0" stroke-width="1.5"></path>
+  <path d="M74,120 L74,142 L802,142 L802,120" fill="none" stroke="#d5d5d0" stroke-width="1.5"></path>
+  <circle r="6" fill="#a5322a">
+    <animateMotion dur="5.2s" repeatCount="indefinite" path="M74,120 L74,142 L802,142 L802,120"></animateMotion>
+  </circle>
+  <!-- bars -->
+  <g>
+    <rect x="14" y="210" width="560" height="10" rx="3" fill="#ecece8"></rect>
+    <rect x="588" y="210" width="140" height="10" rx="3" fill="#a5322a"></rect>
+    <text x="294" y="240" font-size="11" font-family="monospace" fill="#6b7076" text-anchor="middle">measuring pixels — deterministic, no learning</text>
+    <text x="658" y="240" font-size="11" font-family="monospace" fill="#a5322a" text-anchor="middle">learned, then frozen</text>
+    <text x="450" y="272" font-size="11" font-family="monospace" fill="#6b7076" text-anchor="middle">one input → one output. every stage is inspectable. unknown is an answer, never a guess.</text>
+  </g>
+</svg>
+<figcaption>fig 1 · the whole tool. Nine stages, one of them learned.</figcaption>
+</figure>
+
+<h4>The plan in one line each</h4>
+<ul>
+  <li><b>Lines are geometry, blobs are classes.</b> Staff lines, stems, beams and barlines are straight lines — found by math, not by the model. Only ink blobs (heads, clefs, accidentals, rests, digits) go through the classifier.</li>
+  <li><b>Proportions, not absolutes.</b> Everything is measured in <a class="t" href="#term-staff-space">staff spaces</a>; one screenshot at any zoom gives the same output.</li>
+  <li><b>The model is small</b> — ~300K <a class="t" href="#term-parameter">numbers</a> you can print. Trained on pages your own renderer draws, so labels are exact and cost nothing.</li>
+  <li><b>Training is plain code</b>: a forward pass, a loss, gradients, a nudging loop. Nothing hidden; the deployed model runs the same functions the trainer does.</li>
+</ul>
+</section>
+
+<hr>
+
+<!-- ============================ 2 · CODE ============================ -->
+<section id="code">
+<h2><span class="n">2</span>Where the code lives</h2>
+<p>One folder in <code>src/</code>. One function per file. Training data is generated on demand; weights ship with the repo.</p>
+
+<div class="folder">
+  <div class="name">src/omr/ — the public entry</div>
+  <div class="row"><span class="f2">api.js</span><span class="d">the four exported functions; nothing else is public</span></div>
+</div>
+
+<div class="folder">
+  <div class="name">src/omr/analysis/ — the image half</div>
+  <div class="row"><span class="f2">readBitmapFromImage.js</span><span class="d">png/jpeg bytes → grayscale numbers</span></div>
+  <div class="row"><span class="f2">deskewBitmap.js</span><span class="d">straighten a photo: find the dominant line angle, rotate</span></div>
+  <div class="row"><span class="f2">detectStaves.js</span><span class="d">find groups of 5 parallel lines; measure the staff space <i>s</i></span></div>
+  <div class="row"><span class="f2">groupStavesIntoSystems.js</span><span class="d">staves joined by a brace or bracket (and shared barlines) form one system</span></div>
+  <div class="row"><span class="f2">removeStaffLines.js</span><span class="d">subtract the lines so symbols separate into pieces</span></div>
+  <div class="row"><span class="f2">findSymbolComponents.js</span><span class="d">connected ink regions (= components) with bounding boxes</span></div>
+  <div class="row"><span class="f2">splitTouchingComponents.js</span><span class="d">two overlapping heads are one blob — split by vertical profile</span></div>
+  <div class="row"><span class="f2">classifyComponent.js</span><span class="d">the model's forward pass; returns class + <a class="t" href="#term-softmax">probabilities</a> + <code>unknown</code></span></div>
+  <div class="row"><span class="f2">symbolClasses.js</span><span class="d">the class table — <b>data</b>; adding an MSQ element = adding a row</span></div>
+  <div class="row"><span class="f2">findTextBlocks.js</span><span class="d">clusters of ink that are words: title, subtitle, instrument names</span></div>
+  <div class="row"><span class="f2">measureStyles.js</span><span class="d">text heights ÷ <i>s</i> = font sizes; median colors</span></div>
+</div>
+
+<div class="folder">
+  <div class="name">src/omr/translation/ — the music half (rules, no learning)</div>
+  <div class="row"><span class="f2">assignPitchByStaffPosition.js</span><span class="d">vertical position + clef → note letter and octave</span></div>
+  <div class="row"><span class="f2">inferDurationFromNoteShapes.js</span><span class="d">head fill + stem + flags/beams + dots → duration</span></div>
+  <div class="row"><span class="f2">groupChordsByHorizontalProximity.js</span><span class="d">heads at the same x → one chord unit; a stem crossing the gap joins staves</span></div>
+  <div class="row"><span class="f2">splitVoicesByStemDirection.js</span><span class="d">stems up vs down at the same x → voice 1 / voice 2</span></div>
+  <div class="row"><span class="f2">buildMeasuresFromBarLines.js</span><span class="d">barlines slice the timeline into measures</span></div>
+  <div class="row"><span class="f2">inferKeyAndTimeSignature.js</span><span class="d">accidentals after the clef → key; stacked digits → meter</span></div>
+  <div class="row"><span class="f2">fillRestsInMeasures.js</span><span class="d">gaps in a measure become the rests that fill them</span></div>
+  <div class="row"><span class="f2">pairTiesAndSlurs.js</span><span class="d">curve ends → span pairs — ties, slurs, glissandi — across staves too</span></div>
+  <div class="row"><span class="f2">carryStateAcrossPages.js</span><span class="d">measure numbers, key and meter continue on page 2+</span></div>
+  <div class="row"><span class="f2">buildPageSchemaFromAnalysis.js</span><span class="d">the music model → the page schema <code>src/language</code> consumes</span></div>
+</div>
+
+<div class="folder">
+  <div class="name">src/omr/model/ — the learned numbers</div>
+  <div class="row"><span class="f2">forwardConvolution.js</span><span class="d">conv layer as one matrix multiply (im2col)</span></div>
+  <div class="row"><span class="f2">forwardDense.js</span><span class="d">dense layer, ReLU, softmax — the rest of the forward pass</span></div>
+  <div class="row"><span class="f2">weights.json</span><span class="d">flat number arrays + their SHA-256 hash; what ships</span></div>
+</div>
+
+<div class="folder">
+  <div class="name">src/omr/training/ — how the numbers are learned</div>
+  <div class="row"><span class="f2">generateTrainingSet.js</span><span class="d"><a class="t" href="#term-seed">seed</a> → random page schema → your own renderer draws it</span></div>
+  <div class="row"><span class="f2">applyDegradations.js</span><span class="d">make it photo-like: skew, blur, jpeg noise, low contrast</span></div>
+  <div class="row"><span class="f2">cropComponents.js</span><span class="d">cut each symbol at 3 staff spaces, pad square, resample 48×48</span></div>
+  <div class="row"><span class="f2">inspectDataset.js</span><span class="d">contact sheets — look at your data before training on it</span></div>
+  <div class="row"><span class="f2">train.js</span><span class="d">the loop: forward → loss → gradients → nudge</span></div>
+  <div class="row"><span class="f2">backpropagateDense.js</span><span class="d">gradients for dense/conv (shared via im2col)</span></div>
+  <div class="row"><span class="f2">backpropagateConvolution.js</span><span class="d">gradients for the conv weights and inputs</span></div>
+  <div class="row"><span class="f2">updateWeightsWithAdam.js</span><span class="d">the nudging rule (<a class="t" href="#term-adam">Adam</a>)</span></div>
+  <div class="row"><span class="f2">evaluate.js</span><span class="d">confusion matrix + the worst mistakes as images</span></div>
+  <div class="row"><span class="f2">exportWeights.js</span><span class="d">write <code>weights.json</code> + hash</span></div>
+</div>
+
+<div class="folder">
+  <div class="name">training-data/ (gitignored) — bytes are a cache, seeds are the source</div>
+  <div class="row"><span class="f2">generated/</span><span class="d">regenerated from seeds; never committed</span></div>
+  <div class="row"><span class="f2">fixtures/</span><span class="d">~10 curated images + expected .msq — <b>committed</b>, back the golden tests</span></div>
+</div>
+</section>
+
+<hr>
+
+<!-- ============================ 3 · FEATURES ============================ -->
+<section id="features">
+<h2><span class="n">3</span>Every MSQ feature, and the pixels that prove it</h2>
+<p>Recognition is not magic: each MSQ feature corresponds to something <b>visible and measurable</b> in the image. If a feature has no visible signal in a given image, it goes to the report instead of being invented. Watch one measure go through the pipeline:</p>
+
+<figure>
+<svg viewBox="0 0 900 420" role="img" aria-label="Animated walkthrough of one measure being recognized">
+  <!-- staff -->
+  <g stroke="#333" stroke-width="1.6">
+    <line x1="150" y1="60" x2="700" y2="60"></line>
+    <line x1="150" y1="72" x2="700" y2="72"></line>
+    <line x1="150" y1="84" x2="700" y2="84"></line>
+    <line x1="150" y1="96" x2="700" y2="96"></line>
+    <line x1="150" y1="108" x2="700" y2="108"></line>
+  </g>
+  <!-- clef -->
+  <text x="168" y="102" font-family="Georgia, serif" font-size="52">𝄞</text>
+  <!-- time signature -->
+  <g font-family="Georgia, serif" font-size="26" text-anchor="middle">
+    <text x="232" y="78">3</text><text x="232" y="104">4</text>
+  </g>
+  <!-- barline -->
+  <line x1="690" y1="60" x2="690" y2="108" stroke="#333" stroke-width="2"></line>
+  <!-- notes: c quarter (head at y=96 space), e quarter (y=84), g half (y=72) -->
+  <g>
+    <ellipse cx="330" cy="96" rx="9" ry="6.5" fill="#17181a" transform="rotate(-18 330 96)"></ellipse>
+    <line x1="338" y1="94" x2="338" y2="38" stroke="#17181a" stroke-width="2.2"></line>
+    <ellipse cx="420" cy="84" rx="9" ry="6.5" fill="#17181a" transform="rotate(-18 420 84)"></ellipse>
+    <line x1="428" y1="82" x2="428" y2="26" stroke="#17181a" stroke-width="2.2"></line>
+    <ellipse cx="520" cy="72" rx="9" ry="6.5" fill="none" stroke="#17181a" stroke-width="2.2" transform="rotate(-18 520 72)"></ellipse>
+    <line x1="528" y1="70" x2="528" y2="14" stroke="#17181a" stroke-width="2.2"></line>
+  </g>
+
+  <!-- STEP 1: staff found -->
+  <rect class="flash" style="animation-delay:0s" x="146" y="54" width="558" height="60" fill="none" stroke="#a5322a" stroke-width="2" rx="3"></rect>
+  <text class="flash" style="animation-delay:0s" x="425" y="140" font-size="11" font-family="monospace" fill="#a5322a" text-anchor="middle">1 · staff found — s = 12px, everything below is measured in s</text>
+
+  <!-- STEP 2: components -->
+  <g class="flash" style="animation-delay:1.6s" fill="none" stroke="#a5322a" stroke-width="1.5" stroke-dasharray="3 2">
+    <rect x="312" y="34" width="36" height="72" rx="3"></rect>
+    <rect x="402" y="22" width="36" height="72" rx="3"></rect>
+    <rect x="502" y="10" width="36" height="72" rx="3"></rect>
+  </g>
+  <text class="flash" style="animation-delay:1.6s" x="425" y="164" font-size="11" font-family="monospace" fill="#a5322a" text-anchor="middle">2 · lines removed → 3 components (head+stem as one blob each)</text>
+
+  <!-- STEP 3: classified -->
+  <g class="flash" style="animation-delay:3.2s" font-family="monospace" font-size="10" fill="#a5322a" text-anchor="middle">
+    <text x="330" y="122">filled·stem</text>
+    <text x="420" y="110">filled·stem</text>
+    <text x="520" y="98">open·stem</text>
+    <text x="232" y="122">digit 3 / 4</text>
+  </g>
+  <text class="flash" style="animation-delay:3.2s" x="425" y="188" font-size="11" font-family="monospace" fill="#a5322a" text-anchor="middle">3 · classify each blob — p = 0.97 · 0.96 · 0.94 · 0.99</text>
+
+  <!-- STEP 4: measured -->
+  <g class="flash" style="animation-delay:4.8s" font-family="monospace" font-size="10" fill="#2f6b3c" text-anchor="middle">
+    <text x="330" y="146">pos 3 → c4</text>
+    <text x="420" y="134">pos 2 → e4</text>
+    <text x="520" y="122">pos 1 → g4</text>
+    <text x="640" y="80">barline → end measure</text>
+    <text x="232" y="146">3:4</text>
+  </g>
+  <text class="flash" style="animation-delay:4.8s" x="425" y="212" font-size="11" font-family="monospace" fill="#2f6b3c" text-anchor="middle">4 · staff position + clef → pitch · head fill + stem → duration · barlines → measure</text>
+
+  <!-- STEP 5: MSQ text -->
+  <g class="typein" style="animation-delay:0s" font-family="monospace" font-size="13">
+    <rect x="180" y="248" width="540" height="140" rx="4" fill="#f4f3ef" stroke="#e4e4e0"></rect>
+    <text x="200" y="276" fill="#17181a">measure</text>
+    <text x="200" y="298" fill="#17181a">time signature is 3:4</text>
+    <text x="200" y="320" fill="#17181a">treble clef</text>
+    <text x="200" y="348" fill="#a5322a">1/4 c</text>
+    <text x="280" y="348" fill="#a5322a">1/4 e</text>
+    <text x="360" y="348" fill="#a5322a">1/2 g</text>
+    <text x="200" y="376" fill="#6b7076">← each unit one line; report: none</text>
+  </g>
+</svg>
+<figcaption>fig 2 · one measure, five steps, looping. Every step is a measurement, not a guess.</figcaption>
+</figure>
+
+<h3>Grand staves and cross-stave writing</h3>
+<p>Multiple staves are not special cases. The page schema is built for them: a measure holds several staves, braces and brackets are connections between staves, and each note carries the stave it sits on (<code>stave: 'prev' | 'current' | 'next'</code>). The image gives the same signals as always — just across two grids:</p>
+
+<figure>
+<svg viewBox="0 0 900 330" role="img" aria-label="Grand staff with a brace, a cross-stave chord and a cross-stave slur">
+  <!-- treble staff -->
+  <g stroke="#333" stroke-width="1.5">
+    <line x1="96" y1="60" x2="700" y2="60"></line><line x1="96" y1="72" x2="700" y2="72"></line>
+    <line x1="96" y1="84" x2="700" y2="84"></line><line x1="96" y1="96" x2="700" y2="96"></line>
+    <line x1="96" y1="108" x2="700" y2="108"></line>
+  </g>
+  <!-- bass staff -->
+  <g stroke="#333" stroke-width="1.5">
+    <line x1="96" y1="180" x2="700" y2="180"></line><line x1="96" y1="192" x2="700" y2="192"></line>
+    <line x1="96" y1="204" x2="700" y2="204"></line><line x1="96" y1="216" x2="700" y2="216"></line>
+    <line x1="96" y1="228" x2="700" y2="228"></line>
+  </g>
+  <!-- brace -->
+  <path d="M94,60 C64,112 64,176 94,228" fill="none" stroke="#17181a" stroke-width="2.5"></path>
+  <!-- clefs -->
+  <text x="112" y="104" font-family="Georgia, serif" font-size="48">𝄞</text>
+  <text x="112" y="218" font-family="Georgia, serif" font-size="38">𝄢</text>
+  <!-- cross-stave chord at x=380 -->
+  <ellipse cx="380" cy="108" rx="8.5" ry="6" fill="#17181a" transform="rotate(-18 380 108)"></ellipse>
+  <ellipse cx="380" cy="180" rx="8.5" ry="6" fill="#17181a" transform="rotate(-18 380 180)"></ellipse>
+  <line x1="388" y1="104" x2="388" y2="184" stroke="#17181a" stroke-width="2.2"></line>
+  <!-- cross-stave slur: treble head at 300 → bass head at 520 -->
+  <ellipse cx="300" cy="96" rx="8.5" ry="6" fill="#17181a" transform="rotate(-18 300 96)"></ellipse>
+  <ellipse cx="520" cy="192" rx="8.5" ry="6" fill="#17181a" transform="rotate(-18 520 192)"></ellipse>
+  <path d="M294,86 C332,50 428,118 526,182" fill="none" stroke="#a5322a" stroke-width="2"></path>
+  <!-- shared barline -->
+  <line x1="680" y1="60" x2="680" y2="228" stroke="#333" stroke-width="2.2"></line>
+  <text x="688" y="112" font-size="9.5" font-family="monospace" fill="#6b7076">shared barline →</text>
+  <text x="688" y="126" font-size="9.5" font-family="monospace" fill="#6b7076">measures align</text>
+  <!-- labels -->
+  <text x="96" y="272" font-size="10.5" font-family="monospace" fill="#6b7076">brace → connectionsParams { name: 'brace', staveStartNumber: 1, staveEndNumber: 2 }</text>
+  <text x="96" y="294" font-size="10.5" font-family="monospace" fill="#6b7076">cross-stave chord → one unit; its notes carry stave: 'current' | 'next'</text>
+  <text x="96" y="316" font-size="10.5" font-family="monospace" fill="#a5322a">cross-stave slur → slurMarks paired by key; ends named (measure, stave, voice, unit)</text>
+</svg>
+<figcaption>fig 2b · the three cross-stave cases: a connection, a chord, a slur. All three are geometry first.</figcaption>
+</figure>
+
+<ul>
+  <li><b>Systems.</b> A brace (curly) or bracket (thick line with serifs) at the left edge joins staves into one system; a barline drawn across staves confirms it. Measures then slice on the <em>union</em> of barline x-positions — a barline in either stave closes the measure for both.</li>
+  <li><b>Cross-stave chords and beams.</b> A stem crossing the gap between staves joins heads from both — one unit, notes tagged <code>stave: 'prev' | 'next'</code> (the language words: <code>on the next stave</code>, <code>on the previous stave</code>). Beamed groups may cross the same way.</li>
+  <li><b>Cross-stave slurs and ties.</b> Curve ends are paired as always; when the ends land on different staves, each is named by its (measure, stave, voice, unit) — the schema's span keys pair across staves. <code>with s shape</code> when it curves both ways; <code>goes through unit</code> for passing points.</li>
+  <li><b>A head between staves</b> (ledger lines of both grids) belongs to the grid needing fewer ledger lines; stems and ties settle the rest. Still ambiguous → the report, with both candidates.</li>
+</ul>
+
+<h3>Every feature MSQ can write</h3>
+<p>The complete vocabulary of the language — every command in <code>command-index.md</code>, grouped as the language docs group it (578 constructs in <code>docs/concepts.js</code>). Each row: what proves it in the image, who reads it, when. The table is kept in step with the language: a new command forces a new row. What has no visible signal is never invented — it is listed at the end.</p>
+
+<h4>The page</h4>
+<table class="grid">
+<tr><th>feature</th><th>written as</th><th>signal in the image</th><th>who reads it</th><th></th></tr>
+<tr><td>clefs</td><td><code>treble clef</code>, <code>bass</code>, <code>alto</code>, <code>tenor</code>, <code>soprano</code>, <code>mezzo soprano</code>, <code>baritone</code>, <code>octave up/down</code>, <code>two octaves …</code></td><td>large glyph at the stave's left edge — every clef a distinct shape; small 8 above/below for octave clefs</td><td>classes + position</td><td><span class="tag v1">v1</span></td></tr>
+<tr><td>staves</td><td><code>stave</code>, <code>stave with bass clef</code></td><td>another group of 5 lines</td><td>geometry</td><td><span class="tag v1">v1</span></td></tr>
+<tr><td>cross-stave connections</td><td><code>bracket from stave N to stave M</code>, <code>brace</code></td><td>brace (curly) or bracket (thick line + serifs) at the left of several staves</td><td>class + left-edge position → <code>connectionsParams</code></td><td><span class="tag v1">v1</span></td></tr>
+<tr><td>measures</td><td><code>measure</code></td><td>barlines slicing the system; boundaries align across staves</td><td>geometry</td><td><span class="tag v1">v1</span></td></tr>
+<tr><td>barlines</td><td><code>opening barline</code>, <code>ends with closing double barline</code>, <code>bold</code>, <code>dotted</code>, <code>no opening barline</code></td><td>vertical lines; their count, thickness, and dots at the junction</td><td>geometry</td><td><span class="tag v1">v1</span></td></tr>
+<tr><td>repeat signs</td><td><code>repeat sign at the start</code>, <code>at the end</code></td><td>double barline + two dots beside it</td><td>geometry + dot pair</td><td><span class="tag v1">v1</span></td></tr>
+<tr><td>time signature</td><td><code>time signature is 3:4</code>, <code>c</code>, <code>crossed c</code></td><td>two digits stacked after the key, or the C / ℄ glyph</td><td>digit classes + stacking</td><td><span class="tag v1">v1</span></td></tr>
+<tr><td>key signature</td><td><code>key signature is f major</code></td><td>row of sharps/flats after the clef, on fixed heights</td><td>count + type = key</td><td><span class="tag v1">v1</span></td></tr>
+<tr><td>page lines</td><td><code>new line</code></td><td>systems stacked down the page</td><td>row structure</td><td><span class="tag v1">v1</span></td></tr>
+<tr><td>voices</td><td><code>voice</code></td><td>interleaved groups with opposite stem directions</td><td><code>splitVoicesByStemDirection</code></td><td><span class="tag v1">v1</span></td></tr>
+<tr><td>titles, page meta</td><td><code>title is "…"</code>, <code>subtitle</code>, <code>composer</code>, <code>left/right subtitle</code>, <code>description</code>, <code>page number</code></td><td>text blocks at known positions — top, corners, bottom</td><td><code>findTextBlocks</code> + role by position</td><td><span class="tag v1">v1</span></td></tr>
+<tr><td>instrument titles</td><td><code>instrument title is "Piano" for stave 1</code>, <code>between stave N and stave M</code></td><td>text left of a system, centered on the stave(s) it names</td><td>text role + stave alignment</td><td><span class="tag v1">v1</span></td></tr>
+<tr><td>measure numbers</td><td><code>measure numbers for first measures</code>, <code>above measures</code></td><td>small digits above/below system starts</td><td>digit classes + position</td><td><span class="tag v1">v1</span></td></tr>
+<tr><td>styles, sizes, colours</td><td><code>font size is 7</code>, <code>title font size is 5.4</code>, <code>background color …</code></td><td>text heights ÷ <i>s</i>; median pixel of each region</td><td><code>measureStyles</code> (§3.4)</td><td><span class="tag v1">v1</span></td></tr>
+<tr><td>voices across staves</td><td>a voice continuing on the next stave</td><td>one voice's beam/stem chain continues on the adjacent stave</td><td>chain rule across <code>stavesParams</code></td><td><span class="tag v1">v1</span></td></tr>
+<tr><td>mid-measure clef / key</td><td><code>with bass clef before</code>, <code>with key signature g major before</code></td><td>the same glyphs appearing mid-measure</td><td>same rules, at a unit</td><td><span class="tag v1">v1</span></td></tr>
+<tr><td>unit spacing</td><td><code>compress units by 2 times</code>, <code>stretch …</code>, <code>hide the last measure</code></td><td>x-spacing wider or narrower than the default rhythm would give</td><td>measured ratio (or absorbed in layout)</td><td><span class="tag v1">v1</span></td></tr>
+</table>
+
+<h4>Units</h4>
+<table class="grid">
+<tr><th>feature</th><th>written as</th><th>signal in the image</th><th>who reads it</th><th></th></tr>
+<tr><td>pitch, octave</td><td><code>c</code>, <code>g4</code></td><td>head center vs the <b>stored</b> line positions, half-space resolution; ledger lines extend the grid — <a href="#pixels">§4.4</a></td><td><code>clefTable[clef][position]</code></td><td><span class="tag v1">v1</span></td></tr>
+<tr><td>duration</td><td><code>1/4</code> … <code>1/256</code>, <code>whole</code>, <code>half</code> …</td><td>head fill (solid/hollow) + stem + number of flags or beams</td><td>classes + decision table</td><td><span class="tag v1">v1</span></td></tr>
+<tr><td>dots</td><td><code>dotted</code>, <code>with dot</code>, <code>with 2 dots</code></td><td>dot blob right of the head at its height (one or two)</td><td>class + proximity</td><td><span class="tag v1">v1</span></td></tr>
+<tr><td>accidentals</td><td><code>flat</code>, <code>sharp</code>, <code>natural</code>, <code>double flat</code>, <code>double sharp</code>, <code>demiflat</code>, <code>sesquiflat</code>, <code>demisharp</code>, <code>sesquisharp</code></td><td>blob left of the head at its height</td><td>9 shape classes + microtone shapes</td><td><span class="tag v1">v1</span></td></tr>
+<tr><td>rests</td><td><code>is rest</code>, <code>top rest</code>, <code>mid rest</code>, <code>bottom rest</code></td><td>rest glyph per duration; or a gap the measure must fill</td><td>classes + <code>fillRestsInMeasures</code></td><td><span class="tag v1">v1</span></td></tr>
+<tr><td>measure rests</td><td><code>measure rest</code>, <code>multi measure rest N times</code></td><td>whole-measure rest glyph; barred rest with a number</td><td>class + digit</td><td><span class="tag v1">v1</span></td></tr>
+<tr><td>chords</td><td><code>1/4 c e g</code>, <code>chord</code></td><td>heads sharing x within 0.3 <i>s</i></td><td><code>groupChordsByHorizontalProximity</code></td><td><span class="tag v1">v1</span></td></tr>
+<tr><td>stems</td><td><code>with stem up</code>, <code>with stem down</code></td><td>which side of the head the stem is on</td><td>geometry</td><td><span class="tag v1">v1</span></td></tr>
+<tr><td>beams</td><td><code>beamed</code>, <code>not beamed</code>, <code>beamed with only primary line</code></td><td>horizontal ink runs at stem ends; parallel count = number of beams</td><td>geometry</td><td><span class="tag v1">v1</span></td></tr>
+<tr><td>ties</td><td><code>tied with next</code>, <code>tied before</code>, <code>… measure N</code>, <code>with roundness N</code></td><td>curve joining two heads at the same height</td><td><code>pairTiesAndSlurs</code></td><td><span class="tag v1">v1</span></td></tr>
+<tr><td>cross-stave chords</td><td><code>on the next stave</code>, <code>on the previous stave</code>, <code>on the current stave</code></td><td>one stem crossing the gap, heads on two staves — fig 2b</td><td>stem geometry → <code>notes[].stave</code></td><td><span class="tag v1">v1</span></td></tr>
+<tr><td>ghost units</td><td><code>is ghost</code></td><td>x-shaped head</td><td>class</td><td><span class="tag v1">v1</span></td></tr>
+<tr><td>grace units</td><td><code>is grace</code>, <code>crushed grace</code>, <code>with crush line</code></td><td>small head (≈ 0.65 <i>s</i>) + optional slash through the stem</td><td>size ratio + class</td><td><span class="tag v1">v1</span></td></tr>
+<tr><td>parentheses</td><td><code>with parentheses</code>, for a chord <code>from note N to note M</code></td><td>arc pair around a unit, or around part of a chord</td><td>geometry + placement</td><td><span class="tag v1">v1</span></td></tr>
+<tr><td>arpeggiated chords</td><td><code>is arpeggiated</code>, <code>with chord below</code>, <code>with arrow up/down</code>; across staves</td><td>wavy vertical line left of a chord; optional arrow head</td><td>geometry + class</td><td><span class="tag v1">v1</span></td></tr>
+<tr><td>centralized units</td><td><code>is centralized</code></td><td>a lone unit centered in a half-empty measure</td><td>x-position within the measure</td><td><span class="tag v1">v1</span></td></tr>
+</table>
+
+<h4>Marks on units</h4>
+<table class="grid">
+<tr><th>feature</th><th>written as</th><th>signal in the image</th><th>who reads it</th><th></th></tr>
+<tr><td>articulations</td><td><code>with staccato</code>, <code>spiccato</code>, <code>accent</code>, <code>tenuto</code>, <code>marcato</code>, <code>fermata</code>, <code>left hand pizzicato</code>, <code>snap pizzicato</code>, <code>natural harmonic</code>, <code>up bow</code>, <code>down bow</code></td><td>small glyphs above/below a head or stem end; side and N-up/N-down offsets measured</td><td>classes + proximity + side</td><td><span class="tag v1">v1</span></td></tr>
+<tr><td>ornaments</td><td><code>with trill</code>, <code>with turn</code>, <code>with mordent</code>, <code>inverted</code>, <code>with wave after</code>, <code>with sharp key above</code></td><td>ornament glyph shapes over units</td><td>classes</td><td><span class="tag v1">v1</span></td></tr>
+<tr><td>dynamics</td><td><code>with dynamic "mp"</code>, <code>up</code>, <code>above stave</code></td><td>bold-italic word under/over the stave from a closed vocabulary (pp … fff, sfz, fp …)</td><td>word-shape classes (closed set)</td><td><span class="tag v1">v1</span></td></tr>
+<tr><td>pedal marks</td><td><code>with pedal before</code>, <code>"Ped."</code>, <code>opens with bracket</code>, <code>with release</code>, <code>under stave N</code></td><td>Ped. glyph + bracket line under a stave; notch at release</td><td>class + geometry</td><td><span class="tag v1">v1</span></td></tr>
+<tr><td>breath marks</td><td><code>with breath mark before</code>, <code>breath double slash</code></td><td>comma or double slash above the stave between units</td><td>class</td><td><span class="tag v1">v1</span></td></tr>
+<tr><td>tremolo</td><td><code>with tremolo</code>, <code>with tremolo with next</code>, <code>with 1/2/3 strokes</code></td><td>diagonal strokes through a stem, or between two notes</td><td>geometry (stroke count)</td><td><span class="tag v1">v1</span></td></tr>
+<tr><td>fermata over barline</td><td><code>ends with fermata</code></td><td>fermata glyph over the closing barline</td><td>class + position</td><td><span class="tag v1">v1</span></td></tr>
+<tr><td>chord letters</td><td><code>with chord "Cm7"</code>, <code>above measure</code></td><td>letter group above the measure</td><td>small reader over the chord vocabulary; unreadable → report</td><td><span class="tag v1">v1</span></td></tr>
+<tr><td>text labels</td><td><code>with text "…"</code></td><td>small text near a unit</td><td>text blocks + letter reader; unreadable wording → report</td><td><span class="tag v1">v1</span></td></tr>
+<tr><td>lyrics</td><td><code>with lyrics "…"</code>, <code>followed by dash</code>, <code>lyrics is under stave N</code></td><td>text row under a stave, syllables aligned to heads</td><td>row + alignment + letter reader; unreadable words → report</td><td><span class="tag v1">v1</span></td></tr>
+</table>
+
+<h4>Spans</h4>
+<table class="grid">
+<tr><th>feature</th><th>written as</th><th>signal in the image</th><th>who reads it</th><th></th></tr>
+<tr><td>slurs</td><td><code>slur from … to …</code>, <code>starts before</code>, <code>finishes after</code>, <code>with s shape</code>, <code>with roundness N</code></td><td>arc over/under units at different heights; ends may sit before/after a unit; s = double curve</td><td><code>pairTiesAndSlurs</code> + shape flags</td><td><span class="tag v1">v1</span></td></tr>
+<tr><td>cross-stave slurs</td><td><code>changes stave</code>, <code>goes through unit N</code>, <code>goes through above unit N</code></td><td>arc whose ends sit on different staves — fig 2b</td><td>pairing with (measure, stave, voice, unit) ends</td><td><span class="tag v1">v1</span></td></tr>
+<tr><td>crescendo / diminuendo</td><td><code>crescendo from … to …</code>, <code>dim.</code>, <code>above stave</code></td><td>two diverging (or converging) hairpin lines</td><td>geometry + direction</td><td><span class="tag v1">v1</span></td></tr>
+<tr><td>octave signs</td><td><code>octave up from … to …</code>, <code>two octaves down</code>, <code>is octave up</code></td><td>dashed line + "8" / "15" text over a span or one unit</td><td>text class + dashed span</td><td><span class="tag v1">v1</span></td></tr>
+<tr><td>tuplets</td><td><code>tuplet 3 from … to …</code>, <code>tuplet 3:2</code>, <code>with brackets</code></td><td>digit (with optional bracket) over a group of units</td><td>digit class + geometry</td><td><span class="tag v1">v1</span></td></tr>
+<tr><td>glissando</td><td><code>glissando from … to …</code>, <code>as wave</code>, <code>as line</code>, <code>with glissando after</code></td><td>straight or wavy line between heads — or running off a unit to the edge</td><td>geometry + pairing</td><td><span class="tag v1">v1</span></td></tr>
+<tr><td>volta brackets</td><td><code>volta with text "1." from … to …</code></td><td>bracket with a number over measures at a repeat</td><td>geometry + digit/text</td><td><span class="tag v1">v1</span></td></tr>
+<tr><td>similes</td><td><code>simile of previous measure</code>, <code>repeat of previous beat</code>, <code>simile from … to …</code></td><td>simile slash glyphs (% style) standing in for notes or measures</td><td>special classes + measure geometry</td><td><span class="tag v1">v1</span></td></tr>
+</table>
+
+<h4>Measure furniture</h4>
+<table class="grid">
+<tr><th>feature</th><th>written as</th><th>signal in the image</th><th>who reads it</th><th></th></tr>
+<tr><td>tempo marks</td><td><code>tempo is "Andante"</code>, <code>metronome</code>, <code>N up/down</code></td><td>text above a measure; digits in brackets after it</td><td>text block + digit reading</td><td><span class="tag v1">v1</span></td></tr>
+<tr><td>sign (segno)</td><td><code>sign</code>, <code>at the start of the measure</code></td><td>segno glyph at a measure end/start</td><td>class + position</td><td><span class="tag v1">v1</span></td></tr>
+<tr><td>coda</td><td><code>coda</code>, <code>N up/down</code></td><td>coda glyph (crossed circles) at a measure</td><td>class + position</td><td><span class="tag v1">v1</span></td></tr>
+<tr><td>repetition instructions</td><td><code>repetition note "D.C. al Coda"</code></td><td>text at a measure start/end from a closed vocabulary</td><td>text + vocabulary</td><td><span class="tag v1">v1</span></td></tr>
+</table>
+
+<h4>Not read from the image</h4>
+<table class="grid">
+<tr><th>feature</th><th>written as</th><th>why not</th></tr>
+<tr><td>comments</td><td><code>comment: "…"</code></td><td>never drawn — cannot exist in an image</td></tr>
+<tr><td>MIDI settings</td><td><code>default instrument</code>, <code>default tempo</code>, <code>fermata duration is N</code></td><td>playback only; no pixels. Defaults are emitted</td></tr>
+<tr><td>font identity</td><td><code>fonts</code></td><td>decided out: sizes and colours are measured (§3.4), families are not detected</td></tr>
+<tr><td>adjusting units</td><td><code>is left by N</code>, <code>is right by N</code></td><td>a layout nudge the editor redoes; folded into measured spacing</td></tr>
+<tr><td>layout tricks</td><td><code>hide the last measure</code>, <code>compress/stretch units</code></td><td>layout decisions, not notation; measured, then left to the editor</td></tr>
+</table>
+
+<div class="f">
+rows(i) = Σ<sub>x</sub> ink(x, i) &nbsp;→&nbsp; peaks = five parallel peaks, spacing <i>s</i>
+<span class="who">the first measurement everything else depends on · detectStaves.js</span>
+</div>
+<table class="legend"><tr><td>ink(x, i)</td><td>1 when pixel at column <i>x</i>, row <i>i</i> is dark, 0 when not</td></tr>
+<tr><td>rows(i)</td><td>how much ink lies on row <i>i</i> — staff lines are its sharp peaks</td></tr>
+<tr><td>s</td><td>staff space: distance between two lines; the unit of every measurement below</td></tr></table>
+</section>
+
+<hr>
+
+<!-- ============================ 4 · PIXELS → NUMBERS ============================ -->
+<section id="pixels">
+<h2><span class="n">4</span>Pixels → numbers</h2>
+<p>Before any recognition, the image becomes a coordinate system. This is plain measuring.</p>
+
+<h3>4.1 Staff space is the unit</h3>
+<div class="f">
+<i>s</i> = mean(<i>y</i><sub>2</sub>−<i>y</i><sub>1</sub>, <i>y</i><sub>3</sub>−<i>y</i><sub>2</sub>, <i>y</i><sub>4</sub>−<i>y</i><sub>3</sub>, <i>y</i><sub>5</sub>−<i>y</i><sub>4</sub>) &nbsp;&nbsp;&nbsp;&nbsp;
+<i>û</i> = (<i>u</i> − <i>u</i><sub>0</sub>) / <i>s</i>
+<span class="who">deskewBitmap.js, detectStaves.js</span>
+</div>
+<table class="legend">
+<tr><td>y<sub>1..5</sub></td><td>row coordinates of the five staff lines, top to bottom, in pixels</td></tr>
+<tr><td>s</td><td>staff space, in pixels — the one anchor; it never becomes music meaning</td></tr>
+<tr><td>u</td><td>any coordinate in pixels (x or y)</td></tr>
+<tr><td>u<sub>0</sub></td><td>the origin (the staff's top-left corner)</td></tr>
+<tr><td>û</td><td>the coordinate in staff spaces — scale-free; two zooms of one page give the same û</td></tr>
+</table>
+
+<h3>4.2 Cutting out one symbol</h3>
+<p>Take a box of fixed <em>musical</em> size (3 <i>s</i> tall), pad it to a square — never stretch, aspect ratio carries meaning (stem vs notehead) — then scale it to 48×48. This is <b>size normalization</b>; the scaling inside is <b>image resampling</b>:</p>
+
+<div class="f">
+shrink: &nbsp; dst(<i>x</i>, <i>y</i>) = (1 / |<i>R</i>|) · Σ<sub>(u,v) ∈ R</sub> src(<i>u</i>, <i>v</i>) <span style="color:var(--muted)">&nbsp;&nbsp;(average the pixels covered)</span><br>
+enlarge: dst(<i>x</i>, <i>y</i>) = (1−α)(1−β)·<i>Q</i><sub>00</sub> + α(1−β)·<i>Q</i><sub>01</sub> + (1−α)β·<i>Q</i><sub>10</sub> + αβ·<i>Q</i><sub>11</sub> <span style="color:var(--muted)">&nbsp;&nbsp;(blend 2×2 neighbors)</span>
+<span class="who">cropComponents.js</span>
+</div>
+<table class="legend">
+<tr><td>dst(x, y)</td><td>the output pixel at column <i>x</i>, row <i>y</i> of the 48×48 crop</td></tr>
+<tr><td>src(u, v)</td><td>the source pixel at column <i>u</i>, row <i>v</i> of the original image</td></tr>
+<tr><td>R</td><td>the set of source pixels one output pixel covers (used when shrinking)</td></tr>
+<tr><td>Q<sub>00..11</sub></td><td>the four source pixels around the sample point (used when enlarging)</td></tr>
+<tr><td>α, β</td><td>how far the sample point sits between those four pixels, 0…1 each</td></tr>
+</table>
+<p>Shrink by averaging, enlarge by blending — the other way round makes speckle. The same crop then always arrives as the same 48×48 numbers, whichever camera or zoom produced it.</p>
+
+<h3>4.3 Lines and blobs come apart</h3>
+<p>Straight lines (staff lines, stems, beams, barlines) are found by geometry — a line is a run of ink with a consistent angle, free to detect exactly. They are removed; what remains are <b>components</b>: connected blobs of ink. Those are what the model classifies. Lines never need learning.</p>
+
+<h3>4.4 The pixels go; the coordinates stay</h3>
+<p>Staff lines are measured <em>before</em> being subtracted, and their positions are kept. A note's position is measured against those stored coordinates — not against visible pixels. Each line is kept as a line model (a photo's stave is rarely perfectly flat):</p>
+
+<div class="f">
+<i>y</i><sub>i</sub>(<i>x</i>) = <i>a</i><sub>i</sub>·<i>x</i> + <i>b</i><sub>i</sub> &nbsp;&nbsp;(i = 1..5) &nbsp;&nbsp;&nbsp;&nbsp;
+<i>d</i> = (<i>y<sub>h</sub></i> − <i>y</i><sub>3</sub>(<i>x<sub>h</sub></i>)) / (<i>s</i>/2) &nbsp;&nbsp;&nbsp;&nbsp; position = round(<i>d</i>)
+<span class="who">analysis/detectStaves.js → translation/assignPitchByStaffPosition.js</span>
+</div>
+<table class="legend">
+<tr><td>y<sub>i</sub>(x)</td><td>row of staff line <i>i</i> at column <i>x</i> — stored from the measurement, survives subtraction</td></tr>
+<tr><td>a<sub>i</sub>, b<sub>i</sub></td><td>the line's slope and offset (slope ≈ 0 after deskew; kept so tilted photos work)</td></tr>
+<tr><td>x<sub>h</sub>, y<sub>h</sub></td><td>the notehead blob's center</td></tr>
+<tr><td>y<sub>3</sub></td><td>the middle line — the zero of the scale</td></tr>
+<tr><td>s/2</td><td>half a staff space: positions step by halves (line, space, line…)</td></tr>
+<tr><td>d, position</td><td>0 = middle line, odd = spaces, even = lines; then <code>clefTable[clef][position]</code> gives letter and octave</td></tr>
+</table>
+<p>Subtraction cannot move the head's center — the lines pass through it horizontally and symmetrically — and when in doubt, the center is taken from the original grayscale using the blob's pixel mask.</p>
+<ul>
+  <li><b>Ledger lines extend the same grid.</b> A short segment is a line again; it sits exactly one <i>s</i> from its neighbor, so position = nearest measured line ± 2 per staff space.</li>
+  <li><b>Damaged lines are reconstructed.</b> Lines are equally spaced by definition, so a missing one is interpolated: <i>y</i><sub>missing</sub> ≈ <i>y<sub>k</sub></i> ± (i−k)·<i>s</i>. The coordinate system survives even where pixels don't.</li>
+</ul>
+</section>
+
+<hr>
+
+<!-- ============================ 5 · MODEL ============================ -->
+<section id="model">
+<h2><span class="n">5</span>The model, built by hand</h2>
+<p>A crop of 48×48 numbers goes in; <i>K</i> probabilities come out (<i>K</i> ≈ 50 classes — the whole vocabulary: heads, flags, dots, 9 accidentals, 8 clefs, rests, digits, 11 articulations, ornaments, ghost and grace heads, segno, coda, pedal…, and unknown. <code>symbolClasses.js</code> is data; <i>K</i> is whatever the vocabulary needs). The model is a chain of simple layers; each transforms an array of numbers.</p>
+
+<figure>
+<svg viewBox="0 0 900 240" role="img" aria-label="Animated model architecture">
+  <g font-family="system-ui, sans-serif" text-anchor="middle">
+    <rect x="16" y="70" width="76" height="60" rx="4" fill="#f4f3ef" stroke="#c9c9c4"></rect>
+    <text x="54" y="96" font-size="11.5" font-weight="600">input</text><text x="54" y="112" font-size="10" font-family="monospace" fill="#a5322a">48×48×1</text>
+    <rect x="118" y="58" width="110" height="84" rx="4" fill="#fff" stroke="#c9c9c4"></rect>
+    <text x="173" y="82" font-size="11.5" font-weight="600">conv 3×3 ×16</text><text x="173" y="98" font-size="10" fill="#6b7076">ReLU</text><text x="173" y="118" font-size="10" font-family="monospace" fill="#a5322a">48×48×16</text><text x="173" y="133" font-size="9" fill="#6b7076">160 numbers</text>
+    <rect x="254" y="70" width="82" height="60" rx="4" fill="#fff" stroke="#c9c9c4"></rect>
+    <text x="295" y="94" font-size="11.5" font-weight="600">maxpool</text><text x="295" y="112" font-size="10" font-family="monospace" fill="#a5322a">24×24×16</text>
+    <rect x="362" y="58" width="110" height="84" rx="4" fill="#fff" stroke="#c9c9c4"></rect>
+    <text x="417" y="82" font-size="11.5" font-weight="600">conv 3×3 ×32</text><text x="417" y="98" font-size="10" fill="#6b7076">ReLU</text><text x="417" y="118" font-size="10" font-family="monospace" fill="#a5322a">24×24×32</text><text x="417" y="133" font-size="9" fill="#6b7076">4,640 numbers</text>
+    <rect x="498" y="70" width="82" height="60" rx="4" fill="#fff" stroke="#c9c9c4"></rect>
+    <text x="539" y="94" font-size="11.5" font-weight="600">maxpool</text><text x="539" y="112" font-size="10" font-family="monospace" fill="#a5322a">12×12×32</text>
+    <rect x="606" y="70" width="70" height="60" rx="4" fill="#fff" stroke="#c9c9c4"></rect>
+    <text x="641" y="94" font-size="11.5" font-weight="600">flatten</text><text x="641" y="112" font-size="10" font-family="monospace" fill="#a5322a">4608</text>
+    <rect x="702" y="64" width="84" height="72" rx="4" fill="#fff" stroke="#c9c9c4"></rect>
+    <text x="744" y="88" font-size="11.5" font-weight="600">dense 64</text><text x="744" y="104" font-size="10" fill="#6b7076">ReLU</text><text x="744" y="122" font-size="10" font-family="monospace" fill="#a5322a">64</text>
+    <rect x="812" y="70" width="72" height="60" rx="4" fill="#f6e9e6" stroke="#a5322a" stroke-width="2"></rect>
+    <text x="848" y="94" font-size="11.5" font-weight="600">dense K</text><text x="848" y="112" font-size="10" font-family="monospace" fill="#a5322a">softmax p</text>
+  </g>
+  <!-- forward activations -->
+  <path d="M54,170 L848,170" fill="none" stroke="#d5d5d0" stroke-width="1.5"></path>
+  <circle r="5" fill="#a5322a"><animateMotion dur="3.4s" repeatCount="indefinite" path="M54,170 L848,170"></animateMotion></circle>
+  <text x="450" y="192" font-size="10.5" font-family="monospace" fill="#6b7076" text-anchor="middle">forward: numbers flow left → right</text>
+  <!-- backward gradients -->
+  <path class="dashmove" d="M848,216 L54,216" fill="none" stroke="#a5322a" stroke-width="1.5" stroke-dasharray="6 5"></path>
+  <circle r="5" fill="#2f6b3c"><animateMotion dur="3.4s" begin="1.7s" repeatCount="indefinite" path="M848,216 L54,216"></animateMotion></circle>
+  <text x="450" y="236" font-size="10.5" font-family="monospace" fill="#2f6b3c" text-anchor="middle">backward: error signals flow right → left (only during training)</text>
+</svg>
+<figcaption>fig 3 · the network. Forward always; backward only while training.</figcaption>
+</figure>
+
+<h3>5.1 What a convolution layer does</h3>
+<p>A <a class="t" href="#term-convolution">convolution</a> slides small pattern detectors (filters) over the image. Each filter produces one <a class="t" href="#term-feature-map">feature map</a> — a grid saying "how much this pattern is present here". Implement it as one matrix multiply: cut every 3×3 window into a row of a big matrix (im2col), multiply once.</p>
+
+<div class="f">
+<i>z</i><sub>i,j,k</sub> = <i>b</i><sub>k</sub> + Σ<sub>p=0..2</sub> Σ<sub>q=0..2</sub> Σ<sub>c</sub> <i>W</i><sub>p,q,c,k</sub> · <i>a</i><sub>i+p, j+q, c</sub>
+<span class="who">model/forwardConvolution.js</span>
+</div>
+<table class="legend">
+<tr><td>i, j</td><td>where the filter sits: output column and row</td></tr>
+<tr><td>k</td><td>which filter (of the 16 or 32); its index in the layer</td></tr>
+<tr><td>p, q</td><td>position inside the 3×3 window of the filter (0, 1 or 2)</td></tr>
+<tr><td>c</td><td>input channel (1 for the input image; 16 or 32 deeper in)</td></tr>
+<tr><td>W</td><td>the filter's numbers — <b>learned</b>; each filter is 3×3×channels of them</td></tr>
+<tr><td>b</td><td>bias: one <b>learned</b> number per filter, added after the sum</td></tr>
+<tr><td>a</td><td>input values (the raw pixels, or the previous layer's output)</td></tr>
+<tr><td>z</td><td>output before activation</td></tr>
+</table>
+
+<h3>5.2 The other layers</h3>
+<div class="f">
+ReLU: &nbsp;<i>a</i> = max(0, <i>z</i>) &nbsp;&nbsp;&nbsp;&nbsp; maxpool: <i>a</i><sup>pool</sup><sub>i,j,c</sub> = max of <i>a</i> over the 2×2 window at (2i, 2j) &nbsp;&nbsp;&nbsp;&nbsp; dense: <i>z</i> = <i>W</i>·<i>a</i> + <i>b</i>
+<span class="who">model/forwardDense.js</span>
+</div>
+<table class="legend">
+<tr><td>ReLU</td><td>"turn negative to zero" — the cheapest way to let layers combine into any shape</td></tr>
+<tr><td>maxpool</td><td>halves the grid, keeps the strongest response — the image shrinks, the patterns survive</td></tr>
+<tr><td>dense</td><td>every output connected to every input; after flatten it mixes everything into class scores</td></tr>
+</table>
+
+<div class="f">
+softmax: &nbsp;<i>p</i><sub>c</sub> = e<sup><i>z</i><sub>c</sub> − m</sup> / Σ<sub>j</sub> e<sup><i>z</i><sub>j</sub> − m</sup> &nbsp;&nbsp;&nbsp; where &nbsp; m = max<sub>j</sub> <i>z</i><sub>j</sub>
+<span class="who">model/forwardDense.js</span>
+</div>
+<table class="legend">
+<tr><td>z<sub>c</sub></td><td>the raw score for class <i>c</i> (higher = more likely)</td></tr>
+<tr><td>p<sub>c</sub></td><td>probability of class <i>c</i>; all <i>p</i> add up to 1</td></tr>
+<tr><td>m</td><td>the biggest score, subtracted only so the exponentials don't overflow — same result</td></tr>
+<tr><td>e</td><td>≈ 2.718; e<sup>x</sup> is its exponential function</td></tr>
+</table>
+
+<div class="f">
+decision: class = argmax<sub>c</sub> <i>p</i><sub>c</sub> &nbsp; if max <i>p</i> ≥ τ &nbsp;;&nbsp; <b>unknown</b> otherwise
+<span class="who">analysis/classifyComponent.js</span>
+</div>
+<table class="legend">
+<tr><td>argmax</td><td>"the class with the highest probability"</td></tr>
+<tr><td>τ</td><td>the confidence floor, e.g. 0.8 — below it the honest answer is <code>unknown</code> (goes to the report)</td></tr>
+</table>
+</section>
+
+<hr>
+
+<!-- ============================ 6 · TRAINING ============================ -->
+<section id="training">
+<h2><span class="n">6</span>Training, built by hand</h2>
+<p>Training means: show the model a crop with the <b>known right answer</b>, measure how wrong its guess was, and nudge every learned number to make the answer a little less wrong. Repeat ~10<sup>6</sup> times. Below is the entire idea in five steps.</p>
+
+<figure>
+<svg viewBox="0 0 900 260" role="img" aria-label="Animated training loop">
+  <g font-family="system-ui, sans-serif" text-anchor="middle">
+    <circle cx="450" cy="130" r="92" fill="none" stroke="#e4e4e0" stroke-width="2"></circle>
+    <!-- indicator -->
+    <g class="spin"><circle cx="450" cy="38" r="8" fill="#a5322a"></circle></g>
+    <!-- steps -->
+    <text x="450" y="34" font-size="11" font-weight="600">1 show a batch</text>
+    <text x="580" y="112" font-size="11" font-weight="600">2 forward: guess</text>
+    <text x="545" y="222" font-size="11" font-weight="600">3 loss: how wrong</text>
+    <text x="330" y="222" font-size="11" font-weight="600">4 gradients: blame</text>
+    <text x="322" y="112" font-size="11" font-weight="600">5 nudge: Adam</text>
+    <!-- inner text -->
+    <text x="450" y="126" font-size="11" font-family="monospace" fill="#6b7076">per batch of 32</text>
+    <text x="450" y="144" font-size="11" font-family="monospace" fill="#6b7076">≈ 1,600 batches / epoch</text>
+  </g>
+</svg>
+<figcaption>fig 4 · the loop. An <a class="t" href="#term-epoch">epoch</a> is one full pass over all training crops.</figcaption>
+</figure>
+
+<h3>6.1 The data: drawn by your own renderer</h3>
+<p>You never label anything. The generator writes random MSQ pages, your own drawer renders them, and since the drawer knows exactly what it drew, every symbol's class and position comes attached.</p>
+
+<figure>
+<svg viewBox="0 0 900 180" role="img" aria-label="Animated data factory">
+  <g font-family="system-ui, sans-serif" text-anchor="middle">
+    <rect x="14" y="60" width="110" height="50" rx="4" fill="#f4f3ef" stroke="#c9c9c4"></rect><text x="69" y="82" font-size="11.5" font-weight="600">seed</text><text x="69" y="98" font-size="9.5" fill="#6b7076">a number, e.g. 42</text>
+    <rect x="150" y="60" width="130" height="50" rx="4" fill="#fff" stroke="#c9c9c4"></rect><text x="215" y="82" font-size="11.5" font-weight="600">random MSQ page</text><text x="215" y="98" font-size="9.5" fill="#6b7076">features chosen from the list</text>
+    <rect x="306" y="60" width="130" height="50" rx="4" fill="#fff" stroke="#c9c9c4"></rect><text x="371" y="82" font-size="11.5" font-weight="600">your renderer</text><text x="371" y="98" font-size="9.5" fill="#6b7076">draws it as SVG</text>
+    <rect x="462" y="60" width="120" height="50" rx="4" fill="#fff" stroke="#c9c9c4"></rect><text x="522" y="82" font-size="11.5" font-weight="600">degrade</text><text x="522" y="98" font-size="9.5" fill="#6b7076">skew · blur · jpeg</text>
+    <rect x="608" y="60" width="130" height="50" rx="4" fill="#fff" stroke="#c9c9c4"></rect><text x="673" y="82" font-size="11.5" font-weight="600">crop 48×48</text><text x="673" y="98" font-size="9.5" fill="#6b7076">normalized</text>
+    <rect x="764" y="60" width="120" height="50" rx="4" fill="#eef4ee" stroke="#2f6b3c"></rect><text x="824" y="82" font-size="11.5" font-weight="600">+ label</text><text x="824" y="98" font-size="9.5" fill="#2f6b3c">exact, free</text>
+  </g>
+  <path d="M124,85 L146,85 M280,85 L302,85 M436,85 L458,85 M582,85 L604,85 M738,85 L760,85" stroke="#c9c9c4" stroke-width="1.5"></path>
+  <circle r="5" fill="#a5322a"><animateMotion dur="4s" repeatCount="indefinite" path="M69,85 L824,85"></animateMotion></circle>
+  <text x="450" y="150" font-size="10.5" font-family="monospace" fill="#6b7076" text-anchor="middle">same seed → same page → same crops. the dataset is defined by its seeds, not by gigabytes.</text>
+</svg>
+<figcaption>fig 5 · the data factory. Labels are never written by hand.</figcaption>
+</figure>
+
+<h3>6.2 The loss: one number for "how wrong"</h3>
+<p>For a crop with known answer <i>y</i>, the model gives probability <i>p<sub>y</sub></i> to the right class. Perfect = 1 → loss 0. Confident and wrong → huge loss.</p>
+
+<div class="f">
+L = − (1/N) Σ<sub>n=1..N</sub> log <i>p</i><sub>n, y<sub>n</sub></sub> + λ Σ θ<sup>2</sup>
+<span class="who">training/train.js</span>
+</div>
+<table class="legend">
+<tr><td>L</td><td>the loss: one number for the whole <a class="t" href="#term-batch">batch</a>; training pushes it down</td></tr>
+<tr><td>N</td><td>batch size — how many crops are averaged at once (32)</td></tr>
+<tr><td>n</td><td>index of the crop inside the batch</td></tr>
+<tr><td>y<sub>n</sub></td><td>the known right class of crop <i>n</i> (from the data factory)</td></tr>
+<tr><td>p<sub>n,y<sub>n</sub></sub></td><td>probability the model gave to that right class</td></tr>
+<tr><td>log</td><td>natural logarithm; −log(0.9) ≈ 0.10, −log(0.01) ≈ 4.6 — wrong-and-certain is punished hard</td></tr>
+<tr><td>θ</td><td>all learned numbers together (weights <i>W</i> and biases <i>b</i>)</td></tr>
+<tr><td>λ</td><td>tiny, e.g. 0.0005 — keeps the learned numbers small so the model can't memorize the training set</td></tr>
+</table>
+
+<h3>6.3 Gradients: who is to blame</h3>
+<p>A <a class="t" href="#term-gradient">gradient</a> answers one question per learned number: "if I nudge you up by a hair, does L go up or down, and by how much?" Chain rule, layer by layer, backward:</p>
+
+<div class="f">
+δ<sup>final</sup> = <i>p</i> − onehot(<i>y</i>) &nbsp;&nbsp;&nbsp;&nbsp; δ<sub>z</sub> = δ<sub>a</sub> ⊙ 1[<i>z</i> &gt; 0]
+<span class="who">training/backpropagateDense.js</span>
+</div>
+<table class="legend">
+<tr><td>δ</td><td>"delta": the error signal flowing backward, layer to layer</td></tr>
+<tr><td>onehot(y)</td><td>all zeros except 1 at the right class — so <i>p</i> − onehot is "how far the guess is from certain"</td></tr>
+<tr><td>⊙</td><td>multiply element by element</td></tr>
+<tr><td>1[z &gt; 0]</td><td>1 where the value was positive, else 0 — ReLU only forwards blame where it passed signal</td></tr>
+</table>
+
+<div class="f">
+d<i>W</i> = δ · <i>a</i><sub>prev</sub><sup>T</sup> &nbsp;&nbsp;&nbsp; d<i>b</i> = Σ δ &nbsp;&nbsp;&nbsp; δ<sub>prev</sub> = <i>W</i><sup>T</sup> δ
+<span class="who">training/backpropagateDense.js (+ convolution.js via im2col)</span>
+</div>
+<table class="legend">
+<tr><td>dW, db</td><td>gradients for the weights and biases — the blame for each learned number</td></tr>
+<tr><td>a<sub>prev</sub><sup>T</sup></td><td>the previous layer's values, transposed (rows ↔ columns)</td></tr>
+<tr><td>δ<sub>prev</sub></td><td>the blame handed further back; W<sup>T</sup> routes it through the connections</td></tr>
+</table>
+
+<h3>6.4 The nudge: Adam</h3>
+<div class="f">
+<i>g<sub>t</sub></i> = the gradient at step <i>t</i><br>
+<i>m<sub>t</sub></i> = β<sub>1</sub> <i>m</i><sub>t−1</sub> + (1−β<sub>1</sub>) <i>g<sub>t</sub></i> &nbsp;&nbsp;&nbsp; <i>v<sub>t</sub></i> = β<sub>2</sub> <i>v</i><sub>t−1</sub> + (1−β<sub>2</sub>) <i>g<sub>t</sub></i><sup>2</sup><br>
+θ<sub>t</sub> = θ<sub>t−1</sub> − η · <i>m̂<sub>t</sub></i> / (√<i>v̂<sub>t</sub></i> + ε)
+<span class="who">training/updateWeightsWithAdam.js</span>
+</div>
+<table class="legend">
+<tr><td>g<sub>t</sub></td><td>the gradient at training step <i>t</i></td></tr>
+<tr><td>m<sub>t</sub></td><td>smoothed direction ("which way has the gradient pointed lately")</td></tr>
+<tr><td>v<sub>t</sub></td><td>smoothed size ("how big have the gradients been lately")</td></tr>
+<tr><td>β<sub>1</sub>, β<sub>2</sub></td><td>0.9 and 0.999 — how much history to keep</td></tr>
+<tr><td>m̂, v̂</td><td>m and v corrected for the first steps (when they start at 0)</td></tr>
+<tr><td>η</td><td><a class="t" href="#term-lr">learning rate</a>: nudge size, e.g. 0.001</td></tr>
+<tr><td>ε</td><td>10<sup>−8</sup> — stops division by zero</td></tr>
+</table>
+
+<h3>6.5 What you watch while it trains</h3>
+<div class="viz">
+  <div>
+    <h5>loss per epoch</h5>
+    <svg viewBox="0 0 240 110">
+      <polyline class="draw" points="8,12 30,48 52,62 74,72 96,78 118,82 140,85 162,87 184,88 206,89 228,89" fill="none" stroke="#a5322a" stroke-width="2"></polyline>
+      <polyline class="draw" style="animation-delay:.8s" points="8,20 30,55 52,70 74,79 96,84 118,87 140,90 162,92 184,93 206,94 228,94" fill="none" stroke="#6b7076" stroke-width="1.6" stroke-dasharray="5 4"></polyline>
+      <line x1="8" y1="100" x2="228" y2="100" stroke="#e4e4e0"></line>
+      <text x="120" y="108" font-size="8" font-family="monospace" fill="#6b7076" text-anchor="middle">epoch → · solid: training · dashed: validation</text>
+    </svg>
+  </div>
+  <div>
+    <h5>confusion matrix · 10 classes</h5>
+    <div class="matrix" id="confusion"></div>
+    <p style="font-size:11px;color:var(--muted);margin:8px 0 0">diagonal = right answers. bright off-diagonal = two classes the model mixes up.</p>
+  </div>
+  <div>
+    <h5>error gallery · the worst mistakes</h5>
+    <div class="gl">
+      <figure><div class="crop">♯</div><figcaption>♯ → ♭</figcaption></figure>
+      <figure><div class="crop">𝅗𝅥</div><figcaption>open → filled</figcaption></figure>
+      <figure><div class="crop">𝄾</div><figcaption>1/8 → 1/4</figcaption></figure>
+      <figure><div class="crop">𝄐</div><figcaption>→ unknown ✓</figcaption></figure>
+    </div>
+  </div>
+</div>
+<p>Training is done when the validation curve stops falling and the matrix is mostly diagonal. <code>evaluate.js</code> writes exactly these images; errors are looked at, not read in a log.</p>
+
+<h3>6.6 Getting better</h3>
+<table class="grid">
+<tr><th>you see</th><th>it means</th><th>fix</th></tr>
+<tr><td>two classes confused off-diagonal</td><td>their crops look alike — or a labeling bug</td><td>check the generator first; usually the data is wrong, not the model</td></tr>
+<tr><td>great on validation, bad on real photos</td><td>the model learned "clean", not "music"</td><td>stronger degradations in the generator</td></tr>
+<tr><td>one class always wrong</td><td>too few examples of it</td><td>oversample it, or merge it with a neighbouring class</td></tr>
+<tr><td>everything mediocre</td><td>often a measuring bug</td><td>check <i>s</i> (staff space) before touching the model</td></tr>
+</table>
+</section>
+
+<hr>
+
+<!-- ============================ 7 · SERVER ============================ -->
+<section id="server">
+<h2><span class="n">7</span>Training on a rented server</h2>
+<p>The trainer is plain Node — no framework, no GPU needed. A small server with 8–16 cores just makes it faster and keeps gigabytes of crops off your laptop. The workflow:</p>
+
+<pre><code><span class="cm"># 1 · put the code (and nothing else) on the server</span>
+rsync -a src/omr/ server:omr/
+
+<span class="cm"># 2 · generate the dataset there — seeded, so it exists everywhere by name</span>
+ssh server 'cd omr && node training/generateTrainingSet.js --seed 20261110'
+
+<span class="cm"># 3 · train; it writes loss.svg / confusion.svg each epoch</span>
+ssh server 'cd omr && node training/train.js'
+
+<span class="cm"># 4 · watch the pictures without downloading anything</span>
+rsync server:omr/run/*.svg ./run/        <span class="cm"># open loss.svg after each epoch</span>
+
+<span class="cm"># 5 · take the result home — weights + hash go into the repo</span>
+rsync server:omr/model/weights.json src/omr/model/</code></pre>
+
+<ul>
+  <li><b>Same seed → same dataset</b> on the server and on your laptop; only the speed differs.</li>
+  <li><b>Release weights come from one machine</b> — different CPUs can round floats differently in the last decimal. The hash in the repo settles it anyway: once exported, weights never move.</li>
+  <li>A bigger server later is the same five commands; the model at ~300K numbers trains in an evening on 8 cores.</li>
+</ul>
+</section>
+
+<hr>
+
+<!-- ============================ 8 · API ============================ -->
+<section id="api">
+<h2><span class="n">8</span>The API</h2>
+<pre><code><span class="kw">import</span> { decodeImageToGrayscale, analyzeImage,
+         translateImageToMsq, translateImagesToMsqPages } <span class="kw">from</span> <span class="st">'#msq/omr/api.js'</span></code></pre>
+<table class="grid">
+<tr><th>function</th><th>in</th><th>out</th></tr>
+<tr><td><code>decodeImageToGrayscale(bytes)</code></td><td>png/jpeg bytes</td><td><code>{ width, height, grayscale }</code> — plain numbers, no DOM</td></tr>
+<tr><td><code>analyzeImage(image)</code></td><td>the same</td><td>staves, components (box, class, confidence), text blocks, measured styles — painted back over the source by tools</td></tr>
+<tr><td><code>translateImageToMsq(image)</code></td><td>the same</td><td><code>{ msqText, report }</code></td></tr>
+<tr><td><code>translateImagesToMsqPages(images)</code></td><td>one image per page</td><td><code>{ pagesText, report }</code> — <code>pagesText[i]</code> becomes <code>page-(i+1).txt</code>; measure numbers, key and meter carry on</td></tr>
+</table>
+
+<h3>The report — what the tool was unsure about</h3>
+<pre><code>{ line: 42,                                    <span class="cm">// the MSQ line the unit became</span>
+  box: { x: 18.2, y: 3.0, w: 1.4, h: 1.0 },   <span class="cm">// in staff spaces — where in the image</span>
+  guessed: [<span class="st">'duration'</span>], confidence: 0.6,
+  candidates: [<span class="st">'1/8'</span>, <span class="st">'1/4'</span>] }</code></pre>
+<p>Plus <code>ignored</code> (ink the image had but MSQ has no word for) and <code>styles</code> with their confidence. Nothing uncertain becomes silent fact.</p>
+</section>
+
+<hr>
+
+<!-- ============================ 9 · TESTING ============================ -->
+<section id="testing">
+<h2><span class="n">9</span>Testing</h2>
+<table class="grid">
+<tr><th>layer</th><th>proves</th><th>how</th></tr>
+<tr><td>unit</td><td>each rule is right alone</td><td>tiny tests per function: position → pitch, shapes → duration, gaps → rests</td></tr>
+<tr><td>round-trip</td><td>the output really is MSQ</td><td><code>parse(serialize(x))</code> equals <code>x</code>; the parser reports no errors on generated text</td></tr>
+<tr><td><b>golden</b></td><td>same version → same output</td><td>fixture image → expected <code>.msq</code>, compared byte for byte</td></tr>
+<tr><td>model eval</td><td>the classifier is good enough</td><td>held-out seeds; per-class recall floors; confusion + gallery kept as artifacts</td></tr>
+<tr><td>reproducibility</td><td>the seed <em>is</em> the dataset</td><td>regenerate → same hash; retrain → same weights hash</td></tr>
+<tr><td>extensibility</td><td>the class table is honest</td><td>add one new MSQ element end to end; it must cost a row, samples and one rule</td></tr>
+</table>
+<p>When a real image fails, reproduce it <em>synthetically</em> (new seed + harsher degradation) and keep it as a test. Real failure → synthetic reproduction → fixed → green. Nobody labels big images.</p>
+</section>
+
+<hr>
+
+<!-- ============================ TERMS ============================ -->
+<section id="terms">
+<h2>Terms, plainly</h2>
+<dl class="terms">
+<div><dt id="term-seed">seed</dt><dd>one number that makes "random" repeatable. Same seed → the same pages, crops and shuffles, on any machine. <em>Example: seed 42 always generates the same training page.</em></dd></div>
+<div><dt id="term-parameter">parameter</dt><dd>one learned number inside the model (a weight or a bias). The model ≈ 300K of them. Training is finding good values for them.</dd></div>
+<div><dt id="term-weights">weights W</dt><dd>the filter numbers of the model. Multiply inputs by them; change them to change what the model detects.</dd></div>
+<div><dt id="term-bias">bias b</dt><dd>one added number per filter/neuron; shifts how easily it fires.</dd></div>
+<div><dt id="term-convolution">convolution</dt><dd>sliding a small pattern detector (3×3 pixels) across the image, computing a weighted sum at every position.</dd></div>
+<div><dt id="term-feature-map">feature map</dt><dd>the grid one filter produces: "how strongly the pattern appears" at each position.</dd></div>
+<div><dt id="term-activation">activation a</dt><dd>the values a layer outputs — the input of the next layer. <em>a = max(0, z)</em> after ReLU.</dd></div>
+<div><dt id="term-softmax">softmax</dt><dd>turning raw scores into probabilities that add up to 1.</dd></div>
+<div><dt id="term-batch">batch</dt><dd>a small group of crops (32) processed and averaged together — steadier than one at a time, still fast.</dd></div>
+<div><dt id="term-epoch">epoch</dt><dd>one full pass over the whole training set. Training runs 20–40 of them.</dd></div>
+<div><dt id="term-loss">loss L</dt><dd>one number for "how wrong the model is". Training only ever tries to make it smaller.</dd></div>
+<div><dt id="term-gradient">gradient</dt><dd>per learned number: how much L changes when that number moves a hair. Points toward "less wrong".</dd></div>
+<div><dt id="term-lr">learning rate η</dt><dd>how big each nudge is (e.g. 0.001). Too big: training jumps around. Too small: takes forever.</dd></div>
+<div><dt id="term-adam">Adam</dt><dd>the nudging rule that smooths gradient direction and size; it adapts each number's step automatically.</dd></div>
+<div><dt id="term-backprop">backpropagation</dt><dd>computing all gradients in one backward sweep, layer by layer, reusing each layer's forward values.</dd></div>
+<div><dt id="term-overfit">overfitting</dt><dd>memorizing the training images instead of learning the symbols. Fought by held-out validation, variety in generation, and the λ penalty.</dd></div>
+<div><dt id="term-splits">train / validation / test</dt><dd>three disjoint seed ranges: learn on the first, tune on the second, judge on the third — never the same crops twice.</dd></div>
+<div><dt id="term-confusion">confusion matrix</dt><dd>a table of true class vs predicted class. The diagonal is right; bright cells off it are the mix-ups to fix.</dd></div>
+<div><dt id="term-im2col">im2col</dt><dd>cutting every small window of the image into a row of a big matrix, so a whole convolution becomes one matrix multiply (and one backprop).</dd></div>
+<div><dt id="term-staff-space">staff space</dt><dd>the distance between two staff lines — music's natural ruler. Nearly everything here is measured in it.</dd></div>
+<div><dt id="term-degradation">degradation</dt><dd>a fake photo flaw (skew, blur, jpeg noise) added to clean rendered pages so the model survives real cameras.</dd></div>
+<div><dt id="term-checkpoint">checkpoint</dt><dd>a saved copy of all parameters at a moment in training; keep the best one, throw the rest.</dd></div>
+<div><dt id="term-mac">MAC</dt><dd>one multiply-accumulate, the unit of "how much computation". Forward pass ≈ 2M MACs per crop.</dd></div>
+</dl>
+</section>
+
+<hr>
+
+<!-- ============================ MATH INDEX ============================ -->
+<section id="math">
+<h2>Math ↔ code</h2>
+<table class="grid">
+<tr><th>formula</th><th>file that computes it</th><th>§</th></tr>
+<tr><td>staff peaks → s</td><td><code>analysis/detectStaves.js</code></td><td><a href="#features">3</a></td></tr>
+<tr><td>û = (u − u₀)/s</td><td><code>analysis/detectStaves.js</code></td><td><a href="#pixels">4.1</a></td></tr>
+<tr><td>y<sub>i</sub>(x) = a<sub>i</sub>x + b<sub>i</sub>, d = (y<sub>h</sub> − y<sub>3</sub>)/(s/2)</td><td><code>analysis/detectStaves.js</code> → <code>translation/assignPitchByStaffPosition.js</code></td><td><a href="#pixels">4.4</a></td></tr>
+<tr><td>resampling (average / blend)</td><td><code>training/cropComponents.js</code></td><td><a href="#pixels">4.2</a></td></tr>
+<tr><td>convolution (im2col)</td><td><code>model/forwardConvolution.js</code></td><td><a href="#model">5.1</a></td></tr>
+<tr><td>ReLU, maxpool, dense, softmax</td><td><code>model/forwardDense.js</code></td><td><a href="#model">5.2</a></td></tr>
+<tr><td>argmax + τ</td><td><code>analysis/classifyComponent.js</code></td><td><a href="#model">5.2</a></td></tr>
+<tr><td>loss (−log p + λΣθ²)</td><td><code>training/train.js</code></td><td><a href="#training">6.2</a></td></tr>
+<tr><td>δ = p − onehot, ReLU mask</td><td><code>training/backpropagateDense.js</code></td><td><a href="#training">6.3</a></td></tr>
+<tr><td>dW = δ a<sup>T</sup>, δ<sub>prev</sub> = W<sup>T</sup>δ</td><td><code>training/backpropagateDense.js</code></td><td><a href="#training">6.3</a></td></tr>
+<tr><td>Adam</td><td><code>training/updateWeightsWithAdam.js</code></td><td><a href="#training">6.4</a></td></tr>
+</table>
+</section>
+</div>
+
+<script>
+// SMIL (traveling dots) can't be stopped by CSS media queries — honor reduced motion here
+if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  document.querySelectorAll('animateMotion').forEach((a) => a.remove())
+}
+
+// confusion matrix: diagonal strong, two honest mix-ups; cells fade in with stagger
+;(() => {
+  const g = document.getElementById('confusion')
+  const cells = []
+  for (let r = 0; r < 10; r++) {
+    for (let c = 0; c < 10; c++) {
+      let o = 0.05 + 0.05 * ((r * 7 + c * 3) % 5) / 5
+      if (r === c) o = 0.85
+      if ((r === 2 && c === 6) || (r === 6 && c === 2)) o = 0.45
+      cells.push(`<i style="opacity:${o};animation-delay:${(r + c) * 0.12}s"></i>`)
+    }
+  }
+  g.innerHTML = cells.join('')
+})()
+</script>

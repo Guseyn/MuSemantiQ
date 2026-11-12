@@ -3,18 +3,18 @@
 <style>
 /* Layout: player bar on top; left = live system diagram + state, right = the MR code with the active lines lit */
 :root {
-  --bg: #f4f6f6;
+  --bg: #fdfdfb;
   --panel: #ffffff;
-  --code-bg: #f8faf9;
-  --fg: #142024;
-  --muted: #5a6a6e;
-  --line: #d3dcdd;
-  --accent: #0d6b6b;
-  --accent-soft: #dcefed;
-  --hot: #e0a100;
+  --code-bg: #f4f3ef;
+  --fg: #17181a;
+  --muted: #6b7076;
+  --line: #e4e4e0;
+  --accent: #a5322a;
+  --accent-soft: #f6e9e6;
+  --hot: #b07d18;
   --err: #c43c3c;
   --err-soft: #f7e0e0;
-  --ok: #2c8a4a;
+  --ok: #2f6b3c;
   --node: #ffffff;
   --m-a: #8a5cf6;
   --m-b: #0f9d9a;
@@ -25,23 +25,24 @@
   --c-kw: #8a3ffc; --c-str: #1e7a3c; --c-com: #7d8b8e; --c-fn: #0f62c9; --c-type: #b25c00; --c-num: #c0306a;
   --font-body: system-ui, -apple-system, "Segoe UI", "Helvetica Neue", sans-serif;
   --font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+  --font-serif: Georgia, "Times New Roman", serif;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #0e1416; --panel: #152023; --code-bg: #10181b; --fg: #e3ecec; --muted: #93a6a8; --line: #2a3a3e;
-    --accent: #5cc7bd; --accent-soft: #163536; --hot: #f2c14e; --err: #ff7b7b; --err-soft: #3a1f22; --ok: #6fd28f; --node: #1a272a;
-    --c-kw: #c4a2ff; --c-str: #7fd49a; --c-com: #6f8487; --c-fn: #79b8ff; --c-type: #f0b26b; --c-num: #ff8fb8;
+    --bg: #1c1714; --panel: #241e19; --code-bg: #191411; --fg: #ede8e3; --muted: #a4938a; --line: #3b322c;
+    --accent: #d98c82; --accent-soft: #3a2620; --hot: #e0b055; --err: #ff8a7a; --err-soft: #40231f; --ok: #8fc49b; --node: #241e19;
+    --c-kw: #c4a2ff; --c-str: #7fd49a; --c-com: #96857c; --c-fn: #79b8ff; --c-type: #f0b26b; --c-num: #ff9fb0;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #0e1416; --panel: #152023; --code-bg: #10181b; --fg: #e3ecec; --muted: #93a6a8; --line: #2a3a3e;
-  --accent: #5cc7bd; --accent-soft: #163536; --hot: #f2c14e; --err: #ff7b7b; --err-soft: #3a1f22; --ok: #6fd28f; --node: #1a272a;
-  --c-kw: #c4a2ff; --c-str: #7fd49a; --c-com: #6f8487; --c-fn: #79b8ff; --c-type: #f0b26b; --c-num: #ff8fb8;
+  --bg: #1c1714; --panel: #241e19; --code-bg: #191411; --fg: #ede8e3; --muted: #a4938a; --line: #3b322c;
+  --accent: #d98c82; --accent-soft: #3a2620; --hot: #e0b055; --err: #ff8a7a; --err-soft: #40231f; --ok: #8fc49b; --node: #241e19;
+  --c-kw: #c4a2ff; --c-str: #7fd49a; --c-com: #96857c; --c-fn: #79b8ff; --c-type: #f0b26b; --c-num: #ff9fb0;
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
-body { background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 15px; line-height: 1.5; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 15.5px; line-height: 1.6; }
 body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
 .wrap {
   max-width: 1320px; margin: 0 auto;
@@ -50,7 +51,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
   padding-block: 22px 48px; display: grid; gap: 14px;
 }
 header.top { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 16px; }
-header.top h1 { margin: 0; font-size: clamp(22px, 3vw, 30px); line-height: 1.15; font-weight: 700; }
+header.top h1 { margin: 0; font-family: var(--font-serif); font-size: clamp(22px, 3vw, 31px); line-height: 1.2; font-weight: 400; }
 header.top a { font-family: var(--font-mono); font-size: 12.5px; color: var(--accent); }
 .eyebrow { font-family: var(--font-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
 .intro { margin: 0; color: var(--muted); max-width: 88ch; }
@@ -169,7 +170,7 @@ dl.kv dd { margin: 0; overflow-wrap: anywhere; }
       <div class="eyebrow">MuSemantiQ · dev docs · src/language</div>
       <h1>src/language: the words become a tree</h1>
     </div>
-    <span class="mrlinks"><a href="../docs/walkthrough.html">all three together</a> · <a href="https://github.com/Guseyn/MuSemantiQ">github.com/Guseyn/MuSemantiQ</a></span>
+    <span class="mrlinks"><a href="./omr.html">src/omr</a> · <a href="../docs/walkthrough.html">all three together</a> · <a href="https://github.com/Guseyn/MuSemantiQ">github.com/Guseyn/MuSemantiQ</a></span>
   </header>
   <p class="intro">The parser, in the order it runs. One page of MSQ text becomes the seven structures everything else reads: the tree, the coloured source, the errors, the styles, the comments, the MIDI settings and the per-character progression. Each frame lights the part that runs and shows the real code that runs it.</p>
 
