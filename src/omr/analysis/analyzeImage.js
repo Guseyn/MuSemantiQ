@@ -14,16 +14,22 @@ import measureStyles from './measureStyles.js'
  * pixels on the straightened bitmap; sizes are staff spaces. Nothing here is
  * guessed — each field is a measurement, and anything uncertain gets reported
  * by the stages that consume it.
+ *
+ * `analyzeStraightenedImage` skips the deskew for callers that straighten the
+ * bitmap once and measure symbols against the very same pixels.
  */
 
 export function analyzeImage ({ width, height, grayscale }) {
-  const upright = deskewBitmap({ width, height, grayscale })
+  return analyzeStraightenedImage(deskewBitmap({ width, height, grayscale }))
+}
+
+export function analyzeStraightenedImage (upright) {
   const { staves, staffSpaceHeightPx } = detectStaves(upright)
   const systems = groupStavesIntoSystems(staves)
   const textBlocks = findTextBlocks({ ...upright, staves, systems, staffSpaceHeightPx })
   const { fontSizes, colors } = measureStyles({ ...upright, staves, textBlocks, staffSpaceHeightPx })
   return {
-    skewAngleInDegrees: upright.skewAngleInDegrees,
+    skewAngleInDegrees: upright.skewAngleInDegrees || 0,
     staffSpaceHeightPx: roundTo2(staffSpaceHeightPx),
     staves: staves.map((stave, index) => ({
       index,

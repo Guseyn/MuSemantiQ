@@ -12,10 +12,12 @@
  *
  *   readBitmapFromImage   image pixels → { width, height, grayscale }
  *   analyzeImage          the image → staves, systems, text blocks, styles
+ *   translateImageToMsq   the image → { msqText, report }
  *
- * Coming with the next milestones: translateImageToMsq and
- * translateImagesToMsqPages (the music model and the MSQ text).
+ * Coming with the next milestones: translateImagesToMsqPages (projects, one
+ * image per page, with measure numbers and keys carried across).
  */
 
 export { readBitmapFromImage } from './analysis/readBitmapFromImage.js'
 export { analyzeImage } from './analysis/analyzeImage.js'
+export { translateImageToMsq } from './translateImageToMsq.js'

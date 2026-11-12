@@ -28,7 +28,16 @@ import backpropagateModel from '#msq/omr/training/backpropagateModel.js'
 import { trainModel } from '#msq/omr/training/train.js'
 import { generateTrainingSet } from '#msq/omr/training/generateTrainingSet.js'
 import { createSeededRandom } from '#msq/omr/training/seededRandom.js'
-import { drawEllipse, drawFilledRect, createBitmap as createPlainBitmap } from '#msq/omr/training/drawBitmap.js'
+import assignPitchByStaffPosition from '#msq/omr/translation/assignPitchByStaffPosition.js'
+import inferDurationFromNoteShapes from '#msq/omr/translation/inferDurationFromNoteShapes.js'
+import { translateImageToMsq } from '#msq/omr/translateImageToMsq.js'
+import { generateIntermediateStructuresForSinglePage } from '#msq/language/api.js'
+import {
+  drawEllipse,
+  drawFilledRect,
+  drawLine,
+  createBitmap as createPlainBitmap
+} from '#msq/omr/training/drawBitmap.js'
 import {
   createBitmap,
   drawStave,
@@ -278,6 +287,101 @@ const TESTS = [
       const unknown = classifyComponent(model, samples[0].pixels, classIds, 1.1)
       assert.strictEqual(unknown.className, 'unknown', 'below the floor the answer is unknown')
       assert.ok(unknown.isUnknown, 'and it says so')
+    }
+  },
+  {
+    name: 'assignPitchByStaffPosition reads the grid',
+    run () {
+      assert.deepStrictEqual(assignPitchByStaffPosition(0, 'treble'), { noteName: 'f', octaveNumber: '5' })
+      assert.deepStrictEqual(assignPitchByStaffPosition(4, 'treble'), { noteName: 'b', octaveNumber: '4' })
+      assert.deepStrictEqual(assignPitchByStaffPosition(10, 'treble'), { noteName: 'c', octaveNumber: '4' })
+      assert.deepStrictEqual(assignPitchByStaffPosition(0, 'bass'), { noteName: 'a', octaveNumber: '3' })
+      assert.deepStrictEqual(assignPitchByStaffPosition(2, 'bass'), { noteName: 'f', octaveNumber: '3' })
+    }
+  },
+  {
+    name: 'inferDurationFromNoteShapes reads the shapes',
+    run () {
+      assert.strictEqual(inferDurationFromNoteShapes({ isOpenHead: true, hasStem: false }), 1)
+      assert.strictEqual(inferDurationFromNoteShapes({ isOpenHead: true, hasStem: true }), 0.5)
+      assert.strictEqual(inferDurationFromNoteShapes({ isOpenHead: false, hasStem: true }), 0.25)
+      assert.strictEqual(inferDurationFromNoteShapes({ isOpenHead: false, hasStem: true, beamCount: 1 }), 0.125)
+      assert.strictEqual(inferDurationFromNoteShapes({ isOpenHead: false, hasStem: true, flagCount: 2 }), 0.0625)
+    }
+  },
+  {
+    name: 'translateImageToMsq reads a drawn page',
+    run () {
+      const bitmap = createPlainBitmap(600, 400)
+      drawStave(bitmap, 100, 520, 200, 12)
+      drawFilledRect(bitmap, 110, 196, 10, 30) // the clef
+      drawFilledRect(bitmap, 150, 202, 10, 10) // the time signature, over
+      drawFilledRect(bitmap, 150, 226, 10, 10) // and under the middle
+      // measure 1: c5 quarter, a4 flat quarter, f4 dotted quarter
+      drawEllipse(bitmap, 220, 218, 8, 5.5)
+      drawLine(bitmap, 228, 216, 228, 178, 2)
+      drawFilledRect(bitmap, 280, 225, 6, 10) // the flat before a4
+      drawEllipse(bitmap, 300, 230, 8, 5.5)
+      drawLine(bitmap, 308, 228, 308, 190, 2)
+      drawEllipse(bitmap, 380, 242, 8, 5.5)
+      drawLine(bitmap, 387, 240, 387, 202, 2)
+      drawEllipse(bitmap, 392, 242, 2.5, 2.5) // its dot
+      drawLine(bitmap, 450, 188, 450, 262, 2) // the barline
+      // measure 2: two beamed eighths on b4 and a4, beamed above the stave
+      drawEllipse(bitmap, 480, 224, 8, 5.5)
+      drawLine(bitmap, 488, 226, 488, 192, 2)
+      drawEllipse(bitmap, 520, 230, 8, 5.5)
+      drawLine(bitmap, 528, 232, 528, 192, 2)
+      drawLine(bitmap, 480, 192, 535, 192, 4) // the beam
+
+      const drawn = [
+        { x: 115, y: 211, classId: 'clef-treble' },
+        { x: 155, y: 207, classId: 'digit-4' },
+        { x: 155, y: 231, classId: 'digit-4' },
+        { x: 220, y: 218, classId: 'notehead-filled' },
+        { x: 283, y: 230, classId: 'flat' },
+        { x: 300, y: 230, classId: 'notehead-filled' },
+        { x: 392, y: 242, classId: 'dot' },
+        { x: 380, y: 242, classId: 'notehead-filled' },
+        { x: 480, y: 224, classId: 'notehead-filled' },
+        { x: 520, y: 230, classId: 'notehead-filled' }
+      ]
+      const classify = (pixels, box) => {
+        const centerX = box.x + box.w / 2
+        const centerY = box.y + box.h / 2
+        const nearest = drawn
+          .map((symbol) => ({ ...symbol, distance: Math.hypot(symbol.x - centerX, symbol.y - centerY) }))
+          .sort((first, second) => first.distance - second.distance)[0]
+        return {
+          className: nearest.distance <= 15 ? nearest.classId : 'unknown',
+          confidence: nearest.distance <= 15 ? 1 : 0,
+          candidates: []
+        }
+      }
+
+      const { msqText, report } = translateImageToMsq(bitmap, { classify })
+      assert.ok(msqText.includes('treble clef'), 'the clef is named')
+      assert.ok(msqText.includes('time signature is 4:4'), 'the meter is named')
+      // the beam is geometry and no class says so yet — the report says it
+      assert.ok(report.uncertain.length >= 1, 'the unclassified beam goes to the report')
+
+      const parsed = generateIntermediateStructuresForSinglePage({ pageText: msqText })
+      assert.deepStrictEqual(parsed.errors, [], 'the text parses with no errors')
+      const measures = parsed.pageSchema.measuresParams
+      assert.strictEqual(measures.length, 2, 'the barline made two measures')
+      const first = measures[0].stavesParams[0].voicesParams[0]
+      assert.strictEqual(first.length, 4, 'three notes and the rest the measure needed')
+      assert.deepStrictEqual(
+        { noteName: first[0].notes[0].noteName, octaveNumber: first[0].notes[0].octaveNumber },
+        { noteName: 'c', octaveNumber: '5' },
+        'c5'
+      )
+      assert.strictEqual(first[1].keysParams[0].keyType, 'flatKey', 'the flat is a key on a4')
+      assert.strictEqual(first[2].numberOfDots, 1, 'the dot is counted')
+      assert.strictEqual(first[3].isRest, true, 'the measure is filled with a rest')
+      const second = measures[1].stavesParams[0].voicesParams[0]
+      assert.strictEqual(second[0].unitDuration, 0.125, 'a beamed eighth')
+      assert.strictEqual(second[0].beamedWithNext, true, 'beamed with its neighbour')
     }
   }
 ]
