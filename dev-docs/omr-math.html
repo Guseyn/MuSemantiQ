@@ -56,8 +56,9 @@ figure svg { display: block; width: 100%; height: auto; background: #fff; border
 figcaption { font: 12px var(--mono); color: var(--muted); margin-top: 6px; }
 svg text { font-family: var(--serif); font-style: italic; fill: var(--ink); }
 svg text.up { font-style: normal; }
-svg text.mono { font: 500 10px var(--font-mono); font-style: normal; fill: var(--muted); }
-svg text.lbl { font-size: 13px; }
+svg text.mono { font: 500 8.5px var(--font-mono); font-style: normal; fill: var(--ink); }
+svg text.mono.tiny { font-size: 7.5px; }
+svg text.lbl { font-size: 11px; }
 svg .cell { fill: var(--soft); stroke: var(--rule); }
 svg .cell.ink { fill: var(--ink); }
 svg .cell.hot { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1.6; }
@@ -150,8 +151,8 @@ $$
   </g>
   <rect class="cell hot" x="180" y="100" width="20" height="20"></rect>
   <path class="flow" d="M200 110 L330 110"></path>
-  <text class="lbl" x="336" y="106">x<tspan font-size="10" dy="4">i,j</tspan></text>
-  <text class="mono" x="336" y="128">the ink of this one pixel</text>
+  <text class="mono" x="336" y="106">x<tspan dy="2" font-size="7">i,j</tspan><tspan dy="-2"> = the ink of this pixel</tspan></text>
+  <text class="mono" x="336" y="120">one number: 0 (paper) … 1 (ink)</text>
 
   <path class="axis" d="M120 42 L290 42"></path>
   <text class="lbl" x="196" y="34">i</text>
@@ -224,13 +225,13 @@ $$
     </g>
     <g>
       <rect class="cell win" x="84" y="100" width="54" height="54"></rect>
-      <animateTransform attributeName="transform" type="translate" values="0 0; 72 0; 72 54; 0 54; 0 0" dur="8s" repeatCount="indefinite"/>
+      <text class="lbl" x="111" y="132">F×F</text>
+      <animateTransform attributeName="transform" type="translate" values="0 0; 54 0; 54 54; 0 54; 0 0" dur="8s" repeatCount="indefinite"/>
     </g>
-    <text class="lbl" x="96" y="140">F×F</text>
     <text class="mono" x="30" y="230">window at (i, j) · offsets p, q</text>
-    <text class="lbl" x="236" y="120">w</text>
-    <text class="mono" x="252" y="122">p,q,c,k</text>
-    <path class="flow" d="M272 128 L316 128"></path>
+    <text class="lbl" x="228" y="106">w</text>
+    <text class="mono" x="244" y="108">p,q,c,k</text>
+    <path class="flow" d="M262 128 L314 128"></path>
 
     <text class="mono" x="330" y="34">filter w — 3×3×C, one per k</text>
     <g>
@@ -322,8 +323,9 @@ $$
   <g stroke="#d3dcdd"><path d="M500 62H596 M500 80H596 M500 98H596 M500 116H596 M500 134H596 M500 152H596 M500 170H596 M500 188H596 M532 44V214 M564 44V214"/></g>
   <rect class="cell hot breathe" x="500" y="134" width="32" height="18"></rect>
   <text class="mono" x="500" y="232">(HW) × K</text>
-  <text class="mono" x="640" y="120">one multiply replaces every window sum</text>
-  <text class="mono" x="640" y="140">of (2) — and its derivatives come free</text>
+  <text class="mono" x="640" y="112">one multiply replaces every</text>
+  <text class="mono" x="640" y="126">window sum of (2) — and the</text>
+  <text class="mono" x="640" y="140">derivatives come free</text>
 </svg>
 <figcaption>fig 3 · <a class="term" href="#g-im2col">im2col</a>: each window becomes a row of \(P\); the layer becomes \(Z = P\hat W^{T} + \mathbf{1}b^{T}\).</figcaption>
 </figure>
@@ -455,7 +457,7 @@ $$
     <g><rect class="cell" x="0" y="60" width="26" height="46"></rect><rect class="cell" x="34" y="42" width="26" height="64"></rect><rect class="cell" x="68" y="76" width="26" height="30"></rect><rect class="cell" x="102" y="30" width="26" height="76"></rect></g>
     <text class="mono" x="0" y="122">z<tspan dy="3" font-size="8">1..K</tspan></text>
     <path class="flow" d="M150 82 L188 82"></path>
-    <text class="mono" x="152" y="74">softmax</text>
+    <text class="mono" x="146" y="70">softmax</text>
     <g><rect class="cell hot breathe" x="200" y="70" width="26" height="36"></rect><rect class="cell hot breathe" x="234" y="54" width="26" height="52"></rect><rect class="cell hot breathe" x="268" y="86" width="26" height="20"></rect><rect class="cell hot breathe" x="302" y="46" width="26" height="60"></rect></g>
     <text class="mono" x="200" y="122">p<tspan dy="3" font-size="8">1..K</tspan> · sums to 1</text>
     <text class="mono" x="0" y="152">one score per class, c</text>
@@ -513,14 +515,14 @@ $$
   <defs><marker id="ar3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#6b7076"/></marker></defs>
   <path class="axis" d="M60 190 H580" marker-end="url(#ar3)"></path>
   <path class="axis" d="M60 190 V26"></path>
-  <text class="mono" x="586" y="194">p<tspan dy="3" font-size="8">y</tspan> → 1</text>
+  <text class="mono" x="496" y="212">p<tspan dy="3" font-size="8">y</tspan> → 1</text>
   <text class="mono" x="18" y="34">C</text>
   <polyline class="curve" points="70,32 110,86 160,120 220,150 320,172 440,182 560,187"></polyline>
   <circle class="ball" cx="560" cy="187" r="5"/><text class="mono" x="520" y="172">p=1 → cost 0</text>
   <circle class="ball" cx="320" cy="172" r="5"/><text class="mono" x="286" y="210">p=0.5 → 0.69</text>
   <circle class="ball" cx="88" cy="62" r="5"/><text class="mono" x="96" y="58">p=0.01 → 4.6</text>
-  <text class="mono" x="380" y="60">−log p : confident and wrong</text>
-  <text class="mono" x="380" y="76">is punished hard</text>
+  <text class="mono tiny" x="380" y="60">−log p : confident and wrong</text>
+  <text class="mono tiny" x="380" y="74">is punished hard</text>
 </svg>
 <figcaption>fig 6 · the cost (11) as a function of the probability of the true class.</figcaption>
 </figure>
@@ -594,14 +596,14 @@ $$
   <path class="curve" d="M60 40 C 180 220, 320 224, 420 190 C 520 156, 590 120, 660 42"></path>
   <path class="dash" d="M120 92 L188 168"></path>
   <path class="dash" d="M188 168 L262 204"></path>
-  <path class="dash" d="M262 204 L330 214"></path>
+  <path class="dash" d="M262 204 L324 207"></path>
   <text class="mono" x="96" y="86">−η g<tspan dy="3" font-size="8">t</tspan></text>
   <text class="mono" x="386" y="236">step against the slope</text>
-  <text class="mono" x="404" y="186">minimum of C</text>
+  <text class="mono tiny" x="284" y="232">minimum of C</text>
   <circle class="ball" r="9">
     <animateMotion dur="7s" repeatCount="indefinite" path="M60 40 C 180 220, 320 224, 420 190 C 520 156, 590 120, 660 42"/>
   </circle>
-  <circle cx="420" cy="190" r="4" fill="#2f6b3c"/>
+  <circle cx="324" cy="207" r="4" fill="#2f6b3c"/>
   <text class="mono" x="60" y="24">C(θ) — the cost as one number θ moves</text>
 </svg>
 <figcaption>fig 7 · gradient descent (14): the ball rolls against the slope, step after step. It moves on its own.</figcaption>
@@ -965,6 +967,7 @@ $$
 <p>\(\hat m_t\) — the corrected memory; \(v_t\) — the scale memory, corrected the same way with \(\beta_2\)</p>
 </div>
 </div>
+</div>
 
 <!-- ======================= 13 ======================= -->
 <h2 id="s13"><span class="n">13.</span> Checking the Derivative</h2>
@@ -997,8 +1000,8 @@ $$
   <text class="mono" x="196" y="214">θ − ε</text>
   <text class="mono" x="336" y="214">θ + ε</text>
   <text class="mono" x="310" y="176">θ</text>
-  <text class="mono" x="386" y="80">tangent = the true gradient</text>
-  <text class="mono" x="386" y="96">secant = the two probes</text>
+  <text class="mono" x="252" y="100">tangent</text>
+  <text class="mono" x="376" y="82">secant</text>
   <text class="mono" x="60" y="224">the gap between them is O(ε²), by Taylor's expansion</text>
 </svg>
 <figcaption>fig 9 · the central difference (31): the secant through the probes approximates the tangent.</figcaption>
