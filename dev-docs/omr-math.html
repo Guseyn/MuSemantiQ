@@ -56,9 +56,9 @@ figure svg { display: block; width: 100%; height: auto; background: #fff; border
 figcaption { font: 12px var(--mono); color: var(--muted); margin-top: 6px; }
 svg text { font-family: var(--serif); font-style: italic; fill: var(--ink); }
 svg text.up { font-style: normal; }
-svg text.mono { font: 500 8.5px var(--font-mono); font-style: normal; fill: var(--ink); }
-svg text.mono.tiny { font-size: 7.5px; }
-svg text.lbl { font-size: 11px; }
+svg text.mono { font: 500 12px var(--font-mono); font-style: normal; fill: var(--ink); }
+svg text.mono.tiny { font-size: 11px; }
+svg text.lbl { font-size: 14px; }
 svg .cell { fill: var(--soft); stroke: var(--rule); }
 svg .cell.ink { fill: var(--ink); }
 svg .cell.hot { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1.6; }
@@ -71,7 +71,7 @@ svg .box { fill: #fff; stroke: var(--muted); rx: 6; }
 svg .box.hot { fill: var(--accent-soft); stroke: var(--accent); }
 svg .ball { fill: var(--accent); stroke: #fff; stroke-width: 2; }
 svg .token { fill: var(--ok); stroke: #fff; stroke-width: 2; }
-svg text.boxlbl { font: 500 11px var(--font-mono); font-style: normal; fill: var(--ink); text-anchor: middle; }
+svg text.boxlbl { font: 500 13px var(--font-mono); font-style: normal; fill: var(--ink); text-anchor: middle; }
 svg .lit { fill: var(--ok-soft); opacity: 0; animation: lit 5s linear infinite; }
 @keyframes lit { 0%, 8% { opacity: 1 } 18%, 100% { opacity: 0 } }
 @media (prefers-reduced-motion: reduce) { svg .lit { animation: none; } }
@@ -155,7 +155,7 @@ $$
   </g>
   <rect class="cell hot" x="180" y="100" width="20" height="20"></rect>
   <path class="flow" d="M200 110 L330 110"></path>
-  <text class="mono" x="336" y="106">x<tspan dy="2" font-size="7">i,j</tspan><tspan dy="-2"> = the ink of this pixel</tspan></text>
+  <text class="mono" x="336" y="106">x<tspan dy="2" font-size="10">i,j</tspan><tspan dy="-2"> = the ink of this pixel</tspan></text>
   <text class="mono" x="336" y="120">one number: 0 (paper) … 1 (ink)</text>
 
   <path class="axis" d="M120 42 L290 42"></path>
@@ -246,7 +246,7 @@ $$
       <text class="mono" x="336" y="160">weights, learned</text>
     </g>
     <path class="flow" d="M424 118 L520 118"></path>
-    <text class="mono" x="432" y="110">+ b<tspan dy="3" font-size="8">k</tspan></text>
+    <text class="mono" x="432" y="110">+ b<tspan dy="3" font-size="10">k</tspan></text>
 
     <text class="mono" x="560" y="34">output z — one cell per (i, j, k)</text>
     <g>
@@ -406,7 +406,7 @@ $$
     <path class="flow" d="M112 76 L160 76"></path>
     <rect class="cell hot" x="164" y="54" width="44" height="44"></rect>
     <text class="lbl" x="178" y="82">7</text>
-    <text class="mono" x="150" y="118">a<tspan dy="3" font-size="8">pool</tspan><tspan dy="-3" font-size="8">i,j,c</tspan></text>
+    <text class="mono" x="150" y="118">a<tspan dy="3" font-size="10">pool</tspan><tspan dy="-3" font-size="10">i,j,c</tspan></text>
     <text class="mono" x="0" y="146">the max wins and is remembered</text>
     <text class="mono" x="0" y="162">(argmax) for the backward pass</text>
   </g>
@@ -440,7 +440,7 @@ $$
   <circle cx="320" cy="170" r="4" fill="#a5322a"/>
   <text class="mono" x="160" y="158">slope 0</text>
   <text class="mono" x="430" y="116">slope 1</text>
-  <text class="mono" x="330" y="196">z = 0: use ε — a formality (7)</text>
+  <text class="mono" x="330" y="196">at z = 0 the slope is ε (7)</text>
   <text class="lbl" x="546" y="190">z</text>
   <text class="lbl" x="306" y="56">a</text>
   <text class="mono" x="100" y="40">flat left of zero, straight right of it</text>
@@ -484,23 +484,23 @@ $$
 <figure>
 <svg viewBox="0 0 900 300" role="img" aria-label="Top: a dense layer. Bottom: scores become probabilities through softmax">
   <g transform="translate(20,10)">
-    <text class="mono" x="30" y="16">a<tspan dy="3" font-size="8">(l−1)</tspan></text>
+    <text class="mono" x="30" y="16">a<tspan dy="3" font-size="10">(l−1)</tspan></text>
     <circle class="box" cx="60" cy="52" r="16"/><circle class="box" cx="60" cy="100" r="16"/><circle class="box" cx="60" cy="148" r="16"/>
-    <text class="mono" x="322" y="16">z<tspan dy="3" font-size="8">(l)</tspan></text>
+    <text class="mono" x="322" y="16">z<tspan dy="3" font-size="10">(l)</tspan></text>
     <circle class="box hot" cx="330" cy="76" r="16"/><circle class="box hot" cx="330" cy="124" r="16"/>
     <g class="dash"><path d="M76 52 L314 76 M76 52 L314 124 M76 100 L314 76 M76 100 L314 124 M76 148 L314 76 M76 148 L314 124"/></g>
-    <text class="mono" x="168" y="70">W<tspan dy="3" font-size="8">(l)</tspan></text>
-    <text class="mono" x="352" y="76">+ b<tspan dy="3" font-size="8">(l)</tspan></text>
+    <text class="mono" x="168" y="70">W<tspan dy="3" font-size="10">(l)</tspan></text>
+    <text class="mono" x="352" y="76">+ b<tspan dy="3" font-size="10">(l)</tspan></text>
     <text class="mono" x="64" y="180">every input into every output</text>
   </g>
   <g transform="translate(520,30)">
     <text class="mono" x="0" y="10">scores z → probabilities p</text>
     <g><rect class="cell" x="0" y="60" width="26" height="46"></rect><rect class="cell" x="34" y="42" width="26" height="64"></rect><rect class="cell" x="68" y="76" width="26" height="30"></rect><rect class="cell" x="102" y="30" width="26" height="76"></rect></g>
-    <text class="mono" x="0" y="122">z<tspan dy="3" font-size="8">1..K</tspan></text>
+    <text class="mono" x="0" y="122">z<tspan dy="3" font-size="10">1..K</tspan></text>
     <path class="flow" d="M150 82 L188 82"></path>
     <text class="mono" x="146" y="70">softmax</text>
     <g><rect class="cell hot breathe" x="200" y="70" width="26" height="36"></rect><rect class="cell hot breathe" x="234" y="54" width="26" height="52"></rect><rect class="cell hot breathe" x="268" y="86" width="26" height="20"></rect><rect class="cell hot breathe" x="302" y="46" width="26" height="60"></rect></g>
-    <text class="mono" x="200" y="122">p<tspan dy="3" font-size="8">1..K</tspan> · sums to 1</text>
+    <text class="mono" x="200" y="122">p<tspan dy="3" font-size="10">1..K</tspan> · sums to 1</text>
     <text class="mono" x="0" y="152">one score per class, c</text>
     <text class="mono" x="0" y="168">bar height = probability</text>
   </g>
@@ -556,7 +556,7 @@ $$
   <defs><marker id="ar3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#6b7076"/></marker></defs>
   <path class="axis" d="M60 190 H580" marker-end="url(#ar3)"></path>
   <path class="axis" d="M60 190 V26"></path>
-  <text class="mono" x="496" y="212">p<tspan dy="3" font-size="8">y</tspan> → 1</text>
+  <text class="mono" x="496" y="212">p<tspan dy="3" font-size="10">y</tspan> → 1</text>
   <text class="mono" x="18" y="34">C</text>
   <polyline class="curve" points="70,32 110,86 160,120 220,150 320,172 440,182 560,187"></polyline>
   <circle class="ball" cx="560" cy="187" r="5"/><text class="mono" x="520" y="172">p=1 → cost 0</text>
@@ -668,7 +668,7 @@ $$
   <path class="dash" d="M120 92 L188 168"></path>
   <path class="dash" d="M188 168 L262 204"></path>
   <path class="dash" d="M262 204 L324 207"></path>
-  <text class="mono" x="96" y="86">−η g<tspan dy="3" font-size="8">t</tspan></text>
+  <text class="mono" x="96" y="86">−η g<tspan dy="3" font-size="10">t</tspan></text>
   <text class="mono" x="386" y="236">step against the slope</text>
   <text class="mono tiny" x="284" y="232">minimum of C</text>
   <circle class="ball" r="9">
@@ -976,7 +976,7 @@ $$
 </div>
 
 <figure>
-<svg viewBox="0 0 640 245" role="img" aria-label="A two by two window whose blame goes only to the remembered winner">
+<svg viewBox="0 0 640 258" role="img" aria-label="A two by two window whose blame goes only to the remembered winner">
   <text class="mono" x="60" y="36">max-pool (22): blame goes only to the remembered argmax</text>
   <g class="cell"><rect x="120" y="70" width="60" height="60"/><rect x="180" y="70" width="60" height="60"/><rect x="120" y="130" width="60" height="60"/><rect x="180" y="130" width="60" height="60"/></g>
   <rect class="cell hot" x="120" y="70" width="60" height="60"></rect>
@@ -1162,7 +1162,8 @@ $$
   <rect class="cell hot" x="268" y="88" width="24" height="24"></rect>
   <text class="mono" x="440" y="100">da(i, j, c) = the sum over</text>
   <text class="mono" x="440" y="120">every patch that covers it</text>
-  <text class="mono tiny" x="440" y="148">im2col cut overlaps; col2im adds them back</text>
+  <text class="mono tiny" x="440" y="148">im2col cut overlaps;</text>
+  <text class="mono tiny" x="440" y="166">col2im adds them back</text>
   <text class="mono tiny" x="220" y="212">the ringed cell collects from both dashed windows</text>
 </svg>
 <figcaption>fig 23 · col2im (26): overlapping windows land in the same cell and add up.</figcaption>
@@ -1226,10 +1227,9 @@ $$
   <path class="dash" d="M80 140 H720"></path>
   <g stroke="var(--muted)" stroke-width="2"><path d="M100 140 V88"/><path d="M160 140 V160"/><path d="M220 140 V96"/><path d="M280 140 V192"/><path d="M340 140 V110"/><path d="M400 140 V80"/><path d="M460 140 V180"/><path d="M520 140 V118"/><path d="M580 140 V90"/><path d="M640 140 V170"/></g>
   <polyline class="curve" points="100,128 160,136 220,122 280,144 340,136 400,118 460,138 520,128 580,118 640,124"></polyline>
-  <text class="mono" x="740" y="100">g_t — this step's noise</text>
-  <text class="mono" x="740" y="122">m_t — smoothed direction</text>
-  <text class="mono" x="740" y="144">v_t — smoothed scale</text>
-  <text class="mono tiny" x="740" y="166">a little of every step is kept</text>
+  <text class="mono" x="100" y="30">g_t — this step's noise</text>
+  <text class="mono" x="100" y="50">m_t — smoothed direction</text>
+  <text class="mono" x="100" y="70">v_t — smoothed scale</text>
   <text class="mono tiny" x="100" y="238">β₁ = 0.9 keeps the past; β₂ = 0.999 keeps even more of it — (28)</text>
 </svg>
 <figcaption>fig 25 · the Adam memories (28): the noisy truth, smoothed into direction and scale.</figcaption>
@@ -1328,7 +1328,7 @@ $$
 </div>
 
 <figure>
-<svg viewBox="0 0 640 255" role="img" aria-label="Two probes around theta on a curve, with their secant approximating the tangent">
+<svg viewBox="0 0 640 262" role="img" aria-label="Two probes around theta on a curve, with their secant approximating the tangent">
   <defs><marker id="ar5" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#6b7076"/></marker></defs>
   <path class="axis" d="M60 190 H580"></path>
   <path class="axis" d="M300 190 V26"></path>
