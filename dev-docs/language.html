@@ -1,3 +1,5 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
 <title>MuSemantiQ — src/language</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
@@ -163,8 +165,29 @@ dl.kv dd { margin: 0; overflow-wrap: anywhere; }
 .hljs-attr, .hljs-property, .hljs-variable.constant_ { color: var(--c-fn); }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style><style>
-.scrollbox { overflow: auto; max-height: 560px; border-bottom: 1px solid var(--line); }
+.scrollbox { overflow: auto; max-height: 580px; border-bottom: 1px solid var(--line); position: relative; }
 .scrollbox svg.sys { width: 820px; height: auto; border: 0; border-radius: 0; background: transparent; }
+.diagram .cluster rect { fill: var(--soft); stroke: var(--line); stroke-dasharray: 4 4; rx: 10; }
+.diagram .cluster text { font: 500 10px var(--mono); fill: var(--muted); text-anchor: start; }
+.diagram .node { cursor: pointer; }
+.diagram .node:hover rect:not(.band) { stroke: var(--accent); }
+.diagram .halo { fill: none; stroke: var(--accent); stroke-width: 2; opacity: 0; rx: 11; transform-box: fill-box; transform-origin: center; }
+.diagram .node.on .halo { animation: halo 1.7s ease-in-out infinite; }
+@keyframes halo {
+  0%, 100% { opacity: .25; transform: scale(1); }
+  50% { opacity: .95; transform: scale(1.07); }
+}
+.diagram .node.on rect:not(.band) { stroke: var(--accent); stroke-width: 2.5; fill: var(--accent-soft); }
+.diagram .node text { font-size: 11px; }
+.crumbs { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; padding: 7px 12px; border-bottom: 1px solid var(--line); font: 500 11.5px var(--mono); }
+.crumbs button { font: inherit; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px; cursor: pointer; }
+.crumbs button:hover { color: var(--accent); border-color: var(--accent); }
+.crumbs button.now { background: var(--accent); border-color: var(--accent); color: var(--panel); }
+.stack { margin: 0; display: grid; gap: 2px; }
+.stack .frame { font: 12px var(--mono); color: var(--muted); padding: 2px 0 2px 14px; border-left: 2px solid var(--line); overflow-wrap: anywhere; }
+.stack .frame.here { border-left-color: var(--accent); color: var(--ink); background: var(--accent-soft); border-radius: 0 5px 5px 0; }
+.stack .frame.here::after { content: " ← here"; color: var(--accent); }
+dl.kv dd { overflow-wrap: anywhere; }
 </style>
 <div class="wrap">
   <header class="top">
@@ -174,7 +197,7 @@ dl.kv dd { margin: 0; overflow-wrap: anywhere; }
     </div>
     <span class="mrlinks"><a href="./omr-code.html">src/omr</a> · <a href="./omr-math.html">the math</a> · <a href="./language.html">src/language</a> · <a href="./drawer.html">src/drawer</a> · <a href="./midi.html">src/midi</a> · <a href="./training.html">training</a></span>
   </header>
-  <p class="intro">Every function of the parser and its reverse, process by process. Each tab holds its own set of connected blocks — the call graph of that process — and each frame lights one function, with the stack above it and its own doc line. The code is read from the repository; the lines are the lines.</p>
+  <p class="intro">Every function of the parser and its reverse, process by process. Each tab holds its own set of connected blocks — the call graph of that process — and each frame lights one function with the stack above it. Click any block to zoom from the high level into what it calls; the code on the right is the code in the repository.</p>
 
   <div class="player" role="region" aria-label="Player">
     <div class="tabs" role="tablist" id="tabs"></div>
@@ -187,15 +210,17 @@ dl.kv dd { margin: 0; overflow-wrap: anywhere; }
       <span class="count" id="count">1 / 1</span>
     </div>
     <div class="caption" aria-live="polite"><b id="ctitle"></b><span id="ctext"></span></div>
-    <div class="keys"><kbd>←</kbd> <kbd>→</kbd> step · <kbd>space</kbd> play / pause</div>
+    <div class="keys"><kbd>←</kbd> <kbd>→</kbd> step · <kbd>space</kbd> play / pause · click a block to zoom in</div>
   </div>
 
   <div class="stage">
     <div class="left">
       <div class="card">
         <div class="hd"><span>this process</span><b id="where"></b></div>
+        <div class="crumbs" id="crumbs"></div>
         <div class="scrollbox">
           <svg class="sys" viewBox="0 0 820 460" role="img" aria-label="The connected blocks of the current process">
+            <g id="groups"></g>
             <g id="edges"></g>
             <g id="nodes"></g>
             <g id="tok" style="display:none"><rect rx="4" height="18"></rect><text dy="4"></text><circle r="7"></circle></g>
@@ -206,11 +231,9 @@ dl.kv dd { margin: 0; overflow-wrap: anywhere; }
         <div class="state">
           <section>
             <h3>The call stack</h3>
-            <dl class="kv" id="worker"></dl>
+            <div id="worker" class="stackwrap"></div>
             <h3>The signature</h3>
             <pre class="msg" id="msg"></pre>
-            <h3>In one line</h3>
-            <pre class="msg" id="logline"></pre>
           </section>
         </div>
       </div>
@@ -19765,7 +19788,9 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "generateIntermediateStructuresForMultiplePages",
+     "stack": [
+      "generateIntermediateStructuresForMultiplePages"
+     ],
      "called by": "\u2014",
      "file": "src/language/api.js"
     },
@@ -19785,7 +19810,9 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "validators",
+     "stack": [
+      "validators"
+     ],
      "called by": "\u2014",
      "file": "src/language/lib/attribute.js"
     },
@@ -19805,7 +19832,9 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "testSchemaNoThrow",
+     "stack": [
+      "testSchemaNoThrow"
+     ],
      "called by": "\u2014",
      "file": "src/language/lib/attribute.js"
     },
@@ -19825,7 +19854,9 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "getEnumerableProperty",
+     "stack": [
+      "getEnumerableProperty"
+     ],
      "called by": "\u2014",
      "file": "src/language/lib/attribute.js"
     },
@@ -19845,7 +19876,9 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "testAdditionalProperty",
+     "stack": [
+      "testAdditionalProperty"
+     ],
      "called by": "\u2014",
      "file": "src/language/lib/attribute.js"
     },
@@ -19865,7 +19898,9 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "validateMultipleOfOrDivisbleBy",
+     "stack": [
+      "validateMultipleOfOrDivisbleBy"
+     ],
      "called by": "\u2014",
      "file": "src/language/lib/attribute.js"
     },
@@ -19885,7 +19920,9 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "testArrays",
+     "stack": [
+      "testArrays"
+     ],
      "called by": "\u2014",
      "file": "src/language/lib/attribute.js"
     },
@@ -19905,7 +19942,9 @@ export default function (schemaOnInput) {
      "ValidationError"
     ],
     "w": {
-     "call stack": "ValidationError",
+     "stack": [
+      "ValidationError"
+     ],
      "called by": "\u2014",
      "file": "src/language/lib/helpers.js"
     },
@@ -19925,7 +19964,9 @@ export default function (schemaOnInput) {
      "ValidatorResultError"
     ],
     "w": {
-     "call stack": "ValidatorResultError",
+     "stack": [
+      "ValidatorResultError"
+     ],
      "called by": "\u2014",
      "file": "src/language/lib/helpers.js"
     },
@@ -19945,7 +19986,9 @@ export default function (schemaOnInput) {
      "SchemaContext"
     ],
     "w": {
-     "call stack": "SchemaContext",
+     "stack": [
+      "SchemaContext"
+     ],
      "called by": "\u2014",
      "file": "src/language/lib/helpers.js"
     },
@@ -19965,7 +20008,9 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "isFormat",
+     "stack": [
+      "isFormat"
+     ],
      "called by": "\u2014",
      "file": "src/language/lib/helpers.js"
     },
@@ -19985,7 +20030,9 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "deepMerger",
+     "stack": [
+      "deepMerger"
+     ],
      "called by": "\u2014",
      "file": "src/language/lib/helpers.js"
     },
@@ -20005,7 +20052,9 @@ export default function (schemaOnInput) {
      "copyist"
     ],
     "w": {
-     "call stack": "copyist",
+     "stack": [
+      "copyist"
+     ],
      "called by": "\u2014",
      "file": "src/language/lib/helpers.js"
     },
@@ -20025,7 +20074,9 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "copyistWithDeepMerge",
+     "stack": [
+      "copyistWithDeepMerge"
+     ],
      "called by": "\u2014",
      "file": "src/language/lib/helpers.js"
     },
@@ -20045,7 +20096,9 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "objectGetPath",
+     "stack": [
+      "objectGetPath"
+     ],
      "called by": "\u2014",
      "file": "src/language/lib/helpers.js"
     },
@@ -20065,7 +20118,9 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "pathEncoder",
+     "stack": [
+      "pathEncoder"
+     ],
      "called by": "\u2014",
      "file": "src/language/lib/helpers.js"
     },
@@ -20085,7 +20140,9 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "encodePath",
+     "stack": [
+      "encodePath"
+     ],
      "called by": "\u2014",
      "file": "src/language/lib/helpers.js"
     },
@@ -20105,7 +20162,9 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "isSchema",
+     "stack": [
+      "isSchema"
+     ],
      "called by": "\u2014",
      "file": "src/language/lib/helpers.js"
     },
@@ -20125,7 +20184,9 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "validate",
+     "stack": [
+      "validate"
+     ],
      "called by": "\u2014",
      "file": "src/language/lib/index.js"
     },
@@ -20145,7 +20206,9 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "scan",
+     "stack": [
+      "scan"
+     ],
      "called by": "\u2014",
      "file": "src/language/lib/scan.js"
     },
@@ -20165,7 +20228,9 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "shouldResolve",
+     "stack": [
+      "shouldResolve"
+     ],
      "called by": "\u2014",
      "file": "src/language/lib/validator.js"
     },
@@ -20185,7 +20250,9 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "types",
+     "stack": [
+      "types"
+     ],
      "called by": "\u2014",
      "file": "src/language/lib/validator.js"
     },
@@ -20205,7 +20272,9 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "isWhitespace",
+     "stack": [
+      "isWhitespace"
+     ],
      "called by": "\u2014",
      "file": "src/language/parser/parseLanguage.js"
     },
@@ -20225,7 +20294,9 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserState",
+     "stack": [
+      "createParserState"
+     ],
      "called by": "\u2014",
      "file": "src/language/parser/parseLanguage.js"
     },
@@ -20245,7 +20316,9 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "runParserScenarios",
+     "stack": [
+      "runParserScenarios"
+     ],
      "called by": "\u2014",
      "file": "src/language/parser/parseLanguage.js"
     },
@@ -20265,7 +20338,9 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "styleNameAction",
+     "stack": [
+      "styleNameAction"
+     ],
      "called by": "\u2014",
      "file": "src/language/parser/scenarios/adapter-sets/highlight-without-ref-ids/addStyleScenarios.js"
     },
@@ -20285,7 +20360,9 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "styleNameIsAction",
+     "stack": [
+      "styleNameIsAction"
+     ],
      "called by": "\u2014",
      "file": "src/language/parser/scenarios/adapter-sets/highlight-without-ref-ids/addStyleScenarios.js"
     },
@@ -20305,7 +20382,9 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "styleValueAction",
+     "stack": [
+      "styleValueAction"
+     ],
      "called by": "\u2014",
      "file": "src/language/parser/scenarios/adapter-sets/highlight-without-ref-ids/addStyleScenarios.js"
     },
@@ -20325,7 +20404,9 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "styleNameAction",
+     "stack": [
+      "styleNameAction"
+     ],
      "called by": "\u2014",
      "file": "src/language/parser/scenarios/adapter-sets/highlight/addStyleScenarios.js"
     },
@@ -20345,7 +20426,9 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "styleNameIsAction",
+     "stack": [
+      "styleNameIsAction"
+     ],
      "called by": "\u2014",
      "file": "src/language/parser/scenarios/adapter-sets/highlight/addStyleScenarios.js"
     },
@@ -20365,7 +20448,9 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "styleValueAction",
+     "stack": [
+      "styleValueAction"
+     ],
      "called by": "\u2014",
      "file": "src/language/parser/scenarios/adapter-sets/highlight/addStyleScenarios.js"
     },
@@ -20385,7 +20470,9 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios",
+     "stack": [
+      "createParserScenarios"
+     ],
      "called by": "\u2014",
      "file": "src/language/parser/scenarios/createParserScenarios.js"
     },
@@ -20405,7 +20492,9 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "styleNameAction",
+     "stack": [
+      "styleNameAction"
+     ],
      "called by": "\u2014",
      "file": "src/language/parser/scenarios/main-set/addStyleScenarios.js"
     },
@@ -20425,7 +20514,9 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "styleNameIsAction",
+     "stack": [
+      "styleNameIsAction"
+     ],
      "called by": "\u2014",
      "file": "src/language/parser/scenarios/main-set/addStyleScenarios.js"
     },
@@ -20445,7 +20536,9 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "styleValueAction",
+     "stack": [
+      "styleValueAction"
+     ],
      "called by": "\u2014",
      "file": "src/language/parser/scenarios/main-set/addStyleScenarios.js"
     },
@@ -20465,7 +20558,9 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "mapWithScenariosAndScenariosWhereItIsRequired",
+     "stack": [
+      "mapWithScenariosAndScenariosWhereItIsRequired"
+     ],
      "called by": "\u2014",
      "file": "src/language/parser/scenarios/mapWithScenariosAndScenariosWhereItIsRequired.js"
     },
@@ -20485,7 +20580,9 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "getLastChordParams",
+     "stack": [
+      "getLastChordParams"
+     ],
      "called by": "\u2014",
      "file": "src/language/parser/scenarios/page-schema/getLastChordParams.js"
     },
@@ -20505,7 +20602,9 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "tokenize",
+     "stack": [
+      "tokenize"
+     ],
      "called by": "\u2014",
      "file": "src/language/parser/scenarios/static-objects/regexps.js"
     },
@@ -20525,7 +20624,9 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "isColor",
+     "stack": [
+      "isColor"
+     ],
      "called by": "\u2014",
      "file": "src/language/parser/scenarios/static-objects/regexps.js"
     },
@@ -20545,7 +20646,9 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "isSupportedMusicFont",
+     "stack": [
+      "isSupportedMusicFont"
+     ],
      "called by": "\u2014",
      "file": "src/language/parser/scenarios/static-objects/regexps.js"
     },
@@ -20565,7 +20668,9 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "isSupportedTextFont",
+     "stack": [
+      "isSupportedTextFont"
+     ],
      "called by": "\u2014",
      "file": "src/language/parser/scenarios/static-objects/regexps.js"
     },
@@ -20585,7 +20690,9 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "isSupportedChordLettersFont",
+     "stack": [
+      "isSupportedChordLettersFont"
+     ],
      "called by": "\u2014",
      "file": "src/language/parser/scenarios/static-objects/regexps.js"
     },
@@ -20605,7 +20712,9 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "isNumeric",
+     "stack": [
+      "isNumeric"
+     ],
      "called by": "\u2014",
      "file": "src/language/parser/scenarios/static-objects/regexps.js"
     },
@@ -20625,7 +20734,9 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "doesFirstArrayContainSecondArray",
+     "stack": [
+      "doesFirstArrayContainSecondArray"
+     ],
      "called by": "\u2014",
      "file": "src/language/parser/scenarios/static-objects/regexps.js"
     },
@@ -20645,7 +20756,9 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "isPositiveInteger",
+     "stack": [
+      "isPositiveInteger"
+     ],
      "called by": "\u2014",
      "file": "src/language/parser/scenarios/static-objects/regexps.js"
     },
@@ -20665,7 +20778,9 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "isLeftOrRight",
+     "stack": [
+      "isLeftOrRight"
+     ],
      "called by": "\u2014",
      "file": "src/language/parser/scenarios/static-objects/regexps.js"
     },
@@ -20685,7 +20800,9 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "isWrappedWithQuotes",
+     "stack": [
+      "isWrappedWithQuotes"
+     ],
      "called by": "\u2014",
      "file": "src/language/parser/scenarios/static-objects/regexps.js"
     },
@@ -20705,7 +20822,9 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "unwrapValueFromQuotes",
+     "stack": [
+      "unwrapValueFromQuotes"
+     ],
      "called by": "\u2014",
      "file": "src/language/parser/scenarios/static-objects/regexps.js"
     },
@@ -20725,7 +20844,9 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "isBelowUnder",
+     "stack": [
+      "isBelowUnder"
+     ],
      "called by": "\u2014",
      "file": "src/language/parser/scenarios/static-objects/regexps.js"
     },
@@ -20745,7 +20866,9 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "isStave",
+     "stack": [
+      "isStave"
+     ],
      "called by": "\u2014",
      "file": "src/language/parser/scenarios/static-objects/regexps.js"
     },
@@ -20765,7 +20888,9 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "isUpHigherDownLower",
+     "stack": [
+      "isUpHigherDownLower"
+     ],
      "called by": "\u2014",
      "file": "src/language/parser/scenarios/static-objects/regexps.js"
     },
@@ -20785,7 +20910,9 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "escapeAsHtmlContent",
+     "stack": [
+      "escapeAsHtmlContent"
+     ],
      "called by": "\u2014",
      "file": "src/language/parser/scenarios/string/escapeAsHtmlContent.js"
     },
@@ -20805,7 +20932,9 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "isPreviousLineEmpty",
+     "stack": [
+      "isPreviousLineEmpty"
+     ],
      "called by": "\u2014",
      "file": "src/language/parser/scenarios/token/isPreviousLineEmpty.js"
     },
@@ -20825,7 +20954,9 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "isStaveNumber",
+     "stack": [
+      "isStaveNumber"
+     ],
      "called by": "\u2014",
      "file": "src/language/parser/scenarios/token/isStaveNumber.js"
     },
@@ -20845,7 +20976,9 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "joinTokens",
+     "stack": [
+      "joinTokens"
+     ],
      "called by": "\u2014",
      "file": "src/language/parser/scenarios/token/joinTokens.js"
     },
@@ -20865,7 +20998,9 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "parseStaveNumberByTokens",
+     "stack": [
+      "parseStaveNumberByTokens"
+     ],
      "called by": "\u2014",
      "file": "src/language/parser/scenarios/token/parseStaveNumberByTokens.js"
     },
@@ -20885,7 +21020,9 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "removeDoubleSpacesAndTrim",
+     "stack": [
+      "removeDoubleSpacesAndTrim"
+     ],
      "called by": "\u2014",
      "file": "src/language/parser/scenarios/token/removeDoubleSpacesAndTrim.js"
     },
@@ -20905,7 +21042,10 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "generateIntermediateStructuresForMultiplePages \u2192 generateIntermediateStructuresForSinglePage",
+     "stack": [
+      "generateIntermediateStructuresForMultiplePages",
+      "generateIntermediateStructuresForSinglePage"
+     ],
      "called by": "generateIntermediateStructuresForMultiplePages",
      "file": "src/language/api.js"
     },
@@ -20925,7 +21065,10 @@ export default function (schemaOnInput) {
      "ValidatorResult"
     ],
     "w": {
-     "call stack": "validateMultipleOfOrDivisbleBy \u2192 ValidatorResult",
+     "stack": [
+      "validateMultipleOfOrDivisbleBy",
+      "ValidatorResult"
+     ],
      "called by": "validateMultipleOfOrDivisbleBy",
      "file": "src/language/lib/helpers.js"
     },
@@ -20945,7 +21088,10 @@ export default function (schemaOnInput) {
      "SchemaError"
     ],
     "w": {
-     "call stack": "validateMultipleOfOrDivisbleBy \u2192 SchemaError",
+     "stack": [
+      "validateMultipleOfOrDivisbleBy",
+      "SchemaError"
+     ],
      "called by": "validateMultipleOfOrDivisbleBy",
      "file": "src/language/lib/helpers.js"
     },
@@ -20965,7 +21111,10 @@ export default function (schemaOnInput) {
      "ValidationError"
     ],
     "w": {
-     "call stack": "ValidationError \u2192 makeSuffix",
+     "stack": [
+      "ValidationError",
+      "makeSuffix"
+     ],
      "called by": "SchemaContext, ValidationError",
      "file": "src/language/lib/helpers.js"
     },
@@ -20985,7 +21134,10 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "testArrays \u2192 deepCompareStrict",
+     "stack": [
+      "testArrays",
+      "deepCompareStrict"
+     ],
      "called by": "scan, testArrays",
      "file": "src/language/lib/helpers.js"
     },
@@ -21005,7 +21157,10 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "deepMerger \u2192 deepMerge",
+     "stack": [
+      "deepMerger",
+      "deepMerge"
+     ],
      "called by": "copyistWithDeepMerge, deepMerger",
      "file": "src/language/lib/helpers.js"
     },
@@ -21025,7 +21180,10 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "validateMultipleOfOrDivisbleBy \u2192 getDecimalPlaces",
+     "stack": [
+      "validateMultipleOfOrDivisbleBy",
+      "getDecimalPlaces"
+     ],
      "called by": "validateMultipleOfOrDivisbleBy",
      "file": "src/language/lib/helpers.js"
     },
@@ -21045,7 +21203,10 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "scan \u2192 resolveUrl",
+     "stack": [
+      "scan",
+      "resolveUrl"
+     ],
      "called by": "scan",
      "file": "src/language/lib/helpers.js"
     },
@@ -21065,7 +21226,10 @@ export default function (schemaOnInput) {
      "SchemaScanResult"
     ],
     "w": {
-     "call stack": "scan \u2192 SchemaScanResult",
+     "stack": [
+      "scan",
+      "SchemaScanResult"
+     ],
      "called by": "scan",
      "file": "src/language/lib/scan.js"
     },
@@ -21085,7 +21249,10 @@ export default function (schemaOnInput) {
      "Validator"
     ],
     "w": {
-     "call stack": "validate \u2192 Validator",
+     "stack": [
+      "validate",
+      "Validator"
+     ],
      "called by": "validate",
      "file": "src/language/lib/validator.js"
     },
@@ -21105,7 +21272,10 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "runParserScenarios \u2192 runActionOnProgressionOfCommandsChange",
+     "stack": [
+      "runParserScenarios",
+      "runActionOnProgressionOfCommandsChange"
+     ],
      "called by": "runParserScenarios",
      "file": "src/language/parser/parseLanguage.js"
     },
@@ -21125,7 +21295,10 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addNotRecognizableCommandScenario",
+     "stack": [
+      "createParserScenarios",
+      "addNotRecognizableCommandScenario"
+     ],
      "called by": "createParserScenarios",
      "file": "src/language/parser/scenarios/adapter-sets/highlight-without-ref-ids/addNotRecognizableCommandScenario.js"
     },
@@ -21145,7 +21318,10 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addNotRecognizableCommandScenario",
+     "stack": [
+      "createParserScenarios",
+      "addNotRecognizableCommandScenario"
+     ],
      "called by": "createParserScenarios",
      "file": "src/language/parser/scenarios/adapter-sets/highlight/addNotRecognizableCommandScenario.js"
     },
@@ -21165,7 +21341,10 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious"
+     ],
      "called by": "createParserScenarios",
      "file": "src/language/parser/scenarios/createParserScenarios.js"
     },
@@ -21185,7 +21364,10 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 attachAdapters",
+     "stack": [
+      "createParserScenarios",
+      "attachAdapters"
+     ],
      "called by": "createParserScenarios",
      "file": "src/language/parser/scenarios/createParserScenarios.js"
     },
@@ -21205,7 +21387,10 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addNotRecognizableCommandScenario",
+     "stack": [
+      "createParserScenarios",
+      "addNotRecognizableCommandScenario"
+     ],
      "called by": "createParserScenarios",
      "file": "src/language/parser/scenarios/main-set/addNotRecognizableCommandScenario.js"
     },
@@ -21225,7 +21410,10 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "isColor \u2192 isHexColorString",
+     "stack": [
+      "isColor",
+      "isHexColorString"
+     ],
      "called by": "isColor",
      "file": "src/language/parser/scenarios/static-objects/regexps.js"
     },
@@ -21245,7 +21433,10 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "isColor \u2192 isRgbColorString",
+     "stack": [
+      "isColor",
+      "isRgbColorString"
+     ],
      "called by": "isColor",
      "file": "src/language/parser/scenarios/static-objects/regexps.js"
     },
@@ -21265,7 +21456,10 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "isColor \u2192 isRgbaColorString",
+     "stack": [
+      "isColor",
+      "isRgbaColorString"
+     ],
      "called by": "isColor",
      "file": "src/language/parser/scenarios/static-objects/regexps.js"
     },
@@ -21285,7 +21479,10 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "doesFirstArrayContainSecondArray \u2192 areTwoArraysEqual",
+     "stack": [
+      "doesFirstArrayContainSecondArray",
+      "areTwoArraysEqual"
+     ],
      "called by": "doesFirstArrayContainSecondArray",
      "file": "src/language/parser/scenarios/static-objects/regexps.js"
     },
@@ -21305,7 +21502,10 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "isWrappedWithQuotes \u2192 isQuote",
+     "stack": [
+      "isWrappedWithQuotes",
+      "isQuote"
+     ],
      "called by": "isWrappedWithQuotes",
      "file": "src/language/parser/scenarios/static-objects/regexps.js"
     },
@@ -21325,7 +21525,10 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "isWrappedWithQuotes \u2192 isCommentQuote",
+     "stack": [
+      "isWrappedWithQuotes",
+      "isCommentQuote"
+     ],
      "called by": "isWrappedWithQuotes",
      "file": "src/language/parser/scenarios/static-objects/regexps.js"
     },
@@ -21345,7 +21548,10 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "runParserScenarios \u2192 extractTokenValuesFromTokens",
+     "stack": [
+      "runParserScenarios",
+      "extractTokenValuesFromTokens"
+     ],
      "called by": "joinTokens, runParserScenarios",
      "file": "src/language/parser/scenarios/token/extractTokenValuesFromTokens.js"
     },
@@ -21365,7 +21571,10 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "runParserScenarios \u2192 joinTokensWithRealDelimiters",
+     "stack": [
+      "runParserScenarios",
+      "joinTokensWithRealDelimiters"
+     ],
      "called by": "runParserScenarios",
      "file": "src/language/parser/scenarios/token/joinTokensWithRealDelimiters.js"
     },
@@ -21385,7 +21594,10 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "runParserScenarios \u2192 removeCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem",
+     "stack": [
+      "runParserScenarios",
+      "removeCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem"
+     ],
      "called by": "runParserScenarios",
      "file": "src/language/parser/scenarios/token/removeCommandDelimitersAsPartOfTokensAndConjunctionsBetweenThem.js"
     },
@@ -21405,7 +21617,12 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addCompressAndStretchUnitsScenarios \u2192 replaceWordsWithNumbers",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addCompressAndStretchUnitsScenarios",
+      "replaceWordsWithNumbers"
+     ],
      "called by": "addCompressAndStretchUnitsScenarios, addHideLastMeasureScenario, addMeasureRestScenarios, addMeasureSetupScenarios",
      "file": "src/language/parser/scenarios/token/replaceWordsWithNumbers.js"
     },
@@ -21425,7 +21642,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "generateIntermediateStructuresForMultiplePages \u2192 generateIntermediateStructuresForSinglePage \u2192 parserOptions",
+     "stack": [
+      "generateIntermediateStructuresForMultiplePages",
+      "generateIntermediateStructuresForSinglePage",
+      "parserOptions"
+     ],
      "called by": "generateIntermediateStructuresForSinglePage",
      "file": "src/language/api.js"
     },
@@ -21445,7 +21666,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "generateIntermediateStructuresForMultiplePages \u2192 generateIntermediateStructuresForSinglePage \u2192 normalizeMuSemantiQText",
+     "stack": [
+      "generateIntermediateStructuresForMultiplePages",
+      "generateIntermediateStructuresForSinglePage",
+      "normalizeMuSemantiQText"
+     ],
      "called by": "generateIntermediateStructuresForSinglePage",
      "file": "src/language/api.js"
     },
@@ -21465,7 +21690,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "generateIntermediateStructuresForMultiplePages \u2192 generateIntermediateStructuresForSinglePage \u2192 parseLanguage",
+     "stack": [
+      "generateIntermediateStructuresForMultiplePages",
+      "generateIntermediateStructuresForSinglePage",
+      "parseLanguage"
+     ],
      "called by": "generateIntermediateStructuresForSinglePage",
      "file": "src/language/parser/parseLanguage.js"
     },
@@ -21485,7 +21714,11 @@ export default function (schemaOnInput) {
      "addBarLineScenarios"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addBarLineScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addBarLineScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight-without-ref-ids/addBarLineScenarios.js"
     },
@@ -21505,7 +21738,11 @@ export default function (schemaOnInput) {
      "addChordSetupScenarios"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addChordSetupScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addChordSetupScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight-without-ref-ids/addChordSetupScenarios.js"
     },
@@ -21525,7 +21762,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addClefScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addClefScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight-without-ref-ids/addClefScenarios.js"
     },
@@ -21545,7 +21786,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addCodaScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addCodaScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight-without-ref-ids/addCodaScenarios.js"
     },
@@ -21565,7 +21810,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addCommentScenario",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addCommentScenario"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight-without-ref-ids/addCommentScenario.js"
     },
@@ -21585,7 +21834,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addCompressAndStretchUnitsScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addCompressAndStretchUnitsScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight-without-ref-ids/addCompressAndStretchUnitsScenarios.js"
     },
@@ -21605,7 +21858,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addCrescendoAndDiminuendoScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addCrescendoAndDiminuendoScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight-without-ref-ids/addCrescendoAndDiminuendoScenarios.js"
     },
@@ -21625,7 +21882,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addCrossStaveConnectionsScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addCrossStaveConnectionsScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight-without-ref-ids/addCrossStaveConnectionsScenarios.js"
     },
@@ -21645,7 +21906,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addGeneralEmptyLineScenario",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addGeneralEmptyLineScenario"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight-without-ref-ids/addGeneralEmptyLineScenario.js"
     },
@@ -21665,7 +21930,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addGlissandoScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addGlissandoScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight-without-ref-ids/addGlissandoScenarios.js"
     },
@@ -21685,7 +21954,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addHideLastMeasureScenario",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addHideLastMeasureScenario"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight-without-ref-ids/addHideLastMeasureScenario.js"
     },
@@ -21705,7 +21978,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addInstrumentTitlesScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addInstrumentTitlesScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight-without-ref-ids/addInstrumentTitlesScenarios.js"
     },
@@ -21725,7 +22002,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addKeySignatureScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addKeySignatureScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight-without-ref-ids/addKeySignatureScenarios.js"
     },
@@ -21745,7 +22026,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addLyricsPositionScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addLyricsPositionScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight-without-ref-ids/addLyricsPositionScenarios.js"
     },
@@ -21765,7 +22050,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addMeasureFermataScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addMeasureFermataScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight-without-ref-ids/addMeasureFermataScenarios.js"
     },
@@ -21785,7 +22074,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addMeasureNumbersScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addMeasureNumbersScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight-without-ref-ids/addMeasureNumbersScenarios.js"
     },
@@ -21805,7 +22098,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addMeasureRestScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addMeasureRestScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight-without-ref-ids/addMeasureRestScenarios.js"
     },
@@ -21825,7 +22122,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addMeasureSetupScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addMeasureSetupScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight-without-ref-ids/addMeasureSetupScenarios.js"
     },
@@ -21845,7 +22146,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addMeasureSimileScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addMeasureSimileScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight-without-ref-ids/addMeasureSimileScenarios.js"
     },
@@ -21865,7 +22170,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addMidiSettingsScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addMidiSettingsScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight-without-ref-ids/addMidiSettingsScenarios.js"
     },
@@ -21885,7 +22194,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addNewLineScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addNewLineScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight-without-ref-ids/addNewLineScenarios.js"
     },
@@ -21905,7 +22218,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addNoteSetupScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addNoteSetupScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight-without-ref-ids/addNoteSetupScenarios.js"
     },
@@ -21925,7 +22242,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addOctaveSignScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addOctaveSignScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight-without-ref-ids/addOctaveSignScenarios.js"
     },
@@ -21945,7 +22266,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addPageMetaScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addPageMetaScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight-without-ref-ids/addPageMetaScenarios.js"
     },
@@ -21965,7 +22290,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addPunctuationScenario",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addPunctuationScenario"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight-without-ref-ids/addPunctuationScenario.js"
     },
@@ -21985,7 +22314,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addRepeatSignScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addRepeatSignScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight-without-ref-ids/addRepeatSignScenarios.js"
     },
@@ -22005,7 +22338,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addRepeatSimileScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addRepeatSimileScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight-without-ref-ids/addRepeatSimileScenarios.js"
     },
@@ -22025,7 +22362,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addRepetitionNoteScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addRepetitionNoteScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight-without-ref-ids/addRepetitionNoteScenarios.js"
     },
@@ -22045,7 +22386,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addSignScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addSignScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight-without-ref-ids/addSignScenarios.js"
     },
@@ -22065,7 +22410,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addSlurScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addSlurScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight-without-ref-ids/addSlurScenarios.js"
     },
@@ -22085,7 +22434,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addStaveSetupScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addStaveSetupScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight-without-ref-ids/addStaveSetupScenarios.js"
     },
@@ -22105,7 +22458,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addStyleScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addStyleScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight-without-ref-ids/addStyleScenarios.js"
     },
@@ -22125,7 +22482,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addTempoMarkScenario",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addTempoMarkScenario"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight-without-ref-ids/addTempoMarkScenario.js"
     },
@@ -22145,7 +22506,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addTimeSignatureScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addTimeSignatureScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight-without-ref-ids/addTimeSignatureScenarios.js"
     },
@@ -22165,7 +22530,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addTupletScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addTupletScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight-without-ref-ids/addTupletScenarios.js"
     },
@@ -22185,7 +22554,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addVoiceSetupScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addVoiceSetupScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight-without-ref-ids/addVoiceSetupScenarios.js"
     },
@@ -22205,7 +22578,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addVoltaScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addVoltaScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight-without-ref-ids/addVoltaScenarios.js"
     },
@@ -22225,7 +22602,11 @@ export default function (schemaOnInput) {
      "addBarLineScenarios"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addBarLineScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addBarLineScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight/addBarLineScenarios.js"
     },
@@ -22245,7 +22626,11 @@ export default function (schemaOnInput) {
      "addChordSetupScenarios"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addChordSetupScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addChordSetupScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight/addChordSetupScenarios.js"
     },
@@ -22265,7 +22650,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addClefScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addClefScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight/addClefScenarios.js"
     },
@@ -22285,7 +22674,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addCodaScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addCodaScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight/addCodaScenarios.js"
     },
@@ -22305,7 +22698,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addCommentScenario",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addCommentScenario"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight/addCommentScenario.js"
     },
@@ -22325,7 +22722,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addCompressAndStretchUnitsScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addCompressAndStretchUnitsScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight/addCompressAndStretchUnitsScenarios.js"
     },
@@ -22345,7 +22746,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addCrescendoAndDiminuendoScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addCrescendoAndDiminuendoScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight/addCrescendoAndDiminuendoScenarios.js"
     },
@@ -22365,7 +22770,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addCrossStaveConnectionsScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addCrossStaveConnectionsScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight/addCrossStaveConnectionsScenarios.js"
     },
@@ -22385,7 +22794,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addGeneralEmptyLineScenario",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addGeneralEmptyLineScenario"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight/addGeneralEmptyLineScenario.js"
     },
@@ -22405,7 +22818,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addGlissandoScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addGlissandoScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight/addGlissandoScenarios.js"
     },
@@ -22425,7 +22842,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addHideLastMeasureScenario",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addHideLastMeasureScenario"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight/addHideLastMeasureScenario.js"
     },
@@ -22445,7 +22866,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addInstrumentTitlesScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addInstrumentTitlesScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight/addInstrumentTitlesScenarios.js"
     },
@@ -22465,7 +22890,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addKeySignatureScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addKeySignatureScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight/addKeySignatureScenarios.js"
     },
@@ -22485,7 +22914,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addLyricsPositionScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addLyricsPositionScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight/addLyricsPositionScenarios.js"
     },
@@ -22505,7 +22938,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addMeasureFermataScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addMeasureFermataScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight/addMeasureFermataScenarios.js"
     },
@@ -22525,7 +22962,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addMeasureNumbersScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addMeasureNumbersScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight/addMeasureNumbersScenarios.js"
     },
@@ -22545,7 +22986,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addMeasureRestScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addMeasureRestScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight/addMeasureRestScenarios.js"
     },
@@ -22565,7 +23010,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addMeasureSetupScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addMeasureSetupScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight/addMeasureSetupScenarios.js"
     },
@@ -22585,7 +23034,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addMeasureSimileScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addMeasureSimileScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight/addMeasureSimileScenarios.js"
     },
@@ -22605,7 +23058,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addMidiSettingsScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addMidiSettingsScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight/addMidiSettingsScenarios.js"
     },
@@ -22625,7 +23082,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addNewLineScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addNewLineScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight/addNewLineScenarios.js"
     },
@@ -22645,7 +23106,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addNoteSetupScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addNoteSetupScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight/addNoteSetupScenarios.js"
     },
@@ -22665,7 +23130,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addOctaveSignScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addOctaveSignScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight/addOctaveSignScenarios.js"
     },
@@ -22685,7 +23154,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addPageMetaScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addPageMetaScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight/addPageMetaScenarios.js"
     },
@@ -22705,7 +23178,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addPunctuationScenario",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addPunctuationScenario"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight/addPunctuationScenario.js"
     },
@@ -22725,7 +23202,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addRepeatSignScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addRepeatSignScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight/addRepeatSignScenarios.js"
     },
@@ -22745,7 +23226,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addRepeatSimileScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addRepeatSimileScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight/addRepeatSimileScenarios.js"
     },
@@ -22765,7 +23250,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addRepetitionNoteScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addRepetitionNoteScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight/addRepetitionNoteScenarios.js"
     },
@@ -22785,7 +23274,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addSignScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addSignScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight/addSignScenarios.js"
     },
@@ -22805,7 +23298,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addSlurScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addSlurScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight/addSlurScenarios.js"
     },
@@ -22825,7 +23322,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addStaveSetupScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addStaveSetupScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight/addStaveSetupScenarios.js"
     },
@@ -22845,7 +23346,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addStyleScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addStyleScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight/addStyleScenarios.js"
     },
@@ -22865,7 +23370,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addTempoMarkScenario",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addTempoMarkScenario"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight/addTempoMarkScenario.js"
     },
@@ -22885,7 +23394,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addTimeSignatureScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addTimeSignatureScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight/addTimeSignatureScenarios.js"
     },
@@ -22905,7 +23418,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addTupletScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addTupletScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight/addTupletScenarios.js"
     },
@@ -22925,7 +23442,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addVoiceSetupScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addVoiceSetupScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight/addVoiceSetupScenarios.js"
     },
@@ -22945,7 +23466,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addVoltaScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addVoltaScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/adapter-sets/highlight/addVoltaScenarios.js"
     },
@@ -22965,7 +23490,11 @@ export default function (schemaOnInput) {
      "addBarLineScenarios"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addBarLineScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addBarLineScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/main-set/addBarLineScenarios.js"
     },
@@ -22985,7 +23514,11 @@ export default function (schemaOnInput) {
      "addChordSetupScenarios"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addChordSetupScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addChordSetupScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/main-set/addChordSetupScenarios.js"
     },
@@ -23005,7 +23538,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addClefScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addClefScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/main-set/addClefScenarios.js"
     },
@@ -23025,7 +23562,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addCodaScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addCodaScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/main-set/addCodaScenarios.js"
     },
@@ -23045,7 +23586,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addCommentScenario",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addCommentScenario"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/main-set/addCommentScenario.js"
     },
@@ -23065,7 +23610,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addCompressAndStretchUnitsScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addCompressAndStretchUnitsScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/main-set/addCompressAndStretchUnitsScenarios.js"
     },
@@ -23085,7 +23634,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addCrescendoAndDiminuendoScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addCrescendoAndDiminuendoScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/main-set/addCrescendoAndDiminuendoScenarios.js"
     },
@@ -23105,7 +23658,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addCrossStaveConnectionsScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addCrossStaveConnectionsScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/main-set/addCrossStaveConnectionsScenarios.js"
     },
@@ -23125,7 +23682,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addGeneralEmptyLineScenario",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addGeneralEmptyLineScenario"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/main-set/addGeneralEmptyLineScenario.js"
     },
@@ -23145,7 +23706,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addGlissandoScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addGlissandoScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/main-set/addGlissandoScenarios.js"
     },
@@ -23165,7 +23730,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addHideLastMeasureScenario",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addHideLastMeasureScenario"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/main-set/addHideLastMeasureScenario.js"
     },
@@ -23185,7 +23754,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addInstrumentTitlesScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addInstrumentTitlesScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/main-set/addInstrumentTitlesScenarios.js"
     },
@@ -23205,7 +23778,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addKeySignatureScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addKeySignatureScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/main-set/addKeySignatureScenarios.js"
     },
@@ -23225,7 +23802,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addLyricsPositionScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addLyricsPositionScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/main-set/addLyricsPositionScenarios.js"
     },
@@ -23245,7 +23826,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addMeasureFermataScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addMeasureFermataScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/main-set/addMeasureFermataScenarios.js"
     },
@@ -23265,7 +23850,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addMeasureNumbersScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addMeasureNumbersScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/main-set/addMeasureNumbersScenarios.js"
     },
@@ -23285,7 +23874,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addMeasureRestScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addMeasureRestScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/main-set/addMeasureRestScenarios.js"
     },
@@ -23305,7 +23898,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addMeasureSetupScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addMeasureSetupScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/main-set/addMeasureSetupScenarios.js"
     },
@@ -23325,7 +23922,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addMeasureSimileScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addMeasureSimileScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/main-set/addMeasureSimileScenarios.js"
     },
@@ -23345,7 +23946,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addMidiSettingsScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addMidiSettingsScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/main-set/addMidiSettingsScenarios.js"
     },
@@ -23365,7 +23970,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addNewLineScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addNewLineScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/main-set/addNewLineScenarios.js"
     },
@@ -23385,7 +23994,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addNoteSetupScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addNoteSetupScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/main-set/addNoteSetupScenarios.js"
     },
@@ -23405,7 +24018,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addOctaveSignScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addOctaveSignScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/main-set/addOctaveSignScenarios.js"
     },
@@ -23425,7 +24042,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addPageMetaScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addPageMetaScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/main-set/addPageMetaScenarios.js"
     },
@@ -23445,7 +24066,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addPunctuationScenario",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addPunctuationScenario"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/main-set/addPunctuationScenario.js"
     },
@@ -23465,7 +24090,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addRepeatSignScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addRepeatSignScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/main-set/addRepeatSignScenarios.js"
     },
@@ -23485,7 +24114,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addRepeatSimileScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addRepeatSimileScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/main-set/addRepeatSimileScenarios.js"
     },
@@ -23505,7 +24138,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addRepetitionNoteScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addRepetitionNoteScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/main-set/addRepetitionNoteScenarios.js"
     },
@@ -23525,7 +24162,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addSignScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addSignScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/main-set/addSignScenarios.js"
     },
@@ -23545,7 +24186,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addSlurScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addSlurScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/main-set/addSlurScenarios.js"
     },
@@ -23565,7 +24210,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addStaveSetupScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addStaveSetupScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/main-set/addStaveSetupScenarios.js"
     },
@@ -23585,7 +24234,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addStyleScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addStyleScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/main-set/addStyleScenarios.js"
     },
@@ -23605,7 +24258,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addTempoMarkScenario",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addTempoMarkScenario"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/main-set/addTempoMarkScenario.js"
     },
@@ -23625,7 +24282,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addTimeSignatureScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addTimeSignatureScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/main-set/addTimeSignatureScenarios.js"
     },
@@ -23645,7 +24306,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addTupletScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addTupletScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/main-set/addTupletScenarios.js"
     },
@@ -23665,7 +24330,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addVoiceSetupScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addVoiceSetupScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/main-set/addVoiceSetupScenarios.js"
     },
@@ -23685,7 +24354,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addVoltaScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addVoltaScenarios"
+     ],
      "called by": "addMainScenarious",
      "file": "src/language/parser/scenarios/main-set/addVoltaScenarios.js"
     },
@@ -23705,7 +24378,12 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "isColor \u2192 isRgbaColorString \u2192 isDigitsUpToThree \u2192 isDigitChar",
+     "stack": [
+      "isColor",
+      "isRgbaColorString",
+      "isDigitsUpToThree",
+      "isDigitChar"
+     ],
      "called by": "isDigitsUpToThree, isRgbaColorString",
      "file": "src/language/parser/scenarios/static-objects/regexps.js"
     },
@@ -23725,7 +24403,11 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "isColor \u2192 isRgbaColorString \u2192 isDigitsUpToThree",
+     "stack": [
+      "isColor",
+      "isRgbaColorString",
+      "isDigitsUpToThree"
+     ],
      "called by": "isRgbaColorString",
      "file": "src/language/parser/scenarios/static-objects/regexps.js"
     },
@@ -23745,7 +24427,12 @@ export default function (schemaOnInput) {
      "addLineMeasureStaveVoicePositionScenarios"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addCrescendoAndDiminuendoScenarios \u2192 addLineMeasureStaveVoicePositionScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addCrescendoAndDiminuendoScenarios",
+      "addLineMeasureStaveVoicePositionScenarios"
+     ],
      "called by": "addCrescendoAndDiminuendoScenarios, addGlissandoScenarios, addOctaveSignScenarios, addRepeatSimileScenarios",
      "file": "src/language/parser/scenarios/adapter-sets/highlight-without-ref-ids/addLineMeasureStaveVoicePositionScenarios.js"
     },
@@ -23765,7 +24452,12 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addCrescendoAndDiminuendoScenarios \u2192 addUnitPositionScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addCrescendoAndDiminuendoScenarios",
+      "addUnitPositionScenarios"
+     ],
      "called by": "addCrescendoAndDiminuendoScenarios, addGlissandoScenarios, addOctaveSignScenarios, addRepeatSimileScenarios",
      "file": "src/language/parser/scenarios/adapter-sets/highlight-without-ref-ids/addUnitPositionScenarios.js"
     },
@@ -23785,7 +24477,12 @@ export default function (schemaOnInput) {
      "addLineMeasureStaveVoicePositionScenarios"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addCrescendoAndDiminuendoScenarios \u2192 addLineMeasureStaveVoicePositionScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addCrescendoAndDiminuendoScenarios",
+      "addLineMeasureStaveVoicePositionScenarios"
+     ],
      "called by": "addCrescendoAndDiminuendoScenarios, addGlissandoScenarios, addOctaveSignScenarios, addRepeatSimileScenarios",
      "file": "src/language/parser/scenarios/adapter-sets/highlight/addLineMeasureStaveVoicePositionScenarios.js"
     },
@@ -23805,7 +24502,12 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addRepeatSimileScenarios \u2192 updateNoteAndRestRefIdsInHighlightsHtmlBufferThatFollowAfterSimileUnit",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addRepeatSimileScenarios",
+      "updateNoteAndRestRefIdsInHighlightsHtmlBufferThatFollowAfterSimileUnit"
+     ],
      "called by": "addRepeatSimileScenarios",
      "file": "src/language/parser/scenarios/adapter-sets/highlight/addRepeatSimileScenarios.js"
     },
@@ -23825,7 +24527,12 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addCrescendoAndDiminuendoScenarios \u2192 addUnitPositionScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addCrescendoAndDiminuendoScenarios",
+      "addUnitPositionScenarios"
+     ],
      "called by": "addCrescendoAndDiminuendoScenarios, addGlissandoScenarios, addOctaveSignScenarios, addRepeatSimileScenarios",
      "file": "src/language/parser/scenarios/adapter-sets/highlight/addUnitPositionScenarios.js"
     },
@@ -23845,7 +24552,12 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addCrescendoAndDiminuendoScenarios \u2192 fillAllPlaceholdersInHighlightsHtmlBufferWithMentionedPositionsWhereItsNeeded",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addCrescendoAndDiminuendoScenarios",
+      "fillAllPlaceholdersInHighlightsHtmlBufferWithMentionedPositionsWhereItsNeeded"
+     ],
      "called by": "addCrescendoAndDiminuendoScenarios, addGlissandoScenarios, addOctaveSignScenarios, addRepeatSimileScenarios",
      "file": "src/language/parser/scenarios/adapter-sets/highlight/fillAllPlaceholdersInHighlightsHtmlBufferWithMentionedPositionsWhereItsNeeded.js"
     },
@@ -23865,7 +24577,12 @@ export default function (schemaOnInput) {
      "addChordSetupScenarios"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addChordSetupScenarios \u2192 copyScenarioWithDifferentRequiredCommandProgression",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addChordSetupScenarios",
+      "copyScenarioWithDifferentRequiredCommandProgression"
+     ],
      "called by": "addChordSetupScenarios, addCommentScenario, addCrossStaveConnectionsScenarios, addInstrumentTitlesScenarios",
      "file": "src/language/parser/scenarios/copyScenarioWithDifferentRequiredCommandProgression.js"
     },
@@ -23885,7 +24602,12 @@ export default function (schemaOnInput) {
      "addLineMeasureStaveVoicePositionScenarios"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addCrescendoAndDiminuendoScenarios \u2192 addLineMeasureStaveVoicePositionScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addCrescendoAndDiminuendoScenarios",
+      "addLineMeasureStaveVoicePositionScenarios"
+     ],
      "called by": "addCrescendoAndDiminuendoScenarios, addGlissandoScenarios, addOctaveSignScenarios, addRepeatSimileScenarios",
      "file": "src/language/parser/scenarios/main-set/addLineMeasureStaveVoicePositionScenarios.js"
     },
@@ -23905,7 +24627,12 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addNoteSetupScenarios \u2192 addSimileUnitsToPageSchema",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addNoteSetupScenarios",
+      "addSimileUnitsToPageSchema"
+     ],
      "called by": "addNoteSetupScenarios, addRepeatSimileScenarios",
      "file": "src/language/parser/scenarios/main-set/addNoteSetupScenarios.js"
     },
@@ -23925,7 +24652,12 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addNoteSetupScenarios \u2192 addSimileUnitsToPageSchema",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addNoteSetupScenarios",
+      "addSimileUnitsToPageSchema"
+     ],
      "called by": "addNoteSetupScenarios, addRepeatSimileScenarios",
      "file": "src/language/parser/scenarios/main-set/addRepeatSimileScenarios.js"
     },
@@ -23945,7 +24677,12 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addSlurScenarios \u2192 addSlurFeaturesIfTheyAreSpecifiedBeforeItsUnitPositions",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addSlurScenarios",
+      "addSlurFeaturesIfTheyAreSpecifiedBeforeItsUnitPositions"
+     ],
      "called by": "addSlurScenarios",
      "file": "src/language/parser/scenarios/main-set/addSlurScenarios.js"
     },
@@ -23965,7 +24702,12 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addCrescendoAndDiminuendoScenarios \u2192 addUnitPositionScenarios",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addCrescendoAndDiminuendoScenarios",
+      "addUnitPositionScenarios"
+     ],
      "called by": "addCrescendoAndDiminuendoScenarios, addGlissandoScenarios, addOctaveSignScenarios, addRepeatSimileScenarios",
      "file": "src/language/parser/scenarios/main-set/addUnitPositionScenarios.js"
     },
@@ -23985,7 +24727,13 @@ export default function (schemaOnInput) {
      "addDirectionToSlurMarkByKey"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addSlurScenarios \u2192 addSlurFeaturesIfTheyAreSpecifiedBeforeItsUnitPositions \u2192 addDirectionToSlurMarkByKey",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addSlurScenarios",
+      "addSlurFeaturesIfTheyAreSpecifiedBeforeItsUnitPositions",
+      "addDirectionToSlurMarkByKey"
+     ],
      "called by": "addSlurFeaturesIfTheyAreSpecifiedBeforeItsUnitPositions, addSlurScenarios",
      "file": "src/language/parser/scenarios/page-schema/addDirectionToSlurMarkByKey.js"
     },
@@ -24005,7 +24753,13 @@ export default function (schemaOnInput) {
      "addLeftYCorrectionToSlurMarkByKey"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addSlurScenarios \u2192 addSlurFeaturesIfTheyAreSpecifiedBeforeItsUnitPositions \u2192 addLeftYCorrectionToSlurMarkByKey",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addSlurScenarios",
+      "addSlurFeaturesIfTheyAreSpecifiedBeforeItsUnitPositions",
+      "addLeftYCorrectionToSlurMarkByKey"
+     ],
      "called by": "addSlurFeaturesIfTheyAreSpecifiedBeforeItsUnitPositions, addSlurScenarios",
      "file": "src/language/parser/scenarios/page-schema/addLeftYCorrectionToSlurMarkByKey.js"
     },
@@ -24025,7 +24779,13 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addSlurScenarios \u2192 addSlurFeaturesIfTheyAreSpecifiedBeforeItsUnitPositions \u2192 addRightPointPlacementToSlurMarkByKey",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addSlurScenarios",
+      "addSlurFeaturesIfTheyAreSpecifiedBeforeItsUnitPositions",
+      "addRightPointPlacementToSlurMarkByKey"
+     ],
      "called by": "addSlurFeaturesIfTheyAreSpecifiedBeforeItsUnitPositions, addSlurScenarios",
      "file": "src/language/parser/scenarios/page-schema/addRightPointPlacementToSlurMarkByKey.js"
     },
@@ -24045,7 +24805,13 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addSlurScenarios \u2192 addSlurFeaturesIfTheyAreSpecifiedBeforeItsUnitPositions \u2192 addRightYCorrectionToSlurMarkByKey",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addSlurScenarios",
+      "addSlurFeaturesIfTheyAreSpecifiedBeforeItsUnitPositions",
+      "addRightYCorrectionToSlurMarkByKey"
+     ],
      "called by": "addSlurFeaturesIfTheyAreSpecifiedBeforeItsUnitPositions, addSlurScenarios",
      "file": "src/language/parser/scenarios/page-schema/addRightYCorrectionToSlurMarkByKey.js"
     },
@@ -24065,7 +24831,13 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addSlurScenarios \u2192 addSlurFeaturesIfTheyAreSpecifiedBeforeItsUnitPositions \u2192 addRoundnessToSlurMarkByKey",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addSlurScenarios",
+      "addSlurFeaturesIfTheyAreSpecifiedBeforeItsUnitPositions",
+      "addRoundnessToSlurMarkByKey"
+     ],
      "called by": "addSlurFeaturesIfTheyAreSpecifiedBeforeItsUnitPositions, addSlurScenarios",
      "file": "src/language/parser/scenarios/page-schema/addRoundnessToSlurMarkByKey.js"
     },
@@ -24085,7 +24857,13 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addSlurScenarios \u2192 addSlurFeaturesIfTheyAreSpecifiedBeforeItsUnitPositions \u2192 addSShapeToSlurMarkByKey",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addSlurScenarios",
+      "addSlurFeaturesIfTheyAreSpecifiedBeforeItsUnitPositions",
+      "addSShapeToSlurMarkByKey"
+     ],
      "called by": "addSlurFeaturesIfTheyAreSpecifiedBeforeItsUnitPositions, addSlurScenarios",
      "file": "src/language/parser/scenarios/page-schema/addSShapeToSlurMarkByKey.js"
     },
@@ -24105,7 +24883,12 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addCrescendoAndDiminuendoScenarios \u2192 findChordParamsByLastMentionedUnitPositions",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addCrescendoAndDiminuendoScenarios",
+      "findChordParamsByLastMentionedUnitPositions"
+     ],
      "called by": "addCrescendoAndDiminuendoScenarios, addGlissandoScenarios, addOctaveSignScenarios, addRepeatSimileScenarios",
      "file": "src/language/parser/scenarios/page-schema/findChordParamsByLastMentionedUnitPositions.js"
     },
@@ -24125,7 +24908,12 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addKeySignatureScenarios \u2192 findKeySignatureThatUserMeant",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addKeySignatureScenarios",
+      "findKeySignatureThatUserMeant"
+     ],
      "called by": "addKeySignatureScenarios, addNoteSetupScenarios",
      "file": "src/language/parser/scenarios/page-schema/findKeySignatureThatUserMeant.js"
     },
@@ -24145,7 +24933,12 @@ export default function (schemaOnInput) {
      "addChordSetupScenarios"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addChordSetupScenarios \u2192 findLastNonSimileChordParams",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addChordSetupScenarios",
+      "findLastNonSimileChordParams"
+     ],
      "called by": "addChordSetupScenarios, addNoteSetupScenarios, initNewVoiceParamsIfThereIsNoVoicesAtAllAndInitNewChordParamsIfThereIsAlreadySuchChordProperty",
      "file": "src/language/parser/scenarios/page-schema/findLastNonSimileChordParams.js"
     },
@@ -24165,7 +24958,12 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addVoltaScenarios \u2192 findMeasureParamsByLastMentionedMeasurePosition",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addVoltaScenarios",
+      "findMeasureParamsByLastMentionedMeasurePosition"
+     ],
      "called by": "addVoltaScenarios",
      "file": "src/language/parser/scenarios/page-schema/findMeasureParamsByLastMentionedMeasurePosition.js"
     },
@@ -24185,7 +24983,12 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addNoteSetupScenarios \u2192 getLastArticulationParams",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addNoteSetupScenarios",
+      "getLastArticulationParams"
+     ],
      "called by": "addNoteSetupScenarios",
      "file": "src/language/parser/scenarios/page-schema/getLastArticulationParams.js"
     },
@@ -24205,7 +25008,12 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addCrossStaveConnectionsScenarios \u2192 getLastCrossStaveConnectionParam",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addCrossStaveConnectionsScenarios",
+      "getLastCrossStaveConnectionParam"
+     ],
      "called by": "addCrossStaveConnectionsScenarios",
      "file": "src/language/parser/scenarios/page-schema/getLastCrossStaveConnectionParam.js"
     },
@@ -24225,7 +25033,12 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addNoteSetupScenarios \u2192 getLastGlissandoMark",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addNoteSetupScenarios",
+      "getLastGlissandoMark"
+     ],
      "called by": "addNoteSetupScenarios",
      "file": "src/language/parser/scenarios/page-schema/getLastGlissandoMark.js"
     },
@@ -24245,7 +25058,12 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addInstrumentTitlesScenarios \u2192 getLastInstrumentTitleParam",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addInstrumentTitlesScenarios",
+      "getLastInstrumentTitleParam"
+     ],
      "called by": "addInstrumentTitlesScenarios",
      "file": "src/language/parser/scenarios/page-schema/getLastInstrumentTitleParam.js"
     },
@@ -24265,7 +25083,12 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addNoteSetupScenarios \u2192 getLastKeyParams",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addNoteSetupScenarios",
+      "getLastKeyParams"
+     ],
      "called by": "addNoteSetupScenarios",
      "file": "src/language/parser/scenarios/page-schema/getLastKeyParams.js"
     },
@@ -24285,7 +25108,12 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addNoteSetupScenarios \u2192 getLastLyric",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addNoteSetupScenarios",
+      "getLastLyric"
+     ],
      "called by": "addNoteSetupScenarios",
      "file": "src/language/parser/scenarios/page-schema/getLastLyric.js"
     },
@@ -24305,7 +25133,12 @@ export default function (schemaOnInput) {
      "addBarLineScenarios"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addBarLineScenarios \u2192 getLastMeasureParams",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addBarLineScenarios",
+      "getLastMeasureParams"
+     ],
      "called by": "addBarLineScenarios, addChordSetupScenarios, addClefScenarios, addCodaScenarios",
      "file": "src/language/parser/scenarios/page-schema/getLastMeasureParams.js"
     },
@@ -24325,7 +25158,12 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addNoteSetupScenarios \u2192 getLastNoteParams",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addNoteSetupScenarios",
+      "getLastNoteParams"
+     ],
      "called by": "addNoteSetupScenarios",
      "file": "src/language/parser/scenarios/page-schema/getLastNoteParams.js"
     },
@@ -24345,7 +25183,12 @@ export default function (schemaOnInput) {
      "addChordSetupScenarios"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addChordSetupScenarios \u2192 getLastParentheses",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addChordSetupScenarios",
+      "getLastParentheses"
+     ],
      "called by": "addChordSetupScenarios",
      "file": "src/language/parser/scenarios/page-schema/getLastParentheses.js"
     },
@@ -24365,7 +25208,12 @@ export default function (schemaOnInput) {
      "addChordSetupScenarios"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addChordSetupScenarios \u2192 getLastStaveParams",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addChordSetupScenarios",
+      "getLastStaveParams"
+     ],
      "called by": "addChordSetupScenarios, addClefScenarios, addNoteSetupScenarios, addStaveSetupScenarios",
      "file": "src/language/parser/scenarios/page-schema/getLastStaveParams.js"
     },
@@ -24385,7 +25233,12 @@ export default function (schemaOnInput) {
      "addChordSetupScenarios"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addChordSetupScenarios \u2192 getLastVoiceParams",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addChordSetupScenarios",
+      "getLastVoiceParams"
+     ],
      "called by": "addChordSetupScenarios, addNoteSetupScenarios",
      "file": "src/language/parser/scenarios/page-schema/getLastVoiceParams.js"
     },
@@ -24405,7 +25258,12 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addSlurScenarios \u2192 getMentionedPositions",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addSlurScenarios",
+      "getMentionedPositions"
+     ],
      "called by": "addCrescendoAndDiminuendoScenarios, addGlissandoScenarios, addOctaveSignScenarios, addRepeatSimileScenarios",
      "file": "src/language/parser/scenarios/page-schema/getMentionedPositions.js"
     },
@@ -24425,7 +25283,12 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addNoteSetupScenarios \u2192 getRestPositionNumberByRestPositionName",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addNoteSetupScenarios",
+      "getRestPositionNumberByRestPositionName"
+     ],
      "called by": "addNoteSetupScenarios",
      "file": "src/language/parser/scenarios/page-schema/getRestPositionNumberByRestPositionName.js"
     },
@@ -24445,7 +25308,12 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addMeasureSetupScenarios \u2192 initMeasureParams",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addMeasureSetupScenarios",
+      "initMeasureParams"
+     ],
      "called by": "addMeasureSetupScenarios",
      "file": "src/language/parser/scenarios/page-schema/initMeasureParams.js"
     },
@@ -24465,7 +25333,12 @@ export default function (schemaOnInput) {
      "addBarLineScenarios"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addBarLineScenarios \u2192 initNewMeasureParamsIfThereIsAlreadySuchMeasurePropertyOrNoMeasuresAtAll",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addBarLineScenarios",
+      "initNewMeasureParamsIfThereIsAlreadySuchMeasurePropertyOrNoMeasuresAtAll"
+     ],
      "called by": "addBarLineScenarios, addChordSetupScenarios, addClefScenarios, addCodaScenarios",
      "file": "src/language/parser/scenarios/page-schema/initNewMeasureParamsIfThereIsAlreadySuchMeasurePropertyOrNoMeasuresAtAll.js"
     },
@@ -24485,7 +25358,12 @@ export default function (schemaOnInput) {
      "addChordSetupScenarios"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addChordSetupScenarios \u2192 initNewStaveParamsIfThereIsAlreadySuchStavePropertyOrNoStavesAtAll",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addChordSetupScenarios",
+      "initNewStaveParamsIfThereIsAlreadySuchStavePropertyOrNoStavesAtAll"
+     ],
      "called by": "addChordSetupScenarios, addClefScenarios, addNoteSetupScenarios, addVoiceSetupScenarios",
      "file": "src/language/parser/scenarios/page-schema/initNewStaveParamsIfThereIsAlreadySuchStavePropertyOrNoStavesAtAll.js"
     },
@@ -24505,7 +25383,12 @@ export default function (schemaOnInput) {
      "addChordSetupScenarios"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addChordSetupScenarios \u2192 initNewVoiceParamsIfThereIsNoVoicesAtAllAndInitNewChordParamsIfThereIsAlreadySuchChordProperty",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addChordSetupScenarios",
+      "initNewVoiceParamsIfThereIsNoVoicesAtAllAndInitNewChordParamsIfThereIsAlreadySuchChordProperty"
+     ],
      "called by": "addChordSetupScenarios, addNoteSetupScenarios",
      "file": "src/language/parser/scenarios/page-schema/initNewVoiceParamsIfThereIsNoVoicesAtAllAndInitNewChordParamsIfThereIsAlreadySuchChordProperty.js"
     },
@@ -24525,7 +25408,12 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addSlurScenarios \u2192 removeSlurMarksThatFinishFromChordsParamsByKeyAndSlurMarksFromCurrentChordParamsThatDontFinishByKey",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addSlurScenarios",
+      "removeSlurMarksThatFinishFromChordsParamsByKeyAndSlurMarksFromCurrentChordParamsThatDontFinishByKey"
+     ],
      "called by": "addSlurScenarios",
      "file": "src/language/parser/scenarios/page-schema/removeSlurMarksThatFinishFromChordsParamsByKeyAndSlurMarksFromCurrentChordParamsThatDontFinishByKey.js"
     },
@@ -24545,7 +25433,12 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addCrescendoAndDiminuendoScenarios \u2192 undefineAllMentionedPositions",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addCrescendoAndDiminuendoScenarios",
+      "undefineAllMentionedPositions"
+     ],
      "called by": "addCrescendoAndDiminuendoScenarios, addGlissandoScenarios, addOctaveSignScenarios, addRepeatSimileScenarios",
      "file": "src/language/parser/scenarios/page-schema/undefineAllMentionedPositions.js"
     },
@@ -24565,7 +25458,12 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addVoltaScenarios \u2192 undefineOnlyLastMentionedMeasurePosition",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addVoltaScenarios",
+      "undefineOnlyLastMentionedMeasurePosition"
+     ],
      "called by": "addVoltaScenarios",
      "file": "src/language/parser/scenarios/page-schema/undefineOnlyLastMentionedMeasurePosition.js"
     },
@@ -24585,7 +25483,12 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addSlurScenarios \u2192 undefineOnlyLastMentionedUnitPosition",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addSlurScenarios",
+      "undefineOnlyLastMentionedUnitPosition"
+     ],
      "called by": "addCrescendoAndDiminuendoScenarios, addGlissandoScenarios, addOctaveSignScenarios, addRepeatSimileScenarios",
      "file": "src/language/parser/scenarios/page-schema/undefineOnlyLastMentionedUnitPosition.js"
     },
@@ -24605,7 +25508,12 @@ export default function (schemaOnInput) {
      "addChordSetupScenarios"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addChordSetupScenarios \u2192 isDirection",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addChordSetupScenarios",
+      "isDirection"
+     ],
      "called by": "addChordSetupScenarios, addCrescendoAndDiminuendoScenarios, addGlissandoScenarios, addMeasureNumbersScenarios",
      "file": "src/language/parser/scenarios/static-objects/regexps.js"
     },
@@ -24625,7 +25533,12 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addMeasureNumbersScenarios \u2192 isAboveBelowOverUnder",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addMeasureNumbersScenarios",
+      "isAboveBelowOverUnder"
+     ],
      "called by": "addMeasureNumbersScenarios, addNoteSetupScenarios, addSlurScenarios, addTupletScenarios",
      "file": "src/language/parser/scenarios/static-objects/regexps.js"
     },
@@ -24645,7 +25558,12 @@ export default function (schemaOnInput) {
      "addChordSetupScenarios"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addChordSetupScenarios \u2192 findNextTokenValueOnTheLine",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addChordSetupScenarios",
+      "findNextTokenValueOnTheLine"
+     ],
      "called by": "addChordSetupScenarios, addCrescendoAndDiminuendoScenarios, addCrossStaveConnectionsScenarios, addGlissandoScenarios",
      "file": "src/language/parser/scenarios/token/findNextTokenValueOnTheLine.js"
     },
@@ -24665,7 +25583,12 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addInstrumentTitlesScenarios \u2192 findNextTokenValuesOnTheLine",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addInstrumentTitlesScenarios",
+      "findNextTokenValuesOnTheLine"
+     ],
      "called by": "addInstrumentTitlesScenarios, addNoteSetupScenarios, addOctaveSignScenarios, addRepeatSimileScenarios",
      "file": "src/language/parser/scenarios/token/findNextTokenValuesOnTheLine.js"
     },
@@ -24685,7 +25608,12 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addMeasureNumbersScenarios \u2192 isAboveBelowOverUnder",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addMeasureNumbersScenarios",
+      "isAboveBelowOverUnder"
+     ],
      "called by": "addMeasureNumbersScenarios, addNoteSetupScenarios, addSlurScenarios, addTupletScenarios",
      "file": "src/language/parser/scenarios/token/isAboveBelowOverUnder.js"
     },
@@ -24705,7 +25633,12 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addCrescendoAndDiminuendoScenarios \u2192 isAboveBelowOverUnderStaveLines",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addCrescendoAndDiminuendoScenarios",
+      "isAboveBelowOverUnderStaveLines"
+     ],
      "called by": "addCrescendoAndDiminuendoScenarios, addNoteSetupScenarios, addTupletScenarios",
      "file": "src/language/parser/scenarios/token/isAboveBelowOverUnderStaveLines.js"
     },
@@ -24725,7 +25658,12 @@ export default function (schemaOnInput) {
      "addChordSetupScenarios"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addChordSetupScenarios \u2192 isDirection",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addChordSetupScenarios",
+      "isDirection"
+     ],
      "called by": "addChordSetupScenarios, addCrescendoAndDiminuendoScenarios, addGlissandoScenarios, addMeasureNumbersScenarios",
      "file": "src/language/parser/scenarios/token/isDirection.js"
     },
@@ -24745,7 +25683,12 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addNoteSetupScenarios \u2192 isHorizontalCorrection",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addNoteSetupScenarios",
+      "isHorizontalCorrection"
+     ],
      "called by": "addNoteSetupScenarios",
      "file": "src/language/parser/scenarios/token/isHorizontalCorrection.js"
     },
@@ -24765,7 +25708,12 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addNoteSetupScenarios \u2192 isMeasureNumber",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addNoteSetupScenarios",
+      "isMeasureNumber"
+     ],
      "called by": "addNoteSetupScenarios",
      "file": "src/language/parser/scenarios/token/isMeasureNumber.js"
     },
@@ -24785,7 +25733,12 @@ export default function (schemaOnInput) {
      "addChordSetupScenarios"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addChordSetupScenarios \u2192 isNoteIndex",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addChordSetupScenarios",
+      "isNoteIndex"
+     ],
      "called by": "addChordSetupScenarios",
      "file": "src/language/parser/scenarios/token/isNoteIndex.js"
     },
@@ -24805,7 +25758,12 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addNoteSetupScenarios \u2192 isNumberOfStrokes",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addNoteSetupScenarios",
+      "isNumberOfStrokes"
+     ],
      "called by": "addNoteSetupScenarios",
      "file": "src/language/parser/scenarios/token/isNumberOfStrokes.js"
     },
@@ -24825,7 +25783,12 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addNoteSetupScenarios \u2192 isNumberOfTimes",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addNoteSetupScenarios",
+      "isNumberOfTimes"
+     ],
      "called by": "addNoteSetupScenarios",
      "file": "src/language/parser/scenarios/token/isNumberOfTimes.js"
     },
@@ -24845,7 +25808,12 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addNoteSetupScenarios \u2192 isRoundness",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addNoteSetupScenarios",
+      "isRoundness"
+     ],
      "called by": "addNoteSetupScenarios, addSlurScenarios",
      "file": "src/language/parser/scenarios/token/isRoundness.js"
     },
@@ -24865,7 +25833,12 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addCrossStaveConnectionsScenarios \u2192 isStaveIndex",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addCrossStaveConnectionsScenarios",
+      "isStaveIndex"
+     ],
      "called by": "addCrossStaveConnectionsScenarios, addInstrumentTitlesScenarios, addLyricsPositionScenarios, addNoteSetupScenarios",
      "file": "src/language/parser/scenarios/token/isStaveIndex.js"
     },
@@ -24885,7 +25858,12 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addCodaScenarios \u2192 isVerticalCorrection",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addCodaScenarios",
+      "isVerticalCorrection"
+     ],
      "called by": "addCodaScenarios, addCrescendoAndDiminuendoScenarios, addNoteSetupScenarios, addOctaveSignScenarios",
      "file": "src/language/parser/scenarios/token/isVerticalCorrection.js"
     },
@@ -24905,7 +25883,12 @@ export default function (schemaOnInput) {
      "addChordSetupScenarios"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addChordSetupScenarios \u2192 parseDirection",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addChordSetupScenarios",
+      "parseDirection"
+     ],
      "called by": "addChordSetupScenarios, addCrescendoAndDiminuendoScenarios, addGlissandoScenarios, addMeasureNumbersScenarios",
      "file": "src/language/parser/scenarios/token/parseDirection.js"
     },
@@ -24925,7 +25908,12 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addMeasureNumbersScenarios \u2192 parseDirectionByAboveBelowOverUnder",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addMeasureNumbersScenarios",
+      "parseDirectionByAboveBelowOverUnder"
+     ],
      "called by": "addMeasureNumbersScenarios, addNoteSetupScenarios, addSlurScenarios, addTupletScenarios",
      "file": "src/language/parser/scenarios/token/parseDirectionByAboveBelowOverUnder.js"
     },
@@ -24945,7 +25933,12 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addCrescendoAndDiminuendoScenarios \u2192 parseDirectionByAboveBelowOverUnderStaveLines",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addCrescendoAndDiminuendoScenarios",
+      "parseDirectionByAboveBelowOverUnderStaveLines"
+     ],
      "called by": "addCrescendoAndDiminuendoScenarios, addNoteSetupScenarios, addTupletScenarios",
      "file": "src/language/parser/scenarios/token/parseDirectionByAboveBelowOverUnderStaveLines.js"
     },
@@ -24965,7 +25958,12 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addNoteSetupScenarios \u2192 parseHorizontalCorrection",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addNoteSetupScenarios",
+      "parseHorizontalCorrection"
+     ],
      "called by": "addNoteSetupScenarios",
      "file": "src/language/parser/scenarios/token/parseHorizontalCorrection.js"
     },
@@ -24985,7 +25983,12 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addNoteSetupScenarios \u2192 parseMeasureNumber",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addNoteSetupScenarios",
+      "parseMeasureNumber"
+     ],
      "called by": "addNoteSetupScenarios",
      "file": "src/language/parser/scenarios/token/parseMeasureNumber.js"
     },
@@ -25005,7 +26008,12 @@ export default function (schemaOnInput) {
      "addChordSetupScenarios"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addChordSetupScenarios \u2192 parseNoteIndexByTokens",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addChordSetupScenarios",
+      "parseNoteIndexByTokens"
+     ],
      "called by": "addChordSetupScenarios",
      "file": "src/language/parser/scenarios/token/parseNoteIndexByTokens.js"
     },
@@ -25025,7 +26033,12 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addNoteSetupScenarios \u2192 parseNumberOfStrokes",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addNoteSetupScenarios",
+      "parseNumberOfStrokes"
+     ],
      "called by": "addNoteSetupScenarios",
      "file": "src/language/parser/scenarios/token/parseNumberOfStrokes.js"
     },
@@ -25045,7 +26058,12 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addNoteSetupScenarios \u2192 parseNumberOfTimes",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addNoteSetupScenarios",
+      "parseNumberOfTimes"
+     ],
      "called by": "addNoteSetupScenarios",
      "file": "src/language/parser/scenarios/token/parseNumberOfTimes.js"
     },
@@ -25065,7 +26083,12 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addNoteSetupScenarios \u2192 parseRoundness",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addNoteSetupScenarios",
+      "parseRoundness"
+     ],
      "called by": "addNoteSetupScenarios, addSlurScenarios",
      "file": "src/language/parser/scenarios/token/parseRoundness.js"
     },
@@ -25085,7 +26108,12 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addLyricsPositionScenarios \u2192 parseStaveIndexByTokens",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addLyricsPositionScenarios",
+      "parseStaveIndexByTokens"
+     ],
      "called by": "addCrossStaveConnectionsScenarios, addInstrumentTitlesScenarios, addLyricsPositionScenarios, addNoteSetupScenarios",
      "file": "src/language/parser/scenarios/token/parseStaveIndexByTokens.js"
     },
@@ -25105,7 +26133,12 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addTempoMarkScenario \u2192 parseTempoValueParts",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addTempoMarkScenario",
+      "parseTempoValueParts"
+     ],
      "called by": "addTempoMarkScenario",
      "file": "src/language/parser/scenarios/token/parseTempoValueParts.js"
     },
@@ -25125,7 +26158,12 @@ export default function (schemaOnInput) {
      "generateIntermediateStructuresForMultiplePages"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addCodaScenarios \u2192 parseVerticalCorrection",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addCodaScenarios",
+      "parseVerticalCorrection"
+     ],
      "called by": "addCodaScenarios, addCrescendoAndDiminuendoScenarios, addNoteSetupScenarios, addOctaveSignScenarios",
      "file": "src/language/parser/scenarios/token/parseVerticalCorrection.js"
     },
@@ -25145,7 +26183,14 @@ export default function (schemaOnInput) {
      "findSlurMarkWithSpecifiedKey"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addSlurScenarios \u2192 addSlurFeaturesIfTheyAreSpecifiedBeforeItsUnitPositions \u2192 addDirectionToSlurMarkByKey \u2192 findSlurMarkWithSpecifiedKey",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addSlurScenarios",
+      "addSlurFeaturesIfTheyAreSpecifiedBeforeItsUnitPositions",
+      "addDirectionToSlurMarkByKey",
+      "findSlurMarkWithSpecifiedKey"
+     ],
      "called by": "addDirectionToSlurMarkByKey, addLeftYCorrectionToSlurMarkByKey, addRightPointPlacementToSlurMarkByKey, addRightYCorrectionToSlurMarkByKey",
      "file": "src/language/parser/scenarios/page-schema/findSlurMarkWithSpecifiedKey.js"
     },
@@ -25165,7 +26210,13 @@ export default function (schemaOnInput) {
      "getCurrentPageLineIndex"
     ],
     "w": {
-     "call stack": "createParserScenarios \u2192 addMainScenarious \u2192 addCrescendoAndDiminuendoScenarios \u2192 findChordParamsByLastMentionedUnitPositions \u2192 getCurrentPageLineIndex",
+     "stack": [
+      "createParserScenarios",
+      "addMainScenarious",
+      "addCrescendoAndDiminuendoScenarios",
+      "findChordParamsByLastMentionedUnitPositions",
+      "getCurrentPageLineIndex"
+     ],
      "called by": "findChordParamsByLastMentionedUnitPositions, findMeasureParamsByLastMentionedMeasurePosition, getMentionedPositions",
      "file": "src/language/parser/scenarios/page-schema/getCurrentPageLineIndex.js"
     },
@@ -25179,91 +26230,206 @@ export default function (schemaOnInput) {
     "x": 90,
     "y": 55,
     "t": "SchemaContext",
-    "k": "helpers.js"
+    "k": "helpers.js",
+    "sub": "lib",
+    "full": "SchemaContext",
+    "lines": [
+     "SchemaContext"
+    ],
+    "parent": null,
+    "children": []
    },
    "ValidationError": {
     "x": 300,
     "y": 55,
     "t": "ValidationError",
-    "k": "helpers.js"
+    "k": "helpers.js",
+    "sub": "lib",
+    "full": "ValidationError",
+    "lines": [
+     "ValidationError"
+    ],
+    "parent": null,
+    "children": []
    },
    "ValidatorResultError": {
     "x": 510,
     "y": 55,
     "t": "ValidatorResultError",
-    "k": "helpers.js"
+    "k": "helpers.js",
+    "sub": "lib",
+    "full": "ValidatorResultError",
+    "lines": [
+     "ValidatorResultError"
+    ],
+    "parent": null,
+    "children": []
    },
    "copyist": {
     "x": 720,
     "y": 55,
     "t": "copyist",
-    "k": "helpers.js"
+    "k": "helpers.js",
+    "sub": "lib",
+    "full": "copyist",
+    "lines": [
+     "copyist"
+    ],
+    "parent": null,
+    "children": []
    },
    "SchemaError": {
     "x": 90,
     "y": 173,
     "t": "SchemaError",
-    "k": "helpers.js"
+    "k": "helpers.js",
+    "sub": "lib",
+    "full": "SchemaError",
+    "lines": [
+     "SchemaError"
+    ],
+    "parent": null,
+    "children": []
    },
    "SchemaScanResult": {
     "x": 300,
     "y": 173,
     "t": "SchemaScanResult",
-    "k": "scan.js"
+    "k": "scan.js",
+    "sub": "lib",
+    "full": "SchemaScanResult",
+    "lines": [
+     "SchemaScanResult"
+    ],
+    "parent": null,
+    "children": []
    },
    "Validator": {
     "x": 510,
     "y": 173,
     "t": "Validator",
-    "k": "validator.js"
+    "k": "validator.js",
+    "sub": "lib",
+    "full": "Validator",
+    "lines": [
+     "Validator"
+    ],
+    "parent": null,
+    "children": []
    },
    "ValidatorResult": {
     "x": 720,
     "y": 173,
     "t": "ValidatorResult",
-    "k": "helpers.js"
+    "k": "helpers.js",
+    "sub": "lib",
+    "full": "ValidatorResult",
+    "lines": [
+     "ValidatorResult"
+    ],
+    "parent": null,
+    "children": []
    },
    "addBarLineScenarios": {
     "x": 510,
     "y": 291,
     "t": "addBarLineScenarios",
-    "k": "addBarLineScenarios.js"
+    "k": "addBarLineScenarios.js",
+    "sub": "highlight",
+    "full": "addBarLineScenarios",
+    "lines": [
+     "addBarLineScenarios"
+    ],
+    "parent": null,
+    "children": []
    },
    "addChordSetupScenarios": {
     "x": 720,
     "y": 291,
     "t": "addChordSetupScenarios",
-    "k": "addChordSetupScenarios.js"
+    "k": "addChordSetupScenarios.js",
+    "sub": "highlight",
+    "full": "addChordSetupScenarios",
+    "lines": [
+     "addChordSetu",
+     "pScenarios"
+    ],
+    "parent": null,
+    "children": []
    },
    "addDirectionToSlurMarkByKey": {
     "x": 90,
     "y": 409,
     "t": "addDirectionToSlurMark",
-    "k": "addDirectionToSlurMarkByKey.js"
+    "k": "addDirectionToSlurMarkByKey.js",
+    "sub": "page-schema",
+    "full": "addDirectionToSlurMarkByKey",
+    "lines": [
+     "addDirectionTo",
+     "SlurMarkByKey"
+    ],
+    "parent": null,
+    "children": [
+     "findSlurMarkWithSpecifiedKey"
+    ]
    },
    "addLeftYCorrectionToSlurMarkByKey": {
     "x": 300,
     "y": 409,
     "t": "addLeftYCorrectionToSl",
-    "k": "addLeftYCorrectionToSlurMarkByKey.js"
+    "k": "addLeftYCorrectionToSlurMarkByKey.js",
+    "sub": "page-schema",
+    "full": "addLeftYCorrectionToSlurMarkByKey",
+    "lines": [
+     "addLeftYCorrectio",
+     "nToSlurMarkByKey"
+    ],
+    "parent": null,
+    "children": [
+     "findSlurMarkWithSpecifiedKey"
+    ]
    },
    "addLineMeasureStaveVoicePositionScenarios": {
     "x": 720,
     "y": 409,
     "t": "addLineMeasureStaveVoi",
-    "k": "addLineMeasureStaveVoicePositionScenarios.js"
+    "k": "addLineMeasureStaveVoicePositionScenarios.js",
+    "sub": "highlight",
+    "full": "addLineMeasureStaveVoicePositionScenarios",
+    "lines": [
+     "addLineMeasureStaveVo",
+     "icePositionScenarios"
+    ],
+    "parent": null,
+    "children": []
    },
    "findSlurMarkWithSpecifiedKey": {
     "x": 90,
     "y": 527,
     "t": "findSlurMarkWithSpecif",
-    "k": "findSlurMarkWithSpecifiedKey.js"
+    "k": "findSlurMarkWithSpecifiedKey.js",
+    "sub": "page-schema",
+    "full": "findSlurMarkWithSpecifiedKey",
+    "lines": [
+     "findSlurMarkWit",
+     "hSpecifiedKey"
+    ],
+    "parent": "addLeftYCorrectionToSlurMarkByKey",
+    "children": []
    },
    "getCurrentPageLineIndex": {
     "x": 300,
     "y": 527,
     "t": "getCurrentPageLineInde",
-    "k": "getCurrentPageLineIndex.js"
+    "k": "getCurrentPageLineIndex.js",
+    "sub": "page-schema",
+    "full": "getCurrentPageLineIndex",
+    "lines": [
+     "getCurrentPa",
+     "geLineIndex"
+    ],
+    "parent": null,
+    "children": []
    }
   },
   "edges": {
@@ -25298,7 +26464,9 @@ export default function (schemaOnInput) {
      "createCommandForEachKey"
     ],
     "w": {
-     "call stack": "createCommandForEachKey",
+     "stack": [
+      "createCommandForEachKey"
+     ],
      "called by": "\u2014",
      "file": "src/language/serializer/serialize.js"
     },
@@ -25318,7 +26486,9 @@ export default function (schemaOnInput) {
      "serialize"
     ],
     "w": {
-     "call stack": "serialize",
+     "stack": [
+      "serialize"
+     ],
      "called by": "\u2014",
      "file": "src/language/serializer/serialize.js"
     },
@@ -25338,7 +26508,10 @@ export default function (schemaOnInput) {
      "serializeClef"
     ],
     "w": {
-     "call stack": "serialize \u2192 serializeClef",
+     "stack": [
+      "serialize",
+      "serializeClef"
+     ],
      "called by": "serialize",
      "file": "src/language/serializer/serialize.js"
     },
@@ -25358,7 +26531,11 @@ export default function (schemaOnInput) {
      "serialize"
     ],
     "w": {
-     "call stack": "serialize \u2192 serializeClef \u2192 serializeSettings",
+     "stack": [
+      "serialize",
+      "serializeClef",
+      "serializeSettings"
+     ],
      "called by": "serialize, serializeClef, serializeCorrection, serializeScope",
      "file": "src/language/serializer/serialize.js"
     },
@@ -25378,7 +26555,10 @@ export default function (schemaOnInput) {
      "serializePageMeta"
     ],
     "w": {
-     "call stack": "serialize \u2192 serializePageMeta",
+     "stack": [
+      "serialize",
+      "serializePageMeta"
+     ],
      "called by": "serialize",
      "file": "src/language/serializer/serialize.js"
     },
@@ -25398,7 +26578,10 @@ export default function (schemaOnInput) {
      "serializeMeasureCommands"
     ],
     "w": {
-     "call stack": "serialize \u2192 serializeMeasureCommands",
+     "stack": [
+      "serialize",
+      "serializeMeasureCommands"
+     ],
      "called by": "serialize",
      "file": "src/language/serializer/serialize.js"
     },
@@ -25418,7 +26601,10 @@ export default function (schemaOnInput) {
      "serialize"
     ],
     "w": {
-     "call stack": "serialize \u2192 serializeVoltas",
+     "stack": [
+      "serialize",
+      "serializeVoltas"
+     ],
      "called by": "serialize",
      "file": "src/language/serializer/serialize.js"
     },
@@ -25438,7 +26624,10 @@ export default function (schemaOnInput) {
      "serialize"
     ],
     "w": {
-     "call stack": "serialize \u2192 serializeVoice",
+     "stack": [
+      "serialize",
+      "serializeVoice"
+     ],
      "called by": "serialize",
      "file": "src/language/serializer/serialize.js"
     },
@@ -25458,7 +26647,10 @@ export default function (schemaOnInput) {
      "addComments"
     ],
     "w": {
-     "call stack": "serialize \u2192 addComments",
+     "stack": [
+      "serialize",
+      "addComments"
+     ],
      "called by": "serialize",
      "file": "src/language/serializer/serialize.js"
     },
@@ -25478,7 +26670,11 @@ export default function (schemaOnInput) {
      "serializeScope"
     ],
     "w": {
-     "call stack": "serialize \u2192 serializeMeasureCommands \u2192 serializeScope",
+     "stack": [
+      "serialize",
+      "serializeMeasureCommands",
+      "serializeScope"
+     ],
      "called by": "serializeMeasureCommands",
      "file": "src/language/serializer/serialize.js"
     },
@@ -25498,7 +26694,11 @@ export default function (schemaOnInput) {
      "serializeCorrection"
     ],
     "w": {
-     "call stack": "serialize \u2192 serializeMeasureCommands \u2192 serializeCorrection",
+     "stack": [
+      "serialize",
+      "serializeMeasureCommands",
+      "serializeCorrection"
+     ],
      "called by": "serializeArticulation, serializeCorrection, serializeMeasureCommands, serializeModifiers",
      "file": "src/language/serializer/serialize.js"
     },
@@ -25518,7 +26718,11 @@ export default function (schemaOnInput) {
      "serializeCorrection"
     ],
     "w": {
-     "call stack": "serialize \u2192 serializeMeasureCommands \u2192 serializeCorrection",
+     "stack": [
+      "serialize",
+      "serializeMeasureCommands",
+      "serializeCorrection"
+     ],
      "called by": "serializeArticulation, serializeCorrection, serializeMeasureCommands, serializeModifiers",
      "file": "src/language/serializer/serializeSpans.js"
     },
@@ -25538,7 +26742,11 @@ export default function (schemaOnInput) {
      "createCommandForEachKey"
     ],
     "w": {
-     "call stack": "serialize \u2192 serializeVoice \u2192 serializeSpans",
+     "stack": [
+      "serialize",
+      "serializeVoice",
+      "serializeSpans"
+     ],
      "called by": "serializeVoice",
      "file": "src/language/serializer/serializeSpans.js"
     },
@@ -25558,7 +26766,11 @@ export default function (schemaOnInput) {
      "serializeCorrection"
     ],
     "w": {
-     "call stack": "serialize \u2192 serializeMeasureCommands \u2192 serializeCorrection",
+     "stack": [
+      "serialize",
+      "serializeMeasureCommands",
+      "serializeCorrection"
+     ],
      "called by": "serializeArticulation, serializeCorrection, serializeMeasureCommands, serializeModifiers",
      "file": "src/language/serializer/serializeUnit.js"
     },
@@ -25578,7 +26790,11 @@ export default function (schemaOnInput) {
      "createCommandForEachKey"
     ],
     "w": {
-     "call stack": "serialize \u2192 serializeVoice \u2192 serializeUnit",
+     "stack": [
+      "serialize",
+      "serializeVoice",
+      "serializeUnit"
+     ],
      "called by": "serializeVoice",
      "file": "src/language/serializer/serializeUnit.js"
     },
@@ -25598,7 +26814,12 @@ export default function (schemaOnInput) {
      "serializeDuration"
     ],
     "w": {
-     "call stack": "serialize \u2192 serializeVoice \u2192 serializeUnit \u2192 serializeDuration",
+     "stack": [
+      "serialize",
+      "serializeVoice",
+      "serializeUnit",
+      "serializeDuration"
+     ],
      "called by": "serializeUnit",
      "file": "src/language/serializer/serializeDuration.js"
     },
@@ -25618,7 +26839,12 @@ export default function (schemaOnInput) {
      "createCommandForEachKey"
     ],
     "w": {
-     "call stack": "serialize \u2192 serializeVoice \u2192 serializeSpans \u2192 serializeOrdinal",
+     "stack": [
+      "serialize",
+      "serializeVoice",
+      "serializeSpans",
+      "serializeOrdinal"
+     ],
      "called by": "serializeSpans",
      "file": "src/language/serializer/serializeSpans.js"
     },
@@ -25638,7 +26864,14 @@ export default function (schemaOnInput) {
      "collectSpans"
     ],
     "w": {
-     "call stack": "serialize \u2192 serializeVoice \u2192 serializeSpans \u2192 serializeRange \u2192 serializeUnitNumber \u2192 collectSpans",
+     "stack": [
+      "serialize",
+      "serializeVoice",
+      "serializeSpans",
+      "serializeRange",
+      "serializeUnitNumber",
+      "collectSpans"
+     ],
      "called by": "serializeSpans, serializeUnitNumber",
      "file": "src/language/serializer/serializeSpans.js"
     },
@@ -25658,7 +26891,12 @@ export default function (schemaOnInput) {
      "createCommandForEachKey"
     ],
     "w": {
-     "call stack": "serialize \u2192 serializeVoice \u2192 serializeSpans \u2192 serializeRange",
+     "stack": [
+      "serialize",
+      "serializeVoice",
+      "serializeSpans",
+      "serializeRange"
+     ],
      "called by": "serializeSpans",
      "file": "src/language/serializer/serializeSpans.js"
     },
@@ -25678,7 +26916,12 @@ export default function (schemaOnInput) {
      "serializeArticulation"
     ],
     "w": {
-     "call stack": "serialize \u2192 serializeVoice \u2192 serializeSpans \u2192 serializePlacement",
+     "stack": [
+      "serialize",
+      "serializeVoice",
+      "serializeSpans",
+      "serializePlacement"
+     ],
      "called by": "serializeArticulation, serializePlacement, serializeSpans",
      "file": "src/language/serializer/serializeSpans.js"
     },
@@ -25698,7 +26941,12 @@ export default function (schemaOnInput) {
      "createCommandForEachKey"
     ],
     "w": {
-     "call stack": "serialize \u2192 serializeVoice \u2192 serializeUnit \u2192 serializeNote",
+     "stack": [
+      "serialize",
+      "serializeVoice",
+      "serializeUnit",
+      "serializeNote"
+     ],
      "called by": "serializeUnit",
      "file": "src/language/serializer/serializeUnit.js"
     },
@@ -25718,7 +26966,12 @@ export default function (schemaOnInput) {
      "serializeArticulation"
     ],
     "w": {
-     "call stack": "serialize \u2192 serializeVoice \u2192 serializeSpans \u2192 serializePlacement",
+     "stack": [
+      "serialize",
+      "serializeVoice",
+      "serializeSpans",
+      "serializePlacement"
+     ],
      "called by": "serializeArticulation, serializePlacement, serializeSpans",
      "file": "src/language/serializer/serializeUnit.js"
     },
@@ -25738,7 +26991,12 @@ export default function (schemaOnInput) {
      "findKeyOfNote"
     ],
     "w": {
-     "call stack": "serialize \u2192 serializeVoice \u2192 serializeUnit \u2192 findKeyOfNote",
+     "stack": [
+      "serialize",
+      "serializeVoice",
+      "serializeUnit",
+      "findKeyOfNote"
+     ],
      "called by": "serializeUnit",
      "file": "src/language/serializer/serializeUnit.js"
     },
@@ -25758,7 +27016,12 @@ export default function (schemaOnInput) {
      "serializeModifiers"
     ],
     "w": {
-     "call stack": "serialize \u2192 serializeVoice \u2192 serializeUnit \u2192 serializeModifiers",
+     "stack": [
+      "serialize",
+      "serializeVoice",
+      "serializeUnit",
+      "serializeModifiers"
+     ],
      "called by": "serializeUnit",
      "file": "src/language/serializer/serializeUnit.js"
     },
@@ -25778,7 +27041,13 @@ export default function (schemaOnInput) {
      "serializeDots"
     ],
     "w": {
-     "call stack": "serialize \u2192 serializeVoice \u2192 serializeUnit \u2192 serializeModifiers \u2192 serializeDots",
+     "stack": [
+      "serialize",
+      "serializeVoice",
+      "serializeUnit",
+      "serializeModifiers",
+      "serializeDots"
+     ],
      "called by": "serializeModifiers",
      "file": "src/language/serializer/serializeDuration.js"
     },
@@ -25798,7 +27067,13 @@ export default function (schemaOnInput) {
      "createCommandForEachKey"
     ],
     "w": {
-     "call stack": "serialize \u2192 serializeVoice \u2192 serializeSpans \u2192 serializeRange \u2192 serializeUnitNumber",
+     "stack": [
+      "serialize",
+      "serializeVoice",
+      "serializeSpans",
+      "serializeRange",
+      "serializeUnitNumber"
+     ],
      "called by": "serializeRange",
      "file": "src/language/serializer/serializeSpans.js"
     },
@@ -25818,7 +27093,13 @@ export default function (schemaOnInput) {
      "serializeArticulation"
     ],
     "w": {
-     "call stack": "serialize \u2192 serializeVoice \u2192 serializeUnit \u2192 serializeModifiers \u2192 serializeArticulation",
+     "stack": [
+      "serialize",
+      "serializeVoice",
+      "serializeUnit",
+      "serializeModifiers",
+      "serializeArticulation"
+     ],
      "called by": "serializeModifiers",
      "file": "src/language/serializer/serializeUnit.js"
     },
@@ -25838,7 +27119,13 @@ export default function (schemaOnInput) {
      "serializeModifiers"
     ],
     "w": {
-     "call stack": "serialize \u2192 serializeVoice \u2192 serializeUnit \u2192 serializeModifiers \u2192 serializePedal",
+     "stack": [
+      "serialize",
+      "serializeVoice",
+      "serializeUnit",
+      "serializeModifiers",
+      "serializePedal"
+     ],
      "called by": "serializeModifiers",
      "file": "src/language/serializer/serializeUnit.js"
     },
@@ -25858,7 +27145,13 @@ export default function (schemaOnInput) {
      "serializeModifiers"
     ],
     "w": {
-     "call stack": "serialize \u2192 serializeVoice \u2192 serializeUnit \u2192 serializeModifiers \u2192 serializeTies",
+     "stack": [
+      "serialize",
+      "serializeVoice",
+      "serializeUnit",
+      "serializeModifiers",
+      "serializeTies"
+     ],
      "called by": "serializeModifiers",
      "file": "src/language/serializer/serializeUnit.js"
     },
@@ -25878,7 +27171,13 @@ export default function (schemaOnInput) {
      "serializeKeys"
     ],
     "w": {
-     "call stack": "serialize \u2192 serializeVoice \u2192 serializeUnit \u2192 serializeModifiers \u2192 serializeKeys",
+     "stack": [
+      "serialize",
+      "serializeVoice",
+      "serializeUnit",
+      "serializeModifiers",
+      "serializeKeys"
+     ],
      "called by": "serializeModifiers",
      "file": "src/language/serializer/serializeUnit.js"
     },
@@ -25898,7 +27197,13 @@ export default function (schemaOnInput) {
      "serializeKey"
     ],
     "w": {
-     "call stack": "serialize \u2192 serializeVoice \u2192 serializeUnit \u2192 findKeyOfNote \u2192 serializeKey",
+     "stack": [
+      "serialize",
+      "serializeVoice",
+      "serializeUnit",
+      "findKeyOfNote",
+      "serializeKey"
+     ],
      "called by": "findKeyOfNote",
      "file": "src/language/serializer/serializeUnit.js"
     },
@@ -25912,116 +27217,243 @@ export default function (schemaOnInput) {
     "x": 90,
     "y": 55,
     "t": "createCommandForEachKe",
-    "k": "serialize.js"
+    "k": "serialize.js",
+    "sub": "serializer",
+    "full": "createCommandForEachKey",
+    "lines": [
+     "createComman",
+     "dForEachKey"
+    ],
+    "parent": null,
+    "children": []
    },
    "serialize": {
     "x": 300,
     "y": 55,
     "t": "serialize",
-    "k": "serialize.js"
+    "k": "serialize.js",
+    "sub": "serializer",
+    "full": "serialize",
+    "lines": [
+     "serialize"
+    ],
+    "parent": null,
+    "children": [
+     "serializeMeasureCommands",
+     "serializeClef",
+     "addComments",
+     "serializePageMeta"
+    ]
    },
    "addComments": {
     "x": 90,
     "y": 173,
     "t": "addComments",
-    "k": "serialize.js"
+    "k": "serialize.js",
+    "sub": "serializer",
+    "full": "addComments",
+    "lines": [
+     "addComments"
+    ],
+    "parent": "serialize",
+    "children": []
    },
    "serializeClef": {
     "x": 300,
     "y": 173,
     "t": "serializeClef",
-    "k": "serialize.js"
+    "k": "serialize.js",
+    "sub": "serializer",
+    "full": "serializeClef",
+    "lines": [
+     "serializeClef"
+    ],
+    "parent": "serialize",
+    "children": []
    },
    "serializeMeasureCommands": {
     "x": 510,
     "y": 173,
     "t": "serializeMeasureComman",
-    "k": "serialize.js"
+    "k": "serialize.js",
+    "sub": "serializer",
+    "full": "serializeMeasureCommands",
+    "lines": [
+     "serializeMeas",
+     "ureCommands"
+    ],
+    "parent": "serialize",
+    "children": [
+     "serializeScope",
+     "serializeCorrection"
+    ]
    },
    "serializePageMeta": {
     "x": 720,
     "y": 173,
     "t": "serializePageMeta",
-    "k": "serialize.js"
+    "k": "serialize.js",
+    "sub": "serializer",
+    "full": "serializePageMeta",
+    "lines": [
+     "serializePageMeta"
+    ],
+    "parent": "serialize",
+    "children": []
    },
    "serializeCorrection": {
     "x": 510,
     "y": 291,
     "t": "serializeCorrection",
-    "k": "serialize.js"
+    "k": "serialize.js",
+    "sub": "serializer",
+    "full": "serializeCorrection",
+    "lines": [
+     "serializeCorrection"
+    ],
+    "parent": "serializeModifiers",
+    "children": [
+     "serializeCorrection"
+    ]
    },
    "serializeScope": {
     "x": 720,
     "y": 291,
     "t": "serializeScope",
-    "k": "serialize.js"
+    "k": "serialize.js",
+    "sub": "serializer",
+    "full": "serializeScope",
+    "lines": [
+     "serializeScope"
+    ],
+    "parent": "serializeMeasureCommands",
+    "children": []
    },
    "collectSpans": {
     "x": 90,
     "y": 409,
     "t": "collectSpans",
-    "k": "serializeSpans.js"
+    "k": "serializeSpans.js",
+    "sub": "serializer",
+    "full": "collectSpans",
+    "lines": [
+     "collectSpans"
+    ],
+    "parent": null,
+    "children": []
    },
    "findKeyOfNote": {
     "x": 300,
     "y": 409,
     "t": "findKeyOfNote",
-    "k": "serializeUnit.js"
+    "k": "serializeUnit.js",
+    "sub": "serializer",
+    "full": "findKeyOfNote",
+    "lines": [
+     "findKeyOfNote"
+    ],
+    "parent": null,
+    "children": [
+     "serializeKey"
+    ]
    },
    "serializeDuration": {
     "x": 510,
     "y": 409,
     "t": "serializeDuration",
-    "k": "serializeDuration.js"
+    "k": "serializeDuration.js",
+    "sub": "serializer",
+    "full": "serializeDuration",
+    "lines": [
+     "serializeDuration"
+    ],
+    "parent": null,
+    "children": []
    },
    "serializeModifiers": {
     "x": 720,
     "y": 409,
     "t": "serializeModifiers",
-    "k": "serializeUnit.js"
+    "k": "serializeUnit.js",
+    "sub": "serializer",
+    "full": "serializeModifiers",
+    "lines": [
+     "serializeModifiers"
+    ],
+    "parent": null,
+    "children": [
+     "serializeDots",
+     "serializeArticulation",
+     "serializeKeys",
+     "serializeCorrection"
+    ]
    },
    "serializeArticulation": {
     "x": 90,
     "y": 527,
     "t": "serializeArticulation",
-    "k": "serializeUnit.js"
+    "k": "serializeUnit.js",
+    "sub": "serializer",
+    "full": "serializeArticulation",
+    "lines": [
+     "serializeArticulation"
+    ],
+    "parent": "serializeModifiers",
+    "children": [
+     "serializeCorrection"
+    ]
    },
    "serializeDots": {
     "x": 300,
     "y": 527,
     "t": "serializeDots",
-    "k": "serializeDuration.js"
+    "k": "serializeDuration.js",
+    "sub": "serializer",
+    "full": "serializeDots",
+    "lines": [
+     "serializeDots"
+    ],
+    "parent": "serializeModifiers",
+    "children": []
    },
    "serializeKey": {
     "x": 510,
     "y": 527,
     "t": "serializeKey",
-    "k": "serializeUnit.js"
+    "k": "serializeUnit.js",
+    "sub": "serializer",
+    "full": "serializeKey",
+    "lines": [
+     "serializeKey"
+    ],
+    "parent": "findKeyOfNote",
+    "children": []
    },
    "serializeKeys": {
     "x": 720,
     "y": 527,
     "t": "serializeKeys",
-    "k": "serializeUnit.js"
+    "k": "serializeUnit.js",
+    "sub": "serializer",
+    "full": "serializeKeys",
+    "lines": [
+     "serializeKeys"
+    ],
+    "parent": "serializeModifiers",
+    "children": []
    }
   },
   "edges": {
-   "serializeMeasureCommands-serializeCorrection": {
-    "d": "M510 173 L510 291",
-    "lx": 510,
-    "ly": 226,
-    "l": ""
-   },
    "serializeMeasureCommands-serializeScope": {
     "d": "M510 173 L720 291",
     "lx": 615,
     "ly": 226,
     "l": ""
    },
-   "serialize-serializeClef": {
-    "d": "M300 55 L300 173",
-    "lx": 300,
-    "ly": 108,
+   "serializeMeasureCommands-serializeCorrection": {
+    "d": "M510 173 L510 291",
+    "lx": 510,
+    "ly": 226,
     "l": ""
    },
    "serialize-serializeMeasureCommands": {
@@ -26030,15 +27462,21 @@ export default function (schemaOnInput) {
     "ly": 108,
     "l": ""
    },
-   "serialize-serializePageMeta": {
-    "d": "M300 55 L720 173",
-    "lx": 510,
+   "serialize-serializeClef": {
+    "d": "M300 55 L300 173",
+    "lx": 300,
     "ly": 108,
     "l": ""
    },
    "serialize-addComments": {
     "d": "M300 55 L90 173",
     "lx": 195,
+    "ly": 108,
+    "l": ""
+   },
+   "serialize-serializePageMeta": {
+    "d": "M300 55 L720 173",
+    "lx": 510,
     "ly": 108,
     "l": ""
    },
@@ -26060,18 +27498,6 @@ export default function (schemaOnInput) {
     "ly": 462,
     "l": ""
    },
-   "serializeModifiers-serializeCorrection": {
-    "d": "M720 409 L510 291",
-    "lx": 615,
-    "ly": 344,
-    "l": ""
-   },
-   "serializeModifiers-serializeKeys": {
-    "d": "M720 409 L720 527",
-    "lx": 720,
-    "ly": 462,
-    "l": ""
-   },
    "serializeModifiers-serializeDots": {
     "d": "M720 409 L300 527",
     "lx": 510,
@@ -26082,6 +27508,18 @@ export default function (schemaOnInput) {
     "d": "M720 409 L90 527",
     "lx": 405,
     "ly": 462,
+    "l": ""
+   },
+   "serializeModifiers-serializeKeys": {
+    "d": "M720 409 L720 527",
+    "lx": 720,
+    "ly": 462,
+    "l": ""
+   },
+   "serializeModifiers-serializeCorrection": {
+    "d": "M720 409 L510 291",
+    "lx": 615,
+    "ly": 344,
     "l": ""
    }
   },
@@ -26103,7 +27541,9 @@ export default function (schemaOnInput) {
      "validatePageSchema"
     ],
     "w": {
-     "call stack": "validatePageSchema",
+     "stack": [
+      "validatePageSchema"
+     ],
      "called by": "\u2014",
      "file": "src/language/schema/validatePageSchema.js"
     },
@@ -26117,7 +27557,14 @@ export default function (schemaOnInput) {
     "x": 90,
     "y": 55,
     "t": "validatePageSchema",
-    "k": "validatePageSchema.js"
+    "k": "validatePageSchema.js",
+    "sub": "schema",
+    "full": "validatePageSchema",
+    "lines": [
+     "validatePageSchema"
+    ],
+    "parent": null,
+    "children": []
    }
   },
   "edges": {},
@@ -26127,29 +27574,103 @@ export default function (schemaOnInput) {
 
   const SVGNS = 'http://www.w3.org/2000/svg';
   const el = (n, a, p) => { const e = document.createElementNS(SVGNS, n); for (const k in a) e.setAttribute(k, a[k]); if (p) p.appendChild(e); return e; };
-  const gE = document.getElementById('edges'), gN = document.getElementById('nodes'), svg = document.querySelector('svg.sys');
-  const tok = document.getElementById('tok');
+  const svg = document.querySelector('svg.sys');
+  const gG = document.getElementById('groups'), gE = document.getElementById('edges'), gN = document.getElementById('nodes');
+  const scroller = document.querySelector('.scrollbox');
+  const crumbs = document.getElementById('crumbs');
 
-  let drawnTab = -1;
-  function drawDiagram(sc, index) {
-    if (drawnTab === index) return;
-    drawnTab = index;
-    gE.innerHTML = ''; gN.innerHTML = '';
-    svg.setAttribute('viewBox', `0 0 820 ${sc.height || 460}`);
+  let zoom = null;
+  function visibleSet(sc, root) {
+    if (!root) return null;
+    const seen = new Set([root]);
+    let frontier = [root];
+    while (frontier.length) {
+      const next = [];
+      for (const id of frontier) for (const c of (sc.nodes[id].children || [])) {
+        if (!seen.has(c)) { seen.add(c); next.push(c); }
+      }
+      frontier = next;
+    }
+    if (seen.size < 3) { // a leaf: keep its ancestors so the zoom has context
+      let p = sc.nodes[root].parent;
+      while (p && seen.size < 4) { seen.add(p); p = sc.nodes[p].parent; }
+    }
+    return seen;
+  }
+  function drawCrumbs(sc) {
+    const chain = [];
+    let cur = zoom;
+    while (cur) { chain.unshift(cur); cur = sc.nodes[cur].parent; }
+    crumbs.innerHTML = '';
+    const mk = (label, id) => {
+      const b = document.createElement('button');
+      b.type = 'button'; b.textContent = label;
+      if (id === zoom) b.className = 'now';
+      b.addEventListener('click', () => { zoom = id; render(); });
+      crumbs.appendChild(b);
+    };
+    mk('⊞ overview', null);
+    chain.forEach((id, i) => {
+      crumbs.insertAdjacentHTML('beforeend', '<span>›</span>');
+      mk(sc.nodes[id].t, id);
+    });
+    if (zoom) {
+      crumbs.insertAdjacentHTML('beforeend', '<span>·</span>');
+      const b = document.createElement('button');
+      b.type = 'button'; b.textContent = '⤢ jump to code';
+      b.addEventListener('click', () => jumpTo(zoom));
+      crumbs.appendChild(b);
+    }
+  }
+  function drawDiagram(sc) {
+    gG.innerHTML = ''; gE.innerHTML = ''; gN.innerHTML = '';
+    const vis = visibleSet(sc, zoom);
+    const ids = Object.keys(sc.nodes).filter(id => !vis || vis.has(id));
+    if (zoom) {
+      let x1 = 1e9, y1 = 1e9, x2 = -1e9, y2 = -1e9;
+      for (const id of ids) {
+        const n = sc.nodes[id];
+        x1 = Math.min(x1, n.x); y1 = Math.min(y1, n.y); x2 = Math.max(x2, n.x); y2 = Math.max(y2, n.y);
+      }
+      svg.setAttribute('viewBox', `${x1 - 120} ${y1 - 90} ${x2 - x1 + 240} ${y2 - y1 + 180}`);
+    } else {
+      svg.setAttribute('viewBox', `0 0 820 ${sc.height || 460}`);
+    }
+    // group boxes behind the blocks, by the folder each function lives in
+    const groups = {};
+    for (const id of ids) {
+      const n = sc.nodes[id];
+      (groups[n.sub] = groups[n.sub] || []).push(n);
+    }
+    for (const sub in groups) {
+      const ns = groups[sub];
+      const x1 = Math.min(...ns.map(n => n.x)) - 88, x2 = Math.max(...ns.map(n => n.x)) + 88;
+      const y1 = Math.min(...ns.map(n => n.y)) - 34, y2 = Math.max(...ns.map(n => n.y)) + 34;
+      const g = el('g', { class: 'cluster' }, gG);
+      el('rect', { x: x1, y: y1, width: x2 - x1, height: y2 - y1 }, g);
+      const t = el('text', { x: x1 + 8, y: y1 + 13 }, g); t.textContent = sub;
+    }
     for (const id in sc.edges) {
       const e = sc.edges[id];
-      el('path', { d: e.d, class: 'edge' }, gE);
-      if (e.l) { const t = el('text', { x: e.lx, y: e.ly, class: 'elabel' }, gE); t.textContent = e.l; }
+      if ((!vis || (vis.has(e.a) && vis.has(e.b)))) {
+        el('path', { d: e.d, class: 'edge' }, gE);
+      }
     }
     const nodeEls = {};
-    for (const id in sc.nodes) {
+    for (const id of ids) {
       const n = sc.nodes[id];
       const g = el('g', { class: 'node', style: '--own: var(--accent)' }, gN);
-      const tt = el('title', {}, g); tt.textContent = id;
+      const tt = el('title', {}, g); tt.textContent = n.full + ' — click to zoom in';
+      el('rect', { class: 'halo', x: n.x - 80, y: n.y - 27, width: 160, height: 54 }, g);
       el('rect', { x: n.x - 75, y: n.y - 24, width: 150, height: 48, rx: 7 }, g);
       el('rect', { x: n.x - 75, y: n.y - 24, width: 6, height: 48, rx: 3, class: 'band' }, g);
-      const a = el('text', { x: n.x, y: n.y - 3 }, g); a.textContent = n.t;
-      const b = el('text', { x: n.x, y: n.y + 13, class: 'k' }, g); b.textContent = n.k;
+      const words = n.lines;
+      const a = el('text', { x: n.x, y: n.y - 3 - (words.length - 1) * 6 }, g);
+      words.forEach((w, i) => {
+        const ts = el('tspan', { x: n.x, dy: i === 0 ? 0 : 12 }, a); ts.textContent = w;
+      });
+      const b = el('text', { x: n.x, y: n.y + 22 }, g); b.textContent = n.k;
+      g.addEventListener('click', () => { zoom = id; jumpTo(id); });
       nodeEls[id] = g;
     }
     return nodeEls;
@@ -26210,23 +27731,45 @@ export default function (schemaOnInput) {
       const n = +li.dataset.n; const on = range && n >= range[0] && n <= range[1];
       li.classList.toggle('hl', !!on); if (on && !first) first = li;
     });
-    if (first) codeBox.scrollTo({ top: Math.max(0, first.offsetTop - 70), behavior: 'auto' });
+    if (first) codeBox.scrollTo({ top: Math.max(0, first.offsetTop - 70), behavior: 'smooth' });
   }
 
   const msgEl = document.getElementById('msg'), workerEl = document.getElementById('worker');
   function showState(fr) {
     msgEl.textContent = fr.msg ? JSON.stringify(fr.msg, null, 2) : '—';
-    workerEl.innerHTML = fr.w
-      ? Object.entries(fr.w).map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(String(v))}</dd>`).join('')
-      : '<dt>—</dt><dd>nothing new in this frame</dd>';
+    const w = fr.w || {};
+    const rest = Object.entries(w).filter(([k]) => k !== 'stack' && k !== 'call stack')
+      .map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(String(v))}</dd>`).join('');
+    const stack = w.stack || (w['call stack'] ? String(w['call stack']).split(' → ') : null);
+    workerEl.innerHTML = (stack
+      ? `<div class="stack">` + stack.map((s, i) =>
+          `<div class="frame${i === stack.length - 1 ? ' here' : ''}">${esc(s)}</div>`).join('') + `</div>`
+      : '<dt>—</dt><dd>nothing new in this frame</dd>') + rest;
     document.getElementById('logline').textContent = fr.log || '—';
+  }
+
+  function jumpTo(id) {
+    const i = S[si].frames.findIndex(f => (f.on || []).includes(id));
+    if (i >= 0) { stop(); fi = i; }
+    render();
+  }
+  function scrollToActive() {
+    if (zoom) return;
+    const id = S[si].frames[fi].on && S[si].frames[fi].on[0];
+    const n = id && S[si].nodes[id];
+    if (!n) return;
+    scroller.scrollTo({
+      left: Math.max(0, n.x - scroller.clientWidth / 2),
+      top: Math.max(0, n.y - scroller.clientHeight / 2),
+      behavior: 'smooth'
+    });
   }
 
   let si = 0, fi = 0, timer = null;
   const tabs = document.getElementById('tabs'), scrub = document.getElementById('scrub');
   S.forEach((sc, i) => {
     const b = document.createElement('button'); b.type = 'button'; b.role = 'tab'; b.id = 'tab-' + i;
-    b.textContent = sc.name; b.addEventListener('click', () => { stop(); si = i; fi = 0; drawnTab = -1; render(); });
+    b.textContent = sc.name; b.addEventListener('click', () => { stop(); si = i; fi = 0; zoom = null; render(); });
     tabs.appendChild(b);
   });
   function render() {
@@ -26236,11 +27779,16 @@ export default function (schemaOnInput) {
     document.getElementById('count').textContent = `${fi + 1} / ${sc.frames.length}`;
     document.getElementById('ctitle').textContent = fr.t;
     document.getElementById('ctext').textContent = fr.x;
-    const nodeEls = drawDiagram(sc, si) || {};
+    const active = fr.on && fr.on[0];
+    const vis = visibleSet(sc, zoom);
+    if (active && zoom && !vis.has(active)) zoom = null;
+    drawCrumbs(sc);
+    const nodeEls = drawDiagram(sc);
     document.getElementById('where').textContent = (fr.on || []).map(k => (sc.nodes[k] || {}).t || k).join(' · ');
     for (const k in nodeEls) nodeEls[k].classList.toggle('on', (fr.on || []).includes(k));
     showState(fr);
     showCode(fr.f, fr.l);
+    scrollToActive();
     document.getElementById('prev').disabled = document.getElementById('first').disabled = fi === 0;
     document.getElementById('next').disabled = fi === sc.frames.length - 1;
   }
