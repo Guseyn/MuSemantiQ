@@ -15,10 +15,12 @@ export function evaluateModel ({ model, samples, worstCount = 10 }) {
   const confusion = Array.from({ length: classCount }, () => new Array(classCount).fill(0))
   const mistakes = []
   let correct = 0
+  let lossTotal = 0
   for (let index = 0; index < samples.length; index++) {
     const sample = samples[index]
     const { probabilities } = forwardModel(model, sample.pixels)
     const predicted = argmax(probabilities)
+    lossTotal += -Math.log(Math.max(probabilities[sample.classIndex], 1e-12))
     confusion[sample.classIndex][predicted]++
     if (predicted === sample.classIndex) {
       correct++
@@ -32,6 +34,7 @@ export function evaluateModel ({ model, samples, worstCount = 10 }) {
     }
   }
   return {
+    loss: samples.length ? Math.round(lossTotal / samples.length * 1e6) / 1e6 : 0,
     accuracy: samples.length ? Math.round(correct / samples.length * 1e4) / 1e4 : 0,
     confusion,
     worst: mistakes

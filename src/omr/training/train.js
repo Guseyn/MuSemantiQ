@@ -8,6 +8,7 @@ import backpropagateModel from './backpropagateModel.js'
 import { createAdamState, updateWeightsWithAdam } from './updateWeightsWithAdam.js'
 import { createSeededRandom } from './seededRandom.js'
 import { generateTrainingSet } from './generateTrainingSet.js'
+import { drawableClassIds } from './drawSymbols.js'
 import { evaluateModel } from './evaluate.js'
 import { exportWeights } from './exportWeights.js'
 
@@ -30,7 +31,8 @@ export function trainModel ({
   learningRate = 0.001,
   l2 = 0.0005,
   seed = 1,
-  onEpoch = null
+  onEpoch = null,
+  onBatch = null
 }) {
   const random = createSeededRandom(seed)
   const states = {}
@@ -44,7 +46,10 @@ export function trainModel ({
   let step = 0
   let best = { accuracy: -1, weights: null }
   for (let epoch = 1; epoch <= epochs; epoch++) {
+    const epochStartedAt = Date.now()
     const order = shuffledIndexes(trainingSamples.length, random)
+    const batchesTotal = Math.ceil(trainingSamples.length / batchSize)
+    let batchesDone = 0
     let lossTotal = 0
     for (let start = 0; start < order.length; start += batchSize) {
       const batch = order.slice(start, start + batchSize)
@@ -79,6 +84,15 @@ export function trainModel ({
           step
         })
       }
+      batchesDone++
+      if (onBatch) {
+        onBatch({
+          epoch,
+          batchesDone,
+          batchesTotal,
+          runningLoss: Math.round(lossTotal / batchesDone / batchSize * 1e6) / 1e6
+        })
+      }
     }
     const training = evaluateModel({ model, samples: trainingSamples })
     const validation = validationSamples
@@ -86,9 +100,12 @@ export function trainModel ({
       : training
     history.push({
       epoch,
+      epochs,
       loss: Math.round(lossTotal / trainingSamples.length * 1e6) / 1e6,
       accuracy: training.accuracy,
-      validationAccuracy: validation.accuracy
+      validationLoss: validation.loss,
+      validationAccuracy: validation.accuracy,
+      seconds: Math.round((Date.now() - epochStartedAt) / 1000)
     })
     if (onEpoch) {
       onEpoch(history[history.length - 1])
@@ -119,16 +136,25 @@ export function runTraining () {
   const learningRate = numberFlag('learning-rate', 0.01)
   const seed = numberFlag('seed', 20261110)
   const shape = { gridSize, filterSize: 3, filterCounts, denseSize, classCount: 0 }
-  const { classIds, samples } = generateTrainingSet({ seed, samplesPerClass, gridSize: shape.gridSize })
-  shape.classCount = classIds.length
   const log = (line) => {
     appendFileSync(RUN_LOG, `${line}\n`)
     console.log(line)
   }
   try {
     const startedAt = Date.now()
-    log(`=== ${new Date().toISOString()} · seed ${seed} · grid ${gridSize} · filters ${filterCounts.join(',')} · dense ${denseSize} · ${classIds.length} classes · ${samples.length} samples · ${epochs} epochs`)
+    log(`=== ${new Date().toISOString()} · seed ${seed} · grid ${gridSize} · filters ${filterCounts.join(',')} · dense ${denseSize} · ${drawableClassIds.length} classes · ${drawableClassIds.length * samplesPerClass} samples · ${epochs} epochs`)
+    log(`drawing the training set — ${samplesPerClass} pictures per class…`)
+    const generationStartedAt = Date.now()
+    const { classIds, samples } = generateTrainingSet({
+      seed,
+      samplesPerClass,
+      gridSize,
+      onClass: (classId, index, total) => log(`  ${index}/${total} ${classId}`)
+    })
+    shape.classCount = classIds.length
+    log(`dataset ready in ${durationSince(generationStartedAt)} — ${samples.length} samples`)
     const split = Math.floor(samples.length * 0.8)
+    log(`training on ${split} · validating on ${samples.length - split} · batch ${batchSize} · learning rate ${learningRate}`)
     const model = createModel({ ...shape, classCount: classIds.length }, 1)
     const { history } = trainModel({
       model,
@@ -137,9 +163,17 @@ export function runTraining () {
       epochs,
       batchSize,
       learningRate,
-      onEpoch: (entry) => log(
-        `epoch ${entry.epoch}: loss ${entry.loss}, accuracy ${entry.accuracy}, validation ${entry.validationAccuracy}`
-      )
+      onBatch: ({ epoch, batchesDone, batchesTotal, runningLoss }) => {
+        const every = Math.max(1, Math.floor(batchesTotal / 4))
+        if (batchesDone % every === 0 || batchesDone === batchesTotal) {
+          log(`  epoch ${epoch} · ${batchesDone}/${batchesTotal} batches · running loss ${runningLoss}`)
+        }
+      },
+      onEpoch: (entry) => {
+        const left = entry.seconds * (epochs - entry.epoch)
+        log(`epoch ${entry.epoch}/${epochs} · ${formatDuration(entry.seconds)} · loss ${entry.loss} · accuracy ${entry.accuracy} · validation loss ${entry.validationLoss} · validation ${entry.validationAccuracy}` +
+          (left > 0 ? ` · ~${formatDuration(left)} left` : ''))
+      }
     })
     const outIndex = process.argv.findIndex((argument) => argument.startsWith('--out='))
     if (outIndex !== -1) {
@@ -170,9 +204,12 @@ function listFlag (name, fallback) {
 }
 
 function durationSince (startedAt) {
-  const seconds = Math.round((Date.now() - startedAt) / 1000)
+  return formatDuration((Date.now() - startedAt) / 1000)
+}
+
+function formatDuration (seconds) {
   if (seconds < 90) {
-    return `${seconds}s`
+    return `${Math.round(seconds)}s`
   }
   return seconds < 5400 ? `${Math.round(seconds / 60)}m` : `${Math.round(seconds / 360) / 10}h`
 }

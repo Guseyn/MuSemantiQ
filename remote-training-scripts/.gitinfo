@@ -7,6 +7,7 @@ tracked.
   remote-git-pull.sh          the server checks out omr and resets to origin/omr
   remote-start-training.sh    training runs there, detached, logging to
                               training-data/training.log
+  remote-stop-training.sh     stops the run that is going
   remote-download-model.sh    the weights and the log come home, with their sha
 
 Not tracked because the scripts name a server and an ssh key — they are

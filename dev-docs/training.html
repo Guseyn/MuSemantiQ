@@ -142,7 +142,7 @@ figcaption { font: 12px var(--mono); color: var(--muted); margin-top: 6px; }
 
 <pre><code>./remote-training-scripts/remote-git-pull.sh
 ./remote-training-scripts/remote-start-training.sh</code></pre>
-<p>The first script has the server check out the branch and reset to it — <code>ssh … 'cd MuSemantiQ && git fetch --all && git checkout omr && git reset --hard origin/omr'</code>. The second starts training detached with <code>nohup</code> and tells you its pid; the run keeps going after the command returns, and it <b>logs itself</b> to <code>training-data/training.log</code> on the server: the config it started with, one line per epoch, the sha of the weights it wrote, and any error it died of.</p>
+<p>The first script has the server check out the branch and reset to it — <code>ssh … 'cd MuSemantiQ && git fetch --all && git checkout omr && git reset --hard origin/omr'</code>. The second starts training detached with <code>nohup</code> and tells you its pid; the run keeps going after the command returns. The third stops it. And the run <b>logs itself</b> to <code>training-data/training.log</code> on the server — every phase, so nothing is silent.</p>
 
 <p>The defaults are the smoke run (360 samples, 15 epochs — seconds). A run worth keeping takes its size as flags, and they pass through the script.</p>
 
@@ -178,9 +178,25 @@ figcaption { font: 12px var(--mono); color: var(--muted); margin-top: 6px; }
 </ul>
 
 <p>Watching is one more command; <code>Ctrl-c</code> stops the watching, not the training:</p>
-<pre><code>ssh user@server 'tail -f MuSemantiQ/training-data/training.log'   <span class="cm"># one line per epoch</span>
+<pre><code>ssh user@server 'tail -f MuSemantiQ/training-data/training.log'   <span class="cm"># follows every line below</span>
 
-ssh user@server 'pkill -f train.js'                               <span class="cm"># to stop the run</span></code></pre>
+./remote-training-scripts/remote-stop-training.sh                  <span class="cm"># to stop the run</span></code></pre>
+
+<p>What the log tells you, from the first minute to the last:</p>
+<pre><code>=== 2026-11-13T18:00:00Z · seed 20261110 · grid 48 · filters 16,32 · dense 64 · 43 classes · 17200 samples · 40 epochs
+drawing the training set — 400 pictures per class…
+  1/43 notehead-filled
+  2/43 notehead-open
+  …
+dataset ready in 3m 12s — 17200 samples
+training on 13760 · validating on 3440 · batch 32 · learning rate 0.001
+  epoch 1 · 128/430 batches · running loss 2.91
+  epoch 1 · 256/430 batches · running loss 2.42
+epoch 1/40 · 11m 04s · loss 2.31 · accuracy 0.38 · validation loss 1.98 · validation 0.47 · ~7h 15m left
+…
+weights written to src/omr/model/weights.json
+sha256 7190c2b9…
+✓ done in 8h 12m — best validation 0.87 at epoch 31</code></pre>
 <div class="note"><b>Reproducible</b> The seeds live in the run itself: the same code and seed give the same dataset and the same weights on any machine. The seed and shape are in <code>runTraining()</code> in <code>src/omr/training/train.js</code>.</div>
 </section>
 
@@ -271,11 +287,12 @@ for (const sample of samples) {
 <pre><code><span class="cm"># once</span>
 ./remote-training-scripts/remote-setup-server.sh
 
-<span class="cm"># every run — your three scripts in remote-training-scripts/ (not tracked)</span>
+<span class="cm"># every run — your scripts in remote-training-scripts/ (not tracked)</span>
 ./remote-training-scripts/remote-git-pull.sh
 ./remote-training-scripts/remote-start-training.sh
 ./remote-training-scripts/remote-start-training.sh --samples-per-class=400 --epochs=40 --grid=48 --filters=16,32 --dense=64 --batch=32 --learning-rate=0.001   <span class="cm"># the production run</span>
 ssh user@server 'tail -f MuSemantiQ/training-data/training.log'   <span class="cm"># Ctrl-c stops the watching, not the training</span>
+./remote-training-scripts/remote-stop-training.sh                 <span class="cm"># to stop the run</span>
 
 <span class="cm"># take the result</span>
 ./remote-training-scripts/remote-download-model.sh

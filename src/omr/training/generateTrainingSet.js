@@ -14,11 +14,14 @@ import { resampleToGrid } from './cropComponents.js'
  * on any machine gives the same bytes.
  */
 
-export function generateTrainingSet ({ seed, samplesPerClass, gridSize, classIds = drawableClassIds }) {
+export function generateTrainingSet ({ seed, samplesPerClass, gridSize, classIds = drawableClassIds, onClass = null }) {
   const random = createSeededRandom(seed)
   const drawSize = gridSize * 2
   const samples = []
   for (const classId of classIds) {
+    if (onClass) {
+      onClass(classId, classIds.indexOf(classId) + 1, classIds.length)
+    }
     for (let sample = 0; sample < samplesPerClass; sample++) {
       const drawn = drawSymbolSample(classId, drawSize, random)
       const degraded = applyDegradations(drawn, random)
