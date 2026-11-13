@@ -9,6 +9,9 @@ dir.create(out, showWarnings = FALSE, recursive = TRUE)
 # ── the paper palette of the docs ──
 ink <- "#17181a"; muted <- "#6b7076"; rule <- "#e4e4e0"; soft <- "#f4f3ef"
 accent <- "#a5322a"; accent_soft <- "#f6e9e6"; ok <- "#2f6b3c"; ok_soft <- "#e2f0e4"
+# Latin Modern is the Computer Modern the page's KaTeX sets its math in;
+# cairo bakes the glyphs into the svg, so viewers need no such font
+mathfont <- "LMRoman10"
 
 # one user unit is one hundredth of an inch; cex 1 is the 12px label size
 marks <- list(); fig_w <- 0; fig_h <- 0
@@ -16,7 +19,7 @@ marks <- list(); fig_w <- 0; fig_h <- 0
 open_fig <- function(name, w, h) {
   marks <<- list(); fig_w <<- w; fig_h <<- h
   svg(file.path(out, paste0(name, ".svg")), width = w / 100, height = h / 100, bg = "white")
-  par(mar = rep(0, 4), xpd = NA, ps = 12 * 72 / 100)
+  par(mar = rep(0, 4), xpd = NA, ps = 12 * 72 / 100, family = mathfont)
   # y grows downward, like the coordinates the figures were designed in
   plot(0, 0, type = "n", xlim = c(0, w), ylim = c(h, 0), axes = FALSE, xlab = "", ylab = "")
 }
@@ -25,8 +28,8 @@ open_fig <- function(name, w, h) {
 mark_text <- function(x, y, s, adj, size) {
   # strheight is negative on the flipped y axis — boxes normalize or every
   # text-vs-text test comes out inverted and silently false
-  w <- abs(strwidth(s, cex = size / 12, family = "serif"))
-  h <- abs(strheight(s, cex = size / 12, family = "serif")) * 0.72
+  w <- abs(strwidth(s, cex = size / 12))
+  h <- abs(strheight(s, cex = size / 12)) * 0.72
   marks[[length(marks) + 1]] <<- list(kind = "text", what = paste(deparse(s), collapse = " "),
     x0 = x - adj[1] * w, x1 = x - adj[1] * w + w, y0 = y - adj[2] * h, y1 = y - adj[2] * h + h)
 }
@@ -39,7 +42,7 @@ mark_poly <- function(x, y) {
 
 mono <- function(x, y, s, size = 16, col = ink, adj = c(0, 0.5), font = 1) {
   mark_text(x, y, s, adj, size)
-  text(x, y, s, adj = adj, cex = size / 12, col = col, family = "serif", font = font)
+  text(x, y, s, adj = adj, cex = size / 12, col = col, font = font)
 }
 math <- function(x, y, e, size = 18, col = ink, adj = c(0, 0.5)) {
   mark_text(x, y, e, adj, size)
@@ -250,7 +253,7 @@ fig_06_the_two_slopes <- function() {
   note(160, 158, "slope 0"); note(430, 116, "slope 1")
   note(330, 196, "at z = 0 the slope is ε (7)")
   math(546, 190, expression(z)); math(306, 56, expression(a))
-  note(100, 40, "flat left of zero, straight right of it")
+  note(70, 216, "flat left of zero, straight right of it")
   dev.off()
   add(6, "fig-06-the-two-slopes")
 }
@@ -434,7 +437,7 @@ fig_15_the_last_layer_blame <- function() {
   for (i in 1:5) {
     if (i == 3) hot(580, 200, 24, 44) else cell(520 + (i - 1) * 30, 200 - p[i], 24, p[i])
   }
-  note(520, 272, "one entry is negative — the truth was not certain enough")
+  note(520, 272, "one entry is negative: the truth was uncertain")
   dev.off()
   add(15, "fig-15-the-last-layer-blame")
 }
@@ -451,7 +454,7 @@ fig_16_the_weight_gradient_table <- function() {
   hot(232, 118, 36, 24)
   math(128, 46, expression(delta)); math(358, 50, expression(a))
   mono(380, 110, expression(dW[j * "," * k] == delta[j] %.% a[k]), size = 16)
-  note(380, 130, "the row factor times the column factor")
+  note(380, 130, "row factor times column factor")
   dev.off()
   add(16, "fig-16-the-weight-gradient-table")
 }
