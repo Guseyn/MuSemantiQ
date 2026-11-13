@@ -4123,7 +4123,7 @@ export default function serialize (pageSchema, customStyles, midiSettings, comme
   }
   for (const id in NODES) {
     const n = NODES[id];
-    const g = el('g', { class: 'node' }, gN);
+    const g = el('g', { class: 'node', style: '--own: var(--accent)' }, gN);
     const tt = el('title', {}, g); tt.textContent = id;
     el('rect', { x: n.x - 75, y: n.y - 24, width: 150, height: 48, rx: 7 }, g);
     el('rect', { x: n.x - 75, y: n.y - 24, width: 6, height: 48, rx: 3, class: 'band' }, g);
