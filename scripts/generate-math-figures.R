@@ -23,8 +23,10 @@ open_fig <- function(name, w, h) {
 
 # everything drawn is recorded, so check_marks can find collisions
 mark_text <- function(x, y, s, adj, size) {
-  w <- strwidth(s, cex = size / 12, family = "serif")
-  h <- strheight(s, cex = size / 12, family = "serif") * 0.72
+  # strheight is negative on the flipped y axis — boxes normalize or every
+  # text-vs-text test comes out inverted and silently false
+  w <- abs(strwidth(s, cex = size / 12, family = "serif"))
+  h <- abs(strheight(s, cex = size / 12, family = "serif")) * 0.72
   marks[[length(marks) + 1]] <<- list(kind = "text", what = paste(deparse(s), collapse = " "),
     x0 = x - adj[1] * w, x1 = x - adj[1] * w + w, y0 = y - adj[2] * h, y1 = y - adj[2] * h + h)
 }
@@ -35,15 +37,15 @@ mark_poly <- function(x, y) {
   marks[[length(marks) + 1]] <<- list(kind = "poly", x = x, y = y)
 }
 
-mono <- function(x, y, s, size = 14, col = ink, adj = c(0, 0.5), font = 1) {
+mono <- function(x, y, s, size = 16, col = ink, adj = c(0, 0.5), font = 1) {
   mark_text(x, y, s, adj, size)
   text(x, y, s, adj = adj, cex = size / 12, col = col, family = "serif", font = font)
 }
-math <- function(x, y, e, size = 16, col = ink, adj = c(0, 0.5)) {
+math <- function(x, y, e, size = 18, col = ink, adj = c(0, 0.5)) {
   mark_text(x, y, e, adj, size)
   text(x, y, e, adj = adj, cex = size / 12, col = col)
 }
-note <- function(x, y, s, adj = c(0, 0.5)) mono(x, y, s, size = 13, col = ink, adj = adj)
+note <- function(x, y, s, adj = c(0, 0.5)) mono(x, y, s, size = 15, col = ink, adj = adj)
 
 cell <- function(x, y, w, h, fill = soft, border = rule, lwd = 1) {
   mark_box(x, y, x + w, y + h)
@@ -106,7 +108,7 @@ grid_of <- function(x, y, cols, rows, cw, ch, fills = NULL) {
     cell(x + (c - 1) * cw, y + (r - 1) * ch, cw, ch, fill = f)
   }
 }
-value_in <- function(x, y, w, h, s, size = 14, col = ink, font = 1) {
+value_in <- function(x, y, w, h, s, size = 16, col = ink, font = 1) {
   mono(x + w / 2, y + h / 2, s, size = size, col = col, adj = c(0.5, 0.5), font = font)
 }
 matrix_grid <- function(x, y, cols, rows, cw, ch) grid_of(x, y, cols, rows, cw, ch)
@@ -129,7 +131,7 @@ fig_01_the_crop <- function() {
   for (j in 0:n) dashed(x0, y0 + j * cw, x0 + n * cw, y0 + j * cw)
   hot(x0 + 2 * cw, y0 + 2 * cw, cw, cw)
   flow(x0 + 2 * cw + cw, y0 + 2 * cw + cw / 2, 330, 110)
-  math(336, 106, expression(x[i * "," * j] == "the ink of this pixel"), size = 14)
+  math(336, 106, expression(x[i * "," * j] == "the ink of this pixel"), size = 16)
   note(336, 124, "one number: 0 (paper) to 1 (ink)")
   axis_line(x0, 42, x0 + n * cw + 10, 42); math(x0 + 88, 34, expression(i))
   note(300, 46, "columns")
@@ -151,7 +153,7 @@ fig_02_the_convolution_window <- function() {
     grid_of(x0, y0, n, n, cw, cw)
     frame(x0 + (p[1] - 3) * cw, y0 + (p[2] - 3) * cw, 3 * cw, 3 * cw)
     math(x0 + (p[1] - 3) * cw + 27, y0 + (p[2] - 3) * cw + 27, expression(F %*% F),
-         size = 13, adj = c(0.5, 0.5))
+         size = 15, adj = c(0.5, 0.5))
     note(x0, 232, "window at (i, j) · offsets p, q")
     note(60, 30, "input a — 9×9, C channels")
     note(228, 106, "w"); note(244, 108, "p,q,c,k")
@@ -162,7 +164,7 @@ fig_02_the_convolution_window <- function() {
     note(432, 106, "+ b"); arrow(424, 118, 520, 118)
     matrix_grid(560, 60, 4, 5, 32, 26)
     note(560, 34, "output z — one cell per (i, j, k)")
-    math(700, 90, expression(z[i * "," * j * "," * k]), size = 14)
+    math(700, 90, expression(z[i * "," * j * "," * k]), size = 16)
     note(700, 134, "written by that window")
     dev.off()
     add(2, name)
@@ -196,11 +198,11 @@ fig_04_im2col <- function() {
   note(42, 30, "P — patches")
   note(42, 232, "row jH + i = window at (i, j)")
   flow(168, 143, 208, 143)
-  math(236, 30, expression(hat(W)^T * " — filters as columns"), size = 13)
+  math(236, 30, expression(hat(W)^T * " — filters as columns"), size = 15)
   matrix_grid(236, 44, 3, 3, 40, 23)
   note(236, 132, "R × K")
   math(386, 84, expression("+"), adj = c(0.5, 0.5))
-  cell(412, 52, 12, 54); math(408, 122, expression(1 * b^T), size = 13)
+  cell(412, 52, 12, 54); math(408, 122, expression(1 * b^T), size = 15)
   math(458, 84, expression("="), adj = c(0.5, 0.5))
   note(500, 30, "Z — pre-activations")
   matrix_grid(500, 44, 3, 10, 32, 17)
@@ -216,12 +218,12 @@ fig_04_im2col <- function() {
 # ── 5 · ReLU and max-pool ──
 fig_05_relu_and_pool <- function() {
   open_fig("fig-05-relu-and-pool", 900, 300)
-  axis_line(80, 170, 560, 170); axis_line(320, 170, 320, 40)
-  xs <- seq(120, 520, length.out = 200)
-  draw_line(xs, 170 - pmax(0, xs - 320) * 0.5, col = ink, lwd = 2)
-  points(320, 170, pch = 16, cex = 0.8, col = accent)
-  note(160, 158, "slope 0"); note(430, 116, "slope 1")
-  math(306, 56, expression(a))
+  axis_line(60, 170, 440, 170); axis_line(280, 170, 280, 40)
+  draw_line(c(120, 280), c(170, 170), col = ink, lwd = 2)
+  draw_line(c(280, 430), c(170, 95), col = ink, lwd = 2)
+  points(280, 170, pch = 16, cex = 0.8, col = accent)
+  note(150, 156, "slope 0"); note(356, 122, "slope 1")
+  math(266, 56, expression(a))
   mono(470, 30, "2×2 window of a, one channel c")
   cells <- matrix(c(7, 3, 1, 2), 2, 2, byrow = TRUE)
   for (r in 1:2) for (c in 1:2) {
@@ -231,7 +233,7 @@ fig_05_relu_and_pool <- function() {
   hot(470, 80, 56, 56)
   arrow(600, 138, 660, 138)
   cell(680, 110, 56, 56); value_in(680, 110, 56, 56, "7", font = 2)
-  mono(760, 122, expression(a^{pool[i * "," * j * "," * c]}), size = 14)
+  mono(760, 122, expression({a^{pool}}[i * "," * j * "," * c]), size = 16)
   note(560, 232, "the max wins and is remembered")
   note(560, 250, "(argmax) for the backward pass")
   dev.off()
@@ -259,21 +261,21 @@ fig_07_dense_and_softmax <- function() {
   for (y in c(62, 110, 158)) { rect(80 - 16, y - 16, 80 + 16, y + 16, col = "white", border = muted) }
   for (y in c(86, 134)) { rect(350 - 16, y - 16, 350 + 16, y + 16, col = accent_soft, border = accent) }
   for (y0 in c(62, 110, 158)) for (y1 in c(86, 134)) dashed(96, y0, 334, y1)
-  math(50, 26, expression(a^{(l - 1)}), size = 14); math(342, 26, expression(z^{(l)}), size = 14)
-  mono(188, 80, expression(W^{(l)}), size = 14, adj = c(0.5, 0.5))
-  math(392, 86, expression("+" ~ b^{(l)}), size = 14)
+  math(50, 26, expression(a^{(l - 1)}), size = 16); math(342, 26, expression(z^{(l)}), size = 16)
+  mono(188, 80, expression(W^{(l)}), size = 16, adj = c(0.5, 0.5))
+  math(392, 86, expression("+" ~ b^{(l)}), size = 16)
   note(84, 190, "every input into every output")
   # scores → probabilities
   note(520, 40, "scores z become probabilities p")
   zb <- c(46, 64, 30, 76)
   for (i in 1:4) cell(520 + (i - 1) * 34, 190 - zb[i], 26, zb[i])
-  math(520, 212, expression(z[1 * ":" * K]), size = 13)
+  math(520, 212, expression(z[1 * ":" * K]), size = 15)
   flow(670, 152, 708, 152)
   mono(689, 136, "softmax", adj = c(0.5, 0.5))
   pb <- c(36, 52, 20, 60)
   for (i in 1:4) hot(720 + (i - 1) * 34, 190 - pb[i], 26, pb[i])
-  math(720, 212, expression(p[1 * ":" * K]), size = 13)
-  note(772, 212, "· sums to 1")
+  math(720, 212, expression(p[1 * ":" * K]), size = 15)
+  note(720, 232, "· sums to 1")
   note(520, 242, "one score per class, c")
   note(520, 258, "bar height = probability")
   dev.off()
@@ -291,9 +293,9 @@ fig_08_the_cost_curve <- function() {
   for (p in c(0.01, 0.5, 1)) {
     points(px(p), py(p), pch = 21, bg = accent, col = "white", lwd = 2, cex = 1.2)
   }
-  text(px(0.01) + 12, py(0.01) - 4, expression(p == 0.01 %->% "cost 4.6"), adj = c(0, 0.5), cex = 13 / 12, col = ink)
-  text(px(0.5) - 34, py(0.5) + 26, expression(p == 0.5 %->% 0.69), adj = c(0, 0.5), cex = 13 / 12, col = ink)
-  text(px(1) - 40, py(1) - 14, expression(p == 1 %->% "cost 0"), adj = c(0, 0.5), cex = 13 / 12, col = ink)
+  text(px(0.01) + 12, py(0.01) - 4, expression(p == 0.01 %->% "cost 4.6"), adj = c(0, 0.5), cex = 15 / 12, col = ink)
+  text(px(0.5) - 34, py(0.5) + 26, expression(p == 0.5 %->% 0.69), adj = c(0, 0.5), cex = 15 / 12, col = ink)
+  text(px(1) - 40, py(1) - 14, expression(p == 1 %->% "cost 0"), adj = c(0, 0.5), cex = 15 / 12, col = ink)
   note(380, 60, "−log p: confident and wrong")
   note(380, 76, "is punished hard")
   note(496, 212, expression(p[y] %->% 1), adj = c(0.5, 0.5))
@@ -308,7 +310,7 @@ fig_09_the_two_part_cost <- function() {
   note(60, 46, "the cost of (12) is two parts")
   cell(60, 70, 330, 52); hot(390, 70, 90, 52)
   mono(225, 148, "cross-entropy: the fit of p to the truth", adj = c(0.5, 0.5))
-  math(435, 148, expression(lambda * Sigma * theta^2), size = 14, adj = c(0.5, 0.5))
+  math(435, 148, expression(lambda * Sigma * theta^2), size = 16, adj = c(0.5, 0.5))
   note(60, 186, "the penalty is small but never zero: it keeps the weights from drifting")
   dev.off()
   add(9, "fig-09-the-two-part-cost")
@@ -321,9 +323,9 @@ fig_10_the_initial_bell <- function() {
   x <- seq(-3, 3, length.out = 300)
   draw_line(320 + x * 73, 180 - dnorm(x) / dnorm(0) * 120, col = ink, lwd = 2)
   dashed(320 - 73, 180, 320 - 73, 132); dashed(320 + 73, 180, 320 + 73, 132)
-  math(238, 200, expression(-sigma), size = 14, adj = c(0.5, 0.5)); mono(320, 200, "0", adj = c(0.5, 0.5))
-  math(394, 200, expression(sigma), size = 14, adj = c(0.5, 0.5))
-  math(320, 230, expression(sigma == sqrt(2 / "fan-in")), size = 14, adj = c(0.5, 0.5))
+  math(238, 200, expression(-sigma), size = 16, adj = c(0.5, 0.5)); mono(320, 200, "0", adj = c(0.5, 0.5))
+  math(394, 200, expression(sigma), size = 16, adj = c(0.5, 0.5))
+  math(320, 230, expression(sigma == sqrt(2 / "fan-in")), size = 16, adj = c(0.5, 0.5))
   note(100, 46, "weights start small and centred; biases start at 0")
   dev.off()
   add(10, "fig-10-the-initial-bell")
@@ -345,11 +347,11 @@ fig_11_gradient_descent <- function() {
       dashed(xs(steps[i]), ys(steps[i]) + 26, xs(steps[i + 1]), ys(steps[i + 1]) + 26)
     }
     points(xs(tmin), ys(tmin), pch = 16, cex = 0.8, col = ok)
-    note(xs(tmin) - 44, ys(tmin) + 26, "minimum of C", adj = c(0.5, 0.5))
+    note(xs(tmin) + 56, ys(tmin) + 28, "minimum of C", adj = c(0, 0.5))
     points(xs(steps[k]), ys(steps[k]), pch = 21, bg = accent, col = "white", lwd = 2, cex = 1.3)
-    if (k > 1) math(xs(steps[k - 1]) + 12, ys(steps[k - 1]) + 44, expression(-eta * g), size = 13, col = ink)
-    note(386, 236, "step against the slope")
-    mono(60, 24, expression(C(theta) ~ "— the cost as one number" ~ theta ~ "moves"), size = 13)
+    if (k > 1) math(xs(steps[k - 1]) + 12, ys(steps[k - 1]) + 44, expression(-eta * g), size = 15, col = ink)
+    note(60, 232, "step against the slope")
+    mono(60, 24, expression(C(theta) ~ "— the cost as one number" ~ theta ~ "moves"), size = 15)
     dev.off()
     add(11, name)
   }
@@ -366,7 +368,7 @@ fig_12_the_backward_pass <- function() {
       lit <- (i == 6 - k + 1)
       cell(bx[i], 60, bw[i], 42, fill = if (lit) ok_soft else if (i == 6) accent_soft else "white",
            border = if (lit) ok else muted, lwd = if (lit) 2 else 1)
-      mono(bx[i] + bw[i] / 2, 86, labels[[i]], size = 15, adj = c(0.5, 0.5))
+      mono(bx[i] + bw[i] / 2, 86, labels[[i]], size = 17, adj = c(0.5, 0.5))
     }
     axis_line(130, 46, 714, 46)
     mono(380, 38, "forward: the answer", adj = c(0.5, 0.5))
@@ -388,8 +390,8 @@ fig_13_the_stable_rewrite <- function() {
   frame(110, 120, 30, 70)
   dashed(55, 120, 280, 120)
   note(288, 124, "m = max z")
-  text(330, 150, expression(log ~ Sigma ~ e^z ~ " — all scores push up"), adj = c(0, 0.5), cex = 13 / 12, col = ink)
-  text(330, 172, expression(-z[y] ~ " — the true score pulls down"), adj = c(0, 0.5), cex = 13 / 12, col = ink)
+  text(330, 150, expression(log ~ Sigma ~ e^z ~ " — all scores push up"), adj = c(0, 0.5), cex = 15 / 12, col = ink)
+  text(330, 172, expression(-z[y] ~ " — the true score pulls down"), adj = c(0, 0.5), cex = 15 / 12, col = ink)
   note(70, 222, "the same m appears in (10) and cancels under the log")
   note(70, 40, "the shift m cancels — the cost of (16) is stable to compute")
   dev.off()
@@ -411,7 +413,7 @@ fig_14_the_log_sum_exp_tangent <- function() {
   points(px, py, pch = 16, cex = 0.9, col = accent)
   note(px + 12, 172, "tangent slope = p_c")
   note(110, 212, "z_c →")
-  mono(72, 46, "log Σ e^z", size = 13)
+  mono(72, 46, "log Σ e^z", size = 15)
   note(100, 234, "differentiating the normalizer returns the softmax itself (17)")
   dev.off()
   add(14, "fig-14-the-log-sum-exp-tangent")
@@ -422,7 +424,7 @@ fig_15_the_last_layer_blame <- function() {
   open_fig("fig-15-the-last-layer-blame", 900, 290)
   mono(135, 56, "p — probabilities (10)", adj = c(0.5, 0.5))
   mono(365, 56, "onehot(y) — the truth", adj = c(0.5, 0.5))
-  math(610, 56, expression(delta^{(L)} == p - onehot(y)), size = 14, adj = c(0.5, 0.5))
+  math(610, 56, expression(delta^(L) == p ~ "-" ~ onehot(y)), size = 16, adj = c(0.5, 0.5))
   mono(610, 76, "— the blame (18)", adj = c(0.5, 0.5))
   math(250, 208, expression("-")); math(480, 208, expression("="))
   dashed(55, 200, 215, 200); dashed(285, 200, 445, 200); dashed(515, 200, 675, 200)
@@ -447,8 +449,8 @@ fig_16_the_weight_gradient_table <- function() {
   hot(232, 30, 36, 32)
   for (r in 1:5) for (c in 1:5) cell(160 + (c - 1) * 36, 70 + (r - 1) * 24, 36, 24)
   hot(232, 118, 36, 24)
-  math(128, 22, expression(delta)); math(358, 50, expression(a))
-  mono(380, 110, expression(dW[j * "," * k] == delta[j] %.% a[k]), size = 14)
+  math(128, 46, expression(delta)); math(358, 50, expression(a))
+  mono(380, 110, expression(dW[j * "," * k] == delta[j] %.% a[k]), size = 16)
   note(380, 130, "the row factor times the column factor")
   dev.off()
   add(16, "fig-16-the-weight-gradient-table")
@@ -463,14 +465,14 @@ fig_17_the_outer_product <- function() {
   math(88, 42, expression(delta), adj = c(0.5, 0.5))
   math(230, 42, expression(a^T), adj = c(0.5, 0.5))
   math(430, 42, expression(dW == delta ~ a^T), adj = c(0.5, 0.5))
-  mono(136, 114, "\u00d7", size = 16, adj = c(0.5, 0.5))
+  mono(136, 114, "\u00d7", size = 18, adj = c(0.5, 0.5))
   math(320, 114, expression("="), adj = c(0.5, 0.5))
   note(88, 192, "(K × 1)", adj = c(0.5, 0.5))
   note(230, 192, "(1 × N)", adj = c(0.5, 0.5))
   note(430, 192, "(K × N)", adj = c(0.5, 0.5))
-  mono(560, 100, expression(dW == delta ~ a^T), size = 14)
-  mono(560, 122, expression(db == delta), size = 14)
-  mono(560, 144, expression(da == W^T ~ delta), size = 14)
+  mono(560, 100, expression(dW == delta ~ a^T), size = 16)
+  mono(560, 122, expression(db == delta), size = 16)
+  mono(560, 144, expression(da == W^T ~ delta), size = 16)
   dev.off()
   add(17, "fig-17-the-outer-product")
 }
@@ -486,9 +488,9 @@ fig_18_the_relu_gate <- function() {
     if (dz[i] == 0) hot(60 + (i - 1) * 44, 170, 44, 30) else cell(60 + (i - 1) * 44, 170, 44, 30)
     value_in(60 + (i - 1) * 44, 170, 44, 30, dz[i])
   }
-  mono(360, 88, expression(delta * a), size = 14); note(360, 104, "— arriving")
-  mono(360, 138, "1[z > 0] — the gate", size = 14)
-  mono(360, 188, expression(delta * z == delta * a %.% gate), size = 14)
+  mono(360, 88, expression(delta * a), size = 16); note(360, 104, "— arriving")
+  mono(360, 138, "1[z > 0] — the gate", size = 16)
+  mono(360, 188, expression(delta * z == delta * a %.% gate), size = 16)
   dev.off()
   add(18, "fig-18-the-relu-gate")
 }
@@ -507,7 +509,7 @@ fig_19_the_argmax_routing <- function() {
   mono(305, 116, "argmax", adj = c(0.5, 0.5))
   for (r in 1:2) for (c in 1:2) {
     cell(380 + (c - 1) * 60, 70 + (r - 1) * 60, 60, 60)
-    if (r == 1 && c == 1) math(410, 100, expression(delta * a), size = 14, adj = c(0.5, 0.5)) else value_in(380 + (c - 1) * 60, 70 + (r - 1) * 60, 60, 60, "0")
+    if (r == 1 && c == 1) math(410, 100, expression(delta * a), size = 16, adj = c(0.5, 0.5)) else value_in(380 + (c - 1) * 60, 70 + (r - 1) * 60, 60, 60, "0")
   }
   note(180, 214, "values before pooling (8)", adj = c(0.5, 0.5))
   note(440, 214, "blame after (22)", adj = c(0.5, 0.5))
@@ -524,11 +526,11 @@ fig_20_the_factor_chain <- function() {
   bx <- c(770, 620, 470, 320, 170, 20)
   for (i in 1:6) {
     cell(bx[i], 70, 110, 40, fill = "white", border = muted)
-    mono(bx[i] + 55, 95, boxes[[i]], size = 15, adj = c(0.5, 0.5))
+    mono(bx[i] + 55, 95, boxes[[i]], size = 17, adj = c(0.5, 0.5))
   }
   for (x in c(762, 612, 462, 312, 162)) flow(x, 90, x - 22, 90)
   note(20, 168, "two factors per layer: a gate, then a transpose")
-  text(20, 190, expression("×" ~ a^T ~ "turns the blame into the weight gradient"), adj = c(0, 0.5), cex = 13 / 12, col = ink)
+  text(20, 190, expression("×" ~ a^T ~ "turns the blame into the weight gradient"), adj = c(0, 0.5), cex = 15 / 12, col = ink)
   dev.off()
   add(20, "fig-20-the-factor-chain")
 }
@@ -539,13 +541,13 @@ fig_21_the_bias_split <- function() {
   note(80, 36, "blame leaves the sum node: scaled to W, unchanged to b")
   cell(80, 60, 110, 40, fill = "white", border = muted)
   cell(80, 150, 110, 40, fill = "white", border = muted)
-  mono(135, 85, expression(W), size = 15, adj = c(0.5, 0.5))
-  mono(135, 175, expression(b), size = 15, adj = c(0.5, 0.5))
+  mono(135, 85, expression(W), size = 17, adj = c(0.5, 0.5))
+  mono(135, 175, expression(b), size = 17, adj = c(0.5, 0.5))
   hot(420, 105, 110, 40)
-  mono(475, 130, expression(delta), size = 15, adj = c(0.5, 0.5))
+  mono(475, 130, expression(delta), size = 17, adj = c(0.5, 0.5))
   flow(416, 116, 200, 84); flow(416, 136, 200, 168)
-  math(300, 92, expression("×" ~ a %->% dW), size = 14, adj = c(0.5, 0.5))
-  math(300, 176, expression("×" ~ 1 %->% db == delta), size = 14, adj = c(0.5, 0.5))
+  math(300, 92, expression("×" ~ a %->% dW), size = 16, adj = c(0.5, 0.5))
+  math(300, 176, expression("×" ~ 1 %->% db == delta), size = 16, adj = c(0.5, 0.5))
   note(80, 218, "a bias is a pure shift: its coefficient is 1, so the blame arrives untouched")
   dev.off()
   add(21, "fig-21-the-bias-split")
@@ -557,15 +559,15 @@ fig_22_the_convolution_products <- function() {
   note(40, 36, "the convolution's gradients are matrix products (25)")
   matrix_grid(60, 60, 2, 3, 36, 30)
   mono(98, 52, expression(D^T), adj = c(0.5, 0.5)); note(98, 172, "(K × HW)", adj = c(0.5, 0.5))
-  mono(160, 100, "\u00d7", size = 16, adj = c(0.5, 0.5))
+  mono(160, 100, "\u00d7", size = 18, adj = c(0.5, 0.5))
   matrix_grid(200, 60, 4, 3, 30, 30)
   mono(260, 52, expression(P), adj = c(0.5, 0.5)); note(260, 172, "(HW × R)", adj = c(0.5, 0.5))
   math(350, 100, expression("="), adj = c(0.5, 0.5))
   matrix_grid(390, 60, 3, 3, 36, 30)
   mono(446, 52, expression(d * hat(W)), adj = c(0.5, 0.5)); note(446, 172, "(K × R)", adj = c(0.5, 0.5))
-  mono(560, 92, expression(db == 1^T ~ D), size = 14)
+  mono(560, 92, expression(db == 1^T ~ D), size = 16)
   note(700, 92, "— column sums")
-  mono(560, 114, expression(dP == D ~ hat(W)), size = 14)
+  mono(560, 114, expression(dP == D ~ hat(W)), size = 16)
   note(700, 114, "— patch blame")
   note(560, 144, "patches overlap: col2im (26) adds them up")
   dev.off()
@@ -616,7 +618,7 @@ fig_25_the_adam_memories <- function() {
   note(100, 30, "g_t — this step's noise")
   note(100, 50, "m_t — smoothed direction")
   note(100, 70, "v_t — smoothed scale")
-  text(100, 238, expression(beta[1] == 0.9 ~ "keeps the past;" ~ beta[2] == 0.999 ~ "keeps even more of it — (28)"), adj = c(0, 0.5), cex = 13 / 12, col = ink)
+  text(100, 238, expression(beta[1] == 0.9 ~ "keeps the past;" ~ beta[2] == 0.999 ~ "keeps even more of it — (28)"), adj = c(0, 0.5), cex = 15 / 12, col = ink)
   dev.off()
   add(25, "fig-25-the-adam-memories")
 }
@@ -646,10 +648,10 @@ fig_27_the_adam_step <- function() {
   points(280, 170, pch = 16, cex = 0.9, col = ok)
   flow(415, 132, 295, 132)
   mono(355, 118, expression("step =" ~ eta %.% hat(m) / (sqrt(hat(v)) + epsilon)),
-       size = 14, adj = c(0.5, 0.5))
-  math(420, 196, expression(theta[t - 1]), size = 14, adj = c(0.5, 0.5)); math(280, 196, expression(theta[t]), size = 14, adj = c(0.5, 0.5))
+       size = 16, adj = c(0.5, 0.5))
+  math(420, 196, expression(theta[t - 1]), size = 16, adj = c(0.5, 0.5)); math(280, 196, expression(theta[t]), size = 16, adj = c(0.5, 0.5))
   note(80, 56, "the direction comes from the corrected m, the size from the corrected v (30)")
-  text(80, 218, expression(eta ~ "scales the whole move;" ~ epsilon ~ "only guards the division"), adj = c(0, 0.5), cex = 13 / 12, col = ink)
+  text(80, 218, expression(eta ~ "scales the whole move;" ~ epsilon ~ "only guards the division"), adj = c(0, 0.5), cex = 15 / 12, col = ink)
   dev.off()
   add(27, "fig-27-the-adam-step")
 }
@@ -670,10 +672,10 @@ fig_28_the_central_difference <- function() {
   sv <- (py(x0 + e) - py(x0 - e)) / (px(x0 + e) - px(x0 - e))
   draw_seg(px(x0 - e) - 90, py(x0 - e) - 90 * sv, px(x0 + e) + 90, py(x0 + e) + 90 * sv,
            col = muted, lwd = 1.4, lty = 2)
-  math(135, 216, expression(theta - epsilon), size = 14, adj = c(0.5, 0.5)); math(333, 226, expression(theta + epsilon), size = 14, adj = c(0.5, 0.5))
-  math(px(x0) - 8, py(x0) + 32, expression(theta), size = 14, adj = c(0.5, 0.5))
+  math(135, 216, expression(theta - epsilon), size = 16, adj = c(0.5, 0.5)); math(333, 226, expression(theta + epsilon), size = 16, adj = c(0.5, 0.5))
+  math(px(x0) - 8, py(x0) + 32, expression(theta), size = 16, adj = c(0.5, 0.5))
   mono(250, 168, "tangent"); mono(408, 222, "secant")
-  text(60, 248, expression("the gap between them is" ~ O(epsilon^2) ~ ", by Taylor's expansion"), adj = c(0, 0.5), cex = 13 / 12, col = ink)
+  text(60, 248, expression("the gap between them is" ~ O(epsilon^2) ~ ", by Taylor's expansion"), adj = c(0, 0.5), cex = 15 / 12, col = ink)
   dev.off()
   add(28, "fig-28-the-central-difference")
 }
@@ -685,8 +687,8 @@ fig_29_the_check_error <- function() {
   hot(180, 70, 60, 120); hot(340, 160, 60, 30)
   mono(210, 58, "error at ε", adj = c(0.5, 0.5))
   mono(370, 148, "error at ε/2", adj = c(0.5, 0.5))
-  math(210, 212, expression(epsilon^2), size = 13, col = ink, adj = c(0.5, 0.5)); math(370, 212, expression(epsilon^2 / 4), size = 13, col = ink, adj = c(0.5, 0.5))
-  text(140, 40, expression("halve" ~ epsilon ~ ": the error drops fourfold (32)"), adj = c(0, 0.5), cex = 13 / 12, col = ink)
+  math(210, 212, expression(epsilon^2), size = 15, col = ink, adj = c(0.5, 0.5)); math(370, 212, expression(epsilon^2 / 4), size = 15, col = ink, adj = c(0.5, 0.5))
+  text(140, 40, expression("halve" ~ epsilon ~ ": the error drops fourfold (32)"), adj = c(0, 0.5), cex = 15 / 12, col = ink)
   note(100, 244, "the check gets sharper fast — but too small an ε re-enters rounding")
   dev.off()
   add(29, "fig-29-the-check-error")
