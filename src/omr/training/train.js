@@ -156,6 +156,7 @@ export function runTraining () {
     const split = Math.floor(samples.length * 0.8)
     log(`training on ${split} · validating on ${samples.length - split} · batch ${batchSize} · learning rate ${learningRate}`)
     const model = createModel({ ...shape, classCount: classIds.length }, 1)
+    let lastBeatAt = Date.now()
     const { history } = trainModel({
       model,
       trainingSamples: samples.slice(0, split),
@@ -165,7 +166,9 @@ export function runTraining () {
       learningRate,
       onBatch: ({ epoch, batchesDone, batchesTotal, runningLoss }) => {
         const every = Math.max(1, Math.floor(batchesTotal / 4))
-        if (batchesDone % every === 0 || batchesDone === batchesTotal) {
+        const now = Date.now()
+        if (batchesDone % every === 0 || batchesDone === batchesTotal || now - lastBeatAt >= 60000) {
+          lastBeatAt = now
           log(`  epoch ${epoch} · ${batchesDone}/${batchesTotal} batches · running loss ${runningLoss}`)
         }
       },
