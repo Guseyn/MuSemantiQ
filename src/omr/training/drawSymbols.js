@@ -1,6 +1,6 @@
 'use strict'
 
-import { createBitmap, drawLine, drawEllipse, drawEllipseOutline, drawFilledRect } from './drawBitmap.js'
+import { createBitmap, drawLine, drawEllipse, drawEllipseOutline, drawFilledRect } from '#msq/omr/training/drawBitmap.js'
 
 /**
  * Symbol shapes, drawn as the training set's stand-in glyphs.

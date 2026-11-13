@@ -17,8 +17,8 @@
  *   translateImagesToMsqPages   one image per page → { pagesText, report }
  */
 
-export { decodeImageToGrayscale } from './analysis/decodeImageToGrayscale.js'
-export { readBitmapFromImage } from './analysis/readBitmapFromImage.js'
-export { analyzeImage } from './analysis/analyzeImage.js'
-export { translateImageToMsq } from './translateImageToMsq.js'
-export { translateImagesToMsqPages } from './translateImagesToMsqPages.js'
+export { decodeImageToGrayscale } from '#msq/omr/analysis/decodeImageToGrayscale.js'
+export { readBitmapFromImage } from '#msq/omr/analysis/readBitmapFromImage.js'
+export { analyzeImage } from '#msq/omr/analysis/analyzeImage.js'
+export { translateImageToMsq } from '#msq/omr/translateImageToMsq.js'
+export { translateImagesToMsqPages } from '#msq/omr/translateImagesToMsqPages.js'

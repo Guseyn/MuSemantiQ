@@ -2,9 +2,9 @@
 
 import { mkdirSync, writeFileSync } from 'node:fs'
 
-import { generateTrainingSet } from './generateTrainingSet.js'
-import { encodePng } from './encodePng.js'
-import { drawableClassIds } from './drawSymbols.js'
+import { generateTrainingSet } from '#msq/omr/training/generateTrainingSet.js'
+import { encodePng } from '#msq/omr/training/encodePng.js'
+import { drawableClassIds } from '#msq/omr/training/drawSymbols.js'
 
 /**
  * Contact sheets: what the model is about to see.

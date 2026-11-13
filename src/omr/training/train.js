@@ -2,15 +2,15 @@
 
 import { appendFileSync, mkdirSync, writeFileSync } from 'node:fs'
 
-import { forwardModel } from '../model/forwardModel.js'
-import { createModel } from '../model/createModel.js'
-import backpropagateModel from './backpropagateModel.js'
-import { createAdamState, updateWeightsWithAdam } from './updateWeightsWithAdam.js'
-import { createSeededRandom } from './seededRandom.js'
-import { generateTrainingSet } from './generateTrainingSet.js'
-import { drawableClassIds } from './drawSymbols.js'
-import { evaluateModel } from './evaluate.js'
-import { exportWeights } from './exportWeights.js'
+import { forwardModel } from '#msq/omr/model/forwardModel.js'
+import { createModel } from '#msq/omr/model/createModel.js'
+import backpropagateModel from '#msq/omr/training/backpropagateModel.js'
+import { createAdamState, updateWeightsWithAdam } from '#msq/omr/training/updateWeightsWithAdam.js'
+import { createSeededRandom } from '#msq/omr/training/seededRandom.js'
+import { generateTrainingSet } from '#msq/omr/training/generateTrainingSet.js'
+import { drawableClassIds } from '#msq/omr/training/drawSymbols.js'
+import { evaluateModel } from '#msq/omr/training/evaluate.js'
+import { exportWeights } from '#msq/omr/training/exportWeights.js'
 
 /**
  * The training loop: show a batch, guess, measure how wrong, nudge.

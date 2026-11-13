@@ -1,9 +1,9 @@
 'use strict'
 
-import { createSeededRandom } from './seededRandom.js'
-import { applyDegradations } from './applyDegradations.js'
-import { drawSymbolSample, drawableClassIds } from './drawSymbols.js'
-import { resampleToGrid } from './cropComponents.js'
+import { createSeededRandom } from '#msq/omr/training/seededRandom.js'
+import { applyDegradations } from '#msq/omr/training/applyDegradations.js'
+import { drawSymbolSample, drawableClassIds } from '#msq/omr/training/drawSymbols.js'
+import { resampleToGrid } from '#msq/omr/training/cropComponents.js'
 
 /**
  * The training set, drawn from a seed.

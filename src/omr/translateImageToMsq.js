@@ -1,12 +1,12 @@
 'use strict'
 
-import deskewBitmap from './analysis/deskewBitmap.js'
-import { analyzeStraightenedImage } from './analysis/analyzeImage.js'
-import extractSymbols from './analysis/extractSymbols.js'
-import classifyComponent from './analysis/classifyComponent.js'
-import buildMusicModel from './translation/buildMusicModel.js'
-import buildPageSchemaFromMusicModel from './translation/buildPageSchemaFromMusicModel.js'
-import carryStateAcrossPages from './translation/carryStateAcrossPages.js'
+import deskewBitmap from '#msq/omr/analysis/deskewBitmap.js'
+import { analyzeStraightenedImage } from '#msq/omr/analysis/analyzeImage.js'
+import extractSymbols from '#msq/omr/analysis/extractSymbols.js'
+import classifyComponent from '#msq/omr/analysis/classifyComponent.js'
+import buildMusicModel from '#msq/omr/translation/buildMusicModel.js'
+import buildPageSchemaFromMusicModel from '#msq/omr/translation/buildPageSchemaFromMusicModel.js'
+import carryStateAcrossPages from '#msq/omr/translation/carryStateAcrossPages.js'
 import serialize from '#msq/language/serializer/serialize.js'
 
 /**

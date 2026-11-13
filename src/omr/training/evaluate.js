@@ -1,6 +1,6 @@
 'use strict'
 
-import { forwardModel } from '../model/forwardModel.js'
+import { forwardModel } from '#msq/omr/model/forwardModel.js'
 
 /**
  * How the model is doing, as pictures' worth of numbers.

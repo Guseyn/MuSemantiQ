@@ -1,13 +1,13 @@
 'use strict'
 
-import groupChordsByHorizontalProximity from './groupChordsByHorizontalProximity.js'
-import assignPitchByStaffPosition from './assignPitchByStaffPosition.js'
-import inferDurationFromNoteShapes from './inferDurationFromNoteShapes.js'
-import buildMeasuresFromBarLines from './buildMeasuresFromBarLines.js'
-import splitVoicesByStemDirection from './splitVoicesByStemDirection.js'
-import fillRestsInMeasures from './fillRestsInMeasures.js'
-import inferKeyAndTimeSignature from './inferKeyAndTimeSignature.js'
-import { roleOf } from '../analysis/symbolClasses.js'
+import groupChordsByHorizontalProximity from '#msq/omr/translation/groupChordsByHorizontalProximity.js'
+import assignPitchByStaffPosition from '#msq/omr/translation/assignPitchByStaffPosition.js'
+import inferDurationFromNoteShapes from '#msq/omr/translation/inferDurationFromNoteShapes.js'
+import buildMeasuresFromBarLines from '#msq/omr/translation/buildMeasuresFromBarLines.js'
+import splitVoicesByStemDirection from '#msq/omr/translation/splitVoicesByStemDirection.js'
+import fillRestsInMeasures from '#msq/omr/translation/fillRestsInMeasures.js'
+import inferKeyAndTimeSignature from '#msq/omr/translation/inferKeyAndTimeSignature.js'
+import { roleOf } from '#msq/omr/analysis/symbolClasses.js'
 
 /**
  * Symbols become music: measures, staves, voices, units.

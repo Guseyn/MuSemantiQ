@@ -1,7 +1,7 @@
 'use strict'
 
-import forwardConvolution from './forwardConvolution.js'
-import { applyRelu, applyMaxPool, forwardDense, applySoftmax } from './forwardDense.js'
+import forwardConvolution from '#msq/omr/model/forwardConvolution.js'
+import { applyRelu, applyMaxPool, forwardDense, applySoftmax } from '#msq/omr/model/forwardDense.js'
 
 /**
  * The whole forward pass over one crop: probabilities, and everything the

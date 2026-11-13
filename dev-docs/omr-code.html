@@ -222,13 +222,13 @@ dl.kv dd { margin: 0; overflow-wrap: anywhere; }
 <script type="text/plain" id="src-TRANSLATE" data-path="src/omr/translateImageToMsq.js" data-start="1">
 'use strict'
 
-import deskewBitmap from './analysis/deskewBitmap.js'
-import { analyzeStraightenedImage } from './analysis/analyzeImage.js'
-import extractSymbols from './analysis/extractSymbols.js'
-import classifyComponent from './analysis/classifyComponent.js'
-import buildMusicModel from './translation/buildMusicModel.js'
-import buildPageSchemaFromMusicModel from './translation/buildPageSchemaFromMusicModel.js'
-import carryStateAcrossPages from './translation/carryStateAcrossPages.js'
+import deskewBitmap from '#msq/omr/analysis/deskewBitmap.js'
+import { analyzeStraightenedImage } from '#msq/omr/analysis/analyzeImage.js'
+import extractSymbols from '#msq/omr/analysis/extractSymbols.js'
+import classifyComponent from '#msq/omr/analysis/classifyComponent.js'
+import buildMusicModel from '#msq/omr/translation/buildMusicModel.js'
+import buildPageSchemaFromMusicModel from '#msq/omr/translation/buildPageSchemaFromMusicModel.js'
+import carryStateAcrossPages from '#msq/omr/translation/carryStateAcrossPages.js'
 import serialize from '#msq/language/serializer/serialize.js'
 
 /**
@@ -353,11 +353,11 @@ export default translateImageToMsq
 <script type="text/plain" id="src-ANALYZE" data-path="src/omr/analysis/analyzeImage.js" data-start="1">
 'use strict'
 
-import deskewBitmap from './deskewBitmap.js'
-import detectStaves from './detectStaves.js'
-import groupStavesIntoSystems from './groupStavesIntoSystems.js'
-import findTextBlocks from './findTextBlocks.js'
-import measureStyles from './measureStyles.js'
+import deskewBitmap from '#msq/omr/analysis/deskewBitmap.js'
+import detectStaves from '#msq/omr/analysis/detectStaves.js'
+import groupStavesIntoSystems from '#msq/omr/analysis/groupStavesIntoSystems.js'
+import findTextBlocks from '#msq/omr/analysis/findTextBlocks.js'
+import measureStyles from '#msq/omr/analysis/measureStyles.js'
 
 /**
  * What the image shows, as numbers.
@@ -415,7 +415,7 @@ export default analyzeImage
 <script type="text/plain" id="src-DESKEW" data-path="src/omr/analysis/deskewBitmap.js" data-start="1">
 'use strict'
 
-import estimateSkewAngleInDegrees from './estimateSkewAngleInDegrees.js'
+import estimateSkewAngleInDegrees from '#msq/omr/analysis/estimateSkewAngleInDegrees.js'
 
 /**
  * The page, straightened.
@@ -1493,12 +1493,12 @@ export default splitTouchingComponents
 <script type="text/plain" id="src-EXTRACT" data-path="src/omr/analysis/extractSymbols.js" data-start="1">
 'use strict'
 
-import removeStaffLines from './removeStaffLines.js'
-import findBarLines from './findBarLines.js'
-import findStems, { measureStemEnds } from './findStems.js'
-import findSymbolComponents from './findSymbolComponents.js'
-import splitTouchingComponents from './splitTouchingComponents.js'
-import { roleOf } from './symbolClasses.js'
+import removeStaffLines from '#msq/omr/analysis/removeStaffLines.js'
+import findBarLines from '#msq/omr/analysis/findBarLines.js'
+import findStems, { measureStemEnds } from '#msq/omr/analysis/findStems.js'
+import findSymbolComponents from '#msq/omr/analysis/findSymbolComponents.js'
+import splitTouchingComponents from '#msq/omr/analysis/splitTouchingComponents.js'
+import { roleOf } from '#msq/omr/analysis/symbolClasses.js'
 
 /**
  * What the ink is, where it is.
@@ -1616,7 +1616,7 @@ export default extractSymbols
 <script type="text/plain" id="src-CLASSIFY" data-path="src/omr/analysis/classifyComponent.js" data-start="1">
 'use strict'
 
-import { forwardModel } from '../model/forwardModel.js'
+import { forwardModel } from '#msq/omr/model/forwardModel.js'
 
 /**
  * What one blob of ink is — or `unknown`.
@@ -1651,8 +1651,8 @@ export default classifyComponent
 <script type="text/plain" id="src-MODEL" data-path="src/omr/model/forwardModel.js" data-start="1">
 'use strict'
 
-import forwardConvolution from './forwardConvolution.js'
-import { applyRelu, applyMaxPool, forwardDense, applySoftmax } from './forwardDense.js'
+import forwardConvolution from '#msq/omr/model/forwardConvolution.js'
+import { applyRelu, applyMaxPool, forwardDense, applySoftmax } from '#msq/omr/model/forwardDense.js'
 
 /**
  * The whole forward pass over one crop: probabilities, and everything the
@@ -1707,14 +1707,14 @@ export default forwardModel
 <script type="text/plain" id="src-MUSIC" data-path="src/omr/translation/buildMusicModel.js" data-start="1">
 'use strict'
 
-import groupChordsByHorizontalProximity from './groupChordsByHorizontalProximity.js'
-import assignPitchByStaffPosition from './assignPitchByStaffPosition.js'
-import inferDurationFromNoteShapes from './inferDurationFromNoteShapes.js'
-import buildMeasuresFromBarLines from './buildMeasuresFromBarLines.js'
-import splitVoicesByStemDirection from './splitVoicesByStemDirection.js'
-import fillRestsInMeasures from './fillRestsInMeasures.js'
-import inferKeyAndTimeSignature from './inferKeyAndTimeSignature.js'
-import { roleOf } from '../analysis/symbolClasses.js'
+import groupChordsByHorizontalProximity from '#msq/omr/translation/groupChordsByHorizontalProximity.js'
+import assignPitchByStaffPosition from '#msq/omr/translation/assignPitchByStaffPosition.js'
+import inferDurationFromNoteShapes from '#msq/omr/translation/inferDurationFromNoteShapes.js'
+import buildMeasuresFromBarLines from '#msq/omr/translation/buildMeasuresFromBarLines.js'
+import splitVoicesByStemDirection from '#msq/omr/translation/splitVoicesByStemDirection.js'
+import fillRestsInMeasures from '#msq/omr/translation/fillRestsInMeasures.js'
+import inferKeyAndTimeSignature from '#msq/omr/translation/inferKeyAndTimeSignature.js'
+import { roleOf } from '#msq/omr/analysis/symbolClasses.js'
 
 /**
  * Symbols become music: measures, staves, voices, units.
@@ -2215,10 +2215,10 @@ export default buildPageSchemaFromMusicModel
 <script type="text/plain" id="src-GEN" data-path="src/omr/training/generateTrainingSet.js" data-start="1">
 'use strict'
 
-import { createSeededRandom } from './seededRandom.js'
-import { applyDegradations } from './applyDegradations.js'
-import { drawSymbolSample, drawableClassIds } from './drawSymbols.js'
-import { resampleToGrid } from './cropComponents.js'
+import { createSeededRandom } from '#msq/omr/training/seededRandom.js'
+import { applyDegradations } from '#msq/omr/training/applyDegradations.js'
+import { drawSymbolSample, drawableClassIds } from '#msq/omr/training/drawSymbols.js'
+import { resampleToGrid } from '#msq/omr/training/cropComponents.js'
 
 /**
  * The training set, drawn from a seed.
@@ -2336,7 +2336,7 @@ export default cropComponent
 <script type="text/plain" id="src-DRAW" data-path="src/omr/training/drawSymbols.js" data-start="1">
 'use strict'
 
-import { createBitmap, drawLine, drawEllipse, drawEllipseOutline, drawFilledRect } from './drawBitmap.js'
+import { createBitmap, drawLine, drawEllipse, drawEllipseOutline, drawFilledRect } from '#msq/omr/training/drawBitmap.js'
 
 /**
  * Symbol shapes, drawn as the training set's stand-in glyphs.
@@ -2626,15 +2626,15 @@ export function drawSymbolSample (classId, drawSize, random) {
 
 import { appendFileSync, mkdirSync, writeFileSync } from 'node:fs'
 
-import { forwardModel } from '../model/forwardModel.js'
-import { createModel } from '../model/createModel.js'
-import backpropagateModel from './backpropagateModel.js'
-import { createAdamState, updateWeightsWithAdam } from './updateWeightsWithAdam.js'
-import { createSeededRandom } from './seededRandom.js'
-import { generateTrainingSet } from './generateTrainingSet.js'
-import { drawableClassIds } from './drawSymbols.js'
-import { evaluateModel } from './evaluate.js'
-import { exportWeights } from './exportWeights.js'
+import { forwardModel } from '#msq/omr/model/forwardModel.js'
+import { createModel } from '#msq/omr/model/createModel.js'
+import backpropagateModel from '#msq/omr/training/backpropagateModel.js'
+import { createAdamState, updateWeightsWithAdam } from '#msq/omr/training/updateWeightsWithAdam.js'
+import { createSeededRandom } from '#msq/omr/training/seededRandom.js'
+import { generateTrainingSet } from '#msq/omr/training/generateTrainingSet.js'
+import { drawableClassIds } from '#msq/omr/training/drawSymbols.js'
+import { evaluateModel } from '#msq/omr/training/evaluate.js'
+import { exportWeights } from '#msq/omr/training/exportWeights.js'
 
 /**
  * The training loop: show a batch, guess, measure how wrong, nudge.
@@ -2898,13 +2898,13 @@ if (import.meta.url === `file://${process.argv[1]}`) {
 <script type="text/plain" id="src-BACKPROP" data-path="src/omr/training/backpropagateModel.js" data-start="1">
 'use strict'
 
-import backpropagateConvolution from './backpropagateConvolution.js'
+import backpropagateConvolution from '#msq/omr/training/backpropagateConvolution.js'
 import {
   softmaxCrossEntropyGradient,
   backpropagateDense,
   backpropagateRelu,
   backpropagateMaxPool
-} from './backpropagateDense.js'
+} from '#msq/omr/training/backpropagateDense.js'
 
 /**
  * The whole backward sweep over one crop.
@@ -3006,7 +3006,7 @@ export default updateWeightsWithAdam
 <script type="text/plain" id="src-EVAL" data-path="src/omr/training/evaluate.js" data-start="1">
 'use strict'
 
-import { forwardModel } from '../model/forwardModel.js'
+import { forwardModel } from '#msq/omr/model/forwardModel.js'
 
 /**
  * How the model is doing, as pictures' worth of numbers.

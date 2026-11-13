@@ -1,10 +1,10 @@
 'use strict'
 
-import deskewBitmap from './deskewBitmap.js'
-import detectStaves from './detectStaves.js'
-import groupStavesIntoSystems from './groupStavesIntoSystems.js'
-import findTextBlocks from './findTextBlocks.js'
-import measureStyles from './measureStyles.js'
+import deskewBitmap from '#msq/omr/analysis/deskewBitmap.js'
+import detectStaves from '#msq/omr/analysis/detectStaves.js'
+import groupStavesIntoSystems from '#msq/omr/analysis/groupStavesIntoSystems.js'
+import findTextBlocks from '#msq/omr/analysis/findTextBlocks.js'
+import measureStyles from '#msq/omr/analysis/measureStyles.js'
 
 /**
  * What the image shows, as numbers.

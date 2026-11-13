@@ -1,6 +1,6 @@
 'use strict'
 
-import estimateSkewAngleInDegrees from './estimateSkewAngleInDegrees.js'
+import estimateSkewAngleInDegrees from '#msq/omr/analysis/estimateSkewAngleInDegrees.js'
 
 /**
  * The page, straightened.

@@ -1,6 +1,6 @@
 'use strict'
 
-import { translatePage } from './translateImageToMsq.js'
+import { translatePage } from '#msq/omr/translateImageToMsq.js'
 
 /**
  * A project's pages, one image each, in order.

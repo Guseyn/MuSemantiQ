@@ -1,6 +1,6 @@
 'use strict'
 
-import { createSeededRandom } from '../training/seededRandom.js'
+import { createSeededRandom } from '#msq/omr/training/seededRandom.js'
 
 /**
  * The model's numbers, and the shape that holds them.

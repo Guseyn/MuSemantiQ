@@ -1,11 +1,11 @@
 'use strict'
 
-import removeStaffLines from './removeStaffLines.js'
-import findBarLines from './findBarLines.js'
-import findStems, { measureStemEnds } from './findStems.js'
-import findSymbolComponents from './findSymbolComponents.js'
-import splitTouchingComponents from './splitTouchingComponents.js'
-import { roleOf } from './symbolClasses.js'
+import removeStaffLines from '#msq/omr/analysis/removeStaffLines.js'
+import findBarLines from '#msq/omr/analysis/findBarLines.js'
+import findStems, { measureStemEnds } from '#msq/omr/analysis/findStems.js'
+import findSymbolComponents from '#msq/omr/analysis/findSymbolComponents.js'
+import splitTouchingComponents from '#msq/omr/analysis/splitTouchingComponents.js'
+import { roleOf } from '#msq/omr/analysis/symbolClasses.js'
 
 /**
  * What the ink is, where it is.

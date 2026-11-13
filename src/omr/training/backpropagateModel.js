@@ -1,12 +1,12 @@
 'use strict'
 
-import backpropagateConvolution from './backpropagateConvolution.js'
+import backpropagateConvolution from '#msq/omr/training/backpropagateConvolution.js'
 import {
   softmaxCrossEntropyGradient,
   backpropagateDense,
   backpropagateRelu,
   backpropagateMaxPool
-} from './backpropagateDense.js'
+} from '#msq/omr/training/backpropagateDense.js'
 
 /**
  * The whole backward sweep over one crop.
