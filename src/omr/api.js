@@ -21,3 +21,4 @@
 export { readBitmapFromImage } from './analysis/readBitmapFromImage.js'
 export { analyzeImage } from './analysis/analyzeImage.js'
 export { translateImageToMsq } from './translateImageToMsq.js'
+export { translateImagesToMsqPages } from './translateImagesToMsqPages.js'

@@ -31,6 +31,7 @@ import { createSeededRandom } from '#msq/omr/training/seededRandom.js'
 import assignPitchByStaffPosition from '#msq/omr/translation/assignPitchByStaffPosition.js'
 import inferDurationFromNoteShapes from '#msq/omr/translation/inferDurationFromNoteShapes.js'
 import { translateImageToMsq } from '#msq/omr/translateImageToMsq.js'
+import { translateImagesToMsqPages } from '#msq/omr/translateImagesToMsqPages.js'
 import { generateIntermediateStructuresForSinglePage } from '#msq/language/api.js'
 import {
   drawEllipse,
@@ -74,6 +75,113 @@ function cleanPage () {
   drawTextBlock(bitmap, 220, 40, 160, 12) // the title
   drawTextBlock(bitmap, 20, 132, 40, 12) // the instrument name
   return bitmap
+}
+
+// The classifier stand-in: the drawn page says what each blob is, so the
+// rules under test see exact classes. The learned model swaps in later.
+function classifyByPositions (drawn) {
+  return (pixels, box) => {
+    const centerX = box.x + box.w / 2
+    const centerY = box.y + box.h / 2
+    const nearest = drawn
+      .map((symbol) => ({ ...symbol, distance: Math.hypot(symbol.x - centerX, symbol.y - centerY) }))
+      .sort((first, second) => first.distance - second.distance)[0]
+    const known = nearest.distance <= 15
+    return {
+      className: known ? nearest.classId : 'unknown',
+      confidence: known ? (nearest.confidence ?? 1) : 0,
+      candidates: []
+    }
+  }
+}
+
+function examplePage () {
+  const bitmap = createPlainBitmap(600, 400)
+  drawStave(bitmap, 100, 520, 200, 12)
+  drawFilledRect(bitmap, 110, 196, 10, 30) // the clef
+  drawFilledRect(bitmap, 150, 202, 10, 10) // the time signature, over
+  drawFilledRect(bitmap, 150, 226, 10, 10) // and under the middle
+  // measure 1: c5 quarter, a4 flat quarter, f4 dotted quarter
+  drawEllipse(bitmap, 220, 218, 8, 5.5)
+  drawLine(bitmap, 228, 216, 228, 178, 2)
+  drawFilledRect(bitmap, 280, 225, 6, 10) // the flat before a4
+  drawEllipse(bitmap, 300, 230, 8, 5.5)
+  drawLine(bitmap, 308, 228, 308, 190, 2)
+  drawEllipse(bitmap, 380, 242, 8, 5.5)
+  drawLine(bitmap, 387, 240, 387, 202, 2)
+  drawEllipse(bitmap, 392, 242, 2.5, 2.5) // its dot
+  drawLine(bitmap, 450, 188, 450, 262, 2) // the barline
+  // measure 2: two beamed eighths on b4 and a4, beamed above the stave
+  drawEllipse(bitmap, 480, 224, 8, 5.5)
+  drawLine(bitmap, 488, 226, 488, 192, 2)
+  drawEllipse(bitmap, 520, 230, 8, 5.5)
+  drawLine(bitmap, 528, 232, 528, 192, 2)
+  drawLine(bitmap, 480, 192, 535, 192, 4) // the beam
+  const drawn = [
+    { x: 115, y: 211, classId: 'clef-treble' },
+    { x: 155, y: 207, classId: 'digit-4' },
+    { x: 155, y: 231, classId: 'digit-4' },
+    { x: 220, y: 218, classId: 'notehead-filled', confidence: 0.5 }, // the shaky one
+    { x: 283, y: 230, classId: 'flat' },
+    { x: 300, y: 230, classId: 'notehead-filled' },
+    { x: 392, y: 242, classId: 'dot' },
+    { x: 380, y: 242, classId: 'notehead-filled' },
+    { x: 480, y: 224, classId: 'notehead-filled' },
+    { x: 520, y: 230, classId: 'notehead-filled' }
+  ]
+  return { bitmap, drawn, classify: classifyByPositions(drawn) }
+}
+
+// page 1 of a project: the key and meter live here
+function keyAndMeterPage () {
+  const bitmap = createPlainBitmap(600, 400)
+  drawStave(bitmap, 100, 520, 200, 12)
+  drawFilledRect(bitmap, 110, 196, 10, 30) // the clef
+  drawFilledRect(bitmap, 140, 225, 6, 10) // three flats —
+  drawFilledRect(bitmap, 160, 225, 6, 10) // the key of
+  drawFilledRect(bitmap, 180, 225, 6, 10) // a flat major
+  drawFilledRect(bitmap, 210, 202, 10, 10) // 4 over 4
+  drawFilledRect(bitmap, 210, 226, 10, 10)
+  drawEllipse(bitmap, 300, 230, 8, 5.5)
+  drawLine(bitmap, 308, 228, 308, 190, 2)
+  const drawn = [
+    { x: 115, y: 211, classId: 'clef-treble' },
+    { x: 143, y: 230, classId: 'flat' },
+    { x: 163, y: 230, classId: 'flat' },
+    { x: 183, y: 230, classId: 'flat' },
+    { x: 215, y: 207, classId: 'digit-4' },
+    { x: 215, y: 231, classId: 'digit-4' },
+    { x: 300, y: 230, classId: 'notehead-filled' }
+  ]
+  return { bitmap, drawn, classify: classifyByPositions(drawn) }
+}
+
+// page 2 of the same project: the music continues, nothing is re-declared
+function continuationPage () {
+  const bitmap = createPlainBitmap(600, 400)
+  drawStave(bitmap, 100, 520, 200, 12)
+  drawFilledRect(bitmap, 110, 196, 10, 30)
+  drawEllipse(bitmap, 300, 230, 8, 5.5)
+  drawLine(bitmap, 308, 228, 308, 190, 2)
+  const drawn = [
+    { x: 115, y: 211, classId: 'clef-treble' },
+    { x: 300, y: 230, classId: 'notehead-filled' }
+  ]
+  return { bitmap, drawn, classify: classifyByPositions(drawn) }
+}
+
+async function compareWithExpected (name, actual) {
+  let expected
+  try {
+    expected = await fs.readFile(`${ROOT}/expected/${name}`, 'utf8')
+  } catch {
+    await fs.writeFile(`${ROOT}/actual/${name}`, actual)
+    assert.fail(`${name}: no expected file yet — wrote actual/${name}; adopt it when it is right`)
+  }
+  if (expected !== actual) {
+    await fs.writeFile(`${ROOT}/actual/${name}`, actual)
+    assert.fail(`${name}: differs from expected — wrote actual/${name} for diffing`)
+  }
 }
 
 const TESTS = [
@@ -312,58 +420,21 @@ const TESTS = [
   {
     name: 'translateImageToMsq reads a drawn page',
     run () {
-      const bitmap = createPlainBitmap(600, 400)
-      drawStave(bitmap, 100, 520, 200, 12)
-      drawFilledRect(bitmap, 110, 196, 10, 30) // the clef
-      drawFilledRect(bitmap, 150, 202, 10, 10) // the time signature, over
-      drawFilledRect(bitmap, 150, 226, 10, 10) // and under the middle
-      // measure 1: c5 quarter, a4 flat quarter, f4 dotted quarter
-      drawEllipse(bitmap, 220, 218, 8, 5.5)
-      drawLine(bitmap, 228, 216, 228, 178, 2)
-      drawFilledRect(bitmap, 280, 225, 6, 10) // the flat before a4
-      drawEllipse(bitmap, 300, 230, 8, 5.5)
-      drawLine(bitmap, 308, 228, 308, 190, 2)
-      drawEllipse(bitmap, 380, 242, 8, 5.5)
-      drawLine(bitmap, 387, 240, 387, 202, 2)
-      drawEllipse(bitmap, 392, 242, 2.5, 2.5) // its dot
-      drawLine(bitmap, 450, 188, 450, 262, 2) // the barline
-      // measure 2: two beamed eighths on b4 and a4, beamed above the stave
-      drawEllipse(bitmap, 480, 224, 8, 5.5)
-      drawLine(bitmap, 488, 226, 488, 192, 2)
-      drawEllipse(bitmap, 520, 230, 8, 5.5)
-      drawLine(bitmap, 528, 232, 528, 192, 2)
-      drawLine(bitmap, 480, 192, 535, 192, 4) // the beam
-
-      const drawn = [
-        { x: 115, y: 211, classId: 'clef-treble' },
-        { x: 155, y: 207, classId: 'digit-4' },
-        { x: 155, y: 231, classId: 'digit-4' },
-        { x: 220, y: 218, classId: 'notehead-filled' },
-        { x: 283, y: 230, classId: 'flat' },
-        { x: 300, y: 230, classId: 'notehead-filled' },
-        { x: 392, y: 242, classId: 'dot' },
-        { x: 380, y: 242, classId: 'notehead-filled' },
-        { x: 480, y: 224, classId: 'notehead-filled' },
-        { x: 520, y: 230, classId: 'notehead-filled' }
-      ]
-      const classify = (pixels, box) => {
-        const centerX = box.x + box.w / 2
-        const centerY = box.y + box.h / 2
-        const nearest = drawn
-          .map((symbol) => ({ ...symbol, distance: Math.hypot(symbol.x - centerX, symbol.y - centerY) }))
-          .sort((first, second) => first.distance - second.distance)[0]
-        return {
-          className: nearest.distance <= 15 ? nearest.classId : 'unknown',
-          confidence: nearest.distance <= 15 ? 1 : 0,
-          candidates: []
-        }
-      }
-
+      const { bitmap, classify } = examplePage()
       const { msqText, report } = translateImageToMsq(bitmap, { classify })
       assert.ok(msqText.includes('treble clef'), 'the clef is named')
       assert.ok(msqText.includes('time signature is 4:4'), 'the meter is named')
       // the beam is geometry and no class says so yet — the report says it
       assert.ok(report.uncertain.length >= 1, 'the unclassified beam goes to the report')
+
+      // the shaky c5 links to its unit and to its line in the text
+      const linked = report.uncertain.find((entry) => entry.className === 'notehead-filled')
+      assert.deepStrictEqual(
+        { measure: linked.unit.measureIndex, stave: linked.unit.staveIndex, voice: linked.unit.voiceIndex, unit: linked.unit.unitIndex },
+        { measure: 0, stave: 0, voice: 0, unit: 0 },
+        'the shaky note links to its unit'
+      )
+      assert.ok(msqText.split('\n')[linked.msqLine - 1].includes('c5'), 'and to its line in the text')
 
       const parsed = generateIntermediateStructuresForSinglePage({ pageText: msqText })
       assert.deepStrictEqual(parsed.errors, [], 'the text parses with no errors')
@@ -382,6 +453,42 @@ const TESTS = [
       const second = measures[1].stavesParams[0].voicesParams[0]
       assert.strictEqual(second[0].unitDuration, 0.125, 'a beamed eighth')
       assert.strictEqual(second[0].beamedWithNext, true, 'beamed with its neighbour')
+    }
+  },
+  {
+    name: 'translateImagesToMsqPages carries key and meter across pages',
+    run () {
+      const first = keyAndMeterPage()
+      const second = continuationPage()
+      const classify = classifyByPositions([ ...first.drawn, ...second.drawn ])
+      const { pagesText } = translateImagesToMsqPages([ first.bitmap, second.bitmap ], { classify })
+      assert.ok(pagesText[0].includes('key signature is e flat major'), 'page 1 declares the key')
+      assert.ok(pagesText[0].includes('time signature is 4:4'), 'page 1 declares the meter')
+      assert.ok(pagesText[1].includes('key signature is e flat major'), 'the key carries to page 2')
+      assert.ok(pagesText[1].includes('time signature is 4:4'), 'the meter carries to page 2')
+      for (const pageText of pagesText) {
+        const parsed = generateIntermediateStructuresForSinglePage({ pageText })
+        assert.deepStrictEqual(parsed.errors, [], 'both pages parse with no errors')
+      }
+    }
+  },
+  {
+    name: 'golden: one page is byte stable',
+    async run () {
+      const page = examplePage()
+      const { msqText } = translateImageToMsq(page.bitmap, { classify: page.classify })
+      await compareWithExpected('golden-page.msq', msqText)
+    }
+  },
+  {
+    name: 'golden: a carried two-page project is byte stable',
+    async run () {
+      const first = keyAndMeterPage()
+      const second = continuationPage()
+      const classify = classifyByPositions([ ...first.drawn, ...second.drawn ])
+      const { pagesText } = translateImagesToMsqPages([ first.bitmap, second.bitmap ], { classify })
+      await compareWithExpected('golden-project-page-1.msq', pagesText[0])
+      await compareWithExpected('golden-project-page-2.msq', pagesText[1])
     }
   }
 ]

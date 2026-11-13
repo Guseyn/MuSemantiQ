@@ -1,0 +1,20 @@
+background color is #ffffff
+font color is #000000
+stave lines color is #000000
+
+measure
+time signature is 4:4
+stave
+treble clef
+1/4 c5, with stem up
+1/4 a4, with flat key, with stem up
+1/4 f4, dotted, with stem up
+1/8 rest
+
+measure
+stave
+treble clef
+1/8 b4, beamed with next, with stem up
+1/8 a4, not beamed, with stem up
+1/2 rest
+1/4 rest

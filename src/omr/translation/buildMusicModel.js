@@ -87,7 +87,8 @@ function buildStaveMusic (blobs, stems, stave, staveIndex) {
       unitDuration: REST_DURATIONS[rest.className] || 0.25,
       numberOfDots: 0,
       stemDirection: 'up',
-      beamedWithNext: false
+      beamedWithNext: false,
+      sourceBlobs: [ rest ]
     })
   }
   units.sort((first, second) => first.x - second.x)
@@ -96,6 +97,8 @@ function buildStaveMusic (blobs, stems, stave, staveIndex) {
 
 function buildNoteUnit (chord, staveBlobs, stems, clef, staffSpace) {
   const stem = nearestStem(chord, stems, staffSpace)
+  const keyBlobs = chord.heads.flatMap((head) => accidentalsOf(head, staveBlobs, staffSpace))
+  const dotBlobs = dotsOf(chord, staveBlobs, staffSpace)
   const notes = chord.heads.map((head) => ({
     ...assignPitchByStaffPosition(head.staffPosition, clef),
     staffPosition: head.staffPosition,
@@ -114,9 +117,10 @@ function buildNoteUnit (chord, staveBlobs, stems, clef, staffSpace) {
       beamCount: stem ? stem.beamCount : 0,
       flagCount: stem ? stem.flagCount : 0
     }),
-    numberOfDots: dotsOf(chord, staveBlobs, staffSpace),
+    numberOfDots: dotBlobs.length,
     stemDirection: stem ? stem.stemDirection : 'up',
     beamedWithNext: false,
+    sourceBlobs: [ ...chord.heads, ...keyBlobs, ...dotBlobs ],
     stem
   }
 }
@@ -144,7 +148,7 @@ function dotsOf (chord, staveBlobs, staffSpace) {
     blob.box.x > chord.x &&
     blob.box.x - chord.x <= 1.1 * staffSpace &&
     chord.heads.some((head) => Math.abs(blob.staffPosition - head.staffPosition) <= 2)
-  ).length
+  )
 }
 
 // A beam reaches from one stem's end to the next stem's end: the earlier unit

@@ -1,22 +1,26 @@
 'use strict'
 
 /**
- * The page's palette and text sizes, as proportions.
+ * The page's palette, text sizes and spacing, as proportions.
  *
  * Sizes are text height divided by the staff space — the same units MSQ
- * styles are written in ("stave-line intervals"). Colours are medians of the
- * ink they belong to: the paper, the stave lines, the words. Everything here
- * is a ratio or a colour, never an absolute size.
+ * styles are written in ("stave-line intervals"). Spacing is stave-to-stave
+ * and line-to-line in the same units. Colours are medians of the ink they
+ * belong to: the paper, the stave lines, the words. Everything here is a
+ * ratio or a colour, never an absolute size — `font size` itself (the one
+ * pixel anchor) stays out and keeps its default.
  */
 
-export function measureStyles ({ width, height, grayscale, staves, textBlocks, staffSpaceHeightPx }) {
+export function measureStyles ({ width, height, grayscale, staves, systems, textBlocks, staffSpaceHeightPx }) {
   const fontSizes = {
     titleFontSize: largestBlockSize(textBlocks, [ 'title' ]),
     subtitleFontSize: largestBlockSize(textBlocks, [ 'subtitle' ]),
     leftSubtitleFontSize: largestBlockSize(textBlocks, [ 'leftSubtitle' ]),
     rightSubtitleFontSize: largestBlockSize(textBlocks, [ 'rightSubtitle' ]),
     instrumentFontSize: largestBlockSize(textBlocks, [ 'instrument' ]),
-    pageNumberFontSize: largestBlockSize(textBlocks, [ 'pageNumber' ])
+    pageNumberFontSize: largestBlockSize(textBlocks, [ 'pageNumber' ]),
+    intervalBetweenStaves: averageGapInStaffSpaces(groupedStaves(staves, systems), staffSpaceHeightPx),
+    intervalBetweenPageLines: averageGapInStaffSpaces([ systems ], staffSpaceHeightPx)
   }
   const colors = {
     background: backgroundHex({ width, height, grayscale }),
@@ -29,6 +33,27 @@ export function measureStyles ({ width, height, grayscale, staves, textBlocks, s
 function largestBlockSize (textBlocks, roles) {
   const sizes = textBlocks.filter((block) => roles.includes(block.role)).map((block) => block.sizeInStaffSpaces)
   return sizes.length ? Math.round(Math.max(...sizes) * 100) / 100 : null
+}
+
+// Staves grouped by the system they belong to; spacing is measured inside
+// each group, so a gap between systems is never mistaken for stave spacing.
+function groupedStaves (staves, systems) {
+  return systems.map((system) =>
+    system.staveIndexes.map((index) => staves[index]).sort((first, second) => first.topY - second.topY)
+  )
+}
+
+function averageGapInStaffSpaces (groups, staffSpaceHeightPx) {
+  const spacings = []
+  for (const group of groups) {
+    for (let index = 1; index < group.length; index++) {
+      spacings.push((group[index].topY - group[index - 1].topY) / staffSpaceHeightPx)
+    }
+  }
+  if (!spacings.length) {
+    return null
+  }
+  return Math.round(spacings.reduce((sum, spacing) => sum + spacing, 0) / spacings.length * 100) / 100
 }
 
 // The paper is what almost everything that is not ink is: the most common

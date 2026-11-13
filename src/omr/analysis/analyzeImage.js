@@ -27,7 +27,7 @@ export function analyzeStraightenedImage (upright) {
   const { staves, staffSpaceHeightPx } = detectStaves(upright)
   const systems = groupStavesIntoSystems(staves)
   const textBlocks = findTextBlocks({ ...upright, staves, systems, staffSpaceHeightPx })
-  const { fontSizes, colors } = measureStyles({ ...upright, staves, textBlocks, staffSpaceHeightPx })
+  const { fontSizes, colors } = measureStyles({ ...upright, staves, systems, textBlocks, staffSpaceHeightPx })
   return {
     skewAngleInDegrees: upright.skewAngleInDegrees || 0,
     staffSpaceHeightPx: roundTo2(staffSpaceHeightPx),
