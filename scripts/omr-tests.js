@@ -35,7 +35,7 @@ import { drawableSymbols } from '#msq/omr/training/drawSymbols.js'
 import { translateImageToMsq } from '#msq/omr/translateImageToMsq.js'
 import { translateImagesToMsqPages } from '#msq/omr/translateImagesToMsqPages.js'
 import { decodeImageToGrayscale } from '#msq/omr/analysis/decodeImageToGrayscale.js'
-import { encodePng } from '../test/omr-tests/helpers/encodePng.js'
+import { encodePng } from '#msq/omr/training/encodePng.js'
 import { generateIntermediateStructuresForSinglePage } from '#msq/language/api.js'
 import {
   drawEllipse,

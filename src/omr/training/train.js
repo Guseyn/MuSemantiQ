@@ -121,6 +121,7 @@ export function runTraining () {
     console.log(line)
   }
   try {
+    const startedAt = Date.now()
     log(`=== ${new Date().toISOString()} · seed ${seed} · grid ${shape.gridSize} · ${classIds.length} classes · ${samples.length} samples · ${epochs} epochs`)
     const split = Math.floor(samples.length * 0.8)
     const model = createModel({ ...shape, classCount: classIds.length }, 1)
@@ -143,6 +144,9 @@ export function runTraining () {
       log(`weights written to ${outPath}`)
       log(`sha256 ${hash}`)
     }
+    const best = history.reduce((winner, entry) =>
+      entry.validationAccuracy > winner.validationAccuracy ? entry : winner, history[0])
+    log(`✓ done in ${durationSince(startedAt)} — best validation ${best.validationAccuracy} at epoch ${best.epoch}`)
     return { model, history }
   } catch (error) {
     appendFileSync(RUN_LOG, `error: ${error.message}\n${error.stack}\n`)
@@ -153,6 +157,14 @@ export function runTraining () {
 function numberFlag (name, fallback) {
   const found = process.argv.find((argument) => argument.startsWith(`--${name}=`))
   return found ? Number(found.slice(name.length + 3)) : fallback
+}
+
+function durationSince (startedAt) {
+  const seconds = Math.round((Date.now() - startedAt) / 1000)
+  if (seconds < 90) {
+    return `${seconds}s`
+  }
+  return seconds < 5400 ? `${Math.round(seconds / 60)}m` : `${Math.round(seconds / 360) / 10}h`
 }
 
 function shuffledIndexes (length, random) {
