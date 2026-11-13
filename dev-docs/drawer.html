@@ -176,6 +176,7 @@ dl.kv dd { margin: 0; overflow-wrap: anywhere; }
 .node:hover rect:not(.band) { stroke: var(--accent); }
 .node.on rect:not(.band) { fill: var(--ok-soft); stroke: var(--ok); stroke-width: 2; }
 .node.on rect.band { fill: var(--ok); }
+.node text { font: 600 11px var(--font-body); }
 .node text.fk { font: 500 9.5px var(--font-mono); fill: var(--muted); text-anchor: middle; }
 .crumbs { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; padding: 7px 12px; border-bottom: 1px solid var(--line); font: 500 11.5px var(--font-mono); }
 .crumbs button { font: inherit; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px; cursor: pointer; }
@@ -234,6 +235,8 @@ dl.kv dd { overflow-wrap: anywhere; }
             <div id="worker" class="stackwrap"></div>
             <h3>The signature</h3>
             <pre class="msg" id="msg"></pre>
+            <h3>In one line</h3>
+            <pre class="msg" id="logline"></pre>
           </section>
         </div>
       </div>
@@ -19882,12 +19885,13 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "shared",
     "full": "calculateMinTopAndMaxBottomOfCrossVoiceUnitsOnStaveWithSpecifiedIndex",
     "lines": [
-     "calculateMinTopAndMaxBottomOfCross",
-     "VoiceUnitsOnStaveWithSpecifiedIndex"
+     "calculateMinTopAnd",
+     "MaxBottomOfCross",
+     "VoiceUnitsOnStave\u2026"
     ],
     "klines": [
-     "calculateMinTopAndMaxBottomOfCrossVoice",
-     "UnitsOnStaveWithSpecifiedIndex.js"
+     "calculateMinTopAnd",
+     "MaxBottomOfCross\u2026"
     ],
     "parent": null,
     "children": []
@@ -19918,12 +19922,13 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "shared",
     "full": "calculateSlurRoundCoefficientByXRangeOfSlur",
     "lines": [
-     "calculateSlurRoundCoef",
-     "ficientByXRangeOfSlur"
+     "calculateSlurRound",
+     "CoefficientByX",
+     "RangeOfSlur"
     ],
     "klines": [
-     "calculateSlurRoundCoefficient",
-     "ByXRangeOfSlur.js"
+     "calculateSlurRound",
+     "CoefficientByXRange\u2026"
     ],
     "parent": null,
     "children": []
@@ -19954,7 +19959,8 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "basic",
     "full": "addAnimationToElement",
     "lines": [
-     "addAnimationToElement"
+     "addAnimationTo",
+     "Element"
     ],
     "klines": [
      "convertSvgToAnimated",
@@ -19971,12 +19977,12 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "basic",
     "full": "addPropertiesToElement",
     "lines": [
-     "addPropertie",
-     "sToElement"
+     "addPropertiesTo",
+     "Element"
     ],
     "klines": [
-     "addProperties",
-     "ToElement.js"
+     "addPropertiesTo",
+     "Element.js"
     ],
     "parent": "drawStavesPiece",
     "children": []
@@ -19989,11 +19995,12 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "basic",
     "full": "calculateBboxForPath",
     "lines": [
-     "calculateBboxForPath"
+     "calculateBboxFor",
+     "Path"
     ],
     "klines": [
-     "calculateBbox",
-     "ForPath.js"
+     "calculateBboxForPath",
+     "js"
     ],
     "parent": null,
     "children": [
@@ -20008,8 +20015,9 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "basic",
     "full": "calculateCoordinatesOfElements",
     "lines": [
-     "calculateCoordin",
-     "atesOfElements"
+     "calculate",
+     "CoordinatesOf",
+     "Elements"
     ],
     "klines": [
      "calculateCoordinates",
@@ -20026,11 +20034,12 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "basic",
     "full": "calculateSvgPathBbox",
     "lines": [
-     "calculateSvgPathBbox"
+     "calculateSvgPath",
+     "Bbox"
     ],
     "klines": [
-     "calculateBbox",
-     "ForPath.js"
+     "calculateBboxForPath",
+     "js"
     ],
     "parent": "calculateBboxForPath",
     "children": [
@@ -20046,7 +20055,8 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "shared",
     "full": "calculateVectorLength",
     "lines": [
-     "calculateVectorLength"
+     "calculateVector",
+     "Length"
     ],
     "klines": [
      "calculateSlurSpline",
@@ -20063,12 +20073,13 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "shared",
     "full": "collectMeasuresInformationAboutContainingBrokenConnectionsWhileAdjustingThemWithAdditionalUsefulInformation",
     "lines": [
-     "collectMeasuresInformationAboutContainingBrokenConnect",
-     "ionsWhileAdjustingThemWithAdditionalUsefulInformation"
+     "collectMeasures",
+     "InformationAbout",
+     "ContainingBroken\u2026"
     ],
     "klines": [
-     "collectMeasuresInformationAboutContainingBrokenConnections",
-     "WhileAdjustingThemWithAdditionalUsefulInformation.js"
+     "collectMeasures",
+     "InformationAbout\u2026"
     ],
     "parent": null,
     "children": [
@@ -20084,12 +20095,13 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "shared",
     "full": "correctTopAndBottomOfMeasuresAccordingToTheirVoicesBodies",
     "lines": [
-     "correctTopAndBottomOfMeasures",
-     "AccordingToTheirVoicesBodies"
+     "correctTopAnd",
+     "BottomOfMeasures",
+     "AccordingToTheir\u2026"
     ],
     "klines": [
-     "correctTopAndBottomOfMeasuresAccording",
-     "ToTheirVoicesBodies.js"
+     "correctTopAndBottom",
+     "OfMeasuresAccording\u2026"
     ],
     "parent": null,
     "children": []
@@ -20105,8 +20117,8 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
      "calculateMinmaxC"
     ],
     "klines": [
-     "calculateBbox",
-     "ForPath.js"
+     "calculateBboxForPath",
+     "js"
     ],
     "parent": "calculateSvgPathBbox",
     "children": [
@@ -20124,8 +20136,8 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
      "calculateMinmaxQ"
     ],
     "klines": [
-     "calculateBbox",
-     "ForPath.js"
+     "calculateBboxForPath",
+     "js"
     ],
     "parent": "calculateSvgPathBbox",
     "children": []
@@ -20138,12 +20150,13 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "shared",
     "full": "doSingleUnitParamsContainBrokenConnectionsThatFinishAfter",
     "lines": [
-     "doSingleUnitParamsContainBrok",
-     "enConnectionsThatFinishAfter"
+     "doSingleUnitParams",
+     "ContainBroken",
+     "ConnectionsThat\u2026"
     ],
     "klines": [
-     "doSingleUnitParamsContainBroken",
-     "ConnectionsThatFinishAfter.js"
+     "doSingleUnitParams",
+     "ContainBroken\u2026"
     ],
     "parent": "collectMeasuresInformationAboutContainingBrokenConnectionsWhileAdjustingThemWithAdditionalUsefulInformation",
     "children": []
@@ -20156,12 +20169,13 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "shared",
     "full": "doSingleUnitParamsContainBrokenConnectionsThatStartBefore",
     "lines": [
-     "doSingleUnitParamsContainBrok",
-     "enConnectionsThatStartBefore"
+     "doSingleUnitParams",
+     "ContainBroken",
+     "ConnectionsThat\u2026"
     ],
     "klines": [
-     "doSingleUnitParamsContainBroken",
-     "ConnectionsThatStartBefore.js"
+     "doSingleUnitParams",
+     "ContainBroken\u2026"
     ],
     "parent": "collectMeasuresInformationAboutContainingBrokenConnectionsWhileAdjustingThemWithAdditionalUsefulInformation",
     "children": []
@@ -20174,8 +20188,8 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "shared",
     "full": "calculateTopOffsetForCurrentStave",
     "lines": [
-     "calculateTopOffse",
-     "tForCurrentStave"
+     "calculateTopOffset",
+     "ForCurrentStave"
     ],
     "klines": [
      "calculateTopOffset",
@@ -20245,12 +20259,13 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "voices",
     "full": "calculateMinDurationAmongAccumulatorsForEachVoice",
     "lines": [
-     "calculateMinDurationAmong",
-     "AccumulatorsForEachVoice"
+     "calculateMin",
+     "DurationAmong",
+     "AccumulatorsFor\u2026"
     ],
     "klines": [
-     "calculateMinDurationAmongAccumulators",
-     "ForEachVoice.js"
+     "calculateMinDuration",
+     "AmongAccumulatorsFor\u2026"
     ],
     "parent": null,
     "children": []
@@ -20263,12 +20278,13 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "voices",
     "full": "drawCrossVoiceUnitsOnAllStavesInCrossStaveUnit",
     "lines": [
-     "drawCrossVoiceUnitsOnAll",
-     "StavesInCrossStaveUnit"
+     "drawCrossVoice",
+     "UnitsOnAllStavesIn",
+     "CrossStaveUnit"
     ],
     "klines": [
-     "drawCrossVoiceUnitsOnAll",
-     "StavesInCrossStaveUnit.js"
+     "drawCrossVoiceUnits",
+     "OnAllStavesInCross\u2026"
     ],
     "parent": null,
     "children": []
@@ -20313,12 +20329,13 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "voices",
     "full": "calculateGraceUnitsAccumulatorValueForEachStaveAndVoice",
     "lines": [
-     "calculateGraceUnitsAccumulat",
-     "orValueForEachStaveAndVoice"
+     "calculateGrace",
+     "UnitsAccumulator",
+     "ValueForEachStave\u2026"
     ],
     "klines": [
-     "selectSingleUnitsParamsToBeIncluded",
-     "InNextCrossStaveUnit.js"
+     "selectSingleUnits",
+     "ParamsToBeIncludedIn\u2026"
     ],
     "parent": null,
     "children": []
@@ -20331,12 +20348,12 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "voices",
     "full": "createSingleUnitParams",
     "lines": [
-     "createSingle",
-     "UnitParams"
+     "createSingleUnit",
+     "Params"
     ],
     "klines": [
-     "drawSingleUnitsForCurrent",
-     "CrossStaveUnit.js"
+     "drawSingleUnitsFor",
+     "CurrentCrossStave\u2026"
     ],
     "parent": null,
     "children": []
@@ -20352,8 +20369,8 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
      "generateBeamKey"
     ],
     "klines": [
-     "drawSingleUnitsForCurrent",
-     "CrossStaveUnit.js"
+     "drawSingleUnitsFor",
+     "CurrentCrossStave\u2026"
     ],
     "parent": null,
     "children": []
@@ -20369,8 +20386,8 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
      "generateSimileKey"
     ],
     "klines": [
-     "drawSingleUnitsForCurrent",
-     "CrossStaveUnit.js"
+     "drawSingleUnitsFor",
+     "CurrentCrossStave\u2026"
     ],
     "parent": null,
     "children": []
@@ -21401,12 +21418,13 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "octaves",
     "full": "adjustNotesPositionNumbersInSelectedSingleUnitsParamsToBeIncludedInNextCrossStaveUnitByTheirNoteNamesAndOctaveNumbersAndClefNamesByStaveIndexIfNoteNamesArePresentedInNotes",
     "lines": [
-     "adjustNotesPositionNumbersInSelectedSingleUnitsParamsToBeIncludedInNextCrossStaveUnit",
-     "ByTheirNoteNamesAndOctaveNumbersAndClefNamesByStaveIndexIfNoteNamesArePresentedInNotes"
+     "adjustNotes",
+     "PositionNumbersIn",
+     "SelectedSingle\u2026"
     ],
     "klines": [
-     "adjustNotesPositionNumbersInSelectedSingleUnitsParamsToBeIncludedInNextCrossStaveUnitBy",
-     "TheirNoteNamesAndOctaveNumbersAndClefNamesByStaveIndexIfNoteNamesArePresentedInNotes.js"
+     "adjustNotesPosition",
+     "NumbersInSelected\u2026"
     ],
     "parent": null,
     "children": [
@@ -21421,17 +21439,18 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "durations",
     "full": "calculateActualDurationOfCurrentSingleUnit",
     "lines": [
-     "calculateActualDuratio",
-     "nOfCurrentSingleUnit"
+     "calculateActual",
+     "DurationOfCurrent",
+     "SingleUnit"
     ],
     "klines": [
-     "calculateActualDuration",
-     "OfCurrentSingleUnit.js"
+     "calculateActual",
+     "DurationOfCurrent\u2026"
     ],
     "parent": null,
     "children": [
-     "calculateActualDurationConsideringDotsAndTremolos",
-     "calculateActualDurationConsideringDotsAndTupletsAndTremolos"
+     "calculateActualDurationConsideringDotsAndTupletsAndTremolos",
+     "calculateActualDurationConsideringDotsAndTremolos"
     ]
    },
    "drawDemiflatKeyShape": {
@@ -21442,11 +21461,12 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "accidentals",
     "full": "drawDemiflatKeyShape",
     "lines": [
-     "drawDemiflatKeyShape"
+     "drawDemiflatKey",
+     "Shape"
     ],
     "klines": [
-     "drawDemiflat",
-     "KeyShape.js"
+     "drawDemiflatKeyShape",
+     "js"
     ],
     "parent": null,
     "children": []
@@ -21459,11 +21479,12 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "accidentals",
     "full": "drawDemisharpKeyShape",
     "lines": [
-     "drawDemisharpKeyShape"
+     "drawDemisharpKey",
+     "Shape"
     ],
     "klines": [
-     "drawDemisharp",
-     "KeyShape.js"
+     "drawDemisharpKey",
+     "Shape.js"
     ],
     "parent": null,
     "children": []
@@ -21476,8 +21497,9 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "notes",
     "full": "areAnyNotesOnLedgerLinesInSingleUnit",
     "lines": [
-     "areAnyNotesOnLedger",
-     "LinesInSingleUnit"
+     "areAnyNotesOn",
+     "LedgerLinesIn",
+     "SingleUnit"
     ],
     "klines": [
      "areAnyNotesOnLedger",
@@ -21494,12 +21516,13 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "durations",
     "full": "calculateActualDurationConsideringDotsAndTremolos",
     "lines": [
-     "calculateActualDurationCo",
-     "nsideringDotsAndTremolos"
+     "calculateActual",
+     "Duration",
+     "ConsideringDotsAnd\u2026"
     ],
     "klines": [
-     "calculateActualDurationConsidering",
-     "DotsAndTremolos.js"
+     "calculateActual",
+     "DurationConsidering\u2026"
     ],
     "parent": "calculateActualDurationOfCurrentSingleUnit",
     "children": []
@@ -21512,12 +21535,13 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "durations",
     "full": "calculateActualDurationConsideringDotsAndTupletsAndTremolos",
     "lines": [
-     "calculateActualDurationConside",
-     "ringDotsAndTupletsAndTremolos"
+     "calculateActual",
+     "Duration",
+     "ConsideringDotsAnd\u2026"
     ],
     "klines": [
-     "calculateActualDurationConsidering",
-     "DotsAndTupletsAndTremolos.js"
+     "calculateActual",
+     "DurationConsidering\u2026"
     ],
     "parent": "calculateActualDurationOfCurrentSingleUnit",
     "children": [
@@ -21536,8 +21560,8 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
      "PositionNumber"
     ],
     "klines": [
-     "calculateNotePosition",
-     "Number.js"
+     "calculateNote",
+     "PositionNumber.js"
     ],
     "parent": "adjustNotesPositionNumbersInSelectedSingleUnitsParamsToBeIncludedInNextCrossStaveUnitByTheirNoteNamesAndOctaveNumbersAndClefNamesByStaveIndexIfNoteNamesArePresentedInNotes",
     "children": []
@@ -21553,8 +21577,8 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
      "compareTwoKeys"
     ],
     "klines": [
-     "sortKeysForSingleUnit",
-     "ConsideringStaves.js"
+     "sortKeysForSingle",
+     "UnitConsidering\u2026"
     ],
     "parent": null,
     "children": []
@@ -21583,12 +21607,12 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "notes",
     "full": "drawDoubleWholeNoteHead",
     "lines": [
-     "drawDoubleWh",
-     "oleNoteHead"
+     "drawDoubleWhole",
+     "NoteHead"
     ],
     "klines": [
-     "drawDoubleWhole",
-     "NoteHead.js"
+     "drawDoubleWholeNote",
+     "Head.js"
     ],
     "parent": null,
     "children": []
@@ -21617,11 +21641,12 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "dots",
     "full": "isASecondApartWithNoteBelow",
     "lines": [
-     "isASecondApart",
-     "WithNoteBelow"
+     "isASecondApartWith",
+     "NoteBelow"
     ],
     "klines": [
-     "drawSingleUnitDots.js"
+     "drawSingleUnitDots.",
+     "js"
     ],
     "parent": null,
     "children": []
@@ -21634,15 +21659,15 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "ly": 167,
     "l": ""
    },
-   "calculateActualDurationOfCurrentSingleUnit-calculateActualDurationConsideringDotsAndTremolos": {
-    "d": "M300 55 L300 173",
-    "lx": 300,
-    "ly": 108,
-    "l": ""
-   },
    "calculateActualDurationOfCurrentSingleUnit-calculateActualDurationConsideringDotsAndTupletsAndTremolos": {
     "d": "M300 55 L510 173",
     "lx": 405,
+    "ly": 108,
+    "l": ""
+   },
+   "calculateActualDurationOfCurrentSingleUnit-calculateActualDurationConsideringDotsAndTremolos": {
+    "d": "M300 55 L300 173",
+    "lx": 300,
     "ly": 108,
     "l": ""
    },
@@ -22936,8 +22961,8 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "chords",
     "full": "areAnySecondsInSingleUnit",
     "lines": [
-     "areAnySeconds",
-     "InSingleUnit"
+     "areAnySecondsIn",
+     "SingleUnit"
     ],
     "klines": [
      "areAnySecondsIn",
@@ -22954,12 +22979,13 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "chords",
     "full": "areFirstTwoSortedNotesInSingleUnitASecondApart",
     "lines": [
-     "areFirstTwoSortedNotesIn",
-     "SingleUnitASecondApart"
+     "areFirstTwoSorted",
+     "NotesInSingleUnitA",
+     "SecondApart"
     ],
     "klines": [
-     "areFirstTwoSortedNotesIn",
-     "SingleUnitASecondApart.js"
+     "areFirstTwoSorted",
+     "NotesInSingleUnitA\u2026"
     ],
     "parent": null,
     "children": []
@@ -22972,12 +22998,13 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "chords",
     "full": "areLastTwoSortedNotesInSingleUnitASecondApart",
     "lines": [
-     "areLastTwoSortedNotesIn",
-     "SingleUnitASecondApart"
+     "areLastTwoSorted",
+     "NotesInSingleUnitA",
+     "SecondApart"
     ],
     "klines": [
-     "areLastTwoSortedNotesInSingle",
-     "UnitASecondApart.js"
+     "areLastTwoSorted",
+     "NotesInSingleUnitA\u2026"
     ],
     "parent": null,
     "children": []
@@ -22990,12 +23017,13 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "chords",
     "full": "calculateAdditionalOffsetForDisplacedPartOfUnit",
     "lines": [
-     "calculateAdditionalOffse",
-     "tForDisplacedPartOfUnit"
+     "calculate",
+     "AdditionalOffset",
+     "ForDisplacedPartOf\u2026"
     ],
     "klines": [
-     "calculateAdditionalOffset",
-     "ForDisplacedPartOfUnit.js"
+     "calculateAdditional",
+     "OffsetForDisplaced\u2026"
     ],
     "parent": null,
     "children": []
@@ -23008,8 +23036,9 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "tuplets",
     "full": "areAllLeftPointsWithTupletDirectionOfTupletsWithLevelLowerThanOrEqualToSpecifiedOneFinished",
     "lines": [
-     "areAllLeftPointsWithTupletDirectionOfTupletsWi",
-     "thLevelLowerThanOrEqualToSpecifiedOneFinished"
+     "areAllLeftPoints",
+     "WithTuplet",
+     "DirectionOfTuplets\u2026"
     ],
     "klines": [
      "drawTuplets.js"
@@ -23025,8 +23054,9 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "stems",
     "full": "calculateAdditionalStemHeightForSingleUnitWithConnectedTremoloAndUnitDurationIsQuarterOrHalf",
     "lines": [
-     "calculateAdditionalStemHeightForSingleUnitWith",
-     "ConnectedTremoloAndUnitDurationIsQuarterOrHalf"
+     "calculate",
+     "AdditionalStem",
+     "HeightForSingle\u2026"
     ],
     "klines": [
      "drawStemForSingle",
@@ -23043,8 +23073,9 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "stems",
     "full": "calculateAdditionalStemHeightForSingleUnitWithTremoloStrokesAndNoFlags",
     "lines": [
-     "calculateAdditionalStemHeightForSing",
-     "leUnitWithTremoloStrokesAndNoFlags"
+     "calculate",
+     "AdditionalStem",
+     "HeightForSingle\u2026"
     ],
     "klines": [
      "drawStemForSingle",
@@ -23061,8 +23092,9 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "stems",
     "full": "calculateAdditionalStemHeightForUnitWithFlags",
     "lines": [
-     "calculateAdditionalStem",
-     "HeightForUnitWithFlags"
+     "calculate",
+     "AdditionalStem",
+     "HeightForUnitWith\u2026"
     ],
     "klines": [
      "drawStemForSingle",
@@ -23079,12 +23111,13 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "beams",
     "full": "areAnyStemDirectionChangesInBeamedSingleUnits",
     "lines": [
-     "areAnyStemDirectionChan",
-     "gesInBeamedSingleUnits"
+     "areAnyStem",
+     "DirectionChangesIn",
+     "BeamedSingleUnits"
     ],
     "klines": [
-     "areAnyStemDirectionChanges",
-     "InBeamedSingleUnits.js"
+     "areAnyStemDirection",
+     "ChangesInBeamed\u2026"
     ],
     "parent": null,
     "children": []
@@ -23097,8 +23130,9 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "ties",
     "full": "calculateAdditionalPathPointsForTieToMakeItBulk",
     "lines": [
-     "calculateAdditionalPath",
-     "PointsForTieToMakeItBulk"
+     "calculate",
+     "AdditionalPath",
+     "PointsForTieToMake\u2026"
     ],
     "klines": [
      "drawTieShape.js"
@@ -23114,8 +23148,8 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "beams",
     "full": "calculateBeamLineCoefficients",
     "lines": [
-     "calculateBeamLi",
-     "neCoefficients"
+     "calculateBeamLine",
+     "Coefficients"
     ],
     "klines": [
      "calculateBeamLine",
@@ -23132,8 +23166,8 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "ties",
     "full": "calculateExtremePointOfTie",
     "lines": [
-     "calculateExtre",
-     "mePointOfTie"
+     "calculateExtreme",
+     "PointOfTie"
     ],
     "klines": [
      "drawTieShape.js"
@@ -23149,8 +23183,8 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "beams",
     "full": "drawBeamedStemExtension",
     "lines": [
-     "drawBeamedSt",
-     "emExtension"
+     "drawBeamedStem",
+     "Extension"
     ],
     "klines": [
      "drawBeamedStem",
@@ -23167,12 +23201,13 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "beams",
     "full": "drawBeamedStemExtensionForStemInBeamedSingleUnitsChainWithDifferentStemDirections",
     "lines": [
-     "drawBeamedStemExtensionForStemInBeamedSin",
-     "gleUnitsChainWithDifferentStemDirections"
+     "drawBeamedStem",
+     "ExtensionForStemIn",
+     "BeamedSingleUnits\u2026"
     ],
     "klines": [
-     "drawBeamedStemExtensionForStemInBeamedSingle",
-     "UnitsChainWithDifferentStemDirections.js"
+     "drawBeamedStem",
+     "ExtensionForStemIn\u2026"
     ],
     "parent": null,
     "children": []
@@ -23204,12 +23239,13 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "beams",
     "full": "isProgressionOfCurrentBeamedSingleUnitsSupposedToHaveHorizontalBeamLine",
     "lines": [
-     "isProgressionOfCurrentBeamedSingleUn",
-     "itsSupposedToHaveHorizontalBeamLine"
+     "isProgressionOf",
+     "CurrentBeamed",
+     "SingleUnits\u2026"
     ],
     "klines": [
-     "isProgressionOfCurrentBeamedSingleUnits",
-     "SupposedToHaveHorizontalBeamLine.js"
+     "isProgressionOf",
+     "CurrentBeamedSingle\u2026"
     ],
     "parent": null,
     "children": []
@@ -23222,8 +23258,8 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "beams",
     "full": "correctStemEndCoordinates",
     "lines": [
-     "correctStemEn",
-     "dCoordinates"
+     "correctStemEnd",
+     "Coordinates"
     ],
     "klines": [
      "drawBeamsPiece.js"
@@ -23239,8 +23275,9 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "beams",
     "full": "updateBeamsPerimeterCoordinates",
     "lines": [
-     "updateBeamsPerim",
-     "eterCoordinates"
+     "updateBeams",
+     "Perimeter",
+     "Coordinates"
     ],
     "klines": [
      "drawBeamsPiece.js"
@@ -25417,12 +25454,13 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "slurs",
     "full": "calculateAdditionalPathPointsForSlurToMakeItBulk",
     "lines": [
-     "calculateAdditionalPathPo",
-     "intsForSlurToMakeItBulk"
+     "calculate",
+     "AdditionalPath",
+     "PointsForSlurTo\u2026"
     ],
     "klines": [
-     "calculateAdditionalPathPoints",
-     "ForSlurToMakeItBulk.js"
+     "calculateAdditional",
+     "PathPointsForSlurTo\u2026"
     ],
     "parent": null,
     "children": []
@@ -25435,12 +25473,13 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "slurs",
     "full": "calculateIntersectionPointsOfSlurWithItsSingleUnits",
     "lines": [
-     "calculateIntersectionPoint",
-     "sOfSlurWithItsSingleUnits"
+     "calculate",
+     "IntersectionPoints",
+     "OfSlurWithIts\u2026"
     ],
     "klines": [
-     "calculateIntersectionPoints",
-     "OfSlurWithItsSingleUnits.js"
+     "calculate",
+     "IntersectionPointsOf\u2026"
     ],
     "parent": null,
     "children": [
@@ -25455,8 +25494,8 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "tremolo",
     "full": "calculateNumberOfTremoloStrokes",
     "lines": [
-     "calculateNumber",
-     "OfTremoloStrokes"
+     "calculateNumberOf",
+     "TremoloStrokes"
     ],
     "klines": [
      "calculateNumberOf",
@@ -25473,12 +25512,13 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "slurs",
     "full": "calculateSlurSplinePointsWithAdjustedYOffsetSoItCannotIntersectUnits",
     "lines": [
-     "calculateSlurSplinePointsWithAdjust",
-     "edYOffsetSoItCannotIntersectUnits"
+     "calculateSlur",
+     "SplinePointsWith",
+     "AdjustedYOffsetSo\u2026"
     ],
     "klines": [
-     "calculateSlurSplinePointsWithAdjusted",
-     "YOffsetSoItCannotIntersectUnits.js"
+     "calculateSlurSpline",
+     "PointsWithAdjustedY\u2026"
     ],
     "parent": null,
     "children": []
@@ -25491,12 +25531,13 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "slurs",
     "full": "calculateIntersectionPointOfSlurWithItsSingleUnit",
     "lines": [
-     "calculateIntersectionPoin",
-     "tOfSlurWithItsSingleUnit"
+     "calculate",
+     "IntersectionPoint",
+     "OfSlurWithIts\u2026"
     ],
     "klines": [
-     "calculateIntersectionPoint",
-     "OfSlurWithItsSingleUnit.js"
+     "calculate",
+     "IntersectionPointOf\u2026"
     ],
     "parent": "calculateIntersectionPointsOfSlurWithItsSingleUnits",
     "children": []
@@ -25509,12 +25550,13 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "slurs",
     "full": "createPhantomSingleUnitThatIsInSlurThatFinishesInTheMomentItChangesItsStave",
     "lines": [
-     "createPhantomSingleUnitThatIsInSlurTha",
-     "tFinishesInTheMomentItChangesItsStave"
+     "createPhantom",
+     "SingleUnitThatIsIn",
+     "SlurThatFinishesIn\u2026"
     ],
     "klines": [
-     "createPhantomSingleUnitThatIsInSlurThat",
-     "FinishesInTheMomentItChangesItsStave.js"
+     "createPhantomSingle",
+     "UnitThatIsInSlurThat\u2026"
     ],
     "parent": null,
     "children": []
@@ -25527,8 +25569,8 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "ornaments",
     "full": "drawArticulationKeysInVerticalLine",
     "lines": [
-     "drawArticulationKe",
-     "ysInVerticalLine"
+     "drawArticulation",
+     "KeysInVerticalLine"
     ],
     "klines": [
      "drawArticulationKeys",
@@ -25561,8 +25603,9 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "parentheses",
     "full": "calculateAdditionalPathPointsForParenthesesToMakeItBulk",
     "lines": [
-     "calculateAdditionalPathPoint",
-     "sForParenthesesToMakeItBulk"
+     "calculate",
+     "AdditionalPath",
+     "PointsFor\u2026"
     ],
     "klines": [
      "drawParentheses",
@@ -25579,8 +25622,9 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "parentheses",
     "full": "calculateParenthesesJunctionPhantomPoint",
     "lines": [
-     "calculateParentheses",
-     "JunctionPhantomPoint"
+     "calculate",
+     "Parentheses",
+     "JunctionPhantom\u2026"
     ],
     "klines": [
      "drawParentheses",
@@ -25597,8 +25641,9 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "parentheses",
     "full": "calculateParenthesesRoundCoefficientByYRangeOfSlur",
     "lines": [
-     "calculateParenthesesRound",
-     "CoefficientByYRangeOfSlur"
+     "calculate",
+     "ParenthesesRound",
+     "CoefficientByY\u2026"
     ],
     "klines": [
      "drawParentheses",
@@ -25615,8 +25660,8 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "slurs",
     "full": "calculateSShapeSlurOutlinePoints",
     "lines": [
-     "calculateSShapeSl",
-     "urOutlinePoints"
+     "calculateSShape",
+     "SlurOutlinePoints"
     ],
     "klines": [
      "calculateSShapeSlur",
@@ -25633,12 +25678,13 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "slurs",
     "full": "calculateIntersectionPointsForOnOnePartOfSShapeSlurWithItsSingleUnits",
     "lines": [
-     "calculateIntersectionPointsForOnOne",
-     "PartOfSShapeSlurWithItsSingleUnits"
+     "calculate",
+     "IntersectionPoints",
+     "ForOnOnePartOfS\u2026"
     ],
     "klines": [
-     "calculateIntersectionPointsForOnOnePart",
-     "OfSShapeSlurWithItsSingleUnits.js"
+     "calculate",
+     "IntersectionPoints\u2026"
     ],
     "parent": null,
     "children": [
@@ -25653,12 +25699,13 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "slurs",
     "full": "calculateNextSlurDirectionBySingleUnit",
     "lines": [
-     "calculateNextSlurDir",
-     "ectionBySingleUnit"
+     "calculateNextSlur",
+     "DirectionBySingle",
+     "Unit"
     ],
     "klines": [
-     "calculateNextSlurDirection",
-     "BySingleUnit.js"
+     "calculateNextSlur",
+     "DirectionBySingle\u2026"
     ],
     "parent": null,
     "children": []
@@ -25671,17 +25718,18 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "slurs",
     "full": "calculateSShapeSlurSplinePointsWithAdjustedYOffsetSoItCannotIntersectUnits",
     "lines": [
-     "calculateSShapeSlurSplinePointsWithAdj",
-     "ustedYOffsetSoItCannotIntersectUnits"
+     "calculateSShape",
+     "SlurSplinePoints",
+     "WithAdjustedY\u2026"
     ],
     "klines": [
-     "calculateSShapeSlurSplinePointsWithAdjusted",
-     "YOffsetSoItCannotIntersectUnits.js"
+     "calculateSShapeSlur",
+     "SplinePointsWith\u2026"
     ],
     "parent": null,
     "children": [
-     "stretchSlurSplineSoItCannotIntersectItsSingleUnitsExceptMaybeSomeUnitAtTheStartAndAtTheEndToAvoidBigStretching",
-     "calculateTwoIntersectionPointsInFirstAndSecondHalfsOfSlurWhereSlurCreatesBiggestGapsWithSingleUnitTopOrBottomPositionsInEachHalfRespectivelyDependingOnSlurDirection"
+     "calculateTwoIntersectionPointsInFirstAndSecondHalfsOfSlurWhereSlurCreatesBiggestGapsWithSingleUnitTopOrBottomPositionsInEachHalfRespectivelyDependingOnSlurDirection",
+     "stretchSlurSplineSoItCannotIntersectItsSingleUnitsExceptMaybeSomeUnitAtTheStartAndAtTheEndToAvoidBigStretching"
     ]
    },
    "calculateSlurJunctionPhantomPoint": {
@@ -25692,12 +25740,13 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "slurs",
     "full": "calculateSlurJunctionPhantomPoint",
     "lines": [
-     "calculateSlurJunc",
-     "tionPhantomPoint"
+     "calculateSlur",
+     "JunctionPhantom",
+     "Point"
     ],
     "klines": [
-     "calculateSlurJunction",
-     "PhantomPoint.js"
+     "calculateSlur",
+     "JunctionPhantomPoint\u2026"
     ],
     "parent": null,
     "children": []
@@ -25710,12 +25759,13 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "slurs",
     "full": "calculateIntersectionPointForOnePartOfSShapeSlurWithItsSingleUnit",
     "lines": [
-     "calculateIntersectionPointForOne",
-     "PartOfSShapeSlurWithItsSingleUnit"
+     "calculate",
+     "IntersectionPoint",
+     "ForOnePartOfSShape\u2026"
     ],
     "klines": [
-     "calculateIntersectionPointForOnePart",
-     "OfSShapeSlurWithItsSingleUnit.js"
+     "calculate",
+     "IntersectionPointFor\u2026"
     ],
     "parent": "calculateIntersectionPointsForOnOnePartOfSShapeSlurWithItsSingleUnits",
     "children": []
@@ -25728,12 +25778,13 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "slurs",
     "full": "calculateTwoIntersectionPointsInFirstAndSecondHalfsOfSlurWhereSlurCreatesBiggestGapsWithSingleUnitTopOrBottomPositionsInEachHalfRespectivelyDependingOnSlurDirection",
     "lines": [
-     "calculateTwoIntersectionPointsInFirstAndSecondHalfsOfSlurWhereSlurCreatesBiggestGap",
-     "sWithSingleUnitTopOrBottomPositionsInEachHalfRespectivelyDependingOnSlurDirection"
+     "calculateTwo",
+     "IntersectionPoints",
+     "InFirstAndSecond\u2026"
     ],
     "klines": [
-     "calculateTwoIntersectionPointsInFirstAndSecondHalfsOfSlurWhereSlurCreatesBiggestGaps",
-     "WithSingleUnitTopOrBottomPositionsInEachHalfRespectivelyDependingOnSlurDirection.js"
+     "calculateTwo",
+     "IntersectionPointsIn\u2026"
     ],
     "parent": "calculateSShapeSlurSplinePointsWithAdjustedYOffsetSoItCannotIntersectUnits",
     "children": []
@@ -25749,7 +25800,8 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
      "cubic"
     ],
     "klines": [
-     "calculateSlurPoints.js"
+     "calculateSlurPoints.",
+     "js"
     ],
     "parent": null,
     "children": []
@@ -25762,12 +25814,13 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "slurs",
     "full": "stretchSlurSplineSoItCannotIntersectItsSingleUnitsExceptMaybeSomeUnitAtTheStartAndAtTheEndToAvoidBigStretching",
     "lines": [
-     "stretchSlurSplineSoItCannotIntersectItsSingleUnitsExcept",
-     "MaybeSomeUnitAtTheStartAndAtTheEndToAvoidBigStretching"
+     "stretchSlurSpline",
+     "SoItCannot",
+     "IntersectItsSingle\u2026"
     ],
     "klines": [
-     "stretchSlurSplineSoItCannotIntersectItsSingleUnitsExcept",
-     "MaybeSomeUnitAtTheStartAndAtTheEndToAvoidBigStretching.js"
+     "stretchSlurSplineSo",
+     "ItCannotIntersectIts\u2026"
     ],
     "parent": "calculateSShapeSlurSplinePointsWithAdjustedYOffsetSoItCannotIntersectUnits",
     "children": [
@@ -25782,12 +25835,13 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "slurs",
     "full": "calculateYDeltasToAddToFirstAndSecondCentralControlPointsInSlurSoItCannotIntersectItsSingleUnits",
     "lines": [
-     "calculateYDeltasToAddToFirstAndSecondCentralContr",
-     "olPointsInSlurSoItCannotIntersectItsSingleUnits"
+     "calculateYDeltasTo",
+     "AddToFirstAnd",
+     "SecondCentral\u2026"
     ],
     "klines": [
-     "stretchSlurSplineSoItCannotIntersectItsSingleUnitsExcept",
-     "MaybeSomeUnitAtTheStartAndAtTheEndToAvoidBigStretching.js"
+     "stretchSlurSplineSo",
+     "ItCannotIntersectIts\u2026"
     ],
     "parent": "stretchSlurSplineSoItCannotIntersectItsSingleUnitsExceptMaybeSomeUnitAtTheStartAndAtTheEndToAvoidBigStretching",
     "children": []
@@ -25806,15 +25860,15 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "ly": 108,
     "l": ""
    },
-   "calculateSShapeSlurSplinePointsWithAdjustedYOffsetSoItCannotIntersectUnits-stretchSlurSplineSoItCannotIntersectItsSingleUnitsExceptMaybeSomeUnitAtTheStartAndAtTheEndToAvoidBigStretching": {
-    "d": "M510 409 L720 527",
-    "lx": 615,
-    "ly": 462,
-    "l": ""
-   },
    "calculateSShapeSlurSplinePointsWithAdjustedYOffsetSoItCannotIntersectUnits-calculateTwoIntersectionPointsInFirstAndSecondHalfsOfSlurWhereSlurCreatesBiggestGapsWithSingleUnitTopOrBottomPositionsInEachHalfRespectivelyDependingOnSlurDirection": {
     "d": "M510 409 L300 527",
     "lx": 405,
+    "ly": 462,
+    "l": ""
+   },
+   "calculateSShapeSlurSplinePointsWithAdjustedYOffsetSoItCannotIntersectUnits-stretchSlurSplineSoItCannotIntersectItsSingleUnitsExceptMaybeSomeUnitAtTheStartAndAtTheEndToAvoidBigStretching": {
+    "d": "M510 409 L720 527",
+    "lx": 615,
     "ly": 462,
     "l": ""
    },
@@ -26738,12 +26792,13 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "cross-stave-chords",
     "full": "areAllNotesInSingleUnitParamsOnNextStave",
     "lines": [
-     "areAllNotesInSingleUn",
-     "itParamsOnNextStave"
+     "areAllNotesIn",
+     "SingleUnitParamsOn",
+     "NextStave"
     ],
     "klines": [
-     "areAllNotesInSingleUnit",
-     "ParamsOnNextStave.js"
+     "areAllNotesInSingle",
+     "UnitParamsOnNext\u2026"
     ],
     "parent": null,
     "children": []
@@ -26756,12 +26811,13 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "cross-stave-chords",
     "full": "areAllNotesInSingleUnitParamsOnPrevStave",
     "lines": [
-     "areAllNotesInSingleUn",
-     "itParamsOnPrevStave"
+     "areAllNotesIn",
+     "SingleUnitParamsOn",
+     "PrevStave"
     ],
     "klines": [
-     "areAllNotesInSingleUnit",
-     "ParamsOnPrevStave.js"
+     "areAllNotesInSingle",
+     "UnitParamsOnPrev\u2026"
     ],
     "parent": null,
     "children": []
@@ -26774,12 +26830,13 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "similes",
     "full": "calculateNumberOfSimileStrokesByNumberOfUnitsAndBeats",
     "lines": [
-     "calculateNumberOfSimileStro",
-     "kesByNumberOfUnitsAndBeats"
+     "calculateNumberOf",
+     "SimileStrokesBy",
+     "NumberOfUnitsAnd\u2026"
     ],
     "klines": [
-     "calculateNumberOfSimileStrokes",
-     "ByNumberOfUnitsAndBeats.js"
+     "calculateNumberOf",
+     "SimileStrokesBy\u2026"
     ],
     "parent": null,
     "children": []
@@ -26792,12 +26849,13 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "unit-spacing",
     "full": "calculateSpaceAtEndOfVoicesByByMinUnitDurationOnPageLineAndMinDurationAmongAccumulatorsForEachVoiceInLastCrossStaveUnitConsideringCasesWhenItIsGraceCrossStaveUnit",
     "lines": [
-     "calculateSpaceAtEndOfVoicesByByMinUnitDurationOnPageLineAndMinDurationAmongAccumul",
-     "atorsForEachVoiceInLastCrossStaveUnitConsideringCasesWhenItIsGraceCrossStaveUnit"
+     "calculateSpaceAt",
+     "EndOfVoicesByByMin",
+     "UnitDurationOnPage\u2026"
     ],
     "klines": [
-     "calculateSpaceAtEndOfVoicesByByMinUnitDurationOnPageLineAndMinDurationAmongAccumulators",
-     "ForEachVoiceInLastCrossStaveUnitConsideringCasesWhenItIsGraceCrossStaveUnit.js"
+     "calculateSpaceAtEnd",
+     "OfVoicesByByMinUnit\u2026"
     ],
     "parent": null,
     "children": [
@@ -26812,12 +26870,13 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "unit-spacing",
     "full": "calculateSpaceAfterCrossStaveUnitByMinUnitDurationOnPageLineAndItsMinDurationAmongAccumulatorsForEachVoiceConsideringCasesWhenItIsGraceCrossStaveUnit",
     "lines": [
-     "calculateSpaceAfterCrossStaveUnitByMinUnitDurationOnPageLineAndItsMinDurati",
-     "onAmongAccumulatorsForEachVoiceConsideringCasesWhenItIsGraceCrossStaveUnit"
+     "calculateSpace",
+     "AfterCrossStave",
+     "UnitByMinUnit\u2026"
     ],
     "klines": [
-     "calculateSpaceAfterCrossStaveUnitByMinUnitDurationOnPageLineAndItsMinDuration",
-     "AmongAccumulatorsForEachVoiceConsideringCasesWhenItIsGraceCrossStaveUnit.js"
+     "calculateSpaceAfter",
+     "CrossStaveUnitByMin\u2026"
     ],
     "parent": "calculateSpaceAtEndOfVoicesByByMinUnitDurationOnPageLineAndMinDurationAmongAccumulatorsForEachVoiceInLastCrossStaveUnitConsideringCasesWhenItIsGraceCrossStaveUnit",
     "children": [
@@ -26832,17 +26891,17 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "unit-spacing",
     "full": "doesSingleUnitFitInVertical",
     "lines": [
-     "doesSingleUnit",
-     "FitInVertical"
+     "doesSingleUnitFit",
+     "InVertical"
     ],
     "klines": [
-     "doesSingleUnitFit",
-     "InVertical.js"
+     "doesSingleUnitFitIn",
+     "Vertical.js"
     ],
     "parent": null,
     "children": [
-     "doTwoUnitsHaveSuchDurationsThatTheyCanPotentiallyBeOverlapped",
-     "calculateStaveIndexOfNoteConsideringItsStave"
+     "calculateStaveIndexOfNoteConsideringItsStave",
+     "doTwoUnitsHaveSuchDurationsThatTheyCanPotentiallyBeOverlapped"
     ]
    },
    "drawBarlineFermata": {
@@ -26856,7 +26915,8 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
      "drawBarlineFermata"
     ],
     "klines": [
-     "drawBarlineFermata.js"
+     "drawBarlineFermata.",
+     "js"
     ],
     "parent": null,
     "children": []
@@ -26885,12 +26945,12 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "unit-spacing",
     "full": "calculateCompressedRange",
     "lines": [
-     "calculateComp",
-     "ressedRange"
+     "calculate",
+     "CompressedRange"
     ],
     "klines": [
-     "calculateSpaceAfterCrossStaveUnitByMinUnitDurationOnPageLineAndItsMinDuration",
-     "AmongAccumulatorsForEachVoiceConsideringCasesWhenItIsGraceCrossStaveUnit.js"
+     "calculateSpaceAfter",
+     "CrossStaveUnitByMin\u2026"
     ],
     "parent": "calculateSpaceAfterCrossStaveUnitByMinUnitDurationOnPageLineAndItsMinDurationAmongAccumulatorsForEachVoiceConsideringCasesWhenItIsGraceCrossStaveUnit",
     "children": []
@@ -26903,12 +26963,13 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "cross-stave-chords",
     "full": "calculateStaveIndexOfNoteConsideringItsStave",
     "lines": [
-     "calculateStaveIndexOfNo",
-     "teConsideringItsStave"
+     "calculateStave",
+     "IndexOfNote",
+     "ConsideringIts\u2026"
     ],
     "klines": [
-     "calculateStaveIndexOfNote",
-     "ConsideringItsStave.js"
+     "calculateStaveIndex",
+     "OfNoteConsideringIts\u2026"
     ],
     "parent": "doesSingleUnitFitInVertical",
     "children": []
@@ -26921,12 +26982,13 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "sub": "unit-spacing",
     "full": "doTwoUnitsHaveSuchDurationsThatTheyCanPotentiallyBeOverlapped",
     "lines": [
-     "doTwoUnitsHaveSuchDurationsThat",
-     "TheyCanPotentiallyBeOverlapped"
+     "doTwoUnitsHaveSuch",
+     "DurationsThatThey",
+     "CanPotentiallyBe\u2026"
     ],
     "klines": [
-     "doesSingleUnitFit",
-     "InVertical.js"
+     "doesSingleUnitFitIn",
+     "Vertical.js"
     ],
     "parent": "doesSingleUnitFitInVertical",
     "children": []
@@ -26962,15 +27024,15 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "ly": 108,
     "l": ""
    },
-   "doesSingleUnitFitInVertical-doTwoUnitsHaveSuchDurationsThatTheyCanPotentiallyBeOverlapped": {
-    "d": "M300 173 L510 291",
-    "lx": 405,
-    "ly": 226,
-    "l": ""
-   },
    "doesSingleUnitFitInVertical-calculateStaveIndexOfNoteConsideringItsStave": {
     "d": "M300 173 L300 291",
     "lx": 300,
+    "ly": 226,
+    "l": ""
+   },
+   "doesSingleUnitFitInVertical-doTwoUnitsHaveSuchDurationsThatTheyCanPotentiallyBeOverlapped": {
+    "d": "M300 173 L510 291",
+    "lx": 405,
     "ly": 226,
     "l": ""
    }
@@ -27068,17 +27130,16 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
       const n = sc.nodes[id];
       const g = el('g', { class: 'node', style: '--own: var(--accent)' }, gN);
       const tt = el('title', {}, g); tt.textContent = n.full + ' — click to zoom in';
-      el('rect', { x: n.x - 78, y: n.y - 31, width: 156, height: 62, rx: 7 }, g);
-      el('rect', { x: n.x - 78, y: n.y - 31, width: 6, height: 62, rx: 3, class: 'band' }, g);
+      el('rect', { x: n.x - 80, y: n.y - 37, width: 160, height: 74, rx: 7 }, g);
+      el('rect', { x: n.x - 80, y: n.y - 37, width: 6, height: 74, rx: 3, class: 'band' }, g);
       const words = n.lines;
-      const nameY = words.length > 1 ? n.y - 18 : n.y - 11;
+      const nameY = n.y - 26 + (3 - Math.min(words.length, 3)) * 6;
       const a = el('text', { x: n.x, y: nameY }, g);
       words.forEach((w, i) => {
-        const ts = el('tspan', { x: n.x, dy: i === 0 ? 0 : 13 }, a); ts.textContent = w;
+        const ts = el('tspan', { x: n.x, dy: i === 0 ? 0 : 12 }, a); ts.textContent = w;
       });
       const kLines = n.klines || [n.k];
-      const kY = kLines.length > 1 ? n.y + 13 : n.y + 19;
-      const b = el('text', { x: n.x, y: kY, class: 'fk' }, g);
+      const b = el('text', { x: n.x, y: n.y + 14, class: 'fk' }, g);
       kLines.forEach((w, i) => {
         const ts = el('tspan', { x: n.x, dy: i === 0 ? 0 : 12 }, b); ts.textContent = w;
       });
@@ -27157,7 +27218,8 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
       ? `<div class="stack">` + stack.map((s, i) =>
           `<div class="frame${i === stack.length - 1 ? ' here' : ''}">${esc(s)}</div>`).join('') + `</div>`
       : '<dt>—</dt><dd>nothing new in this frame</dd>') + rest;
-    document.getElementById('logline').textContent = fr.log || '—';
+    const logEl = document.getElementById('logline');
+    if (logEl) logEl.textContent = fr.log || '—';
   }
 
   function jumpTo(id) {

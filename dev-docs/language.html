@@ -176,6 +176,7 @@ dl.kv dd { margin: 0; overflow-wrap: anywhere; }
 .node:hover rect:not(.band) { stroke: var(--accent); }
 .node.on rect:not(.band) { fill: var(--ok-soft); stroke: var(--ok); stroke-width: 2; }
 .node.on rect.band { fill: var(--ok); }
+.node text { font: 600 11px var(--font-body); }
 .node text.fk { font: 500 9.5px var(--font-mono); fill: var(--muted); text-anchor: middle; }
 .crumbs { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; padding: 7px 12px; border-bottom: 1px solid var(--line); font: 500 11.5px var(--font-mono); }
 .crumbs button { font: inherit; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px; cursor: pointer; }
@@ -234,6 +235,8 @@ dl.kv dd { overflow-wrap: anywhere; }
             <div id="worker" class="stackwrap"></div>
             <h3>The signature</h3>
             <pre class="msg" id="msg"></pre>
+            <h3>In one line</h3>
+            <pre class="msg" id="logline"></pre>
           </section>
         </div>
       </div>
@@ -26266,7 +26269,8 @@ export default function (schemaOnInput) {
     "sub": "lib",
     "full": "ValidatorResultError",
     "lines": [
-     "ValidatorResultError"
+     "ValidatorResult",
+     "Error"
     ],
     "klines": [
      "helpers.js"
@@ -26362,10 +26366,12 @@ export default function (schemaOnInput) {
     "sub": "highlight",
     "full": "addBarLineScenarios",
     "lines": [
-     "addBarLineScenarios"
+     "addBarLine",
+     "Scenarios"
     ],
     "klines": [
-     "addBarLineScenarios.js"
+     "addBarLineScenarios.",
+     "js"
     ],
     "parent": null,
     "children": []
@@ -26378,8 +26384,8 @@ export default function (schemaOnInput) {
     "sub": "highlight",
     "full": "addChordSetupScenarios",
     "lines": [
-     "addChordSetu",
-     "pScenarios"
+     "addChordSetup",
+     "Scenarios"
     ],
     "klines": [
      "addChordSetup",
@@ -26396,8 +26402,8 @@ export default function (schemaOnInput) {
     "sub": "page-schema",
     "full": "addDirectionToSlurMarkByKey",
     "lines": [
-     "addDirectionTo",
-     "SlurMarkByKey"
+     "addDirectionToSlur",
+     "MarkByKey"
     ],
     "klines": [
      "addDirectionToSlur",
@@ -26416,12 +26422,12 @@ export default function (schemaOnInput) {
     "sub": "page-schema",
     "full": "addLeftYCorrectionToSlurMarkByKey",
     "lines": [
-     "addLeftYCorrectio",
-     "nToSlurMarkByKey"
+     "addLeftYCorrection",
+     "ToSlurMarkByKey"
     ],
     "klines": [
-     "addLeftYCorrection",
-     "ToSlurMarkByKey.js"
+     "addLeftYCorrectionTo",
+     "SlurMarkByKey.js"
     ],
     "parent": null,
     "children": [
@@ -26436,12 +26442,13 @@ export default function (schemaOnInput) {
     "sub": "highlight",
     "full": "addLineMeasureStaveVoicePositionScenarios",
     "lines": [
-     "addLineMeasureStaveVo",
-     "icePositionScenarios"
+     "addLineMeasure",
+     "StaveVoicePosition",
+     "Scenarios"
     ],
     "klines": [
-     "addLineMeasureStaveVoice",
-     "PositionScenarios.js"
+     "addLineMeasureStave",
+     "VoicePosition\u2026"
     ],
     "parent": null,
     "children": []
@@ -26454,8 +26461,8 @@ export default function (schemaOnInput) {
     "sub": "page-schema",
     "full": "findSlurMarkWithSpecifiedKey",
     "lines": [
-     "findSlurMarkWit",
-     "hSpecifiedKey"
+     "findSlurMarkWith",
+     "SpecifiedKey"
     ],
     "klines": [
      "findSlurMarkWith",
@@ -26472,12 +26479,12 @@ export default function (schemaOnInput) {
     "sub": "page-schema",
     "full": "getCurrentPageLineIndex",
     "lines": [
-     "getCurrentPa",
-     "geLineIndex"
+     "getCurrentPageLine",
+     "Index"
     ],
     "klines": [
-     "getCurrentPage",
-     "LineIndex.js"
+     "getCurrentPageLine",
+     "Index.js"
     ],
     "parent": null,
     "children": []
@@ -27272,8 +27279,8 @@ export default function (schemaOnInput) {
     "sub": "serializer",
     "full": "createCommandForEachKey",
     "lines": [
-     "createComman",
-     "dForEachKey"
+     "createCommandFor",
+     "EachKey"
     ],
     "klines": [
      "serialize.js"
@@ -27297,9 +27304,9 @@ export default function (schemaOnInput) {
     "parent": null,
     "children": [
      "serializePageMeta",
-     "addComments",
+     "serializeMeasureCommands",
      "serializeClef",
-     "serializeMeasureCommands"
+     "addComments"
     ]
    },
    "addComments": {
@@ -27342,16 +27349,16 @@ export default function (schemaOnInput) {
     "sub": "serializer",
     "full": "serializeMeasureCommands",
     "lines": [
-     "serializeMeas",
-     "ureCommands"
+     "serializeMeasure",
+     "Commands"
     ],
     "klines": [
      "serialize.js"
     ],
     "parent": "serialize",
     "children": [
-     "serializeScope",
-     "serializeCorrection"
+     "serializeCorrection",
+     "serializeScope"
     ]
    },
    "serializePageMeta": {
@@ -27378,7 +27385,8 @@ export default function (schemaOnInput) {
     "sub": "serializer",
     "full": "serializeCorrection",
     "lines": [
-     "serializeCorrection"
+     "serialize",
+     "Correction"
     ],
     "klines": [
      "serialize.js"
@@ -27469,9 +27477,9 @@ export default function (schemaOnInput) {
     ],
     "parent": null,
     "children": [
-     "serializeCorrection",
      "serializeArticulation",
      "serializeDots",
+     "serializeCorrection",
      "serializeKeys"
     ]
    },
@@ -27483,7 +27491,8 @@ export default function (schemaOnInput) {
     "sub": "serializer",
     "full": "serializeArticulation",
     "lines": [
-     "serializeArticulation"
+     "serialize",
+     "Articulation"
     ],
     "klines": [
      "serializeUnit.js"
@@ -27543,15 +27552,15 @@ export default function (schemaOnInput) {
    }
   },
   "edges": {
-   "serializeMeasureCommands-serializeScope": {
-    "d": "M510 173 L720 291",
-    "lx": 615,
-    "ly": 226,
-    "l": ""
-   },
    "serializeMeasureCommands-serializeCorrection": {
     "d": "M510 173 L510 291",
     "lx": 510,
+    "ly": 226,
+    "l": ""
+   },
+   "serializeMeasureCommands-serializeScope": {
+    "d": "M510 173 L720 291",
+    "lx": 615,
     "ly": 226,
     "l": ""
    },
@@ -27561,9 +27570,9 @@ export default function (schemaOnInput) {
     "ly": 108,
     "l": ""
    },
-   "serialize-addComments": {
-    "d": "M300 55 L90 173",
-    "lx": 195,
+   "serialize-serializeMeasureCommands": {
+    "d": "M300 55 L510 173",
+    "lx": 405,
     "ly": 108,
     "l": ""
    },
@@ -27573,9 +27582,9 @@ export default function (schemaOnInput) {
     "ly": 108,
     "l": ""
    },
-   "serialize-serializeMeasureCommands": {
-    "d": "M300 55 L510 173",
-    "lx": 405,
+   "serialize-addComments": {
+    "d": "M300 55 L90 173",
+    "lx": 195,
     "ly": 108,
     "l": ""
    },
@@ -27597,12 +27606,6 @@ export default function (schemaOnInput) {
     "ly": 462,
     "l": ""
    },
-   "serializeModifiers-serializeCorrection": {
-    "d": "M720 409 L510 291",
-    "lx": 615,
-    "ly": 344,
-    "l": ""
-   },
    "serializeModifiers-serializeArticulation": {
     "d": "M720 409 L90 527",
     "lx": 405,
@@ -27613,6 +27616,12 @@ export default function (schemaOnInput) {
     "d": "M720 409 L300 527",
     "lx": 510,
     "ly": 462,
+    "l": ""
+   },
+   "serializeModifiers-serializeCorrection": {
+    "d": "M720 409 L510 291",
+    "lx": 615,
+    "ly": 344,
     "l": ""
    },
    "serializeModifiers-serializeKeys": {
@@ -27663,7 +27672,8 @@ export default function (schemaOnInput) {
      "validatePageSchema"
     ],
     "klines": [
-     "validatePageSchema.js"
+     "validatePageSchema.",
+     "js"
     ],
     "parent": null,
     "children": []
@@ -27763,17 +27773,16 @@ export default function (schemaOnInput) {
       const n = sc.nodes[id];
       const g = el('g', { class: 'node', style: '--own: var(--accent)' }, gN);
       const tt = el('title', {}, g); tt.textContent = n.full + ' — click to zoom in';
-      el('rect', { x: n.x - 78, y: n.y - 31, width: 156, height: 62, rx: 7 }, g);
-      el('rect', { x: n.x - 78, y: n.y - 31, width: 6, height: 62, rx: 3, class: 'band' }, g);
+      el('rect', { x: n.x - 80, y: n.y - 37, width: 160, height: 74, rx: 7 }, g);
+      el('rect', { x: n.x - 80, y: n.y - 37, width: 6, height: 74, rx: 3, class: 'band' }, g);
       const words = n.lines;
-      const nameY = words.length > 1 ? n.y - 18 : n.y - 11;
+      const nameY = n.y - 26 + (3 - Math.min(words.length, 3)) * 6;
       const a = el('text', { x: n.x, y: nameY }, g);
       words.forEach((w, i) => {
-        const ts = el('tspan', { x: n.x, dy: i === 0 ? 0 : 13 }, a); ts.textContent = w;
+        const ts = el('tspan', { x: n.x, dy: i === 0 ? 0 : 12 }, a); ts.textContent = w;
       });
       const kLines = n.klines || [n.k];
-      const kY = kLines.length > 1 ? n.y + 13 : n.y + 19;
-      const b = el('text', { x: n.x, y: kY, class: 'fk' }, g);
+      const b = el('text', { x: n.x, y: n.y + 14, class: 'fk' }, g);
       kLines.forEach((w, i) => {
         const ts = el('tspan', { x: n.x, dy: i === 0 ? 0 : 12 }, b); ts.textContent = w;
       });
@@ -27852,7 +27861,8 @@ export default function (schemaOnInput) {
       ? `<div class="stack">` + stack.map((s, i) =>
           `<div class="frame${i === stack.length - 1 ? ' here' : ''}">${esc(s)}</div>`).join('') + `</div>`
       : '<dt>—</dt><dd>nothing new in this frame</dd>') + rest;
-    document.getElementById('logline').textContent = fr.log || '—';
+    const logEl = document.getElementById('logline');
+    if (logEl) logEl.textContent = fr.log || '—';
   }
 
   function jumpTo(id) {
