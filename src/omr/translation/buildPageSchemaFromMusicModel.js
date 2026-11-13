@@ -46,6 +46,7 @@ function schemaUnit (unit) {
     notes: unit.notes.map((note, id) => ({
       noteName: note.noteName,
       octaveNumber: note.octaveNumber,
+      ...(note.isGhost ? { isGhost: true } : {}),
       id
     })),
     unitDuration: unit.unitDuration,

@@ -5,6 +5,7 @@ import findBarLines from './findBarLines.js'
 import findStems, { measureStemEnds } from './findStems.js'
 import findSymbolComponents from './findSymbolComponents.js'
 import splitTouchingComponents from './splitTouchingComponents.js'
+import { roleOf } from './symbolClasses.js'
 
 /**
  * What the ink is, where it is.
@@ -111,7 +112,7 @@ function headSideOf (stem, blobs) {
 // The stem's end sits at the head's edge, so a head within its own height of
 // the end is the head of that stem.
 function touchesStemEnd (blob, x, y) {
-  return blob.className.startsWith('notehead') &&
+  return roleOf(blob.className) === 'head' &&
     x >= blob.box.x - 1 && x <= blob.box.x + blob.box.w + 1 &&
     Math.abs(blob.box.y + blob.box.h / 2 - y) <= blob.box.h
 }

@@ -30,6 +30,8 @@ import { generateTrainingSet } from '#msq/omr/training/generateTrainingSet.js'
 import { createSeededRandom } from '#msq/omr/training/seededRandom.js'
 import assignPitchByStaffPosition from '#msq/omr/translation/assignPitchByStaffPosition.js'
 import inferDurationFromNoteShapes from '#msq/omr/translation/inferDurationFromNoteShapes.js'
+import { roleOf } from '#msq/omr/analysis/symbolClasses.js'
+import { drawableSymbols } from '#msq/omr/training/drawSymbols.js'
 import { translateImageToMsq } from '#msq/omr/translateImageToMsq.js'
 import { translateImagesToMsqPages } from '#msq/omr/translateImagesToMsqPages.js'
 import { generateIntermediateStructuresForSinglePage } from '#msq/language/api.js'
@@ -489,6 +491,38 @@ const TESTS = [
       const { pagesText } = translateImagesToMsqPages([ first.bitmap, second.bitmap ], { classify })
       await compareWithExpected('golden-project-page-1.msq', pagesText[0])
       await compareWithExpected('golden-project-page-2.msq', pagesText[1])
+    }
+  },
+  {
+    name: 'a new symbol class costs a row, samples and one rule',
+    run () {
+      // the extensibility audit: ghost-head joined the pipeline as one row in
+      // symbolClasses (with role 'head'), one shape in drawSymbols, and one
+      // isGhost rule in buildNoteUnit. Nothing else was touched — the rules
+      // matched it through its role the moment the row existed.
+      assert.strictEqual(roleOf('ghost-head'), 'head', 'the row puts it among the heads')
+
+      const { classIds, samples } = generateTrainingSet({ seed: 44, samplesPerClass: 1, gridSize: 12 })
+      assert.ok(classIds.includes('ghost-head'), 'the generator draws it without being told')
+      assert.strictEqual(
+        samples.filter((sample) => sample.classId === 'ghost-head').length,
+        1,
+        'with its label, for free'
+      )
+
+      const bitmap = createPlainBitmap(600, 400)
+      drawStave(bitmap, 100, 520, 200, 12)
+      drawFilledRect(bitmap, 110, 196, 10, 30) // the clef
+      drawableSymbols['ghost-head'](bitmap, 220, 218, 14, () => 0.5) // the ghost head
+      drawLine(bitmap, 228, 216, 228, 178, 2) // its stem
+      const classify = classifyByPositions([
+        { x: 115, y: 211, classId: 'clef-treble' },
+        { x: 220, y: 218, classId: 'ghost-head' }
+      ])
+      const { msqText } = translateImageToMsq(bitmap, { classify })
+      assert.ok(msqText.includes('is ghost'), 'and one rule turns it into MSQ')
+      const parsed = generateIntermediateStructuresForSinglePage({ pageText: msqText })
+      assert.deepStrictEqual(parsed.errors, [], 'the page still parses')
     }
   }
 ]

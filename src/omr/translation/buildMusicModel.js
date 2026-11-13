@@ -7,6 +7,7 @@ import buildMeasuresFromBarLines from './buildMeasuresFromBarLines.js'
 import splitVoicesByStemDirection from './splitVoicesByStemDirection.js'
 import fillRestsInMeasures from './fillRestsInMeasures.js'
 import inferKeyAndTimeSignature from './inferKeyAndTimeSignature.js'
+import { roleOf } from '../analysis/symbolClasses.js'
 
 /**
  * Symbols become music: measures, staves, voices, units.
@@ -70,9 +71,9 @@ export function buildMusicModel ({ blobs, stems, barLines }, staves) {
 function buildStaveMusic (blobs, stems, stave, staveIndex) {
   const staffSpace = stave.staffSpaceHeightPx
   const staveBlobs = blobs.filter((blob) => blob.staveIndex === staveIndex)
-  const heads = staveBlobs.filter((blob) => blob.className.startsWith('notehead'))
-  const rests = staveBlobs.filter((blob) => blob.className.startsWith('rest-'))
-  const clefBlob = staveBlobs.find((blob) => blob.className.startsWith('clef-'))
+  const heads = staveBlobs.filter((blob) => roleOf(blob.className) === 'head')
+  const rests = staveBlobs.filter((blob) => roleOf(blob.className) === 'rest')
+  const clefBlob = staveBlobs.find((blob) => roleOf(blob.className) === 'clef')
   const clef = clefBlob ? CLEF_NAMES[clefBlob.className] || 'treble' : 'treble'
   const { keySignatureName, timeSignatureParams } = inferKeyAndTimeSignature(staveBlobs, heads, staffSpace)
   const units = groupChordsByHorizontalProximity(heads, staffSpace).map((chord) =>
@@ -104,7 +105,8 @@ function buildNoteUnit (chord, staveBlobs, stems, clef, staffSpace) {
     staffPosition: head.staffPosition,
     keys: accidentalsOf(head, staveBlobs, staffSpace)
       .map((blob) => KEY_TYPES[blob.className])
-      .filter(Boolean)
+      .filter(Boolean),
+    ...(head.className === 'ghost-head' ? { isGhost: true } : {})
   }))
   const isOpenHead = chord.heads.every((head) => head.className === 'notehead-open')
   return {
@@ -135,6 +137,7 @@ function nearestStem (chord, stems, staffSpace) {
 // An accidental hugs the head it alters: close on the left, at its height.
 function accidentalsOf (head, staveBlobs, staffSpace) {
   return staveBlobs.filter((blob) =>
+    roleOf(blob.className) === 'accidental' &&
     KEY_TYPES[blob.className] &&
     blob.box.x + blob.box.w / 2 < head.box.x &&
     head.box.x - (blob.box.x + blob.box.w) <= 0.9 * staffSpace &&
@@ -144,7 +147,7 @@ function accidentalsOf (head, staveBlobs, staffSpace) {
 
 function dotsOf (chord, staveBlobs, staffSpace) {
   return staveBlobs.filter((blob) =>
-    blob.className === 'dot' &&
+    roleOf(blob.className) === 'dot' &&
     blob.box.x > chord.x &&
     blob.box.x - chord.x <= 1.1 * staffSpace &&
     chord.heads.some((head) => Math.abs(blob.staffPosition - head.staffPosition) <= 2)

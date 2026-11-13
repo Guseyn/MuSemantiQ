@@ -19,6 +19,12 @@ export const drawableSymbols = {
   'notehead-open' (bitmap, x, y, size, random) {
     drawEllipseOutline(bitmap, x, y, size * (0.52 + 0.1 * random()), size * (0.36 + 0.08 * random()), 1 + random())
   },
+  'ghost-head' (bitmap, x, y, size, random) {
+    const spread = size * 0.5
+    const weight = 1 + random()
+    drawLine(bitmap, x - spread, y - spread * 0.7, x + spread, y + spread * 0.7, weight)
+    drawLine(bitmap, x - spread, y + spread * 0.7, x + spread, y - spread * 0.7, weight)
+  },
   dot (bitmap, x, y, size, random) {
     drawEllipse(bitmap, x, y, size * 0.18, size * (0.16 + 0.05 * random()))
   },
