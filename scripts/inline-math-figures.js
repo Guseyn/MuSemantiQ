@@ -13,8 +13,14 @@ const pagePath = path.join(root, 'dev-docs/omr-math.html')
 const figuresDir = path.join(root, 'dev-docs/math-figures')
 
 function svgOf(name, alt) {
+  const prefix = 'f-' + name.replace(/[^a-z0-9]+/g, '-') + '-'
   return fs.readFileSync(path.join(figuresDir, name + '.svg'), 'utf8')
     .replace(/^<\?xml[^>]*>\s*/, '')
+    // cairo defines glyphs by id — without per-figure prefixes every
+    // inlined figure resolves #glyph-… to the first figure's glyphs
+    .replace(/id="([^"]+)"/g, (m, id) => 'id="' + prefix + id + '"')
+    .replace(/(xlink:href|href)="#([^"]+)"/g, (m, attr, id) => attr + '="#' + prefix + id + '"')
+    .replace(/url\(#([^)]+)\)/g, (m, id) => 'url(#' + prefix + id + ')')
     .replace('<svg ', '<svg role="img" aria-label="' + alt + '" ')
     .trim()
 }
@@ -39,4 +45,11 @@ page = page.replace(/<figure([^>]*)>\n([\s\S]*?)<\/figure>/g, (block, attrs, inn
     + body + '\n' + caption + '\n</figure>'
 })
 fs.writeFileSync(pagePath, page)
-console.log('figures inlined:', count)
+
+const ids = [...page.matchAll(/ id="([^"]+)"/g)].map(m => m[1])
+const dupes = ids.filter((id, i) => ids.indexOf(id) !== i)
+if (dupes.length) {
+  console.error('duplicate ids in the page:', [...new Set(dupes)].slice(0, 5).join(', '))
+  process.exit(1)
+}
+console.log('figures inlined:', count, '| ids unique:', ids.length)
