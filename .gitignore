@@ -168,6 +168,11 @@ test/omr-tests/actual/
 src/omr/model/weights.json
 src/omr/model/checkpoints/
 training-data/
+
+# The remote training scripts are personal — they name a server and an ssh
+# key — so the folder stays local; the tutorial describes the same workflow.
+remote-training-scripts/*
+!remote-training-scripts/.gitinfo
 browser-app/web-app/static/magenta-sound-font/
 
 # Each app's static/js/msq is assembled rather than written: the components are

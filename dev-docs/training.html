@@ -134,10 +134,7 @@ git push -u origin omr         <span class="cm"># the branch goes to GitHub firs
 
 ssh user@server 'git clone https://github.com/Guseyn/MuSemantiQ.git && cd MuSemantiQ && git checkout omr && node -v'</code></pre>
 
-<p><code>node -v</code> should print v22 or newer — that is the server's only requirement. To type less, add a host alias to <code>~/.ssh/config</code> and use it in place of <code>user@server</code> everywhere below:</p>
-<pre><code>Host omr
-  HostName server
-  User user</code></pre>
+<p><code>node -v</code> should print v22 or newer — that is the server's only requirement. From here on the work is three scripts in <code>remote-training-scripts/</code>: yours, not tracked, because they name your server and your ssh key. What each one runs is shown at every step below, so the doc stays true even without the scripts.</p>
 </section>
 
 <hr>
@@ -146,12 +143,11 @@ ssh user@server 'git clone https://github.com/Guseyn/MuSemantiQ.git && cd MuSema
 <section id="run">
 <h2><span class="n">3</span>A training run <a class="totop" href="#workflow">↑</a></h2>
 
-<pre><code>ssh user@server 'cd MuSemantiQ && git pull'                        <span class="cm"># the latest code</span>
+<pre><code>./remote-training-scripts/remote-git-pull.sh
+./remote-training-scripts/remote-start-training.sh</code></pre>
+<p>The first script has the server check out the branch and reset to it — <code>ssh … 'cd MuSemantiQ && git fetch --all && git checkout omr && git reset --hard origin/omr'</code>. The second starts training detached with <code>nohup</code> and tells you its pid; the run keeps going after the command returns, and it <b>logs itself</b> to <code>training-data/training.log</code> on the server: the config it started with, one line per epoch, the sha of the weights it wrote, and any error it died of.</p>
 
-ssh user@server 'cd MuSemantiQ && nohup node src/omr/training/train.js --out=src/omr/model/weights.json &gt; /dev/null 2&gt;&amp;1 &amp; echo "training: pid $!"'</code></pre>
-
-<p>The second command returns immediately and the training keeps running after <code>ssh</code> hangs up — <code>nohup</code> detaches it. The run <b>logs itself</b> to <code>training-data/training.log</code> on the server: the config it started with, one line per epoch, the sha of the weights it wrote, and any error it died of. Watching is another one-liner; <code>Ctrl-c</code> stops the watching, not the training:</p>
-
+<p>Watching is one more command; <code>Ctrl-c</code> stops the watching, not the training:</p>
 <pre><code>ssh user@server 'tail -f MuSemantiQ/training-data/training.log'   <span class="cm"># one line per epoch</span>
 
 ssh user@server 'pkill -f train.js'                               <span class="cm"># to stop the run</span></code></pre>
@@ -179,12 +175,8 @@ training-data/</code></pre>
 <section id="home">
 <h2><span class="n">5</span>Bring the model home <a class="totop" href="#workflow">↑</a></h2>
 
-<pre><code>rsync -av user@server:~/MuSemantiQ/src/omr/model/ ./src/omr/model/
-rsync -av user@server:~/MuSemantiQ/training-data/training.log ./training-data/   <span class="cm"># optional: the run history</span>
-
-shasum -a 256 src/omr/model/weights.json                   <span class="cm"># must match the sha in the log</span></code></pre>
-
-<p>The trainer hashes exactly the bytes it wrote, so a mismatch means a broken transfer or a different run — re-rsync before trusting the file. Once the weights are in <code>src/omr/model/</code>, the code picks them up where you load them (see below).</p>
+<pre><code>./remote-training-scripts/remote-download-model.sh</code></pre>
+<p>It rsyncs <code>src/omr/model/</code> and the run log to the same paths here, then prints the sha of what arrived — <code>rsync -av -e "ssh -i your-key" user@server:~/MuSemantiQ/src/omr/model/ ./src/omr/model/</code> and <code>shasum -a 256 src/omr/model/weights.json</code>. The sha must match the one at the end of <code>training-data/training.log</code>: a mismatch means a broken transfer or a different run — re-download before trusting the file. Once the weights are in <code>src/omr/model/</code>, the code picks them up where you load them (see below).</p>
 </section>
 
 <hr>
@@ -251,15 +243,13 @@ ssh-copy-id user@server
 git push -u origin omr
 ssh user@server 'git clone https://github.com/Guseyn/MuSemantiQ.git && cd MuSemantiQ && git checkout omr && node -v'
 
-<span class="cm"># every run</span>
-ssh user@server 'cd MuSemantiQ && git pull'
-ssh user@server 'cd MuSemantiQ && nohup node src/omr/training/train.js --out=src/omr/model/weights.json &gt; /dev/null 2&gt;&amp;1 &amp; echo "training: pid $!"'
+<span class="cm"># every run — your three scripts in remote-training-scripts/ (not tracked)</span>
+./remote-training-scripts/remote-git-pull.sh
+./remote-training-scripts/remote-start-training.sh
 ssh user@server 'tail -f MuSemantiQ/training-data/training.log'   <span class="cm"># Ctrl-c stops the watching, not the training</span>
 
 <span class="cm"># take the result</span>
-rsync -av user@server:~/MuSemantiQ/src/omr/model/ ./src/omr/model/
-rsync -av user@server:~/MuSemantiQ/training-data/training.log ./training-data/
-shasum -a 256 src/omr/model/weights.json
+./remote-training-scripts/remote-download-model.sh
 npm run test:omr:all</code></pre>
 
 <p>Release weights come from one machine — different CPUs can round floats in the last decimal — and the printed hash is what pins the result. Once a <code>weights.json</code> is adopted, it never moves silently.</p>
