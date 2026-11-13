@@ -27304,9 +27304,9 @@ export default function (schemaOnInput) {
     "parent": null,
     "children": [
      "serializePageMeta",
-     "serializeMeasureCommands",
      "serializeClef",
-     "addComments"
+     "addComments",
+     "serializeMeasureCommands"
     ]
    },
    "addComments": {
@@ -27477,10 +27477,10 @@ export default function (schemaOnInput) {
     ],
     "parent": null,
     "children": [
-     "serializeArticulation",
-     "serializeDots",
      "serializeCorrection",
-     "serializeKeys"
+     "serializeKeys",
+     "serializeDots",
+     "serializeArticulation"
     ]
    },
    "serializeArticulation": {
@@ -27570,12 +27570,6 @@ export default function (schemaOnInput) {
     "ly": 108,
     "l": ""
    },
-   "serialize-serializeMeasureCommands": {
-    "d": "M300 55 L510 173",
-    "lx": 405,
-    "ly": 108,
-    "l": ""
-   },
    "serialize-serializeClef": {
     "d": "M300 55 L300 173",
     "lx": 300,
@@ -27585,6 +27579,12 @@ export default function (schemaOnInput) {
    "serialize-addComments": {
     "d": "M300 55 L90 173",
     "lx": 195,
+    "ly": 108,
+    "l": ""
+   },
+   "serialize-serializeMeasureCommands": {
+    "d": "M300 55 L510 173",
+    "lx": 405,
     "ly": 108,
     "l": ""
    },
@@ -27606,18 +27606,6 @@ export default function (schemaOnInput) {
     "ly": 462,
     "l": ""
    },
-   "serializeModifiers-serializeArticulation": {
-    "d": "M720 409 L90 527",
-    "lx": 405,
-    "ly": 462,
-    "l": ""
-   },
-   "serializeModifiers-serializeDots": {
-    "d": "M720 409 L300 527",
-    "lx": 510,
-    "ly": 462,
-    "l": ""
-   },
    "serializeModifiers-serializeCorrection": {
     "d": "M720 409 L510 291",
     "lx": 615,
@@ -27627,6 +27615,18 @@ export default function (schemaOnInput) {
    "serializeModifiers-serializeKeys": {
     "d": "M720 409 L720 527",
     "lx": 720,
+    "ly": 462,
+    "l": ""
+   },
+   "serializeModifiers-serializeDots": {
+    "d": "M720 409 L300 527",
+    "lx": 510,
+    "ly": 462,
+    "l": ""
+   },
+   "serializeModifiers-serializeArticulation": {
+    "d": "M720 409 L90 527",
+    "lx": 405,
     "ly": 462,
     "l": ""
    }
@@ -27871,13 +27871,14 @@ export default function (schemaOnInput) {
     render();
   }
   function scrollToActive() {
-    if (zoom) return;
     const id = S[si].frames[fi].on && S[si].frames[fi].on[0];
     const n = id && S[si].nodes[id];
     if (!n) return;
+    const vb = svg.viewBox.baseVal;
+    const scale = 820 / vb.width;
     scroller.scrollTo({
-      left: Math.max(0, n.x - scroller.clientWidth / 2),
-      top: Math.max(0, n.y - scroller.clientHeight / 2),
+      left: Math.max(0, (n.x - vb.x) * scale - scroller.clientWidth / 2),
+      top: Math.max(0, (n.y - vb.y) * scale - scroller.clientHeight / 2),
       behavior: 'smooth'
     });
   }
@@ -27897,8 +27898,10 @@ export default function (schemaOnInput) {
     document.getElementById('ctitle').textContent = fr.t;
     document.getElementById('ctext').textContent = fr.x;
     const active = fr.on && fr.on[0];
-    const vis = visibleSet(sc, zoom);
-    if (active && zoom && !vis.has(active)) zoom = null;
+    if (active) {
+      const vis = visibleSet(sc, zoom);
+      if (!vis || !vis.has(active)) zoom = active;
+    }
     drawCrumbs(sc);
     const nodeEls = drawDiagram(sc);
     document.getElementById('where').textContent = (fr.on || []).map(k => (sc.nodes[k] || {}).t || k).join(' · ');

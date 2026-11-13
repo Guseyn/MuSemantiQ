@@ -4418,8 +4418,8 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
     ],
     "parent": null,
     "children": [
-     "calculateEndingVelocityInCrescendoIfItIsNotSpeicified",
-     "calculateEndingVelocityInDiminuendoIfItIsNotSpeicified"
+     "calculateEndingVelocityInDiminuendoIfItIsNotSpeicified",
+     "calculateEndingVelocityInCrescendoIfItIsNotSpeicified"
     ]
    },
    "addTimeFrameToIndicateKeysThatLastOneMeasure": {
@@ -4524,15 +4524,15 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
     "ly": 108,
     "l": ""
    },
-   "addTimeFrameToIndicateDynamic-calculateEndingVelocityInCrescendoIfItIsNotSpeicified": {
-    "d": "M300 55 L300 173",
-    "lx": 300,
-    "ly": 108,
-    "l": ""
-   },
    "addTimeFrameToIndicateDynamic-calculateEndingVelocityInDiminuendoIfItIsNotSpeicified": {
     "d": "M300 55 L510 173",
     "lx": 405,
+    "ly": 108,
+    "l": ""
+   },
+   "addTimeFrameToIndicateDynamic-calculateEndingVelocityInCrescendoIfItIsNotSpeicified": {
+    "d": "M300 55 L300 173",
+    "lx": 300,
     "ly": 108,
     "l": ""
    }
@@ -5925,8 +5925,8 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
     "parent": null,
     "children": [
      "isChannelOccupied",
-     "canInstrumentBeReassigned",
-     "findInstrumentForCurrentStaveInMidiFormat"
+     "findInstrumentForCurrentStaveInMidiFormat",
+     "canInstrumentBeReassigned"
     ]
    },
    "deleteArticulationsWithName": {
@@ -6055,15 +6055,15 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
     "ly": 108,
     "l": ""
    },
-   "attachTrackToNote-canInstrumentBeReassigned": {
-    "d": "M510 55 L90 173",
-    "lx": 300,
-    "ly": 108,
-    "l": ""
-   },
    "attachTrackToNote-findInstrumentForCurrentStaveInMidiFormat": {
     "d": "M510 55 L510 173",
     "lx": 510,
+    "ly": 108,
+    "l": ""
+   },
+   "attachTrackToNote-canInstrumentBeReassigned": {
+    "d": "M510 55 L90 173",
+    "lx": 300,
     "ly": 108,
     "l": ""
    },
@@ -6265,13 +6265,14 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
     render();
   }
   function scrollToActive() {
-    if (zoom) return;
     const id = S[si].frames[fi].on && S[si].frames[fi].on[0];
     const n = id && S[si].nodes[id];
     if (!n) return;
+    const vb = svg.viewBox.baseVal;
+    const scale = 820 / vb.width;
     scroller.scrollTo({
-      left: Math.max(0, n.x - scroller.clientWidth / 2),
-      top: Math.max(0, n.y - scroller.clientHeight / 2),
+      left: Math.max(0, (n.x - vb.x) * scale - scroller.clientWidth / 2),
+      top: Math.max(0, (n.y - vb.y) * scale - scroller.clientHeight / 2),
       behavior: 'smooth'
     });
   }
@@ -6291,8 +6292,10 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
     document.getElementById('ctitle').textContent = fr.t;
     document.getElementById('ctext').textContent = fr.x;
     const active = fr.on && fr.on[0];
-    const vis = visibleSet(sc, zoom);
-    if (active && zoom && !vis.has(active)) zoom = null;
+    if (active) {
+      const vis = visibleSet(sc, zoom);
+      if (!vis || !vis.has(active)) zoom = active;
+    }
     drawCrumbs(sc);
     const nodeEls = drawDiagram(sc);
     document.getElementById('where').textContent = (fr.on || []).map(k => (sc.nodes[k] || {}).t || k).join(' · ');
