@@ -165,28 +165,26 @@ dl.kv dd { margin: 0; overflow-wrap: anywhere; }
 .hljs-attr, .hljs-property, .hljs-variable.constant_ { color: var(--c-fn); }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style><style>
+:root { --ok-soft: #e2f0e4; }
 .scrollbox { overflow: auto; max-height: 580px; border-bottom: 1px solid var(--line); position: relative; }
 .scrollbox svg.sys { width: 820px; height: auto; border: 0; border-radius: 0; background: transparent; }
-.cluster rect { fill: var(--soft); stroke: var(--line); stroke-dasharray: 4 4; rx: 10; }
-.cluster text { font: 500 10px var(--mono); fill: var(--muted); text-anchor: start; }
+.cluster rect { fill: var(--code-bg); stroke: var(--line); stroke-dasharray: 4 4; rx: 10; }
+.cluster text { font: 500 10px var(--font-mono); fill: var(--muted); text-anchor: start; }
 .node { cursor: pointer; }
+.node rect:not(.band) { fill: var(--accent-soft); stroke: var(--line); stroke-width: 1.5; }
+.node rect.band { fill: var(--accent); stroke: none; }
 .node:hover rect:not(.band) { stroke: var(--accent); }
-.halo { fill: none; stroke: var(--accent); stroke-width: 2; opacity: 0; rx: 11; transform-box: fill-box; transform-origin: center; }
-.node.on .halo { animation: halo 1.7s ease-in-out infinite; }
-@keyframes halo {
-  0%, 100% { opacity: .25; transform: scale(1); }
-  50% { opacity: .95; transform: scale(1.07); }
-}
-.node.on rect:not(.band) { stroke: var(--accent); stroke-width: 2.5; fill: var(--accent-soft); }
-.node text { font-size: 11px; }
-.crumbs { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; padding: 7px 12px; border-bottom: 1px solid var(--line); font: 500 11.5px var(--mono); }
+.node.on rect:not(.band) { fill: var(--ok-soft); stroke: var(--ok); stroke-width: 2; }
+.node.on rect.band { fill: var(--ok); }
+.node text.fk { font: 500 9.5px var(--font-mono); fill: var(--muted); text-anchor: middle; }
+.crumbs { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; padding: 7px 12px; border-bottom: 1px solid var(--line); font: 500 11.5px var(--font-mono); }
 .crumbs button { font: inherit; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px; cursor: pointer; }
 .crumbs button:hover { color: var(--accent); border-color: var(--accent); }
 .crumbs button.now { background: var(--accent); border-color: var(--accent); color: var(--panel); }
 .stack { margin: 0; display: grid; gap: 2px; }
-.stack .frame { font: 12px var(--mono); color: var(--muted); padding: 2px 0 2px 14px; border-left: 2px solid var(--line); overflow-wrap: anywhere; }
-.stack .frame.here { border-left-color: var(--accent); color: var(--ink); background: var(--accent-soft); border-radius: 0 5px 5px 0; }
-.stack .frame.here::after { content: " ← here"; color: var(--accent); }
+.stack .frame { font: 12px var(--font-mono); color: var(--muted); padding: 2px 0 2px 14px; border-left: 2px solid var(--line); overflow-wrap: anywhere; }
+.stack .frame.here { border-left-color: var(--ok); color: var(--fg); background: var(--ok-soft); border-radius: 0 5px 5px 0; }
+.stack .frame.here::after { content: " ← here"; color: var(--ok); }
 dl.kv dd { overflow-wrap: anywhere; }
 .state { grid-template-columns: minmax(0, 1fr); }
 .stackwrap { min-width: 0; }
@@ -26238,6 +26236,9 @@ export default function (schemaOnInput) {
     "lines": [
      "SchemaContext"
     ],
+    "klines": [
+     "helpers.js"
+    ],
     "parent": null,
     "children": []
    },
@@ -26250,6 +26251,9 @@ export default function (schemaOnInput) {
     "full": "ValidationError",
     "lines": [
      "ValidationError"
+    ],
+    "klines": [
+     "helpers.js"
     ],
     "parent": null,
     "children": []
@@ -26264,6 +26268,9 @@ export default function (schemaOnInput) {
     "lines": [
      "ValidatorResultError"
     ],
+    "klines": [
+     "helpers.js"
+    ],
     "parent": null,
     "children": []
    },
@@ -26276,6 +26283,9 @@ export default function (schemaOnInput) {
     "full": "copyist",
     "lines": [
      "copyist"
+    ],
+    "klines": [
+     "helpers.js"
     ],
     "parent": null,
     "children": []
@@ -26290,6 +26300,9 @@ export default function (schemaOnInput) {
     "lines": [
      "SchemaError"
     ],
+    "klines": [
+     "helpers.js"
+    ],
     "parent": null,
     "children": []
    },
@@ -26302,6 +26315,9 @@ export default function (schemaOnInput) {
     "full": "SchemaScanResult",
     "lines": [
      "SchemaScanResult"
+    ],
+    "klines": [
+     "scan.js"
     ],
     "parent": null,
     "children": []
@@ -26316,6 +26332,9 @@ export default function (schemaOnInput) {
     "lines": [
      "Validator"
     ],
+    "klines": [
+     "validator.js"
+    ],
     "parent": null,
     "children": []
    },
@@ -26329,6 +26348,9 @@ export default function (schemaOnInput) {
     "lines": [
      "ValidatorResult"
     ],
+    "klines": [
+     "helpers.js"
+    ],
     "parent": null,
     "children": []
    },
@@ -26341,6 +26363,9 @@ export default function (schemaOnInput) {
     "full": "addBarLineScenarios",
     "lines": [
      "addBarLineScenarios"
+    ],
+    "klines": [
+     "addBarLineScenarios.js"
     ],
     "parent": null,
     "children": []
@@ -26356,6 +26381,10 @@ export default function (schemaOnInput) {
      "addChordSetu",
      "pScenarios"
     ],
+    "klines": [
+     "addChordSetup",
+     "Scenarios.js"
+    ],
     "parent": null,
     "children": []
    },
@@ -26369,6 +26398,10 @@ export default function (schemaOnInput) {
     "lines": [
      "addDirectionTo",
      "SlurMarkByKey"
+    ],
+    "klines": [
+     "addDirectionToSlur",
+     "MarkByKey.js"
     ],
     "parent": null,
     "children": [
@@ -26386,6 +26419,10 @@ export default function (schemaOnInput) {
      "addLeftYCorrectio",
      "nToSlurMarkByKey"
     ],
+    "klines": [
+     "addLeftYCorrection",
+     "ToSlurMarkByKey.js"
+    ],
     "parent": null,
     "children": [
      "findSlurMarkWithSpecifiedKey"
@@ -26402,6 +26439,10 @@ export default function (schemaOnInput) {
      "addLineMeasureStaveVo",
      "icePositionScenarios"
     ],
+    "klines": [
+     "addLineMeasureStaveVoice",
+     "PositionScenarios.js"
+    ],
     "parent": null,
     "children": []
    },
@@ -26416,6 +26457,10 @@ export default function (schemaOnInput) {
      "findSlurMarkWit",
      "hSpecifiedKey"
     ],
+    "klines": [
+     "findSlurMarkWith",
+     "SpecifiedKey.js"
+    ],
     "parent": "addLeftYCorrectionToSlurMarkByKey",
     "children": []
    },
@@ -26429,6 +26474,10 @@ export default function (schemaOnInput) {
     "lines": [
      "getCurrentPa",
      "geLineIndex"
+    ],
+    "klines": [
+     "getCurrentPage",
+     "LineIndex.js"
     ],
     "parent": null,
     "children": []
@@ -27226,6 +27275,9 @@ export default function (schemaOnInput) {
      "createComman",
      "dForEachKey"
     ],
+    "klines": [
+     "serialize.js"
+    ],
     "parent": null,
     "children": []
    },
@@ -27239,12 +27291,15 @@ export default function (schemaOnInput) {
     "lines": [
      "serialize"
     ],
+    "klines": [
+     "serialize.js"
+    ],
     "parent": null,
     "children": [
      "serializePageMeta",
-     "serializeMeasureCommands",
      "addComments",
-     "serializeClef"
+     "serializeClef",
+     "serializeMeasureCommands"
     ]
    },
    "addComments": {
@@ -27256,6 +27311,9 @@ export default function (schemaOnInput) {
     "full": "addComments",
     "lines": [
      "addComments"
+    ],
+    "klines": [
+     "serialize.js"
     ],
     "parent": "serialize",
     "children": []
@@ -27270,6 +27328,9 @@ export default function (schemaOnInput) {
     "lines": [
      "serializeClef"
     ],
+    "klines": [
+     "serialize.js"
+    ],
     "parent": "serialize",
     "children": []
    },
@@ -27283,6 +27344,9 @@ export default function (schemaOnInput) {
     "lines": [
      "serializeMeas",
      "ureCommands"
+    ],
+    "klines": [
+     "serialize.js"
     ],
     "parent": "serialize",
     "children": [
@@ -27300,6 +27364,9 @@ export default function (schemaOnInput) {
     "lines": [
      "serializePageMeta"
     ],
+    "klines": [
+     "serialize.js"
+    ],
     "parent": "serialize",
     "children": []
    },
@@ -27312,6 +27379,9 @@ export default function (schemaOnInput) {
     "full": "serializeCorrection",
     "lines": [
      "serializeCorrection"
+    ],
+    "klines": [
+     "serialize.js"
     ],
     "parent": "serializeModifiers",
     "children": [
@@ -27328,6 +27398,9 @@ export default function (schemaOnInput) {
     "lines": [
      "serializeScope"
     ],
+    "klines": [
+     "serialize.js"
+    ],
     "parent": "serializeMeasureCommands",
     "children": []
    },
@@ -27341,6 +27414,9 @@ export default function (schemaOnInput) {
     "lines": [
      "collectSpans"
     ],
+    "klines": [
+     "serializeSpans.js"
+    ],
     "parent": null,
     "children": []
    },
@@ -27353,6 +27429,9 @@ export default function (schemaOnInput) {
     "full": "findKeyOfNote",
     "lines": [
      "findKeyOfNote"
+    ],
+    "klines": [
+     "serializeUnit.js"
     ],
     "parent": null,
     "children": [
@@ -27369,6 +27448,9 @@ export default function (schemaOnInput) {
     "lines": [
      "serializeDuration"
     ],
+    "klines": [
+     "serializeDuration.js"
+    ],
     "parent": null,
     "children": []
    },
@@ -27382,12 +27464,15 @@ export default function (schemaOnInput) {
     "lines": [
      "serializeModifiers"
     ],
+    "klines": [
+     "serializeUnit.js"
+    ],
     "parent": null,
     "children": [
+     "serializeCorrection",
      "serializeArticulation",
-     "serializeKeys",
      "serializeDots",
-     "serializeCorrection"
+     "serializeKeys"
     ]
    },
    "serializeArticulation": {
@@ -27399,6 +27484,9 @@ export default function (schemaOnInput) {
     "full": "serializeArticulation",
     "lines": [
      "serializeArticulation"
+    ],
+    "klines": [
+     "serializeUnit.js"
     ],
     "parent": "serializeModifiers",
     "children": [
@@ -27415,6 +27503,9 @@ export default function (schemaOnInput) {
     "lines": [
      "serializeDots"
     ],
+    "klines": [
+     "serializeDuration.js"
+    ],
     "parent": "serializeModifiers",
     "children": []
    },
@@ -27428,6 +27519,9 @@ export default function (schemaOnInput) {
     "lines": [
      "serializeKey"
     ],
+    "klines": [
+     "serializeUnit.js"
+    ],
     "parent": "findKeyOfNote",
     "children": []
    },
@@ -27440,6 +27534,9 @@ export default function (schemaOnInput) {
     "full": "serializeKeys",
     "lines": [
      "serializeKeys"
+    ],
+    "klines": [
+     "serializeUnit.js"
     ],
     "parent": "serializeModifiers",
     "children": []
@@ -27464,12 +27561,6 @@ export default function (schemaOnInput) {
     "ly": 108,
     "l": ""
    },
-   "serialize-serializeMeasureCommands": {
-    "d": "M300 55 L510 173",
-    "lx": 405,
-    "ly": 108,
-    "l": ""
-   },
    "serialize-addComments": {
     "d": "M300 55 L90 173",
     "lx": 195,
@@ -27479,6 +27570,12 @@ export default function (schemaOnInput) {
    "serialize-serializeClef": {
     "d": "M300 55 L300 173",
     "lx": 300,
+    "ly": 108,
+    "l": ""
+   },
+   "serialize-serializeMeasureCommands": {
+    "d": "M300 55 L510 173",
+    "lx": 405,
     "ly": 108,
     "l": ""
    },
@@ -27500,15 +27597,15 @@ export default function (schemaOnInput) {
     "ly": 462,
     "l": ""
    },
+   "serializeModifiers-serializeCorrection": {
+    "d": "M720 409 L510 291",
+    "lx": 615,
+    "ly": 344,
+    "l": ""
+   },
    "serializeModifiers-serializeArticulation": {
     "d": "M720 409 L90 527",
     "lx": 405,
-    "ly": 462,
-    "l": ""
-   },
-   "serializeModifiers-serializeKeys": {
-    "d": "M720 409 L720 527",
-    "lx": 720,
     "ly": 462,
     "l": ""
    },
@@ -27518,10 +27615,10 @@ export default function (schemaOnInput) {
     "ly": 462,
     "l": ""
    },
-   "serializeModifiers-serializeCorrection": {
-    "d": "M720 409 L510 291",
-    "lx": 615,
-    "ly": 344,
+   "serializeModifiers-serializeKeys": {
+    "d": "M720 409 L720 527",
+    "lx": 720,
+    "ly": 462,
     "l": ""
    }
   },
@@ -27564,6 +27661,9 @@ export default function (schemaOnInput) {
     "full": "validatePageSchema",
     "lines": [
      "validatePageSchema"
+    ],
+    "klines": [
+     "validatePageSchema.js"
     ],
     "parent": null,
     "children": []
@@ -27663,15 +27763,20 @@ export default function (schemaOnInput) {
       const n = sc.nodes[id];
       const g = el('g', { class: 'node', style: '--own: var(--accent)' }, gN);
       const tt = el('title', {}, g); tt.textContent = n.full + ' — click to zoom in';
-      el('rect', { class: 'halo', x: n.x - 81, y: n.y - 30, width: 162, height: 60 }, g);
-      el('rect', { x: n.x - 75, y: n.y - 25, width: 150, height: 50, rx: 7 }, g);
-      el('rect', { x: n.x - 75, y: n.y - 25, width: 6, height: 50, rx: 3, class: 'band' }, g);
+      el('rect', { x: n.x - 78, y: n.y - 31, width: 156, height: 62, rx: 7 }, g);
+      el('rect', { x: n.x - 78, y: n.y - 31, width: 6, height: 62, rx: 3, class: 'band' }, g);
       const words = n.lines;
-      const a = el('text', { x: n.x, y: n.y - 9 - (words.length - 1) * 7 }, g);
+      const nameY = words.length > 1 ? n.y - 18 : n.y - 11;
+      const a = el('text', { x: n.x, y: nameY }, g);
       words.forEach((w, i) => {
         const ts = el('tspan', { x: n.x, dy: i === 0 ? 0 : 13 }, a); ts.textContent = w;
       });
-      const b = el('text', { x: n.x, y: n.y + 17, class: 'k' }, g); b.textContent = n.k;
+      const kLines = n.klines || [n.k];
+      const kY = kLines.length > 1 ? n.y + 13 : n.y + 19;
+      const b = el('text', { x: n.x, y: kY, class: 'fk' }, g);
+      kLines.forEach((w, i) => {
+        const ts = el('tspan', { x: n.x, dy: i === 0 ? 0 : 12 }, b); ts.textContent = w;
+      });
       g.addEventListener('click', () => { zoom = id; jumpTo(id); });
       nodeEls[id] = g;
     }

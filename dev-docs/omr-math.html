@@ -32,10 +32,12 @@ h2 { font: 400 25px/1.3 var(--serif); margin: 40px 0 8px; }
 h3 { font: 400 19px/1.3 var(--serif); margin: 26px 0 6px; }
 p { max-width: 72ch; margin: 10px 0; }
 hr { border: 0; border-top: 1px solid var(--rule); margin: 34px 0; }
-.syms { margin: 6px 0 18px; }
-.syms p { margin: 4px 0; padding-left: 14px; border-left: 2px solid var(--rule); }
-.katex-display { margin: 18px 0 !important; }
+.katex-display { margin: 16px 0 8px !important; }
 .katex { font-size: 1.06em; }
+.syms { margin: 0 0 20px; }
+.syms p { margin: 3px 0; padding-left: 14px; border-left: 2px solid var(--rule); }
+.syms.tight { margin-bottom: 12px; }
+.syms.tight p { font-size: 13.5px; }
 .claim { border-left: 3px solid var(--accent); background: var(--accent-soft); padding: 10px 16px; margin: 18px 0; border-radius: 0 7px 7px 0; }
 .claim b { font: 600 11px var(--mono); text-transform: uppercase; letter-spacing: .06em; color: var(--muted); display: block; margin-bottom: 4px; }
 .proof { border-left: 3px solid var(--rule); padding: 4px 16px; margin: 12px 0 18px; }
@@ -44,14 +46,13 @@ hr { border: 0; border-top: 1px solid var(--rule); margin: 34px 0; }
 ol.algo { max-width: 72ch; }
 ol.algo li { margin: 6px 0; }
 code { font: .87em var(--mono); background: var(--soft); padding: 0 4px; border-radius: 3px; }
-.totop { float: right; font: 500 11px var(--mono); }
 </style>
 
 <div class="page">
 <header>
   <div class="eyebrow">MuSemantiQ · dev docs · src/omr</div>
   <h1>Mathematics of Training</h1>
-  <p class="sub">The complete mathematics of how the classifier learns: the forward pass, the cost, the derivatives through every layer, and the nudge. Built from one neuron upward, each result derived — nothing assumed.</p>
+  <p class="sub">The complete mathematics of how the classifier learns: the forward pass, the cost, the derivatives through every layer, and the nudge. Every formula is followed by every variable it uses — nothing is left to remember.</p>
 </header>
 
 <nav>
@@ -82,8 +83,10 @@ $$
 
 <div class="syms">
 <p>\(x_{i,j}\) — the ink of one pixel, a scalar between \(0\) (paper) and \(1\) (ink)</p>
-<p>\(i\) — the column index; \(j\) — the row index (image coordinates, \(y\) down)</p>
-<p>\(H,\ W\) — the grid's width and height; the crop is normalized to \(H = W = 48\) before anything else</p>
+<p>\(i\) — the column index of the pixel</p>
+<p>\(j\) — the row index of the pixel (image coordinates, \(j\) grows downward)</p>
+<p>\(H\) — the width of the grid in pixels</p>
+<p>\(W\) — the height of the grid in pixels; the crop is normalized to \(H = W = 48\) before anything else</p>
 </div>
 
 <p>One unit of the network takes such numbers and produces one number:</p>
@@ -93,10 +96,12 @@ a = \sigma\Bigl(\sum_{i,j} x_{i,j}\, w_{i,j} + b\Bigr) \tag{1}
 $$
 
 <div class="syms">
-<p>\(a\) — the result, or activation, of the unit</p>
-<p>\(w_{i,j}\) — the weight the unit gives to the pixel at \((i, j)\)</p>
-<p>\(b\) — the bias, a scalar shift</p>
-<p>\(\sigma\) — the activation function; we use \(\mathrm{ReLU}(z) = \max(0, z)\)</p>
+<p>\(a\) — the result, or activation, of the unit: one number</p>
+<p>\(\sigma\) — the activation function applied to the sum; we use \(\mathrm{ReLU}(z) = \max(0, z)\)</p>
+<p>\(\sum_{i,j}\) — the sum over every pixel of the input window</p>
+<p>\(x_{i,j}\) — the ink of the pixel at column \(i\), row \(j\)</p>
+<p>\(w_{i,j}\) — the weight the unit gives to that pixel; what training finds</p>
+<p>\(b\) — the bias of the unit, a scalar shift added before the activation</p>
 </div>
 
 <p>A convolutional layer is nothing but many such units, each reading only a small window of the image. A dense layer is many such units, each reading everything.</p>
@@ -111,11 +116,15 @@ z_{i,j,k} = b_k + \sum_{p=0}^{F-1} \sum_{q=0}^{F-1} \sum_{c=1}^{C} w_{p,q,c,k}\,
 $$
 
 <div class="syms">
-<p>\(z_{i,j,k}\) — the pre-activation of filter \(k\) at position \((i, j)\)</p>
-<p>\(w_{p,q,c,k}\) — the weight of filter \(k\) at window offset \((p, q)\) of input channel \(c\); this is what training finds</p>
-<p>\(b_k\) — the bias of filter \(k\), one per filter</p>
-<p>\(a_{i+p,\,j+q,\,c}\) — the input activation; out-of-bounds positions read \(0\) ("same" padding), so the grid keeps its size</p>
-<p>\(F\) — the window size, \(3\) in our model; \(C\) — the number of input channels; \(K\) — the number of filters</p>
+<p>\(z_{i,j,k}\) — the pre-activation of filter \(k\) at output position \((i, j)\): the weighted sum before the activation function</p>
+<p>\(b_k\) — the bias of filter \(k\); one bias per filter, shared by all its positions</p>
+<p>\(\sum_{p=0}^{F-1} \sum_{q=0}^{F-1}\) — the sum over the \(F \times F\) window offsets</p>
+<p>\(\sum_{c=1}^{C}\) — the sum over all input channels</p>
+<p>\(F\) — the window size, \(3\) in our model; \(p, q\) — the offset inside the window, \(0 \le p, q \lt F\)</p>
+<p>\(C\) — the number of input channels (\(1\) for the first layer, more deeper in)</p>
+<p>\(w_{p,q,c,k}\) — the weight of filter \(k\) at window offset \((p, q)\) of input channel \(c\); what training finds</p>
+<p>\(a_{i+p,\, j+q,\, c}\) — the input activation at the window position; out-of-bounds positions read \(0\) ("same" padding), so the grid keeps its size</p>
+<p>\(i, j\) — the output column and row; \(k\) — the filter index, \(1 \le k \le K\)</p>
 </div>
 
 <p>Then the activation:</p>
@@ -124,6 +133,13 @@ $$
 a_{i,j,k} = \max(0,\ z_{i,j,k}) \tag{3}
 $$
 
+<div class="syms">
+<p>\(a_{i,j,k}\) — the activation of filter \(k\) at position \((i, j)\): the output of this layer</p>
+<p>\(\max(0, z)\) — the ReLU: negative values become \(0\), others pass unchanged</p>
+<p>\(z_{i,j,k}\) — the pre-activation from (2)</p>
+<p>\(i, j, k\) — output column, row, and filter index, as in (2)</p>
+</div>
+
 <p>Now the form the code actually runs. Every window of the input is cut into one row of a matrix — this is called <em>im2col</em>:</p>
 
 $$
@@ -131,8 +147,13 @@ P \in \mathbb{R}^{(H W) \times R}, \qquad \hat{W} \in \mathbb{R}^{K \times R}, \
 $$
 
 <div class="syms">
-<p>\(P\) — the patch matrix; row \((j H + i)\) is the flattened window starting at \((i, j)\)</p>
-<p>\(\hat W\) — the same weights as \(w_{p,q,c,k}\), flattened so one filter is one row of length \(R\)</p>
+<p>\(P\) — the patch matrix; row \(jH + i\) is the flattened input window starting at \((i, j)\)</p>
+<p>\(\mathbb{R}^{(HW) \times R}\) — the space of real matrices with \(H \times W\) rows and \(R\) columns</p>
+<p>\(H, W\) — the width and height of the input grid, in pixels</p>
+<p>\(\hat W\) — the same weights as \(w_{p,q,c,k}\), flattened so one filter is one row</p>
+<p>\(K\) — the number of filters; each is one row of \(\hat W\)</p>
+<p>\(R\) — the length of one flattened window: \(F^2 C\) numbers</p>
+<p>\(F\) — the window size; \(C\) — the number of input channels</p>
 </div>
 
 <p>Then the whole layer is one matrix product:</p>
@@ -141,10 +162,25 @@ $$
 Z = P\, \hat{W}^{T} + \mathbf{1}\, b^{T} \tag{5}
 $$
 
+<div class="syms">
+<p>\(Z\) — all pre-activations of the layer, one row per output position, one column per filter</p>
+<p>\(P\) — the patch matrix from (4)</p>
+<p>\(\hat W^{T}\) — the transposed weight matrix from (4); transposition puts each filter against each row</p>
+<p>\(\mathbf{1}\) — a column of ones, so the bias adds to every position</p>
+<p>\(b^{T}\) — the transposed bias vector; \(b\) holds one bias \(b_k\) per filter</p>
+</div>
+
 <div class="claim">
 <b>Claim.</b> The matrix form (5) computes exactly the sums of (2).
 <div class="proof">
 <b>Proof.</b> Row \(m = jH + i\) of \(P\) holds the window of (2) in the same order \(\hat W\) holds \(w_{p,q,c,k}\). The product of row \(m\) of \(P\) with column \(k\) of \(\hat W^T\) is therefore the triple sum of (2), and adding \(b_k\) gives \(z_{i,j,k}\). This holds for every \((i, j)\), so the matrices agree element by element. <span class="step">∎</span>
+
+<div class="syms tight">
+<p>\(m\) — the flattened position index of output pixel \((i, j)\): \(m = jH + i\)</p>
+<p>\(P\) — the patch matrix from (4); \(\hat W\) — the flattened weights from (4)</p>
+<p>\(\hat W^T\) — its transpose; \(b_k\) — the bias of filter \(k\) from (2)</p>
+<p>\(z_{i,j,k}\) — the pre-activation of filter \(k\) at \((i, j)\), as in (2)</p>
+</div>
 </div>
 </div>
 
@@ -156,6 +192,12 @@ $$
 $$
 a = \max(0,\ z) \tag{6}
 $$
+
+<div class="syms">
+<p>\(a\) — the activation, the output of the unit</p>
+<p>\(\max(0, z)\) — ReLU: negative values become \(0\)</p>
+<p>\(z\) — the pre-activation, one number</p>
+</div>
 
 <p>Element by element. The derivative exists everywhere except at \(z = 0\):</p>
 
@@ -169,7 +211,10 @@ $$
 $$
 
 <div class="syms">
+<p>\(\frac{\partial a}{\partial z}\) — the derivative of the activation with respect to its pre-activation: how much \(a\) moves when \(z\) moves by a hair</p>
+<p>\(a\) — the activation from (6); \(z\) — the pre-activation from (6)</p>
 <p>\(\varepsilon\) — an arbitrarily small number; \(\max(0, z)\) has no derivative at \(0\), so we agree on one. It changes nothing and removes the exception</p>
+<p>the cases say: the gate is shut (\(0\)) below zero, open (\(1\)) above</p>
 </div>
 
 <p>Pooling shrinks the grid by half, keeping only the strongest value of each \(2 \times 2\) window:</p>
@@ -179,9 +224,11 @@ a^{\mathrm{pool}}_{i,j,c} = \max_{u,v \in \{0,1\}}\ a_{2i+u,\ 2j+v,\ c} \tag{8}
 $$
 
 <div class="syms">
-<p>\(a^{\mathrm{pool}}_{i,j,c}\) — the pooled value at half the resolution</p>
-<p>\((u, v)\) — the offset inside the \(2 \times 2\) window</p>
-<p>the winning offset is <em>remembered</em>; the backward pass will need it</p>
+<p>\(a^{\mathrm{pool}}_{i,j,c}\) — the pooled value at position \((i, j)\) of channel \(c\); half the resolution of the input</p>
+<p>\(\max_{u,v \in \{0,1\}}\) — the largest value over the four cells of the window</p>
+<p>\(a_{2i+u,\, 2j+v,\, c}\) — the unpooled activation at the window cell; \(u, v\) — offsets inside the \(2 \times 2\) window</p>
+<p>\(i, j\) — the pooled column and row; \(c\) — the channel index</p>
+<p>the winning offset \((u, v)\) is <em>remembered</em>; the backward pass will need it</p>
 </div>
 
 <!-- ======================= 4 ======================= -->
@@ -194,9 +241,13 @@ z^{(l)} = W^{(l)} a^{(l-1)} + b^{(l)}, \qquad a^{(l)} = \mathrm{ReLU}(z^{(l)}) \
 $$
 
 <div class="syms">
+<p>\(z^{(l)}\) — the pre-activation vector of layer \(l\): one entry per output neuron</p>
+<p>\(W^{(l)} \in \mathbb{R}^{n_l \times n_{l-1}}\) — the weights of layer \(l\); row \(j\) holds the weights of output neuron \(j\)</p>
 <p>\(a^{(l-1)}\) — the input of layer \(l\), the output of layer \(l-1\); \(a^{(0)}\) is the flattened crop</p>
-<p>\(W^{(l)} \in \mathbb{R}^{n_l \times n_{l-1}}\) — the weights; row \(j\) holds the weights of output neuron \(j\)</p>
-<p>\(b^{(l)} \in \mathbb{R}^{n_l}\) — the biases; \(n_l\) — the number of outputs of layer \(l\)</p>
+<p>\(b^{(l)} \in \mathbb{R}^{n_l}\) — the biases of layer \(l\), one per output neuron</p>
+<p>\(a^{(l)}\) — the activation vector of layer \(l\): the same shape as \(z^{(l)}\), after ReLU</p>
+<p>\(\mathrm{ReLU}(\cdot)\) — applied element by element, as (6)</p>
+<p>\(l\) — the layer index; \(n_l\) — the number of outputs of layer \(l\), \(n_{l-1}\) the number of inputs</p>
 </div>
 
 <p>The last layer produces class scores \(z \in \mathbb{R}^{K}\), and the softmax turns them into probabilities:</p>
@@ -207,13 +258,22 @@ $$
 
 <div class="syms">
 <p>\(p_c\) — the probability the crop belongs to class \(c\); the whole vector \(p\) sums to \(1\)</p>
-<p>\(m\) — the largest score, subtracted only so the exponentials cannot overflow</p>
+<p>\(z_c\) — the score (pre-activation) of class \(c\) from the last layer</p>
+<p>\(e\) — the base of the natural logarithm, \(\approx 2.718\)</p>
+<p>\(m\) — the largest score, \(\max_j z_j\); subtracted only so the exponentials cannot overflow</p>
+<p>\(\sum_{j=1}^{K}\) — the sum over all \(K\) classes; the denominator makes the probabilities total \(1\)</p>
+<p>\(K\) — the number of classes (the vocabulary size); \(j\) — the class index of the sum</p>
 </div>
 
 <div class="claim">
 <b>Claim.</b> Subtracting \(m\) does not change \(p\).
 <div class="proof">
 <b>Proof.</b> \(e^{z_c - m} = e^{-m} e^{z_c}\), so both numerator and denominator carry the same factor \(e^{-m}\), which cancels. <span class="step">∎</span>
+
+<div class="syms tight">
+<p>\(z_c\) — the score of class \(c\); \(m\) — the largest score; both from (10)</p>
+<p>\(e^{-m}\) — the common factor that cancels; \(p\) — the probability vector of (10)</p>
+</div>
 </div>
 </div>
 
@@ -226,6 +286,13 @@ $$
 C_{\mathrm{CE}} = -\log p_y \tag{11}
 $$
 
+<div class="syms">
+<p>\(C_{\mathrm{CE}}\) — the cross-entropy cost of one crop: \(0\) when the truth is certain, growing fast when the model is confidently wrong</p>
+<p>\(\log\) — the natural logarithm</p>
+<p>\(p_y\) — the probability the model gave to the true class of this crop</p>
+<p>\(y\) — the true class of the crop, a number between \(1\) and \(K\)</p>
+</div>
+
 <p>Over a batch of \(N\) crops, plus a penalty on the size of the learned numbers:</p>
 
 $$
@@ -233,11 +300,15 @@ C = \underbrace{-\frac{1}{N} \sum_{n=1}^{N} \log p_{n,\, y_n}}_{\text{cross-entr
 $$
 
 <div class="syms">
-<p>\(n\) — the index of a crop in the batch, \(1 \le n \le N\)</p>
-<p>\(y_n\) — the true class of crop \(n\) (a number, \(1 \le y_n \le K\))</p>
-<p>\(p_{n,\,y_n}\) — the probability the model gave to that true class</p>
-<p>\(\theta\) — every learned number together: all \(w\) and all \(b\)</p>
-<p>\(\lambda\) — how hard the penalty bites; tiny, \(0.0005\)</p>
+<p>\(C\) — the total cost: the one number training pushes down</p>
+<p>\(N\) — the number of crops in the batch</p>
+<p>\(\sum_{n=1}^{N}\) — the sum over the crops of the batch; \(n\) — the crop index, \(1 \le n \le N\)</p>
+<p>\(\log p_{n,\, y_n}\) — the log-probability crop \(n\) gave to its own true class \(y_n\)</p>
+<p>\(y_n\) — the true class of crop \(n\)</p>
+<p>\(\lambda\) — how hard the size penalty bites; tiny, \(0.0005\)</p>
+<p>\(\sum_{\theta} \theta^{2}\) — the sum of the squares of every learned number (all weights and biases)</p>
+<p>\(\theta\) — any one learned number; the sum ranges over all of them</p>
+<p>\(L_2\) — the name of this penalty, the sum of squares</p>
 </div>
 
 <p>Why \(-\log\): \(p_y = 1\) costs \(0\); \(p_y = 0.5\) costs \(0.69\); \(p_y = 0.01\) costs \(4.6\). Confident and wrong is punished hard. Why \(\lambda\sum\theta^2\): without it the model can grow huge numbers to memorize the training pictures, and then fail on any picture it has not seen.</p>
@@ -257,7 +328,11 @@ w \sim \sqrt{\frac{2}{\mathrm{fan\text{-}in}}}\ \cdot\ \mathcal{N}(0, 1), \qquad
 $$
 
 <div class="syms">
+<p>\(w\) — any one weight at the start of training</p>
+<p>\(\sim\) — "is drawn from"; the value is a random sample</p>
 <p>\(\mathrm{fan\text{-}in}\) — how many inputs the unit reads: \(F^2 C\) for a conv, \(n_{l-1}\) for a dense layer</p>
+<p>\(\mathcal{N}(0, 1)\) — the standard bell curve: mean \(0\), spread \(1\)</p>
+<p>\(b\) — any one bias at the start; all begin at exactly \(0\)</p>
 <p>the \(\sqrt{2/\mathrm{fan\text{-}in}}\) factor keeps the size of \(z\) stable from layer to layer, so neither explosion nor vanishing</p>
 <p>the draws come from one seeded generator: the same seed gives the same starting model, everywhere</p>
 </div>
@@ -272,9 +347,13 @@ $$
 $$
 
 <div class="syms">
-<p>\(t\) — the step index</p>
-<p>\(g_t\) — the gradient at step \(t\): for every learned number, how much \(C\) grows when that number grows by a hair</p>
+<p>\(\theta_{t+1}\) — the value of one learned number after the step</p>
+<p>\(\theta_t\) — that number before the step</p>
 <p>\(\eta\) — the learning rate, the step size</p>
+<p>\(g_t\) — the gradient at step \(t\): how much \(C\) grows when this number grows by a hair</p>
+<p>\(\frac{\partial C}{\partial \theta}\Big|_{\theta_t}\) — the derivative of cost with respect to the number, evaluated at its current value</p>
+<p>\(t\) — the step index: \(0\) at the start, increasing once per batch</p>
+<p>\(C\) — the cost from (12)</p>
 </div>
 
 <p>One pass over the whole training set is an <em>epoch</em>; one small group of crops averaged together is a <em>batch</em>. The loop is:</p>
@@ -298,6 +377,18 @@ $$
 \frac{\partial C}{\partial \theta} = \frac{\partial C}{\partial p}\cdot\frac{\partial p}{\partial z^{(L)}}\cdot\frac{\partial z^{(L)}}{\partial a^{(L-1)}}\cdot\frac{\partial a^{(L-1)}}{\partial z^{(L-1)}} \cdots \frac{\partial z^{(l)}}{\partial \theta} \tag{15}
 $$
 
+<div class="syms">
+<p>\(\frac{\partial C}{\partial \theta}\) — the gradient of cost with respect to one learned number, anywhere in the network</p>
+<p>\(C\) — the cost from (12); \(p\) — the probability vector from (10)</p>
+<p>\(\frac{\partial C}{\partial p}\) — how the cost moves when a probability moves</p>
+<p>\(\frac{\partial p}{\partial z^{(L)}}\) — how the probabilities move when the last layer's scores move</p>
+<p>\(z^{(L)}\) — the score vector of the last layer \(L\); \(a^{(L-1)}\) — the last layer's input</p>
+<p>\(\frac{\partial z^{(L)}}{\partial a^{(L-1)}}\) — how the scores move when the previous activations move (here: \(W^{(L)}\))</p>
+<p>\(\frac{\partial a^{(L-1)}}{\partial z^{(L-1)}}\) — the ReLU gate of layer \(L-1\), as (7)</p>
+<p>\(\frac{\partial z^{(l)}}{\partial \theta}\) — how the affected pre-activation moves with the parameter being differentiated</p>
+<p>\(L\) — the index of the last layer; \(l\) — the index of the layer holding \(\theta\)</p>
+</div>
+
 <h3>9.1 The last layer: softmax + cross-entropy</h3>
 
 <div class="claim">
@@ -310,17 +401,40 @@ $$
 C = -z_y + m + \log \sum_{j} e^{\,z_j - m}
 $$
 
+<div class="syms tight">
+<p>\(C\) — the cross-entropy cost of one crop, from (11)</p>
+<p>\(z_y\) — the score of the true class \(y\)</p>
+<p>\(m\) — the largest score, \(\max_j z_j\), from (10)</p>
+<p>\(\log \sum_j e^{z_j - m}\) — the log of the softmax denominator from (10)</p>
+<p>\(z_j\) — the score of class \(j\); \(j\) — the class index summed over all \(K\) classes</p>
+</div>
+
 The \(m\) terms cancel under the log, so
 
 $$
 C = -z_y + \log \sum_{j} e^{z_j} \tag{16}
 $$
 
+<div class="syms tight">
+<p>\(C\) — the same cost, rewritten without the shift</p>
+<p>\(z_y\) — the score of the true class \(y\)</p>
+<p>\(\log \sum_j e^{z_j}\) — the log-sum-exp of all scores; the normalizing term of the softmax</p>
+<p>\(z_j\) — the score of class \(j\), summed over all \(K\) classes</p>
+</div>
+
 <span class="step">(a)</span> Differentiate the log-sum. For one score \(z_c\),
 
 $$
 \frac{\partial}{\partial z_c} \log \sum_j e^{z_j} = \frac{e^{z_c}}{\sum_j e^{z_j}} = p_c \tag{17}
 $$
+
+<div class="syms tight">
+<p>\(\frac{\partial}{\partial z_c}\) — the derivative with respect to the score of class \(c\), holding the other scores fixed</p>
+<p>\(\log \sum_j e^{z_j}\) — the log-sum-exp from (16)</p>
+<p>\(e^{z_c}\) — the exponential of the score of class \(c\); \(z_c\) is that score</p>
+<p>\(\sum_j e^{z_j}\) — the sum of the exponentials of all scores</p>
+<p>\(p_c\) — the resulting probability of class \(c\), exactly the softmax of (10)</p>
+</div>
 
 <span class="step">(b)</span> Differentiate the first term: \(\partial(-z_y)/\partial z_c = -1\) if \(c = y\), else \(0\). That is exactly \(-\mathrm{onehot}(y)_c\). <span class="step">[1]</span>
 
@@ -330,13 +444,17 @@ $$
 \frac{\partial C}{\partial z_c} = p_c - \mathrm{onehot}(y)_c \qquad \Longrightarrow \qquad \delta^{(L)} = p - \mathrm{onehot}(y) \tag{18}
 $$
 
-which is one subtraction of vectors. <span class="step">∎</span>
-</div>
+<div class="syms tight">
+<p>\(\frac{\partial C}{\partial z_c}\) — the gradient of cost with respect to the score of class \(c\)</p>
+<p>\(p_c\) — the probability of class \(c\) from (10)</p>
+<p>\(\mathrm{onehot}(y)_c\) — \(1\) if \(c\) is the true class, \(0\) otherwise</p>
+<p>\(\delta^{(L)}\) — the error signal at the last layer: one entry per class, how far each score was from certain</p>
+<p>\(p\) — the whole probability vector; \(\mathrm{onehot}(y)\) — the whole one-hot vector of the true class</p>
+<p>\(y\) — the true class; \(L\) — the last layer</p>
 </div>
 
-<div class="syms">
-<p>\(\delta^{(L)}\) — the error signal at the last layer: how far each score was from certain</p>
-<p>\(\mathrm{onehot}(y)\) — all zeros except \(1\) at the true class</p>
+which is one subtraction of vectors. <span class="step">∎</span>
+</div>
 </div>
 
 <h3>9.2 The dense layer</h3>
@@ -351,6 +469,18 @@ $$
 \frac{\partial C}{\partial a_k} = \sum_j W_{jk}\, \delta_j \tag{19}
 $$
 
+<div class="syms">
+<p>\(\frac{\partial C}{\partial W_{jk}}\) — the gradient of cost with respect to the weight from input \(k\) to output \(j\)</p>
+<p>\(\frac{\partial C}{\partial z_j}\) — how the cost moves with the pre-activation of output \(j\), written \(\delta_j\)</p>
+<p>\(\delta_j\) — the error signal arriving at output \(j\) from the layer after</p>
+<p>\(a_k\) — the activation of input \(k\) that fed this unit</p>
+<p>\(\frac{\partial C}{\partial b_j}\) — the gradient with respect to the bias of output \(j\)</p>
+<p>\(\frac{\partial C}{\partial a_k}\) — the blame handed back to input \(k\)</p>
+<p>\(\sum_j W_{jk} \delta_j\) — the sum over all outputs \(j\), each weighted by its own \(W_{jk}\)</p>
+<p>\(W_{jk}\) — the weight from input \(k\) to output \(j\); \(z_j, b_j\) — pre-activation and bias of output \(j\)</p>
+<p>\(C\) — the cost from (12)</p>
+</div>
+
 <p>Collecting (19) over all \(j, k\) gives the matrix forms the code runs:</p>
 
 $$
@@ -358,8 +488,12 @@ $$
 $$
 
 <div class="syms">
-<p>\(\delta\) — the error signal coming into this layer from the one after it</p>
-<p>\(\mathrm{d}a\) — the blame handed further back; it becomes the next layer's \(\delta\)</p>
+<p>\(\mathrm{d}W\) — the gradient matrix for \(W\): entry \((j, k)\) is \(\frac{\partial C}{\partial W_{jk}}\) from (19)</p>
+<p>\(\delta\) — the error signal vector arriving at this layer; entry \(j\) is \(\delta_j\)</p>
+<p>\(a^{T}\) — the transposed input vector; \(a\) is the layer's input, \(a_k\) its entries</p>
+<p>\(\mathrm{d}b\) — the gradient vector for the biases; same numbers as \(\delta\), by (19)</p>
+<p>\(\mathrm{d}a\) — the gradient vector handed back to the previous layer; entries \(\frac{\partial C}{\partial a_k}\)</p>
+<p>\(W^{T}\) — the transposed weight matrix; \(W\) holds the \(W_{jk}\) of this layer</p>
 <p>over a batch, \(\mathrm{d}W\) and \(\mathrm{d}b\) are summed over crops and divided by \(N\)</p>
 </div>
 
@@ -371,6 +505,14 @@ $$
 \delta_z = \delta_a \odot \mathbf{1}[z \gt 0] \tag{21}
 $$
 
+<div class="syms">
+<p>\(\delta_z\) — the blame for the pre-activation \(z\), before the ReLU</p>
+<p>\(\delta_a\) — the blame arriving for the activation \(a\), after the ReLU</p>
+<p>\(\odot\) — element-by-element multiplication</p>
+<p>\(\mathbf{1}[z \gt 0]\) — the indicator: \(1\) where \(z\) is positive, \(0\) elsewhere — the derivative of (7)</p>
+<p>\(z\) — the pre-activation from (6)</p>
+</div>
+
 $$
 \delta_z(2i+u,\, 2j+v,\, c) =
 \begin{cases}
@@ -380,10 +522,14 @@ $$
 $$
 
 <div class="syms">
-<p>\(\odot\) — element-by-element multiplication</p>
-<p>\(\mathbf{1}[\cdot]\) — \(1\) when true, \(0\) when false</p>
-<p>max-pool routes each blame to the single cell that won — which is why the forward pass remembers the winners</p>
+<p>\(\delta_z(2i+u, 2j+v, c)\) — the blame for the unpooled cell at window offset \((u, v)\) of pooled position \((i, j)\), channel \(c\)</p>
+<p>\(\delta_a(i, j, c)\) — the blame arriving at the pooled value of that window</p>
+<p>\(\text{at the remembered argmax}\) — the one cell of the \(2 \times 2\) window that won in (8); it receives all the blame</p>
+<p>\(\text{everywhere else}\) — the three losing cells receive \(0\): they did not affect the output</p>
+<p>\(i, j\) — pooled column and row; \(u, v\) — offsets inside the \(2 \times 2\) window; \(c\) — the channel</p>
 </div>
+
+<p>max-pool routes each blame to the single cell that won — which is why the forward pass remembers the winners.</p>
 
 <h3>9.4 The general pattern</h3>
 
@@ -392,6 +538,17 @@ $$
 $$
 \frac{\partial C}{\partial W^{(l)}} = \Bigl(\cdots\bigl((p - \mathrm{onehot}(y))\, W^{(L)T}\bigr) \odot \mathbf{1}[z^{(L-1)} \gt 0]\ W^{(L-1)T} \cdots\Bigr) \odot \mathbf{1}[z^{(l)} \gt 0]\ a^{(l-1)T} \tag{23}
 $$
+
+<div class="syms">
+<p>\(\frac{\partial C}{\partial W^{(l)}}\) — the gradient matrix for the weights of layer \(l\)</p>
+<p>\(p - \mathrm{onehot}(y)\) — the last layer's error signal \(\delta^{(L)}\) from (18)</p>
+<p>\(W^{(L)T}, W^{(L-1)T}\) — transposed weight matrices of the layers after \(l\); they route the blame back</p>
+<p>\(\odot \mathbf{1}[z^{(m)} \gt 0]\) — the ReLU gate of layer \(m\) from (21), applied on the way back</p>
+<p>\(a^{(l-1)T}\) — the transposed input of layer \(l\); multiplying by it turns blame into weight gradient, by (20)</p>
+<p>\(z^{(L-1)}, z^{(l)}\) — pre-activations of the layers whose gates are applied</p>
+<p>\(\cdots\) — the same two factors (gate, then \(W^T\)) repeated for every layer between</p>
+<p>\(L\) — the last layer; \(l\) — the layer being differentiated; \(y\) — the true class</p>
+</div>
 
 <p>Read (23) right to left: each layer turns the blame it receives into blame for the layer before, and multiplies it by its own input. That is the whole backward pass — implemented once per layer type, then simply run in reverse order.</p>
 
@@ -405,23 +562,32 @@ $$
 $$
 
 <div class="syms">
-<p>over a batch: \(\mathrm{d}b = \frac{1}{N}\sum_n \delta_n\) — the mean error of the batch, one per neuron</p>
-<p>nothing stops each neuron from carrying its own bias, so each gets its own update</p>
+<p>\(\frac{\partial C}{\partial b^{(l)}}\) — the gradient vector for the biases of layer \(l\)</p>
+<p>\(\delta^{(l)}\) — the error signal vector arriving at layer \(l\)</p>
+<p>\(\frac{\partial C}{\partial b^{(L)}}\) — the gradient for the biases of the last layer \(L\)</p>
+<p>\(p\) — the probability vector from (10)</p>
+<p>\(\mathrm{onehot}(y)\) — the one-hot vector of the true class \(y\)</p>
+<p>over a batch: \(\mathrm{d}b = \frac{1}{N}\sum_n \delta_n\) — the mean error of the batch, one per neuron; \(N\) — the batch size, \(\delta_n\) the error signal of crop \(n\)</p>
 </div>
 
 <!-- ======================= 11 ======================= -->
 <h2 id="s11"><span class="n">11.</span> The Derivative of the Convolution</h2>
 
-<p>Through im2col the convolution is \(Z = P\hat W^{T} + \mathbf{1}b^{T}\) — a matrix product — so its gradients are matrix gradients. With the error reshaped to match, \(D \in \mathbb{R}^{(HW) \times K}\), row \(m\) = position \(m\):</p>
+<p>Through im2col the convolution is \(Z = P\hat W^{T} + \mathbf{1}b^{T}\) — a matrix product — so its gradients are matrix gradients. With the error reshaped to match, \(D \in \mathbb{R}^{(HW) \times K}\):</p>
 
 $$
 \mathrm{d}\hat W = D^{T} P, \qquad \mathrm{d}b = \mathbf{1}^{T} D, \qquad \mathrm{d}P = D\, \hat W \tag{25}
 $$
 
 <div class="syms">
-<p>\(D\) — the blame arriving at the convolution's output, in the same layout as \(Z\)</p>
-<p>\(\mathrm{d}\hat W\) — one row per filter: how each weight of that filter contributed to the error</p>
+<p>\(\mathrm{d}\hat W\) — the gradient for the flattened weights \(\hat W\) of (4): one row per filter</p>
+<p>\(D\) — the blame arriving at the convolution's output, reshaped to match \(Z\): row \(m\) = position \(m\), column \(k\) = filter \(k\)</p>
+<p>\(D^{T}\) — the transpose of \(D\)</p>
+<p>\(P\) — the patch matrix of (4)</p>
+<p>\(\mathrm{d}b\) — the gradient for the biases of the convolution; one entry per filter</p>
+<p>\(\mathbf{1}^{T} D\) — the column sums of \(D\): each filter's blame added over all positions</p>
 <p>\(\mathrm{d}P\) — the blame for every patch; patches overlap, so it must be scattered back</p>
+<p>\(\hat W\) — the flattened weights of (4)</p>
 </div>
 
 <div class="claim">
@@ -433,6 +599,15 @@ $$
 \frac{\partial C}{\partial w_{p,q,c,k}} = \sum_{i,j} \frac{\partial C}{\partial z_{i,j,k}}\, a_{i+p,\, j+q,\, c} = \sum_{i,j} D_{i,j,k}\, a_{i+p,\, j+q,\, c}
 $$
 
+<div class="syms tight">
+<p>\(\frac{\partial C}{\partial w_{p,q,c,k}}\) — the gradient of cost with respect to one weight of filter \(k\), window offset \((p, q)\), channel \(c\)</p>
+<p>\(\sum_{i,j}\) — the sum over every output position where that weight takes part</p>
+<p>\(\frac{\partial C}{\partial z_{i,j,k}}\) — the blame at pre-activation \((i, j, k)\); by definition the entry \(D_{i,j,k}\) of \(D\)</p>
+<p>\(a_{i+p,\, j+q,\, c}\) — the input value the weight multiplied at that position</p>
+<p>\(D_{i,j,k}\) — the entry of the error matrix \(D\) at position \((i, j)\), filter \(k\)</p>
+<p>\(C\) — the cost from (12); \(w_{p,q,c,k}\) — the weight from (2)</p>
+</div>
+
 which is precisely the \((k, p, q, c)\) entry of \(D^{T}P\), since row \((i,j)\) of \(P\) holds \(a_{i+p,j+q,c}\) at that offset. The bias case is the same sum with coefficient \(1\). <span class="step">∎</span>
 </div>
 </div>
@@ -443,11 +618,28 @@ $$
 \mathrm{d}a = \mathrm{col2im}(\mathrm{d}P), \qquad \mathrm{col2im}(P)_{i,j,c} = \sum_{\text{patches covering }(i,j,c)} (\cdot) \tag{26}
 $$
 
+<div class="syms">
+<p>\(\mathrm{d}a\) — the gradient for the convolution's input: same shape as \(a\)</p>
+<p>\(\mathrm{col2im}(\cdot)\) — the scatter of patch rows back to the grid they were cut from (the inverse of im2col)</p>
+<p>\(\mathrm{d}P\) — the patch-wise blame from (25)</p>
+<p>\(\mathrm{col2im}(P)_{i,j,c}\) — the value written at input position \((i, j)\), channel \(c\)</p>
+<p>\(\sum_{\text{patches covering }(i,j,c)}\) — the sum over every patch that includes this input position; overlapping windows add their blames</p>
+<p>\((\cdot)\) — the patch value being scattered</p>
+</div>
+
 <p>Finally, the penalty of (12) differentiates to:</p>
 
 $$
 \frac{\partial C_{L_2}}{\partial \theta} = 2 \lambda \theta \tag{27}
 $$
+
+<div class="syms">
+<p>\(C_{L_2}\) — the size penalty \(\lambda\sum_\theta \theta^2\) from (12)</p>
+<p>\(\frac{\partial C_{L_2}}{\partial \theta}\) — its gradient with respect to one learned number</p>
+<p>\(\lambda\) — the penalty strength from (12)</p>
+<p>\(\theta\) — that learned number (a weight or a bias)</p>
+<p>the factor \(2\) comes from differentiating the square</p>
+</div>
 
 <p>and joins every gradient before the update.</p>
 
@@ -460,25 +652,53 @@ $$
 m_t = \beta_1 m_{t-1} + (1 - \beta_1) g_t, \qquad v_t = \beta_2 v_{t-1} + (1 - \beta_2) g_t^{2} \tag{28}
 $$
 
+<div class="syms">
+<p>\(m_t\) — the smoothed direction of this parameter at step \(t\): which way its gradients have been pointing lately</p>
+<p>\(v_t\) — the smoothed scale at step \(t\): how big its gradients have been lately</p>
+<p>\(\beta_1 = 0.9\) — how much past direction to keep</p>
+<p>\(\beta_2 = 0.999\) — how much past scale to keep</p>
+<p>\(m_{t-1}, v_{t-1}\) — the same memories at the previous step</p>
+<p>\(g_t\) — the gradient of this parameter at step \(t\), from (18)–(27)</p>
+<p>\(g_t^{2}\) — the squared gradient; \(t\) — the step index</p>
+</div>
+
 $$
 \hat m_t = \frac{m_t}{1 - \beta_1^{t}}, \qquad \hat v_t = \frac{v_t}{1 - \beta_2^{t}} \tag{29}
 $$
+
+<div class="syms">
+<p>\(\hat m_t\) — the corrected direction: the memory un-shrunk for the first steps</p>
+<p>\(\hat v_t\) — the corrected scale, likewise</p>
+<p>\(m_t, v_t\) — the memories from (28)</p>
+<p>\(\beta_1^{t}, \beta_2^{t}\) — the histories raised to the step index \(t\); both factors start near \(0\) and approach \(1\)</p>
+</div>
 
 $$
 \theta_t = \theta_{t-1} - \eta \cdot \frac{\hat m_t}{\sqrt{\hat v_t} + \varepsilon} \tag{30}
 $$
 
 <div class="syms">
-<p>\(m_t\) — smoothed direction: which way the gradients have been pointing lately</p>
-<p>\(v_t\) — smoothed scale: how big they have been lately</p>
-<p>\(\beta_1 = 0.9,\ \beta_2 = 0.999\) — how much history to keep</p>
-<p>\(\eta = 0.001\) — the learning rate; \(\varepsilon = 10^{-8}\) — only to keep the denominator away from zero</p>
+<p>\(\theta_t\) — the value of this learned number after step \(t\)</p>
+<p>\(\theta_{t-1}\) — its value before the step</p>
+<p>\(\eta = 0.001\) — the learning rate, the overall step size</p>
+<p>\(\hat m_t\) — the corrected direction from (29)</p>
+<p>\(\sqrt{\hat v_t}\) — the corrected scale from (29), square-rooted so it shares the units of the gradient</p>
+<p>\(\varepsilon = 10^{-8}\) — only to keep the denominator away from zero</p>
 </div>
 
 <div class="claim">
 <b>Claim.</b> The correction (29) removes the bias of the first steps.
 <div class="proof">
 <b>Proof.</b> Both memories start at zero, so after one step \(m_1 = (1-\beta_1) g_1\) is far too small. Taking expectations with \(g\) roughly constant in direction, \(\mathbb{E}[m_t] = (1 - \beta_1) \sum_{i=1}^{t} \beta_1^{\,t-i}\, \mathbb{E}[g] = (1-\beta_1^{t})\, \mathbb{E}[g]\). Dividing by \(1 - \beta_1^{t}\) gives \(\mathbb{E}[\hat m_t] = \mathbb{E}[g]\) — an honest estimate from step one. The same argument holds for \(v_t\) with \(\beta_2\). <span class="step">∎</span>
+
+<div class="syms tight">
+<p>\(\mathbb{E}[\cdot]\) — the expected (average) value over randomness in the gradients</p>
+<p>\(m_1 = (1-\beta_1) g_1\) — the first step's memory: only a fraction of the first gradient</p>
+<p>\(\beta_1^{\,t-i}\) — the weight the gradient of step \(i\) still carries at step \(t\)</p>
+<p>\(\mathbb{E}[g]\) — the expected gradient, assumed roughly steady in direction</p>
+<p>\(1-\beta_1^{t}\) — the missing mass of the first steps; the divisor of (29)</p>
+<p>\(\hat m_t\) — the corrected memory; \(v_t\) — the scale memory, corrected the same way with \(\beta_2\)</p>
+</div>
 </div>
 </div>
 
@@ -491,6 +711,16 @@ $$
 \frac{\partial C}{\partial \theta_i} \approx \frac{C(\theta + \varepsilon e_i) - C(\theta - \varepsilon e_i)}{2\varepsilon} \tag{31}
 $$
 
+<div class="syms">
+<p>\(\frac{\partial C}{\partial \theta_i}\) — the true gradient with respect to the \(i\)-th learned number</p>
+<p>\(C(\theta \pm \varepsilon e_i)\) — the cost of the whole model when that one number is nudged up (or down) by \(\varepsilon\)</p>
+<p>\(\theta\) — all learned numbers together</p>
+<p>\(\varepsilon\) — the nudge, tiny (\(10^{-7}\) in the tests)</p>
+<p>\(e_i\) — the vector that is \(1\) at position \(i\), \(0\) everywhere else; it selects one number</p>
+<p>\(2\varepsilon\) — the distance between the two probes</p>
+<p>\(\approx\) — equal up to the error proved below</p>
+</div>
+
 <div class="claim">
 <b>Claim.</b> The right side of (31) is the true derivative plus an error of order \(\varepsilon^2\).
 <div class="proof">
@@ -500,11 +730,28 @@ $$
 C(\theta \pm \varepsilon e_i) = C(\theta) \pm \varepsilon \frac{\partial C}{\partial \theta_i} + \frac{\varepsilon^2}{2} \frac{\partial^2 C}{\partial \theta_i^2} \pm \frac{\varepsilon^3}{6} \frac{\partial^3 C}{\partial \theta_i^3} + \cdots
 $$
 
+<div class="syms tight">
+<p>\(C(\theta \pm \varepsilon e_i)\) — the cost at the nudged values</p>
+<p>\(C(\theta)\) — the cost at the current values</p>
+<p>\(\frac{\partial C}{\partial \theta_i}\) — the first derivative, the gradient being checked</p>
+<p>\(\frac{\partial^2 C}{\partial \theta_i^2}, \frac{\partial^3 C}{\partial \theta_i^3}\) — the second and third derivatives of cost with respect to that one number</p>
+<p>\(\varepsilon\) — the nudge; \(\varepsilon^2, \varepsilon^3\) — its powers, coming from the expansion</p>
+<p>\(\pm\) — the upper sign is the \(+\varepsilon\) probe, the lower the \(-\varepsilon\) probe</p>
+<p>\(\cdots\) — the smaller terms that follow</p>
+</div>
+
 Subtracting cancels the even terms and divides out one \(\varepsilon\):
 
 $$
 \frac{C(\theta + \varepsilon e_i) - C(\theta - \varepsilon e_i)}{2\varepsilon} = \frac{\partial C}{\partial \theta_i} + \frac{\varepsilon^2}{6} \frac{\partial^3 C}{\partial \theta_i^3} + \cdots \tag{32}
 $$
+
+<div class="syms tight">
+<p>\(\frac{C(\theta + \varepsilon e_i) - C(\theta - \varepsilon e_i)}{2\varepsilon}\) — the central difference: the two probes of (31), divided by their distance</p>
+<p>\(\frac{\partial C}{\partial \theta_i}\) — the true gradient, what we want</p>
+<p>\(\frac{\varepsilon^2}{6} \frac{\partial^3 C}{\partial \theta_i^3}\) — the leading error term: order \(\varepsilon^2\)</p>
+<p>\(C, \theta, \varepsilon, e_i\) — as in (31)</p>
+</div>
 
 so the agreement improves by two orders when \(\varepsilon\) shrinks by one. One caveat, the same as (7): at a ReLU corner the third derivative does not exist, and the finite difference lands between two slopes — so the check runs on a crop whose gates are all clearly open or shut. <span class="step">∎</span>
 </div>
@@ -522,6 +769,12 @@ so the agreement improves by two orders when \(\varepsilon\) shrinks by one. One
 <li>Repeat 3–5 for one epoch; then measure \(C\) and accuracy on the validation set — pictures the model has not trained on.</li>
 <li>Stop when the validation cost stops falling; keep the weights that scored best on validation. Check them once with (31); record their hash; ship.</li>
 </ol>
+
+<div class="syms tight">
+<p>\(N\) — the batch size; \(C\) — the cost from (12)</p>
+<p>\(\delta^{(L)}\) — the last layer's error signal from (18)</p>
+<p>\(\theta\) — all learned numbers; \(\eta\) — the learning rate used in (30)</p>
+</div>
 
 <p>That is the whole of it. The forward pass answers, the cost measures, the backward pass assigns blame, and the nudge moves. Everything else is pictures.</p>
 </div>

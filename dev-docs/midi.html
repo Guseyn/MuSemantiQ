@@ -165,28 +165,26 @@ dl.kv dd { margin: 0; overflow-wrap: anywhere; }
 .hljs-attr, .hljs-property, .hljs-variable.constant_ { color: var(--c-fn); }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style><style>
+:root { --ok-soft: #e2f0e4; }
 .scrollbox { overflow: auto; max-height: 580px; border-bottom: 1px solid var(--line); position: relative; }
 .scrollbox svg.sys { width: 820px; height: auto; border: 0; border-radius: 0; background: transparent; }
-.cluster rect { fill: var(--soft); stroke: var(--line); stroke-dasharray: 4 4; rx: 10; }
-.cluster text { font: 500 10px var(--mono); fill: var(--muted); text-anchor: start; }
+.cluster rect { fill: var(--code-bg); stroke: var(--line); stroke-dasharray: 4 4; rx: 10; }
+.cluster text { font: 500 10px var(--font-mono); fill: var(--muted); text-anchor: start; }
 .node { cursor: pointer; }
+.node rect:not(.band) { fill: var(--accent-soft); stroke: var(--line); stroke-width: 1.5; }
+.node rect.band { fill: var(--accent); stroke: none; }
 .node:hover rect:not(.band) { stroke: var(--accent); }
-.halo { fill: none; stroke: var(--accent); stroke-width: 2; opacity: 0; rx: 11; transform-box: fill-box; transform-origin: center; }
-.node.on .halo { animation: halo 1.7s ease-in-out infinite; }
-@keyframes halo {
-  0%, 100% { opacity: .25; transform: scale(1); }
-  50% { opacity: .95; transform: scale(1.07); }
-}
-.node.on rect:not(.band) { stroke: var(--accent); stroke-width: 2.5; fill: var(--accent-soft); }
-.node text { font-size: 11px; }
-.crumbs { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; padding: 7px 12px; border-bottom: 1px solid var(--line); font: 500 11.5px var(--mono); }
+.node.on rect:not(.band) { fill: var(--ok-soft); stroke: var(--ok); stroke-width: 2; }
+.node.on rect.band { fill: var(--ok); }
+.node text.fk { font: 500 9.5px var(--font-mono); fill: var(--muted); text-anchor: middle; }
+.crumbs { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; padding: 7px 12px; border-bottom: 1px solid var(--line); font: 500 11.5px var(--font-mono); }
 .crumbs button { font: inherit; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px; cursor: pointer; }
 .crumbs button:hover { color: var(--accent); border-color: var(--accent); }
 .crumbs button.now { background: var(--accent); border-color: var(--accent); color: var(--panel); }
 .stack { margin: 0; display: grid; gap: 2px; }
-.stack .frame { font: 12px var(--mono); color: var(--muted); padding: 2px 0 2px 14px; border-left: 2px solid var(--line); overflow-wrap: anywhere; }
-.stack .frame.here { border-left-color: var(--accent); color: var(--ink); background: var(--accent-soft); border-radius: 0 5px 5px 0; }
-.stack .frame.here::after { content: " ← here"; color: var(--accent); }
+.stack .frame { font: 12px var(--font-mono); color: var(--muted); padding: 2px 0 2px 14px; border-left: 2px solid var(--line); overflow-wrap: anywhere; }
+.stack .frame.here { border-left-color: var(--ok); color: var(--fg); background: var(--ok-soft); border-radius: 0 5px 5px 0; }
+.stack .frame.here::after { content: " ← here"; color: var(--ok); }
 dl.kv dd { overflow-wrap: anywhere; }
 .state { grid-template-columns: minmax(0, 1fr); }
 .stackwrap { min-width: 0; }
@@ -4007,6 +4005,10 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "fillTimeStamps",
      "MappedWithRefs"
     ],
+    "klines": [
+     "fillTimeStampsMapped",
+     "WithRefs.js"
+    ],
     "parent": null,
     "children": []
    },
@@ -4020,11 +4022,14 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
     "lines": [
      "generateMidi"
     ],
+    "klines": [
+     "generateMidi.js"
+    ],
     "parent": null,
     "children": [
-     "markUnitParamsIfItIsLastSingleUnitInVoiceOnPageLine",
      "orderTimeFrames",
-     "clone"
+     "clone",
+     "markUnitParamsIfItIsLastSingleUnitInVoiceOnPageLine"
     ]
    },
    "clone": {
@@ -4036,6 +4041,9 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
     "full": "clone",
     "lines": [
      "clone"
+    ],
+    "klines": [
+     "toolbox.js"
     ],
     "parent": "generateMidi",
     "children": []
@@ -4051,6 +4059,10 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "markUnitParamsIfItIsLastSi",
      "ngleUnitInVoiceOnPageLine"
     ],
+    "klines": [
+     "markUnitParamsIfItIsLastSingle",
+     "UnitInVoiceOnPageLine.js"
+    ],
     "parent": "generateMidi",
     "children": []
    },
@@ -4064,17 +4076,14 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
     "lines": [
      "orderTimeFrames"
     ],
+    "klines": [
+     "orderTimeFrames.js"
+    ],
     "parent": "generateMidi",
     "children": []
    }
   },
   "edges": {
-   "generateMidi-markUnitParamsIfItIsLastSingleUnitInVoiceOnPageLine": {
-    "d": "M300 55 L300 173",
-    "lx": 300,
-    "ly": 108,
-    "l": ""
-   },
    "generateMidi-orderTimeFrames": {
     "d": "M300 55 L510 173",
     "lx": 405,
@@ -4084,6 +4093,12 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
    "generateMidi-clone": {
     "d": "M300 55 L90 173",
     "lx": 195,
+    "ly": 108,
+    "l": ""
+   },
+   "generateMidi-markUnitParamsIfItIsLastSingleUnitInVoiceOnPageLine": {
+    "d": "M300 55 L300 173",
+    "lx": 300,
     "ly": 108,
     "l": ""
    }
@@ -4373,6 +4388,9 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
     "lines": [
      "addMidiNoteToTrack"
     ],
+    "klines": [
+     "addMidiNoteToTrack.js"
+    ],
     "parent": null,
     "children": [
      "addMidiNoteToTrackInCommonCase"
@@ -4388,6 +4406,10 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
     "lines": [
      "addTimeFrameTo",
      "IndicateDynamic"
+    ],
+    "klines": [
+     "addTimeFrameToIndicate",
+     "Dynamic.js"
     ],
     "parent": null,
     "children": [
@@ -4406,6 +4428,10 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "addTimeFrameToIndicate",
      "KeysThatLastOneMeasure"
     ],
+    "klines": [
+     "addTimeFrameToIndicateKeys",
+     "ThatLastOneMeasure.js"
+    ],
     "parent": null,
     "children": []
    },
@@ -4419,6 +4445,10 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
     "lines": [
      "addTimeFrameToIndic",
      "ateNewClefOnStave"
+    ],
+    "klines": [
+     "addTimeFrameToIndicate",
+     "NewClefOnStave.js"
     ],
     "parent": null,
     "children": []
@@ -4434,6 +4464,9 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "addMidiNoteToTra",
      "ckInCommonCase"
     ],
+    "klines": [
+     "addMidiNoteToTrack.js"
+    ],
     "parent": "addMidiNoteToTrack",
     "children": []
    },
@@ -4448,6 +4481,10 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "calculateEndingVelocityInCr",
      "escendoIfItIsNotSpeicified"
     ],
+    "klines": [
+     "addTimeFrameToIndicate",
+     "Dynamic.js"
+    ],
     "parent": "addTimeFrameToIndicateDynamic",
     "children": []
    },
@@ -4461,6 +4498,10 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
     "lines": [
      "calculateEndingVelocityInDim",
      "inuendoIfItIsNotSpeicified"
+    ],
+    "klines": [
+     "addTimeFrameToIndicate",
+     "Dynamic.js"
     ],
     "parent": "addTimeFrameToIndicateDynamic",
     "children": []
@@ -4860,6 +4901,10 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "calculateActual",
      "DurationOfUnit"
     ],
+    "klines": [
+     "calculateActualDuration",
+     "OfUnit.js"
+    ],
     "parent": null,
     "children": [
      "calculateMidiTremoloDurationFactor"
@@ -4876,6 +4921,10 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "calculateBreathMar",
      "ksTimeAdjustment"
     ],
+    "klines": [
+     "calculateBreathMarks",
+     "TimeAdjustment.js"
+    ],
     "parent": null,
     "children": []
    },
@@ -4889,6 +4938,10 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
     "lines": [
      "calculateDurationOf",
      "MeasureRestInSeconds"
+    ],
+    "klines": [
+     "calculateDurationOfMeasure",
+     "RestInSeconds.js"
     ],
     "parent": null,
     "children": [
@@ -4906,6 +4959,10 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "calculateFermataArticu",
      "lationTimeAdjustment"
     ],
+    "klines": [
+     "calculateFermataArticulation",
+     "TimeAdjustment.js"
+    ],
     "parent": null,
     "children": []
    },
@@ -4919,6 +4976,10 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
     "lines": [
      "calculateDurat",
      "ionInSeconds"
+    ],
+    "klines": [
+     "calculateDuration",
+     "InSeconds.js"
     ],
     "parent": "calculateDurationOfMeasureRestInSeconds",
     "children": []
@@ -4934,6 +4995,10 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "calculateMidiTremo",
      "loDurationFactor"
     ],
+    "klines": [
+     "calculateMidiTremolo",
+     "DurationFactor.js"
+    ],
     "parent": "calculateActualDurationOfUnit",
     "children": []
    },
@@ -4947,6 +5012,10 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
     "lines": [
      "calculatePitchAdjustm",
      "entForNoteTimeFrame"
+    ],
+    "klines": [
+     "calculatePitchAdjustment",
+     "ForNoteTimeFrame.js"
     ],
     "parent": null,
     "children": []
@@ -5315,6 +5384,10 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "adjustArpegg",
      "iatedNotes"
     ],
+    "klines": [
+     "adjustArpeggiated",
+     "Notes.js"
+    ],
     "parent": null,
     "children": []
    },
@@ -5328,6 +5401,10 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
     "lines": [
      "adjustMidiNoteWi",
      "thArticulations"
+    ],
+    "klines": [
+     "adjustMidiNoteWith",
+     "Articulations.js"
     ],
     "parent": null,
     "children": []
@@ -5343,6 +5420,10 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "adjustMidiNot",
      "eWithPedals"
     ],
+    "klines": [
+     "adjustMidiNote",
+     "WithPedals.js"
+    ],
     "parent": null,
     "children": []
    },
@@ -5356,6 +5437,10 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
     "lines": [
      "adjustMidiNo",
      "teWithSlur"
+    ],
+    "klines": [
+     "adjustMidiNote",
+     "WithSlur.js"
     ],
     "parent": null,
     "children": []
@@ -5783,6 +5868,10 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "assignTremol",
      "oTypeToUnit"
     ],
+    "klines": [
+     "assignTremolo",
+     "TypeToUnit.js"
+    ],
     "parent": null,
     "children": []
    },
@@ -5797,6 +5886,10 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "attachStaveIndexToNoteCon",
      "sideringItsStavePosition"
     ],
+    "klines": [
+     "attachStaveIndexToNoteConsidering",
+     "ItsStavePosition.js"
+    ],
     "parent": null,
     "children": []
    },
@@ -5810,11 +5903,14 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
     "lines": [
      "attachTrackToNote"
     ],
+    "klines": [
+     "attachTrackToNote.js"
+    ],
     "parent": null,
     "children": [
-     "canInstrumentBeReassigned",
      "findInstrumentForCurrentStaveInMidiFormat",
-     "isChannelOccupied"
+     "isChannelOccupied",
+     "canInstrumentBeReassigned"
     ]
    },
    "deleteArticulationsWithName": {
@@ -5827,6 +5923,10 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
     "lines": [
      "deleteArticula",
      "tionsWithName"
+    ],
+    "klines": [
+     "deleteArticulations",
+     "WithName.js"
     ],
     "parent": null,
     "children": []
@@ -5841,6 +5941,9 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
     "lines": [
      "canInstrument",
      "BeReassigned"
+    ],
+    "klines": [
+     "attachTrackToNote.js"
     ],
     "parent": "attachTrackToNote",
     "children": [
@@ -5858,6 +5961,10 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "findFirstArticu",
      "lationWithName"
     ],
+    "klines": [
+     "findFirstArticulation",
+     "WithName.js"
+    ],
     "parent": null,
     "children": []
    },
@@ -5871,6 +5978,10 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
     "lines": [
      "findInstrumentForCurr",
      "entStaveInMidiFormat"
+    ],
+    "klines": [
+     "findInstrumentForCurrent",
+     "StaveInMidiFormat.js"
     ],
     "parent": "attachTrackToNote",
     "children": [
@@ -5887,6 +5998,9 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
     "lines": [
      "isChannelOccupied"
     ],
+    "klines": [
+     "isChannelOccupied.js"
+    ],
     "parent": "attachTrackToNote",
     "children": []
    },
@@ -5901,6 +6015,10 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "doesNoteHaveSom",
      "eArticulations"
     ],
+    "klines": [
+     "doesNoteHaveSome",
+     "Articulations.js"
+    ],
     "parent": "findInstrumentForCurrentStaveInMidiFormat",
     "children": []
    }
@@ -5912,12 +6030,6 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
     "ly": 226,
     "l": ""
    },
-   "attachTrackToNote-canInstrumentBeReassigned": {
-    "d": "M510 55 L90 173",
-    "lx": 300,
-    "ly": 108,
-    "l": ""
-   },
    "attachTrackToNote-findInstrumentForCurrentStaveInMidiFormat": {
     "d": "M510 55 L510 173",
     "lx": 510,
@@ -5927,6 +6039,12 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
    "attachTrackToNote-isChannelOccupied": {
     "d": "M510 55 L720 173",
     "lx": 615,
+    "ly": 108,
+    "l": ""
+   },
+   "attachTrackToNote-canInstrumentBeReassigned": {
+    "d": "M510 55 L90 173",
+    "lx": 300,
     "ly": 108,
     "l": ""
    },
@@ -6030,15 +6148,20 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
       const n = sc.nodes[id];
       const g = el('g', { class: 'node', style: '--own: var(--accent)' }, gN);
       const tt = el('title', {}, g); tt.textContent = n.full + ' — click to zoom in';
-      el('rect', { class: 'halo', x: n.x - 81, y: n.y - 30, width: 162, height: 60 }, g);
-      el('rect', { x: n.x - 75, y: n.y - 25, width: 150, height: 50, rx: 7 }, g);
-      el('rect', { x: n.x - 75, y: n.y - 25, width: 6, height: 50, rx: 3, class: 'band' }, g);
+      el('rect', { x: n.x - 78, y: n.y - 31, width: 156, height: 62, rx: 7 }, g);
+      el('rect', { x: n.x - 78, y: n.y - 31, width: 6, height: 62, rx: 3, class: 'band' }, g);
       const words = n.lines;
-      const a = el('text', { x: n.x, y: n.y - 9 - (words.length - 1) * 7 }, g);
+      const nameY = words.length > 1 ? n.y - 18 : n.y - 11;
+      const a = el('text', { x: n.x, y: nameY }, g);
       words.forEach((w, i) => {
         const ts = el('tspan', { x: n.x, dy: i === 0 ? 0 : 13 }, a); ts.textContent = w;
       });
-      const b = el('text', { x: n.x, y: n.y + 17, class: 'k' }, g); b.textContent = n.k;
+      const kLines = n.klines || [n.k];
+      const kY = kLines.length > 1 ? n.y + 13 : n.y + 19;
+      const b = el('text', { x: n.x, y: kY, class: 'fk' }, g);
+      kLines.forEach((w, i) => {
+        const ts = el('tspan', { x: n.x, dy: i === 0 ? 0 : 12 }, b); ts.textContent = w;
+      });
       g.addEventListener('click', () => { zoom = id; jumpTo(id); });
       nodeEls[id] = g;
     }
