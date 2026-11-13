@@ -1,0 +1,50 @@
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <div class="eyebrow">MuSemantiQ · dev docs · __MODULE__</div>
+      <h1>__TITLE__</h1>
+    </div>
+    <span class="mrlinks"><a href="./omr-code.html">src/omr</a> · <a href="./omr-math.html">the math</a> · <a href="./language.html">src/language</a> · <a href="./drawer.html">src/drawer</a> · <a href="./midi.html">src/midi</a> · <a href="./training.html">training</a></span>
+  </header>
+  <p class="intro">__INTRO__</p>
+
+  <div class="player" role="region" aria-label="Player">
+    <div class="tabs" role="tablist" id="tabs"></div>
+    <div class="ctrl">
+      <button id="first" type="button" aria-label="First frame">⏮</button>
+      <button id="prev" type="button" aria-label="Previous frame">◀</button>
+      <button id="play" type="button" class="primary" aria-label="Play">▶ Play</button>
+      <button id="next" type="button" aria-label="Next frame">▶</button>
+      <input id="scrub" type="range" min="0" max="0" value="0" aria-label="Frame">
+      <span class="count" id="count">1 / 1</span>
+    </div>
+    <div class="caption" aria-live="polite"><b id="ctitle"></b><span id="ctext"></span></div>
+    <div class="keys"><kbd>←</kbd> <kbd>→</kbd> step · <kbd>space</kbd> play / pause · click a file to jump to its first frame</div>
+  </div>
+
+  <div class="stage">
+    <div class="left">
+      <div class="card">
+        <div class="hd"><span>folder structure</span><b id="where"></b></div>
+        <div class="scrollbox tree" id="tree" aria-label="The folder structure of the files this process touches"></div>
+      </div>
+      <div class="card">
+        <div class="state">
+          <section>
+            <h3>The call stack</h3>
+            <div id="worker" class="stackwrap"></div>
+            <h3>The signature</h3>
+            <pre class="msg" id="msg"></pre>
+            <h3>In one line</h3>
+            <pre class="msg" id="logline"></pre>
+          </section>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="hd"><span id="frepo" class="repo" style="--own:var(--accent)">MuSemantiQ</span><b id="fpath"></b><span id="flines"></span></div>
+      <div class="codebox" id="codebox"><ol id="code"></ol></div>
+    </div>
+  </div>
+</div>

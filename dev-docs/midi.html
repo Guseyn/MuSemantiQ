@@ -167,25 +167,17 @@ dl.kv dd { margin: 0; overflow-wrap: anywhere; }
 </style><style>
 :root { --ok-soft: #e2f0e4; }
 .scrollbox { overflow: auto; max-height: 580px; border-bottom: 1px solid var(--line); position: relative; }
-.scrollbox svg.sys { width: 820px; height: auto; border: 0; border-radius: 0; background: transparent; }
-.cluster rect { fill: var(--code-bg); stroke: var(--line); stroke-dasharray: 4 4; rx: 10; }
-.cluster text { font: 500 10px var(--font-mono); fill: var(--muted); text-anchor: start; }
-.node { cursor: pointer; }
-.node rect:not(.band) { fill: var(--accent-soft); stroke: var(--line); stroke-width: 1.5; }
-.node rect.band { fill: var(--accent); stroke: none; }
-.node:hover rect:not(.band) { stroke: var(--accent); }
-.node.on rect:not(.band) { fill: var(--ok-soft); stroke: var(--ok); stroke-width: 2; }
-.node.on rect.band { fill: var(--ok); }
-.node text { font: 600 11px var(--font-body); }
-.node text.fk { font: 500 9.5px var(--font-mono); fill: var(--muted); text-anchor: middle; }
-.crumbs { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; padding: 7px 12px; border-bottom: 1px solid var(--line); font: 500 11.5px var(--font-mono); }
-.crumbs button { font: inherit; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px; cursor: pointer; }
-.crumbs button:hover { color: var(--accent); border-color: var(--accent); }
-.crumbs button.now { background: var(--accent); border-color: var(--accent); color: var(--panel); }
+.scrollbox.tree { padding: 8px 6px; }
+.trow { font: 500 12px var(--font-mono); padding: 3px 10px; border-radius: 6px; white-space: nowrap; border-left: 2px solid transparent; }
+.trow.dir { color: var(--muted); }
+.trow.file { cursor: pointer; }
+.trow.file:hover { color: var(--accent); border-left-color: var(--accent); }
+.trow.file.in { background: var(--accent-soft); border-left-color: var(--accent); }
+.trow.file.on { background: var(--ok-soft); border-left-color: var(--ok); }
 .stack { margin: 0; display: grid; gap: 2px; }
 .stack .frame { font: 12px var(--font-mono); color: var(--muted); padding: 2px 0 2px 14px; border-left: 2px solid var(--line); overflow-wrap: anywhere; }
 .stack .frame.here { border-left-color: var(--ok); color: var(--fg); background: var(--ok-soft); border-radius: 0 5px 5px 0; }
-.stack .frame.here::after { content: " ← here"; color: var(--ok); }
+.stack .frame.here::after { content: " \u2190 here"; color: var(--ok); }
 dl.kv dd { overflow-wrap: anywhere; }
 .state { grid-template-columns: minmax(0, 1fr); }
 .stackwrap { min-width: 0; }
@@ -198,7 +190,7 @@ dl.kv dd { overflow-wrap: anywhere; }
     </div>
     <span class="mrlinks"><a href="./omr-code.html">src/omr</a> · <a href="./omr-math.html">the math</a> · <a href="./language.html">src/language</a> · <a href="./drawer.html">src/drawer</a> · <a href="./midi.html">src/midi</a> · <a href="./training.html">training</a></span>
   </header>
-  <p class="intro">Every function of the MIDI engine, process by process. Each tab holds its own set of connected blocks — the calls of that process — and each frame lights one function with the stack above it. Click any block to zoom in; the code is read from the repository.</p>
+  <p class="intro">Every function of the MIDI engine, file by file. Each tab holds the files that process touches; each frame lights one function and highlights its file in the folder structure. Click a file to jump to its first frame; the code is read from the repository.</p>
 
   <div class="player" role="region" aria-label="Player">
     <div class="tabs" role="tablist" id="tabs"></div>
@@ -211,22 +203,14 @@ dl.kv dd { overflow-wrap: anywhere; }
       <span class="count" id="count">1 / 1</span>
     </div>
     <div class="caption" aria-live="polite"><b id="ctitle"></b><span id="ctext"></span></div>
-    <div class="keys"><kbd>←</kbd> <kbd>→</kbd> step · <kbd>space</kbd> play / pause · click a block to zoom in</div>
+    <div class="keys"><kbd>←</kbd> <kbd>→</kbd> step · <kbd>space</kbd> play / pause · click a file to jump to its first frame</div>
   </div>
 
   <div class="stage">
     <div class="left">
       <div class="card">
-        <div class="hd"><span>this process</span><b id="where"></b></div>
-        <div class="crumbs" id="crumbs"></div>
-        <div class="scrollbox">
-          <svg class="sys" viewBox="0 0 820 460" role="img" aria-label="The connected blocks of the current process">
-            <g id="groups"></g>
-            <g id="edges"></g>
-            <g id="nodes"></g>
-            <g id="tok" style="display:none"><rect rx="4" height="18"></rect><text dy="4"></text><circle r="7"></circle></g>
-          </svg>
-        </div>
+        <div class="hd"><span>folder structure</span><b id="where"></b></div>
+        <div class="scrollbox tree" id="tree" aria-label="The folder structure of the files this process touches"></div>
       </div>
       <div class="card">
         <div class="state">
@@ -3873,6 +3857,62 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
   }
 }
 </script>
+<script type="text/plain" id="src-src/midi/convertUint8ToBase64.js#3" data-path="src/midi/convertUint8ToBase64.js" data-start="3">
+const convertTripletToBase64 = (num, lookup) => {
+  return lookup[num >> 18 & 0x3F] +
+    lookup[num >> 12 & 0x3F] +
+    lookup[num >> 6 & 0x3F] +
+    lookup[num & 0x3F]
+}
+</script>
+<script type="text/plain" id="src-src/midi/convertUint8ToBase64.js#10" data-path="src/midi/convertUint8ToBase64.js" data-start="10">
+const encodeChunk = (uint8, start, end, lookup) => {
+  let tmp
+  const output = []
+  for (let i = start; i < end; i += 3) {
+    tmp = ((uint8[i] << 16) & 0xFF0000) +
+      ((uint8[i + 1] << 8) & 0xFF00) +
+      (uint8[i + 2] & 0xFF)
+    output.push(convertTripletToBase64(tmp, lookup))
+  }
+  return output.join('')
+}
+</script>
+<script type="text/plain" id="src-src/midi/convertUint8ToBase64.js#22" data-path="src/midi/convertUint8ToBase64.js" data-start="22">
+const convertUint8ToBase64 = (uint8) => {
+  let tmp
+  const len = uint8.length
+  const extraBytes = len % 3 // if we have 1 byte left, pad 2 bytes
+  const parts = []
+  const maxChunkLength = 16383 // must be multiple of 3
+  const lookup = [ 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '/' ]
+
+  // go through the array every three bytes, we'll deal with trailing stuff later
+  for (let i = 0, len2 = len - extraBytes; i < len2; i += maxChunkLength) {
+    parts.push(encodeChunk(uint8, i, (i + maxChunkLength) > len2 ? len2 : (i + maxChunkLength), lookup))
+  }
+
+  // pad the end with zeros, but make sure to not forget the extra bytes
+  if (extraBytes === 1) {
+    tmp = uint8[len - 1]
+    parts.push(
+      lookup[tmp >> 2] +
+      lookup[(tmp << 4) & 0x3F] +
+      '=='
+    )
+  } else if (extraBytes === 2) {
+    tmp = (uint8[len - 2] << 8) + uint8[len - 1]
+    parts.push(
+      lookup[tmp >> 10] +
+      lookup[(tmp >> 4) & 0x3F] +
+      lookup[(tmp << 2) & 0x3F] +
+      '='
+    )
+  }
+
+  return parts.join('')
+}
+</script>
 
 <script>
 
@@ -3900,9 +3940,9 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "called by": "\u2014",
      "file": "src/midi/fillTimeStampsMappedWithRefs.js"
     },
-    "msg": {
-     "signature": "export default function (note, startTime, endTime, timeStampsMappedWithRefsOn, refsOnMappedWithTimeStamps)"
-    }
+    "fs": [
+     "src/midi/fillTimeStampsMappedWithRefs.js"
+    ]
    },
    {
     "t": "generateMidi",
@@ -3922,9 +3962,9 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "called by": "\u2014",
      "file": "src/midi/generateMidi.js"
     },
-    "msg": {
-     "signature": "export default function (pageSchema, midiSettingsForEachPage = [])"
-    }
+    "fs": [
+     "src/midi/generateMidi.js"
+    ]
    },
    {
     "t": "markUnitParamsIfItIsLastSingleUnitInVoiceOnPageLine",
@@ -3945,9 +3985,10 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "called by": "generateMidi",
      "file": "src/midi/markUnitParamsIfItIsLastSingleUnitInVoiceOnPageLine.js"
     },
-    "msg": {
-     "signature": "export default function (measuresParams, measureParams, voiceParams, unitParams, measureIndex, staveIndex, voiceIndex, unitIndex)"
-    }
+    "fs": [
+     "src/midi/generateMidi.js",
+     "src/midi/markUnitParamsIfItIsLastSingleUnitInVoiceOnPageLine.js"
+    ]
    },
    {
     "t": "orderTimeFrames",
@@ -3968,9 +4009,10 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "called by": "generateMidi",
      "file": "src/midi/orderTimeFrames.js"
     },
-    "msg": {
-     "signature": "export default function (somethingSplittedInTimeFrames)"
-    }
+    "fs": [
+     "src/midi/generateMidi.js",
+     "src/midi/orderTimeFrames.js"
+    ]
    },
    {
     "t": "clone",
@@ -3991,123 +4033,19 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "called by": "generateMidi",
      "file": "src/midi/toolbox.js"
     },
-    "msg": {
-     "signature": "function clone (obj)"
-    }
+    "fs": [
+     "src/midi/generateMidi.js",
+     "src/midi/toolbox.js"
+    ]
    }
   ],
-  "nodes": {
-   "fillTimeStampsMappedWithRefs": {
-    "x": 90,
-    "y": 55,
-    "t": "fillTimeStampsMappedWi",
-    "k": "fillTimeStampsMappedWithRefs.js",
-    "sub": "midi",
-    "full": "fillTimeStampsMappedWithRefs",
-    "lines": [
-     "fillTimeStamps",
-     "MappedWithRefs"
-    ],
-    "klines": [
-     "fillTimeStampsMapped",
-     "WithRefs.js"
-    ],
-    "parent": null,
-    "children": []
-   },
-   "generateMidi": {
-    "x": 300,
-    "y": 55,
-    "t": "generateMidi",
-    "k": "generateMidi.js",
-    "sub": "midi",
-    "full": "generateMidi",
-    "lines": [
-     "generateMidi"
-    ],
-    "klines": [
-     "generateMidi.js"
-    ],
-    "parent": null,
-    "children": [
-     "clone",
-     "orderTimeFrames",
-     "markUnitParamsIfItIsLastSingleUnitInVoiceOnPageLine"
-    ]
-   },
-   "clone": {
-    "x": 90,
-    "y": 173,
-    "t": "clone",
-    "k": "toolbox.js",
-    "sub": "midi",
-    "full": "clone",
-    "lines": [
-     "clone"
-    ],
-    "klines": [
-     "toolbox.js"
-    ],
-    "parent": "generateMidi",
-    "children": []
-   },
-   "markUnitParamsIfItIsLastSingleUnitInVoiceOnPageLine": {
-    "x": 300,
-    "y": 173,
-    "t": "markUnitParamsIfItIsLa",
-    "k": "markUnitParamsIfItIsLastSingleUnitInVoiceOnPageLine.js",
-    "sub": "midi",
-    "full": "markUnitParamsIfItIsLastSingleUnitInVoiceOnPageLine",
-    "lines": [
-     "markUnitParamsIfIt",
-     "IsLastSingleUnitIn",
-     "VoiceOnPageLine"
-    ],
-    "klines": [
-     "markUnitParamsIfItIs",
-     "LastSingleUnitIn\u2026"
-    ],
-    "parent": "generateMidi",
-    "children": []
-   },
-   "orderTimeFrames": {
-    "x": 510,
-    "y": 173,
-    "t": "orderTimeFrames",
-    "k": "orderTimeFrames.js",
-    "sub": "midi",
-    "full": "orderTimeFrames",
-    "lines": [
-     "orderTimeFrames"
-    ],
-    "klines": [
-     "orderTimeFrames.js"
-    ],
-    "parent": "generateMidi",
-    "children": []
-   }
-  },
-  "edges": {
-   "generateMidi-clone": {
-    "d": "M300 55 L90 173",
-    "lx": 195,
-    "ly": 108,
-    "l": ""
-   },
-   "generateMidi-orderTimeFrames": {
-    "d": "M300 55 L510 173",
-    "lx": 405,
-    "ly": 108,
-    "l": ""
-   },
-   "generateMidi-markUnitParamsIfItIsLastSingleUnitInVoiceOnPageLine": {
-    "d": "M300 55 L300 173",
-    "lx": 300,
-    "ly": 108,
-    "l": ""
-   }
-  },
-  "height": 291
+  "files": [
+   "src/midi/fillTimeStampsMappedWithRefs.js",
+   "src/midi/generateMidi.js",
+   "src/midi/markUnitParamsIfItIsLastSingleUnitInVoiceOnPageLine.js",
+   "src/midi/orderTimeFrames.js",
+   "src/midi/toolbox.js"
+  ]
  },
  {
   "id": "time-frames",
@@ -4131,9 +4069,9 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "called by": "\u2014",
      "file": "src/midi/addMidiNoteToTrack.js"
     },
-    "msg": {
-     "signature": "export default function (note, noteWithTremoloWithNextOnEachStaveInEachVoice, slurMarksMappedWithTracks, tracksForEachInstrumentOnEachStaveInEachVoice, timeStampsMappedWithRefsOn, refsOnMappedWithTimeStamps)"
-    }
+    "fs": [
+     "src/midi/addMidiNoteToTrack.js"
+    ]
    },
    {
     "t": "addTimeFrameToIndicateDynamic",
@@ -4153,9 +4091,9 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "called by": "\u2014",
      "file": "src/midi/addTimeFrameToIndicateDynamic.js"
     },
-    "msg": {
-     "signature": "export default function (articulationParams, dynamicChangeMark, dynamicsAuraForEachVoiceOnEachStaveSplittedInTimeFrames, currentDynamicsAuraObjectsForEachVoiceOnEachStave, lastMentionedDynamicsForEachVoiceOnEachStave, unitIsGrace, graceCountersForEachVoiceInEachStaveSplittedInTimeFrames, time, staveVoiceKey, isLastSingleUnitInVoiceOnPageLine)"
-    }
+    "fs": [
+     "src/midi/addTimeFrameToIndicateDynamic.js"
+    ]
    },
    {
     "t": "addTimeFrameToIndicateKeysThatLastOneMeasure",
@@ -4175,9 +4113,9 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "called by": "\u2014",
      "file": "src/midi/addTimeFrameToIndicateKeysThatLastOneMeasure.js"
     },
-    "msg": {
-     "signature": "export default function (keysParams, pitchesByNoteNames, pitchAdjustmentsByKeyType, pitchAdjustmentsAuraForEachStaveThatLastOneMeasureSplittedInTimeFrames, unitIsGrace, graceCountersForEachVoiceInEachStaveSplittedInTimeFrames, time, measureIndex, staveIndex, staveVoiceKey)"
-    }
+    "fs": [
+     "src/midi/addTimeFrameToIndicateKeysThatLastOneMeasure.js"
+    ]
    },
    {
     "t": "addTimeFrameToIndicateNewClefOnStave",
@@ -4197,9 +4135,9 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "called by": "\u2014",
      "file": "src/midi/addTimeFrameToIndicateNewClefOnStave.js"
     },
-    "msg": {
-     "signature": "export default function (clef, clefAurasForEachStaveSplittedInTimeFrames, time, staveIndex)"
-    }
+    "fs": [
+     "src/midi/addTimeFrameToIndicateNewClefOnStave.js"
+    ]
    },
    {
     "t": "addTimeFrameToIndicateNewClefOnStaveBeforeUnit",
@@ -4219,9 +4157,9 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "called by": "\u2014",
      "file": "src/midi/addTimeFrameToIndicateNewClefOnStaveBeforeUnit.js"
     },
-    "msg": {
-     "signature": "export default function (clef, clefAurasForEachStaveSplittedInTimeFrames, unitIsGrace, graceCountersForEachVoiceInEachStaveSplittedInTimeFrames, time, staveIndex, staveVoiceKey)"
-    }
+    "fs": [
+     "src/midi/addTimeFrameToIndicateNewClefOnStaveBeforeUnit.js"
+    ]
    },
    {
     "t": "addTimeFrameToIndicateNewKeySignatureOnStave",
@@ -4241,9 +4179,9 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "called by": "\u2014",
      "file": "src/midi/addTimeFrameToIndicateNewKeySignatureOnStave.js"
     },
-    "msg": {
-     "signature": "export default function (keySignatureName, pitchAdjustmentsAuraForAllStavesSplittedInTimeFrames, time, pitchAdjustmentsByKeySignatures)"
-    }
+    "fs": [
+     "src/midi/addTimeFrameToIndicateNewKeySignatureOnStave.js"
+    ]
    },
    {
     "t": "addTimeFrameToIndicateNewKeySignatureOnStaveBeforeUnit",
@@ -4263,9 +4201,9 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "called by": "\u2014",
      "file": "src/midi/addTimeFrameToIndicateNewKeySignatureOnStaveBeforeUnit.js"
     },
-    "msg": {
-     "signature": "export default function (keySignatureName, pitchAdjustmentsAuraForAllStavesSplittedInTimeFrames, unitIsGrace, graceCountersForEachVoiceInEachStaveSplittedInTimeFrames, time, pitchAdjustmentsByKeySignatures, staveVoiceKey)"
-    }
+    "fs": [
+     "src/midi/addTimeFrameToIndicateNewKeySignatureOnStaveBeforeUnit.js"
+    ]
    },
    {
     "t": "addTimeFrameToIndicateOctaveSignOnStaveInVoice",
@@ -4285,9 +4223,9 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "called by": "\u2014",
      "file": "src/midi/addTimeFrameToIndicateOctaveSignOnStaveInVoice.js"
     },
-    "msg": {
-     "signature": "export default function (octaveSignMark, octaveSignAuraForEachVoiceOnEachStaveSplittedInTimeFrames, indicatorsOfOctaveSignEndingsByStaveAndVoice, unitIsGrace, graceCountersForEachVoiceInEachStaveSplittedInTimeFrames, time, staveIndexesOccupiedByUnit, voiceIndex, staveVoiceKey)"
-    }
+    "fs": [
+     "src/midi/addTimeFrameToIndicateOctaveSignOnStaveInVoice.js"
+    ]
    },
    {
     "t": "addTimeFramesToIndicateNotes",
@@ -4307,9 +4245,9 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "called by": "\u2014",
      "file": "src/midi/addTimeFramesToIndicateNotes.js"
     },
-    "msg": {
-     "signature": "export default function (unitParams, notesSplittedInTimeFrames, unitActualDuration, unitDurationInSeconds, octaveAdjustmentForUnitParams, graceCountersForEachVoiceInEachStaveSplittedInTimeFrames, time, staveVoiceKey)"
-    }
+    "fs": [
+     "src/midi/addTimeFramesToIndicateNotes.js"
+    ]
    },
    {
     "t": "addMidiNoteToTrackInCommonCase",
@@ -4330,9 +4268,9 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "called by": "addMidiNoteToTrack",
      "file": "src/midi/addMidiNoteToTrack.js"
     },
-    "msg": {
-     "signature": "const addMidiNoteToTrackInCommonCase = (note, duration, time, slurMarksMappedWithTracks, tracksForEachInstrumentOnEachStaveInEachVoice, midNoteIsAtTheStartOfOrnament, midNoteIsAtTheEndOfOrnament, timeStampsMappedWithRefsOn, refsOnMappedWithTimeStamps) =>"
-    }
+    "fs": [
+     "src/midi/addMidiNoteToTrack.js"
+    ]
    },
    {
     "t": "calculateEndingVelocityInCrescendoIfItIsNotSpeicified",
@@ -4353,9 +4291,9 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "called by": "addTimeFrameToIndicateDynamic",
      "file": "src/midi/addTimeFrameToIndicateDynamic.js"
     },
-    "msg": {
-     "signature": "const calculateEndingVelocityInCrescendoIfItIsNotSpeicified = (startVelocity) =>"
-    }
+    "fs": [
+     "src/midi/addTimeFrameToIndicateDynamic.js"
+    ]
    },
    {
     "t": "calculateEndingVelocityInDiminuendoIfItIsNotSpeicified",
@@ -4376,168 +4314,22 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "called by": "addTimeFrameToIndicateDynamic",
      "file": "src/midi/addTimeFrameToIndicateDynamic.js"
     },
-    "msg": {
-     "signature": "const calculateEndingVelocityInDiminuendoIfItIsNotSpeicified = (startVelocity) =>"
-    }
+    "fs": [
+     "src/midi/addTimeFrameToIndicateDynamic.js"
+    ]
    }
   ],
-  "nodes": {
-   "addMidiNoteToTrack": {
-    "x": 90,
-    "y": 55,
-    "t": "addMidiNoteToTrack",
-    "k": "addMidiNoteToTrack.js",
-    "sub": "midi",
-    "full": "addMidiNoteToTrack",
-    "lines": [
-     "addMidiNoteToTrack"
-    ],
-    "klines": [
-     "addMidiNoteToTrack.",
-     "js"
-    ],
-    "parent": null,
-    "children": [
-     "addMidiNoteToTrackInCommonCase"
-    ]
-   },
-   "addTimeFrameToIndicateDynamic": {
-    "x": 300,
-    "y": 55,
-    "t": "addTimeFrameToIndicate",
-    "k": "addTimeFrameToIndicateDynamic.js",
-    "sub": "midi",
-    "full": "addTimeFrameToIndicateDynamic",
-    "lines": [
-     "addTimeFrameTo",
-     "IndicateDynamic"
-    ],
-    "klines": [
-     "addTimeFrameTo",
-     "IndicateDynamic.js"
-    ],
-    "parent": null,
-    "children": [
-     "calculateEndingVelocityInDiminuendoIfItIsNotSpeicified",
-     "calculateEndingVelocityInCrescendoIfItIsNotSpeicified"
-    ]
-   },
-   "addTimeFrameToIndicateKeysThatLastOneMeasure": {
-    "x": 510,
-    "y": 55,
-    "t": "addTimeFrameToIndicate",
-    "k": "addTimeFrameToIndicateKeysThatLastOneMeasure.js",
-    "sub": "midi",
-    "full": "addTimeFrameToIndicateKeysThatLastOneMeasure",
-    "lines": [
-     "addTimeFrameTo",
-     "IndicateKeysThat",
-     "LastOneMeasure"
-    ],
-    "klines": [
-     "addTimeFrameTo",
-     "IndicateKeysThatLast\u2026"
-    ],
-    "parent": null,
-    "children": []
-   },
-   "addTimeFrameToIndicateNewClefOnStave": {
-    "x": 720,
-    "y": 55,
-    "t": "addTimeFrameToIndicate",
-    "k": "addTimeFrameToIndicateNewClefOnStave.js",
-    "sub": "midi",
-    "full": "addTimeFrameToIndicateNewClefOnStave",
-    "lines": [
-     "addTimeFrameTo",
-     "IndicateNewClefOn",
-     "Stave"
-    ],
-    "klines": [
-     "addTimeFrameTo",
-     "IndicateNewClefOn\u2026"
-    ],
-    "parent": null,
-    "children": []
-   },
-   "addMidiNoteToTrackInCommonCase": {
-    "x": 90,
-    "y": 173,
-    "t": "addMidiNoteToTrackInCo",
-    "k": "addMidiNoteToTrack.js",
-    "sub": "midi",
-    "full": "addMidiNoteToTrackInCommonCase",
-    "lines": [
-     "addMidiNoteToTrack",
-     "InCommonCase"
-    ],
-    "klines": [
-     "addMidiNoteToTrack.",
-     "js"
-    ],
-    "parent": "addMidiNoteToTrack",
-    "children": []
-   },
-   "calculateEndingVelocityInCrescendoIfItIsNotSpeicified": {
-    "x": 300,
-    "y": 173,
-    "t": "calculateEndingVelocit",
-    "k": "addTimeFrameToIndicateDynamic.js",
-    "sub": "midi",
-    "full": "calculateEndingVelocityInCrescendoIfItIsNotSpeicified",
-    "lines": [
-     "calculateEnding",
-     "VelocityIn",
-     "CrescendoIfItIsNot\u2026"
-    ],
-    "klines": [
-     "addTimeFrameTo",
-     "IndicateDynamic.js"
-    ],
-    "parent": "addTimeFrameToIndicateDynamic",
-    "children": []
-   },
-   "calculateEndingVelocityInDiminuendoIfItIsNotSpeicified": {
-    "x": 510,
-    "y": 173,
-    "t": "calculateEndingVelocit",
-    "k": "addTimeFrameToIndicateDynamic.js",
-    "sub": "midi",
-    "full": "calculateEndingVelocityInDiminuendoIfItIsNotSpeicified",
-    "lines": [
-     "calculateEnding",
-     "VelocityIn",
-     "DiminuendoIfItIs\u2026"
-    ],
-    "klines": [
-     "addTimeFrameTo",
-     "IndicateDynamic.js"
-    ],
-    "parent": "addTimeFrameToIndicateDynamic",
-    "children": []
-   }
-  },
-  "edges": {
-   "addMidiNoteToTrack-addMidiNoteToTrackInCommonCase": {
-    "d": "M90 55 L90 173",
-    "lx": 90,
-    "ly": 108,
-    "l": ""
-   },
-   "addTimeFrameToIndicateDynamic-calculateEndingVelocityInDiminuendoIfItIsNotSpeicified": {
-    "d": "M300 55 L510 173",
-    "lx": 405,
-    "ly": 108,
-    "l": ""
-   },
-   "addTimeFrameToIndicateDynamic-calculateEndingVelocityInCrescendoIfItIsNotSpeicified": {
-    "d": "M300 55 L300 173",
-    "lx": 300,
-    "ly": 108,
-    "l": ""
-   }
-  },
-  "height": 291
+  "files": [
+   "src/midi/addMidiNoteToTrack.js",
+   "src/midi/addTimeFrameToIndicateDynamic.js",
+   "src/midi/addTimeFrameToIndicateKeysThatLastOneMeasure.js",
+   "src/midi/addTimeFrameToIndicateNewClefOnStave.js",
+   "src/midi/addTimeFrameToIndicateNewClefOnStaveBeforeUnit.js",
+   "src/midi/addTimeFrameToIndicateNewKeySignatureOnStave.js",
+   "src/midi/addTimeFrameToIndicateNewKeySignatureOnStaveBeforeUnit.js",
+   "src/midi/addTimeFrameToIndicateOctaveSignOnStaveInVoice.js",
+   "src/midi/addTimeFramesToIndicateNotes.js"
+  ]
  },
  {
   "id": "calculations",
@@ -4561,9 +4353,9 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "called by": "\u2014",
      "file": "src/midi/calculateActualDurationOfUnit.js"
     },
-    "msg": {
-     "signature": "export default function (tupletValuesAuraForEachVoiceInEachStave, unitParams, staveVoiceKey)"
-    }
+    "fs": [
+     "src/midi/calculateActualDurationOfUnit.js"
+    ]
    },
    {
     "t": "calculateBreathMarksTimeAdjustment",
@@ -4583,9 +4375,9 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "called by": "\u2014",
      "file": "src/midi/calculateBreathMarksTimeAdjustment.js"
     },
-    "msg": {
-     "signature": "export default function (note, pointsOfTimeWhenBreathMarkIsApplied)"
-    }
+    "fs": [
+     "src/midi/calculateBreathMarksTimeAdjustment.js"
+    ]
    },
    {
     "t": "calculateDurationOfMeasureRestInSeconds",
@@ -4605,9 +4397,9 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "called by": "\u2014",
      "file": "src/midi/calculateDurationOfMeasureRestInSeconds.js"
     },
-    "msg": {
-     "signature": "export default function (timeSignatureDurationInSeconds, tempoAura, fullDurationOfLastMeasure)"
-    }
+    "fs": [
+     "src/midi/calculateDurationOfMeasureRestInSeconds.js"
+    ]
    },
    {
     "t": "calculateFermataArticulationTimeAdjustment",
@@ -4627,9 +4419,9 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "called by": "\u2014",
      "file": "src/midi/calculateFermataArticulationTimeAdjustment.js"
     },
-    "msg": {
-     "signature": "export default function (note, pointsOfTimeWhenFermataArticulationIsApplied, fermataDurationFromMidiSettings)"
-    }
+    "fs": [
+     "src/midi/calculateFermataArticulationTimeAdjustment.js"
+    ]
    },
    {
     "t": "calculateGraceNoteTimeAdjustment",
@@ -4649,9 +4441,9 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "called by": "\u2014",
      "file": "src/midi/calculateGraceNoteTimeAdjustment.js"
     },
-    "msg": {
-     "signature": "export default function (note, globalCurrentGraceTimeOffset, graceTimeOffestForEachVoiceOnEachStaveSplittedInTimeFrames, graceTimeOffestForEachGraceUnitInVoiceOnEachStaveSplittedInTimeFrames, staveVoiceKey)"
-    }
+    "fs": [
+     "src/midi/calculateGraceNoteTimeAdjustment.js"
+    ]
    },
    {
     "t": "calculateMinTimeAmongTimeProgressionsForEachVoiceInEachStave",
@@ -4671,9 +4463,9 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "called by": "\u2014",
      "file": "src/midi/calculateMinTimeAmongTimeProgressionsForEachVoiceInEachStave.js"
     },
-    "msg": {
-     "signature": "export default function ("
-    }
+    "fs": [
+     "src/midi/calculateMinTimeAmongTimeProgressionsForEachVoiceInEachStave.js"
+    ]
    },
    {
     "t": "calculateOctaveAdjustmentForUnitParams",
@@ -4693,9 +4485,9 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "called by": "\u2014",
      "file": "src/midi/calculateOctaveAdjustmentForUnitParams.js"
     },
-    "msg": {
-     "signature": "export default function (unitParams)"
-    }
+    "fs": [
+     "src/midi/calculateOctaveAdjustmentForUnitParams.js"
+    ]
    },
    {
     "t": "calculateOctaveAdjustmentForUnitParamsByOctaveSignMark",
@@ -4715,9 +4507,9 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "called by": "\u2014",
      "file": "src/midi/calculateOctaveAdjustmentForUnitParamsByOctaveSignMark.js"
     },
-    "msg": {
-     "signature": "export default function (octaveSignMark)"
-    }
+    "fs": [
+     "src/midi/calculateOctaveAdjustmentForUnitParamsByOctaveSignMark.js"
+    ]
    },
    {
     "t": "calculateOctaveForNoteTimeFrame",
@@ -4737,9 +4529,9 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "called by": "\u2014",
      "file": "src/midi/calculateOctaveForNoteTimeFrame.js"
     },
-    "msg": {
-     "signature": "export default function (note, pitchForNote, clefAurasForEachStaveSplittedInTimeFrames, orderedTimeFramesFromClefAurasForEachStaveSplittedInTimeFrames, octaveSignAuraForEachVoiceOnEachStaveSplittedInTimeFrames, orderedTimeFramesFromOctaveSignAuraForEachVoiceOnEachStaveSplittedInTimeFrames, graceMaxCountForCurrentTime, graceCountersForEachVoiceInEachStaveSplittedInTimeFrames, staveVoiceKey)"
-    }
+    "fs": [
+     "src/midi/calculateOctaveForNoteTimeFrame.js"
+    ]
    },
    {
     "t": "calculatePitchForNoteTimeFrame",
@@ -4759,9 +4551,9 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "called by": "\u2014",
      "file": "src/midi/calculatePitchForNoteTimeFrame.js"
     },
-    "msg": {
-     "signature": "export default function (note, pitchAdjustmentsAuraForAllStavesSplittedInTimeFrames, orderedTimeFramesFromPitchAdjustmentsAuraForAllStavesSplittedInTimeFrames, pitchAdjustmentsAuraForEachStaveThatLastOneMeasureSplittedInTimeFrames, orderedTimeFramesFromPitchAdjustmentsAuraForEachStaveThatLastOneMeasureSplittedInTimeFrames, graceMaxCountForCurrentTime, graceCountersForEachVoiceInEachStaveSplittedInTimeFrames, staveVoiceKey)"
-    }
+    "fs": [
+     "src/midi/calculatePitchForNoteTimeFrame.js"
+    ]
    },
    {
     "t": "calculateStaveIndexWhereClefBeforeIsConsidered",
@@ -4781,9 +4573,9 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "called by": "\u2014",
      "file": "src/midi/calculateStaveIndexWhereClefBeforeIsConsidered.js"
     },
-    "msg": {
-     "signature": "export default function (unitHasNotesOnDifferentStaves, note, staveIndex)"
-    }
+    "fs": [
+     "src/midi/calculateStaveIndexWhereClefBeforeIsConsidered.js"
+    ]
    },
    {
     "t": "calculateTimeSignatureInQuarters",
@@ -4803,9 +4595,9 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "called by": "\u2014",
      "file": "src/midi/calculateTimeSignatureInQuarters.js"
     },
-    "msg": {
-     "signature": "export default function (timeSignatureParams)"
-    }
+    "fs": [
+     "src/midi/calculateTimeSignatureInQuarters.js"
+    ]
    },
    {
     "t": "calculateVelocityForNote",
@@ -4825,9 +4617,9 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "called by": "\u2014",
      "file": "src/midi/calculateVelocityForNote.js"
     },
-    "msg": {
-     "signature": "export default function (note, dynamicsAuraForEachVoiceOnEachStaveSplittedInTimeFrames, orderedTimeFramesFromDynamicsAuraForEachVoiceOnEachStaveSplittedInTimeFrames, graceMaxCountForCurrentTime, graceCountersForEachVoiceInEachStaveSplittedInTimeFrames, staveIndex, staveVoiceKey)"
-    }
+    "fs": [
+     "src/midi/calculateVelocityForNote.js"
+    ]
    },
    {
     "t": "calculateDurationInSeconds",
@@ -4848,9 +4640,10 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "called by": "calculateDurationOfMeasureRestInSeconds",
      "file": "src/midi/calculateDurationInSeconds.js"
     },
-    "msg": {
-     "signature": "export default function (durationInQuarters, quatersPerMinute = 120)"
-    }
+    "fs": [
+     "src/midi/calculateDurationOfMeasureRestInSeconds.js",
+     "src/midi/calculateDurationInSeconds.js"
+    ]
    },
    {
     "t": "calculateMidiTremoloDurationFactor",
@@ -4871,9 +4664,10 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "called by": "calculateActualDurationOfUnit",
      "file": "src/midi/calculateMidiTremoloDurationFactor.js"
     },
-    "msg": {
-     "signature": "export default function (tremoloParams)"
-    }
+    "fs": [
+     "src/midi/calculateActualDurationOfUnit.js",
+     "src/midi/calculateMidiTremoloDurationFactor.js"
+    ]
    },
    {
     "t": "calculatePitchAdjustmentForNoteTimeFrame",
@@ -4894,163 +4688,30 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "called by": "calculatePitchForNoteTimeFrame",
      "file": "src/midi/calculatePitchAdjustmentForNoteTimeFrame.js"
     },
-    "msg": {
-     "signature": "export default function (note, pitchAdjustmentsAuraForAllStavesSplittedInTimeFrames, orderedTimeFramesFromPitchAdjustmentsAuraForAllStavesSplittedInTimeFrames, pitchAdjustmentsAuraForEachStaveThatLastOneMeasureSplittedInTimeFrames, orderedTimeFramesFromPitchAdjustmentsAuraForEachStaveThatLastOneMeasureSplittedInTimeFrames, graceMaxCountForCurrentTime, graceCountersForEachVoiceInEachStaveSplittedInTimeFrames, staveVoiceKey)"
-    }
+    "fs": [
+     "src/midi/calculatePitchForNoteTimeFrame.js",
+     "src/midi/calculatePitchAdjustmentForNoteTimeFrame.js"
+    ]
    }
   ],
-  "nodes": {
-   "calculateActualDurationOfUnit": {
-    "x": 90,
-    "y": 55,
-    "t": "calculateActualDuratio",
-    "k": "calculateActualDurationOfUnit.js",
-    "sub": "midi",
-    "full": "calculateActualDurationOfUnit",
-    "lines": [
-     "calculateActual",
-     "DurationOfUnit"
-    ],
-    "klines": [
-     "calculateActual",
-     "DurationOfUnit.js"
-    ],
-    "parent": null,
-    "children": [
-     "calculateMidiTremoloDurationFactor"
-    ]
-   },
-   "calculateBreathMarksTimeAdjustment": {
-    "x": 300,
-    "y": 55,
-    "t": "calculateBreathMarksTi",
-    "k": "calculateBreathMarksTimeAdjustment.js",
-    "sub": "midi",
-    "full": "calculateBreathMarksTimeAdjustment",
-    "lines": [
-     "calculateBreath",
-     "MarksTime",
-     "Adjustment"
-    ],
-    "klines": [
-     "calculateBreathMarks",
-     "TimeAdjustment.js"
-    ],
-    "parent": null,
-    "children": []
-   },
-   "calculateDurationOfMeasureRestInSeconds": {
-    "x": 510,
-    "y": 55,
-    "t": "calculateDurationOfMea",
-    "k": "calculateDurationOfMeasureRestInSeconds.js",
-    "sub": "midi",
-    "full": "calculateDurationOfMeasureRestInSeconds",
-    "lines": [
-     "calculateDuration",
-     "OfMeasureRestIn",
-     "Seconds"
-    ],
-    "klines": [
-     "calculateDurationOf",
-     "MeasureRestInSeconds\u2026"
-    ],
-    "parent": null,
-    "children": [
-     "calculateDurationInSeconds"
-    ]
-   },
-   "calculateFermataArticulationTimeAdjustment": {
-    "x": 720,
-    "y": 55,
-    "t": "calculateFermataArticu",
-    "k": "calculateFermataArticulationTimeAdjustment.js",
-    "sub": "midi",
-    "full": "calculateFermataArticulationTimeAdjustment",
-    "lines": [
-     "calculateFermata",
-     "ArticulationTime",
-     "Adjustment"
-    ],
-    "klines": [
-     "calculateFermata",
-     "ArticulationTime\u2026"
-    ],
-    "parent": null,
-    "children": []
-   },
-   "calculateDurationInSeconds": {
-    "x": 90,
-    "y": 173,
-    "t": "calculateDurationInSec",
-    "k": "calculateDurationInSeconds.js",
-    "sub": "midi",
-    "full": "calculateDurationInSeconds",
-    "lines": [
-     "calculateDuration",
-     "InSeconds"
-    ],
-    "klines": [
-     "calculateDurationIn",
-     "Seconds.js"
-    ],
-    "parent": "calculateDurationOfMeasureRestInSeconds",
-    "children": []
-   },
-   "calculateMidiTremoloDurationFactor": {
-    "x": 300,
-    "y": 173,
-    "t": "calculateMidiTremoloDu",
-    "k": "calculateMidiTremoloDurationFactor.js",
-    "sub": "midi",
-    "full": "calculateMidiTremoloDurationFactor",
-    "lines": [
-     "calculateMidi",
-     "TremoloDuration",
-     "Factor"
-    ],
-    "klines": [
-     "calculateMidiTremolo",
-     "DurationFactor.js"
-    ],
-    "parent": "calculateActualDurationOfUnit",
-    "children": []
-   },
-   "calculatePitchAdjustmentForNoteTimeFrame": {
-    "x": 510,
-    "y": 173,
-    "t": "calculatePitchAdjustme",
-    "k": "calculatePitchAdjustmentForNoteTimeFrame.js",
-    "sub": "midi",
-    "full": "calculatePitchAdjustmentForNoteTimeFrame",
-    "lines": [
-     "calculatePitch",
-     "AdjustmentForNote",
-     "TimeFrame"
-    ],
-    "klines": [
-     "calculatePitch",
-     "AdjustmentForNote\u2026"
-    ],
-    "parent": null,
-    "children": []
-   }
-  },
-  "edges": {
-   "calculateActualDurationOfUnit-calculateMidiTremoloDurationFactor": {
-    "d": "M90 55 L300 173",
-    "lx": 195,
-    "ly": 108,
-    "l": ""
-   },
-   "calculateDurationOfMeasureRestInSeconds-calculateDurationInSeconds": {
-    "d": "M510 55 L90 173",
-    "lx": 300,
-    "ly": 108,
-    "l": ""
-   }
-  },
-  "height": 291
+  "files": [
+   "src/midi/calculateActualDurationOfUnit.js",
+   "src/midi/calculateBreathMarksTimeAdjustment.js",
+   "src/midi/calculateDurationInSeconds.js",
+   "src/midi/calculateDurationOfMeasureRestInSeconds.js",
+   "src/midi/calculateFermataArticulationTimeAdjustment.js",
+   "src/midi/calculateGraceNoteTimeAdjustment.js",
+   "src/midi/calculateMidiTremoloDurationFactor.js",
+   "src/midi/calculateMinTimeAmongTimeProgressionsForEachVoiceInEachStave.js",
+   "src/midi/calculateOctaveAdjustmentForUnitParams.js",
+   "src/midi/calculateOctaveAdjustmentForUnitParamsByOctaveSignMark.js",
+   "src/midi/calculateOctaveForNoteTimeFrame.js",
+   "src/midi/calculatePitchAdjustmentForNoteTimeFrame.js",
+   "src/midi/calculatePitchForNoteTimeFrame.js",
+   "src/midi/calculateStaveIndexWhereClefBeforeIsConsidered.js",
+   "src/midi/calculateTimeSignatureInQuarters.js",
+   "src/midi/calculateVelocityForNote.js"
+  ]
  },
  {
   "id": "adjustments",
@@ -5074,9 +4735,9 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "called by": "\u2014",
      "file": "src/midi/adjustArpeggiatedNotes.js"
     },
-    "msg": {
-     "signature": "export default function (repertoireNote, midiNote, trackForNote, midiNoteShouldBeAdjustedAsStartArpeggiatedNote, midiNoteShouldBeAdjustedAsLastArpeggiatedNote)"
-    }
+    "fs": [
+     "src/midi/adjustArpeggiatedNotes.js"
+    ]
    },
    {
     "t": "adjustMidiNoteWithArticulations",
@@ -5096,9 +4757,9 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "called by": "\u2014",
      "file": "src/midi/adjustMidiNoteWithArticulations.js"
     },
-    "msg": {
-     "signature": "export default function (repertoireNote, midiNote, trackForNote)"
-    }
+    "fs": [
+     "src/midi/adjustMidiNoteWithArticulations.js"
+    ]
    },
    {
     "t": "adjustMidiNoteWithPedals",
@@ -5118,9 +4779,9 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "called by": "\u2014",
      "file": "src/midi/adjustMidiNoteWithPedals.js"
     },
-    "msg": {
-     "signature": "export default function (repertoireNote, midiNote, tracksForEachInstrumentOnEachStaveInEachVoice, midiNoteShouldBeAdjustedWithPedalSustain, midiNoteShouldBeAdjustedWithPedalRelease)"
-    }
+    "fs": [
+     "src/midi/adjustMidiNoteWithPedals.js"
+    ]
    },
    {
     "t": "adjustMidiNoteWithSlur",
@@ -5140,9 +4801,9 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "called by": "\u2014",
      "file": "src/midi/adjustMidiNoteWithSlur.js"
     },
-    "msg": {
-     "signature": "export default function (repertoireNote, midiNote, trackForNote, slurMarksMappedWithTracks, midiNoteShouldBeAdjustedWithStartSlur, midiNoteShouldBeAdjustedWithFinishSlur)"
-    }
+    "fs": [
+     "src/midi/adjustMidiNoteWithSlur.js"
+    ]
    },
    {
     "t": "clearUpPitchAdjustmentsForNewMeasureByAddingNewTimeFrame",
@@ -5162,9 +4823,9 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "called by": "\u2014",
      "file": "src/midi/clearUpPitchAdjustmentsForNewMeasureByAddingNewTimeFrame.js"
     },
-    "msg": {
-     "signature": "export default function (pitchAdjustmentsAuraForEachStaveThatLastOneMeasureSplittedInTimeFrames, timeProgressionForAllMeasures, measureParams, measureIndex)"
-    }
+    "fs": [
+     "src/midi/clearUpPitchAdjustmentsForNewMeasureByAddingNewTimeFrame.js"
+    ]
    },
    {
     "t": "createBottomAlternateNote",
@@ -5184,9 +4845,9 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "called by": "\u2014",
      "file": "src/midi/createBottomAlternateNote.js"
     },
-    "msg": {
-     "signature": "export default function (note, trillOfNote, pitchAdjustmentsAuraForAllStavesSplittedInTimeFrames, orderedTimeFramesFromPitchAdjustmentsAuraForAllStavesSplittedInTimeFrames, pitchAdjustmentsAuraForEachStaveThatLastOneMeasureSplittedInTimeFrames, orderedTimeFramesFromPitchAdjustmentsAuraForEachStaveThatLastOneMeasureSplittedInTimeFrames, graceMaxCountForCurrentTime, graceCountersForEachVoiceInEachStaveSplittedInTimeFrames, staveVoiceKey)"
-    }
+    "fs": [
+     "src/midi/createBottomAlternateNote.js"
+    ]
    },
    {
     "t": "createNextHigherGlissandoNote",
@@ -5206,9 +4867,9 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "called by": "\u2014",
      "file": "src/midi/createNextHigherGlissandoNote.js"
     },
-    "msg": {
-     "signature": "export default function (note)"
-    }
+    "fs": [
+     "src/midi/createNextHigherGlissandoNote.js"
+    ]
    },
    {
     "t": "createNextLowerGlissandoNote",
@@ -5228,9 +4889,9 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "called by": "\u2014",
      "file": "src/midi/createNextLowerGlissandoNote.js"
     },
-    "msg": {
-     "signature": "export default function (note)"
-    }
+    "fs": [
+     "src/midi/createNextLowerGlissandoNote.js"
+    ]
    },
    {
     "t": "createOrnamentBottomAlternateNote",
@@ -5250,9 +4911,9 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "called by": "\u2014",
      "file": "src/midi/createOrnamentBottomAlternateNote.js"
     },
-    "msg": {
-     "signature": "export default function (note, ornamentOfNote, pitchAdjustmentsAuraForAllStavesSplittedInTimeFrames, orderedTimeFramesFromPitchAdjustmentsAuraForAllStavesSplittedInTimeFrames, pitchAdjustmentsAuraForEachStaveThatLastOneMeasureSplittedInTimeFrames, orderedTimeFramesFromPitchAdjustmentsAuraForEachStaveThatLastOneMeasureSplittedInTimeFrames, graceMaxCountForCurrentTime, graceCountersForEachVoiceInEachStaveSplittedInTimeFrames, staveVoiceKey)"
-    }
+    "fs": [
+     "src/midi/createOrnamentBottomAlternateNote.js"
+    ]
    },
    {
     "t": "createOrnamentTopAlternateNote",
@@ -5272,9 +4933,9 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "called by": "\u2014",
      "file": "src/midi/createOrnamentTopAlternateNote.js"
     },
-    "msg": {
-     "signature": "export default function (note, ornamentOfNote, pitchAdjustmentsAuraForAllStavesSplittedInTimeFrames, orderedTimeFramesFromPitchAdjustmentsAuraForAllStavesSplittedInTimeFrames, pitchAdjustmentsAuraForEachStaveThatLastOneMeasureSplittedInTimeFrames, orderedTimeFramesFromPitchAdjustmentsAuraForEachStaveThatLastOneMeasureSplittedInTimeFrames, graceMaxCountForCurrentTime, graceCountersForEachVoiceInEachStaveSplittedInTimeFrames, staveVoiceKey)"
-    }
+    "fs": [
+     "src/midi/createOrnamentTopAlternateNote.js"
+    ]
    },
    {
     "t": "createTopAlternateNote",
@@ -5294,9 +4955,9 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "called by": "\u2014",
      "file": "src/midi/createTopAlternateNote.js"
     },
-    "msg": {
-     "signature": "export default function (note, trillOfNote, pitchAdjustmentsAuraForAllStavesSplittedInTimeFrames, orderedTimeFramesFromPitchAdjustmentsAuraForAllStavesSplittedInTimeFrames, pitchAdjustmentsAuraForEachStaveThatLastOneMeasureSplittedInTimeFrames, orderedTimeFramesFromPitchAdjustmentsAuraForEachStaveThatLastOneMeasureSplittedInTimeFrames, graceMaxCountForCurrentTime, graceCountersForEachVoiceInEachStaveSplittedInTimeFrames, staveVoiceKey)"
-    }
+    "fs": [
+     "src/midi/createTopAlternateNote.js"
+    ]
    },
    {
     "t": "sortByGraceCount",
@@ -5316,9 +4977,9 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "called by": "\u2014",
      "file": "src/midi/sortByGraceCount.js"
     },
-    "msg": {
-     "signature": "export default function (array)"
-    }
+    "fs": [
+     "src/midi/sortByGraceCount.js"
+    ]
    },
    {
     "t": "sortByGraceCountAndMidMeasureClef",
@@ -5338,9 +4999,9 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "called by": "\u2014",
      "file": "src/midi/sortByGraceCountAndMidMeasureClef.js"
     },
-    "msg": {
-     "signature": "export default function (array)"
-    }
+    "fs": [
+     "src/midi/sortByGraceCountAndMidMeasureClef.js"
+    ]
    },
    {
     "t": "splitNoteInTremoloNotes",
@@ -5360,9 +5021,9 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "called by": "\u2014",
      "file": "src/midi/splitNoteInTremoloNotes.js"
     },
-    "msg": {
-     "signature": "export default function (note)"
-    }
+    "fs": [
+     "src/midi/splitNoteInTremoloNotes.js"
+    ]
    },
    {
     "t": "untieUnitWithNotes",
@@ -5382,87 +5043,28 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "called by": "\u2014",
      "file": "src/midi/untieUnitWithNotes.js"
     },
-    "msg": {
-     "signature": "export default function (unitParams)"
-    }
+    "fs": [
+     "src/midi/untieUnitWithNotes.js"
+    ]
    }
   ],
-  "nodes": {
-   "adjustArpeggiatedNotes": {
-    "x": 90,
-    "y": 55,
-    "t": "adjustArpeggiatedNotes",
-    "k": "adjustArpeggiatedNotes.js",
-    "sub": "midi",
-    "full": "adjustArpeggiatedNotes",
-    "lines": [
-     "adjustArpeggiated",
-     "Notes"
-    ],
-    "klines": [
-     "adjustArpeggiated",
-     "Notes.js"
-    ],
-    "parent": null,
-    "children": []
-   },
-   "adjustMidiNoteWithArticulations": {
-    "x": 300,
-    "y": 55,
-    "t": "adjustMidiNoteWithArti",
-    "k": "adjustMidiNoteWithArticulations.js",
-    "sub": "midi",
-    "full": "adjustMidiNoteWithArticulations",
-    "lines": [
-     "adjustMidiNoteWith",
-     "Articulations"
-    ],
-    "klines": [
-     "adjustMidiNoteWith",
-     "Articulations.js"
-    ],
-    "parent": null,
-    "children": []
-   },
-   "adjustMidiNoteWithPedals": {
-    "x": 510,
-    "y": 55,
-    "t": "adjustMidiNoteWithPeda",
-    "k": "adjustMidiNoteWithPedals.js",
-    "sub": "midi",
-    "full": "adjustMidiNoteWithPedals",
-    "lines": [
-     "adjustMidiNoteWith",
-     "Pedals"
-    ],
-    "klines": [
-     "adjustMidiNoteWith",
-     "Pedals.js"
-    ],
-    "parent": null,
-    "children": []
-   },
-   "adjustMidiNoteWithSlur": {
-    "x": 720,
-    "y": 55,
-    "t": "adjustMidiNoteWithSlur",
-    "k": "adjustMidiNoteWithSlur.js",
-    "sub": "midi",
-    "full": "adjustMidiNoteWithSlur",
-    "lines": [
-     "adjustMidiNoteWith",
-     "Slur"
-    ],
-    "klines": [
-     "adjustMidiNoteWith",
-     "Slur.js"
-    ],
-    "parent": null,
-    "children": []
-   }
-  },
-  "edges": {},
-  "height": 173
+  "files": [
+   "src/midi/adjustArpeggiatedNotes.js",
+   "src/midi/adjustMidiNoteWithArticulations.js",
+   "src/midi/adjustMidiNoteWithPedals.js",
+   "src/midi/adjustMidiNoteWithSlur.js",
+   "src/midi/clearUpPitchAdjustmentsForNewMeasureByAddingNewTimeFrame.js",
+   "src/midi/createBottomAlternateNote.js",
+   "src/midi/createNextHigherGlissandoNote.js",
+   "src/midi/createNextLowerGlissandoNote.js",
+   "src/midi/createOrnamentBottomAlternateNote.js",
+   "src/midi/createOrnamentTopAlternateNote.js",
+   "src/midi/createTopAlternateNote.js",
+   "src/midi/sortByGraceCount.js",
+   "src/midi/sortByGraceCountAndMidMeasureClef.js",
+   "src/midi/splitNoteInTremoloNotes.js",
+   "src/midi/untieUnitWithNotes.js"
+  ]
  },
  {
   "id": "the-rest",
@@ -5486,9 +5088,9 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "called by": "\u2014",
      "file": "src/midi/assignTremoloTypeToUnit.js"
     },
-    "msg": {
-     "signature": "export default function (unitParams, measuresParams, measureParams, measureIndex, staveIndex, voiceIndex, unitIndex)"
-    }
+    "fs": [
+     "src/midi/assignTremoloTypeToUnit.js"
+    ]
    },
    {
     "t": "attachStaveIndexToNoteConsideringItsStavePosition",
@@ -5508,9 +5110,9 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "called by": "\u2014",
      "file": "src/midi/attachStaveIndexToNoteConsideringItsStavePosition.js"
     },
-    "msg": {
-     "signature": "export default function (note, measureParams)"
-    }
+    "fs": [
+     "src/midi/attachStaveIndexToNoteConsideringItsStavePosition.js"
+    ]
    },
    {
     "t": "attachTrackToNote",
@@ -5530,9 +5132,9 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "called by": "\u2014",
      "file": "src/midi/attachTrackToNote.js"
     },
-    "msg": {
-     "signature": "export default function (midi, note, midiSettings, instrumentTitleParamsForCurrentMeasure, tracksForEachInstrumentOnEachStaveInEachVoice, instrumentsMappedWithChannels, currentInstrumentsForEachStaveOnEachVoice)"
-    }
+    "fs": [
+     "src/midi/attachTrackToNote.js"
+    ]
    },
    {
     "t": "deleteArticulationsWithName",
@@ -5552,9 +5154,9 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "called by": "\u2014",
      "file": "src/midi/deleteArticulationsWithName.js"
     },
-    "msg": {
-     "signature": "export default function (note, articulationName)"
-    }
+    "fs": [
+     "src/midi/deleteArticulationsWithName.js"
+    ]
    },
    {
     "t": "fillSimilesAuraForEachVoiceInEachStave",
@@ -5574,9 +5176,9 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "called by": "\u2014",
      "file": "src/midi/fillSimilesAuraForEachVoiceInEachStave.js"
     },
-    "msg": {
-     "signature": "export default function (similesAuraForEachVoiceInEachStave, unitParams, staveVoiceKey)"
-    }
+    "fs": [
+     "src/midi/fillSimilesAuraForEachVoiceInEachStave.js"
+    ]
    },
    {
     "t": "fillTimeStampsMappedWithRefs",
@@ -5596,9 +5198,9 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "called by": "\u2014",
      "file": "src/midi/fillTimeStampsMappedWithRefs.js"
     },
-    "msg": {
-     "signature": "export default function (note, startTime, endTime, timeStampsMappedWithRefsOn, refsOnMappedWithTimeStamps)"
-    }
+    "fs": [
+     "src/midi/fillTimeStampsMappedWithRefs.js"
+    ]
    },
    {
     "t": "fillTupletValuesAuraForEachVoiceInEachStave",
@@ -5618,9 +5220,9 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "called by": "\u2014",
      "file": "src/midi/fillTupletValuesAuraForEachVoiceInEachStave.js"
     },
-    "msg": {
-     "signature": "export default function (tupletValuesAuraForEachVoiceInEachStave, unitParams, staveVoiceKey)"
-    }
+    "fs": [
+     "src/midi/fillTupletValuesAuraForEachVoiceInEachStave.js"
+    ]
    },
    {
     "t": "findAllConnectedTracks",
@@ -5640,9 +5242,9 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "called by": "\u2014",
      "file": "src/midi/findAllConnectedTracks.js"
     },
-    "msg": {
-     "signature": "export default function (note, tracksForEachInstrumentOnEachStaveInEachVoice)"
-    }
+    "fs": [
+     "src/midi/findAllConnectedTracks.js"
+    ]
    },
    {
     "t": "findStaveIndexesOccupiedByUnit",
@@ -5662,9 +5264,9 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "called by": "\u2014",
      "file": "src/midi/findStaveIndexesOccupiedByUnit.js"
     },
-    "msg": {
-     "signature": "export default function (unitParams, staveIndex)"
-    }
+    "fs": [
+     "src/midi/findStaveIndexesOccupiedByUnit.js"
+    ]
    },
    {
     "t": "insertUnitsThatNeedsToBeRepeatedIntoVoiceInsteadOfSimileUnitWhichRelatedToThoseUnits",
@@ -5684,9 +5286,9 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "called by": "\u2014",
      "file": "src/midi/insertUnitsThatNeedsToBeRepeatedIntoVoiceInsteadOfSimileUnitWhichRelatedToThoseUnits.js"
     },
-    "msg": {
-     "signature": "export default function (similesAuraForEachVoiceInEachStave, voiceParams, staveVoiceKey, unitParams, unitIndex)"
-    }
+    "fs": [
+     "src/midi/insertUnitsThatNeedsToBeRepeatedIntoVoiceInsteadOfSimileUnitWhichRelatedToThoseUnits.js"
+    ]
    },
    {
     "t": "releaseTupletValuesAuraForEachVoiceInEachStave",
@@ -5706,9 +5308,9 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "called by": "\u2014",
      "file": "src/midi/releaseTupletValuesAuraForEachVoiceInEachStave.js"
     },
-    "msg": {
-     "signature": "export default function (tupletValuesAuraForEachVoiceInEachStave, unitParams, staveVoiceKey)"
-    }
+    "fs": [
+     "src/midi/releaseTupletValuesAuraForEachVoiceInEachStave.js"
+    ]
    },
    {
     "t": "shouldNoteWithTrillEndWithTurn",
@@ -5728,9 +5330,9 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "called by": "\u2014",
      "file": "src/midi/shouldNoteWithTrillEndWithTurn.js"
     },
-    "msg": {
-     "signature": "export default function (note, notesSplittedInTimeFrames, orderedTimeFramesFromNotesSplittedInTimeFrames, timeIndex, noteTimeIndex)"
-    }
+    "fs": [
+     "src/midi/shouldNoteWithTrillEndWithTurn.js"
+    ]
    },
    {
     "t": "updateTempoAuraIfNeeded",
@@ -5750,9 +5352,9 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "called by": "\u2014",
      "file": "src/midi/updateTempoAuraIfNeeded.js"
     },
-    "msg": {
-     "signature": "export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFirstUnitInMeasure, label)"
-    }
+    "fs": [
+     "src/midi/updateTempoAuraIfNeeded.js"
+    ]
    },
    {
     "t": "canInstrumentBeReassigned",
@@ -5773,9 +5375,9 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "called by": "attachTrackToNote",
      "file": "src/midi/attachTrackToNote.js"
     },
-    "msg": {
-     "signature": "const canInstrumentBeReassigned = (note) =>"
-    }
+    "fs": [
+     "src/midi/attachTrackToNote.js"
+    ]
    },
    {
     "t": "findFirstArticulationWithName",
@@ -5796,9 +5398,10 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "called by": "shouldNoteWithTrillEndWithTurn",
      "file": "src/midi/findFirstArticulationWithName.js"
     },
-    "msg": {
-     "signature": "export default function (note, articulationName)"
-    }
+    "fs": [
+     "src/midi/shouldNoteWithTrillEndWithTurn.js",
+     "src/midi/findFirstArticulationWithName.js"
+    ]
    },
    {
     "t": "findInstrumentForCurrentStaveInMidiFormat",
@@ -5819,9 +5422,10 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "called by": "attachTrackToNote",
      "file": "src/midi/findInstrumentForCurrentStaveInMidiFormat.js"
     },
-    "msg": {
-     "signature": "export default function (instrumentTitlesParams, note)"
-    }
+    "fs": [
+     "src/midi/attachTrackToNote.js",
+     "src/midi/findInstrumentForCurrentStaveInMidiFormat.js"
+    ]
    },
    {
     "t": "isChannelOccupied",
@@ -5842,9 +5446,10 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "called by": "attachTrackToNote",
      "file": "src/midi/isChannelOccupied.js"
     },
-    "msg": {
-     "signature": "export default function (instrumentsMappedWithChannels, channelNumber)"
-    }
+    "fs": [
+     "src/midi/attachTrackToNote.js",
+     "src/midi/isChannelOccupied.js"
+    ]
    },
    {
     "t": "doesNoteHaveSomeArticulations",
@@ -5866,324 +5471,155 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
      "called by": "canInstrumentBeReassigned, findInstrumentForCurrentStaveInMidiFormat",
      "file": "src/midi/doesNoteHaveSomeArticulations.js"
     },
-    "msg": {
-     "signature": "export default function (note, articulationNames)"
-    }
+    "fs": [
+     "src/midi/attachTrackToNote.js",
+     "src/midi/doesNoteHaveSomeArticulations.js"
+    ]
    }
   ],
-  "nodes": {
-   "assignTremoloTypeToUnit": {
-    "x": 90,
-    "y": 55,
-    "t": "assignTremoloTypeToUni",
-    "k": "assignTremoloTypeToUnit.js",
-    "sub": "midi",
-    "full": "assignTremoloTypeToUnit",
-    "lines": [
-     "assignTremoloType",
-     "ToUnit"
+  "files": [
+   "src/midi/assignTremoloTypeToUnit.js",
+   "src/midi/attachStaveIndexToNoteConsideringItsStavePosition.js",
+   "src/midi/attachTrackToNote.js",
+   "src/midi/deleteArticulationsWithName.js",
+   "src/midi/doesNoteHaveSomeArticulations.js",
+   "src/midi/fillSimilesAuraForEachVoiceInEachStave.js",
+   "src/midi/fillTimeStampsMappedWithRefs.js",
+   "src/midi/fillTupletValuesAuraForEachVoiceInEachStave.js",
+   "src/midi/findAllConnectedTracks.js",
+   "src/midi/findFirstArticulationWithName.js",
+   "src/midi/findInstrumentForCurrentStaveInMidiFormat.js",
+   "src/midi/findStaveIndexesOccupiedByUnit.js",
+   "src/midi/insertUnitsThatNeedsToBeRepeatedIntoVoiceInsteadOfSimileUnitWhichRelatedToThoseUnits.js",
+   "src/midi/isChannelOccupied.js",
+   "src/midi/releaseTupletValuesAuraForEachVoiceInEachStave.js",
+   "src/midi/shouldNoteWithTrillEndWithTurn.js",
+   "src/midi/updateTempoAuraIfNeeded.js"
+  ]
+ },
+ {
+  "id": "everything-else",
+  "name": "everything else \u00b7 3",
+  "frames": [
+   {
+    "t": "convertUint8ToBase64",
+    "x": "const convertUint8ToBase64 = (uint8) =>",
+    "f": "src/midi/convertUint8ToBase64.js#22",
+    "l": [
+     22,
+     54
     ],
-    "klines": [
-     "assignTremoloTypeTo",
-     "Unit.js"
+    "on": [
+     "convertUint8ToBase64"
     ],
-    "parent": null,
-    "children": []
-   },
-   "attachStaveIndexToNoteConsideringItsStavePosition": {
-    "x": 300,
-    "y": 55,
-    "t": "attachStaveIndexToNote",
-    "k": "attachStaveIndexToNoteConsideringItsStavePosition.js",
-    "sub": "midi",
-    "full": "attachStaveIndexToNoteConsideringItsStavePosition",
-    "lines": [
-     "attachStaveIndexTo",
-     "NoteConsideringIts",
-     "StavePosition"
-    ],
-    "klines": [
-     "attachStaveIndexTo",
-     "NoteConsideringIts\u2026"
-    ],
-    "parent": null,
-    "children": []
-   },
-   "attachTrackToNote": {
-    "x": 510,
-    "y": 55,
-    "t": "attachTrackToNote",
-    "k": "attachTrackToNote.js",
-    "sub": "midi",
-    "full": "attachTrackToNote",
-    "lines": [
-     "attachTrackToNote"
-    ],
-    "klines": [
-     "attachTrackToNote.js"
-    ],
-    "parent": null,
-    "children": [
-     "isChannelOccupied",
-     "findInstrumentForCurrentStaveInMidiFormat",
-     "canInstrumentBeReassigned"
+    "w": {
+     "stack": [
+      "convertUint8ToBase64"
+     ],
+     "called by": "\u2014",
+     "file": "src/midi/convertUint8ToBase64.js"
+    },
+    "fs": [
+     "src/midi/convertUint8ToBase64.js"
     ]
    },
-   "deleteArticulationsWithName": {
-    "x": 720,
-    "y": 55,
-    "t": "deleteArticulationsWit",
-    "k": "deleteArticulationsWithName.js",
-    "sub": "midi",
-    "full": "deleteArticulationsWithName",
-    "lines": [
-     "delete",
-     "ArticulationsWith",
-     "Name"
+   {
+    "t": "encodeChunk",
+    "x": "const encodeChunk = (uint8, start, end, lookup) =>",
+    "f": "src/midi/convertUint8ToBase64.js#10",
+    "l": [
+     10,
+     20
     ],
-    "klines": [
-     "deleteArticulations",
-     "WithName.js"
+    "on": [
+     "encodeChunk"
     ],
-    "parent": null,
-    "children": []
-   },
-   "canInstrumentBeReassigned": {
-    "x": 90,
-    "y": 173,
-    "t": "canInstrumentBeReassig",
-    "k": "attachTrackToNote.js",
-    "sub": "midi",
-    "full": "canInstrumentBeReassigned",
-    "lines": [
-     "canInstrumentBe",
-     "Reassigned"
-    ],
-    "klines": [
-     "attachTrackToNote.js"
-    ],
-    "parent": "attachTrackToNote",
-    "children": [
-     "doesNoteHaveSomeArticulations"
+    "w": {
+     "stack": [
+      "convertUint8ToBase64",
+      "encodeChunk"
+     ],
+     "called by": "convertUint8ToBase64",
+     "file": "src/midi/convertUint8ToBase64.js"
+    },
+    "fs": [
+     "src/midi/convertUint8ToBase64.js"
     ]
    },
-   "findFirstArticulationWithName": {
-    "x": 300,
-    "y": 173,
-    "t": "findFirstArticulationW",
-    "k": "findFirstArticulationWithName.js",
-    "sub": "midi",
-    "full": "findFirstArticulationWithName",
-    "lines": [
-     "findFirst",
-     "ArticulationWith",
-     "Name"
+   {
+    "t": "convertTripletToBase64",
+    "x": "const convertTripletToBase64 = (num, lookup) =>",
+    "f": "src/midi/convertUint8ToBase64.js#3",
+    "l": [
+     3,
+     8
     ],
-    "klines": [
-     "findFirst",
-     "ArticulationWithName\u2026"
+    "on": [
+     "convertTripletToBase64"
     ],
-    "parent": null,
-    "children": []
-   },
-   "findInstrumentForCurrentStaveInMidiFormat": {
-    "x": 510,
-    "y": 173,
-    "t": "findInstrumentForCurre",
-    "k": "findInstrumentForCurrentStaveInMidiFormat.js",
-    "sub": "midi",
-    "full": "findInstrumentForCurrentStaveInMidiFormat",
-    "lines": [
-     "findInstrumentFor",
-     "CurrentStaveInMidi",
-     "Format"
-    ],
-    "klines": [
-     "findInstrumentFor",
-     "CurrentStaveInMidi\u2026"
-    ],
-    "parent": "attachTrackToNote",
-    "children": [
-     "doesNoteHaveSomeArticulations"
+    "w": {
+     "stack": [
+      "convertUint8ToBase64",
+      "encodeChunk",
+      "convertTripletToBase64"
+     ],
+     "called by": "encodeChunk",
+     "file": "src/midi/convertUint8ToBase64.js"
+    },
+    "fs": [
+     "src/midi/convertUint8ToBase64.js"
     ]
-   },
-   "isChannelOccupied": {
-    "x": 720,
-    "y": 173,
-    "t": "isChannelOccupied",
-    "k": "isChannelOccupied.js",
-    "sub": "midi",
-    "full": "isChannelOccupied",
-    "lines": [
-     "isChannelOccupied"
-    ],
-    "klines": [
-     "isChannelOccupied.js"
-    ],
-    "parent": "attachTrackToNote",
-    "children": []
-   },
-   "doesNoteHaveSomeArticulations": {
-    "x": 90,
-    "y": 291,
-    "t": "doesNoteHaveSomeArticu",
-    "k": "doesNoteHaveSomeArticulations.js",
-    "sub": "midi",
-    "full": "doesNoteHaveSomeArticulations",
-    "lines": [
-     "doesNoteHaveSome",
-     "Articulations"
-    ],
-    "klines": [
-     "doesNoteHaveSome",
-     "Articulations.js"
-    ],
-    "parent": "findInstrumentForCurrentStaveInMidiFormat",
-    "children": []
    }
-  },
-  "edges": {
-   "canInstrumentBeReassigned-doesNoteHaveSomeArticulations": {
-    "d": "M90 173 L90 291",
-    "lx": 90,
-    "ly": 226,
-    "l": ""
-   },
-   "attachTrackToNote-isChannelOccupied": {
-    "d": "M510 55 L720 173",
-    "lx": 615,
-    "ly": 108,
-    "l": ""
-   },
-   "attachTrackToNote-findInstrumentForCurrentStaveInMidiFormat": {
-    "d": "M510 55 L510 173",
-    "lx": 510,
-    "ly": 108,
-    "l": ""
-   },
-   "attachTrackToNote-canInstrumentBeReassigned": {
-    "d": "M510 55 L90 173",
-    "lx": 300,
-    "ly": 108,
-    "l": ""
-   },
-   "findInstrumentForCurrentStaveInMidiFormat-doesNoteHaveSomeArticulations": {
-    "d": "M510 173 L90 291",
-    "lx": 300,
-    "ly": 226,
-    "l": ""
-   }
-  },
-  "height": 409
+  ],
+  "files": [
+   "src/midi/convertUint8ToBase64.js"
+  ]
  }
 ];
 
-  const SVGNS = 'http://www.w3.org/2000/svg';
-  const el = (n, a, p) => { const e = document.createElementNS(SVGNS, n); for (const k in a) e.setAttribute(k, a[k]); if (p) p.appendChild(e); return e; };
-  const svg = document.querySelector('svg.sys');
-  const gG = document.getElementById('groups'), gE = document.getElementById('edges'), gN = document.getElementById('nodes');
+  const treeBox = document.getElementById('tree');
   const scroller = document.querySelector('.scrollbox');
-  const crumbs = document.getElementById('crumbs');
 
-  let zoom = null;
-  function visibleSet(sc, root) {
-    if (!root) return null;
-    const seen = new Set([root]);
-    let frontier = [root];
-    while (frontier.length) {
-      const next = [];
-      for (const id of frontier) for (const c of (sc.nodes[id].children || [])) {
-        if (!seen.has(c)) { seen.add(c); next.push(c); }
+  // the folder structure is built once per tab; only the highlight moves
+  let treeFor = -1, rowByFile = {}, activePath = null;
+  function drawTree(sc) {
+    if (treeFor === si) return;
+    treeFor = si;
+    activePath = null;
+    const root = { dirs: new Map(), files: [] };
+    for (const path of sc.files) {
+      const parts = path.split('/');
+      const name = parts.pop();
+      let at = root;
+      for (const p of parts) {
+        if (!at.dirs.has(p)) at.dirs.set(p, { dirs: new Map(), files: [] });
+        at = at.dirs.get(p);
       }
-      frontier = next;
+      at.files.push({ name: name, path: path });
     }
-    if (seen.size < 3) { // a leaf: keep its ancestors so the zoom has context
-      let p = sc.nodes[root].parent;
-      while (p && seen.size < 4) { seen.add(p); p = sc.nodes[p].parent; }
-    }
-    return seen;
-  }
-  function drawCrumbs(sc) {
-    const chain = [];
-    let cur = zoom;
-    while (cur) { chain.unshift(cur); cur = sc.nodes[cur].parent; }
-    crumbs.innerHTML = '';
-    const mk = (label, id) => {
-      const b = document.createElement('button');
-      b.type = 'button'; b.textContent = label;
-      if (id === zoom) b.className = 'now';
-      b.addEventListener('click', () => { zoom = id; render(); });
-      crumbs.appendChild(b);
+    treeBox.innerHTML = '';
+    rowByFile = {};
+    const row = (depth, text, cls, path) => {
+      const d = document.createElement('div');
+      d.className = 'trow ' + cls;
+      d.style.paddingLeft = (10 + depth * 16) + 'px';
+      d.textContent = text;
+      if (path) {
+        d.title = path + ' — click to jump to its first frame';
+        d.addEventListener('click', () => jumpToFile(path));
+        rowByFile[path] = d;
+      }
+      treeBox.appendChild(d);
     };
-    mk('⊞ overview', null);
-    chain.forEach((id, i) => {
-      crumbs.insertAdjacentHTML('beforeend', '<span>›</span>');
-      mk(sc.nodes[id].t, id);
-    });
-    if (zoom) {
-      crumbs.insertAdjacentHTML('beforeend', '<span>·</span>');
-      const b = document.createElement('button');
-      b.type = 'button'; b.textContent = '⤢ jump to code';
-      b.addEventListener('click', () => jumpTo(zoom));
-      crumbs.appendChild(b);
-    }
-  }
-  function drawDiagram(sc) {
-    gG.innerHTML = ''; gE.innerHTML = ''; gN.innerHTML = '';
-    const vis = visibleSet(sc, zoom);
-    const ids = Object.keys(sc.nodes).filter(id => !vis || vis.has(id));
-    if (zoom) {
-      let x1 = 1e9, y1 = 1e9, x2 = -1e9, y2 = -1e9;
-      for (const id of ids) {
-        const n = sc.nodes[id];
-        x1 = Math.min(x1, n.x); y1 = Math.min(y1, n.y); x2 = Math.max(x2, n.x); y2 = Math.max(y2, n.y);
-      }
-      svg.setAttribute('viewBox', `${x1 - 120} ${y1 - 90} ${x2 - x1 + 240} ${y2 - y1 + 180}`);
-    } else {
-      svg.setAttribute('viewBox', `0 0 820 ${sc.height || 460}`);
-    }
-    // group boxes behind the blocks, by the folder each function lives in
-    const groups = {};
-    for (const id of ids) {
-      const n = sc.nodes[id];
-      (groups[n.sub] = groups[n.sub] || []).push(n);
-    }
-    for (const sub in groups) {
-      const ns = groups[sub];
-      const x1 = Math.min(...ns.map(n => n.x)) - 88, x2 = Math.max(...ns.map(n => n.x)) + 88;
-      const y1 = Math.min(...ns.map(n => n.y)) - 34, y2 = Math.max(...ns.map(n => n.y)) + 34;
-      const g = el('g', { class: 'cluster' }, gG);
-      el('rect', { x: x1, y: y1, width: x2 - x1, height: y2 - y1 }, g);
-      const t = el('text', { x: x1 + 8, y: y1 + 13 }, g); t.textContent = sub;
-    }
-    for (const id in sc.edges) {
-      const e = sc.edges[id];
-      if ((!vis || (vis.has(e.a) && vis.has(e.b)))) {
-        el('path', { d: e.d, class: 'edge' }, gE);
-      }
-    }
-    const nodeEls = {};
-    for (const id of ids) {
-      const n = sc.nodes[id];
-      const g = el('g', { class: 'node', style: '--own: var(--accent)' }, gN);
-      const tt = el('title', {}, g); tt.textContent = n.full + ' — click to zoom in';
-      el('rect', { x: n.x - 80, y: n.y - 37, width: 160, height: 74, rx: 7 }, g);
-      el('rect', { x: n.x - 80, y: n.y - 37, width: 6, height: 74, rx: 3, class: 'band' }, g);
-      const words = n.lines;
-      const nameY = n.y - 26 + (3 - Math.min(words.length, 3)) * 6;
-      const a = el('text', { x: n.x, y: nameY }, g);
-      words.forEach((w, i) => {
-        const ts = el('tspan', { x: n.x, dy: i === 0 ? 0 : 12 }, a); ts.textContent = w;
+    const walk = (at, depth) => {
+      [...at.dirs.keys()].sort().forEach(name => {
+        row(depth, name + '/', 'dir');
+        walk(at.dirs.get(name), depth + 1);
       });
-      const kLines = n.klines || [n.k];
-      const b = el('text', { x: n.x, y: n.y + 14, class: 'fk' }, g);
-      kLines.forEach((w, i) => {
-        const ts = el('tspan', { x: n.x, dy: i === 0 ? 0 : 12 }, b); ts.textContent = w;
-      });
-      g.addEventListener('click', () => { zoom = id; jumpTo(id); });
-      nodeEls[id] = g;
-    }
-    return nodeEls;
+      at.files.sort((a, b) => a.name < b.name ? -1 : 1)
+        .forEach(f => row(depth, f.name, 'file', f.path));
+    };
+    walk(root, 0);
   }
 
   const files = {};
@@ -6259,29 +5695,31 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
     if (logEl) logEl.textContent = fr.log || '—';
   }
 
-  function jumpTo(id) {
-    const i = S[si].frames.findIndex(f => (f.on || []).includes(id));
-    if (i >= 0) { stop(); fi = i; }
+  function jumpToFile(path) {
+    stop();
+    const i = S[si].frames.findIndex(f => f.f.split('#')[0] === path);
+    if (i >= 0) fi = i;
     render();
   }
+  // a call stack can span several files: the deepest one is the current
+  // file (green), the files above it stay tinted
   function scrollToActive() {
-    const id = S[si].frames[fi].on && S[si].frames[fi].on[0];
-    const n = id && S[si].nodes[id];
-    if (!n) return;
-    const vb = svg.viewBox.baseVal;
-    const scale = 820 / vb.width;
-    scroller.scrollTo({
-      left: Math.max(0, (n.x - vb.x) * scale - scroller.clientWidth / 2),
-      top: Math.max(0, (n.y - vb.y) * scale - scroller.clientHeight / 2),
-      behavior: 'smooth'
-    });
+    const fs = S[si].frames[fi].fs || [];
+    const cur = fs[fs.length - 1];
+    const r = cur && rowByFile[cur];
+    if (!r) return;
+    const out = r.offsetTop < scroller.scrollTop || r.offsetTop + r.offsetHeight > scroller.scrollTop + scroller.clientHeight;
+    if (cur !== activePath || out) {
+      activePath = cur;
+      scroller.scrollTo({ top: Math.max(0, r.offsetTop - scroller.clientHeight / 2 + r.offsetHeight / 2), behavior: 'smooth' });
+    }
   }
 
   let si = 0, fi = 0, timer = null;
   const tabs = document.getElementById('tabs'), scrub = document.getElementById('scrub');
   S.forEach((sc, i) => {
     const b = document.createElement('button'); b.type = 'button'; b.role = 'tab'; b.id = 'tab-' + i;
-    b.textContent = sc.name; b.addEventListener('click', () => { stop(); si = i; fi = 0; zoom = null; render(); });
+    b.textContent = sc.name; b.addEventListener('click', () => { stop(); si = i; fi = 0; render(); });
     tabs.appendChild(b);
   });
   function render() {
@@ -6291,15 +5729,12 @@ export default function (tempoMark, tempoAura, unitDurationInQuarters, thisIsFir
     document.getElementById('count').textContent = `${fi + 1} / ${sc.frames.length}`;
     document.getElementById('ctitle').textContent = fr.t;
     document.getElementById('ctext').textContent = fr.x;
-    const active = fr.on && fr.on[0];
-    if (active) {
-      const vis = visibleSet(sc, zoom);
-      if (!vis || !vis.has(active)) zoom = active;
+    drawTree(sc);
+    const fs = fr.fs || [], cur = fs[fs.length - 1];
+    for (const p in rowByFile) {
+      rowByFile[p].className = 'trow file' + (p === cur ? ' on' : fs.includes(p) ? ' in' : '');
     }
-    drawCrumbs(sc);
-    const nodeEls = drawDiagram(sc);
-    document.getElementById('where').textContent = (fr.on || []).map(k => (sc.nodes[k] || {}).t || k).join(' · ');
-    for (const k in nodeEls) nodeEls[k].classList.toggle('on', (fr.on || []).includes(k));
+    document.getElementById('where').textContent = cur || fr.f.split('#')[0];
     showState(fr);
     showCode(fr.f, fr.l);
     scrollToActive();
