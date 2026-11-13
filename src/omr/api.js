@@ -10,14 +10,14 @@
  *
  * The public surface, and nothing else:
  *
- *   readBitmapFromImage   image pixels → { width, height, grayscale }
- *   analyzeImage          the image → staves, systems, text blocks, styles
- *   translateImageToMsq   the image → { msqText, report }
- *
- * Coming with the next milestones: translateImagesToMsqPages (projects, one
- * image per page, with measure numbers and keys carried across).
+ *   decodeImageToGrayscale   png bytes → { width, height, grayscale }
+ *   readBitmapFromImage      image pixels → { width, height, grayscale }
+ *   analyzeImage             the image → staves, systems, text blocks, styles
+ *   translateImageToMsq      the image → { msqText, report }
+ *   translateImagesToMsqPages   one image per page → { pagesText, report }
  */
 
+export { decodeImageToGrayscale } from './analysis/decodeImageToGrayscale.js'
 export { readBitmapFromImage } from './analysis/readBitmapFromImage.js'
 export { analyzeImage } from './analysis/analyzeImage.js'
 export { translateImageToMsq } from './translateImageToMsq.js'

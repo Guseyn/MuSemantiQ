@@ -34,6 +34,8 @@ import { roleOf } from '#msq/omr/analysis/symbolClasses.js'
 import { drawableSymbols } from '#msq/omr/training/drawSymbols.js'
 import { translateImageToMsq } from '#msq/omr/translateImageToMsq.js'
 import { translateImagesToMsqPages } from '#msq/omr/translateImagesToMsqPages.js'
+import { decodeImageToGrayscale } from '#msq/omr/analysis/decodeImageToGrayscale.js'
+import { encodePng } from '../test/omr-tests/helpers/encodePng.js'
 import { generateIntermediateStructuresForSinglePage } from '#msq/language/api.js'
 import {
   drawEllipse,
@@ -523,6 +525,31 @@ const TESTS = [
       assert.ok(msqText.includes('is ghost'), 'and one rule turns it into MSQ')
       const parsed = generateIntermediateStructuresForSinglePage({ pageText: msqText })
       assert.deepStrictEqual(parsed.errors, [], 'the page still parses')
+    }
+  },
+  {
+    name: 'decodeImageToGrayscale reads a PNG',
+    run () {
+      const bitmap = createPlainBitmap(4, 2)
+      drawFilledRect(bitmap, 0, 0, 2, 2) // ink in one corner
+      const decoded = decodeImageToGrayscale(encodePng(bitmap))
+      assert.strictEqual(decoded.width, 4, 'width')
+      assert.strictEqual(decoded.height, 2, 'height')
+      near(decoded.grayscale[0], 1, 1 / 255, 'ink where it was drawn')
+      near(decoded.grayscale[3], 0, 1 / 255, 'paper where it was not')
+    }
+  },
+  {
+    name: 'any image becomes MSQ through the API',
+    run () {
+      // the main thing: a file of pixels in, MSQ text out. The PNG round trip
+      // must change nothing — what the drawing wrote is what the rules read.
+      const page = examplePage()
+      const fromFile = decodeImageToGrayscale(encodePng(page.bitmap))
+      const viaFile = translateImageToMsq(fromFile, { classify: page.classify })
+      const direct = translateImageToMsq(page.bitmap, { classify: page.classify })
+      assert.strictEqual(viaFile.msqText, direct.msqText, 'the file path changes nothing')
+      assert.ok(viaFile.msqText.includes('treble clef'), 'and the text is a page')
     }
   }
 ]

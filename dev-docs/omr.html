@@ -230,7 +230,8 @@ dl.terms dd em { color: var(--muted); }
 
 <div class="folder">
   <div class="name">src/omr/analysis/ — the image half</div>
-  <div class="row"><span class="f2">readBitmapFromImage.js</span><span class="d">png/jpeg bytes → grayscale numbers</span></div>
+  <div class="row"><span class="f2">decodeImageToGrayscale.js</span><span class="d">png bytes → grayscale numbers (node zlib)</span></div>
+  <div class="row"><span class="f2">readBitmapFromImage.js</span><span class="d">canvas pixels (RGBA) → grayscale numbers</span></div>
   <div class="row"><span class="f2">deskewBitmap.js</span><span class="d">straighten a photo: find the dominant line angle, rotate</span></div>
   <div class="row"><span class="f2">detectStaves.js</span><span class="d">find groups of 5 parallel lines; measure the staff space <i>s</i></span></div>
   <div class="row"><span class="f2">groupStavesIntoSystems.js</span><span class="d">staves joined by a brace or bracket (and shared barlines) form one system</span></div>
@@ -852,7 +853,7 @@ rsync server:omr/model/weights.json src/omr/model/</code></pre>
          translateImageToMsq, translateImagesToMsqPages } <span class="kw">from</span> <span class="st">'#msq/omr/api.js'</span></code></pre>
 <table class="grid">
 <tr><th>function</th><th>in</th><th>out</th></tr>
-<tr><td><code>decodeImageToGrayscale(bytes)</code></td><td>png/jpeg bytes</td><td><code>{ width, height, grayscale }</code> — plain numbers, no DOM</td></tr>
+<tr><td><code>decodeImageToGrayscale(bytes)</code></td><td>png bytes (node zlib; jpeg: convert first)</td><td><code>{ width, height, grayscale }</code> — plain numbers, no DOM</td></tr>
 <tr><td><code>analyzeImage(image)</code></td><td>the same</td><td>staves, components (box, class, confidence), text blocks, measured styles — painted back over the source by tools</td></tr>
 <tr><td><code>translateImageToMsq(image)</code></td><td>the same</td><td><code>{ msqText, report }</code></td></tr>
 <tr><td><code>translateImagesToMsqPages(images)</code></td><td>one image per page</td><td><code>{ pagesText, report }</code> — <code>pagesText[i]</code> becomes <code>page-(i+1).txt</code>; measure numbers, key and meter carry on</td></tr>

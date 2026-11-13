@@ -132,7 +132,7 @@ export function runTraining () {
     const outIndex = process.argv.findIndex((argument) => argument.startsWith('--out='))
     if (outIndex !== -1) {
       const outPath = process.argv[outIndex].slice('--out='.length)
-      const { json, hash } = exportWeights(model)
+      const { json, hash } = exportWeights(model, classIds)
       writeFileSync(outPath, json)
       log(`weights written to ${outPath}`)
       log(`sha256 ${hash}`)

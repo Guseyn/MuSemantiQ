@@ -193,8 +193,37 @@ shasum -a 256 src/omr/model/weights.json                   <span class="cm"># mu
 <section id="test">
 <h2><span class="n">6</span>Test it locally <a class="totop" href="#workflow">↑</a></h2>
 
+<h3>The API under test</h3>
+<p>The one that matters is the first line: <b>any image → MSQ</b>. The others are the same pipeline taken apart.</p>
+<table style="border-collapse:collapse;width:100%;font-size:13.5px">
+<tr style="border-bottom:2px solid var(--ink)"><th style="text-align:left;padding:6px 10px;font:600 11px var(--mono)">function</th><th style="text-align:left;padding:6px 10px;font:600 11px var(--mono)">in → out</th></tr>
+<tr style="border-bottom:1px solid var(--rule)"><td style="padding:7px 10px"><code>translateImageToMsq(image, { model, classIds })</code></td><td style="padding:7px 10px"><b>an image → <code>{ msqText, report }</code></b> — the main test</td></tr>
+<tr style="border-bottom:1px solid var(--rule)"><td style="padding:7px 10px"><code>translateImagesToMsqPages(images, options)</code></td><td style="padding:7px 10px">one image per page → <code>{ pagesText, report }</code>, with key and meter carried across</td></tr>
+<tr style="border-bottom:1px solid var(--rule)"><td style="padding:7px 10px"><code>decodeImageToGrayscale(bytes)</code></td><td style="padding:7px 10px">png bytes → <code>{ width, height, grayscale }</code></td></tr>
+<tr style="border-bottom:1px solid var(--rule)"><td style="padding:7px 10px"><code>analyzeImage(image)</code></td><td style="padding:7px 10px">the image → staves, systems, symbols, measured styles</td></tr>
+<tr><td style="padding:7px 10px"><code>readBitmapFromImage(pixels)</code></td><td style="padding:7px 10px">canvas <code>ImageData</code> → the same numbers (the browser path)</td></tr>
+</table>
+
+<h3>The main test — any image becomes MSQ</h3>
+<pre><code><span class="cm"># node --input-type=module -e "…paste this…"</span>
+import { readFileSync, writeFileSync } from 'node:fs'
+import { decodeImageToGrayscale, translateImageToMsq } from '#msq/omr/api.js'
+import { modelFromWeights } from '#msq/omr/training/exportWeights.js'
+
+const { shape, layers, classIds } = JSON.parse(readFileSync('src/omr/model/weights.json', 'utf8'))
+const model = modelFromWeights({ shape, layers })
+
+const image = decodeImageToGrayscale(readFileSync('score.png'))
+const { msqText, report } = translateImageToMsq(image, { model, classIds })
+
+writeFileSync('score.msq', msqText)
+console.log(report.uncertain)     <span class="cm">// what the tool was unsure of, with its MSQ line</span></code></pre>
+
+<p>Then read <code>score.msq</code> — it is plain MSQ text; open it in Unison or run it through the parser. A JPEG is not decoded: convert it first with <code>sips -s format png photo.jpg</code> (macOS) or <code>magick photo.jpg photo.png</code>, or in a browser hand the canvas pixels to <code>readBitmapFromImage</code>.</p>
+
+<h3>And everything around it</h3>
 <pre><code>npm run test:omr:all</code></pre>
-<p>The suite runs without the weights — rules and math are tested against drawn pages. To hear the transferred model speak, load it and ask it about a few crops:</p>
+<p>The suite covers the parts: the PNG round trip, rules and math against drawn pages, and the golden byte-stable outputs. The weights file carries its own <code>classIds</code>, so the order the model was trained with is never reconstructed from memory. A quick check that the transferred model itself speaks:</p>
 
 <pre><code><span class="cm"># node --input-type=module -e "…paste this…"</span>
 import { readFileSync } from 'node:fs'
@@ -202,15 +231,13 @@ import { modelFromWeights } from '#msq/omr/training/exportWeights.js'
 import classifyComponent from '#msq/omr/analysis/classifyComponent.js'
 import { generateTrainingSet } from '#msq/omr/training/generateTrainingSet.js'
 
-const { shape, layers } = JSON.parse(readFileSync('src/omr/model/weights.json', 'utf8'))
+const { shape, layers, classIds } = JSON.parse(readFileSync('src/omr/model/weights.json', 'utf8'))
 const model = modelFromWeights({ shape, layers })
-const { classIds, samples } = generateTrainingSet({ seed: 1, samplesPerClass: 1, gridSize: shape.gridSize })
+const { samples } = generateTrainingSet({ seed: 1, samplesPerClass: 1, gridSize: shape.gridSize })
 for (const sample of samples) {
   const answer = classifyComponent(model, sample.pixels, classIds)
   console.log(sample.classId, '→', answer.className, answer.confidence)
 }</code></pre>
-
-<div class="note"><b>Class order matters</b> The model's classes are the order it was trained with. Both sides use <code>generateTrainingSet</code> defaults, so they match; a trained-on-purpose run should carry its <code>classIds</code> alongside the weights.</div>
 </section>
 
 <hr>
