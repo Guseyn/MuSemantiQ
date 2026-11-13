@@ -156,6 +156,23 @@ src/midi/magenta-sound-font/*
 
 # What a generator wrote while it ran, kept so a failed render can be read back.
 .generator-logs/
+
+# What an OMR test wrote when it failed, kept so the numbers can be read back.
+# Only failures write here, so nothing from a green run is worth tracking.
+test/omr-tests/actual/
+
+# The trained model and its runs: generated on the training server and copied
+# home by hand (see dev-docs/training.html). The dataset is not here at all —
+# seeds regenerate it — but the run's log is, at training-data/training.log.
+# Weights are data, not source.
+src/omr/model/weights.json
+src/omr/model/checkpoints/
+training-data/
+
+# The remote training scripts are personal — they name a server and an ssh
+# key — so the folder stays local; the tutorial describes the same workflow.
+remote-training-scripts/*
+!remote-training-scripts/.gitinfo
 browser-app/web-app/static/magenta-sound-font/
 
 # Each app's static/js/msq is assembled rather than written: the components are
