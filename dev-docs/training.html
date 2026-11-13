@@ -1,0 +1,244 @@
+<title>MuSemantiQ — training on a server</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root {
+  --paper: #fdfdfb;
+  --ink: #17181a;
+  --muted: #6b7076;
+  --rule: #e4e4e0;
+  --soft: #f4f3ef;
+  --accent: #a5322a;
+  --accent-soft: #f6e9e6;
+  --ok: #2f6b3c;
+  --font: system-ui, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+  --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+  --serif: Georgia, "Times New Roman", serif;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 64px; }
+body { background: var(--paper); color: var(--ink); font: 15.5px/1.6 var(--font); margin: 0; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.page { max-width: 860px; margin: 0 auto; padding: 36px 22px 120px; }
+header h1 { font: 400 34px/1.2 var(--serif); margin: 0 0 6px; }
+header .sub { color: var(--muted); max-width: 70ch; }
+.eyebrow { font: 500 12px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+hr { border: 0; border-top: 1px solid var(--rule); margin: 34px 0; }
+nav { position: sticky; top: 0; z-index: 10; background: var(--paper); border-bottom: 1px solid var(--rule); padding: 10px 0; margin: 22px 0 26px; display: flex; flex-wrap: wrap; gap: 4px 14px; }
+nav a { font: 500 12.5px var(--mono); color: var(--muted); }
+nav a:hover { color: var(--accent); text-decoration: none; }
+h2 { font: 400 25px/1.25 var(--serif); margin: 0 0 10px; }
+h2 .n { color: var(--muted); font-size: 17px; margin-right: 8px; }
+h3 { font: 600 15px var(--font); margin: 24px 0 6px; }
+p { max-width: 72ch; margin: 8px 0; }
+ul, ol { max-width: 72ch; padding-left: 22px; }
+li { margin: 4px 0; }
+code { font: .87em var(--mono); background: var(--soft); padding: 0 4px; border-radius: 3px; }
+pre { background: #fff; border: 1px solid var(--rule); border-radius: 4px; padding: 12px 16px; overflow-x: auto; font: 12.5px/1.7 var(--mono); margin: 12px 0; }
+pre .cm { color: var(--muted); }
+.totop { float: right; font: 500 11.5px var(--mono); }
+.note { border-left: 3px solid var(--accent); background: var(--accent-soft); padding: 10px 14px; border-radius: 0 7px 7px 0; margin: 14px 0; max-width: 72ch; }
+.note b { font: 600 11px var(--mono); text-transform: uppercase; letter-spacing: .06em; display: block; margin-bottom: 3px; color: var(--muted); }
+figure { margin: 18px 0; }
+figure svg { display: block; width: 100%; height: auto; background: #fff; border: 1px solid var(--rule); border-radius: 4px; }
+figcaption { font: 12px var(--mono); color: var(--muted); margin-top: 6px; }
+.diagram .box { fill: #fff; stroke: #c9c9c4; stroke-width: 1.5; rx: 8; }
+.diagram .box.hot { stroke: var(--accent); stroke-width: 2; fill: var(--accent-soft); }
+.diagram text { font: 600 12.5px var(--font); fill: var(--ink); text-anchor: middle; }
+.diagram text.k { font: 500 10.5px var(--mono); fill: var(--muted); }
+.diagram text.k.acc { fill: var(--accent); }
+.diagram .arrow { stroke: var(--muted); stroke-width: 1.8; fill: none; marker-end: url(#arr); }
+.diagram .arrow.down { stroke: var(--accent); }
+@keyframes pulse { 0%, 100% { opacity: .45; } 50% { opacity: 1; } }
+.pulse { animation: pulse 2.4s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
+</style>
+
+<div class="page">
+<header>
+  <div class="eyebrow">MuSemantiQ · dev docs · src/omr</div>
+  <h1>Training on a server</h1>
+  <p class="sub">Clone the project on a rented server, train there, keep the model out of git, and bring the weights home to test. Code travels by git; weights travel by <code>rsync</code>; the training set travels nowhere.</p>
+</header>
+
+<nav>
+  <a href="#workflow">the shape</a>
+  <a href="#setup">set up once</a>
+  <a href="#run">a training run</a>
+  <a href="#gitignore">model data</a>
+  <a href="#home">bring it home</a>
+  <a href="#test">test locally</a>
+  <a href="#cheat">cheat sheet</a>
+</nav>
+
+<!-- ============================ 1 ============================ -->
+<section id="workflow">
+<h2><span class="n">1</span>The shape of it <a class="totop" href="#workflow">↑</a></h2>
+
+<figure>
+<svg class="diagram" viewBox="0 0 900 360" role="img" aria-label="Code travels to the server by git, weights travel back by rsync">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="currentColor" style="fill: var(--muted)"></path>
+    </marker>
+    <marker id="arr-acc" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="currentColor" style="fill: var(--accent)"></path>
+    </marker>
+  </defs>
+  <!-- laptop -->
+  <rect class="box" x="20" y="60" width="280" height="200"></rect>
+  <text x="160" y="92">your laptop</text>
+  <text x="160" y="128" class="k">edit the code · run the tests</text>
+  <text x="160" y="152" class="k">npm run test:omr:all</text>
+  <text x="160" y="184" class="k acc">src/omr/model/weights.json</text>
+  <text x="160" y="204" class="k">arrives here — gitignored</text>
+  <!-- server -->
+  <rect class="box hot" x="600" y="60" width="280" height="200"></rect>
+  <text x="740" y="92">the server</text>
+  <text x="740" y="128" class="k">git clone · tmux · node</text>
+  <text x="740" y="152" class="k">src/omr/training/train.js</text>
+  <text x="740" y="184" class="k acc">model/weights.json</text>
+  <text x="740" y="204" class="k">born here — gitignored</text>
+  <!-- lanes -->
+  <path class="arrow" d="M310,120 L590,120"></path>
+  <text x="450" y="102" class="k">git push / git pull — the code</text>
+  <path class="arrow down" d="M590,220 L310,220" marker-end="url(#arr-acc)"></path>
+  <text x="450" y="248" class="k acc">rsync — the weights, and their hash</text>
+  <circle r="6" fill="#a5322a" class="pulse">
+    <animateMotion dur="3s" repeatCount="indefinite" path="M590,220 L310,220"></animateMotion>
+  </circle>
+  <!-- the dataset -->
+  <text x="450" y="310" class="k">the training set travels nowhere: one seed regenerates the same bytes on any machine</text>
+</svg>
+<figcaption>fig 1 · two lanes. Git is for source; rsync is for model data.</figcaption>
+</figure>
+
+<p>Three facts make this simple:</p>
+<ul>
+  <li><b>Training needs nothing but Node</b> — no <code>npm install</code> on the server. The trainer and the data factory are dependency-free.</li>
+  <li><b>The dataset does not exist as files</b> — it is drawn from seeds. The same seed on both machines gives the same bytes, so nothing to sync.</li>
+  <li><b>Weights are data, not source</b> — they are gitignored and travel directly to you.</li>
+</ul>
+</section>
+
+<hr>
+
+<!-- ============================ 2 ============================ -->
+<section id="setup">
+<h2><span class="n">2</span>Set up the server, once <a class="totop" href="#workflow">↑</a></h2>
+<p>Any CPU droplet with 4–8 vCPU will do; the model is small and the trainer uses the CPU. On the laptop, put the branch on GitHub first.</p>
+
+<pre><code><span class="cm"># on your laptop</span>
+git push -u origin omr
+
+<span class="cm"># on the server</span>
+ssh user@server
+git clone https://github.com/Guseyn/MuSemantiQ.git
+cd MuSemantiQ
+git checkout omr
+node -v                     <span class="cm"># v22 or newer — nothing else is needed</span></code></pre>
+</section>
+
+<hr>
+
+<!-- ============================ 3 ============================ -->
+<section id="run">
+<h2><span class="n">3</span>A training run <a class="totop" href="#workflow">↑</a></h2>
+
+<pre><code>git pull                                        <span class="cm"># the latest code</span>
+
+tmux new -s train                               <span class="cm"># the run survives your ssh session</span>
+node src/omr/training/train.js \
+  --out=src/omr/model/weights.json | tee run.log
+
+<span class="cm"># from another ssh session, any time:</span>
+tail -f run.log                                 <span class="cm"># one line per epoch</span></code></pre>
+
+<p>The run prints a line per epoch — loss, training accuracy, validation accuracy — and writes <code>model/weights.json</code> with its <b>sha256</b> at the end. <code>Ctrl-b d</code> detaches tmux, <code>tmux attach -t train</code> returns.</p>
+<div class="note"><b>Reproducible</b> The seeds live in the run itself: the same code and seed give the same dataset and the same weights on any machine. The seed and shape are in <code>runTraining()</code> in <code>src/omr/training/train.js</code>.</div>
+</section>
+
+<hr>
+
+<!-- ============================ 4 ============================ -->
+<section id="gitignore">
+<h2><span class="n">4</span>Model data stays out of git <a class="totop" href="#workflow">↑</a></h2>
+<p>Already in <code>.gitignore</code>, on both machines alike:</p>
+<pre><code># The trained model and its runs: generated on the training server and copied
+# home by hand. The dataset is not here at all — seeds regenerate it.
+# Weights are data, not source.
+src/omr/model/weights.json
+src/omr/model/checkpoints/
+training-data/</code></pre>
+<p>So <code>git status</code> on the server stays clean while a run lives in <code>model/</code>, and a weights file can never be committed by accident.</p>
+</section>
+
+<hr>
+
+<!-- ============================ 5 ============================ -->
+<section id="home">
+<h2><span class="n">5</span>Bring the model home <a class="totop" href="#workflow">↑</a></h2>
+
+<pre><code>rsync -av server:~/MuSemantiQ/src/omr/model/ ./src/omr/model/
+rsync -av server:~/MuSemantiQ/run.log ./              <span class="cm"># optional: the loss history</span>
+
+shasum -a 256 src/omr/model/weights.json              <span class="cm"># must match the sha the trainer printed</span></code></pre>
+
+<p>The trainer hashes exactly the bytes it wrote, so a mismatch means a broken transfer or a different run — re-rsync before trusting the file. Once the weights are in <code>src/omr/model/</code>, the code picks them up where you load them (see below).</p>
+</section>
+
+<hr>
+
+<!-- ============================ 6 ============================ -->
+<section id="test">
+<h2><span class="n">6</span>Test it locally <a class="totop" href="#workflow">↑</a></h2>
+
+<pre><code>npm run test:omr:all</code></pre>
+<p>The suite runs without the weights — rules and math are tested against drawn pages. To hear the transferred model speak, load it and ask it about a few crops:</p>
+
+<pre><code><span class="cm"># node --input-type=module -e "…paste this…"</span>
+import { readFileSync } from 'node:fs'
+import { modelFromWeights } from '#msq/omr/training/exportWeights.js'
+import classifyComponent from '#msq/omr/analysis/classifyComponent.js'
+import { generateTrainingSet } from '#msq/omr/training/generateTrainingSet.js'
+
+const { shape, layers } = JSON.parse(readFileSync('src/omr/model/weights.json', 'utf8'))
+const model = modelFromWeights({ shape, layers })
+const { classIds, samples } = generateTrainingSet({ seed: 1, samplesPerClass: 1, gridSize: shape.gridSize })
+for (const sample of samples) {
+  const answer = classifyComponent(model, sample.pixels, classIds)
+  console.log(sample.classId, '→', answer.className, answer.confidence)
+}</code></pre>
+
+<div class="note"><b>Class order matters</b> The model's classes are the order it was trained with. Both sides use <code>generateTrainingSet</code> defaults, so they match; a trained-on-purpose run should carry its <code>classIds</code> alongside the weights.</div>
+</section>
+
+<hr>
+
+<!-- ============================ 7 ============================ -->
+<section id="cheat">
+<h2><span class="n">7</span>Cheat sheet <a class="totop" href="#workflow">↑</a></h2>
+<pre><code><span class="cm"># laptop — publish the branch</span>
+git push -u origin omr
+
+<span class="cm"># server — first time</span>
+git clone https://github.com/Guseyn/MuSemantiQ.git && cd MuSemantiQ
+git checkout omr
+
+<span class="cm"># server — every run</span>
+git pull
+tmux new -s train
+node src/omr/training/train.js --out=src/omr/model/weights.json | tee run.log
+<span class="cm"># … wait, or Ctrl-b d and come back …</span>
+tail run.log
+
+<span class="cm"># laptop — take the result</span>
+rsync -av server:~/MuSemantiQ/src/omr/model/ ./src/omr/model/
+shasum -a 256 src/omr/model/weights.json
+npm run test:omr:all</code></pre>
+
+<p>Release weights come from one machine — different CPUs can round floats in the last decimal — and the printed hash is what pins the result. Once a <code>weights.json</code> is adopted, it never moves silently.</p>
+</section>
+</div>

@@ -160,6 +160,13 @@ src/midi/magenta-sound-font/*
 # What an OMR test wrote when it failed, kept so the numbers can be read back.
 # Only failures write here, so nothing from a green run is worth tracking.
 test/omr-tests/actual/
+
+# The trained model and its runs: generated on the training server and copied
+# home by hand (see dev-docs/training.html). The dataset is not here at all —
+# seeds regenerate it. Weights are data, not source.
+src/omr/model/weights.json
+src/omr/model/checkpoints/
+training-data/
 browser-app/web-app/static/magenta-sound-font/
 
 # Each app's static/js/msq is assembled rather than written: the components are

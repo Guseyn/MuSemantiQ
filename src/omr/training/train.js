@@ -29,7 +29,8 @@ export function trainModel ({
   batchSize = 32,
   learningRate = 0.001,
   l2 = 0.0005,
-  seed = 1
+  seed = 1,
+  onEpoch = null
 }) {
   const random = createSeededRandom(seed)
   const states = {}
@@ -89,6 +90,9 @@ export function trainModel ({
       accuracy: training.accuracy,
       validationAccuracy: validation.accuracy
     })
+    if (onEpoch) {
+      onEpoch(history[history.length - 1])
+    }
     if (validation.accuracy > best.accuracy) {
       best = { accuracy: validation.accuracy, weights: copyWeights(model) }
     }
@@ -107,11 +111,11 @@ export function runTraining () {
     validationSamples: samples.slice(split),
     epochs: 15,
     batchSize: 8,
-    learningRate: 0.01
+    learningRate: 0.01,
+    onEpoch: (entry) => console.log(
+      `epoch ${entry.epoch}: loss ${entry.loss}, accuracy ${entry.accuracy}, validation ${entry.validationAccuracy}`
+    )
   })
-  console.log(history.map((entry) =>
-    `epoch ${entry.epoch}: loss ${entry.loss}, accuracy ${entry.accuracy}, validation ${entry.validationAccuracy}`
-  ).join('\n'))
   const outIndex = process.argv.findIndex((argument) => argument.startsWith('--out='))
   if (outIndex !== -1) {
     const outPath = process.argv[outIndex].slice('--out='.length)
