@@ -52,31 +52,8 @@ code { font: .87em var(--mono); background: var(--soft); padding: 0 4px; border-
 
 /* figures */
 figure { margin: 22px 0; }
-figure svg { display: block; width: 100%; height: auto; background: #fff; border: 1px solid var(--rule); border-radius: 6px; }
-figcaption { font: 12px var(--mono); color: var(--muted); margin-top: 6px; }
-svg text { font-family: var(--serif); font-style: italic; fill: var(--ink); }
-svg text.up { font-style: normal; }
-svg text.mono { font: 500 12px var(--font-mono); font-style: normal; fill: var(--ink); }
-svg text.mono.tiny { font-size: 11px; }
-svg text.lbl { font-size: 14px; }
-svg .cell { fill: var(--soft); stroke: var(--rule); }
-svg .cell.ink { fill: var(--ink); }
-svg .cell.hot { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1.6; }
-svg .cell.win { fill: none; stroke: var(--accent); stroke-width: 2; }
-svg .axis { stroke: var(--muted); stroke-width: 1.4; fill: none; marker-end: url(#ar); }
-svg .curve { stroke: var(--ink); stroke-width: 2; fill: none; }
-svg .dash { stroke: var(--muted); stroke-width: 1.4; fill: none; stroke-dasharray: 5 4; }
-svg .flow { stroke: var(--accent); stroke-width: 1.8; fill: none; marker-end: url(#ara); }
-svg .box { fill: #fff; stroke: var(--muted); rx: 6; }
-svg .box.hot { fill: var(--accent-soft); stroke: var(--accent); }
-svg .ball { fill: var(--accent); stroke: #fff; stroke-width: 2; }
-svg .token { fill: var(--ok); stroke: #fff; stroke-width: 2; }
-svg text.boxlbl { font: 500 13px var(--font-mono); font-style: normal; fill: var(--ink); text-anchor: middle; }
-svg .lit { fill: var(--ok-soft); opacity: 0; animation: lit 5s linear infinite; }
-@keyframes lit { 0%, 8% { opacity: 1 } 18%, 100% { opacity: 0 } }
-@media (prefers-reduced-motion: reduce) { svg .lit { animation: none; } }
-@keyframes breathe { 0%,100% { opacity: .45 } 50% { opacity: 1 } }
-.breathe { animation: breathe 1.6s ease-in-out infinite; }
+figure img { display: block; width: 100%; height: auto; background: #fff; border: 1px solid var(--rule); border-radius: 6px; }
+.frames { display: grid; gap: 10px; }
 
 /* glossary */
 dl.gloss { margin: 8px 0 24px; }
@@ -128,44 +105,7 @@ $$
 </div>
 
 <figure>
-<svg viewBox="0 0 640 252" role="img" aria-label="A crop: an 8 by 8 grid of pixels with i, j, H and W labelled">
-  <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#6b7076"/></marker></defs>
-  <g>
-    <rect class="cell ink" x="120" y="60" width="20" height="20"></rect>
-    <rect class="cell ink" x="140" y="60" width="20" height="20"></rect>
-    <rect class="cell ink" x="120" y="80" width="20" height="20"></rect>
-    <rect class="cell ink" x="320" y="120" width="20" height="20"></rect>
-    <rect class="cell ink" x="340" y="140" width="20" height="20"></rect>
-    <rect class="cell ink" x="160" y="160" width="20" height="20"></rect>
-    <rect class="cell ink" x="180" y="160" width="20" height="20"></rect>
-    <rect class="cell ink" x="260" y="100" width="20" height="20"></rect>
-  </g>
-  <g class="cell">
-    <rect x="120" y="60" width="160" height="160" fill="none" stroke="#d3dcdd"></rect>
-  </g>
-  <g>
-    <line x1="120" y1="60" x2="120" y2="220" stroke="#d3dcdd"/><line x1="140" y1="60" x2="140" y2="220" stroke="#d3dcdd"/>
-    <line x1="160" y1="60" x2="160" y2="220" stroke="#d3dcdd"/><line x1="180" y1="60" x2="180" y2="220" stroke="#d3dcdd"/>
-    <line x1="200" y1="60" x2="200" y2="220" stroke="#d3dcdd"/><line x1="220" y1="60" x2="220" y2="220" stroke="#d3dcdd"/>
-    <line x1="240" y1="60" x2="240" y2="220" stroke="#d3dcdd"/><line x1="260" y1="60" x2="260" y2="220" stroke="#d3dcdd"/>
-    <line x1="120" y1="80" x2="280" y2="80" stroke="#d3dcdd"/><line x1="120" y1="100" x2="280" y2="100" stroke="#d3dcdd"/>
-    <line x1="120" y1="120" x2="280" y2="120" stroke="#d3dcdd"/><line x1="120" y1="140" x2="280" y2="140" stroke="#d3dcdd"/>
-    <line x1="120" y1="160" x2="280" y2="160" stroke="#d3dcdd"/><line x1="120" y1="180" x2="280" y2="180" stroke="#d3dcdd"/>
-    <line x1="120" y1="200" x2="280" y2="200" stroke="#d3dcdd"/>
-  </g>
-  <rect class="cell hot" x="180" y="100" width="20" height="20"></rect>
-  <path class="flow" d="M200 110 L330 110"></path>
-  <text class="mono" x="336" y="106">x<tspan dy="2" font-size="10">i,j</tspan><tspan dy="-2"> = the ink of this pixel</tspan></text>
-  <text class="mono" x="336" y="120">one number: 0 (paper) … 1 (ink)</text>
-
-  <path class="axis" d="M120 42 L290 42"></path>
-  <text class="lbl" x="196" y="34">i</text>
-  <text class="mono" x="300" y="46">columns →</text>
-  <path class="axis" d="M104 60 L104 226"></path>
-  <text class="lbl" x="88" y="146">j</text>
-  <text class="mono" x="30" y="150">rows ↓</text>
-  <text class="lbl" x="196" y="238">H = W = 48</text>
-</svg>
+<img src="math-figures/fig-01-the-crop.svg" alt="A crop: an 8 by 8 grid of pixels with i, j, H and W labelled">
 <figcaption>fig 1 · a crop: one number per pixel, ink between 0 and 1. The highlighted cell is \(x_{i,j}\).</figcaption>
 </figure>
 
@@ -208,56 +148,11 @@ $$
 </div>
 
 <figure>
-<svg viewBox="0 0 960 320" role="img" aria-label="A convolution: a 3 by 3 window slides over the input, meets the filter, and writes one output cell">
-  <defs>
-    <marker id="ar2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#6b7076"/></marker>
-  </defs>
-  <g transform="translate(0,0)">
-    <text class="mono" x="60" y="34">input a — 9×9, C channels</text>
-    <g>
-      <rect class="cell" x="30" y="46" width="162" height="162" fill="none"></rect>
-      <g stroke="#d3dcdd">
-        <path d="M48 46V208 M66 46V208 M84 46V208 M102 46V208 M120 46V208 M138 46V208 M156 46V208 M174 46V208 M192 46V208 M30 64H192 M30 82H192 M30 100H192 M30 118H192 M30 136H192 M30 154H192 M30 172H192 M30 190H192"/>
-      </g>
-    </g>
-    <g>
-      <rect class="cell ink" x="48" y="64" width="18" height="18"></rect>
-      <rect class="cell ink" x="66" y="82" width="18" height="18"></rect>
-      <rect class="cell ink" x="138" y="118" width="18" height="18"></rect>
-      <rect class="cell ink" x="156" y="136" width="18" height="18"></rect>
-      <rect class="cell ink" x="102" y="154" width="18" height="18"></rect>
-    </g>
-    <g>
-      <rect class="cell win" x="84" y="100" width="54" height="54"></rect>
-      <text class="lbl" x="111" y="132">F×F</text>
-      <animateTransform attributeName="transform" type="translate" values="0 0; 54 0; 54 54; 0 54; 0 0" dur="8s" repeatCount="indefinite"/>
-    </g>
-    <text class="mono" x="30" y="230">window at (i, j) · offsets p, q</text>
-    <text class="lbl" x="228" y="106">w</text>
-    <text class="mono" x="244" y="108">p,q,c,k</text>
-    <path class="flow" d="M262 128 L314 128"></path>
-
-    <text class="mono" x="330" y="34">filter w — 3×3×C, one per k</text>
-    <g>
-      <rect class="cell" x="330" y="64" width="78" height="78" fill="none"></rect>
-      <g stroke="#d3dcdd"><path d="M356 64V142 M382 64V142 M330 90H408 M330 116H408"/></g>
-      <rect class="cell hot" x="330" y="64" width="26" height="26"></rect>
-      <text class="lbl" x="338" y="83">w</text><text class="mono" x="348" y="86">0,0</text>
-      <text class="mono" x="336" y="160">weights, learned</text>
-    </g>
-    <path class="flow" d="M424 118 L520 118"></path>
-    <text class="mono" x="432" y="110">+ b<tspan dy="3" font-size="10">k</tspan></text>
-
-    <text class="mono" x="560" y="34">output z — one cell per (i, j, k)</text>
-    <g>
-      <rect class="cell" x="560" y="60" width="126" height="126" fill="none"></rect>
-      <g stroke="#d3dcdd"><path d="M582 60V186 M604 60V186 M626 60V186 M648 60V186 M664 60V186 M560 82H686 M560 104H686 M560 126H686 M560 148H686 M560 170H686"/></g>
-      <rect class="cell hot breathe" x="604" y="104" width="22" height="22"></rect>
-      <text class="lbl" x="700" y="112">z<tspan font-size="10" dy="4">i,j,k</tspan></text>
-      <text class="mono" x="700" y="134">written by that window</text>
-    </g>
-  </g>
-</svg>
+<div class="frames">
+<img src="math-figures/fig-02-the-convolution-window-1.svg" alt="A convolution: a 3 by 3 window slides over the input, meets the filter, and writes one output cell — frame 1">
+<img src="math-figures/fig-02-the-convolution-window-2.svg" alt="A convolution: a 3 by 3 window slides over the input, meets the filter, and writes one output cell — frame 2">
+<img src="math-figures/fig-02-the-convolution-window-3.svg" alt="A convolution: a 3 by 3 window slides over the input, meets the filter, and writes one output cell — frame 3">
+</div>
 <figcaption>fig 2 · the <a class="term" href="#g-window">window</a> slides; at each stop one <a class="term" href="#g-weight">weighted</a> sum writes one output cell. The window moves on its own.</figcaption>
 </figure>
 
@@ -275,21 +170,7 @@ $$
 </div>
 
 <figure>
-<svg viewBox="0 0 640 225" role="img" aria-label="A grid of pre-activations becoming a grid where negatives are zero">
-  <text class="mono" x="80" y="40">element by element: negative ink never survives (3)</text>
-  <g class="cell"><rect x="100" y="60" width="36" height="28"/><rect x="136" y="60" width="36" height="28"/><rect x="172" y="60" width="36" height="28"/><rect x="208" y="60" width="36" height="28"/><rect x="100" y="88" width="36" height="28"/><rect x="136" y="88" width="36" height="28"/><rect x="172" y="88" width="36" height="28"/><rect x="208" y="88" width="36" height="28"/><rect x="100" y="116" width="36" height="28"/><rect x="136" y="116" width="36" height="28"/><rect x="172" y="116" width="36" height="28"/><rect x="208" y="116" width="36" height="28"/></g>
-  <text class="mono" x="118" y="79" text-anchor="middle">−2</text><text class="mono" x="154" y="79" text-anchor="middle">3</text><text class="mono" x="190" y="79" text-anchor="middle">−1</text><text class="mono" x="226" y="79" text-anchor="middle">4</text>
-  <text class="mono" x="118" y="107" text-anchor="middle">−5</text><text class="mono" x="154" y="107" text-anchor="middle">2</text><text class="mono" x="190" y="107" text-anchor="middle">1</text><text class="mono" x="226" y="107" text-anchor="middle">−3</text>
-  <text class="mono" x="118" y="135" text-anchor="middle">6</text><text class="mono" x="154" y="135" text-anchor="middle">0</text><text class="mono" x="190" y="135" text-anchor="middle">2</text><text class="mono" x="226" y="135" text-anchor="middle">−4</text>
-  <path class="flow" d="M262 102 L362 102"></path>
-  <text class="mono" x="312" y="92" text-anchor="middle">max(0, z)</text>
-  <g class="cell"><rect x="380" y="60" width="36" height="28"/><rect x="416" y="60" width="36" height="28"/><rect x="452" y="60" width="36" height="28"/><rect x="488" y="60" width="36" height="28"/><rect x="380" y="88" width="36" height="28"/><rect x="416" y="88" width="36" height="28"/><rect x="452" y="88" width="36" height="28"/><rect x="488" y="88" width="36" height="28"/><rect x="380" y="116" width="36" height="28"/><rect x="416" y="116" width="36" height="28"/><rect x="452" y="116" width="36" height="28"/><rect x="488" y="116" width="36" height="28"/></g>
-  <text class="mono" x="398" y="79" text-anchor="middle">0</text><text class="mono" x="434" y="79" text-anchor="middle">3</text><text class="mono" x="470" y="79" text-anchor="middle">0</text><text class="mono" x="506" y="79" text-anchor="middle">4</text>
-  <text class="mono" x="398" y="107" text-anchor="middle">0</text><text class="mono" x="434" y="107" text-anchor="middle">2</text><text class="mono" x="470" y="107" text-anchor="middle">1</text><text class="mono" x="506" y="107" text-anchor="middle">0</text>
-  <text class="mono" x="398" y="135" text-anchor="middle">6</text><text class="mono" x="434" y="135" text-anchor="middle">0</text><text class="mono" x="470" y="135" text-anchor="middle">2</text><text class="mono" x="506" y="135" text-anchor="middle">0</text>
-  <text class="mono" x="172" y="172" text-anchor="middle">z — pre-activations</text>
-  <text class="mono" x="434" y="172" text-anchor="middle">a = max(0, z)</text>
-</svg>
+<img src="math-figures/fig-03-the-relu-over-a-map.svg" alt="A grid of pre-activations becoming a grid where negatives are zero">
 <figcaption>fig 3 · the ReLU over a whole feature map (3): negatives become zero, position by position.</figcaption>
 </figure>
 
@@ -325,32 +206,7 @@ $$
 </div>
 
 <figure>
-<svg viewBox="0 0 900 250" role="img" aria-label="im2col: the patch matrix times the transposed weights gives the output matrix">
-  <text class="mono" x="42" y="30">P — patches</text>
-  <rect class="cell" x="42" y="44" width="120" height="170" fill="none"></rect>
-  <g stroke="#d3dcdd"><path d="M42 62H162 M42 80H162 M42 98H162 M42 116H162 M42 134H162 M42 152H162 M42 170H162 M42 188H162 M82 44V214 M122 44V214"/></g>
-  <rect class="cell hot" x="42" y="134" width="120" height="18"></rect>
-  <path class="flow" d="M168 143 L208 143"></path>
-  <text class="mono" x="42" y="232">row jH + i = window at (i, j)</text>
-
-  <text class="mono" x="236" y="30">Ŵᵀ — filters as columns</text>
-  <rect class="cell" x="236" y="44" width="120" height="70" fill="none"></rect>
-  <g stroke="#d3dcdd"><path d="M236 67H356 M236 90H356 M276 44V114 M316 44V114"/></g>
-  <text class="mono" x="236" y="132">R × K</text>
-  <text class="lbl" x="376" y="84">+</text>
-  <rect class="cell" x="398" y="52" width="12" height="54" fill="none"></rect>
-  <text class="mono" x="394" y="122">1bᵀ</text>
-
-  <text class="lbl" x="452" y="84">=</text>
-  <text class="mono" x="500" y="30">Z — pre-activations</text>
-  <rect class="cell" x="500" y="44" width="96" height="170" fill="none"></rect>
-  <g stroke="#d3dcdd"><path d="M500 62H596 M500 80H596 M500 98H596 M500 116H596 M500 134H596 M500 152H596 M500 170H596 M500 188H596 M532 44V214 M564 44V214"/></g>
-  <rect class="cell hot breathe" x="500" y="134" width="32" height="18"></rect>
-  <text class="mono" x="500" y="232">(HW) × K</text>
-  <text class="mono" x="640" y="112">one multiply replaces every</text>
-  <text class="mono" x="640" y="126">window sum of (2) — and the</text>
-  <text class="mono" x="640" y="140">derivatives come free</text>
-</svg>
+<img src="math-figures/fig-04-im2col.svg" alt="im2col: the patch matrix times the transposed weights gives the output matrix">
 <figcaption>fig 4 · <a class="term" href="#g-im2col">im2col</a>: each window becomes a row of \(P\); the layer becomes \(Z = P\hat W^{T} + \mathbf{1}b^{T}\).</figcaption>
 </figure>
 
@@ -382,35 +238,7 @@ $$
 </div>
 
 <figure>
-<svg viewBox="0 0 820 250" role="img" aria-label="Left: the ReLU function. Right: a 2 by 2 max-pool keeping the largest value">
-  <g transform="translate(20,20)">
-    <path class="axis" d="M40 150 H220"></path>
-    <path class="axis" d="M40 150 V30"></path>
-    <text class="lbl" x="228" y="154">z</text>
-    <text class="lbl" x="28" y="36">a</text>
-    <polyline class="curve" points="40,150 130,150 216,58"></polyline>
-    <text class="mono" x="150" y="176">ReLU: flat left of 0,</text>
-    <text class="mono" x="150" y="192">identity right of 0</text>
-    <circle cx="130" cy="150" r="3.5" fill="#a5322a"></circle>
-    <text class="mono" x="112" y="212">z = 0: no derivative</text>
-  </g>
-  <g transform="translate(470,30)">
-    <text class="mono" x="0" y="-6">2×2 window of a, one channel c</text>
-    <rect class="cell" x="0" y="10" width="44" height="44"></rect>
-    <rect class="cell" x="44" y="10" width="44" height="44"></rect>
-    <rect class="cell" x="0" y="54" width="44" height="44"></rect>
-    <rect class="cell hot" x="44" y="54" width="44" height="44"></rect>
-    <text class="lbl" x="14" y="38">3</text><text class="lbl" x="58" y="38">7</text>
-    <text class="lbl" x="14" y="82">2</text><text class="lbl" x="58" y="82">5</text>
-    <text class="mono" x="6" y="112">u, v</text>
-    <path class="flow" d="M112 76 L160 76"></path>
-    <rect class="cell hot" x="164" y="54" width="44" height="44"></rect>
-    <text class="lbl" x="178" y="82">7</text>
-    <text class="mono" x="150" y="118">a<tspan dy="3" font-size="10">pool</tspan><tspan dy="-3" font-size="10">i,j,c</tspan></text>
-    <text class="mono" x="0" y="146">the max wins and is remembered</text>
-    <text class="mono" x="0" y="162">(argmax) for the backward pass</text>
-  </g>
-</svg>
+<img src="math-figures/fig-05-relu-and-pool.svg" alt="Left: the ReLU function. Right: a 2 by 2 max-pool keeping the largest value">
 <figcaption>fig 5 · left: <a class="term" href="#g-relu">ReLU</a> (6)–(7); right: <a class="term" href="#g-pooling">max-pooling</a> (8) keeps the largest of each 2×2 window.</figcaption>
 </figure>
 
@@ -433,18 +261,7 @@ $$
 </div>
 
 <figure>
-<svg viewBox="0 0 640 225" role="img" aria-label="The ReLU curve with its two slopes and the corner">
-  <path class="axis" d="M80 170 H560"></path>
-  <path class="axis" d="M320 170 V40"></path>
-  <path class="curve" d="M120 170 L320 170 L520 70"></path>
-  <circle cx="320" cy="170" r="4" fill="#a5322a"/>
-  <text class="mono" x="160" y="158">slope 0</text>
-  <text class="mono" x="430" y="116">slope 1</text>
-  <text class="mono" x="330" y="196">at z = 0 the slope is ε (7)</text>
-  <text class="lbl" x="546" y="190">z</text>
-  <text class="lbl" x="306" y="56">a</text>
-  <text class="mono" x="100" y="40">flat left of zero, straight right of it</text>
-</svg>
+<img src="math-figures/fig-06-the-two-slopes.svg" alt="The ReLU curve with its two slopes and the corner">
 <figcaption>fig 6 · the derivative of (7): the gate of (21), drawn as two slopes.</figcaption>
 </figure>
 
@@ -482,29 +299,7 @@ $$
 </div>
 
 <figure>
-<svg viewBox="0 0 900 300" role="img" aria-label="Top: a dense layer. Bottom: scores become probabilities through softmax">
-  <g transform="translate(20,10)">
-    <text class="mono" x="30" y="16">a<tspan dy="3" font-size="10">(l−1)</tspan></text>
-    <circle class="box" cx="60" cy="52" r="16"/><circle class="box" cx="60" cy="100" r="16"/><circle class="box" cx="60" cy="148" r="16"/>
-    <text class="mono" x="322" y="16">z<tspan dy="3" font-size="10">(l)</tspan></text>
-    <circle class="box hot" cx="330" cy="76" r="16"/><circle class="box hot" cx="330" cy="124" r="16"/>
-    <g class="dash"><path d="M76 52 L314 76 M76 52 L314 124 M76 100 L314 76 M76 100 L314 124 M76 148 L314 76 M76 148 L314 124"/></g>
-    <text class="mono" x="168" y="70">W<tspan dy="3" font-size="10">(l)</tspan></text>
-    <text class="mono" x="352" y="76">+ b<tspan dy="3" font-size="10">(l)</tspan></text>
-    <text class="mono" x="64" y="180">every input into every output</text>
-  </g>
-  <g transform="translate(520,30)">
-    <text class="mono" x="0" y="10">scores z → probabilities p</text>
-    <g><rect class="cell" x="0" y="60" width="26" height="46"></rect><rect class="cell" x="34" y="42" width="26" height="64"></rect><rect class="cell" x="68" y="76" width="26" height="30"></rect><rect class="cell" x="102" y="30" width="26" height="76"></rect></g>
-    <text class="mono" x="0" y="122">z<tspan dy="3" font-size="10">1..K</tspan></text>
-    <path class="flow" d="M150 82 L188 82"></path>
-    <text class="mono" x="146" y="70">softmax</text>
-    <g><rect class="cell hot breathe" x="200" y="70" width="26" height="36"></rect><rect class="cell hot breathe" x="234" y="54" width="26" height="52"></rect><rect class="cell hot breathe" x="268" y="86" width="26" height="20"></rect><rect class="cell hot breathe" x="302" y="46" width="26" height="60"></rect></g>
-    <text class="mono" x="200" y="122">p<tspan dy="3" font-size="10">1..K</tspan> · sums to 1</text>
-    <text class="mono" x="0" y="152">one score per class, c</text>
-    <text class="mono" x="0" y="168">bar height = probability</text>
-  </g>
-</svg>
+<img src="math-figures/fig-07-dense-and-softmax.svg" alt="Top: a dense layer. Bottom: scores become probabilities through softmax">
 <figcaption>fig 7 · top: a <a class="term" href="#g-dense">dense layer</a> (9); bottom: <a class="term" href="#g-softmax">softmax</a> (10) turns \(K\) scores into probabilities.</figcaption>
 </figure>
 
@@ -552,19 +347,7 @@ $$
 </div>
 
 <figure>
-<svg viewBox="0 0 640 230" role="img" aria-label="The negative log curve with the cost of three example probabilities">
-  <defs><marker id="ar3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#6b7076"/></marker></defs>
-  <path class="axis" d="M60 190 H580" marker-end="url(#ar3)"></path>
-  <path class="axis" d="M60 190 V26"></path>
-  <text class="mono" x="496" y="212">p<tspan dy="3" font-size="10">y</tspan> → 1</text>
-  <text class="mono" x="18" y="34">C</text>
-  <polyline class="curve" points="70,32 110,86 160,120 220,150 320,172 440,182 560,187"></polyline>
-  <circle class="ball" cx="560" cy="187" r="5"/><text class="mono" x="520" y="172">p=1 → cost 0</text>
-  <circle class="ball" cx="320" cy="172" r="5"/><text class="mono" x="286" y="210">p=0.5 → 0.69</text>
-  <circle class="ball" cx="88" cy="62" r="5"/><text class="mono" x="96" y="58">p=0.01 → 4.6</text>
-  <text class="mono tiny" x="380" y="60">−log p : confident and wrong</text>
-  <text class="mono tiny" x="380" y="74">is punished hard</text>
-</svg>
+<img src="math-figures/fig-08-the-cost-curve.svg" alt="The negative log curve with the cost of three example probabilities">
 <figcaption>fig 8 · the cost (11) as a function of the probability of the true class.</figcaption>
 </figure>
 
@@ -587,14 +370,7 @@ $$
 </div>
 
 <figure>
-<svg viewBox="0 0 640 215" role="img" aria-label="A stacked bar: the fit and the penalty make the cost">
-  <text class="mono" x="60" y="46">the cost of (12) is two parts</text>
-  <rect class="cell" x="60" y="70" width="330" height="52"></rect>
-  <rect class="cell hot" x="390" y="70" width="90" height="52"></rect>
-  <text class="mono" x="225" y="148" text-anchor="middle">cross-entropy: the fit of p to the truth</text>
-  <text class="mono" x="435" y="148" text-anchor="middle">λ Σ θ²</text>
-  <text class="mono tiny" x="60" y="186">the penalty is small but never zero: it keeps the weights from drifting</text>
-</svg>
+<img src="math-figures/fig-09-the-two-part-cost.svg" alt="A stacked bar: the fit and the penalty make the cost">
 <figcaption>fig 9 · the cost (12): the mean fit over the batch, plus the size penalty.</figcaption>
 </figure>
 
@@ -626,18 +402,7 @@ $$
 </div>
 
 <figure>
-<svg viewBox="0 0 640 245" role="img" aria-label="A bell curve centred at zero with the standard deviation marked">
-  <path class="axis" d="M60 180 H580"></path>
-  <path class="axis" d="M320 180 V30"></path>
-  <path class="curve" d="M100 180 C 180 178, 240 170, 280 110 C 300 60, 340 60, 360 110 C 400 170, 460 178, 540 180"></path>
-  <path class="dash" d="M250 180 V132"></path>
-  <path class="dash" d="M390 180 V132"></path>
-  <text class="mono" x="238" y="200">−σ</text>
-  <text class="mono" x="316" y="200">0</text>
-  <text class="mono" x="394" y="200">+σ</text>
-  <text class="mono" x="320" y="230" text-anchor="middle">σ = √(2 / fan-in) — (13)</text>
-  <text class="mono" x="100" y="46">weights start small and centred; biases start at 0</text>
-</svg>
+<img src="math-figures/fig-10-the-initial-bell.svg" alt="A bell curve centred at zero with the standard deviation marked">
 <figcaption>fig 10 · the initial weights (13): a bell at zero, narrow enough to keep the signal alive.</figcaption>
 </figure>
 
@@ -662,22 +427,13 @@ $$
 </div>
 
 <figure>
-<svg viewBox="0 0 720 260" role="img" aria-label="A ball rolling down a valley of the cost curve, taking steps against the slope">
-  <defs><marker id="ar4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#6b7076"/></marker></defs>
-  <path class="curve" d="M60 40 C 180 220, 320 224, 420 190 C 520 156, 590 120, 660 42"></path>
-  <path class="dash" d="M120 92 L188 168"></path>
-  <path class="dash" d="M188 168 L262 204"></path>
-  <path class="dash" d="M262 204 L324 207"></path>
-  <text class="mono" x="96" y="86">−η g<tspan dy="3" font-size="10">t</tspan></text>
-  <text class="mono" x="386" y="236">step against the slope</text>
-  <text class="mono tiny" x="284" y="232">minimum of C</text>
-  <circle class="ball" r="9">
-    <animateMotion dur="7s" repeatCount="indefinite" path="M60 40 C 180 220, 320 224, 420 190 C 520 156, 590 120, 660 42"/>
-  </circle>
-  <circle cx="324" cy="207" r="4" fill="#2f6b3c"/>
-  <text class="mono" x="60" y="24">C(θ) — the cost as one number θ moves</text>
-</svg>
-<figcaption>fig 11 · gradient descent (14): the ball rolls against the slope, step after step. It moves on its own.</figcaption>
+<div class="frames">
+<img src="math-figures/fig-11-gradient-descent-1.svg" alt="A ball rolling down a valley of the cost curve, taking steps against the slope — frame 1">
+<img src="math-figures/fig-11-gradient-descent-2.svg" alt="A ball rolling down a valley of the cost curve, taking steps against the slope — frame 2">
+<img src="math-figures/fig-11-gradient-descent-3.svg" alt="A ball rolling down a valley of the cost curve, taking steps against the slope — frame 3">
+<img src="math-figures/fig-11-gradient-descent-4.svg" alt="A ball rolling down a valley of the cost curve, taking steps against the slope — frame 4">
+</div>
+<figcaption>fig 11 · gradient descent (14): the ball rolls against the slope, step after step, in four frames.</figcaption>
 </figure>
 
 <p>One pass over the whole training set is an <a class="term" href="#g-epoch">epoch</a>; one small group of crops averaged together is a <a class="term" href="#g-batch">batch</a>. The loop is:</p>
@@ -714,20 +470,14 @@ $$
 </div>
 
 <figure>
-<svg viewBox="0 0 960 200" role="img" aria-label="Blame flowing backward through the stages of the network">
-  <g class="box"><rect x="20" y="60" width="110" height="42"/><rect x="160" y="60" width="110" height="42"/><rect x="300" y="60" width="110" height="42"/><rect x="440" y="60" width="110" height="42"/><rect x="580" y="60" width="110" height="42"/><rect class="box hot" x="720" y="60" width="120" height="42"/></g>
-  <rect class="lit" x="20" y="60" width="110" height="42" style="animation-delay: -4.92s"/><rect class="lit" x="160" y="60" width="110" height="42" style="animation-delay: -1.02s"/><rect class="lit" x="300" y="60" width="110" height="42" style="animation-delay: -2.12s"/><rect class="lit" x="440" y="60" width="110" height="42" style="animation-delay: -3.23s"/><rect class="lit" x="580" y="60" width="110" height="42" style="animation-delay: -4.33s"/><rect class="lit" x="720" y="60" width="120" height="42" style="animation-delay: -4.9s"/>
-  <text class="boxlbl" x="75" y="86">a⁽ˡ⁻¹⁾</text><text class="boxlbl" x="215" y="86">W⁽ˡ⁾</text><text class="boxlbl" x="355" y="86">z⁽ˡ⁾</text><text class="boxlbl" x="495" y="86">ReLU</text><text class="boxlbl" x="635" y="86">softmax</text><text class="boxlbl" x="780" y="86">cost C</text>
-  <path class="axis" d="M130 46 L714 46"></path>
-  <text class="mono" x="380" y="38">forward: the answer</text>
-  <path class="flow" d="M720 128 L86 128"></path>
-  <text class="mono" x="330" y="152">backward: blame, one factor per stage</text>
-  <circle class="token" r="7">
-    <animateMotion dur="5s" repeatCount="indefinite" path="M720 128 L86 128"/>
-  </circle>
-  <text class="mono" x="30" y="178">δ arrives at each stage; the stage multiplies it by its own input</text>
-</svg>
-<figcaption>fig 12 · the backward pass (15): one \(\delta\) travels right to left. It moves on its own.</figcaption>
+<div class="frames">
+<img src="math-figures/fig-12-the-backward-pass-1.svg" alt="Blame flowing backward through the stages of the network — frame 1">
+<img src="math-figures/fig-12-the-backward-pass-2.svg" alt="Blame flowing backward through the stages of the network — frame 2">
+<img src="math-figures/fig-12-the-backward-pass-3.svg" alt="Blame flowing backward through the stages of the network — frame 3">
+<img src="math-figures/fig-12-the-backward-pass-4.svg" alt="Blame flowing backward through the stages of the network — frame 4">
+<img src="math-figures/fig-12-the-backward-pass-5.svg" alt="Blame flowing backward through the stages of the network — frame 5">
+</div>
+<figcaption>fig 12 · the backward pass (15): one \(\delta\) travels right to left, in five frames.</figcaption>
 </figure>
 
 <h3>9.1 The last layer: softmax + cross-entropy</h3>
@@ -764,15 +514,7 @@ $$
 </div>
 
 <figure>
-<svg viewBox="0 0 640 245" role="img" aria-label="Score bars with the maximum marked and the two terms of the rewritten cost">
-  <text class="mono" x="70" y="40">the shift m cancels — the cost of (16) is stable to compute</text>
-  <rect class="cell" x="70" y="144" width="30" height="46"></rect><rect class="cell win" x="110" y="120" width="30" height="70"></rect><rect class="cell" x="150" y="156" width="30" height="34"></rect><rect class="cell" x="190" y="132" width="30" height="58"></rect><rect class="cell" x="230" y="150" width="30" height="40"></rect>
-  <path class="dash" d="M55 120 H280"></path>
-  <text class="mono" x="288" y="124">m = max z</text>
-  <text class="mono" x="330" y="150">log Σ e^z — all scores push up</text>
-  <text class="mono" x="330" y="172">− z_y — the true score pulls down</text>
-  <text class="mono tiny" x="70" y="222">the same m appears in (10) and cancels under the log</text>
-</svg>
+<img src="math-figures/fig-13-the-stable-rewrite.svg" alt="Score bars with the maximum marked and the two terms of the rewritten cost">
 <figcaption>fig 13 · the rewritten cost (16): the shift \(m\) removes the largest score and vanishes.</figcaption>
 </figure>
 
@@ -792,17 +534,7 @@ $$
 </div>
 
 <figure>
-<svg viewBox="0 0 640 245" role="img" aria-label="A convex curve whose tangent slope is the softmax probability">
-  <path class="axis" d="M60 180 H580"></path>
-  <path class="axis" d="M100 180 V30"></path>
-  <path class="curve" d="M110 170 C 200 166, 280 150, 380 110 C 450 82, 510 60, 555 46"></path>
-  <circle cx="380" cy="110" r="5" fill="#a5322a"/>
-  <path class="dash" d="M300 138 L470 72"></path>
-  <text class="mono" x="392" y="172">tangent slope = p_c</text>
-  <text class="mono" x="110" y="212">z_c →</text>
-  <text class="mono" x="72" y="46">log Σ e^z</text>
-  <text class="mono tiny" x="100" y="234">differentiating the normalizer returns the softmax itself (17)</text>
-</svg>
+<img src="math-figures/fig-14-the-log-sum-exp-tangent.svg" alt="A convex curve whose tangent slope is the softmax probability">
 <figcaption>fig 14 · the derivative of the log-sum-exp (17): its slope at any score is that score's probability.</figcaption>
 </figure>
 
@@ -825,20 +557,7 @@ $$
 </div>
 
 <figure>
-<svg viewBox="0 0 900 290" role="img" aria-label="Probabilities minus the one-hot truth give the blame vector">
-  <text class="mono" x="135" y="56" text-anchor="middle">p — probabilities (10)</text>
-  <text class="mono" x="365" y="56" text-anchor="middle">onehot(y) — the truth</text>
-  <text class="mono" x="610" y="56" text-anchor="middle">δ⁽ᴸ⁾ = p − onehot(y) — the blame (18)</text>
-  <text class="lbl" x="244" y="208">−</text>
-  <text class="lbl" x="474" y="208">=</text>
-  <path class="dash" d="M55 200 H215"></path>
-  <path class="dash" d="M285 200 H445"></path>
-  <path class="dash" d="M515 200 H675"></path>
-  <rect class="cell" x="60" y="174" width="24" height="26"></rect><rect class="cell" x="90" y="156" width="24" height="44"></rect><rect class="cell" x="120" y="184" width="24" height="16"></rect><rect class="cell" x="150" y="166" width="24" height="34"></rect><rect class="cell" x="180" y="180" width="24" height="20"></rect>
-  <rect class="cell" x="290" y="197" width="24" height="3"></rect><rect class="cell" x="320" y="197" width="24" height="3"></rect><rect class="cell hot" x="350" y="140" width="24" height="60"></rect><rect class="cell" x="380" y="197" width="24" height="3"></rect><rect class="cell" x="410" y="197" width="24" height="3"></rect>
-  <rect class="cell" x="520" y="174" width="24" height="26"></rect><rect class="cell" x="550" y="156" width="24" height="44"></rect><rect class="cell hot" x="580" y="200" width="24" height="44"></rect><rect class="cell" x="610" y="166" width="24" height="34"></rect><rect class="cell" x="640" y="180" width="24" height="20"></rect>
-  <text class="mono tiny" x="520" y="272">one entry is negative — the truth was not certain enough</text>
-</svg>
+<img src="math-figures/fig-15-the-last-layer-blame.svg" alt="Probabilities minus the one-hot truth give the blame vector">
 <figcaption>fig 15 · the last layer's blame (18): one subtraction of vectors.</figcaption>
 </figure>
 
@@ -872,19 +591,7 @@ $$
 </div>
 
 <figure>
-<svg viewBox="0 0 640 235" role="img" aria-label="A multiplication table where one row and one column meet in one cell">
-  <text class="mono" x="70" y="36">one row and one column meet in one number (19)</text>
-  <g class="cell"><rect x="110" y="70" width="36" height="24"/><rect x="110" y="94" width="36" height="24"/><rect x="110" y="118" width="36" height="24"/><rect x="110" y="142" width="36" height="24"/><rect x="110" y="166" width="36" height="24"/></g>
-  <rect class="cell hot" x="110" y="118" width="36" height="24"></rect>
-  <g class="cell"><rect x="160" y="30" width="36" height="32"/><rect x="196" y="30" width="36" height="32"/><rect x="232" y="30" width="36" height="32"/><rect x="268" y="30" width="36" height="32"/><rect x="304" y="30" width="36" height="32"/></g>
-  <rect class="cell hot" x="232" y="30" width="36" height="32"></rect>
-  <g class="cell"><rect x="160" y="70" width="36" height="24"/><rect x="196" y="70" width="36" height="24"/><rect x="232" y="70" width="36" height="24"/><rect x="268" y="70" width="36" height="24"/><rect x="304" y="70" width="36" height="24"/><rect x="160" y="94" width="36" height="24"/><rect x="196" y="94" width="36" height="24"/><rect x="232" y="94" width="36" height="24"/><rect x="268" y="94" width="36" height="24"/><rect x="304" y="94" width="36" height="24"/><rect x="160" y="118" width="36" height="24"/><rect x="196" y="118" width="36" height="24"/><rect x="232" y="118" width="36" height="24"/><rect x="268" y="118" width="36" height="24"/><rect x="304" y="118" width="36" height="24"/><rect x="160" y="142" width="36" height="24"/><rect x="196" y="142" width="36" height="24"/><rect x="232" y="142" width="36" height="24"/><rect x="268" y="142" width="36" height="24"/><rect x="304" y="142" width="36" height="24"/><rect x="160" y="166" width="36" height="24"/><rect x="196" y="166" width="36" height="24"/><rect x="232" y="166" width="36" height="24"/><rect x="268" y="166" width="36" height="24"/><rect x="304" y="166" width="36" height="24"/></g>
-  <rect class="cell hot" x="232" y="118" width="36" height="24"></rect>
-  <text class="lbl" x="128" y="22">δ</text>
-  <text class="lbl" x="358" y="50">a</text>
-  <text class="mono" x="380" y="110">dW[j,k] = δ_j · a_k</text>
-  <text class="mono tiny" x="380" y="130">the row factor times the column factor</text>
-</svg>
+<img src="math-figures/fig-16-the-weight-gradient-table.svg" alt="A multiplication table where one row and one column meet in one cell">
 <figcaption>fig 16 · one weight's gradient (19): its error signal times its input.</figcaption>
 </figure>
 
@@ -906,22 +613,7 @@ $$
 </div>
 
 <figure>
-<svg viewBox="0 0 800 225" role="img" aria-label="A column vector times a row vector fills a gradient matrix">
-  <text class="mono" x="70" y="42">δ</text>
-  <text class="mono" x="230" y="42" text-anchor="middle">aᵀ</text>
-  <text class="mono" x="430" y="42" text-anchor="middle">dW = δ aᵀ</text>
-  <g class="cell"><rect x="70" y="50" width="36" height="24"/><rect x="70" y="74" width="36" height="24"/><rect x="70" y="98" width="36" height="24"/><rect x="70" y="122" width="36" height="24"/><rect x="70" y="146" width="36" height="24"/></g>
-  <text class="lbl" x="136" y="114">×</text>
-  <g class="cell"><rect x="170" y="88" width="24" height="32"/><rect x="194" y="88" width="24" height="32"/><rect x="218" y="88" width="24" height="32"/><rect x="242" y="88" width="24" height="32"/><rect x="266" y="88" width="24" height="32"/></g>
-  <text class="lbl" x="320" y="114">=</text>
-  <g class="cell"><rect x="350" y="50" width="32" height="24"/><rect x="382" y="50" width="32" height="24"/><rect x="414" y="50" width="32" height="24"/><rect x="446" y="50" width="32" height="24"/><rect x="478" y="50" width="32" height="24"/><rect x="350" y="74" width="32" height="24"/><rect x="382" y="74" width="32" height="24"/><rect x="414" y="74" width="32" height="24"/><rect x="446" y="74" width="32" height="24"/><rect x="478" y="74" width="32" height="24"/><rect x="350" y="98" width="32" height="24"/><rect x="382" y="98" width="32" height="24"/><rect x="414" y="98" width="32" height="24"/><rect x="446" y="98" width="32" height="24"/><rect x="478" y="98" width="32" height="24"/><rect x="350" y="122" width="32" height="24"/><rect x="382" y="122" width="32" height="24"/><rect x="414" y="122" width="32" height="24"/><rect x="446" y="122" width="32" height="24"/><rect x="478" y="122" width="32" height="24"/><rect x="350" y="146" width="32" height="24"/><rect x="382" y="146" width="32" height="24"/><rect x="414" y="146" width="32" height="24"/><rect x="446" y="146" width="32" height="24"/><rect x="478" y="146" width="32" height="24"/></g>
-  <text class="mono tiny" x="88" y="192" text-anchor="middle">(K × 1)</text>
-  <text class="mono tiny" x="230" y="192" text-anchor="middle">(1 × N)</text>
-  <text class="mono tiny" x="430" y="192" text-anchor="middle">(K × N)</text>
-  <text class="mono" x="560" y="100">dW = δ aᵀ — (20)</text>
-  <text class="mono" x="560" y="122">db = δ</text>
-  <text class="mono" x="560" y="144">da = Wᵀ δ</text>
-</svg>
+<img src="math-figures/fig-17-the-outer-product.svg" alt="A column vector times a row vector fills a gradient matrix">
 <figcaption>fig 17 · the dense gradients in matrix form (20): an outer product, and the blame routed back.</figcaption>
 </figure>
 
@@ -943,18 +635,7 @@ $$
 </div>
 
 <figure>
-<svg viewBox="0 0 640 255" role="img" aria-label="A gate row of zeros and ones cutting the blame row">
-  <text class="mono" x="60" y="36">ReLU (21): blame passes only where z &gt; 0</text>
-  <g class="cell"><rect x="60" y="70" width="44" height="30"/><rect x="104" y="70" width="44" height="30"/><rect x="148" y="70" width="44" height="30"/><rect x="192" y="70" width="44" height="30"/><rect x="236" y="70" width="44" height="30"/><rect x="280" y="70" width="44" height="30"/></g>
-  <text class="mono" x="82" y="90" text-anchor="middle">3</text><text class="mono" x="126" y="90" text-anchor="middle">5</text><text class="mono" x="170" y="90" text-anchor="middle">0</text><text class="mono" x="214" y="90" text-anchor="middle">2</text><text class="mono" x="258" y="90" text-anchor="middle">7</text><text class="mono" x="302" y="90" text-anchor="middle">4</text>
-  <g class="cell"><rect x="60" y="120" width="44" height="30"/><rect x="104" y="120" width="44" height="30"/><rect x="148" y="120" width="44" height="30"/><rect x="192" y="120" width="44" height="30"/><rect x="236" y="120" width="44" height="30"/><rect x="280" y="120" width="44" height="30"/></g>
-  <text class="mono" x="82" y="140" text-anchor="middle">1</text><text class="mono" x="126" y="140" text-anchor="middle">1</text><text class="mono" x="170" y="140" text-anchor="middle">0</text><text class="mono" x="214" y="140" text-anchor="middle">1</text><text class="mono" x="258" y="140" text-anchor="middle">1</text><text class="mono" x="302" y="140" text-anchor="middle">0</text>
-  <g class="cell"><rect x="60" y="170" width="44" height="30"/><rect x="104" y="170" width="44" height="30"/><rect class="cell hot" x="148" y="170" width="44" height="30"/><rect x="192" y="170" width="44" height="30"/><rect x="236" y="170" width="44" height="30"/><rect class="cell hot" x="280" y="170" width="44" height="30"/></g>
-  <text class="mono" x="82" y="190" text-anchor="middle">3</text><text class="mono" x="126" y="190" text-anchor="middle">5</text><text class="mono" x="170" y="190" text-anchor="middle">0</text><text class="mono" x="214" y="190" text-anchor="middle">2</text><text class="mono" x="258" y="190" text-anchor="middle">7</text><text class="mono" x="302" y="190" text-anchor="middle">0</text>
-  <text class="mono" x="360" y="88">δa — arriving</text>
-  <text class="mono" x="360" y="138">1[z &gt; 0] — the gate</text>
-  <text class="mono" x="360" y="188">δz = δa ⊙ gate</text>
-</svg>
+<img src="math-figures/fig-18-the-relu-gate.svg" alt="A gate row of zeros and ones cutting the blame row">
 <figcaption>fig 18 · the ReLU gate (21): one multiply per entry, zeros where the unit was silent.</figcaption>
 </figure>
 
@@ -976,19 +657,7 @@ $$
 </div>
 
 <figure>
-<svg viewBox="0 0 640 258" role="img" aria-label="A two by two window whose blame goes only to the remembered winner">
-  <text class="mono" x="60" y="36">max-pool (22): blame goes only to the remembered argmax</text>
-  <g class="cell"><rect x="120" y="70" width="60" height="60"/><rect x="180" y="70" width="60" height="60"/><rect x="120" y="130" width="60" height="60"/><rect x="180" y="130" width="60" height="60"/></g>
-  <rect class="cell hot" x="120" y="70" width="60" height="60"></rect>
-  <text class="mono" x="150" y="105" text-anchor="middle">7</text><text class="mono" x="210" y="105" text-anchor="middle">3</text><text class="mono" x="150" y="165" text-anchor="middle">1</text><text class="mono" x="210" y="165" text-anchor="middle">2</text>
-  <path class="flow" d="M258 130 L352 130"></path>
-  <text class="mono" x="305" y="118" text-anchor="middle">argmax</text>
-  <g class="cell"><rect x="380" y="70" width="60" height="60"/><rect x="440" y="70" width="60" height="60"/><rect x="380" y="130" width="60" height="60"/><rect x="440" y="130" width="60" height="60"/></g>
-  <text class="mono" x="410" y="105" text-anchor="middle">δa</text><text class="mono" x="470" y="105" text-anchor="middle">0</text><text class="mono" x="410" y="165" text-anchor="middle">0</text><text class="mono" x="470" y="165" text-anchor="middle">0</text>
-  <text class="mono" x="180" y="214" text-anchor="middle">values before pooling (8)</text>
-  <text class="mono" x="440" y="214" text-anchor="middle">blame after (22)</text>
-  <text class="mono tiny" x="60" y="238">the three losers get 0: they never touched the output</text>
-</svg>
+<img src="math-figures/fig-19-the-argmax-routing.svg" alt="A two by two window whose blame goes only to the remembered winner">
 <figcaption>fig 19 · pooling backward (22): the window remembers who won, and pays only that cell.</figcaption>
 </figure>
 
@@ -1013,23 +682,7 @@ $$
 </div>
 
 <figure>
-<svg viewBox="0 0 900 215" role="img" aria-label="A chain of factors read right to left, one gate and one transpose per layer">
-  <text class="mono" x="250" y="40">every stage contributes one factor — read right to left (23)</text>
-  <g class="box"><rect x="770" y="70" width="110" height="40"/><rect x="620" y="70" width="110" height="40"/><rect x="470" y="70" width="110" height="40"/><rect x="320" y="70" width="110" height="40"/><rect x="170" y="70" width="110" height="40"/><rect x="20" y="70" width="110" height="40"/></g>
-  <text class="boxlbl" x="825" y="95">δ⁽ᴸ⁾</text>
-  <text class="boxlbl" x="675" y="95">× W⁽ᴸ⁾ᵀ</text>
-  <text class="boxlbl" x="525" y="95">⊙ gate</text>
-  <text class="boxlbl" x="375" y="95">× Wᵀ</text>
-  <text class="boxlbl" x="225" y="95">⊙ gate</text>
-  <text class="boxlbl" x="75" y="95">× aᵀ</text>
-  <path class="flow" d="M762 90 L740 90"></path>
-  <path class="flow" d="M612 90 L590 90"></path>
-  <path class="flow" d="M462 90 L440 90"></path>
-  <path class="flow" d="M312 90 L290 90"></path>
-  <path class="flow" d="M162 90 L140 90"></path>
-  <text class="mono" x="20" y="168">two factors per layer: a gate, then a transpose</text>
-  <text class="mono" x="20" y="190">× aᵀ turns the blame into the weight gradient</text>
-</svg>
+<img src="math-figures/fig-20-the-factor-chain.svg" alt="A chain of factors read right to left, one gate and one transpose per layer">
 <figcaption>fig 20 · the general pattern (23): the chain of factors, assembled once and run in reverse.</figcaption>
 </figure>
 
@@ -1055,20 +708,7 @@ $$
 </div>
 
 <figure>
-<svg viewBox="0 0 640 235" role="img" aria-label="Blame leaving a sum node: scaled to the weights, unchanged to the bias">
-  <text class="mono" x="80" y="36">blame leaves the sum node: scaled to W, unchanged to b</text>
-  <rect class="cell" x="80" y="60" width="110" height="40"></rect>
-  <rect class="cell" x="80" y="150" width="110" height="40"></rect>
-  <text class="mono" x="135" y="85" text-anchor="middle">W</text>
-  <text class="mono" x="135" y="175" text-anchor="middle">b</text>
-  <rect class="cell hot" x="420" y="105" width="110" height="40"></rect>
-  <text class="mono" x="475" y="130" text-anchor="middle">δ</text>
-  <path class="flow" d="M416 116 L200 84"></path>
-  <path class="flow" d="M416 136 L200 168"></path>
-  <text class="mono" x="300" y="92" text-anchor="middle">× a → dW</text>
-  <text class="mono" x="300" y="176" text-anchor="middle">× 1 → db = δ (24)</text>
-  <text class="mono tiny" x="80" y="218">a bias is a pure shift: its coefficient is 1, so the blame arrives untouched</text>
-</svg>
+<img src="math-figures/fig-21-the-bias-split.svg" alt="Blame leaving a sum node: scaled to the weights, unchanged to the bias">
 <figcaption>fig 21 · the bias gradient (24): the error signal itself.</figcaption>
 </figure>
 
@@ -1094,23 +734,7 @@ $$
 </div>
 
 <figure>
-<svg viewBox="0 0 900 215" role="img" aria-label="The convolution gradients as matrix products">
-  <text class="mono" x="40" y="36">the convolution's gradients are matrix products (25)</text>
-  <g class="cell"><rect x="60" y="60" width="36" height="30"/><rect x="96" y="60" width="36" height="30"/><rect x="60" y="90" width="36" height="30"/><rect x="96" y="90" width="36" height="30"/><rect x="60" y="120" width="36" height="30"/><rect x="96" y="120" width="36" height="30"/></g>
-  <text class="mono" x="98" y="52" text-anchor="middle">Dᵀ</text>
-  <text class="mono tiny" x="98" y="172" text-anchor="middle">(K × HW)</text>
-  <text class="lbl" x="160" y="100">×</text>
-  <g class="cell"><rect x="200" y="60" width="30" height="30"/><rect x="230" y="60" width="30" height="30"/><rect x="260" y="60" width="30" height="30"/><rect x="290" y="60" width="30" height="30"/><rect x="200" y="90" width="30" height="30"/><rect x="230" y="90" width="30" height="30"/><rect x="260" y="90" width="30" height="30"/><rect x="290" y="90" width="30" height="30"/><rect x="200" y="120" width="30" height="30"/><rect x="230" y="120" width="30" height="30"/><rect x="260" y="120" width="30" height="30"/><rect x="290" y="120" width="30" height="30"/></g>
-  <text class="mono" x="260" y="52" text-anchor="middle">P</text>
-  <text class="mono tiny" x="260" y="172" text-anchor="middle">(HW × R)</text>
-  <text class="lbl" x="350" y="100">=</text>
-  <g class="cell"><rect x="390" y="60" width="36" height="30"/><rect x="426" y="60" width="36" height="30"/><rect x="462" y="60" width="36" height="30"/><rect x="390" y="90" width="36" height="30"/><rect x="426" y="90" width="36" height="30"/><rect x="462" y="90" width="36" height="30"/><rect x="390" y="120" width="36" height="30"/><rect x="426" y="120" width="36" height="30"/><rect x="462" y="120" width="36" height="30"/></g>
-  <text class="mono" x="446" y="52" text-anchor="middle">dŴ</text>
-  <text class="mono tiny" x="446" y="172" text-anchor="middle">(K × R)</text>
-  <text class="mono" x="560" y="92">db = 1ᵀ D — column sums</text>
-  <text class="mono" x="560" y="114">dP = D Ŵ — patch blame</text>
-  <text class="mono tiny" x="560" y="144">patches overlap: col2im (26) adds them up</text>
-</svg>
+<img src="math-figures/fig-22-the-convolution-products.svg" alt="The convolution gradients as matrix products">
 <figcaption>fig 22 · the convolution's gradients (25): the same matrix products as the forward pass.</figcaption>
 </figure>
 
@@ -1153,19 +777,7 @@ $$
 </div>
 
 <figure>
-<svg viewBox="0 0 700 235" role="img" aria-label="Two overlapping windows adding their blames into one cell">
-  <text class="mono" x="220" y="30">one cell, two windows: the blames add — (26)</text>
-  <g class="cell"><rect x="220" y="40" width="24" height="24"/><rect x="244" y="40" width="24" height="24"/><rect x="268" y="40" width="24" height="24"/><rect x="292" y="40" width="24" height="24"/><rect x="316" y="40" width="24" height="24"/><rect x="340" y="40" width="24" height="24"/><rect x="220" y="64" width="24" height="24"/><rect x="244" y="64" width="24" height="24"/><rect x="268" y="64" width="24" height="24"/><rect x="292" y="64" width="24" height="24"/><rect x="316" y="64" width="24" height="24"/><rect x="340" y="64" width="24" height="24"/><rect x="220" y="88" width="24" height="24"/><rect x="244" y="88" width="24" height="24"/><rect x="268" y="88" width="24" height="24"/><rect x="292" y="88" width="24" height="24"/><rect x="316" y="88" width="24" height="24"/><rect x="340" y="88" width="24" height="24"/><rect x="220" y="112" width="24" height="24"/><rect x="244" y="112" width="24" height="24"/><rect x="268" y="112" width="24" height="24"/><rect x="292" y="112" width="24" height="24"/><rect x="316" y="112" width="24" height="24"/><rect x="340" y="112" width="24" height="24"/><rect x="220" y="136" width="24" height="24"/><rect x="244" y="136" width="24" height="24"/><rect x="268" y="136" width="24" height="24"/><rect x="292" y="136" width="24" height="24"/><rect x="316" y="136" width="24" height="24"/><rect x="340" y="136" width="24" height="24"/><rect x="220" y="160" width="24" height="24"/><rect x="244" y="160" width="24" height="24"/><rect x="268" y="160" width="24" height="24"/><rect x="292" y="160" width="24" height="24"/><rect x="316" y="160" width="24" height="24"/><rect x="340" y="160" width="24" height="24"/></g>
-  <rect class="cell hot" x="268" y="88" width="48" height="48"></rect>
-  <rect class="cell win" x="244" y="64" width="72" height="72"></rect>
-  <rect class="cell win" x="268" y="88" width="72" height="72"></rect>
-  <rect class="cell hot" x="268" y="88" width="24" height="24"></rect>
-  <text class="mono" x="440" y="100">da(i, j, c) = the sum over</text>
-  <text class="mono" x="440" y="120">every patch that covers it</text>
-  <text class="mono tiny" x="440" y="148">im2col cut overlaps;</text>
-  <text class="mono tiny" x="440" y="166">col2im adds them back</text>
-  <text class="mono tiny" x="220" y="212">the ringed cell collects from both dashed windows</text>
-</svg>
+<img src="math-figures/fig-23-col2im.svg" alt="Two overlapping windows adding their blames into one cell">
 <figcaption>fig 23 · col2im (26): overlapping windows land in the same cell and add up.</figcaption>
 </figure>
 
@@ -1185,18 +797,7 @@ $$
 </div>
 
 <figure>
-<svg viewBox="0 0 640 245" role="img" aria-label="A line through the origin whose arrows pull toward zero">
-  <path class="axis" d="M80 180 H560"></path>
-  <path class="axis" d="M320 180 V40"></path>
-  <path class="curve" d="M160 228 L480 132"></path>
-  <path class="flow" d="M250 210 L305 192"></path>
-  <path class="flow" d="M420 148 L365 166"></path>
-  <text class="lbl" x="492" y="130">2λθ</text>
-  <text class="lbl" x="546" y="198">θ</text>
-  <text class="mono" x="312" y="198">0</text>
-  <text class="mono" x="100" y="60">the penalty's pull grows with the weight</text>
-  <text class="mono tiny" x="100" y="232">farther from zero, the harder it pulls home — (27)</text>
-</svg>
+<img src="math-figures/fig-24-the-pull-to-zero.svg" alt="A line through the origin whose arrows pull toward zero">
 <figcaption>fig 24 · the penalty's gradient (27): always aimed at zero.</figcaption>
 </figure>
 
@@ -1223,15 +824,7 @@ $$
 </div>
 
 <figure>
-<svg viewBox="0 0 900 270" role="img" aria-label="Noisy per-step gradients with a smoothed direction line">
-  <path class="dash" d="M80 140 H720"></path>
-  <g stroke="var(--muted)" stroke-width="2"><path d="M100 140 V88"/><path d="M160 140 V160"/><path d="M220 140 V96"/><path d="M280 140 V192"/><path d="M340 140 V110"/><path d="M400 140 V80"/><path d="M460 140 V180"/><path d="M520 140 V118"/><path d="M580 140 V90"/><path d="M640 140 V170"/></g>
-  <polyline class="curve" points="100,128 160,136 220,122 280,144 340,136 400,118 460,138 520,128 580,118 640,124"></polyline>
-  <text class="mono" x="100" y="30">g_t — this step's noise</text>
-  <text class="mono" x="100" y="50">m_t — smoothed direction</text>
-  <text class="mono" x="100" y="70">v_t — smoothed scale</text>
-  <text class="mono tiny" x="100" y="238">β₁ = 0.9 keeps the past; β₂ = 0.999 keeps even more of it — (28)</text>
-</svg>
+<img src="math-figures/fig-25-the-adam-memories.svg" alt="Noisy per-step gradients with a smoothed direction line">
 <figcaption>fig 25 · the Adam memories (28): the noisy truth, smoothed into direction and scale.</figcaption>
 </figure>
 
@@ -1248,17 +841,7 @@ $$
 </div>
 
 <figure>
-<svg viewBox="0 0 700 255" role="img" aria-label="The corrected memory is honest from the first step, the raw one ramps up">
-  <path class="axis" d="M80 200 H640"></path>
-  <path class="axis" d="M100 200 V40"></path>
-  <path class="dash" d="M100 100 H620"></path>
-  <polyline class="curve" points="120,190 180,170 240,152 300,140 360,128 420,120 480,112 540,108 600,104"></polyline>
-  <polyline class="curve" points="120,102 180,100 240,101 300,100 360,100 420,99 480,100 540,100 600,100" stroke-dasharray="5 4"></polyline>
-  <text class="lbl" x="128" y="84">m̂</text>
-  <text class="lbl" x="256" y="168">m</text>
-  <text class="mono" x="430" y="92">the true direction E[g]</text>
-  <text class="mono tiny" x="100" y="236">without the correction the first steps would barely move (29)</text>
-</svg>
+<img src="math-figures/fig-26-the-bias-correction.svg" alt="The corrected memory is honest from the first step, the raw one ramps up">
 <figcaption>fig 26 · the bias correction (29): the memory un-shrunk, honest from step one.</figcaption>
 </figure>
 
@@ -1277,17 +860,7 @@ $$
 </div>
 
 <figure>
-<svg viewBox="0 0 700 235" role="img" aria-label="A number line: theta steps by the direction over the scale">
-  <path class="axis" d="M80 170 H620"></path>
-  <circle cx="420" cy="170" r="5" fill="#a5322a"/>
-  <circle cx="280" cy="170" r="5" fill="#2f6b3c"/>
-  <path class="flow" d="M415 132 L295 132"></path>
-  <text class="mono" x="355" y="120" text-anchor="middle">step = η · m̂ / (√v̂ + ε)</text>
-  <text class="mono" x="420" y="196" text-anchor="middle">θ_t₋₁</text>
-  <text class="mono" x="280" y="196" text-anchor="middle">θ_t</text>
-  <text class="mono" x="80" y="56">the direction comes from m̂, the size from √v̂ (30)</text>
-  <text class="mono tiny" x="80" y="218">η scales the whole move; ε only guards the division</text>
-</svg>
+<img src="math-figures/fig-27-the-adam-step.svg" alt="A number line: theta steps by the direction over the scale">
 <figcaption>fig 27 · the Adam step (30): direction divided by scale.</figcaption>
 </figure>
 
@@ -1328,21 +901,7 @@ $$
 </div>
 
 <figure>
-<svg viewBox="0 0 640 262" role="img" aria-label="Two probes around theta on a curve, with their secant approximating the tangent">
-  <defs><marker id="ar5" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#6b7076"/></marker></defs>
-  <path class="axis" d="M60 190 H580"></path>
-  <path class="axis" d="M300 190 V26"></path>
-  <polyline class="curve" points="80,44 180,92 300,140 420,92 520,44"></polyline>
-  <path class="dash" d="M240 108 L360 108"></path>
-  <path class="dash" d="M232 116 L368 90"></path>
-  <circle cx="240" cy="112" r="5" fill="#a5322a"/><circle cx="360" cy="94" r="5" fill="#a5322a"/>
-  <text class="mono" x="196" y="214">θ − ε</text>
-  <text class="mono" x="336" y="214">θ + ε</text>
-  <text class="mono" x="310" y="176">θ</text>
-  <text class="mono" x="252" y="100">tangent</text>
-  <text class="mono" x="376" y="82">secant</text>
-  <text class="mono" x="60" y="248">the gap between them is O(ε²), by Taylor's expansion</text>
-</svg>
+<img src="math-figures/fig-28-the-central-difference.svg" alt="Two probes around theta on a curve, with their secant approximating the tangent">
 <figcaption>fig 28 · the central difference (31): the secant through the probes approximates the tangent.</figcaption>
 </figure>
 
@@ -1379,17 +938,7 @@ $$
 </div>
 
 <figure>
-<svg viewBox="0 0 640 255" role="img" aria-label="Halving the nudge shrinks the error fourfold">
-  <path class="axis" d="M80 190 H560"></path>
-  <rect class="cell hot" x="180" y="70" width="60" height="120"></rect>
-  <rect class="cell hot" x="340" y="160" width="60" height="30"></rect>
-  <text class="mono" x="210" y="58" text-anchor="middle">error at ε</text>
-  <text class="mono" x="370" y="148" text-anchor="middle">error at ε/2</text>
-  <text class="mono tiny" x="210" y="212" text-anchor="middle">∝ ε²</text>
-  <text class="mono tiny" x="370" y="212" text-anchor="middle">∝ ε² / 4</text>
-  <text class="mono" x="140" y="40">halve ε: the error drops fourfold (32)</text>
-  <text class="mono tiny" x="100" y="244">the check gets sharper fast — but too small an ε re-enters rounding</text>
-</svg>
+<img src="math-figures/fig-29-the-check-error.svg" alt="Halving the nudge shrinks the error fourfold">
 <figcaption>fig 29 · the error of the check (32): quadratic in the nudge.</figcaption>
 </figure>
 
@@ -1459,9 +1008,7 @@ so the agreement improves by two orders when \(\varepsilon\) shrinks by one. One
 </div>
 
 <script>
-if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) {
-  document.querySelectorAll('animate, animateTransform, animateMotion').forEach(function (a) { a.remove(); });
-}
+
 </script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" crossorigin="anonymous"

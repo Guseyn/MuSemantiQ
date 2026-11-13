@@ -42,6 +42,7 @@
     "docs:api-example": "node scripts/generate-api-example.js",
     "docs:walkthroughs": "node scripts/build-walkthrough-docs.js",
     "docs:walkthroughs:check": "node scripts/build-walkthrough-docs.js --check",
+    "docs:math-figures": "Rscript scripts/generate-math-figures.R",
     "docs": "npm run setup:symlinks && npm run msq:apps:update && npm run web-components:update && node docs/web-app/main.js",
     "browser-app:setup": "npm run setup:symlinks && npm run msq:apps:update && npm run web-components:update",
     "browser-app": "node browser-app/web-app/main.js",
