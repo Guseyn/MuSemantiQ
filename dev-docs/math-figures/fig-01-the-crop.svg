@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="460pt" height="181pt" viewBox="0 0 460 181">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="518.4pt" height="187.9pt" viewBox="-41.9 2.6 518.4 187.9">
 <defs>
 <g>
 <g id="glyph-0-0">
@@ -306,27 +306,27 @@
 <path fill="none" stroke-width="1.05" stroke-linecap="round" stroke-linejoin="round" stroke="rgb(41.960784%, 43.921569%, 46.27451%)" stroke-opacity="1" stroke-miterlimit="10" d="M 96.898438 34.636719 L 210.035156 34.636719 "/>
 <path fill="none" stroke-width="1.05" stroke-linecap="round" stroke-linejoin="round" stroke="rgb(41.960784%, 43.921569%, 46.27451%)" stroke-opacity="1" stroke-miterlimit="10" d="M 202.550781 38.957031 L 210.035156 34.636719 L 202.550781 30.316406 "/>
 <g fill="rgb(9.019608%, 9.411765%, 10.196078%)" fill-opacity="1">
-<use xlink:href="#glyph-4-0" x="155.464844" y="33.324219"/>
+<use xlink:href="#glyph-4-0" x="148.472656" y="30.664062"/>
 </g>
 <g fill="rgb(9.019608%, 9.411765%, 10.196078%)" fill-opacity="1">
-<use xlink:href="#glyph-3-18" x="216.691406" y="40.710938"/>
-<use xlink:href="#glyph-3-0" x="221.131406" y="40.710938"/>
-<use xlink:href="#glyph-3-19" x="226.131406" y="40.710938"/>
-<use xlink:href="#glyph-3-4" x="228.911406" y="40.710938"/>
-<use xlink:href="#glyph-3-5" x="234.471406" y="40.710938"/>
-<use xlink:href="#glyph-3-1" x="242.801406" y="40.710938"/>
-<use xlink:href="#glyph-3-20" x="248.361406" y="40.710938"/>
+<use xlink:href="#glyph-3-18" x="215.359375" y="38.050781"/>
+<use xlink:href="#glyph-3-0" x="219.799375" y="38.050781"/>
+<use xlink:href="#glyph-3-19" x="224.799375" y="38.050781"/>
+<use xlink:href="#glyph-3-4" x="227.579375" y="38.050781"/>
+<use xlink:href="#glyph-3-5" x="233.139375" y="38.050781"/>
+<use xlink:href="#glyph-3-1" x="241.469375" y="38.050781"/>
+<use xlink:href="#glyph-3-20" x="247.029375" y="38.050781"/>
 </g>
 <path fill="none" stroke-width="1.05" stroke-linecap="round" stroke-linejoin="round" stroke="rgb(41.960784%, 43.921569%, 46.27451%)" stroke-opacity="1" stroke-miterlimit="10" d="M 86.25 46.605469 L 86.25 158.335938 "/>
 <path fill="none" stroke-width="1.05" stroke-linecap="round" stroke-linejoin="round" stroke="rgb(41.960784%, 43.921569%, 46.27451%)" stroke-opacity="1" stroke-miterlimit="10" d="M 81.929688 150.851562 L 86.25 158.335938 L 90.570312 150.851562 "/>
 <g fill="rgb(9.019608%, 9.411765%, 10.196078%)" fill-opacity="1">
-<use xlink:href="#glyph-4-1" x="75.601562" y="106.585938"/>
+<use xlink:href="#glyph-4-1" x="76.429688" y="102.59375"/>
 </g>
 <g fill="rgb(9.019608%, 9.411765%, 10.196078%)" fill-opacity="1">
-<use xlink:href="#glyph-3-7" x="37.003906" y="109.875"/>
-<use xlink:href="#glyph-3-0" x="40.923906" y="109.875"/>
-<use xlink:href="#glyph-3-21" x="45.923906" y="109.875"/>
-<use xlink:href="#glyph-3-20" x="53.143906" y="109.875"/>
+<use xlink:href="#glyph-3-7" x="51.53125" y="103.226562"/>
+<use xlink:href="#glyph-3-0" x="55.45125" y="103.226562"/>
+<use xlink:href="#glyph-3-21" x="60.45125" y="103.226562"/>
+<use xlink:href="#glyph-3-20" x="67.67125" y="103.226562"/>
 </g>
 <g fill="rgb(9.019608%, 9.411765%, 10.196078%)" fill-opacity="1">
 <use xlink:href="#glyph-4-2" x="114.421875" y="168.953125"/>

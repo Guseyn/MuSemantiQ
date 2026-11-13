@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="460pt" height="169pt" viewBox="0 0 460 169">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="518.4pt" height="168.0pt" viewBox="-31.3 7.4 518.4 168.0">
 <defs>
 <g>
 <g id="glyph-0-0">
@@ -173,14 +173,14 @@
 <path fill-rule="nonzero" fill="rgb(100%, 100%, 100%)" fill-opacity="1" stroke-width="0.75" stroke-linecap="round" stroke-linejoin="round" stroke="rgb(41.960784%, 43.921569%, 46.27451%)" stroke-opacity="1" stroke-miterlimit="10" d="M 70.277344 46.210938 L 143.484375 46.210938 L 143.484375 72.847656 L 70.277344 72.847656 Z M 70.277344 46.210938 "/>
 <path fill-rule="nonzero" fill="rgb(100%, 100%, 100%)" fill-opacity="1" stroke-width="0.75" stroke-linecap="round" stroke-linejoin="round" stroke="rgb(41.960784%, 43.921569%, 46.27451%)" stroke-opacity="1" stroke-miterlimit="10" d="M 70.277344 106.140625 L 143.484375 106.140625 L 143.484375 132.777344 L 70.277344 132.777344 Z M 70.277344 106.140625 "/>
 <g fill="rgb(9.019608%, 9.411765%, 10.196078%)" fill-opacity="1">
-<use xlink:href="#glyph-1-0" x="101.054688" y="66.605469"/>
+<use xlink:href="#glyph-1-0" x="101.054688" y="63.273438"/>
 </g>
 <g fill="rgb(9.019608%, 9.411765%, 10.196078%)" fill-opacity="1">
-<use xlink:href="#glyph-1-1" x="103.730469" y="126.660156"/>
+<use xlink:href="#glyph-1-1" x="103.730469" y="123.328125"/>
 </g>
 <path fill-rule="nonzero" fill="rgb(96.470588%, 91.372549%, 90.196078%)" fill-opacity="1" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" stroke="rgb(64.705882%, 19.607843%, 16.470588%)" stroke-opacity="1" stroke-miterlimit="10" d="M 296.550781 76.175781 L 369.757812 76.175781 L 369.757812 102.8125 L 296.550781 102.8125 Z M 296.550781 76.175781 "/>
 <g fill="rgb(9.019608%, 9.411765%, 10.196078%)" fill-opacity="1">
-<use xlink:href="#glyph-2-0" x="330.480469" y="96.777344"/>
+<use xlink:href="#glyph-2-0" x="330.480469" y="93.449219"/>
 </g>
 <path fill="none" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round" stroke="rgb(64.705882%, 19.607843%, 16.470588%)" stroke-opacity="1" stroke-miterlimit="10" d="M 293.890625 83.5 L 150.140625 62.191406 "/>
 <path fill="none" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round" stroke="rgb(64.705882%, 19.607843%, 16.470588%)" stroke-opacity="1" stroke-miterlimit="10" d="M 158.175781 59.015625 L 150.140625 62.191406 L 156.90625 67.5625 "/>
