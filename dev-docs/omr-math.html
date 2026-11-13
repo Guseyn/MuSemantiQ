@@ -1,0 +1,377 @@
+<title>MuSemantiQ — the math of training</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root {
+  --paper: #fdfdfb;
+  --ink: #17181a;
+  --muted: #6b7076;
+  --rule: #e4e4e0;
+  --soft: #f4f3ef;
+  --accent: #a5322a;
+  --accent-soft: #f6e9e6;
+  --font: system-ui, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+  --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+  --serif: Georgia, "Times New Roman", serif;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 64px; }
+body { background: var(--paper); color: var(--ink); font: 15.5px/1.6 var(--font); margin: 0; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.page { max-width: 820px; margin: 0 auto; padding: 36px 22px 120px; }
+header h1 { font: 400 34px/1.2 var(--serif); margin: 0 0 6px; }
+header .sub { color: var(--muted); max-width: 70ch; }
+.eyebrow { font: 500 12px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+hr { border: 0; border-top: 1px solid var(--rule); margin: 34px 0; }
+nav { position: sticky; top: 0; z-index: 10; background: var(--paper); border-bottom: 1px solid var(--rule); padding: 10px 0; margin: 22px 0 26px; display: flex; flex-wrap: wrap; gap: 4px 14px; }
+nav a { font: 500 12.5px var(--mono); color: var(--muted); }
+nav a:hover { color: var(--accent); text-decoration: none; }
+h2 { font: 400 25px/1.25 var(--serif); margin: 0 0 10px; }
+h2 .n { color: var(--muted); font-size: 17px; margin-right: 8px; }
+p { max-width: 72ch; margin: 8px 0; }
+.totop { float: right; font: 500 11.5px var(--mono); }
+
+/* the math itself — typeset in the page, no library */
+.m { font-family: var(--serif); font-style: italic; }
+.m .up { font-style: normal; }
+.eq {
+  display: grid; grid-template-columns: 1fr auto; gap: 10px 18px; align-items: center;
+  background: var(--soft); border-left: 3px solid var(--accent); border-radius: 0 7px 7px 0;
+  padding: 14px 18px; margin: 18px 0; overflow-x: auto;
+}
+.eq .body { font: 18px/2.1 var(--serif); white-space: nowrap; }
+.eq .num { font: 500 11px var(--mono); color: var(--muted); }
+.eq .name { grid-column: 1 / -1; font: 500 11px var(--mono); color: var(--muted); margin-top: -6px; }
+sub, sup { font-size: .68em; }
+.frac { display: inline-flex; flex-direction: column; vertical-align: -0.55em; text-align: center; }
+.frac .num { border-bottom: 1px solid currentColor; padding: 0 .35em .12em; }
+.frac .den { padding: .12em .35em 0; }
+.sum { display: inline-flex; flex-direction: column; align-items: center; vertical-align: -0.75em; line-height: 1.05; }
+.sum .op { font-size: 1.55em; font-style: normal; }
+.sum .lim { font-size: .62em; font-style: normal; }
+.vec { font-weight: bold; font-style: italic; }
+table.notation { border-collapse: collapse; width: 100%; font-size: 14px; margin: 12px 0; }
+table.notation td { border-bottom: 1px solid var(--rule); padding: 6px 10px; vertical-align: top; }
+table.notation td:first-child { width: 90px; font-family: var(--serif); font-size: 16px; }
+table.notation td:last-child { color: var(--muted); }
+code { font: .87em var(--mono); background: var(--soft); padding: 0 4px; border-radius: 3px; }
+</style>
+
+<div class="page">
+<header>
+  <div class="eyebrow">MuSemantiQ · dev docs · src/omr</div>
+  <h1>the math of training</h1>
+  <p class="sub">Every equation behind <code>src/omr</code> training, and nothing else. The crop, the forward pass, the loss, the backward pass, the nudge, and the check that keeps them honest. Each equation is the code it becomes.</p>
+</header>
+
+<nav>
+  <a href="#notation">notation</a>
+  <a href="#crop">1 the crop</a>
+  <a href="#forward">2 forward</a>
+  <a href="#loss">3 loss</a>
+  <a href="#backward">4 backward</a>
+  <a href="#adam">5 the nudge</a>
+  <a href="#check">6 the check</a>
+  <a href="#count">7 the count</a>
+  <a href="./omr-code.html">the code →</a>
+</nav>
+
+<!-- ============================ NOTATION ============================ -->
+<section id="notation">
+<h2>Notation</h2>
+<table class="notation">
+<tr><td><span class="m">a</span>, <span class="m">z</span></td><td>activation, pre-activation — arrays; index triples like <span class="m">a<sub>i,j,c</sub></span> are column, row, channel</td></tr>
+<tr><td><span class="m">W</span>, <span class="m">b</span></td><td>weights, bias — learned numbers; <span class="m">W<sub>p,q,c,k</sub></span> is filter <span class="m">k</span>, window offset <span class="m">(p, q)</span>, input channel <span class="m">c</span></td></tr>
+<tr><td><span class="m">F</span>, <span class="m">C</span>, <span class="m">K</span></td><td>filter size (3), input channels, number of filters</td></tr>
+<tr><td><span class="m">H</span>, <span class="m">W</span>, <span class="m">N</span></td><td>grid height, grid width, batch size</td></tr>
+<tr><td><span class="m">p<sub>c</sub></span>, <span class="m">y</span></td><td>probability of class <span class="m">c</span>; the true class of a sample</td></tr>
+<tr><td><span class="m">θ</span></td><td>all learned numbers together — every <span class="m">W</span> and every <span class="m">b</span></td></tr>
+<tr><td><span class="m">λ</span>, <span class="m">η</span>, <span class="m">ε</span></td><td>L2 strength, learning rate, small constant</td></tr>
+<tr><td><span class="m">δ</span>, <span class="m">g</span></td><td>error signal flowing backward; the gradient of one parameter</td></tr>
+</table>
+</section>
+
+<hr>
+
+<!-- ============================ 1 · THE CROP ============================ -->
+<section id="crop">
+<h2><span class="n">1</span>The crop</h2>
+<p>One symbol, scaled to a fixed grid before anything else.</p>
+
+<div class="eq">
+  <div class="body m">
+    dst(<span class="up">x</span>, <span class="up">y</span>) =
+    (1 / |<span class="m">R</span>|) ·
+    <span class="sum"><span class="op">∑</span><span class="lim">(u,v) ∈ R</span></span>
+    src(<span class="up">u</span>, <span class="up">v</span>)
+  </div>
+  <div class="num">(1)</div>
+  <div class="name">shrink — the average of the source pixels the output pixel covers</div>
+</div>
+
+<div class="eq">
+  <div class="body m">
+    dst(<span class="up">x</span>, <span class="up">y</span>) =
+    (1−α)(1−β)·<span class="m">Q</span><sub>00</sub> + α(1−β)·<span class="m">Q</span><sub>01</sub> +
+    (1−α)β·<span class="m">Q</span><sub>10</sub> + αβ·<span class="m">Q</span><sub>11</sub>
+  </div>
+  <div class="num">(2)</div>
+  <div class="name">enlarge — bilinear blend of the 2×2 neighbourhood Q; α, β are the fractional sample offsets</div>
+</div>
+</section>
+
+<hr>
+
+<!-- ============================ 2 · FORWARD ============================ -->
+<section id="forward">
+<h2><span class="n">2</span>The forward pass</h2>
+<p>Convolution, in the sum form and in the matrix form the code runs.</p>
+
+<div class="eq">
+  <div class="body m">
+    z<sub>i,j,k</sub> = b<sub>k</sub> +
+    <span class="sum"><span class="op">∑</span><span class="lim">p,q = 0..F−1</span></span>
+    <span class="sum"><span class="op">∑</span><span class="lim">c</span></span>
+    W<sub>p,q,c,k</sub> · a<sub>i+p, j+q, c</sub>
+  </div>
+  <div class="num">(3)</div>
+  <div class="name">convolution — out-of-bounds reads paper (padding = 0)</div>
+</div>
+
+<div class="eq">
+  <div class="body m">
+    <span class="m">Z</span> = <span class="m">P</span> <span class="m">Ŵ</span><sup>T</sup> + <span class="m">1</span> <span class="m">b</span><sup>T</sup>,
+    &nbsp;&nbsp; <span class="m">P</span> ∈ ℝ<sup>(HW)×R</sup>, &nbsp; <span class="m">Ŵ</span> ∈ ℝ<sup>K×R</sup>, &nbsp; R = F<sup>2</sup>C
+  </div>
+  <div class="num">(4)</div>
+  <div class="name">im2col — each window of the input becomes a row of P; the layer is one multiply</div>
+</div>
+
+<div class="eq">
+  <div class="body m">a = max(0, z)</div>
+  <div class="num">(5)</div>
+  <div class="name">ReLU</div>
+</div>
+
+<div class="eq">
+  <div class="body m">
+    a<sup>pool</sup><sub>i,j,c</sub> = max<sub>u,v ∈ {0,1}</sub> &nbsp; a<sub>2i+u, 2j+v, c</sub>
+  </div>
+  <div class="num">(6)</div>
+  <div class="name">max-pool, 2×2 — the winning index is remembered for the backward pass</div>
+</div>
+
+<div class="eq">
+  <div class="body m">z = <span class="m">W</span> a + b</div>
+  <div class="num">(7)</div>
+  <div class="name">dense — every output on every input; before it, the maps are flattened: vec</div>
+</div>
+
+<div class="eq">
+  <div class="body m">
+    p<sub>c</sub> =
+    <span class="frac">
+      <span class="num">e<sup> z<sub>c</sub> − m </sup></span>
+      <span class="den"><span class="sum"><span class="op">∑</span><span class="lim">j = 1..K</span></span> e<sup> z<sub>j</sub> − m</sup></span>
+    </span>,
+    &nbsp;&nbsp; m = max<sub>j</sub> z<sub>j</sub>
+  </div>
+  <div class="num">(8)</div>
+  <div class="name">softmax — the shift by m is a constant; ∑ p<sub>c</sub> = 1</div>
+</div>
+</section>
+
+<hr>
+
+<!-- ============================ 3 · LOSS ============================ -->
+<section id="loss">
+<h2><span class="n">3</span>The loss</h2>
+
+<div class="eq">
+  <div class="body m">
+    L<sub>CE</sub> = −
+    <span class="frac">
+      <span class="num">1</span>
+      <span class="den">N</span>
+    </span>
+    <span class="sum"><span class="op">∑</span><span class="lim">n = 1..N</span></span>
+    log p<sub>n, y<sub>n</sub></sub>
+  </div>
+  <div class="num">(9)</div>
+  <div class="name">cross-entropy — only the probability of the right class counts</div>
+</div>
+
+<div class="eq">
+  <div class="body m">
+    L<sub>reg</sub> = λ <span class="sum"><span class="op">∑</span><span class="lim">θ</span></span> θ<sup>2</sup>
+  </div>
+  <div class="num">(10)</div>
+  <div class="name">L2 — keeps the learned numbers small</div>
+</div>
+
+<div class="eq">
+  <div class="body m">L = L<sub>CE</sub> + L<sub>reg</sub></div>
+  <div class="num">(11)</div>
+  <div class="name">the total loss — the one number training pushes down</div>
+</div>
+</section>
+
+<hr>
+
+<!-- ============================ 4 · BACKWARD ============================ -->
+<section id="backward">
+<h2><span class="n">4</span>The backward pass</h2>
+<p>One gradient rule per stage, in reverse order. For a single sample; a batch sums and divides.</p>
+
+<div class="eq">
+  <div class="body m">
+    δ<sup>(L)</sup> = p − onehot(y)
+  </div>
+  <div class="num">(12)</div>
+  <div class="name">softmax + cross-entropy collapse to one subtraction</div>
+</div>
+
+<div class="eq">
+  <div class="body m">
+    d<span class="m">W</span> = δ a<sup>T</sup>, &nbsp;&nbsp; db = δ, &nbsp;&nbsp; da = <span class="m">W</span><sup>T</sup> δ
+  </div>
+  <div class="num">(13)</div>
+  <div class="name">dense — blame on the weights, the bias, and backward through to the input</div>
+</div>
+
+<div class="eq">
+  <div class="body m">
+    δ<sub>z</sub> = δ<sub>a</sub> ⊙ 1[z &gt; 0]
+  </div>
+  <div class="num">(14)</div>
+  <div class="name">ReLU — blame passes only where the gate was open</div>
+</div>
+
+<div class="eq">
+  <div class="body m">
+    δ<sub>z</sub>(2i+u, 2j+v, c) =
+    <span class="cases">
+      δ<sub>a</sub>(i, j, c) &nbsp;<span class="up">at the remembered argmax</span><br>
+      0 &nbsp;<span class="up">everywhere else</span>
+    </span>
+  </div>
+  <div class="num">(15)</div>
+  <div class="name">max-pool — the blame goes back to the cell that won</div>
+</div>
+
+<p>Convolution through the same im2col as (4). With <span class="m">D</span> = the error reshaped to ℝ<sup>(HW)×K</sup>:</p>
+
+<div class="eq">
+  <div class="body m">
+    d<span class="m">Ŵ</span> = <span class="m">D</span><sup>T</sup> <span class="m">P</span>, &nbsp;&nbsp;
+    db = <span class="m">1</span><sup>T</sup> <span class="m">D</span>, &nbsp;&nbsp;
+    d<span class="m">P</span> = <span class="m">D</span> <span class="m">Ŵ</span>
+  </div>
+  <div class="num">(16)</div>
+  <div class="name">the layer is a matrix multiply, so its gradients are matrix gradients</div>
+</div>
+
+<div class="eq">
+  <div class="body m">
+    d<span class="m">a</span> = <span class="up">col2im</span>(d<span class="m">P</span>)
+  </div>
+  <div class="num">(17)</div>
+  <div class="name">each patch value returns to where it was cut from; where windows overlap, the blames add</div>
+</div>
+
+<div class="eq">
+  <div class="body m">
+    <span class="frac">
+      <span class="num">∂L<sub>reg</sub></span>
+      <span class="den">∂θ</span>
+    </span>
+    = 2λθ
+  </div>
+  <div class="num">(18)</div>
+  <div class="name">the L2 share joins every weight gradient</div>
+</div>
+</section>
+
+<hr>
+
+<!-- ============================ 5 · ADAM ============================ -->
+<section id="adam">
+<h2><span class="n">5</span>The nudge</h2>
+<p>Adam, per parameter, per step <span class="m">t</span>. <span class="m">g<sub>t</sub></span> is that parameter's gradient from (12)–(18).</p>
+
+<div class="eq">
+  <div class="body m">
+    m<sub>t</sub> = β<sub>1</sub> m<sub>t−1</sub> + (1 − β<sub>1</sub>) g<sub>t</sub>
+  </div>
+  <div class="num">(19)</div>
+  <div class="name">smoothed direction — β<sub>1</sub> = 0.9</div>
+</div>
+
+<div class="eq">
+  <div class="body m">
+    v<sub>t</sub> = β<sub>2</sub> v<sub>t−1</sub> + (1 − β<sub>2</sub>) g<sub>t</sub><sup>2</sup>
+  </div>
+  <div class="num">(20)</div>
+  <div class="name">smoothed scale — β<sub>2</sub> = 0.999</div>
+</div>
+
+<div class="eq">
+  <div class="body m">
+    m̂<sub>t</sub> =
+    <span class="frac"><span class="num">m<sub>t</sub></span><span class="den">1 − β<sub>1</sub><sup> t</sup></span></span>,
+    &nbsp;&nbsp;
+    v̂<sub>t</sub> =
+    <span class="frac"><span class="num">v<sub>t</sub></span><span class="den">1 − β<sub>2</sub><sup> t</sup></span></span>
+  </div>
+  <div class="num">(21)</div>
+  <div class="name">the correction for the first steps, when both start at zero</div>
+</div>
+
+<div class="eq">
+  <div class="body m">
+    θ<sub>t</sub> = θ<sub>t−1</sub> − η ·
+    <span class="frac"><span class="num">m̂<sub>t</sub></span><span class="den">√v̂<sub>t</sub> + ε</span></span>
+  </div>
+  <div class="num">(22)</div>
+  <div class="name">the nudge — η = 0.001, ε = 10<sup>−8</sup></div>
+</div>
+</section>
+
+<hr>
+
+<!-- ============================ 6 · CHECK ============================ -->
+<section id="check">
+<h2><span class="n">6</span>The check</h2>
+<p>The backward pass is believed only where the finite difference agrees.</p>
+
+<div class="eq">
+  <div class="body m">
+    <span class="frac"><span class="num">∂L</span><span class="den">∂θ<sub>i</sub></span></span>
+    ≈
+    <span class="frac">
+      <span class="num">L(θ + ε e<sub>i</sub>) − L(θ − ε e<sub>i</sub>)</span>
+      <span class="den">2ε</span>
+    </span>
+  </div>
+  <div class="num">(23)</div>
+  <div class="name">central difference — meaningful only away from ReLU corners, where the loss has no derivative</div>
+</div>
+</section>
+
+<hr>
+
+<!-- ============================ 7 · COUNT ============================ -->
+<section id="count">
+<h2><span class="n">7</span>The count</h2>
+<p>How many learned numbers each stage owns.</p>
+
+<div class="eq">
+  <div class="body m">
+    |θ<sub>conv</sub>| = K(F<sup>2</sup>C + 1), &nbsp;&nbsp;
+    |θ<sub>dense</sub>| = out · in + out
+  </div>
+  <div class="num">(24)</div>
+  <div class="name">weights and biases; for the 48×48 model — conv 160 + 4 640, dense 294 976 + 6 405 ≈ 306K</div>
+</div>
+</section>
+</div>
