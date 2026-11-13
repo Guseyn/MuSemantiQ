@@ -167,18 +167,18 @@ dl.kv dd { margin: 0; overflow-wrap: anywhere; }
 </style><style>
 .scrollbox { overflow: auto; max-height: 580px; border-bottom: 1px solid var(--line); position: relative; }
 .scrollbox svg.sys { width: 820px; height: auto; border: 0; border-radius: 0; background: transparent; }
-.diagram .cluster rect { fill: var(--soft); stroke: var(--line); stroke-dasharray: 4 4; rx: 10; }
-.diagram .cluster text { font: 500 10px var(--mono); fill: var(--muted); text-anchor: start; }
-.diagram .node { cursor: pointer; }
-.diagram .node:hover rect:not(.band) { stroke: var(--accent); }
-.diagram .halo { fill: none; stroke: var(--accent); stroke-width: 2; opacity: 0; rx: 11; transform-box: fill-box; transform-origin: center; }
-.diagram .node.on .halo { animation: halo 1.7s ease-in-out infinite; }
+.cluster rect { fill: var(--soft); stroke: var(--line); stroke-dasharray: 4 4; rx: 10; }
+.cluster text { font: 500 10px var(--mono); fill: var(--muted); text-anchor: start; }
+.node { cursor: pointer; }
+.node:hover rect:not(.band) { stroke: var(--accent); }
+.halo { fill: none; stroke: var(--accent); stroke-width: 2; opacity: 0; rx: 11; transform-box: fill-box; transform-origin: center; }
+.node.on .halo { animation: halo 1.7s ease-in-out infinite; }
 @keyframes halo {
   0%, 100% { opacity: .25; transform: scale(1); }
   50% { opacity: .95; transform: scale(1.07); }
 }
-.diagram .node.on rect:not(.band) { stroke: var(--accent); stroke-width: 2.5; fill: var(--accent-soft); }
-.diagram .node text { font-size: 11px; }
+.node.on rect:not(.band) { stroke: var(--accent); stroke-width: 2.5; fill: var(--accent-soft); }
+.node text { font-size: 11px; }
 .crumbs { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; padding: 7px 12px; border-bottom: 1px solid var(--line); font: 500 11.5px var(--mono); }
 .crumbs button { font: inherit; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px; cursor: pointer; }
 .crumbs button:hover { color: var(--accent); border-color: var(--accent); }
@@ -188,6 +188,8 @@ dl.kv dd { margin: 0; overflow-wrap: anywhere; }
 .stack .frame.here { border-left-color: var(--accent); color: var(--ink); background: var(--accent-soft); border-radius: 0 5px 5px 0; }
 .stack .frame.here::after { content: " ← here"; color: var(--accent); }
 dl.kv dd { overflow-wrap: anywhere; }
+.state { grid-template-columns: minmax(0, 1fr); }
+.stackwrap { min-width: 0; }
 </style>
 <div class="wrap">
   <header class="top">
@@ -19995,8 +19997,8 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     ],
     "parent": "calculateBboxForPath",
     "children": [
-     "calculateMinmaxQ",
-     "calculateMinmaxC"
+     "calculateMinmaxC",
+     "calculateMinmaxQ"
     ]
    },
    "calculateVectorLength": {
@@ -20125,8 +20127,8 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     ],
     "parent": null,
     "children": [
-     "drawNaturalKey",
-     "drawFlatKey"
+     "drawFlatKey",
+     "drawNaturalKey"
     ]
    },
    "drawStavesPiece": {
@@ -20273,15 +20275,15 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "ly": 403,
     "l": ""
    },
-   "calculateSvgPathBbox-calculateMinmaxQ": {
-    "d": "M90 291 L300 409",
-    "lx": 195,
-    "ly": 344,
-    "l": ""
-   },
    "calculateSvgPathBbox-calculateMinmaxC": {
     "d": "M90 291 L90 409",
     "lx": 90,
+    "ly": 344,
+    "l": ""
+   },
+   "calculateSvgPathBbox-calculateMinmaxQ": {
+    "d": "M90 291 L300 409",
+    "lx": 195,
     "ly": 344,
     "l": ""
    },
@@ -20291,15 +20293,15 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "ly": 226,
     "l": ""
    },
-   "drawKeySignature-drawNaturalKey": {
-    "d": "M300 527 L720 645",
-    "lx": 510,
-    "ly": 580,
-    "l": ""
-   },
    "drawKeySignature-drawFlatKey": {
     "d": "M300 527 L510 645",
     "lx": 405,
+    "ly": 580,
+    "l": ""
+   },
+   "drawKeySignature-drawNaturalKey": {
+    "d": "M300 527 L720 645",
+    "lx": 510,
     "ly": 580,
     "l": ""
    },
@@ -22977,8 +22979,8 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     ],
     "parent": null,
     "children": [
-     "correctStemEndCoordinates",
-     "updateBeamsPerimeterCoordinates"
+     "updateBeamsPerimeterCoordinates",
+     "correctStemEndCoordinates"
     ]
    },
    "isProgressionOfCurrentBeamedSingleUnitsSupposedToHaveHorizontalBeamLine": {
@@ -23025,15 +23027,15 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
    }
   },
   "edges": {
-   "drawBeamsPiece-correctStemEndCoordinates": {
-    "d": "M510 409 L90 527",
-    "lx": 300,
-    "ly": 462,
-    "l": ""
-   },
    "drawBeamsPiece-updateBeamsPerimeterCoordinates": {
     "d": "M510 409 L300 527",
     "lx": 405,
+    "ly": 462,
+    "l": ""
+   },
+   "drawBeamsPiece-correctStemEndCoordinates": {
+    "d": "M510 409 L90 527",
+    "lx": 300,
     "ly": 462,
     "l": ""
    }
@@ -25396,8 +25398,8 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     ],
     "parent": null,
     "children": [
-     "calculateTwoIntersectionPointsInFirstAndSecondHalfsOfSlurWhereSlurCreatesBiggestGapsWithSingleUnitTopOrBottomPositionsInEachHalfRespectivelyDependingOnSlurDirection",
-     "stretchSlurSplineSoItCannotIntersectItsSingleUnitsExceptMaybeSomeUnitAtTheStartAndAtTheEndToAvoidBigStretching"
+     "stretchSlurSplineSoItCannotIntersectItsSingleUnitsExceptMaybeSomeUnitAtTheStartAndAtTheEndToAvoidBigStretching",
+     "calculateTwoIntersectionPointsInFirstAndSecondHalfsOfSlurWhereSlurCreatesBiggestGapsWithSingleUnitTopOrBottomPositionsInEachHalfRespectivelyDependingOnSlurDirection"
     ]
    },
    "calculateSlurJunctionPhantomPoint": {
@@ -25499,15 +25501,15 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "ly": 108,
     "l": ""
    },
-   "calculateSShapeSlurSplinePointsWithAdjustedYOffsetSoItCannotIntersectUnits-calculateTwoIntersectionPointsInFirstAndSecondHalfsOfSlurWhereSlurCreatesBiggestGapsWithSingleUnitTopOrBottomPositionsInEachHalfRespectivelyDependingOnSlurDirection": {
-    "d": "M510 409 L300 527",
-    "lx": 405,
-    "ly": 462,
-    "l": ""
-   },
    "calculateSShapeSlurSplinePointsWithAdjustedYOffsetSoItCannotIntersectUnits-stretchSlurSplineSoItCannotIntersectItsSingleUnitsExceptMaybeSomeUnitAtTheStartAndAtTheEndToAvoidBigStretching": {
     "d": "M510 409 L720 527",
     "lx": 615,
+    "ly": 462,
+    "l": ""
+   },
+   "calculateSShapeSlurSplinePointsWithAdjustedYOffsetSoItCannotIntersectUnits-calculateTwoIntersectionPointsInFirstAndSecondHalfsOfSlurWhereSlurCreatesBiggestGapsWithSingleUnitTopOrBottomPositionsInEachHalfRespectivelyDependingOnSlurDirection": {
+    "d": "M510 409 L300 527",
+    "lx": 405,
     "ly": 462,
     "l": ""
    },
@@ -26510,8 +26512,8 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     ],
     "parent": null,
     "children": [
-     "calculateStaveIndexOfNoteConsideringItsStave",
-     "doTwoUnitsHaveSuchDurationsThatTheyCanPotentiallyBeOverlapped"
+     "doTwoUnitsHaveSuchDurationsThatTheyCanPotentiallyBeOverlapped",
+     "calculateStaveIndexOfNoteConsideringItsStave"
     ]
    },
    "drawBarlineFermata": {
@@ -26610,15 +26612,15 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
     "ly": 108,
     "l": ""
    },
-   "doesSingleUnitFitInVertical-calculateStaveIndexOfNoteConsideringItsStave": {
-    "d": "M300 173 L300 291",
-    "lx": 300,
-    "ly": 226,
-    "l": ""
-   },
    "doesSingleUnitFitInVertical-doTwoUnitsHaveSuchDurationsThatTheyCanPotentiallyBeOverlapped": {
     "d": "M300 173 L510 291",
     "lx": 405,
+    "ly": 226,
+    "l": ""
+   },
+   "doesSingleUnitFitInVertical-calculateStaveIndexOfNoteConsideringItsStave": {
+    "d": "M300 173 L300 291",
+    "lx": 300,
     "ly": 226,
     "l": ""
    }
@@ -26716,15 +26718,15 @@ export default function (stavesParams, singleUnitsForCurrentCrossStaveUnit, vert
       const n = sc.nodes[id];
       const g = el('g', { class: 'node', style: '--own: var(--accent)' }, gN);
       const tt = el('title', {}, g); tt.textContent = n.full + ' — click to zoom in';
-      el('rect', { class: 'halo', x: n.x - 80, y: n.y - 27, width: 160, height: 54 }, g);
-      el('rect', { x: n.x - 75, y: n.y - 24, width: 150, height: 48, rx: 7 }, g);
-      el('rect', { x: n.x - 75, y: n.y - 24, width: 6, height: 48, rx: 3, class: 'band' }, g);
+      el('rect', { class: 'halo', x: n.x - 81, y: n.y - 30, width: 162, height: 60 }, g);
+      el('rect', { x: n.x - 75, y: n.y - 25, width: 150, height: 50, rx: 7 }, g);
+      el('rect', { x: n.x - 75, y: n.y - 25, width: 6, height: 50, rx: 3, class: 'band' }, g);
       const words = n.lines;
-      const a = el('text', { x: n.x, y: n.y - 3 - (words.length - 1) * 6 }, g);
+      const a = el('text', { x: n.x, y: n.y - 9 - (words.length - 1) * 7 }, g);
       words.forEach((w, i) => {
-        const ts = el('tspan', { x: n.x, dy: i === 0 ? 0 : 12 }, a); ts.textContent = w;
+        const ts = el('tspan', { x: n.x, dy: i === 0 ? 0 : 13 }, a); ts.textContent = w;
       });
-      const b = el('text', { x: n.x, y: n.y + 22 }, g); b.textContent = n.k;
+      const b = el('text', { x: n.x, y: n.y + 17, class: 'k' }, g); b.textContent = n.k;
       g.addEventListener('click', () => { zoom = id; jumpTo(id); });
       nodeEls[id] = g;
     }
