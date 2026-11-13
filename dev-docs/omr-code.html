@@ -1,0 +1,4276 @@
+<title>MuSemantiQ — src/omr code</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+/* Layout: player bar on top; left = live system diagram + state, right = the MR code with the active lines lit */
+:root {
+  --bg: #fdfdfb;
+  --panel: #ffffff;
+  --code-bg: #f4f3ef;
+  --fg: #17181a;
+  --muted: #6b7076;
+  --line: #e4e4e0;
+  --accent: #a5322a;
+  --accent-soft: #f6e9e6;
+  --hot: #b07d18;
+  --err: #c43c3c;
+  --err-soft: #f7e0e0;
+  --ok: #2f6b3c;
+  --node: #ffffff;
+  --m-a: #8a5cf6;
+  --m-b: #0f9d9a;
+  --m-c: #d9861c;
+  --m-d: #2f7fd8;
+  --m-e: #d6457f;
+  --m-f: #2c8a4a;
+  --c-kw: #8a3ffc; --c-str: #1e7a3c; --c-com: #7d8b8e; --c-fn: #0f62c9; --c-type: #b25c00; --c-num: #c0306a;
+  --font-body: system-ui, -apple-system, "Segoe UI", "Helvetica Neue", sans-serif;
+  --font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+  --font-serif: Georgia, "Times New Roman", serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #1c1714; --panel: #241e19; --code-bg: #191411; --fg: #ede8e3; --muted: #a4938a; --line: #3b322c;
+    --accent: #d98c82; --accent-soft: #3a2620; --hot: #e0b055; --err: #ff8a7a; --err-soft: #40231f; --ok: #8fc49b; --node: #241e19;
+    --c-kw: #c4a2ff; --c-str: #7fd49a; --c-com: #96857c; --c-fn: #79b8ff; --c-type: #f0b26b; --c-num: #ff9fb0;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #1c1714; --panel: #241e19; --code-bg: #191411; --fg: #ede8e3; --muted: #a4938a; --line: #3b322c;
+  --accent: #d98c82; --accent-soft: #3a2620; --hot: #e0b055; --err: #ff8a7a; --err-soft: #40231f; --ok: #8fc49b; --node: #241e19;
+  --c-kw: #c4a2ff; --c-str: #7fd49a; --c-com: #96857c; --c-fn: #79b8ff; --c-type: #f0b26b; --c-num: #ff9fb0;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 15.5px; line-height: 1.6; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+.wrap {
+  max-width: 1320px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 22px 48px; display: grid; gap: 14px;
+}
+header.top { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 16px; }
+header.top h1 { margin: 0; font-family: var(--font-serif); font-size: clamp(22px, 3vw, 31px); line-height: 1.2; font-weight: 400; }
+header.top a { font-family: var(--font-mono); font-size: 12.5px; color: var(--accent); }
+.eyebrow { font-family: var(--font-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+.intro { margin: 0; color: var(--muted); max-width: 88ch; }
+.intro code { font-family: var(--font-mono); font-size: 13px; }
+
+/* Player */
+.player {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px;
+  display: grid; gap: 10px;
+}
+.tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+.tabs button {
+  font: 500 13px var(--font-body); color: var(--muted); background: transparent; border: 1px solid var(--line);
+  border-radius: 999px; padding: 4px 12px; cursor: pointer;
+}
+.tabs button[aria-selected="true"] { background: var(--accent); border-color: var(--accent); color: var(--panel); }
+.tabs button:focus-visible, .ctrl button:focus-visible, .ctrl input:focus-visible { outline: 2px solid var(--hot); outline-offset: 2px; }
+.ctrl { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.ctrl button {
+  font: 600 13px var(--font-body); color: var(--fg); background: var(--accent-soft); border: 1px solid var(--line);
+  border-radius: 6px; padding: 6px 12px; cursor: pointer; min-width: 44px;
+}
+.ctrl button.primary { background: var(--accent); color: var(--panel); border-color: var(--accent); }
+.ctrl button:disabled { opacity: .45; cursor: default; }
+.ctrl input[type="range"] { flex: 1; min-width: 120px; accent-color: var(--accent); }
+.ctrl .count { font: 500 13px var(--font-mono); color: var(--muted); font-variant-numeric: tabular-nums; min-width: 64px; text-align: right; }
+.caption { display: grid; gap: 2px; }
+.caption b { font-size: 16px; }
+.caption span { color: var(--muted); font-size: 14px; max-width: 80ch; }
+.keys { font-size: 12px; color: var(--muted); }
+.keys kbd { font-family: var(--font-mono); font-size: 11px; border: 1px solid var(--line); border-radius: 3px; padding: 0 4px; background: var(--code-bg); }
+
+/* Stage */
+.stage { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; align-items: start; }
+@media (max-width: 900px) { .stage { grid-template-columns: 1fr; } }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; min-width: 0; }
+.card > .hd { display: flex; justify-content: space-between; gap: 8px; padding: 8px 12px; border-bottom: 1px solid var(--line); font: 500 12px var(--font-mono); color: var(--muted); }
+.card > .hd b { color: var(--accent); font-weight: 500; overflow-wrap: anywhere; }
+.left { display: grid; gap: 14px; min-width: 0; }
+
+svg.sys { display: block; width: 100%; height: auto; }
+.edge { stroke: var(--line); stroke-width: 2; fill: none; }
+.edge.on { stroke: var(--hot); stroke-width: 3; }
+.edge.lit { stroke: var(--accent); stroke-width: 2.5; stroke-dasharray: 5 4; }
+#tok.err circle, #tok.err rect { fill: var(--err); }
+.elabel { font: 500 10.5px var(--font-mono); fill: var(--muted); text-anchor: middle; }
+.node rect { fill: color-mix(in srgb, var(--own) 13%, var(--node)); stroke: color-mix(in srgb, var(--own) 65%, var(--line)); stroke-width: 1.5; transition: fill .3s, stroke .3s; }
+.node rect.band { fill: var(--own); stroke: none; }
+.node.on rect:not(.band) { stroke: var(--hot); stroke-width: 3; fill: color-mix(in srgb, var(--own) 28%, var(--node)); }
+.node.err rect:not(.band) { stroke: var(--err); stroke-width: 3; fill: var(--err-soft); }
+.owners { display: flex; flex-wrap: wrap; gap: 6px 14px; padding: 8px 12px; border-bottom: 1px solid var(--line); font-size: 12px; color: var(--muted); }
+.owners span { display: inline-flex; align-items: center; gap: 6px; }
+.owners i { width: 12px; height: 12px; border-radius: 3px; background: var(--own); display: inline-block; }
+.owners b { color: var(--fg); font-weight: 600; }
+.repo { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 11.5px; padding: 1px 8px; border-radius: 999px; background: color-mix(in srgb, var(--own) 18%, transparent); color: var(--fg); border: 1px solid var(--own); white-space: nowrap; }
+.node text { font: 600 12.5px var(--font-body); fill: var(--fg); text-anchor: middle; }
+.node text.k { font: 500 10px var(--font-mono); fill: var(--muted); }
+#tok circle { fill: var(--hot); stroke: var(--panel); stroke-width: 2; }
+#tok rect { fill: var(--fg); }
+#tok text { font: 600 11px var(--font-mono); fill: var(--panel); }
+
+.state { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0; }
+@media (max-width: 520px) { .state { grid-template-columns: 1fr; } }
+.state section { padding: 10px 12px; min-width: 0; display: grid; gap: 6px; align-content: start; }
+.state section + section { border-left: 1px solid var(--line); }
+@media (max-width: 520px) { .state section + section { border-left: 0; border-top: 1px solid var(--line); } }
+.state h3 { margin: 0; font: 500 11px var(--font-mono); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+pre.msg { margin: 0; font: 12px/1.5 var(--font-mono); background: var(--code-bg); border: 1px solid var(--line); border-radius: 5px; padding: 8px 10px; overflow-x: auto; min-height: 44px; }
+dl.kv { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; font: 12.5px var(--font-mono); font-variant-numeric: tabular-nums; }
+dl.kv dt { color: var(--muted); }
+dl.kv dd { margin: 0; overflow-wrap: anywhere; }
+.grid { display: flex; flex-wrap: wrap; gap: 3px; }
+.grid i { width: 13px; height: 13px; border-radius: 2px; border: 1.5px solid var(--line); background: var(--code-bg); transition: background .25s, border-color .25s, opacity .25s; }
+.grid i.L { border-color: var(--hot); background: color-mix(in srgb, var(--hot) 35%, transparent); }
+.grid i.D { border-color: var(--ok); background: var(--ok); }
+.grid i.F { border-color: var(--err); background: var(--err); }
+.grid i.G { opacity: .25; border-style: dashed; }
+.glegend { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 11.5px; color: var(--muted); }
+.glegend span { display: inline-flex; gap: 5px; align-items: center; }
+.glegend i { width: 10px; height: 10px; border-radius: 2px; border: 1.5px solid var(--line); display: inline-block; }
+.glegend i.L { border-color: var(--hot); background: color-mix(in srgb, var(--hot) 35%, transparent); }
+.glegend i.D { border-color: var(--ok); background: var(--ok); }
+.glegend i.F { border-color: var(--err); background: var(--err); }
+.glegend i.G { opacity: .35; border-style: dashed; }
+
+.chip { font: 500 12px var(--font-mono); padding: 3px 8px; border-radius: 4px; border: 1.5px solid var(--line); background: var(--code-bg); transition: background .25s, border-color .25s, opacity .25s; }
+.chip.L { border-color: var(--hot); background: color-mix(in srgb, var(--hot) 30%, transparent); }
+.chip.D { border-color: var(--ok); background: color-mix(in srgb, var(--ok) 25%, transparent); }
+.chip.F { border-color: var(--err); background: var(--err-soft); text-decoration: line-through; }
+.chip.G { opacity: .6; border-style: dashed; }
+.mrlinks { display: inline-flex; gap: 6px; flex-wrap: wrap; font-family: var(--font-mono); font-size: 12.5px; color: var(--muted); }
+
+/* Code */
+.codebox { max-height: min(72vh, 680px); overflow: auto; background: var(--code-bg); border-radius: 0 0 8px 8px; }
+.codebox ol { list-style: none; margin: 0; padding: 8px 0; font: 12.5px/1.6 var(--font-mono); min-width: max-content; }
+.codebox li { display: grid; grid-template-columns: 52px 1fr; padding-right: 16px; border-left: 3px solid transparent; }
+.codebox li .n { color: var(--muted); text-align: right; padding-right: 14px; user-select: none; opacity: .7; font-variant-numeric: tabular-nums; }
+.codebox li code { font: inherit; white-space: pre; color: var(--fg); }
+.codebox li.hl { background: var(--accent-soft); border-left-color: var(--accent); }
+.codebox li.hl .n { color: var(--accent); opacity: 1; }
+.codebox.dim li:not(.hl) code { opacity: .55; }
+.hljs-keyword, .hljs-literal, .hljs-built_in { color: var(--c-kw); }
+.hljs-string, .hljs-regexp, .hljs-subst { color: var(--c-str); }
+.hljs-comment { color: var(--c-com); font-style: italic; }
+.hljs-title, .hljs-title.function_ { color: var(--c-fn); }
+.hljs-type, .hljs-title.class_ { color: var(--c-type); }
+.hljs-number { color: var(--c-num); }
+.hljs-attr, .hljs-property, .hljs-variable.constant_ { color: var(--c-fn); }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <div class="eyebrow">MuSemantiQ · dev docs · src/omr</div>
+      <h1>src/omr: the code, call by call</h1>
+    </div>
+    <span class="mrlinks"><a href="./omr.html">the design</a> · <a href="./training.html">training on a server</a> · <a href="./language.html">src/language</a> · <a href="https://github.com/Guseyn/MuSemantiQ">github.com/Guseyn/MuSemantiQ</a></span>
+  </header>
+  <p class="intro">The whole flow, every function call in the stack, for each process — image to MSQ, the measuring, the symbols, the rules, one training batch. Each frame lights the real lines that run it and shows the call stack above it. The code on the right is the code in the repository.</p>
+
+  <div class="player" role="region" aria-label="Player">
+    <div class="tabs" role="tablist" id="tabs"></div>
+    <div class="ctrl">
+      <button id="first" type="button" aria-label="First frame">⏮</button>
+      <button id="prev" type="button" aria-label="Previous frame">◀</button>
+      <button id="play" type="button" class="primary" aria-label="Play">▶ Play</button>
+      <button id="next" type="button" aria-label="Next frame">▶</button>
+      <input id="scrub" type="range" min="0" max="0" value="0" aria-label="Frame">
+      <span class="count" id="count">1 / 1</span>
+    </div>
+    <div class="caption" aria-live="polite"><b id="ctitle"></b><span id="ctext"></span></div>
+    <div class="keys"><kbd>←</kbd> <kbd>→</kbd> step · <kbd>space</kbd> play / pause</div>
+  </div>
+
+  <div class="stage">
+    <div class="left">
+      <div class="card">
+        <div class="hd"><span>flow</span><b id="where"></b></div>
+        <svg class="sys" viewBox="0 0 820 460" role="img" aria-label="The stages of the pipeline and the data flowing between them">
+          <g id="edges"></g>
+          <g id="nodes"></g>
+          <g id="tok" style="display:none"><rect rx="4" height="18"></rect><text dy="4"></text><circle r="7"></circle></g>
+        </svg>
+      </div>
+      <div class="card">
+        <div class="state">
+          <section>
+            <h3>The call stack</h3>
+            <dl class="kv" id="worker"></dl>
+            <h3>The data</h3>
+            <pre class="msg" id="msg"></pre>
+            <h3>In one line</h3>
+            <pre class="msg" id="logline"></pre>
+          </section>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="hd"><span id="frepo" class="repo" style="--own:var(--accent)">MuSemantiQ</span><b id="fpath"></b><span id="flines"></span></div>
+      <div class="codebox" id="codebox"><ol id="code"></ol></div>
+    </div>
+  </div>
+</div>
+
+
+<script type="text/plain" id="src-TRANSLATE" data-path="src/omr/translateImageToMsq.js" data-start="1">
+'use strict'
+
+import deskewBitmap from './analysis/deskewBitmap.js'
+import { analyzeStraightenedImage } from './analysis/analyzeImage.js'
+import extractSymbols from './analysis/extractSymbols.js'
+import classifyComponent from './analysis/classifyComponent.js'
+import buildMusicModel from './translation/buildMusicModel.js'
+import buildPageSchemaFromMusicModel from './translation/buildPageSchemaFromMusicModel.js'
+import carryStateAcrossPages from './translation/carryStateAcrossPages.js'
+import serialize from '#msq/language/serializer/serialize.js'
+
+/**
+ * A score image becomes MSQ text and a report.
+ *
+ * Straighten once, measure, extract symbols, walk the music rules, hand the
+ * page schema to the language's own serializer — so the text round-trips
+ * through the parser by construction. The measured styles ride along as the
+ * page's style commands. The report names what the classifier was unsure of,
+ * with the unit it became and its line in the text; nothing uncertain becomes
+ * silent fact.
+ */
+
+export function translateImageToMsq (bitmap, options = {}) {
+  return translatePage(bitmap, options).result
+}
+
+// The same, with the page's carry-over state in and out — what
+// translateImagesToMsqPages threads through a project's pages.
+export function translatePage (bitmap, options = {}, carried = {}) {
+  const classify = options.classify || classifyWithModel(options)
+  const upright = deskewBitmap(bitmap)
+  const analysis = analyzeStraightenedImage(upright)
+  const symbols = extractSymbols(upright, analysis.staves, { classify })
+  const built = buildMusicModel(symbols, analysis.staves)
+  const withState = carryStateAcrossPages(
+    { musicModel: built, customStyles: customStylesFrom(analysis) },
+    carried
+  )
+  const pageSchema = buildPageSchemaFromMusicModel(withState.musicModel)
+  const msqText = serialize(pageSchema, withState.customStyles, {}, [])
+  return {
+    result: {
+      msqText,
+      report: createReport(symbols, withState.musicModel, msqText)
+    },
+    carried: withState.carried
+  }
+}
+
+function classifyWithModel ({ model, classIds, threshold }) {
+  return (pixels) => classifyComponent(model, pixels, classIds, threshold)
+}
+
+// Sizes in staff spaces and colours as measured; the one pixel anchor
+// (`font size`) is left at its default on purpose.
+function customStylesFrom (analysis) {
+  const sizes = analysis.measuredStyles
+  const colors = analysis.colors
+  return {
+    titleFontSize: sizes.titleFontSize,
+    subtitleFontSize: sizes.subtitleFontSize,
+    leftSubtitleFontSize: sizes.leftSubtitleFontSize,
+    rightSubtitleFontSize: sizes.rightSubtitleFontSize,
+    instrumentTitleFontSize: sizes.instrumentFontSize,
+    pageNumberFontSize: sizes.pageNumberFontSize,
+    intervalBetweenStaves: sizes.intervalBetweenStaves,
+    intervalBetweenPageLines: sizes.intervalBetweenPageLines,
+    backgroundColor: colors.background,
+    fontColor: colors.text,
+    staveLinesColor: colors.staveLines
+  }
+}
+
+function createReport ({ blobs }, musicModel, msqText) {
+  const unitsInTextOrder = unitsInSerializationOrder(musicModel)
+  const unitLines = msqText.split('\n')
+    .map((line, index) => ({ line, msqLine: index + 1 }))
+    .filter(({ line }) => /^\d/.test(line))
+  return {
+    uncertain: blobs
+      .filter((blob) => blob.className === 'unknown' || blob.confidence < 0.9)
+      .map((blob) => {
+        const position = positionOfBlob(blob, unitsInTextOrder)
+        return {
+          box: blob.box,
+          staveIndex: blob.staveIndex,
+          staffPosition: blob.staffPosition,
+          className: blob.className,
+          confidence: blob.confidence,
+          candidates: blob.candidates,
+          unit: position,
+          msqLine: position ? (unitLines[position.flatIndex] || {}).msqLine || null : null
+        }
+      }),
+    ignored: []
+  }
+}
+
+function unitsInSerializationOrder (musicModel) {
+  const ordered = []
+  musicModel.measures.forEach((measure, measureIndex) => {
+    measure.staves.forEach((stave, staveIndex) => {
+      stave.voices.forEach((voice, voiceIndex) => {
+        voice.forEach((unit, unitIndex) => {
+          ordered.push({ unit, measureIndex, staveIndex, voiceIndex, unitIndex })
+        })
+      })
+    })
+  })
+  return ordered.map((entry, flatIndex) => ({ ...entry, flatIndex }))
+}
+
+function positionOfBlob (blob, orderedUnits) {
+  for (const entry of orderedUnits) {
+    if ((entry.unit.sourceBlobs || []).includes(blob)) {
+      return {
+        measureIndex: entry.measureIndex,
+        staveIndex: entry.staveIndex,
+        voiceIndex: entry.voiceIndex,
+        unitIndex: entry.unitIndex,
+        flatIndex: entry.flatIndex
+      }
+    }
+  }
+  return null
+}
+
+export default translateImageToMsq
+
+</script>
+<script type="text/plain" id="src-ANALYZE" data-path="src/omr/analysis/analyzeImage.js" data-start="1">
+'use strict'
+
+import deskewBitmap from './deskewBitmap.js'
+import detectStaves from './detectStaves.js'
+import groupStavesIntoSystems from './groupStavesIntoSystems.js'
+import findTextBlocks from './findTextBlocks.js'
+import measureStyles from './measureStyles.js'
+
+/**
+ * What the image shows, as numbers.
+ *
+ * The analysis every later stage reads: staves and their lines, systems, the
+ * word blocks with their roles, and the page's proportions. Coordinates are
+ * pixels on the straightened bitmap; sizes are staff spaces. Nothing here is
+ * guessed — each field is a measurement, and anything uncertain gets reported
+ * by the stages that consume it.
+ *
+ * `analyzeStraightenedImage` skips the deskew for callers that straighten the
+ * bitmap once and measure symbols against the very same pixels.
+ */
+
+export function analyzeImage ({ width, height, grayscale }) {
+  return analyzeStraightenedImage(deskewBitmap({ width, height, grayscale }))
+}
+
+export function analyzeStraightenedImage (upright) {
+  const { staves, staffSpaceHeightPx } = detectStaves(upright)
+  const systems = groupStavesIntoSystems(staves)
+  const textBlocks = findTextBlocks({ ...upright, staves, systems, staffSpaceHeightPx })
+  const { fontSizes, colors } = measureStyles({ ...upright, staves, systems, textBlocks, staffSpaceHeightPx })
+  return {
+    skewAngleInDegrees: upright.skewAngleInDegrees || 0,
+    staffSpaceHeightPx: roundTo2(staffSpaceHeightPx),
+    staves: staves.map((stave, index) => ({
+      index,
+      systemIndex: systemIndexOf(staves, systems, index),
+      linesY: stave.linesY.map(roundTo2),
+      staffSpaceHeightPx: roundTo2(stave.staffSpaceHeightPx),
+      topY: roundTo2(stave.topY),
+      bottomY: roundTo2(stave.bottomY),
+      xStart: stave.xStart,
+      xEnd: stave.xEnd
+    })),
+    systems,
+    textBlocks,
+    measuredStyles: fontSizes,
+    colors
+  }
+}
+
+function systemIndexOf (staves, systems, staveIndex) {
+  return systems.findIndex((system) => system.staveIndexes.includes(staveIndex))
+}
+
+function roundTo2 (value) {
+  return Math.round(value * 100) / 100
+}
+
+export default analyzeImage
+
+</script>
+<script type="text/plain" id="src-DESKEW" data-path="src/omr/analysis/deskewBitmap.js" data-start="1">
+'use strict'
+
+import estimateSkewAngleInDegrees from './estimateSkewAngleInDegrees.js'
+
+/**
+ * The page, straightened.
+ *
+ * The estimate is the slope of the content, so rotating by its negation puts
+ * every staff line horizontal again. Sampling is bilinear — the same rule the
+ * crops are resampled with — and anything outside the page reads as paper.
+ */
+
+export function deskewBitmap (bitmap) {
+  const skewAngleInDegrees = estimateSkewAngleInDegrees(bitmap)
+  if (Math.abs(skewAngleInDegrees) < 0.05) {
+    return { ...bitmap, skewAngleInDegrees: 0 }
+  }
+  return {
+    ...rotateBitmap(bitmap, -skewAngleInDegrees),
+    skewAngleInDegrees
+  }
+}
+
+function rotateBitmap ({ width, height, grayscale }, angleInDegrees) {
+  const radians = angleInDegrees * Math.PI / 180
+  const cosine = Math.cos(radians)
+  const sine = Math.sin(radians)
+  const centerX = (width - 1) / 2
+  const centerY = (height - 1) / 2
+  const rotated = new Float32Array(width * height)
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const sourceX = (x - centerX) * cosine + (y - centerY) * sine + centerX
+      const sourceY = -(x - centerX) * sine + (y - centerY) * cosine + centerY
+      rotated[y * width + x] = bilinearSample(grayscale, width, height, sourceX, sourceY)
+    }
+  }
+  return { width, height, grayscale: rotated }
+}
+
+function bilinearSample (grayscale, width, height, x, y) {
+  if (x < 0 || y < 0 || x > width - 1 || y > height - 1) {
+    return 0
+  }
+  const left = Math.floor(x)
+  const top = Math.floor(y)
+  const right = Math.min(left + 1, width - 1)
+  const bottom = Math.min(top + 1, height - 1)
+  const fractionX = x - left
+  const fractionY = y - top
+  const topLeft = grayscale[top * width + left]
+  const topRight = grayscale[top * width + right]
+  const bottomLeft = grayscale[bottom * width + left]
+  const bottomRight = grayscale[bottom * width + right]
+  return (1 - fractionX) * (1 - fractionY) * topLeft +
+    fractionX * (1 - fractionY) * topRight +
+    (1 - fractionX) * fractionY * bottomLeft +
+    fractionX * fractionY * bottomRight
+}
+
+export default deskewBitmap
+
+</script>
+<script type="text/plain" id="src-ANGLE" data-path="src/omr/analysis/estimateSkewAngleInDegrees.js" data-start="1">
+'use strict'
+
+/**
+ * How far the page is turned, in degrees.
+ *
+ * Ink is binned along rows of a candidate angle. When the angle matches the
+ * tilt of the content, the staff lines pile into a few sharp bins and the sum
+ * of squared bin counts peaks — that sum is the sharpness being maximized.
+ * A coarse sweep finds the neighbourhood, a fine sweep finds the angle.
+ *
+ * The result is the slope of the content: positive when lines go down as x
+ * grows. Rotating by its negation straightens the page (see deskewBitmap).
+ */
+
+const INK_THRESHOLD = 0.5
+const MAX_INK_POINTS = 20000
+
+export function estimateSkewAngleInDegrees ({ width, height, grayscale }) {
+  const points = collectInkPoints({ width, height, grayscale })
+  if (points.length < 2) {
+    return 0
+  }
+  let bestAngle = 0
+  let bestSharpness = -1
+  for (const angle of anglesFrom(-5, 5, 0.25)) {
+    const sharpness = projectionSharpness(points, width + height, angle)
+    if (sharpness > bestSharpness) {
+      bestSharpness = sharpness
+      bestAngle = angle
+    }
+  }
+  for (const angle of anglesFrom(bestAngle - 0.3, bestAngle + 0.3, 0.05)) {
+    const sharpness = projectionSharpness(points, width + height, angle)
+    if (sharpness > bestSharpness) {
+      bestSharpness = sharpness
+      bestAngle = angle
+    }
+  }
+  return bestAngle
+}
+
+// A fixed stride keeps big images cheap and the result the same on every run.
+function collectInkPoints ({ width, height, grayscale }) {
+  const points = []
+  let inkCount = 0
+  for (let index = 0; index < grayscale.length; index++) {
+    if (grayscale[index] > INK_THRESHOLD) {
+      inkCount++
+    }
+  }
+  const stride = Math.max(1, Math.ceil(inkCount / MAX_INK_POINTS))
+  let seen = 0
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      if (grayscale[y * width + x] > INK_THRESHOLD) {
+        if (seen % stride === 0) {
+          points.push([ x, y ])
+        }
+        seen++
+      }
+    }
+  }
+  return points
+}
+
+function projectionSharpness (points, binRange, angleInDegrees) {
+  const radians = angleInDegrees * Math.PI / 180
+  const cosine = Math.cos(radians)
+  const sine = Math.sin(radians)
+  const offset = binRange
+  const bins = new Float64Array(binRange * 2 + 1)
+  for (const [ x, y ] of points) {
+    const bin = Math.round(y * cosine - x * sine) + offset
+    bins[bin]++
+  }
+  let sharpness = 0
+  for (const count of bins) {
+    sharpness += count * count
+  }
+  return sharpness
+}
+
+function anglesFrom (start, end, step) {
+  const angles = []
+  for (let angle = start; angle <= end + 1e-9; angle += step) {
+    angles.push(Math.round(angle * 100) / 100)
+  }
+  return angles
+}
+
+export default estimateSkewAngleInDegrees
+
+</script>
+<script type="text/plain" id="src-STAVES" data-path="src/omr/analysis/detectStaves.js" data-start="1">
+'use strict'
+
+/**
+ * Where the staff lines are.
+ *
+ * The lines are the strongest horizontal ink on the page: the row ink profile
+ * has one sharp peak per line. Peaks with near-constant spacing form a staff;
+ * a run of four peaks gets its missing line reconstructed, because lines are
+ * equally spaced by definition. Each line is then re-centred on its ink, and
+ * every position is kept — this measurement is the coordinate system the rest
+ * of the tool reads against (pixels are removed later, coordinates are not).
+ */
+
+const PEAK_THRESHOLD = 0.15
+const SPACING_TOLERANCE = 0.25
+
+export function detectStaves ({ width, height, grayscale }) {
+  const profile = rowInkProfile({ width, height, grayscale })
+  const peaks = findPeakCandidates(profile)
+  const lines = groupPeaksIntoStaves(peaks)
+  const staves = lines.map((rawLines) => buildStave(rawLines, profile, { width, height, grayscale }))
+  const staffSpaceHeightPx = mean(staves.map((stave) => stave.staffSpaceHeightPx))
+  return { staves, staffSpaceHeightPx }
+}
+
+function rowInkProfile ({ width, height, grayscale }) {
+  const profile = new Float64Array(height)
+  for (let y = 0; y < height; y++) {
+    let ink = 0
+    for (let x = 0; x < width; x++) {
+      ink += grayscale[y * width + x]
+    }
+    // a one-row smoothing keeps single dead pixels from becoming peaks
+    profile[y] = ink / width
+  }
+  const smoothed = new Float64Array(height)
+  for (let y = 0; y < height; y++) {
+    const before = profile[Math.max(0, y - 1)]
+    const after = profile[Math.min(height - 1, y + 1)]
+    smoothed[y] = 0.25 * before + 0.5 * profile[y] + 0.25 * after
+  }
+  return smoothed
+}
+
+function findPeakCandidates (profile) {
+  const peaks = []
+  for (let y = 1; y < profile.length - 1; y++) {
+    const isPeak = profile[y] >= PEAK_THRESHOLD && profile[y] >= profile[y - 1] && profile[y] > profile[y + 1]
+    if (isPeak) {
+      peaks.push(y)
+    }
+  }
+  return peaks
+}
+
+// Runs of peaks with constant spacing are staves. A gap of about two spacings
+// means a line is missing and is filled in; anything else ends the run.
+function groupPeaksIntoStaves (peaks) {
+  const staves = []
+  let index = 0
+  while (index < peaks.length - 1) {
+    const spacing = peaks[index + 1] - peaks[index]
+    const run = [ peaks[index] ]
+    let cursor = index
+    while (run.length < 5 && cursor + 1 < peaks.length) {
+      const gap = peaks[cursor + 1] - peaks[cursor]
+      const steps = Math.round(gap / spacing)
+      if (steps < 1 || steps > 2 || Math.abs(gap - steps * spacing) > Math.max(1, SPACING_TOLERANCE * spacing)) {
+        break
+      }
+      for (let step = 1; step < steps; step++) {
+        run.push(peaks[cursor] + step * spacing)
+      }
+      run.push(peaks[cursor + 1])
+      cursor++
+    }
+    if (run.length >= 5) {
+      staves.push(run.slice(0, 5))
+      index = cursor + 1
+    } else if (run.length === 4) {
+      staves.push([ ...run, run[3] + spacing ])
+      index = cursor + 1
+    } else {
+      index++
+    }
+  }
+  return staves
+}
+
+function buildStave (rawLines, profile, bitmap) {
+  const linesY = rawLines.map((line) => recenterLine(line, profile))
+  const gaps = linesY.slice(1).map((line, index) => line - linesY[index])
+  const staffSpaceHeightPx = mean(gaps)
+  const topY = linesY[0]
+  const bottomY = linesY[4]
+  const { xStart, xEnd } = lineExtents(linesY, staffSpaceHeightPx, bitmap)
+  return { linesY, staffSpaceHeightPx, topY, bottomY, xStart, xEnd }
+}
+
+// Interpolated lines have no ink to re-centre on and keep their guess.
+function recenterLine (line, profile) {
+  const from = Math.max(0, Math.round(line) - 2)
+  const to = Math.min(profile.length - 1, Math.round(line) + 2)
+  let weighted = 0
+  let total = 0
+  for (let y = from; y <= to; y++) {
+    weighted += y * profile[y]
+    total += profile[y]
+  }
+  return total > 0 ? weighted / total : line
+}
+
+// The stave's horizontal extent is where most of its lines carry ink, so text
+// sitting beside the stave does not stretch it.
+function lineExtents (linesY, staffSpaceHeightPx, { width, height, grayscale }) {
+  let xStart = width
+  let xEnd = 0
+  for (let x = 0; x < width; x++) {
+    let linesWithInk = 0
+    for (const line of linesY) {
+      const y = Math.round(line)
+      if (y >= 0 && y < height && grayscale[y * width + x] > 0.5) {
+        linesWithInk++
+      }
+    }
+    if (linesWithInk >= 3) {
+      xStart = Math.min(xStart, x)
+      xEnd = Math.max(xEnd, x)
+    }
+  }
+  if (xStart > xEnd) {
+    xStart = 0
+    xEnd = width - 1
+  }
+  return { xStart, xEnd }
+}
+
+function mean (values) {
+  return values.reduce((sum, value) => sum + value, 0) / values.length
+}
+
+export default detectStaves
+
+</script>
+<script type="text/plain" id="src-SYSTEMS" data-path="src/omr/analysis/groupStavesIntoSystems.js" data-start="1">
+'use strict'
+
+/**
+ * Which staves play together.
+ *
+ * Staves that are close, and whose lines overlap horizontally, belong to one
+ * system — one line of music on the page. When symbols can be classified, a
+ * brace or bracket at the left edge will confirm this; until then spacing and
+ * overlap say it.
+ */
+
+const MAX_GAP_IN_STAFF_SPACES = 2.5
+const MIN_X_OVERLAP_FRACTION = 0.25
+
+export function groupStavesIntoSystems (staves) {
+  const systems = []
+  for (const stave of [ ...staves ].sort((first, second) => first.topY - second.topY)) {
+    const current = systems[systems.length - 1]
+    if (current && belongsToSystem(stave, current)) {
+      current.staves.push(stave)
+      current.topY = Math.min(current.topY, stave.topY)
+      current.bottomY = Math.max(current.bottomY, stave.bottomY)
+      current.xStart = Math.min(current.xStart, stave.xStart)
+      current.xEnd = Math.max(current.xEnd, stave.xEnd)
+    } else {
+      systems.push({
+        staves: [ stave ],
+        topY: stave.topY,
+        bottomY: stave.bottomY,
+        xStart: stave.xStart,
+        xEnd: stave.xEnd
+      })
+    }
+  }
+  return systems.map((system, index) => ({
+    index,
+    staveIndexes: system.staves.map((stave) => staves.indexOf(stave)),
+    topY: system.topY,
+    bottomY: system.bottomY,
+    xStart: system.xStart,
+    xEnd: system.xEnd
+  }))
+}
+
+function belongsToSystem (stave, system) {
+  const lastStave = system.staves[system.staves.length - 1]
+  const gap = stave.topY - lastStave.bottomY
+  const staffSpace = (stave.staffSpaceHeightPx + lastStave.staffSpaceHeightPx) / 2
+  const overlap = Math.min(stave.xEnd, system.xEnd) - Math.max(stave.xStart, system.xStart)
+  const smallerWidth = Math.min(stave.xEnd - stave.xStart, system.xEnd - system.xStart)
+  return gap <= MAX_GAP_IN_STAFF_SPACES * staffSpace &&
+    overlap >= MIN_X_OVERLAP_FRACTION * smallerWidth
+}
+
+export default groupStavesIntoSystems
+
+</script>
+<script type="text/plain" id="src-TEXT" data-path="src/omr/analysis/findTextBlocks.js" data-start="1">
+'use strict'
+
+/**
+ * Where the words are.
+ *
+ * Ink outside the staves is words: titles above, instrument names at the left,
+ * page numbers below. Blocks are clusters of ink — split on row gaps bigger
+ * than half a staff space and column gaps bigger than one — and given a role
+ * from where they sit around the systems. What the words say is not read here.
+ */
+
+const INK_THRESHOLD = 0.5
+const STAVE_MARGIN_IN_STAFF_SPACES = 0.3
+const ROW_GAP_IN_STAFF_SPACES = 0.4
+const COLUMN_GAP_IN_STAFF_SPACES = 1
+
+export function findTextBlocks ({ width, height, grayscale, staves, systems, staffSpaceHeightPx }) {
+  const mask = buildMaskOutsideStaves({ width, height, grayscale, staves, staffSpaceHeightPx })
+  const bands = splitIntoRowBands(mask, width, height, staffSpaceHeightPx)
+  const blocks = bands.flatMap((band) => splitBandIntoBlocks(band, mask, width, staffSpaceHeightPx))
+  return blocks.map((block) => ({
+    box: { x: block.x, y: block.y, w: block.w, h: block.h },
+    role: roleOfBlock(block, { width, systems, staffSpaceHeightPx, blocks }),
+    sizeInStaffSpaces: roundTo2(block.h / staffSpaceHeightPx)
+  }))
+}
+
+function buildMaskOutsideStaves ({ width, height, grayscale, staves, staffSpaceHeightPx }) {
+  const mask = new Uint8Array(width * height)
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      if (grayscale[y * width + x] <= INK_THRESHOLD) {
+        continue
+      }
+      mask[y * width + x] = isInsideStave(x, y, staves, staffSpaceHeightPx) ? 0 : 1
+    }
+  }
+  return mask
+}
+
+function isInsideStave (x, y, staves, staffSpaceHeightPx) {
+  return staves.some((stave) => {
+    const margin = STAVE_MARGIN_IN_STAFF_SPACES * stave.staffSpaceHeightPx
+    return y >= stave.topY - margin && y <= stave.bottomY + margin &&
+      x >= stave.xStart - margin && x <= stave.xEnd + margin
+  })
+}
+
+function splitIntoRowBands (mask, width, height, staffSpaceHeightPx) {
+  const rowHasInk = []
+  for (let y = 0; y < height; y++) {
+    let ink = false
+    for (let x = 0; x < width && !ink; x++) {
+      ink = mask[y * width + x] === 1
+    }
+    rowHasInk.push(ink)
+  }
+  const gapLimit = ROW_GAP_IN_STAFF_SPACES * staffSpaceHeightPx
+  const bands = []
+  let band = null
+  for (let y = 0; y < height; y++) {
+    if (rowHasInk[y]) {
+      if (band && y - band.lastY <= gapLimit) {
+        band.lastY = y
+      } else {
+        band = { firstY: y, lastY: y }
+        bands.push(band)
+      }
+    }
+  }
+  return bands
+}
+
+function splitBandIntoBlocks (band, mask, width, staffSpaceHeightPx) {
+  const columnsWithInk = []
+  for (let x = 0; x < width; x++) {
+    let ink = false
+    for (let y = band.firstY; y <= band.lastY && !ink; y++) {
+      ink = mask[y * width + x] === 1
+    }
+    columnsWithInk.push(ink)
+  }
+  const gapLimit = COLUMN_GAP_IN_STAFF_SPACES * staffSpaceHeightPx
+  const blocks = []
+  let block = null
+  for (let x = 0; x < width; x++) {
+    if (columnsWithInk[x]) {
+      if (block && x - block.lastX <= gapLimit) {
+        block.lastX = x
+      } else {
+        block = { firstX: x, lastX: x }
+        blocks.push(block)
+      }
+    }
+  }
+  return blocks.map((columns) => ({
+    x: columns.firstX,
+    y: band.firstY,
+    w: columns.lastX - columns.firstX + 1,
+    h: band.lastY - band.firstY + 1
+  }))
+}
+
+function roleOfBlock (block, { width, systems, staffSpaceHeightPx, blocks }) {
+  const centerX = block.x + block.w / 2
+  const centerY = block.y + block.h / 2
+  const pageCenterX = width / 2
+  const isCentered = Math.abs(centerX - pageCenterX) < 0.25 * width
+  const firstSystemTopY = systems[0].topY
+  const lastSystemBottomY = systems[systems.length - 1].bottomY
+  if (block.y + block.h < firstSystemTopY - 0.5 * staffSpaceHeightPx && isCentered) {
+    const centeredAbove = blocks
+      .filter((other) => other.y + other.h < firstSystemTopY - 0.5 * staffSpaceHeightPx &&
+        Math.abs(other.x + other.w / 2 - pageCenterX) < 0.25 * width)
+      .sort((first, second) => first.y - second.y)
+    return centeredAbove[0] === block ? 'title' : 'subtitle'
+  }
+  if (block.y > lastSystemBottomY + 0.5 * staffSpaceHeightPx && isCentered) {
+    return 'pageNumber'
+  }
+  for (const system of systems) {
+    const leftOfSystem = block.x + block.w < system.xStart - 0.2 * staffSpaceHeightPx
+    const atStaveHeight = centerY > system.topY - staffSpaceHeightPx && centerY < system.bottomY + staffSpaceHeightPx
+    if (leftOfSystem && atStaveHeight) {
+      return 'instrument'
+    }
+  }
+  return 'text'
+}
+
+function roundTo2 (value) {
+  return Math.round(value * 100) / 100
+}
+
+export default findTextBlocks
+
+</script>
+<script type="text/plain" id="src-STYLES" data-path="src/omr/analysis/measureStyles.js" data-start="1">
+'use strict'
+
+/**
+ * The page's palette, text sizes and spacing, as proportions.
+ *
+ * Sizes are text height divided by the staff space — the same units MSQ
+ * styles are written in ("stave-line intervals"). Spacing is stave-to-stave
+ * and line-to-line in the same units. Colours are medians of the ink they
+ * belong to: the paper, the stave lines, the words. Everything here is a
+ * ratio or a colour, never an absolute size — `font size` itself (the one
+ * pixel anchor) stays out and keeps its default.
+ */
+
+export function measureStyles ({ width, height, grayscale, staves, systems, textBlocks, staffSpaceHeightPx }) {
+  const fontSizes = {
+    titleFontSize: largestBlockSize(textBlocks, [ 'title' ]),
+    subtitleFontSize: largestBlockSize(textBlocks, [ 'subtitle' ]),
+    leftSubtitleFontSize: largestBlockSize(textBlocks, [ 'leftSubtitle' ]),
+    rightSubtitleFontSize: largestBlockSize(textBlocks, [ 'rightSubtitle' ]),
+    instrumentFontSize: largestBlockSize(textBlocks, [ 'instrument' ]),
+    pageNumberFontSize: largestBlockSize(textBlocks, [ 'pageNumber' ]),
+    intervalBetweenStaves: averageGapInStaffSpaces(groupedStaves(staves, systems), staffSpaceHeightPx),
+    intervalBetweenPageLines: averageGapInStaffSpaces([ systems ], staffSpaceHeightPx)
+  }
+  const colors = {
+    background: backgroundHex({ width, height, grayscale }),
+    staveLines: staveLinesHex({ width, height, grayscale, staves }),
+    text: textHex({ width, height, grayscale, textBlocks })
+  }
+  return { fontSizes, colors }
+}
+
+function largestBlockSize (textBlocks, roles) {
+  const sizes = textBlocks.filter((block) => roles.includes(block.role)).map((block) => block.sizeInStaffSpaces)
+  return sizes.length ? Math.round(Math.max(...sizes) * 100) / 100 : null
+}
+
+// Staves grouped by the system they belong to; spacing is measured inside
+// each group, so a gap between systems is never mistaken for stave spacing.
+function groupedStaves (staves, systems) {
+  return systems.map((system) =>
+    system.staveIndexes.map((index) => staves[index]).sort((first, second) => first.topY - second.topY)
+  )
+}
+
+function averageGapInStaffSpaces (groups, staffSpaceHeightPx) {
+  const spacings = []
+  for (const group of groups) {
+    for (let index = 1; index < group.length; index++) {
+      spacings.push((group[index].topY - group[index - 1].topY) / staffSpaceHeightPx)
+    }
+  }
+  if (!spacings.length) {
+    return null
+  }
+  return Math.round(spacings.reduce((sum, spacing) => sum + spacing, 0) / spacings.length * 100) / 100
+}
+
+// The paper is what almost everything that is not ink is: the most common
+// value among the light pixels.
+function backgroundHex ({ width, height, grayscale }) {
+  const histogram = new Float64Array(256)
+  for (let index = 0; index < grayscale.length; index++) {
+    if (grayscale[index] < 0.1) {
+      histogram[Math.round((1 - grayscale[index]) * 255)]++
+    }
+  }
+  return hexOfChannel(strongestChannel(histogram))
+}
+
+function staveLinesHex ({ width, height, grayscale, staves }) {
+  const samples = []
+  for (const stave of staves) {
+    for (const line of stave.linesY) {
+      const y = Math.round(line)
+      for (let x = stave.xStart; x <= stave.xEnd; x += 3) {
+        if (y >= 0 && y < height && grayscale[y * width + x] > 0.5) {
+          samples.push(grayscale[y * width + x])
+        }
+      }
+    }
+  }
+  return samples.length ? hexOfChannel(Math.round((1 - median(samples)) * 255)) : null
+}
+
+function textHex ({ width, height, grayscale, textBlocks }) {
+  const samples = []
+  for (const block of textBlocks) {
+    for (let y = block.box.y; y < block.box.y + block.box.h; y++) {
+      for (let x = block.box.x; x < block.box.x + block.box.w; x++) {
+        const ink = grayscale[y * width + x]
+        if (ink > 0.5) {
+          samples.push(ink)
+        }
+      }
+    }
+  }
+  return samples.length ? hexOfChannel(Math.round((1 - median(samples)) * 255)) : null
+}
+
+function strongestChannel (histogram) {
+  let best = 0
+  for (let channel = 0; channel < histogram.length; channel++) {
+    if (histogram[channel] > histogram[best]) {
+      best = channel
+    }
+  }
+  return best
+}
+
+function median (values) {
+  const sorted = [ ...values ].sort((first, second) => first - second)
+  return sorted[Math.floor(sorted.length / 2)]
+}
+
+function hexOfChannel (channel) {
+  const hex = Math.max(0, Math.min(255, channel)).toString(16).padStart(2, '0')
+  return `#${hex}${hex}${hex}`
+}
+
+export default measureStyles
+
+</script>
+<script type="text/plain" id="src-LINES" data-path="src/omr/analysis/removeStaffLines.js" data-start="1">
+'use strict'
+
+/**
+ * The staff lines, subtracted.
+ *
+ * The line positions were measured first and are kept — this removes only
+ * their pixels, so symbols separate instead of fusing with the lines. Every
+ * decision reads the input, never the work in progress: clearing left to
+ * right would shrink each line's run until the rest of it stops looking like
+ * a line.
+ *
+ * A pixel goes when its vertical run is thin (a head or a stem passing
+ * through is thick and stays) and its horizontal run says line rather than
+ * speck. Ink that lies exactly on a line row and is no thicker than the line
+ * goes with it — a beam that thin on a line row is undetectable here and
+ * shows up in the report; beams are usually thicker and their extra rows
+ * survive outside the line band.
+ */
+
+const LINE_HALF_WIDTH_IN_PIXELS = 1.5
+const LINE_LENGTH_IN_STAFF_SPACES = 8
+const THIN_RUN_IN_PIXELS = 6
+
+export function removeStaffLines ({ width, height, grayscale }, staves) {
+  const cleaned = new Float32Array(grayscale)
+  for (const stave of staves) {
+    const lineLength = LINE_LENGTH_IN_STAFF_SPACES * stave.staffSpaceHeightPx
+    for (const line of stave.linesY) {
+      const from = Math.round(line - LINE_HALF_WIDTH_IN_PIXELS)
+      const to = Math.round(line + LINE_HALF_WIDTH_IN_PIXELS)
+      for (let y = from; y <= to; y++) {
+        for (let x = stave.xStart; x <= stave.xEnd; x++) {
+          if (grayscale[y * width + x] > 0.5 && isLinePixel(grayscale, width, height, x, y, lineLength)) {
+            cleaned[y * width + x] = 0
+          }
+        }
+      }
+    }
+  }
+  return { width, height, grayscale: cleaned }
+}
+
+function isLinePixel (grayscale, width, height, x, y, lineLength) {
+  const vertical = verticalRunAround(grayscale, width, height, x, y)
+  if (vertical > THIN_RUN_IN_PIXELS) {
+    return false
+  }
+  const horizontal = horizontalRunLength(grayscale, width, y, x)
+  return horizontal >= lineLength || horizontal <= 3
+}
+
+function verticalRunAround (grayscale, width, height, x, y) {
+  let before = 0
+  while (y - before - 1 >= 0 && grayscale[(y - before - 1) * width + x] > 0.5) {
+    before++
+  }
+  let after = 0
+  while (y + after + 1 < height && grayscale[(y + after + 1) * width + x] > 0.5) {
+    after++
+  }
+  return before + after + 1
+}
+
+function horizontalRunLength (grayscale, width, y, x) {
+  let left = x
+  let right = x
+  while (left - 1 >= 0 && grayscale[y * width + left - 1] > 0.5) {
+    left--
+  }
+  while (right + 1 < width && grayscale[y * width + right + 1] > 0.5) {
+    right++
+  }
+  return right - left + 1
+}
+
+export default removeStaffLines
+
+</script>
+<script type="text/plain" id="src-BARLINES" data-path="src/omr/analysis/findBarLines.js" data-start="1">
+'use strict'
+
+/**
+ * Barlines: ink that crosses a whole stave.
+ *
+ * A barline runs from the top line to the bottom line and a little beyond —
+ * longer than any stem, so length alone separates them. Barlines of the same
+ * system line up, so positions are clustered and the cluster is what ends the
+ * measure on every stave at once.
+ */
+
+const COVERS_STAVE_FRACTION = 0.95
+const CLUSTER_TOLERANCE_IN_STAFF_SPACES = 0.3
+
+export function findBarLines ({ width, height, grayscale }, staves) {
+  const positions = []
+  for (const stave of staves) {
+    const staffSpace = stave.staffSpaceHeightPx
+    const staveHeight = stave.bottomY - stave.topY
+    const thinEnough = Math.max(3, 0.3 * staffSpace)
+    for (let x = stave.xStart; x <= stave.xEnd; x++) {
+      const { y1, y2 } = inkExtent({ width, height, grayscale }, x)
+      const covers = y2 - y1 + 1 >= COVERS_STAVE_FRACTION * staveHeight &&
+        y1 <= stave.topY + 0.3 * staffSpace &&
+        y2 >= stave.bottomY - 0.3 * staffSpace
+      // thin everywhere along the way: a note whose stem and head stack up
+      // into one tall run is wide where the head is
+      const thin = covers && samplesAcross({ width, height, grayscale }, y1, y2, x)
+        .every((extent) => extent <= thinEnough)
+      if (thin) {
+        positions.push(x)
+      }
+    }
+  }
+  return cluster(positions, meanStaffSpace(staves) * CLUSTER_TOLERANCE_IN_STAFF_SPACES)
+}
+
+function samplesAcross (bitmap, y1, y2, x) {
+  const samples = []
+  for (let step = 0; step <= 6; step++) {
+    const y = Math.round(y1 + ((y2 - y1) * step) / 6)
+    samples.push(horizontalExtent(bitmap, y, x))
+  }
+  return samples
+}
+
+function horizontalExtent ({ width, height, grayscale }, y, x) {
+  if (y < 0 || y >= height) {
+    return 0
+  }
+  let left = x
+  let right = x
+  while (left - 1 >= 0 && grayscale[y * width + left - 1] > 0.5) {
+    left--
+  }
+  while (right + 1 < width && grayscale[y * width + right + 1] > 0.5) {
+    right++
+  }
+  return right - left + 1
+}
+
+function inkExtent ({ width, height, grayscale }, x) {
+  let y1 = -1
+  let y2 = -1
+  for (let y = 0; y < height; y++) {
+    if (grayscale[y * width + x] > 0.5) {
+      if (y1 === -1) {
+        y1 = y
+      }
+      y2 = y
+    }
+  }
+  return { y1, y2 }
+}
+
+function cluster (positions, tolerance) {
+  const sorted = [ ...new Set(positions) ].sort((first, second) => first - second)
+  const clustered = []
+  for (const position of sorted) {
+    const current = clustered[clustered.length - 1]
+    if (current !== undefined && position - current[current.length - 1] <= tolerance) {
+      current.push(position)
+    } else {
+      clustered.push([ position ])
+    }
+  }
+  return clustered.map((group) => Math.round(group.reduce((sum, value) => sum + value, 0) / group.length))
+}
+
+function meanStaffSpace (staves) {
+  return staves.reduce((sum, stave) => sum + stave.staffSpaceHeightPx, 0) / staves.length
+}
+
+export default findBarLines
+
+</script>
+<script type="text/plain" id="src-STEMS" data-path="src/omr/analysis/findStems.js" data-start="1">
+'use strict'
+
+/**
+ * Stems: tall, thin runs of ink.
+ *
+ * A stem is a vertical run about two staff spaces long inside a stave — long
+ * enough to be more than a stray mark, short enough to be less than a barline,
+ * and thin enough to be less than a clef. What sits at the stem's outer end
+ * (beams, flags) is measured later, once the head says which end is outer.
+ */
+
+const MIN_STEM_LENGTH_IN_STAFF_SPACES = 1.8
+const MAX_STEM_LENGTH_IN_STAFF_SPACES = 4.4
+const BEAM_WIDTH_IN_STAFF_SPACES = 1.5
+const END_REGION_IN_STAFF_SPACES = 0.6
+
+export function findStems ({ width, height, grayscale }, staves) {
+  const stems = []
+  for (let staveIndex = 0; staveIndex < staves.length; staveIndex++) {
+    const stave = staves[staveIndex]
+    const staffSpace = stave.staffSpaceHeightPx
+    for (let x = stave.xStart; x <= stave.xEnd; x++) {
+      for (const run of verticalRuns({ width, height, grayscale }, x)) {
+        const length = run.y2 - run.y1 + 1
+        const tooShort = length < MIN_STEM_LENGTH_IN_STAFF_SPACES * staffSpace
+        const isBarline = length > MAX_STEM_LENGTH_IN_STAFF_SPACES * staffSpace
+        if (tooShort || isBarline) {
+          continue
+        }
+        stems.push({ x, y1: run.y1, y2: run.y2, staveIndex, columns: 1 })
+      }
+    }
+  }
+  return mergeAdjacentColumns(stems).filter((stem) =>
+    stem.columns <= Math.max(3, 0.3 * staves[stem.staveIndex].staffSpaceHeightPx))
+}
+
+// Wide rows at the outer end are beams; smaller ink beside the tip is flags.
+export function measureStemEnds (stem, bitmap, staffSpace, outerEnd) {
+  const beamRows = []
+  let flagRows = 0
+  const from = Math.round(outerEnd - END_REGION_IN_STAFF_SPACES * staffSpace)
+  const to = Math.round(outerEnd + END_REGION_IN_STAFF_SPACES * staffSpace)
+  for (let y = from; y <= to; y++) {
+    const extent = horizontalExtent(bitmap, y, stem.x)
+    if (extent >= BEAM_WIDTH_IN_STAFF_SPACES * staffSpace) {
+      beamRows.push(y)
+    } else if (extent >= 0.25 * staffSpace) {
+      flagRows++
+    }
+  }
+  let beamCount = 0
+  for (let index = 0; index < beamRows.length; index++) {
+    if (index === 0 || beamRows[index] - beamRows[index - 1] > 1) {
+      beamCount++
+    }
+  }
+  stem.beamRows = beamRows
+  stem.beamCount = beamCount
+  stem.flagCount = beamCount ? 0 : Math.min(Math.ceil(flagRows / 2), 3)
+}
+
+function verticalRuns ({ width, height, grayscale }, x) {
+  const runs = []
+  let start = null
+  for (let y = 0; y < height; y++) {
+    const ink = grayscale[y * width + x] > 0.5
+    if (ink && start === null) {
+      start = y
+    }
+    if (!ink && start !== null) {
+      runs.push({ y1: start, y2: y - 1 })
+      start = null
+    }
+  }
+  if (start !== null) {
+    runs.push({ y1: start, y2: height - 1 })
+  }
+  return runs
+}
+
+function horizontalExtent ({ width, height, grayscale }, y, centerX) {
+  if (y < 0 || y >= height) {
+    return 0
+  }
+  let left = Math.round(centerX)
+  let right = Math.round(centerX)
+  while (left - 1 >= 0 && grayscale[y * width + left - 1] > 0.5) {
+    left--
+  }
+  while (right + 1 < width && grayscale[y * width + right + 1] > 0.5) {
+    right++
+  }
+  return right - left + 1
+}
+
+// A stem two pixels wide is one stem, found once per column it covers.
+function mergeAdjacentColumns (stems) {
+  const merged = []
+  for (const stem of stems) {
+    const neighbour = merged.find((other) =>
+      Math.abs(other.x - stem.x) <= 1 &&
+      Math.abs(other.y1 - stem.y1) <= 2 &&
+      Math.abs(other.y2 - stem.y2) <= 2
+    )
+    if (neighbour) {
+      neighbour.x = (neighbour.x + stem.x) / 2
+      neighbour.columns++
+    } else {
+      merged.push({ ...stem })
+    }
+  }
+  return merged.sort((first, second) => first.x - second.x)
+}
+
+export default findStems
+
+</script>
+<script type="text/plain" id="src-COMPONENTS" data-path="src/omr/analysis/findSymbolComponents.js" data-start="1">
+'use strict'
+
+/**
+ * Ink that belongs together.
+ *
+ * A component is a connected blob of ink — one notehead with its stem, one
+ * accidental, one digit. Flood fill over ink above the threshold; the bounding
+ * box of each blob is what the classifier crops and what the rules measure.
+ */
+
+const INK_THRESHOLD = 0.5
+
+export function findSymbolComponents ({ width, height, grayscale }) {
+  const visited = new Uint8Array(width * height)
+  const components = []
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const index = y * width + x
+      if (visited[index] || grayscale[index] <= INK_THRESHOLD) {
+        continue
+      }
+      components.push(floodFill({ width, height, grayscale }, visited, x, y))
+    }
+  }
+  return components.sort((first, second) => first.box.x - second.box.x || first.box.y - second.box.y)
+}
+
+function floodFill ({ width, height, grayscale }, visited, startX, startY) {
+  const stack = [ [ startX, startY ] ]
+  let minX = startX
+  let maxX = startX
+  let minY = startY
+  let maxY = startY
+  let ink = 0
+  while (stack.length) {
+    const [ x, y ] = stack.pop()
+    const index = y * width + x
+    if (visited[index] || grayscale[index] <= INK_THRESHOLD) {
+      continue
+    }
+    visited[index] = 1
+    ink++
+    minX = Math.min(minX, x)
+    maxX = Math.max(maxX, x)
+    minY = Math.min(minY, y)
+    maxY = Math.max(maxY, y)
+    if (x > 0) stack.push([ x - 1, y ])
+    if (x < width - 1) stack.push([ x + 1, y ])
+    if (y > 0) stack.push([ x, y - 1 ])
+    if (y < height - 1) stack.push([ x, y + 1 ])
+  }
+  return { box: { x: minX, y: minY, w: maxX - minX + 1, h: maxY - minY + 1 }, ink }
+}
+
+export default findSymbolComponents
+
+</script>
+<script type="text/plain" id="src-SPLIT" data-path="src/omr/analysis/splitTouchingComponents.js" data-start="1">
+'use strict'
+
+/**
+ * Two symbols that touch, pulled apart.
+ *
+ * A head against a stem, two heads sharing an edge — flood fill sees one blob.
+ * The blob's column profile is the map: every symbol leaves one peak in it,
+ * and the low point between two peaks is where they meet. Split there, one
+ * pass — no re-profiling of the pieces, so a piece's edges can never pose as
+ * valleys. Wide, flat blobs (beams, ties) have no qualifying dip and stay
+ * whole.
+ */
+
+const VALLEY_FRACTION_OF_PEAK = 0.85
+const WIDE_ENOUGH_TO_SPLIT = 1.15
+
+export function splitTouchingComponents ({ width, height, grayscale }, components) {
+  const split = []
+  for (const component of components) {
+    split.push(...splitComponent({ width, height, grayscale }, component))
+  }
+  return split
+}
+
+function splitComponent (bitmap, component) {
+  const { box } = component
+  if (box.w <= box.h * WIDE_ENOUGH_TO_SPLIT) {
+    return [ component ]
+  }
+  const profile = smooth(columnProfile(bitmap, box))
+  const peaks = findPeaks(profile)
+  const splitAfter = []
+  for (let pair = 1; pair < peaks.length; pair++) {
+    const between = argmin(profile, peaks[pair - 1], peaks[pair])
+    const lowerPeak = Math.min(profile[peaks[pair - 1]], profile[peaks[pair]])
+    if (between > 0 && between < profile.length - 1 && profile[between] < VALLEY_FRACTION_OF_PEAK * lowerPeak) {
+      splitAfter.push(between)
+    }
+  }
+  if (!splitAfter.length) {
+    return [ component ]
+  }
+  const pieces = []
+  let start = 0
+  for (const boundary of [ ...splitAfter, profile.length - 1 ]) {
+    pieces.push({
+      box: { x: box.x + start, y: box.y, w: boundary - start + 1, h: box.h },
+      ink: component.ink
+    })
+    start = boundary + 1
+  }
+  return pieces.filter((piece) => piece.box.w > 0)
+}
+
+function columnProfile ({ width, grayscale }, box) {
+  const profile = new Float64Array(box.w)
+  for (let column = 0; column < box.w; column++) {
+    let ink = 0
+    for (let y = box.y; y < box.y + box.h; y++) {
+      ink += grayscale[y * width + box.x + column]
+    }
+    profile[column] = ink
+  }
+  return profile
+}
+
+function smooth (profile) {
+  const smoothed = new Float64Array(profile.length)
+  for (let column = 0; column < profile.length; column++) {
+    const before = profile[Math.max(0, column - 1)]
+    const after = profile[Math.min(profile.length - 1, column + 1)]
+    smoothed[column] = 0.25 * before + 0.5 * profile[column] + 0.25 * after
+  }
+  return smoothed
+}
+
+// One peak per symbol: a local maximum, with flat tops taken once.
+function findPeaks (profile) {
+  const peaks = []
+  for (let column = 1; column < profile.length - 1; column++) {
+    const isPeak = profile[column] > profile[column - 1] && profile[column] >= profile[column + 1]
+    if (isPeak) {
+      peaks.push(column)
+    }
+  }
+  return peaks
+}
+
+function argmin (profile, from, to) {
+  let best = from
+  for (let column = from + 1; column <= to; column++) {
+    if (profile[column] < profile[best]) {
+      best = column
+    }
+  }
+  return best
+}
+
+export default splitTouchingComponents
+
+</script>
+<script type="text/plain" id="src-EXTRACT" data-path="src/omr/analysis/extractSymbols.js" data-start="1">
+'use strict'
+
+import removeStaffLines from './removeStaffLines.js'
+import findBarLines from './findBarLines.js'
+import findStems, { measureStemEnds } from './findStems.js'
+import findSymbolComponents from './findSymbolComponents.js'
+import splitTouchingComponents from './splitTouchingComponents.js'
+import { roleOf } from './symbolClasses.js'
+
+/**
+ * What the ink is, where it is.
+ *
+ * Lines first — barlines and stems are geometry — then whatever ink is left
+ * is blobs, and each blob is classified. Every symbol carries its stave and,
+ * for blobs, its staff position in half staff-spaces from the top line: the
+ * number the pitch rule reads. The classifier is passed in, so the rules stay
+ * testable against exact classes and the default stays the trained model.
+ */
+
+export function extractSymbols (bitmap, staves, { classify }) {
+  const withoutLines = removeStaffLines(bitmap, staves)
+  const barLines = findBarLines(withoutLines, staves)
+  const stems = findStems(withoutLines, staves)
+  const withoutLinesAndStems = clearVerticalRuns(withoutLines, [ ...stems, ...barLines.map((x) => ({ x, y1: 0, y2: bitmap.height - 1 })) ])
+  const components = splitTouchingComponents(withoutLinesAndStems, findSymbolComponents(withoutLinesAndStems))
+  const blobs = components.map((component) => {
+    const pixels = cropPixels(withoutLinesAndStems, component.box)
+    const answer = classify(pixels, component.box)
+    return {
+      kind: 'blob',
+      className: answer.className,
+      confidence: answer.confidence,
+      candidates: answer.candidates,
+      box: component.box,
+      staveIndex: staveIndexOf(component.box, staves),
+      staffPosition: staffPositionOf(component.box, staves)
+    }
+  })
+  for (const stem of stems) {
+    stem.kind = 'stem'
+    stem.stemDirection = headSideOf(stem, blobs)
+    // the head hangs at one end, so beams and flags can only be at the other
+    const outerEnd = stem.stemDirection === 'up' ? stem.y1 : stem.y2
+    measureStemEnds(stem, withoutLines, staves[stem.staveIndex].staffSpaceHeightPx, outerEnd)
+  }
+  return {
+    blobs,
+    stems,
+    barLines
+  }
+}
+
+function clearVerticalRuns (bitmap, runs) {
+  const cleared = new Float32Array(bitmap.grayscale)
+  for (const run of runs) {
+    const center = Math.round(run.x)
+    for (let x = center - 1; x <= center + 1; x++) {
+      for (let y = Math.round(run.y1); y <= Math.round(run.y2); y++) {
+        if (x >= 0 && x < bitmap.width && y >= 0 && y < bitmap.height) {
+          cleared[y * bitmap.width + x] = 0
+        }
+      }
+    }
+  }
+  return { width: bitmap.width, height: bitmap.height, grayscale: cleared }
+}
+
+function cropPixels (bitmap, box) {
+  const pixels = new Float64Array(box.w * box.h)
+  for (let y = 0; y < box.h; y++) {
+    for (let x = 0; x < box.w; x++) {
+      pixels[y * box.w + x] = bitmap.grayscale[(box.y + y) * bitmap.width + box.x + x]
+    }
+  }
+  return pixels
+}
+
+function staveIndexOf (box, staves) {
+  const centerY = box.y + box.h / 2
+  let best = 0
+  let bestDistance = Infinity
+  staves.forEach((stave, index) => {
+    const margin = 1.5 * stave.staffSpaceHeightPx
+    const distance = centerY < stave.topY
+      ? stave.topY - centerY
+      : centerY > stave.bottomY
+        ? centerY - stave.bottomY
+        : 0
+    if (distance <= margin && distance < bestDistance) {
+      bestDistance = distance
+      best = index
+    }
+  })
+  return best
+}
+
+// Half staff-spaces down from the top line: 0 is the top line, 2 is the first
+// space, 4 the second line. This is the pitch rule's input.
+function staffPositionOf (box, staves) {
+  const stave = staves[staveIndexOf(box, staves)]
+  const centerY = box.y + box.h / 2
+  return Math.round((centerY - stave.linesY[0]) / (stave.staffSpaceHeightPx / 2))
+}
+
+// A stem points away from its head: up when the head hangs below it.
+function headSideOf (stem, blobs) {
+  const nearTop = blobs.some((blob) => touchesStemEnd(blob, stem.x, stem.y1))
+  const nearBottom = blobs.some((blob) => touchesStemEnd(blob, stem.x, stem.y2))
+  return nearTop && !nearBottom ? 'down' : 'up'
+}
+
+// The stem's end sits at the head's edge, so a head within its own height of
+// the end is the head of that stem.
+function touchesStemEnd (blob, x, y) {
+  return roleOf(blob.className) === 'head' &&
+    x >= blob.box.x - 1 && x <= blob.box.x + blob.box.w + 1 &&
+    Math.abs(blob.box.y + blob.box.h / 2 - y) <= blob.box.h
+}
+
+export default extractSymbols
+
+</script>
+<script type="text/plain" id="src-CLASSIFY" data-path="src/omr/analysis/classifyComponent.js" data-start="1">
+'use strict'
+
+import { forwardModel } from '../model/forwardModel.js'
+
+/**
+ * What one blob of ink is — or `unknown`.
+ *
+ * The model gives probabilities; the answer is the best class only when it is
+ * sure enough (max p ≥ τ). Below that the honest answer is `unknown`, and the
+ * candidates go to the report instead of the page.
+ */
+
+const DEFAULT_THRESHOLD = 0.8
+
+export function classifyComponent (model, pixels, classIds, threshold = DEFAULT_THRESHOLD) {
+  const { probabilities } = forwardModel(model, pixels)
+  const candidates = classIds
+    .map((className, classIndex) => ({
+      className,
+      probability: Math.round(probabilities[classIndex] * 1e4) / 1e4
+    }))
+    .sort((first, second) => second.probability - first.probability)
+  const best = candidates[0]
+  return {
+    className: best.probability >= threshold ? best.className : 'unknown',
+    confidence: best.probability,
+    isUnknown: best.probability < threshold,
+    candidates: candidates.slice(0, 3)
+  }
+}
+
+export default classifyComponent
+
+</script>
+<script type="text/plain" id="src-MODEL" data-path="src/omr/model/forwardModel.js" data-start="1">
+'use strict'
+
+import forwardConvolution from './forwardConvolution.js'
+import { applyRelu, applyMaxPool, forwardDense, applySoftmax } from './forwardDense.js'
+
+/**
+ * The whole forward pass over one crop: probabilities, and everything the
+ * backward pass will need.
+ *
+ * crop → conv → relu → pool → conv → relu → pool → flatten → dense → relu →
+ * dense → softmax. This is the same code training runs and the classifier
+ * runs — the deployed model cannot differ from the trained one.
+ */
+
+export function forwardModel (model, pixels) {
+  const { gridSize, filterSize, filterCounts, denseSize, classCount } = model.shape
+  const [ firstFilters, secondFilters ] = filterCounts
+  const conv1 = forwardConvolution({
+    input: pixels,
+    width: gridSize,
+    height: gridSize,
+    channels: 1,
+    weights: model.conv1.weights,
+    biases: model.conv1.biases,
+    filterSize,
+    filterCount: firstFilters
+  })
+  const relu1 = applyRelu(conv1.values)
+  const pool1 = applyMaxPool({ values: relu1, width: gridSize, height: gridSize, channels: firstFilters })
+  const conv2 = forwardConvolution({
+    input: pool1.values,
+    width: pool1.width,
+    height: pool1.height,
+    channels: firstFilters,
+    weights: model.conv2.weights,
+    biases: model.conv2.biases,
+    filterSize,
+    filterCount: secondFilters
+  })
+  const relu2 = applyRelu(conv2.values)
+  const pool2 = applyMaxPool({ values: relu2, width: conv2.width, height: conv2.height, channels: secondFilters })
+  const flattened = new Float64Array(pool2.values)
+  const dense1 = forwardDense({ input: flattened, weights: model.dense1.weights, biases: model.dense1.biases, outputSize: denseSize })
+  const relu3 = applyRelu(dense1)
+  const scores = forwardDense({ input: relu3, weights: model.dense2.weights, biases: model.dense2.biases, outputSize: classCount })
+  const probabilities = applySoftmax(scores)
+  return {
+    probabilities,
+    cache: { pixels, conv1, relu1, pool1, conv2, relu2, pool2, flattened, dense1, relu3 }
+  }
+}
+
+export default forwardModel
+
+</script>
+<script type="text/plain" id="src-MUSIC" data-path="src/omr/translation/buildMusicModel.js" data-start="1">
+'use strict'
+
+import groupChordsByHorizontalProximity from './groupChordsByHorizontalProximity.js'
+import assignPitchByStaffPosition from './assignPitchByStaffPosition.js'
+import inferDurationFromNoteShapes from './inferDurationFromNoteShapes.js'
+import buildMeasuresFromBarLines from './buildMeasuresFromBarLines.js'
+import splitVoicesByStemDirection from './splitVoicesByStemDirection.js'
+import fillRestsInMeasures from './fillRestsInMeasures.js'
+import inferKeyAndTimeSignature from './inferKeyAndTimeSignature.js'
+import { roleOf } from '../analysis/symbolClasses.js'
+
+/**
+ * Symbols become music: measures, staves, voices, units.
+ *
+ * The rules each do one thing and this walks them in order — heads group into
+ * chords, stems give direction and duration, dots and accidentals attach to
+ * the head they hug, barlines slice measures, stems up and down split voices,
+ * and silence fills what the measure still lacks. Nothing is guessed here;
+ * every field traces back to a symbol.
+ */
+
+const REST_DURATIONS = {
+  'rest-whole': 1,
+  'rest-half': 0.5,
+  'rest-quarter': 0.25,
+  'rest-eighth': 0.125,
+  'rest-sixteenth': 0.0625
+}
+
+const CLEF_NAMES = {
+  'clef-treble': 'treble',
+  'clef-bass': 'bass',
+  'clef-alto': 'alto',
+  'clef-tenor': 'tenor'
+}
+
+const KEY_TYPES = {
+  sharp: 'sharpKey',
+  flat: 'flatKey',
+  natural: 'naturalKey',
+  'double-sharp': 'doubleSharpKey',
+  'double-flat': 'doubleFlatKey'
+}
+
+export function buildMusicModel ({ blobs, stems, barLines }, staves) {
+  const staveMusic = staves.map((stave, staveIndex) =>
+    buildStaveMusic(blobs, stems, stave, staveIndex)
+  )
+  const measureDuration = timeInWholeNotes(staveMusic[0].timeSignatureParams)
+  const measureCount = Math.max(...staveMusic.map((music) =>
+    buildMeasuresFromBarLines(music.units, barLines).length))
+  const measures = []
+  for (let measureIndex = 0; measureIndex < measureCount; measureIndex++) {
+    const stavesOfMeasure = staveMusic.map((music) => {
+      const measuresOfStave = buildMeasuresFromBarLines(music.units, barLines)
+      const units = measuresOfStave[measureIndex] || []
+      const voices = fillRestsInMeasures(splitVoicesByStemDirection(units), measureDuration)
+      markBeamedWithNext(voices)
+      return { staveIndex: music.staveIndex, voices }
+    })
+    measures.push({ measureIndex, staves: stavesOfMeasure })
+  }
+  return {
+    clefs: staveMusic.map((music) => music.clef),
+    keySignatureName: staveMusic[0].keySignatureName,
+    timeSignatureParams: staveMusic[0].timeSignatureParams,
+    measures
+  }
+}
+
+function buildStaveMusic (blobs, stems, stave, staveIndex) {
+  const staffSpace = stave.staffSpaceHeightPx
+  const staveBlobs = blobs.filter((blob) => blob.staveIndex === staveIndex)
+  const heads = staveBlobs.filter((blob) => roleOf(blob.className) === 'head')
+  const rests = staveBlobs.filter((blob) => roleOf(blob.className) === 'rest')
+  const clefBlob = staveBlobs.find((blob) => roleOf(blob.className) === 'clef')
+  const clef = clefBlob ? CLEF_NAMES[clefBlob.className] || 'treble' : 'treble'
+  const { keySignatureName, timeSignatureParams } = inferKeyAndTimeSignature(staveBlobs, heads, staffSpace)
+  const units = groupChordsByHorizontalProximity(heads, staffSpace).map((chord) =>
+    buildNoteUnit(chord, staveBlobs, stems, clef, staffSpace)
+  )
+  for (const rest of rests) {
+    units.push({
+      x: rest.box.x,
+      notes: [],
+      isRest: true,
+      restPosition: rest.staffPosition,
+      unitDuration: REST_DURATIONS[rest.className] || 0.25,
+      numberOfDots: 0,
+      stemDirection: 'up',
+      beamedWithNext: false,
+      sourceBlobs: [ rest ]
+    })
+  }
+  units.sort((first, second) => first.x - second.x)
+  return { staveIndex, clef, keySignatureName, timeSignatureParams, units }
+}
+
+function buildNoteUnit (chord, staveBlobs, stems, clef, staffSpace) {
+  const stem = nearestStem(chord, stems, staffSpace)
+  const keyBlobs = chord.heads.flatMap((head) => accidentalsOf(head, staveBlobs, staffSpace))
+  const dotBlobs = dotsOf(chord, staveBlobs, staffSpace)
+  const notes = chord.heads.map((head) => ({
+    ...assignPitchByStaffPosition(head.staffPosition, clef),
+    staffPosition: head.staffPosition,
+    keys: accidentalsOf(head, staveBlobs, staffSpace)
+      .map((blob) => KEY_TYPES[blob.className])
+      .filter(Boolean),
+    ...(head.className === 'ghost-head' ? { isGhost: true } : {})
+  }))
+  const isOpenHead = chord.heads.every((head) => head.className === 'notehead-open')
+  return {
+    x: chord.x,
+    notes,
+    isRest: false,
+    unitDuration: inferDurationFromNoteShapes({
+      isOpenHead,
+      hasStem: Boolean(stem),
+      beamCount: stem ? stem.beamCount : 0,
+      flagCount: stem ? stem.flagCount : 0
+    }),
+    numberOfDots: dotBlobs.length,
+    stemDirection: stem ? stem.stemDirection : 'up',
+    beamedWithNext: false,
+    sourceBlobs: [ ...chord.heads, ...keyBlobs, ...dotBlobs ],
+    stem
+  }
+}
+
+function nearestStem (chord, stems, staffSpace) {
+  const near = stems
+    .filter((stem) => Math.abs(stem.x - chord.x) <= 0.8 * staffSpace)
+    .sort((first, second) => Math.abs(first.x - chord.x) - Math.abs(second.x - chord.x))
+  return near[0] || null
+}
+
+// An accidental hugs the head it alters: close on the left, at its height.
+function accidentalsOf (head, staveBlobs, staffSpace) {
+  return staveBlobs.filter((blob) =>
+    roleOf(blob.className) === 'accidental' &&
+    KEY_TYPES[blob.className] &&
+    blob.box.x + blob.box.w / 2 < head.box.x &&
+    head.box.x - (blob.box.x + blob.box.w) <= 0.9 * staffSpace &&
+    Math.abs(blob.staffPosition - head.staffPosition) <= 1
+  )
+}
+
+function dotsOf (chord, staveBlobs, staffSpace) {
+  return staveBlobs.filter((blob) =>
+    roleOf(blob.className) === 'dot' &&
+    blob.box.x > chord.x &&
+    blob.box.x - chord.x <= 1.1 * staffSpace &&
+    chord.heads.some((head) => Math.abs(blob.staffPosition - head.staffPosition) <= 2)
+  )
+}
+
+// A beam reaches from one stem's end to the next stem's end: the earlier unit
+// of the pair is the beamed one.
+function markBeamedWithNext (voices) {
+  for (const voice of voices) {
+    const withStems = voice.filter((unit) => unit.stem)
+    for (let index = 1; index < withStems.length; index++) {
+      const previous = withStems[index - 1]
+      const current = withStems[index]
+      const sharesBeam = previous.stem.beamCount > 0 && current.stem.beamCount > 0 &&
+        previous.stem.beamRows.some((row) => current.stem.beamRows.some((other) => Math.abs(other - row) <= 3))
+      if (sharesBeam) {
+        previous.beamedWithNext = true
+      }
+    }
+  }
+}
+
+function timeInWholeNotes (timeSignatureParams) {
+  if (!timeSignatureParams) {
+    return 1
+  }
+  return Number(timeSignatureParams.numerator) / Number(timeSignatureParams.denominator)
+}
+
+export default buildMusicModel
+
+</script>
+<script type="text/plain" id="src-PITCH" data-path="src/omr/translation/assignPitchByStaffPosition.js" data-start="1">
+'use strict'
+
+/**
+ * Staff position → pitch.
+ *
+ * The position is half staff-spaces down from the top line (0 is the top
+ * line, 2 the first space). Walking it downward walks the letters d, c, b…,
+ * and the octave ticks down whenever the walk passes from c to b. The clef
+ * says which pitch the top line starts at — the same table the drawer reads
+ * in reverse.
+ */
+
+const LETTERS = [ 'c', 'd', 'e', 'f', 'g', 'a', 'b' ]
+
+const TOP_LINE_PITCH = {
+  treble: { letter: 'f', octave: 5 },
+  bass: { letter: 'a', octave: 3 },
+  alto: { letter: 'e', octave: 4 },
+  tenor: { letter: 'f', octave: 4 }
+}
+
+export function assignPitchByStaffPosition (staffPosition, clef = 'treble') {
+  const start = TOP_LINE_PITCH[clef] || TOP_LINE_PITCH.treble
+  let letterIndex = LETTERS.indexOf(start.letter)
+  let octave = start.octave
+  for (let step = 0; step < staffPosition; step++) {
+    letterIndex = (letterIndex + 6) % 7
+    if (letterIndex === 6) {
+      octave--
+    }
+  }
+  return { noteName: LETTERS[letterIndex], octaveNumber: String(octave) }
+}
+
+export default assignPitchByStaffPosition
+
+</script>
+<script type="text/plain" id="src-DURATION" data-path="src/omr/translation/inferDurationFromNoteShapes.js" data-start="1">
+'use strict'
+
+/**
+ * What a note looks like → how long it lasts.
+ *
+ * An open head is twice a filled one; every beam or flag halves again; a stem
+ * only exists when the note is shorter than a whole. Dots are counted apart,
+ * the way the schema keeps them.
+ */
+
+export function inferDurationFromNoteShapes ({ isOpenHead, hasStem, beamCount = 0, flagCount = 0 }) {
+  if (!hasStem) {
+    return 1
+  }
+  if (isOpenHead) {
+    return 0.5
+  }
+  return 1 / 2 ** (2 + beamCount + flagCount)
+}
+
+export default inferDurationFromNoteShapes
+
+</script>
+<script type="text/plain" id="src-CHORDS" data-path="src/omr/translation/groupChordsByHorizontalProximity.js" data-start="1">
+'use strict'
+
+/**
+ * Heads at the same x are one chord.
+ *
+ * A chord is one unit with several notes, and engraving puts its heads on one
+ * vertical — so heads within a third of a staff space of each other are one
+ * unit. Each unit keeps its x, which is what orders it in the measure.
+ */
+
+const MAX_HORIZONTAL_DISTANCE_IN_STAFF_SPACES = 0.3
+
+export function groupChordsByHorizontalProximity (headBlobs, staffSpaceHeightPx) {
+  const tolerance = MAX_HORIZONTAL_DISTANCE_IN_STAFF_SPACES * staffSpaceHeightPx
+  const sorted = [ ...headBlobs ].sort((first, second) => centerX(first) - centerX(second))
+  const units = []
+  for (const head of sorted) {
+    const current = units[units.length - 1]
+    if (current && Math.abs(centerX(head) - current.x) <= tolerance) {
+      current.heads.push(head)
+    } else {
+      units.push({ x: centerX(head), heads: [ head ] })
+    }
+  }
+  return units
+}
+
+function centerX (blob) {
+  return blob.box.x + blob.box.w / 2
+}
+
+export default groupChordsByHorizontalProximity
+
+</script>
+<script type="text/plain" id="src-MEASURES" data-path="src/omr/translation/buildMeasuresFromBarLines.js" data-start="1">
+'use strict'
+
+/**
+ * Barlines slice the timeline into measures.
+ *
+ * Units go to the measure their x falls in: left of the first barline is the
+ * first measure, right of the last one is the final measure. A page with no
+ * barlines at all is one measure — the score still has to make sense.
+ */
+
+export function buildMeasuresFromBarLines (units, barLines) {
+  const sortedUnits = [ ...units ].sort((first, second) => first.x - second.x)
+  const sortedBarLines = [ ...barLines ].sort((first, second) => first - second)
+  const measures = [ [] ]
+  let barLineIndex = 0
+  for (const unit of sortedUnits) {
+    while (barLineIndex < sortedBarLines.length && unit.x > sortedBarLines[barLineIndex]) {
+      measures.push([])
+      barLineIndex++
+    }
+    measures[measures.length - 1].push(unit)
+  }
+  return measures
+}
+
+export default buildMeasuresFromBarLines
+
+</script>
+<script type="text/plain" id="src-VOICES" data-path="src/omr/translation/splitVoicesByStemDirection.js" data-start="1">
+'use strict'
+
+/**
+ * Stems up and stems down are two voices.
+ *
+ * One stave can carry two lines of music, and the engraving says which is
+ * which by the way the stems point. When a measure has both, the stems-up
+ * units are one voice and the stems-down units the other; when all agree, the
+ * measure is one voice.
+ */
+
+export function splitVoicesByStemDirection (units) {
+  const stemsUp = units.filter((unit) => unit.stemDirection === 'up')
+  const stemsDown = units.filter((unit) => unit.stemDirection === 'down')
+  if (stemsUp.length && stemsDown.length) {
+    return [ stemsUp, stemsDown ]
+  }
+  return [ units ]
+}
+
+export default splitVoicesByStemDirection
+
+</script>
+<script type="text/plain" id="src-KEYTIME" data-path="src/omr/translation/inferKeyAndTimeSignature.js" data-start="1">
+'use strict'
+
+/**
+ * Key and time signatures, from the left edge of the first measure.
+ *
+ * A key signature is a row of sharps or flats right of the clef — counted,
+ * and the count names the key (three flats is e flat major). A time signature
+ * is two digits stacked: the meter. Both are read only where the engraving
+ * always puts them: left of the first note.
+ */
+
+const KEY_SIGNATURE_NAMES = [
+  'c major|a minor',
+  'g major|e minor',
+  'd major|b minor',
+  'a major|f sharp minor',
+  'e major|c sharp minor',
+  'b major|g sharp minor',
+  'f sharp major|d sharp minor',
+  'c sharp major|a sharp minor',
+  'f major|d minor',
+  'b flat major|g minor',
+  'e flat major|c minor',
+  'a flat major|f minor',
+  'd flat major|b flat minor',
+  'g flat major|e flat minor',
+  'c flat major|a flat minor'
+]
+
+export function inferKeyAndTimeSignature (blobs, headBlobs, staffSpaceHeightPx) {
+  const firstHeadX = headBlobs.length
+    ? Math.min(...headBlobs.map((blob) => blob.box.x))
+    : Infinity
+  const leftOfNotes = blobs.filter((blob) => blob.box.x < firstHeadX - 0.3 * staffSpaceHeightPx)
+  return {
+    keySignatureName: keySignatureOf(leftOfNotes, firstHeadX, staffSpaceHeightPx),
+    timeSignatureParams: timeSignatureOf(leftOfNotes, firstHeadX, staffSpaceHeightPx)
+  }
+}
+
+// Accidentals that are not hugging a head belong to the key.
+function keySignatureOf (leftOfNotes, firstHeadX, staffSpaceHeightPx) {
+  const keyAccidentals = leftOfNotes.filter((blob) =>
+    (blob.className === 'sharp' || blob.className === 'flat') &&
+    blob.box.x < firstHeadX - 0.7 * staffSpaceHeightPx
+  )
+  const sharps = keyAccidentals.filter((blob) => blob.className === 'sharp').length
+  const flats = keyAccidentals.filter((blob) => blob.className === 'flat').length
+  if (sharps && !flats) {
+    return KEY_SIGNATURE_NAMES[Math.min(sharps, 7)]
+  }
+  if (flats && !sharps) {
+    return KEY_SIGNATURE_NAMES[7 + Math.min(flats, 7)]
+  }
+  return null
+}
+
+function timeSignatureOf (leftOfNotes, firstHeadX, staffSpaceHeightPx) {
+  const digits = leftOfNotes.filter((blob) => blob.className.startsWith('digit-'))
+  const stacked = digits.filter((blob) => blob.box.x < firstHeadX - 0.3 * staffSpaceHeightPx)
+  if (stacked.length !== 2) {
+    return null
+  }
+  const [ top, bottom ] = stacked.sort((first, second) => first.box.y - second.box.y)
+  const aligned = Math.abs(top.box.x - bottom.box.x) <= 0.4 * staffSpaceHeightPx
+  if (!aligned) {
+    return null
+  }
+  return {
+    numerator: top.className.slice('digit-'.length),
+    denominator: bottom.className.slice('digit-'.length)
+  }
+}
+
+export default inferKeyAndTimeSignature
+
+</script>
+<script type="text/plain" id="src-STATE" data-path="src/omr/translation/carryStateAcrossPages.js" data-start="1">
+'use strict'
+
+/**
+ * What page 1 declared, page 2 repeats.
+ *
+ * Every page's text parses on its own, so a key signature or a meter that
+ * started on an earlier page has to be written again at the top of this one —
+ * unless this page shows its own (a key change mid-piece). Styles carry the
+ * same way: what was measured once and not contradicted stands.
+ */
+
+export function carryStateAcrossPages ({ musicModel, customStyles }, carried = {}) {
+  const keySignatureName = musicModel.keySignatureName || carried.keySignatureName || null
+  const timeSignatureParams = musicModel.timeSignatureParams || carried.timeSignatureParams || null
+  return {
+    musicModel: { ...musicModel, keySignatureName, timeSignatureParams },
+    customStyles: { ...carried.customStyles, ...prune(customStyles) },
+    carried: {
+      keySignatureName,
+      timeSignatureParams,
+      customStyles: { ...carried.customStyles, ...prune(customStyles) }
+    }
+  }
+}
+
+function prune (values) {
+  return Object.fromEntries(Object.entries(values || {}).filter(([ , value ]) => value !== null && value !== undefined))
+}
+
+export default carryStateAcrossPages
+
+</script>
+<script type="text/plain" id="src-SCHEMA" data-path="src/omr/translation/buildPageSchemaFromMusicModel.js" data-start="1">
+'use strict'
+
+/**
+ * The music model, written as the page schema the language produces.
+ *
+ * Same shapes the parser builds and the serializer prints: measures with
+ * staves, staves with voices, voices with units. Key and time signatures sit
+ * on the first measure — that is where the language puts them. This is the
+ * hand-off: from here on it is `serialize`'s job.
+ */
+
+export function buildPageSchemaFromMusicModel (musicModel) {
+  return {
+    measuresParams: musicModel.measures.map((measure, measureIndex) => ({
+      pageIndex: 0,
+      measureIndexOnPage: measureIndex,
+      pageLineNumber: 1,
+      closingBarLineName: 'barLine',
+      ...(measureIndex === 0 && musicModel.keySignatureName ? { keySignatureName: musicModel.keySignatureName } : {}),
+      ...(measureIndex === 0 && musicModel.timeSignatureParams ? { timeSignatureParams: musicModel.timeSignatureParams } : {}),
+      stavesParams: measure.staves.map((stave, staveIndex) => ({
+        clef: musicModel.clefs[staveIndex],
+        voicesParams: stave.voices.map((voice) => voice.map(schemaUnit))
+      }))
+    }))
+  }
+}
+
+function schemaUnit (unit) {
+  if (unit.isRest) {
+    return {
+      notes: [ { positionNumber: unit.restPosition, id: 0 } ],
+      isRest: true,
+      unitDuration: unit.unitDuration,
+      stemDirection: unit.stemDirection,
+      beamedWithNext: false
+    }
+  }
+  const keysParams = []
+  unit.notes.forEach((note) => {
+    note.keys.forEach((keyType) => {
+      keysParams.push({ noteName: note.noteName, keyType, id: keysParams.length })
+    })
+  })
+  return {
+    notes: unit.notes.map((note, id) => ({
+      noteName: note.noteName,
+      octaveNumber: note.octaveNumber,
+      ...(note.isGhost ? { isGhost: true } : {}),
+      id
+    })),
+    unitDuration: unit.unitDuration,
+    ...(unit.numberOfDots ? { numberOfDots: unit.numberOfDots } : {}),
+    stemDirection: unit.stemDirection,
+    ...(keysParams.length ? { keysParams } : {}),
+    beamedWithNext: unit.beamedWithNext
+  }
+}
+
+export default buildPageSchemaFromMusicModel
+
+</script>
+<script type="text/plain" id="src-GEN" data-path="src/omr/training/generateTrainingSet.js" data-start="1">
+'use strict'
+
+import { createSeededRandom } from './seededRandom.js'
+import { applyDegradations } from './applyDegradations.js'
+import { drawSymbolSample, drawableClassIds } from './drawSymbols.js'
+import { resampleToGrid } from './cropComponents.js'
+
+/**
+ * The training set, drawn from a seed.
+ *
+ * One seed gives one exact set: for each class, symbols are drawn with jitter,
+ * degraded like photos, and resampled to the model's grid. The label is the
+ * class the drawing came from — nothing is ever labeled by hand. The same seed
+ * on any machine gives the same bytes.
+ */
+
+export function generateTrainingSet ({ seed, samplesPerClass, gridSize, classIds = drawableClassIds, onClass = null }) {
+  const random = createSeededRandom(seed)
+  const drawSize = gridSize * 2
+  const samples = []
+  for (const classId of classIds) {
+    if (onClass) {
+      onClass(classId, classIds.indexOf(classId) + 1, classIds.length)
+    }
+    for (let sample = 0; sample < samplesPerClass; sample++) {
+      const drawn = drawSymbolSample(classId, drawSize, random)
+      const degraded = applyDegradations(drawn, random)
+      const pixels = resampleToGrid(
+        degraded,
+        { x1: 0, y1: 0, x2: degraded.width, y2: degraded.height },
+        gridSize
+      )
+      samples.push({ pixels, classId, classIndex: classIds.indexOf(classId) })
+    }
+  }
+  // shuffled before returning: samples come out grouped by class, and any
+  // train/validation slice of grouped data would leave whole classes unseen
+  for (let index = samples.length - 1; index > 0; index--) {
+    const swap = Math.floor(random() * (index + 1))
+    ;[ samples[index], samples[swap] ] = [ samples[swap], samples[index] ]
+  }
+  return { classIds, samples }
+}
+
+export default generateTrainingSet
+
+</script>
+<script type="text/plain" id="src-CROP" data-path="src/omr/training/cropComponents.js" data-start="1">
+'use strict'
+
+/**
+ * One symbol, as the grid the model reads.
+ *
+ * The crop is taken at a fixed musical size — three staff spaces, padded to a
+ * square so nothing distorts — and resampled to a fixed grid. Shrink by
+ * averaging, enlarge by blending; the other way round aliases. After this, the
+ * same symbol from any zoom or camera arrives as the same numbers.
+ */
+
+export function cropComponent ({ width, height, grayscale }, box, staffSpaceHeightPx, gridSize) {
+  const side = 3 * staffSpaceHeightPx
+  const centerX = box.x + box.w / 2
+  const centerY = box.y + box.h / 2
+  const from = {
+    x1: centerX - side / 2,
+    y1: centerY - side / 2,
+    x2: centerX + side / 2,
+    y2: centerY + side / 2
+  }
+  return resampleToGrid({ width, height, grayscale }, from, gridSize)
+}
+
+export function resampleToGrid ({ width, height, grayscale }, from, gridSize) {
+  const pixels = new Float64Array(gridSize * gridSize)
+  const stepX = (from.x2 - from.x1) / gridSize
+  const stepY = (from.y2 - from.y1) / gridSize
+  const shrinking = stepX > 1
+  for (let row = 0; row < gridSize; row++) {
+    for (let column = 0; column < gridSize; column++) {
+      pixels[row * gridSize + column] = shrinking
+        ? areaAverage(grayscale, width, height, from.x1 + column * stepX, from.y1 + row * stepY, stepX, stepY)
+        : bilinearSample(grayscale, width, height, from.x1 + (column + 0.5) * stepX, from.y1 + (row + 0.5) * stepY)
+    }
+  }
+  return pixels
+}
+
+function areaAverage (grayscale, width, height, x1, y1, stepX, stepY) {
+  let total = 0
+  let count = 0
+  for (let y = Math.floor(y1); y < Math.ceil(y1 + stepY); y++) {
+    for (let x = Math.floor(x1); x < Math.ceil(x1 + stepX); x++) {
+      if (x >= 0 && y >= 0 && x < width && y < height) {
+        total += grayscale[y * width + x]
+        count++
+      }
+    }
+  }
+  return count ? total / count : 0
+}
+
+function bilinearSample (grayscale, width, height, x, y) {
+  if (x < 0 || y < 0 || x > width - 1 || y > height - 1) {
+    return 0
+  }
+  const left = Math.floor(x)
+  const top = Math.floor(y)
+  const right = Math.min(left + 1, width - 1)
+  const bottom = Math.min(top + 1, height - 1)
+  const fractionX = x - left
+  const fractionY = y - top
+  return (1 - fractionX) * (1 - fractionY) * grayscale[top * width + left] +
+    fractionX * (1 - fractionY) * grayscale[top * width + right] +
+    (1 - fractionX) * fractionY * grayscale[bottom * width + left] +
+    fractionX * fractionY * grayscale[bottom * width + right]
+}
+
+export default cropComponent
+
+</script>
+<script type="text/plain" id="src-DRAW" data-path="src/omr/training/drawSymbols.js" data-start="1">
+'use strict'
+
+import { createBitmap, drawLine, drawEllipse, drawEllipseOutline, drawFilledRect } from './drawBitmap.js'
+
+/**
+ * Symbol shapes, drawn as the training set's stand-in glyphs.
+ *
+ * One shape per row of symbolClasses.js — the drawer covers the whole class
+ * table, so training can see every feature MSQ knows. Each shape draws itself
+ * with a little jitter: size, weight, position, so the model sees variation,
+ * not one template. When the renderer path lands (page schema → SVG →
+ * raster), these become real engravings and the labels keep coming from the
+ * drawing. Labels are never written by hand.
+ */
+
+// A curve is many short segments — enough for braces, clefs and turns.
+function polyline (bitmap, points, weight = 1) {
+  for (let index = 1; index < points.length; index++) {
+    drawLine(bitmap, points[index - 1][0], points[index - 1][1], points[index][0], points[index][1], weight)
+  }
+}
+
+function arc (bitmap, x, y, radiusX, radiusY, fromAngle, toAngle, weight = 1, steps = 12) {
+  const points = []
+  for (let step = 0; step <= steps; step++) {
+    const angle = fromAngle + (toAngle - fromAngle) * step / steps
+    points.push([ x + radiusX * Math.cos(angle), y + radiusY * Math.sin(angle) ])
+  }
+  polyline(bitmap, points, weight)
+}
+
+export const drawableSymbols = {
+  'notehead-filled' (bitmap, x, y, size, random) {
+    drawEllipse(bitmap, x, y, size * (0.55 + 0.1 * random()), size * (0.38 + 0.08 * random()))
+  },
+  'notehead-open' (bitmap, x, y, size, random) {
+    drawEllipseOutline(bitmap, x, y, size * (0.52 + 0.1 * random()), size * (0.36 + 0.08 * random()), 1 + random())
+  },
+  'ghost-head' (bitmap, x, y, size, random) {
+    const spread = size * 0.5
+    const weight = 1 + random()
+    drawLine(bitmap, x - spread, y - spread * 0.7, x + spread, y + spread * 0.7, weight)
+    drawLine(bitmap, x - spread, y + spread * 0.7, x + spread, y - spread * 0.7, weight)
+  },
+  dot (bitmap, x, y, size, random) {
+    drawEllipse(bitmap, x, y, size * 0.18, size * (0.16 + 0.05 * random()))
+  },
+  sharp (bitmap, x, y, size, random) {
+    const weight = 1 + random()
+    drawLine(bitmap, x - size * 0.22, y - size * 0.55, x - size * 0.22, y + size * 0.55, weight)
+    drawLine(bitmap, x + size * 0.22, y - size * 0.55, x + size * 0.22, y + size * 0.55, weight)
+    drawLine(bitmap, x - size * 0.42, y - size * 0.12, x + size * 0.42, y - size * 0.2, weight + 1)
+    drawLine(bitmap, x - size * 0.42, y + size * 0.2, x + size * 0.42, y + size * 0.12, weight + 1)
+  },
+  flat (bitmap, x, y, size, random) {
+    const weight = 1 + random()
+    drawLine(bitmap, x - size * 0.25, y - size * 0.6, x - size * 0.25, y + size * 0.45, weight)
+    drawLine(bitmap, x - size * 0.25, y + size * 0.45, x + size * 0.1, y + size * 0.1, weight + 1)
+    drawLine(bitmap, x + size * 0.1, y + size * 0.1, x - size * 0.25, y - size * 0.05, weight + 1)
+  },
+  natural (bitmap, x, y, size, random) {
+    const weight = 1 + random()
+    drawLine(bitmap, x - size * 0.22, y - size * 0.55, x - size * 0.22, y + size * 0.25, weight)
+    drawLine(bitmap, x + size * 0.22, y - size * 0.25, x + size * 0.22, y + size * 0.55, weight)
+    drawLine(bitmap, x - size * 0.35, y - size * 0.18, x + size * 0.35, y - size * 0.28, weight)
+    drawLine(bitmap, x - size * 0.35, y + size * 0.28, x + size * 0.35, y + size * 0.18, weight)
+  },
+  'double-sharp' (bitmap, x, y, size, random) {
+    const weight = 1 + random()
+    drawFilledRect(bitmap, x - size * 0.18, y - size * 0.12, size * 0.36, size * 0.24)
+    drawLine(bitmap, x - size * 0.42, y - size * 0.28, x + size * 0.42, y + size * 0.28, weight)
+    drawLine(bitmap, x - size * 0.42, y + size * 0.28, x + size * 0.42, y - size * 0.28, weight)
+  },
+  'double-flat' (bitmap, x, y, size, random) {
+    drawableSymbols.flat(bitmap, x - size * 0.28, y + size * 0.05, size * 0.9, random)
+    drawableSymbols.flat(bitmap, x + size * 0.22, y + size * 0.05, size * 0.9, random)
+  },
+  'clef-treble' (bitmap, x, y, size, random) {
+    const weight = 1 + random()
+    arc(bitmap, x - size * 0.05, y + size * 0.18, size * 0.32, size * 0.4, 0, 2 * Math.PI, weight)
+    polyline(bitmap, [
+      [ x + size * 0.12, y + size * 0.62 ], [ x + size * 0.1, y - size * 0.1 ],
+      [ x + size * 0.06, y - size * 0.62 ], [ x - size * 0.18, y - size * 0.78 ],
+      [ x - size * 0.3, y - size * 0.58 ]
+    ], weight + 1)
+    drawEllipse(bitmap, x - size * 0.02, y + size * 0.2, size * 0.12, size * 0.12)
+  },
+  'clef-bass' (bitmap, x, y, size, random) {
+    const weight = 1 + random()
+    drawEllipse(bitmap, x - size * 0.18, y - size * 0.18, size * 0.17, size * 0.15)
+    arc(bitmap, x - size * 0.12, y - size * 0.12, size * 0.5, size * 0.55, -0.4, 1.35, weight + 1)
+    drawEllipse(bitmap, x + size * 0.28, y - size * 0.3, size * 0.08, size * 0.08)
+    drawEllipse(bitmap, x + size * 0.28, y + size * 0.02, size * 0.08, size * 0.08)
+  },
+  'clef-alto' (bitmap, x, y, size, random) {
+    const weight = 1 + random()
+    drawFilledRect(bitmap, x - size * 0.08, y - size * 0.62, size * 0.16, size * 1.24)
+    arc(bitmap, x + size * 0.02, y - size * 0.32, size * 0.3, size * 0.26, Math.PI * 0.6, Math.PI * 1.55, weight + 1)
+    arc(bitmap, x + size * 0.02, y + size * 0.32, size * 0.3, size * 0.26, Math.PI * 1.55, Math.PI * 2.5, weight + 1)
+    drawEllipse(bitmap, x - size * 0.14, y - size * 0.32, size * 0.08, size * 0.08)
+    drawEllipse(bitmap, x - size * 0.14, y + size * 0.32, size * 0.08, size * 0.08)
+  },
+  'rest-whole' (bitmap, x, y, size, random) {
+    drawFilledRect(bitmap, x - size * 0.3, y - size * 0.16, size * 0.6, size * (0.28 + 0.08 * random()))
+  },
+  'rest-half' (bitmap, x, y, size, random) {
+    drawFilledRect(bitmap, x - size * 0.3, y - size * 0.02, size * 0.6, size * (0.28 + 0.08 * random()))
+    drawFilledRect(bitmap, x - size * 0.3, y - size * 0.24, size * 0.22, size * 0.18)
+  },
+  'rest-quarter' (bitmap, x, y, size, random) {
+    const weight = 2 + random()
+    drawLine(bitmap, x - size * 0.15, y - size * 0.55, x + size * 0.2, y - size * 0.1, weight)
+    drawLine(bitmap, x + size * 0.2, y - size * 0.1, x - size * 0.1, y + size * 0.15, weight)
+    drawLine(bitmap, x - size * 0.1, y + size * 0.15, x + size * 0.18, y + size * 0.55, weight)
+  },
+  'rest-eighth' (bitmap, x, y, size, random) {
+    const weight = 2 + random()
+    drawLine(bitmap, x - size * 0.12, y - size * 0.55, x - size * 0.12, y + size * 0.2, weight)
+    drawEllipse(bitmap, x + size * 0.08, y - size * 0.32, size * 0.17, size * 0.24)
+  },
+  'digit-0' (bitmap, x, y, size) {
+    drawEllipseOutline(bitmap, x, y, size * 0.28, size * 0.5, 2)
+  },
+  'digit-1' (bitmap, x, y, size) {
+    polyline(bitmap, [ [ x - size * 0.18, y - size * 0.32 ], [ x, y - size * 0.5 ], [ x, y + size * 0.5 ] ], 2)
+  },
+  'digit-2' (bitmap, x, y, size) {
+    polyline(bitmap, [
+      [ x - size * 0.26, y - size * 0.3 ], [ x - size * 0.08, y - size * 0.52 ], [ x + size * 0.18, y - size * 0.48 ],
+      [ x + size * 0.26, y - size * 0.22 ], [ x - size * 0.24, y + size * 0.42 ], [ x - size * 0.28, y + size * 0.5 ],
+      [ x + size * 0.28, y + size * 0.5 ]
+    ], 2)
+  },
+  'digit-3' (bitmap, x, y, size) {
+    polyline(bitmap, [
+      [ x - size * 0.26, y - size * 0.42 ], [ x + size * 0.06, y - size * 0.52 ], [ x + size * 0.26, y - size * 0.32 ],
+      [ x - size * 0.02, y - size * 0.02 ], [ x + size * 0.26, y + size * 0.26 ], [ x + size * 0.02, y + size * 0.52 ],
+      [ x - size * 0.28, y + size * 0.42 ]
+    ], 2)
+  },
+  'digit-4' (bitmap, x, y, size) {
+    polyline(bitmap, [
+      [ x + size * 0.12, y - size * 0.52 ], [ x - size * 0.28, y + size * 0.16 ], [ x + size * 0.3, y + size * 0.16 ]
+    ], 2)
+    drawLine(bitmap, x + size * 0.12, y - size * 0.52, x + size * 0.12, y + size * 0.52, 2)
+  },
+  'digit-5' (bitmap, x, y, size) {
+    polyline(bitmap, [
+      [ x + size * 0.28, y - size * 0.5 ], [ x - size * 0.24, y - size * 0.5 ], [ x - size * 0.22, y - size * 0.02 ],
+      [ x + size * 0.14, y - size * 0.08 ], [ x + size * 0.28, y + size * 0.2 ], [ x + size * 0.1, y + size * 0.52 ],
+      [ x - size * 0.28, y + size * 0.44 ]
+    ], 2)
+  },
+  'digit-6' (bitmap, x, y, size) {
+    arc(bitmap, x, y + size * 0.12, size * 0.3, size * 0.38, 0, 2 * Math.PI, 2)
+    polyline(bitmap, [ [ x + size * 0.26, y - size * 0.42 ], [ x - size * 0.14, y - size * 0.1 ] ], 2)
+  },
+  'digit-7' (bitmap, x, y, size) {
+    polyline(bitmap, [
+      [ x - size * 0.28, y - size * 0.5 ], [ x + size * 0.28, y - size * 0.5 ], [ x - size * 0.08, y + size * 0.52 ]
+    ], 2)
+  },
+  'digit-8' (bitmap, x, y, size) {
+    arc(bitmap, x, y - size * 0.24, size * 0.24, size * 0.26, 0, 2 * Math.PI, 2)
+    arc(bitmap, x, y + size * 0.22, size * 0.3, size * 0.3, 0, 2 * Math.PI, 2)
+  },
+  'digit-9' (bitmap, x, y, size) {
+    arc(bitmap, x, y - size * 0.12, size * 0.3, size * 0.38, 0, 2 * Math.PI, 2)
+    polyline(bitmap, [ [ x + size * 0.22, y + size * 0.1 ], [ x - size * 0.1, y + size * 0.52 ] ], 2)
+  },
+  fermata (bitmap, x, y, size, random) {
+    arc(bitmap, x, y + size * 0.18, size * 0.48, size * 0.42, Math.PI, 2 * Math.PI, 2 + random())
+    drawEllipse(bitmap, x, y + size * 0.12, size * 0.1, size * 0.1)
+  },
+  'breath-mark' (bitmap, x, y, size, random) {
+    drawEllipse(bitmap, x - size * 0.05, y - size * 0.12, size * 0.14, size * 0.12)
+    drawLine(bitmap, x - size * 0.12, y, x + size * 0.18, y + size * 0.4, 1 + random())
+  },
+  staccato (bitmap, x, y, size) {
+    drawEllipse(bitmap, x, y, size * 0.11, size * 0.11)
+  },
+  accent (bitmap, x, y, size, random) {
+    const weight = 2 + random()
+    polyline(bitmap, [ [ x - size * 0.45, y - size * 0.2 ], [ x + size * 0.45, y ], [ x - size * 0.45, y + size * 0.2 ] ], weight)
+  },
+  tenuto (bitmap, x, y, size, random) {
+    drawLine(bitmap, x - size * 0.32, y, x + size * 0.32, y, 2 + random())
+  },
+  marcato (bitmap, x, y, size, random) {
+    const weight = 2 + random()
+    polyline(bitmap, [ [ x - size * 0.35, y + size * 0.22 ], [ x, y - size * 0.28 ], [ x + size * 0.35, y + size * 0.22 ] ], weight)
+  },
+  'grace-slash' (bitmap, x, y, size, random) {
+    drawLine(bitmap, x - size * 0.35, y + size * 0.38, x + size * 0.35, y - size * 0.38, 2 + random())
+  },
+  segno (bitmap, x, y, size, random) {
+    const weight = 1 + random()
+    arc(bitmap, x, y - size * 0.16, size * 0.22, size * 0.18, Math.PI * 0.5, Math.PI * 1.6, weight + 1)
+    arc(bitmap, x, y + size * 0.16, size * 0.22, size * 0.18, Math.PI * 1.5, Math.PI * 2.6, weight + 1)
+    drawLine(bitmap, x - size * 0.3, y + size * 0.36, x + size * 0.3, y - size * 0.36, weight + 1)
+    drawEllipse(bitmap, x - size * 0.26, y - size * 0.18, size * 0.07, size * 0.07)
+    drawEllipse(bitmap, x + size * 0.26, y + size * 0.18, size * 0.07, size * 0.07)
+  },
+  coda (bitmap, x, y, size, random) {
+    const weight = 1 + random()
+    drawEllipseOutline(bitmap, x, y, size * 0.3, size * 0.3, weight + 1)
+    drawLine(bitmap, x, y - size * 0.55, x, y + size * 0.55, weight + 1)
+    drawLine(bitmap, x - size * 0.55, y, x + size * 0.55, y, weight + 1)
+  },
+  pedal (bitmap, x, y, size, random) {
+    const weight = 2 + random()
+    drawLine(bitmap, x - size * 0.3, y - size * 0.5, x - size * 0.3, y + size * 0.5, weight)
+    arc(bitmap, x - size * 0.05, y - size * 0.3, size * 0.28, size * 0.24, -Math.PI / 2, Math.PI / 2, weight)
+    drawLine(bitmap, x - size * 0.3, y + size * 0.5, x + size * 0.2, y + size * 0.5, weight)
+  },
+  turn (bitmap, x, y, size, random) {
+    const weight = 1 + random()
+    arc(bitmap, x - size * 0.16, y, size * 0.18, size * 0.16, Math.PI * 0.5, Math.PI * 2.5, weight + 1)
+    arc(bitmap, x + size * 0.16, y, size * 0.18, size * 0.16, Math.PI * 1.5, Math.PI * 3.5, weight + 1)
+    drawLine(bitmap, x - size * 0.38, y, x - size * 0.28, y, weight)
+  },
+  mordent (bitmap, x, y, size, random) {
+    const weight = 1 + random()
+    polyline(bitmap, [
+      [ x - size * 0.42, y + size * 0.18 ], [ x - size * 0.14, y - size * 0.22 ],
+      [ x + size * 0.12, y + size * 0.18 ], [ x + size * 0.4, y - size * 0.22 ]
+    ], weight + 1)
+    drawLine(bitmap, x + size * 0.4, y - size * 0.22, x + size * 0.4, y + size * 0.18, weight)
+  },
+  trill (bitmap, x, y, size, random) {
+    const weight = 1 + random()
+    const points = []
+    for (let step = 0; step <= 12; step++) {
+      const t = step / 12
+      points.push([ x - size * 0.42 + t * size * 0.84, y + Math.sin(t * Math.PI * 3) * size * 0.18 ])
+    }
+    polyline(bitmap, points, weight + 1)
+    drawLine(bitmap, x - size * 0.42, y + size * 0.3, x + size * 0.42, y + size * 0.3, weight)
+  },
+  simile (bitmap, x, y, size, random) {
+    drawLine(bitmap, x - size * 0.35, y + size * 0.35, x + size * 0.35, y - size * 0.35, 2 + random())
+    drawEllipse(bitmap, x - size * 0.22, y - size * 0.2, size * 0.08, size * 0.08)
+    drawEllipse(bitmap, x + size * 0.22, y + size * 0.2, size * 0.08, size * 0.08)
+  },
+  brace (bitmap, x, y, size, random) {
+    const weight = 2 + random()
+    polyline(bitmap, [
+      [ x + size * 0.14, y - size * 0.68 ], [ x - size * 0.06, y - size * 0.6 ],
+      [ x - size * 0.12, y - size * 0.28 ], [ x - size * 0.36, y ],
+      [ x - size * 0.12, y + size * 0.28 ], [ x - size * 0.06, y + size * 0.6 ],
+      [ x + size * 0.14, y + size * 0.68 ]
+    ], weight)
+  },
+  bracket (bitmap, x, y, size, random) {
+    const weight = 3 + random()
+    drawLine(bitmap, x, y - size * 0.68, x, y + size * 0.68, weight)
+    drawLine(bitmap, x, y - size * 0.68, x + size * 0.26, y - size * 0.68, weight)
+    drawLine(bitmap, x, y + size * 0.68, x + size * 0.26, y + size * 0.68, weight)
+  },
+  'repeat-dot' (bitmap, x, y, size) {
+    drawEllipse(bitmap, x, y - size * 0.2, size * 0.1, size * 0.1)
+    drawEllipse(bitmap, x, y + size * 0.2, size * 0.1, size * 0.1)
+  },
+  junk (bitmap, x, y, size, random) {
+    for (let stroke = 0; stroke < 3; stroke++) {
+      drawLine(
+        bitmap,
+        x + (random() - 0.5) * size, y + (random() - 0.5) * size,
+        x + (random() - 0.5) * size, y + (random() - 0.5) * size,
+        1 + random()
+      )
+    }
+  }
+}
+
+export const drawableClassIds = Object.keys(drawableSymbols).filter((id) => id !== 'junk')
+
+// One symbol on a fresh bitmap, jittered. The full bitmap is the crop source.
+export function drawSymbolSample (classId, drawSize, random) {
+  const bitmap = createBitmap(drawSize, drawSize)
+  const center = drawSize / 2
+  const size = drawSize * (0.5 + 0.12 * (random() - 0.5))
+  drawableSymbols[classId](bitmap, center, center, size, random)
+  return bitmap
+}
+
+</script>
+<script type="text/plain" id="src-TRAIN" data-path="src/omr/training/train.js" data-start="1">
+'use strict'
+
+import { appendFileSync, mkdirSync, writeFileSync } from 'node:fs'
+
+import { forwardModel } from '../model/forwardModel.js'
+import { createModel } from '../model/createModel.js'
+import backpropagateModel from './backpropagateModel.js'
+import { createAdamState, updateWeightsWithAdam } from './updateWeightsWithAdam.js'
+import { createSeededRandom } from './seededRandom.js'
+import { generateTrainingSet } from './generateTrainingSet.js'
+import { drawableClassIds } from './drawSymbols.js'
+import { evaluateModel } from './evaluate.js'
+import { exportWeights } from './exportWeights.js'
+
+/**
+ * The training loop: show a batch, guess, measure how wrong, nudge.
+ *
+ * Loss is cross-entropy over the batch plus a small L2 penalty so weights
+ * cannot grow into memorizing. Shuffling is seeded — one seed, one run. Each
+ * epoch reports the loss and both accuracies; the best model is kept.
+ */
+
+const LAYER_NAMES = [ 'conv1', 'conv2', 'dense1', 'dense2' ]
+
+export function trainModel ({
+  model,
+  trainingSamples,
+  validationSamples,
+  epochs,
+  batchSize = 32,
+  learningRate = 0.001,
+  l2 = 0.0005,
+  seed = 1,
+  onEpoch = null,
+  onBatch = null
+}) {
+  const random = createSeededRandom(seed)
+  const states = {}
+  for (const name of LAYER_NAMES) {
+    states[name] = {
+      weights: createAdamState(model[name].weights.length),
+      biases: createAdamState(model[name].biases.length)
+    }
+  }
+  const history = []
+  let step = 0
+  let best = { accuracy: -1, weights: null }
+  for (let epoch = 1; epoch <= epochs; epoch++) {
+    const epochStartedAt = Date.now()
+    const order = shuffledIndexes(trainingSamples.length, random)
+    const batchesTotal = Math.ceil(trainingSamples.length / batchSize)
+    let batchesDone = 0
+    let lossTotal = 0
+    for (let start = 0; start < order.length; start += batchSize) {
+      const batch = order.slice(start, start + batchSize)
+      const gradients = freshGradients(model)
+      for (const index of batch) {
+        const sample = trainingSamples[index]
+        const forward = forwardModel(model, sample.pixels)
+        lossTotal += -Math.log(Math.max(forward.probabilities[sample.classIndex], 1e-12))
+        const sampleGradients = backpropagateModel(model, forward, sample.classIndex)
+        for (const name of LAYER_NAMES) {
+          addInto(gradients[name].gradWeights, sampleGradients[name].gradWeights)
+          addInto(gradients[name].gradBiases, sampleGradients[name].gradBiases)
+        }
+      }
+      step++
+      for (const name of LAYER_NAMES) {
+        scale(gradients[name].gradWeights, 1 / batch.length)
+        scale(gradients[name].gradBiases, 1 / batch.length)
+        addL2(gradients[name].gradWeights, model[name].weights, l2)
+        updateWeightsWithAdam({
+          weights: model[name].weights,
+          gradWeights: gradients[name].gradWeights,
+          state: states[name].weights,
+          learningRate,
+          step
+        })
+        updateWeightsWithAdam({
+          weights: model[name].biases,
+          gradWeights: gradients[name].gradBiases,
+          state: states[name].biases,
+          learningRate,
+          step
+        })
+      }
+      batchesDone++
+      if (onBatch) {
+        onBatch({
+          epoch,
+          batchesDone,
+          batchesTotal,
+          runningLoss: Math.round(lossTotal / batchesDone / batchSize * 1e6) / 1e6
+        })
+      }
+    }
+    const training = evaluateModel({ model, samples: trainingSamples })
+    const validation = validationSamples
+      ? evaluateModel({ model, samples: validationSamples })
+      : training
+    history.push({
+      epoch,
+      epochs,
+      loss: Math.round(lossTotal / trainingSamples.length * 1e6) / 1e6,
+      accuracy: training.accuracy,
+      validationLoss: validation.loss,
+      validationAccuracy: validation.accuracy,
+      seconds: Math.round((Date.now() - epochStartedAt) / 1000)
+    })
+    if (onEpoch) {
+      onEpoch(history[history.length - 1])
+    }
+    if (validation.accuracy > best.accuracy) {
+      best = { accuracy: validation.accuracy, weights: copyWeights(model) }
+    }
+  }
+  return { model: best.weights ? { ...model, ...best.weights } : model, history }
+}
+
+// The run's own record: what was trained, how it went, what came out. It is
+// appended to, so the history of runs survives, and it is what `tail -f`
+// watches — no shell redirection needed.
+const RUN_LOG = 'training-data/training.log'
+
+export function runTraining () {
+  mkdirSync('training-data', { recursive: true })
+  // Every value of the run is the user's choice; the defaults are the smoke
+  // run — seconds, to see that it works. The production values live in
+  // dev-docs/training.html.
+  const samplesPerClass = numberFlag('samples-per-class', 40)
+  const epochs = numberFlag('epochs', 15)
+  const gridSize = numberFlag('grid', 24)
+  const filterCounts = listFlag('filters', [ 8, 16 ])
+  const denseSize = numberFlag('dense', 24)
+  const batchSize = numberFlag('batch', 8)
+  const learningRate = numberFlag('learning-rate', 0.01)
+  const seed = numberFlag('seed', 20261110)
+  const shape = { gridSize, filterSize: 3, filterCounts, denseSize, classCount: 0 }
+  const log = (line) => {
+    appendFileSync(RUN_LOG, `${line}\n`)
+    console.log(line)
+  }
+  try {
+    const startedAt = Date.now()
+    log(`=== ${new Date().toISOString()} · seed ${seed} · grid ${gridSize} · filters ${filterCounts.join(',')} · dense ${denseSize} · ${drawableClassIds.length} classes · ${drawableClassIds.length * samplesPerClass} samples · ${epochs} epochs`)
+    log(`drawing the training set — ${samplesPerClass} pictures per class…`)
+    const generationStartedAt = Date.now()
+    const { classIds, samples } = generateTrainingSet({
+      seed,
+      samplesPerClass,
+      gridSize,
+      onClass: (classId, index, total) => log(`  ${index}/${total} ${classId}`)
+    })
+    shape.classCount = classIds.length
+    log(`dataset ready in ${durationSince(generationStartedAt)} — ${samples.length} samples`)
+    const split = Math.floor(samples.length * 0.8)
+    log(`training on ${split} · validating on ${samples.length - split} · batch ${batchSize} · learning rate ${learningRate}`)
+    const model = createModel({ ...shape, classCount: classIds.length }, 1)
+    let lastBeatAt = Date.now()
+    const { history } = trainModel({
+      model,
+      trainingSamples: samples.slice(0, split),
+      validationSamples: samples.slice(split),
+      epochs,
+      batchSize,
+      learningRate,
+      onBatch: ({ epoch, batchesDone, batchesTotal, runningLoss }) => {
+        const every = Math.max(1, Math.floor(batchesTotal / 4))
+        const now = Date.now()
+        if (batchesDone % every === 0 || batchesDone === batchesTotal || now - lastBeatAt >= 60000) {
+          lastBeatAt = now
+          log(`  epoch ${epoch} · ${batchesDone}/${batchesTotal} batches · running loss ${runningLoss}`)
+        }
+      },
+      onEpoch: (entry) => {
+        const left = entry.seconds * (epochs - entry.epoch)
+        log(`epoch ${entry.epoch}/${epochs} · ${formatDuration(entry.seconds)} · loss ${entry.loss} · accuracy ${entry.accuracy} · validation loss ${entry.validationLoss} · validation ${entry.validationAccuracy}` +
+          (left > 0 ? ` · ~${formatDuration(left)} left` : ''))
+      }
+    })
+    const outIndex = process.argv.findIndex((argument) => argument.startsWith('--out='))
+    if (outIndex !== -1) {
+      const outPath = process.argv[outIndex].slice('--out='.length)
+      const { json, hash } = exportWeights(model, classIds)
+      writeFileSync(outPath, json)
+      log(`weights written to ${outPath}`)
+      log(`sha256 ${hash}`)
+    }
+    const best = history.reduce((winner, entry) =>
+      entry.validationAccuracy > winner.validationAccuracy ? entry : winner, history[0])
+    log(`✓ done in ${durationSince(startedAt)} — best validation ${best.validationAccuracy} at epoch ${best.epoch}`)
+    return { model, history }
+  } catch (error) {
+    appendFileSync(RUN_LOG, `error: ${error.message}\n${error.stack}\n`)
+    throw error
+  }
+}
+
+function numberFlag (name, fallback) {
+  const found = process.argv.find((argument) => argument.startsWith(`--${name}=`))
+  return found ? Number(found.slice(name.length + 3)) : fallback
+}
+
+function listFlag (name, fallback) {
+  const found = process.argv.find((argument) => argument.startsWith(`--${name}=`))
+  return found ? found.slice(name.length + 3).split(',').map(Number) : fallback
+}
+
+function durationSince (startedAt) {
+  return formatDuration((Date.now() - startedAt) / 1000)
+}
+
+function formatDuration (seconds) {
+  if (seconds < 90) {
+    return `${Math.round(seconds)}s`
+  }
+  return seconds < 5400 ? `${Math.round(seconds / 60)}m` : `${Math.round(seconds / 360) / 10}h`
+}
+
+function shuffledIndexes (length, random) {
+  const indexes = Array.from({ length }, (_, index) => index)
+  for (let index = length - 1; index > 0; index--) {
+    const swap = Math.floor(random() * (index + 1))
+    ;[ indexes[index], indexes[swap] ] = [ indexes[swap], indexes[index] ]
+  }
+  return indexes
+}
+
+function freshGradients (model) {
+  const gradients = {}
+  for (const name of LAYER_NAMES) {
+    gradients[name] = {
+      gradWeights: new Float64Array(model[name].weights.length),
+      gradBiases: new Float64Array(model[name].biases.length)
+    }
+  }
+  return gradients
+}
+
+function addInto (target, source) {
+  for (let index = 0; index < target.length; index++) {
+    target[index] += source[index]
+  }
+}
+
+function scale (values, factor) {
+  for (let index = 0; index < values.length; index++) {
+    values[index] *= factor
+  }
+}
+
+function addL2 (gradWeights, weights, l2) {
+  for (let index = 0; index < gradWeights.length; index++) {
+    gradWeights[index] += 2 * l2 * weights[index]
+  }
+}
+
+function copyWeights (model) {
+  const copy = {}
+  for (const name of LAYER_NAMES) {
+    copy[name] = {
+      weights: new Float64Array(model[name].weights),
+      biases: new Float64Array(model[name].biases)
+    }
+  }
+  return copy
+}
+
+if (import.meta.url === `file://${process.argv[1]}`) {
+  runTraining()
+}
+
+</script>
+<script type="text/plain" id="src-BACKPROP" data-path="src/omr/training/backpropagateModel.js" data-start="1">
+'use strict'
+
+import backpropagateConvolution from './backpropagateConvolution.js'
+import {
+  softmaxCrossEntropyGradient,
+  backpropagateDense,
+  backpropagateRelu,
+  backpropagateMaxPool
+} from './backpropagateDense.js'
+
+/**
+ * The whole backward sweep over one crop.
+ *
+ * Right to left through the same stages forwardModel walked, each stage
+ * handing the one before it its share of the error. The result mirrors the
+ * model: one gradient array per weight and bias array, ready for the nudging
+ * rule to consume.
+ */
+
+export function backpropagateModel (model, { cache, probabilities }, expectedClass) {
+  const { filterSize, filterCounts } = model.shape
+  const [ firstFilters, secondFilters ] = filterCounts
+
+  const gradScores = softmaxCrossEntropyGradient({ probabilities, expectedClass })
+  const dense2 = backpropagateDense({ gradOutput: gradScores, input: cache.relu3, weights: model.dense2.weights })
+  const gradRelu3 = backpropagateRelu({ gradOutput: dense2.gradInput, preActivation: cache.dense1 })
+  const dense1 = backpropagateDense({ gradOutput: gradRelu3, input: cache.flattened, weights: model.dense1.weights })
+  const gradPool2 = backpropagateMaxPool({
+    gradOutput: dense1.gradInput,
+    argmaxIndexes: cache.pool2.argmaxIndexes,
+    inputLength: cache.relu2.length
+  })
+  const gradRelu2 = backpropagateRelu({ gradOutput: gradPool2, preActivation: cache.conv2.values })
+  const conv2 = backpropagateConvolution({
+    gradOutput: gradRelu2,
+    patches: cache.conv2.patches,
+    patchLength: cache.conv2.patchLength,
+    weights: model.conv2.weights,
+    width: cache.conv2.width,
+    height: cache.conv2.height,
+    channels: firstFilters,
+    filterSize,
+    filterCount: secondFilters
+  })
+  const gradPool1 = backpropagateMaxPool({
+    gradOutput: conv2.gradInput,
+    argmaxIndexes: cache.pool1.argmaxIndexes,
+    inputLength: cache.relu1.length
+  })
+  const gradRelu1 = backpropagateRelu({ gradOutput: gradPool1, preActivation: cache.conv1.values })
+  const conv1 = backpropagateConvolution({
+    gradOutput: gradRelu1,
+    patches: cache.conv1.patches,
+    patchLength: cache.conv1.patchLength,
+    weights: model.conv1.weights,
+    width: cache.conv1.width,
+    height: cache.conv1.height,
+    channels: 1,
+    filterSize,
+    filterCount: firstFilters
+  })
+  return {
+    conv1: { gradWeights: conv1.gradWeights, gradBiases: conv1.gradBiases },
+    conv2: { gradWeights: conv2.gradWeights, gradBiases: conv2.gradBiases },
+    dense1: { gradWeights: dense1.gradWeights, gradBiases: dense1.gradBiases },
+    dense2: { gradWeights: dense2.gradWeights, gradBiases: dense2.gradBiases }
+  }
+}
+
+export default backpropagateModel
+
+</script>
+<script type="text/plain" id="src-ADAM" data-path="src/omr/training/updateWeightsWithAdam.js" data-start="1">
+'use strict'
+
+/**
+ * The nudge: Adam.
+ *
+ * Each learned number gets its step scaled by how big its gradients have been
+ * lately (v) and pointed by which way they have been pointing (m). The
+ * correction for the first steps (m̂, v̂) matters — they start at zero.
+ */
+
+const BETA_1 = 0.9
+const BETA_2 = 0.999
+const EPSILON = 1e-8
+
+export function createAdamState (length) {
+  return { m: new Float64Array(length), v: new Float64Array(length) }
+}
+
+export function updateWeightsWithAdam ({ weights, gradWeights, state, learningRate, step }) {
+  const correction1 = 1 - BETA_1 ** step
+  const correction2 = 1 - BETA_2 ** step
+  for (let index = 0; index < weights.length; index++) {
+    const gradient = gradWeights[index]
+    state.m[index] = BETA_1 * state.m[index] + (1 - BETA_1) * gradient
+    state.v[index] = BETA_2 * state.v[index] + (1 - BETA_2) * gradient * gradient
+    const direction = state.m[index] / correction1
+    const scale = Math.sqrt(state.v[index] / correction2) + EPSILON
+    weights[index] -= learningRate * direction / scale
+  }
+}
+
+export default updateWeightsWithAdam
+
+</script>
+<script type="text/plain" id="src-EVAL" data-path="src/omr/training/evaluate.js" data-start="1">
+'use strict'
+
+import { forwardModel } from '../model/forwardModel.js'
+
+/**
+ * How the model is doing, as pictures' worth of numbers.
+ *
+ * The confusion matrix is the report card: the diagonal is right answers,
+ * bright cells off it are the mix-ups to fix. `worst` keeps the confident
+ * mistakes — the ones worth looking at first.
+ */
+
+export function evaluateModel ({ model, samples, worstCount = 10 }) {
+  const classCount = model.shape.classCount
+  const confusion = Array.from({ length: classCount }, () => new Array(classCount).fill(0))
+  const mistakes = []
+  let correct = 0
+  let lossTotal = 0
+  for (let index = 0; index < samples.length; index++) {
+    const sample = samples[index]
+    const { probabilities } = forwardModel(model, sample.pixels)
+    const predicted = argmax(probabilities)
+    lossTotal += -Math.log(Math.max(probabilities[sample.classIndex], 1e-12))
+    confusion[sample.classIndex][predicted]++
+    if (predicted === sample.classIndex) {
+      correct++
+    } else {
+      mistakes.push({
+        index,
+        expected: sample.classId,
+        predictedIndex: predicted,
+        confidence: Math.round(probabilities[predicted] * 1e4) / 1e4
+      })
+    }
+  }
+  return {
+    loss: samples.length ? Math.round(lossTotal / samples.length * 1e6) / 1e6 : 0,
+    accuracy: samples.length ? Math.round(correct / samples.length * 1e4) / 1e4 : 0,
+    confusion,
+    worst: mistakes
+      .sort((first, second) => second.confidence - first.confidence)
+      .slice(0, worstCount)
+  }
+}
+
+function argmax (values) {
+  let best = 0
+  for (let index = 1; index < values.length; index++) {
+    if (values[index] > values[best]) {
+      best = index
+    }
+  }
+  return best
+}
+
+export default evaluateModel
+
+</script>
+<script type="text/plain" id="src-SERIALIZE" data-path="src/language/serializer/serialize.js" data-start="314">
+export default function serialize (pageSchema, customStyles, midiSettings, comments) {
+  const schema = pageSchema || {}
+  const lines = [
+    ...serializeSettings(customStyles, STYLE_COMMANDS),
+    ...serializeSettings(midiSettings, MIDI_SETTING_COMMANDS),
+    ...serializePageMeta(schema)
+  ]
+
+  let pageLineNumber = null
+  for (const measure of schema.measuresParams || []) {
+    // A new page line is its own command, not a property of the measure after it.
+    if (pageLineNumber !== null && measure.pageLineNumber !== pageLineNumber) {
+      lines.push('', 'new line')
+    }
+    pageLineNumber = measure.pageLineNumber
+
+    lines.push('', 'measure')
+    lines.push(...serializeMeasureCommands(measure))
+
+    for (const stave of measure.stavesParams || []) {
+      lines.push('stave')
+      if (stave.clef) {
+        lines.push(`${serializeClef(stave.clef)} clef`)
+      }
+      const voices = stave.voicesParams || []
+      voices.forEach((units, index) => {
+        // The first voice of a stave is implied; the rest are opened explicitly.
+        if (index > 0) {
+          lines.push('voice')
+        }
+        lines.push(...serializeVoice(units))
+      })
+    }
+  }
+
+  lines.push(...serializeVoltas(schema.measuresParams || []))
+
+  const body = lines.join('\n').trim().split('\n')
+  return `${addComments(body, comments).join('\n')}\n`
+}
+
+</script>
+
+<script>
+
+(function () {
+  const NODES = {
+  "DECODE": {
+    "x": 90,
+    "y": 55,
+    "t": "decode",
+    "k": "bytes \u2192 numbers"
+  },
+  "DESKEW": {
+    "x": 300,
+    "y": 55,
+    "t": "deskew",
+    "k": "straight once"
+  },
+  "STAVES": {
+    "x": 510,
+    "y": 55,
+    "t": "measure",
+    "k": "staves \u00b7 words \u00b7 styles"
+  },
+  "TEXT": {
+    "x": 720,
+    "y": 55,
+    "t": "proportions",
+    "k": "sizes \u00b7 colours"
+  },
+  "LINES": {
+    "x": 90,
+    "y": 170,
+    "t": "lines removed",
+    "k": "pixels go, coords stay"
+  },
+  "BARLINES": {
+    "x": 300,
+    "y": 170,
+    "t": "barlines",
+    "k": "geometry"
+  },
+  "STEMS": {
+    "x": 510,
+    "y": 170,
+    "t": "stems",
+    "k": "geometry"
+  },
+  "COMPONENTS": {
+    "x": 720,
+    "y": 170,
+    "t": "components",
+    "k": "connected ink"
+  },
+  "CLASSIFY": {
+    "x": 90,
+    "y": 285,
+    "t": "classify",
+    "k": "the one model"
+  },
+  "MUSIC": {
+    "x": 300,
+    "y": 285,
+    "t": "music model",
+    "k": "the rules"
+  },
+  "SCHEMA": {
+    "x": 510,
+    "y": 285,
+    "t": "page schema",
+    "k": "the tree"
+  },
+  "SERIALIZE": {
+    "x": 720,
+    "y": 285,
+    "t": "serialize",
+    "k": "the language prints"
+  },
+  "REPORT": {
+    "x": 90,
+    "y": 400,
+    "t": "report",
+    "k": "what was unsure"
+  },
+  "DRAW": {
+    "x": 300,
+    "y": 400,
+    "t": "draw the set",
+    "k": "seeded pictures"
+  },
+  "TRAIN": {
+    "x": 510,
+    "y": 400,
+    "t": "train",
+    "k": "forward \u00b7 backward \u00b7 nudge"
+  },
+  "WEIGHTS": {
+    "x": 720,
+    "y": 400,
+    "t": "weights",
+    "k": "pinned by hash"
+  }
+};
+  const EDGES = {
+  "DECODE-DESKEW": {
+    "d": "M90 55 L300 55",
+    "lx": 195,
+    "ly": 44,
+    "l": "pixels"
+  },
+  "DESKEW-STAVES": {
+    "d": "M300 55 L510 55",
+    "lx": 405,
+    "ly": 44,
+    "l": "upright"
+  },
+  "STAVES-TEXT": {
+    "d": "M510 55 L720 55",
+    "lx": 615,
+    "ly": 44,
+    "l": "the grid"
+  },
+  "STAVES-LINES": {
+    "d": "M510 55 L90 170",
+    "lx": 250,
+    "ly": 106,
+    "l": "staves"
+  },
+  "LINES-BARLINES": {
+    "d": "M90 170 L300 170",
+    "lx": 195,
+    "ly": 159,
+    "l": "ink left"
+  },
+  "BARLINES-STEMS": {
+    "d": "M300 170 L510 170",
+    "lx": 405,
+    "ly": 159,
+    "l": ""
+  },
+  "STEMS-COMPONENTS": {
+    "d": "M510 170 L720 170",
+    "lx": 615,
+    "ly": 159,
+    "l": "blobs"
+  },
+  "COMPONENTS-CLASSIFY": {
+    "d": "M720 170 L90 285",
+    "lx": 360,
+    "ly": 222,
+    "l": "crops"
+  },
+  "CLASSIFY-MUSIC": {
+    "d": "M90 285 L300 285",
+    "lx": 195,
+    "ly": 274,
+    "l": "classes"
+  },
+  "MUSIC-SCHEMA": {
+    "d": "M300 285 L510 285",
+    "lx": 405,
+    "ly": 274,
+    "l": "units"
+  },
+  "SCHEMA-SERIALIZE": {
+    "d": "M510 285 L720 285",
+    "lx": 615,
+    "ly": 274,
+    "l": "the tree"
+  },
+  "SERIALIZE-REPORT": {
+    "d": "M720 285 L90 400",
+    "lx": 360,
+    "ly": 348,
+    "l": "msqText"
+  },
+  "DRAW-TRAIN": {
+    "d": "M300 400 L510 400",
+    "lx": 405,
+    "ly": 389,
+    "l": "labeled pictures"
+  },
+  "TRAIN-WEIGHTS": {
+    "d": "M510 400 L720 400",
+    "lx": 615,
+    "ly": 389,
+    "l": "weights + sha"
+  }
+};
+  const S = [
+ {
+  "id": "flow",
+  "name": "the whole flow",
+  "frames": [
+   {
+    "t": "An image comes in",
+    "x": "translateImageToMsq is the door: pixels in, two things out \u2014 the MSQ text and the report of what was unsure.",
+    "f": "TRANSLATE",
+    "l": [
+     23,
+     25
+    ],
+    "on": [
+     "DECODE"
+    ],
+    "w": {
+     "call stack": "translateImageToMsq",
+     "in": "{ width, height, grayscale } \u00b7 { model, classIds }",
+     "returns": "{ msqText, report }"
+    },
+    "tok": [
+     "DECODE-DESKEW",
+     "bitmap"
+    ],
+    "msg": {
+     "width": 600,
+     "height": 400,
+     "grayscale": "Float32Array(240000) \u2014 0 paper, 1 ink"
+    }
+   },
+   {
+    "t": "Straightened once",
+    "x": "deskewBitmap finds the tilt and rotates once. Every later stage works on these exact pixels.",
+    "f": "DESKEW",
+    "l": [
+     13,
+     22
+    ],
+    "on": [
+     "DESKEW"
+    ],
+    "w": {
+     "call stack": "translateImageToMsq \u2192 translatePage \u2192 deskewBitmap",
+     "in": "the bitmap",
+     "returns": "the same pixels, upright \u00b7 skewAngleInDegrees"
+    },
+    "tok": [
+     "DESKEW-STAVES",
+     "upright bitmap"
+    ]
+   },
+   {
+    "t": "The page is measured",
+    "x": "analyzeStraightenedImage reads what is on the page: staves, systems, words, proportions.",
+    "f": "ANALYZE",
+    "l": [
+     26,
+     49
+    ],
+    "on": [
+     "STAVES"
+    ],
+    "w": {
+     "call stack": "translateImageToMsq \u2192 translatePage \u2192 analyzeStraightenedImage",
+     "in": "the upright bitmap",
+     "returns": "the analysis \u2014 staves \u00b7 systems \u00b7 text blocks \u00b7 styles"
+    },
+    "tok": [
+     "STAVES-TEXT",
+     "the grid"
+    ]
+   },
+   {
+    "t": "Lines and blobs",
+    "x": "extractSymbols removes what is straight and hands what is left to the model.",
+    "f": "EXTRACT",
+    "l": [
+     20,
+     51
+    ],
+    "on": [
+     "COMPONENTS"
+    ],
+    "w": {
+     "call stack": "translateImageToMsq \u2192 translatePage \u2192 analyzeStraightenedImage \u2192 extractSymbols",
+     "in": "the bitmap \u00b7 the staves \u00b7 classify",
+     "returns": "{ blobs, stems, barLines }"
+    },
+    "tok": [
+     "COMPONENTS-CLASSIFY",
+     "blobs"
+    ]
+   },
+   {
+    "t": "Symbols become music",
+    "x": "buildMusicModel walks the rules: pitch, duration, chords, voices, measures.",
+    "f": "MUSIC",
+    "l": [
+     45,
+     69
+    ],
+    "on": [
+     "MUSIC"
+    ],
+    "w": {
+     "call stack": "translateImageToMsq \u2192 translatePage \u2192 analyzeStraightenedImage \u2192 buildMusicModel",
+     "in": "the symbols \u00b7 the staves",
+     "returns": "the music model \u2014 measures \u2192 staves \u2192 voices \u2192 units"
+    },
+    "tok": [
+     "CLASSIFY-MUSIC",
+     "classes"
+    ]
+   },
+   {
+    "t": "What page 1 declared, page 2 repeats",
+    "x": "carryStateAcrossPages writes the key and meter again where they apply, because every page text parses alone.",
+    "f": "STATE",
+    "l": [
+     12,
+     24
+    ],
+    "on": [
+     "MUSIC"
+    ],
+    "w": {
+     "call stack": "translateImageToMsq \u2192 translatePage \u2192 carryStateAcrossPages",
+     "in": "the music model \u00b7 what earlier pages declared",
+     "returns": "the model, with state applied"
+    }
+   },
+   {
+    "t": "The page schema",
+    "x": "buildPageSchemaFromMusicModel speaks the tree the parser builds \u2014 the same shapes the serializer knows.",
+    "f": "SCHEMA",
+    "l": [
+     12,
+     27
+    ],
+    "on": [
+     "SCHEMA"
+    ],
+    "w": {
+     "call stack": "translateImageToMsq \u2192 translatePage \u2192 buildPageSchemaFromMusicModel",
+     "in": "the music model",
+     "returns": "measuresParams \u2192 stavesParams \u2192 voicesParams \u2192 units"
+    },
+    "tok": [
+     "MUSIC-SCHEMA",
+     "music model"
+    ]
+   },
+   {
+    "t": "The language prints itself",
+    "x": "serialize is the language's own printer, so the text round-trips through the parser by construction.",
+    "f": "SERIALIZE",
+    "l": [
+     314,
+     353
+    ],
+    "on": [
+     "SERIALIZE"
+    ],
+    "w": {
+     "call stack": "translateImageToMsq \u2192 translatePage \u2192 serialize  (src/language/serializer)",
+     "in": "the page schema \u00b7 customStyles",
+     "returns": "MSQ text"
+    },
+    "tok": [
+     "SCHEMA-SERIALIZE",
+     "page schema"
+    ]
+   },
+   {
+    "t": "And what was unsure",
+    "x": "createReport names every blob the classifier could not place, with its unit and its line in the text.",
+    "f": "TRANSLATE",
+    "l": [
+     74,
+     97
+    ],
+    "on": [
+     "REPORT"
+    ],
+    "w": {
+     "call stack": "translateImageToMsq \u2192 translatePage \u2192 createReport",
+     "in": "the symbols \u00b7 the music model \u00b7 the text",
+     "returns": "{ uncertain, ignored }"
+    },
+    "tok": [
+     "SERIALIZE-REPORT",
+     "msqText + report"
+    ],
+    "msg": {
+     "uncertain": "[{ box, className, confidence, unit, msqLine }]"
+    }
+   }
+  ]
+ },
+ {
+  "id": "analyze",
+  "name": "analyze \u2014 measuring",
+  "frames": [
+   {
+    "t": "The tilt, by projection",
+    "x": "Ink is binned along rows of a candidate angle; where the staff lines pile up, the page is level.",
+    "f": "ANGLE",
+    "l": [
+     18,
+     40
+    ],
+    "on": [
+     "DESKEW"
+    ],
+    "w": {
+     "call stack": "translateImageToMsq \u2192 translatePage \u2192 deskewBitmap \u2192 estimateSkewAngleInDegrees",
+     "in": "the bitmap",
+     "returns": "the degrees to rotate by"
+    },
+    "msg": {
+     "sharpness": "\u03a3 bin\u00b2 \u2014 peaks when the lines are horizontal"
+    }
+   },
+   {
+    "t": "Rotate with bilinear sampling",
+    "x": "rotateBitmap turns the content back; each destination pixel blends the 2\u00d72 source neighbourhood.",
+    "f": "DESKEW",
+    "l": [
+     24,
+     39
+    ],
+    "on": [
+     "DESKEW"
+    ],
+    "w": {
+     "call stack": "translateImageToMsq \u2192 translatePage \u2192 deskewBitmap \u2192 rotateBitmap \u2192 bilinearSample",
+     "in": "the bitmap \u00b7 the angle",
+     "returns": "the upright bitmap"
+    }
+   },
+   {
+    "t": "Rows become a profile",
+    "x": "rowInkProfile counts the ink on every row \u2014 five sharp peaks are five staff lines.",
+    "f": "STAVES",
+    "l": [
+     26,
+     43
+    ],
+    "on": [
+     "STAVES"
+    ],
+    "w": {
+     "call stack": "translateImageToMsq \u2192 translatePage \u2192 analyzeStraightenedImage \u2192 detectStaves \u2192 rowInkProfile",
+     "in": "the upright bitmap",
+     "returns": "one number per row"
+    }
+   },
+   {
+    "t": "Peaks become staves",
+    "x": "groupPeaksIntoStaves walks the peaks with constant spacing; a run of four gets its missing line back.",
+    "f": "STAVES",
+    "l": [
+     58,
+     88
+    ],
+    "on": [
+     "STAVES"
+    ],
+    "w": {
+     "call stack": "translateImageToMsq \u2192 translatePage \u2192 analyzeStraightenedImage \u2192 detectStaves \u2192 findPeakCandidates \u2192 groupPeaksIntoStaves",
+     "in": "the peaks",
+     "returns": "raw lines \u2014 five per stave"
+    }
+   },
+   {
+    "t": "Each line re-centred on its ink",
+    "x": "buildStave sharpens the positions and keeps them \u2014 the coordinates outlive the pixels.",
+    "f": "STAVES",
+    "l": [
+     90,
+     98
+    ],
+    "on": [
+     "STAVES"
+    ],
+    "w": {
+     "call stack": "translateImageToMsq \u2192 translatePage \u2192 analyzeStraightenedImage \u2192 detectStaves \u2192 buildStave \u2192 recenterLine",
+     "in": "the raw lines \u00b7 the profile",
+     "returns": "linesY \u00b7 staffSpaceHeightPx \u00b7 xStart \u00b7 xEnd"
+    }
+   },
+   {
+    "t": "Staves become systems",
+    "x": "groupStavesIntoSystems joins staves that are close and overlap \u2014 one line of music.",
+    "f": "SYSTEMS",
+    "l": [
+     15,
+     43
+    ],
+    "on": [
+     "STAVES"
+    ],
+    "w": {
+     "call stack": "translateImageToMsq \u2192 translatePage \u2192 analyzeStraightenedImage \u2192 groupStavesIntoSystems",
+     "in": "the staves",
+     "returns": "systems \u2014 each with staveIndexes"
+    }
+   },
+   {
+    "t": "Ink outside the staves is words",
+    "x": "findTextBlocks clusters the rest: titles above, instruments at the left, page numbers below.",
+    "f": "TEXT",
+    "l": [
+     17,
+     26
+    ],
+    "on": [
+     "TEXT"
+    ],
+    "w": {
+     "call stack": "translateImageToMsq \u2192 translatePage \u2192 analyzeStraightenedImage \u2192 findTextBlocks \u2192 roleOfBlock",
+     "in": "the bitmap \u00b7 the staves",
+     "returns": "text blocks \u2014 box \u00b7 role \u00b7 sizeInStaffSpaces"
+    }
+   },
+   {
+    "t": "Sizes and colours, as ratios",
+    "x": "measureStyles divides every size by the staff space and medians the colours \u2014 proportions, never absolutes.",
+    "f": "STYLES",
+    "l": [
+     14,
+     31
+    ],
+    "on": [
+     "TEXT"
+    ],
+    "w": {
+     "call stack": "translateImageToMsq \u2192 translatePage \u2192 analyzeStraightenedImage \u2192 measureStyles",
+     "in": "the staves \u00b7 the text blocks",
+     "returns": "measuredStyles \u00b7 colors"
+    },
+    "msg": {
+     "titleFontSize": 5.4,
+     "intervalBetweenStaves": 13,
+     "background": "#ffffff"
+    }
+   }
+  ]
+ },
+ {
+  "id": "symbols",
+  "name": "symbols \u2014 lines and blobs",
+  "frames": [
+   {
+    "t": "Pixels go, coordinates stay",
+    "x": "removeStaffLines subtracts only thin runs: a line is thin, a head is thick \u2014 and the decisions read the input, never the work in progress.",
+    "f": "LINES",
+    "l": [
+     24,
+     41
+    ],
+    "on": [
+     "LINES"
+    ],
+    "w": {
+     "call stack": "translateImageToMsq \u2192 translatePage \u2192 analyzeStraightenedImage \u2192 extractSymbols \u2192 removeStaffLines",
+     "in": "the bitmap \u00b7 the staves",
+     "returns": "the bitmap without line pixels"
+    }
+   },
+   {
+    "t": "Barlines: ink across a whole stave",
+    "x": "findBarLines wants coverage and thinness \u2014 a note whose stem and head stack into one run is wide where the head is.",
+    "f": "BARLINES",
+    "l": [
+     15,
+     36
+    ],
+    "on": [
+     "BARLINES"
+    ],
+    "w": {
+     "call stack": "translateImageToMsq \u2192 translatePage \u2192 analyzeStraightenedImage \u2192 extractSymbols \u2192 findBarLines",
+     "in": "the bitmap without lines",
+     "returns": "barLines \u2014 the x of each"
+    }
+   },
+   {
+    "t": "Stems: tall, thin runs",
+    "x": "findStems looks for runs about two staff spaces long, merged per stem and thin enough to be a stem.",
+    "f": "STEMS",
+    "l": [
+     17,
+     36
+    ],
+    "on": [
+     "STEMS"
+    ],
+    "w": {
+     "call stack": "translateImageToMsq \u2192 translatePage \u2192 analyzeStraightenedImage \u2192 extractSymbols \u2192 findStems",
+     "in": "the bitmap without lines \u00b7 the staves",
+     "returns": "stems \u2014 x \u00b7 y1 \u00b7 y2 \u00b7 staveIndex"
+    }
+   },
+   {
+    "t": "What hangs at the outer end",
+    "x": "measureStemEnds reads beams and flags \u2014 but only at the end away from the head, or the head pollutes the count.",
+    "f": "STEMS",
+    "l": [
+     39,
+     61
+    ],
+    "on": [
+     "STEMS"
+    ],
+    "w": {
+     "call stack": "translateImageToMsq \u2192 translatePage \u2192 analyzeStraightenedImage \u2192 extractSymbols \u2192 measureStemEnds",
+     "in": "a stem \u00b7 the bitmap",
+     "returns": "beamRows \u00b7 beamCount \u00b7 flagCount"
+    }
+   },
+   {
+    "t": "Connected ink",
+    "x": "findSymbolComponents flood-fills what is left: each blob is one symbol candidate.",
+    "f": "COMPONENTS",
+    "l": [
+     13,
+     26
+    ],
+    "on": [
+     "COMPONENTS"
+    ],
+    "w": {
+     "call stack": "translateImageToMsq \u2192 translatePage \u2192 analyzeStraightenedImage \u2192 extractSymbols \u2192 findSymbolComponents \u2192 floodFill",
+     "in": "the bitmap without lines or stems",
+     "returns": "components \u2014 box \u00b7 ink"
+    }
+   },
+   {
+    "t": "Touching symbols, pulled apart",
+    "x": "splitTouchingComponents reads the column profile: every symbol is one peak, and the dip between peaks is where they meet.",
+    "f": "SPLIT",
+    "l": [
+     17,
+     23
+    ],
+    "on": [
+     "COMPONENTS"
+    ],
+    "w": {
+     "call stack": "translateImageToMsq \u2192 translatePage \u2192 analyzeStraightenedImage \u2192 extractSymbols \u2192 splitTouchingComponents",
+     "in": "the components",
+     "returns": "one component per symbol"
+    }
+   },
+   {
+    "t": "The one learned call",
+    "x": "classifyComponent asks the model \u2014 and below the confidence floor the honest answer is unknown.",
+    "f": "CLASSIFY",
+    "l": [
+     15,
+     30
+    ],
+    "on": [
+     "CLASSIFY"
+    ],
+    "w": {
+     "call stack": "translateImageToMsq \u2192 translatePage \u2192 analyzeStraightenedImage \u2192 extractSymbols \u2192 classify \u2192 classifyComponent \u2192 forwardModel",
+     "in": "a 48\u00d748 crop \u00b7 the model \u00b7 the classIds",
+     "returns": "{ className, confidence, candidates }"
+    },
+    "tok": [
+     "COMPONENTS-CLASSIFY",
+     "a crop"
+    ],
+    "msg": {
+     "candidates": "[{ className, probability }] \u2014 best three"
+    }
+   },
+   {
+    "t": "Position and direction",
+    "x": "staffPositionOf measures the blob against the stored line positions; headSideOf says which way the stem points.",
+    "f": "EXTRACT",
+    "l": [
+     99,
+     103
+    ],
+    "on": [
+     "CLASSIFY"
+    ],
+    "w": {
+     "call stack": "translateImageToMsq \u2192 translatePage \u2192 analyzeStraightenedImage \u2192 extractSymbols \u2192 staffPositionOf",
+     "in": "a blob box \u00b7 the staves",
+     "returns": "staffPosition \u2014 half staff-spaces down from the top line"
+    }
+   }
+  ]
+ },
+ {
+  "id": "music",
+  "name": "music model \u2014 the rules",
+  "frames": [
+   {
+    "t": "Roles, not names",
+    "x": "buildStaveMusic sorts the blobs by the role their class carries, so a new class joins the rules by sitting in the table.",
+    "f": "MUSIC",
+    "l": [
+     71,
+     97
+    ],
+    "on": [
+     "MUSIC"
+    ],
+    "w": {
+     "call stack": "translateImageToMsq \u2192 translatePage \u2192 analyzeStraightenedImage \u2192 buildMusicModel \u2192 buildStaveMusic \u2192 roleOf",
+     "in": "the blobs \u00b7 the staves",
+     "returns": "heads \u00b7 rests \u00b7 clef \u00b7 key and meter"
+    }
+   },
+   {
+    "t": "Heads at one x are a chord",
+    "x": "groupChordsByHorizontalProximity: engraving puts a chord's heads on one vertical.",
+    "f": "CHORDS",
+    "l": [
+     13,
+     26
+    ],
+    "on": [
+     "MUSIC"
+    ],
+    "w": {
+     "call stack": "translateImageToMsq \u2192 translatePage \u2192 analyzeStraightenedImage \u2192 buildMusicModel \u2192 groupChordsByHorizontalProximity",
+     "in": "the heads \u00b7 the staff space",
+     "returns": "units \u2014 each with its heads and its x"
+    }
+   },
+   {
+    "t": "The grid gives the pitch",
+    "x": "assignPitchByStaffPosition walks the letters downward from the clef's top line \u2014 the drawer's own table, in reverse.",
+    "f": "PITCH",
+    "l": [
+     22,
+     33
+    ],
+    "on": [
+     "MUSIC"
+    ],
+    "w": {
+     "call stack": "translateImageToMsq \u2192 translatePage \u2192 analyzeStraightenedImage \u2192 buildMusicModel \u2192 buildNoteUnit \u2192 assignPitchByStaffPosition",
+     "in": "staffPosition \u00b7 clef",
+     "returns": "{ noteName, octaveNumber }"
+    },
+    "msg": {
+     "0": "f5 in treble",
+     "4": "b4 \u2014 the middle line",
+     "10": "c4"
+    }
+   },
+   {
+    "t": "The shapes give the duration",
+    "x": "inferDurationFromNoteShapes: an open head is twice a filled one, and every beam or flag halves again.",
+    "f": "DURATION",
+    "l": [
+     11,
+     19
+    ],
+    "on": [
+     "MUSIC"
+    ],
+    "w": {
+     "call stack": "translateImageToMsq \u2192 translatePage \u2192 analyzeStraightenedImage \u2192 buildMusicModel \u2192 buildNoteUnit \u2192 inferDurationFromNoteShapes",
+     "in": "isOpenHead \u00b7 hasStem \u00b7 beamCount \u00b7 flagCount",
+     "returns": "unitDuration \u2014 1 is a whole note"
+    }
+   },
+   {
+    "t": "What hangs on a head",
+    "x": "accidentalsOf and dotsOf attach to the head they hug \u2014 close on the left, or just right of it.",
+    "f": "MUSIC",
+    "l": [
+     138,
+     146
+    ],
+    "on": [
+     "MUSIC"
+    ],
+    "w": {
+     "call stack": "translateImageToMsq \u2192 translatePage \u2192 analyzeStraightenedImage \u2192 buildMusicModel \u2192 accidentalsOf",
+     "in": "the blob \u00b7 its neighbours",
+     "returns": "the keys of the note \u00b7 its dots"
+    }
+   },
+   {
+    "t": "Key and meter from the left edge",
+    "x": "inferKeyAndTimeSignature reads what engraving always puts left of the first note: the accidental row, the stacked digits.",
+    "f": "KEYTIME",
+    "l": [
+     30,
+     39
+    ],
+    "on": [
+     "MUSIC"
+    ],
+    "w": {
+     "call stack": "translateImageToMsq \u2192 translatePage \u2192 analyzeStraightenedImage \u2192 buildMusicModel \u2192 inferKeyAndTimeSignature",
+     "in": "the blobs left of the first head",
+     "returns": "keySignatureName \u00b7 timeSignatureParams"
+    }
+   },
+   {
+    "t": "Barlines slice measures",
+    "x": "buildMeasuresFromBarLines cuts the timeline at each barline \u2014 and a page with none is one measure.",
+    "f": "MEASURES",
+    "l": [
+     11,
+     24
+    ],
+    "on": [
+     "SCHEMA"
+    ],
+    "w": {
+     "call stack": "translateImageToMsq \u2192 translatePage \u2192 analyzeStraightenedImage \u2192 buildMusicModel \u2192 buildMeasuresFromBarLines",
+     "in": "the units \u00b7 the barLines",
+     "returns": "measures \u2014 arrays of units"
+    }
+   },
+   {
+    "t": "Stems up and down are voices",
+    "x": "splitVoicesByStemDirection splits a measure that carries two lines of music; fillRestsInMeasures pads the silence.",
+    "f": "VOICES",
+    "l": [
+     12,
+     19
+    ],
+    "on": [
+     "SCHEMA"
+    ],
+    "w": {
+     "call stack": "translateImageToMsq \u2192 translatePage \u2192 analyzeStraightenedImage \u2192 buildMusicModel \u2192 splitVoicesByStemDirection",
+     "in": "the units of a measure",
+     "returns": "voices \u2014 each its own line of units"
+    }
+   },
+   {
+    "t": "The unit is written",
+    "x": "schemaUnit turns one unit into the tree: notes with ids, duration, dots, keys, stem, beaming.",
+    "f": "SCHEMA",
+    "l": [
+     29,
+     58
+    ],
+    "on": [
+     "SERIALIZE"
+    ],
+    "w": {
+     "call stack": "translateImageToMsq \u2192 translatePage \u2192 buildPageSchemaFromMusicModel \u2192 schemaUnit",
+     "in": "a unit",
+     "returns": "{ notes, unitDuration, numberOfDots, stemDirection, beamedWithNext }"
+    }
+   }
+  ]
+ },
+ {
+  "id": "train",
+  "name": "one training batch",
+  "frames": [
+   {
+    "t": "The set is drawn, not labeled",
+    "x": "generateTrainingSet draws each class with jitter and photo flaws \u2014 the label is the class it came from.",
+    "f": "GEN",
+    "l": [
+     17,
+     43
+    ],
+    "on": [
+     "DRAW"
+    ],
+    "w": {
+     "call stack": "runTraining \u2192 generateTrainingSet",
+     "in": "seed \u00b7 samplesPerClass \u00b7 gridSize",
+     "returns": "samples \u2014 { pixels, classId, classIndex }"
+    },
+    "tok": [
+     "DRAW-TRAIN",
+     "seeded pictures"
+    ]
+   },
+   {
+    "t": "One picture of one symbol",
+    "x": "drawSymbolSample draws the shape with varied weight and size \u2014 a flashcard, not a template.",
+    "f": "DRAW",
+    "l": [
+     279,
+     285
+    ],
+    "on": [
+     "DRAW"
+    ],
+    "w": {
+     "call stack": "runTraining \u2192 generateTrainingSet \u2192 drawSymbolSample",
+     "in": "classId \u00b7 drawSize \u00b7 random",
+     "returns": "a bitmap of one glyph"
+    }
+   },
+   {
+    "t": "Normalized to the grid",
+    "x": "resampleToGrid shrinks by averaging and enlarges by blending \u2014 the same rule the crops use at inference.",
+    "f": "CROP",
+    "l": [
+     25,
+     38
+    ],
+    "on": [
+     "DRAW"
+    ],
+    "w": {
+     "call stack": "runTraining \u2192 generateTrainingSet \u2192 resampleToGrid",
+     "in": "the drawn bitmap",
+     "returns": "pixels \u2014 the model's exact input"
+    }
+   },
+   {
+    "t": "A batch, an epoch",
+    "x": "trainModel: show a batch, guess, measure how wrong, nudge \u2014 an epoch is one pass over the set.",
+    "f": "TRAIN",
+    "l": [
+     25,
+     118
+    ],
+    "on": [
+     "TRAIN"
+    ],
+    "w": {
+     "call stack": "runTraining \u2192 trainModel",
+     "in": "the samples \u00b7 epochs \u00b7 batchSize \u00b7 learningRate",
+     "returns": "history \u2014 loss and accuracy per epoch"
+    },
+    "tok": [
+     "TRAIN-WEIGHTS",
+     "the loop"
+    ]
+   },
+   {
+    "t": "Forward: guess",
+    "x": "forwardModel walks one crop through the net: conv, relu, pool, dense, softmax.",
+    "f": "MODEL",
+    "l": [
+     15,
+     51
+    ],
+    "on": [
+     "TRAIN"
+    ],
+    "w": {
+     "call stack": "runTraining \u2192 trainModel \u2192 forwardModel",
+     "in": "a crop \u00b7 the model",
+     "returns": "probabilities \u00b7 cache for the backward pass"
+    }
+   },
+   {
+    "t": "Backward: blame",
+    "x": "backpropagateModel walks the same stages in reverse; each hands the one before its share of the error.",
+    "f": "BACKPROP",
+    "l": [
+     20,
+     68
+    ],
+    "on": [
+     "TRAIN"
+    ],
+    "w": {
+     "call stack": "runTraining \u2192 trainModel \u2192 backpropagateModel",
+     "in": "the cache \u00b7 the expected class",
+     "returns": "one gradient per weight and bias"
+    }
+   },
+   {
+    "t": "The nudge",
+    "x": "updateWeightsWithAdam: each number steps by its own smoothed direction and scale.",
+    "f": "ADAM",
+    "l": [
+     19,
+     30
+    ],
+    "on": [
+     "WEIGHTS"
+    ],
+    "w": {
+     "call stack": "runTraining \u2192 trainModel \u2192 updateWeightsWithAdam",
+     "in": "weights \u00b7 gradients \u00b7 state",
+     "returns": "the weights, one step closer"
+    }
+   },
+   {
+    "t": "The report card",
+    "x": "evaluateModel reads the confusion; exportWeights pins what survived with its hash.",
+    "f": "EVAL",
+    "l": [
+     13,
+     44
+    ],
+    "on": [
+     "WEIGHTS"
+    ],
+    "w": {
+     "call stack": "runTraining \u2192 trainModel \u2192 evaluateModel",
+     "in": "the model \u00b7 the validation set",
+     "returns": "loss \u00b7 accuracy \u00b7 confusion \u00b7 worst mistakes"
+    },
+    "tok": [
+     "TRAIN-WEIGHTS",
+     "weights + sha"
+    ]
+   }
+  ]
+ }
+];
+
+  const SVGNS = 'http://www.w3.org/2000/svg';
+  const el = (n, a, p) => { const e = document.createElementNS(SVGNS, n); for (const k in a) e.setAttribute(k, a[k]); if (p) p.appendChild(e); return e; };
+  const gE = document.getElementById('edges'), gN = document.getElementById('nodes');
+  const edgeEls = {}, nodeEls = {};
+  for (const id in EDGES) {
+    const e = EDGES[id];
+    edgeEls[id] = el('path', { d: e.d, class: 'edge' }, gE);
+    if (e.l) { const t = el('text', { x: e.lx, y: e.ly, class: 'elabel' }, gE); t.textContent = e.l; }
+  }
+  for (const id in NODES) {
+    const n = NODES[id];
+    const g = el('g', { class: 'node' }, gN);
+    const tt = el('title', {}, g); tt.textContent = id;
+    el('rect', { x: n.x - 75, y: n.y - 24, width: 150, height: 48, rx: 7 }, g);
+    el('rect', { x: n.x - 75, y: n.y - 24, width: 6, height: 48, rx: 3, class: 'band' }, g);
+    const a = el('text', { x: n.x, y: n.y - 3 }, g); a.textContent = n.t;
+    const b = el('text', { x: n.x, y: n.y + 13, class: 'k' }, g); b.textContent = n.k;
+    nodeEls[id] = g;
+  }
+  const tok = document.getElementById('tok');
+  const tokRect = tok.querySelector('rect'), tokText = tok.querySelector('text');
+
+  const files = {};
+  const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const KEYWORDS = /\b(const|let|var|function|return|if|else|for|while|of|in|new|import|export|from|default|class|extends|async|await|try|catch|finally|throw|typeof|instanceof|null|undefined|true|false|this|switch|case|break|continue|delete|void|yield|static|get|set)\b/;
+  function highlightJs(src) {
+    const re = new RegExp(
+      '(\\/\\*[\\s\\S]*?\\*\\/|\\/\\/[^\\n]*)' +
+      "|('(?:\\\\.|[^'\\\\])*'|\"(?:\\\\.|[^\"\\\\])*\"|`(?:\\\\.|[^`\\\\])*`)" +
+      '|(0x[\\da-fA-F]+|\\d+(?:\\.\\d+)?)' +
+      '|' + KEYWORDS.source, 'g');
+    let out = '', last = 0, m;
+    while ((m = re.exec(src))) {
+      out += esc(src.slice(last, m.index));
+      if (m[1]) out += '<span class="hljs-comment">' + esc(m[1]) + '</span>';
+      else if (m[2]) out += '<span class="hljs-string">' + esc(m[2]) + '</span>';
+      else if (m[3]) out += '<span class="hljs-number">' + esc(m[3]) + '</span>';
+      else out += '<span class="hljs-keyword">' + esc(m[4]) + '</span>';
+      last = re.lastIndex;
+    }
+    return out + esc(src.slice(last));
+  }
+  function splitLines(html) {
+    const out = []; const open = []; let cur = '';
+    const re = /(<span[^>]*>)|(<\/span>)|(\n)|([^<\n]+)/g; let m;
+    while ((m = re.exec(html))) {
+      if (m[1]) { open.push(m[1]); cur += m[1]; }
+      else if (m[2]) { open.pop(); cur += m[2]; }
+      else if (m[3]) { cur += '</span>'.repeat(open.length); out.push(cur); cur = open.join(''); }
+      else cur += m[4];
+    }
+    out.push(cur); return out;
+  }
+  function getFile(key) {
+    if (files[key]) return files[key];
+    const s = document.getElementById('src-' + key);
+    const raw = s.textContent.replace(/^\n/, '').replace(/\n$/, '');
+    files[key] = { path: s.dataset.path, start: +s.dataset.start, lines: splitLines(highlightJs(raw)) };
+    return files[key];
+  }
+  const codeOl = document.getElementById('code'), codeBox = document.getElementById('codebox');
+  let shownFile = null;
+  function showCode(key, range) {
+    const f = getFile(key);
+    if (shownFile !== key) {
+      codeOl.innerHTML = f.lines.map((ln, i) =>
+        `<li data-n="${f.start + i}"><span class="n">${f.start + i}</span><code>${ln || ' '}</code></li>`).join('');
+      shownFile = key;
+    }
+    document.getElementById('fpath').textContent = f.path;
+    document.getElementById('frepo').textContent = 'MuSemantiQ';
+    document.getElementById('flines').textContent = range ? `lines ${range[0]}–${range[1]}` : '';
+    let first = null;
+    codeOl.querySelectorAll('li').forEach(li => {
+      const n = +li.dataset.n; const on = range && n >= range[0] && n <= range[1];
+      li.classList.toggle('hl', !!on); if (on && !first) first = li;
+    });
+    if (first) codeBox.scrollTo({ top: Math.max(0, first.offsetTop - 70), behavior: reduce ? 'auto' : 'smooth' });
+  }
+
+  const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let animId = 0;
+  function placeTok(path, t, rev) {
+    const L = path.getTotalLength(); const p = path.getPointAtLength((rev ? 1 - t : t) * L);
+    tok.setAttribute('transform', `translate(${p.x},${p.y})`);
+  }
+  function runTok(spec) {
+    const my = ++animId;
+    for (const id in edgeEls) edgeEls[id].classList.remove('on', 'lit');
+    if (!spec) { tok.style.display = 'none'; return; }
+    const [edge, label, rev, bad] = spec; const path = edgeEls[edge];
+    path.classList.add('on');
+    tok.classList.toggle('err', !!bad);
+    tokText.textContent = label; tok.style.display = '';
+    const w = Math.max(30, tokText.getComputedTextLength() + 14);
+    tokRect.setAttribute('width', w); tokRect.setAttribute('x', 10); tokRect.setAttribute('y', -9);
+    tokText.setAttribute('x', 17);
+    const a = 0.1, b = 0.9;
+    if (reduce) { placeTok(path, b, rev); return; }
+    const t0 = performance.now(), dur = 1000;
+    const step = now => {
+      if (my !== animId) return;
+      const k = Math.min(1, (now - t0) / dur); const e = k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+      placeTok(path, a + (b - a) * e, rev);
+      if (k < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }
+
+  const msgEl = document.getElementById('msg'), workerEl = document.getElementById('worker');
+  function showState(fr) {
+    msgEl.textContent = fr.msg ? JSON.stringify(fr.msg, null, 2) : '—';
+    workerEl.innerHTML = fr.w
+      ? Object.entries(fr.w).map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(String(v))}</dd>`).join('')
+      : '<dt>—</dt><dd>nothing new in this frame</dd>';
+    document.getElementById('logline').textContent = fr.log || '—';
+  }
+
+  let si = 0, fi = 0, timer = null;
+  const tabs = document.getElementById('tabs'), scrub = document.getElementById('scrub');
+  S.forEach((sc, i) => {
+    const b = document.createElement('button'); b.type = 'button'; b.role = 'tab'; b.id = 'tab-' + sc.id;
+    b.textContent = sc.name; b.addEventListener('click', () => { stop(); si = i; fi = 0; render(); });
+    tabs.appendChild(b);
+  });
+  function render() {
+    const sc = S[si], fr = sc.frames[fi];
+    [...tabs.children].forEach((b, i) => b.setAttribute('aria-selected', i === si ? 'true' : 'false'));
+    scrub.max = sc.frames.length - 1; scrub.value = fi;
+    document.getElementById('count').textContent = `${fi + 1} / ${sc.frames.length}`;
+    document.getElementById('ctitle').textContent = fr.t;
+    document.getElementById('ctext').textContent = fr.x;
+    document.getElementById('where').textContent = (fr.on || []).map(k => NODES[k].t).join(' · ');
+    for (const k in nodeEls) nodeEls[k].classList.toggle('on', (fr.on || []).includes(k));
+    runTok(fr.tok);
+    showState(fr);
+    showCode(fr.f, fr.l);
+    document.getElementById('prev').disabled = document.getElementById('first').disabled = fi === 0;
+    document.getElementById('next').disabled = fi === sc.frames.length - 1;
+  }
+  const go = d => { const n = S[si].frames.length; fi = Math.max(0, Math.min(n - 1, fi + d)); render(); };
+  function stop() { if (timer) { clearInterval(timer); timer = null; } const p = document.getElementById('play'); p.textContent = '▶ Play'; p.setAttribute('aria-label', 'Play'); }
+  function play() {
+    if (fi === S[si].frames.length - 1) { fi = 0; render(); }
+    const p = document.getElementById('play'); p.textContent = '❚❚ Pause'; p.setAttribute('aria-label', 'Pause');
+    timer = setInterval(() => { if (fi >= S[si].frames.length - 1) return stop(); go(1); }, 2800);
+  }
+  document.getElementById('play').addEventListener('click', () => timer ? stop() : play());
+  document.getElementById('next').addEventListener('click', () => { stop(); go(1); });
+  document.getElementById('prev').addEventListener('click', () => { stop(); go(-1); });
+  document.getElementById('first').addEventListener('click', () => { stop(); fi = 0; render(); });
+  scrub.addEventListener('input', () => { stop(); fi = +scrub.value; render(); });
+  document.addEventListener('keydown', e => {
+    if (e.target === scrub) return;
+    if (e.key === 'ArrowRight') { stop(); go(1); e.preventDefault(); }
+    else if (e.key === 'ArrowLeft') { stop(); go(-1); e.preventDefault(); }
+    else if (e.key === ' ' && e.target.tagName !== 'BUTTON') { timer ? stop() : play(); e.preventDefault(); }
+  });
+
+  render();
+})();
+</script>
