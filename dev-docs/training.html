@@ -144,6 +144,9 @@ figcaption { font: 12px var(--mono); color: var(--muted); margin-top: 6px; }
 ./remote-training-scripts/remote-start-training.sh</code></pre>
 <p>The first script has the server check out the branch and reset to it — <code>ssh … 'cd MuSemantiQ && git fetch --all && git checkout omr && git reset --hard origin/omr'</code>. The second starts training detached with <code>nohup</code> and tells you its pid; the run keeps going after the command returns, and it <b>logs itself</b> to <code>training-data/training.log</code> on the server: the config it started with, one line per epoch, the sha of the weights it wrote, and any error it died of.</p>
 
+<p>The defaults are the smoke run (360 samples, 15 epochs — seconds). A run worth keeping takes its size as flags, and they pass through the script:</p>
+<pre><code>./remote-training-scripts/remote-start-training.sh --samples-per-class=400 --epochs=40</code></pre>
+
 <p>Watching is one more command; <code>Ctrl-c</code> stops the watching, not the training:</p>
 <pre><code>ssh user@server 'tail -f MuSemantiQ/training-data/training.log'   <span class="cm"># one line per epoch</span>
 
