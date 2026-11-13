@@ -112,9 +112,10 @@ export function runTraining () {
   const samplesPerClass = numberFlag('samples-per-class', 40)
   const epochs = numberFlag('epochs', 15)
   const gridSize = numberFlag('grid', 24)
-  const shape = { gridSize, filterSize: 3, filterCounts: [ 8, 16 ], denseSize: 24, classCount: 9 }
+  const shape = { gridSize, filterSize: 3, filterCounts: [ 8, 16 ], denseSize: 24, classCount: 0 }
   const seed = 20261110
   const { classIds, samples } = generateTrainingSet({ seed, samplesPerClass, gridSize: shape.gridSize })
+  shape.classCount = classIds.length
   const log = (line) => {
     appendFileSync(RUN_LOG, `${line}\n`)
     console.log(line)

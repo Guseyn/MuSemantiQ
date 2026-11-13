@@ -30,7 +30,7 @@ import { generateTrainingSet } from '#msq/omr/training/generateTrainingSet.js'
 import { createSeededRandom } from '#msq/omr/training/seededRandom.js'
 import assignPitchByStaffPosition from '#msq/omr/translation/assignPitchByStaffPosition.js'
 import inferDurationFromNoteShapes from '#msq/omr/translation/inferDurationFromNoteShapes.js'
-import { roleOf } from '#msq/omr/analysis/symbolClasses.js'
+import { roleOf, classifiedClassIds } from '#msq/omr/analysis/symbolClasses.js'
 import { drawableSymbols } from '#msq/omr/training/drawSymbols.js'
 import { translateImageToMsq } from '#msq/omr/translateImageToMsq.js'
 import { translateImagesToMsqPages } from '#msq/omr/translateImagesToMsqPages.js'
@@ -525,6 +525,19 @@ const TESTS = [
       assert.ok(msqText.includes('is ghost'), 'and one rule turns it into MSQ')
       const parsed = generateIntermediateStructuresForSinglePage({ pageText: msqText })
       assert.deepStrictEqual(parsed.errors, [], 'the page still parses')
+    }
+  },
+  {
+    name: 'the drawer covers the whole class table',
+    run () {
+      // every feature MSQ knows has a shape here, so training can see it —
+      // the classes the model learns are exactly the classes the table names
+      for (const classId of classifiedClassIds) {
+        assert.ok(drawableSymbols[classId], `${classId} has a shape`)
+      }
+      const { classIds, samples } = generateTrainingSet({ seed: 45, samplesPerClass: 2, gridSize: 12 })
+      assert.deepStrictEqual(classIds, classifiedClassIds, 'the model classes are the table classes, in order')
+      assert.strictEqual(samples.length, classifiedClassIds.length * 2, 'every class gets its samples')
     }
   },
   {
