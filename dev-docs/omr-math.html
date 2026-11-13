@@ -1,5 +1,6 @@
-<title>MuSemantiQ — the math of training</title>
+<title>MuSemantiQ — mathematics of training</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous">
 <style>
 :root {
   --paper: #fdfdfb;
@@ -15,363 +16,514 @@
 }
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; scroll-padding-top: 64px; }
-body { background: var(--paper); color: var(--ink); font: 15.5px/1.6 var(--font); margin: 0; }
+body { background: var(--paper); color: var(--ink); font: 15.5px/1.7 var(--font); margin: 0; }
 a { color: var(--accent); text-decoration: none; }
 a:hover { text-decoration: underline; }
-.page { max-width: 820px; margin: 0 auto; padding: 36px 22px 120px; }
+.page { max-width: 800px; margin: 0 auto; padding: 36px 22px 140px; }
 header h1 { font: 400 34px/1.2 var(--serif); margin: 0 0 6px; }
 header .sub { color: var(--muted); max-width: 70ch; }
 .eyebrow { font: 500 12px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
-hr { border: 0; border-top: 1px solid var(--rule); margin: 34px 0; }
-nav { position: sticky; top: 0; z-index: 10; background: var(--paper); border-bottom: 1px solid var(--rule); padding: 10px 0; margin: 22px 0 26px; display: flex; flex-wrap: wrap; gap: 4px 14px; }
-nav a { font: 500 12.5px var(--mono); color: var(--muted); }
+nav { position: sticky; top: 0; z-index: 10; background: var(--paper); border-bottom: 1px solid var(--rule); padding: 10px 0; margin: 22px 0 26px; display: flex; flex-wrap: wrap; gap: 4px 13px; }
+nav a { font: 500 12px var(--mono); color: var(--muted); }
 nav a:hover { color: var(--accent); text-decoration: none; }
-h2 { font: 400 25px/1.25 var(--serif); margin: 0 0 10px; }
-h2 .n { color: var(--muted); font-size: 17px; margin-right: 8px; }
-p { max-width: 72ch; margin: 8px 0; }
-.totop { float: right; font: 500 11.5px var(--mono); }
-
-/* the math itself — typeset in the page, no library */
-.m { font-family: var(--serif); font-style: italic; }
-.m .up { font-style: normal; }
-.eq {
-  display: grid; grid-template-columns: 1fr auto; gap: 10px 18px; align-items: center;
-  background: var(--soft); border-left: 3px solid var(--accent); border-radius: 0 7px 7px 0;
-  padding: 14px 18px; margin: 18px 0; overflow-x: auto;
-}
-.eq .body { font: 18px/2.1 var(--serif); white-space: nowrap; }
-.eq .num { font: 500 11px var(--mono); color: var(--muted); }
-.eq .name { grid-column: 1 / -1; font: 500 11px var(--mono); color: var(--muted); margin-top: -6px; }
-sub, sup { font-size: .68em; }
-.frac { display: inline-flex; flex-direction: column; vertical-align: -0.55em; text-align: center; }
-.frac .num { border-bottom: 1px solid currentColor; padding: 0 .35em .12em; }
-.frac .den { padding: .12em .35em 0; }
-.sum { display: inline-flex; flex-direction: column; align-items: center; vertical-align: -0.75em; line-height: 1.05; }
-.sum .op { font-size: 1.55em; font-style: normal; }
-.sum .lim { font-size: .62em; font-style: normal; }
-.vec { font-weight: bold; font-style: italic; }
-table.notation { border-collapse: collapse; width: 100%; font-size: 14px; margin: 12px 0; }
-table.notation td { border-bottom: 1px solid var(--rule); padding: 6px 10px; vertical-align: top; }
-table.notation td:first-child { width: 90px; font-family: var(--serif); font-size: 16px; }
-table.notation td:last-child { color: var(--muted); }
+h2 { font: 400 25px/1.3 var(--serif); margin: 40px 0 8px; }
+h3 { font: 400 19px/1.3 var(--serif); margin: 26px 0 6px; }
+p { max-width: 72ch; margin: 10px 0; }
+hr { border: 0; border-top: 1px solid var(--rule); margin: 34px 0; }
+.syms { margin: 6px 0 18px; }
+.syms p { margin: 4px 0; padding-left: 14px; border-left: 2px solid var(--rule); }
+.katex-display { margin: 18px 0 !important; }
+.katex { font-size: 1.06em; }
+.claim { border-left: 3px solid var(--accent); background: var(--accent-soft); padding: 10px 16px; margin: 18px 0; border-radius: 0 7px 7px 0; }
+.claim b { font: 600 11px var(--mono); text-transform: uppercase; letter-spacing: .06em; color: var(--muted); display: block; margin-bottom: 4px; }
+.proof { border-left: 3px solid var(--rule); padding: 4px 16px; margin: 12px 0 18px; }
+.proof b { font: 600 11px var(--mono); text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.step { color: var(--accent); font-style: italic; }
+ol.algo { max-width: 72ch; }
+ol.algo li { margin: 6px 0; }
 code { font: .87em var(--mono); background: var(--soft); padding: 0 4px; border-radius: 3px; }
+.totop { float: right; font: 500 11px var(--mono); }
 </style>
 
 <div class="page">
 <header>
   <div class="eyebrow">MuSemantiQ · dev docs · src/omr</div>
-  <h1>the math of training</h1>
-  <p class="sub">Every equation behind <code>src/omr</code> training, and nothing else. The crop, the forward pass, the loss, the backward pass, the nudge, and the check that keeps them honest. Each equation is the code it becomes.</p>
+  <h1>Mathematics of Training</h1>
+  <p class="sub">The complete mathematics of how the classifier learns: the forward pass, the cost, the derivatives through every layer, and the nudge. Built from one neuron upward, each result derived — nothing assumed.</p>
 </header>
 
 <nav>
-  <a href="#notation">notation</a>
-  <a href="#crop">1 the crop</a>
-  <a href="#forward">2 forward</a>
-  <a href="#loss">3 loss</a>
-  <a href="#backward">4 backward</a>
-  <a href="#adam">5 the nudge</a>
-  <a href="#check">6 the check</a>
-  <a href="#count">7 the count</a>
-  <a href="./omr-code.html">the code →</a>
+  <a href="#s1">1 unit</a>
+  <a href="#s2">2 convolution</a>
+  <a href="#s3">3 relu &amp; pool</a>
+  <a href="#s4">4 dense &amp; softmax</a>
+  <a href="#s5">5 cost</a>
+  <a href="#s6">6 goal</a>
+  <a href="#s7">7 initial values</a>
+  <a href="#s8">8 minimum</a>
+  <a href="#s9">9 dC/dW</a>
+  <a href="#s10">10 dC/db</a>
+  <a href="#s11">11 convolution</a>
+  <a href="#s12">12 adam</a>
+  <a href="#s13">13 the check</a>
+  <a href="#s14">14 how to train</a>
 </nav>
 
-<!-- ============================ NOTATION ============================ -->
-<section id="notation">
-<h2>Notation</h2>
-<table class="notation">
-<tr><td><span class="m">a</span>, <span class="m">z</span></td><td>activation, pre-activation — arrays; index triples like <span class="m">a<sub>i,j,c</sub></span> are column, row, channel</td></tr>
-<tr><td><span class="m">W</span>, <span class="m">b</span></td><td>weights, bias — learned numbers; <span class="m">W<sub>p,q,c,k</sub></span> is filter <span class="m">k</span>, window offset <span class="m">(p, q)</span>, input channel <span class="m">c</span></td></tr>
-<tr><td><span class="m">F</span>, <span class="m">C</span>, <span class="m">K</span></td><td>filter size (3), input channels, number of filters</td></tr>
-<tr><td><span class="m">H</span>, <span class="m">W</span>, <span class="m">N</span></td><td>grid height, grid width, batch size</td></tr>
-<tr><td><span class="m">p<sub>c</sub></span>, <span class="m">y</span></td><td>probability of class <span class="m">c</span>; the true class of a sample</td></tr>
-<tr><td><span class="m">θ</span></td><td>all learned numbers together — every <span class="m">W</span> and every <span class="m">b</span></td></tr>
-<tr><td><span class="m">λ</span>, <span class="m">η</span>, <span class="m">ε</span></td><td>L2 strength, learning rate, small constant</td></tr>
-<tr><td><span class="m">δ</span>, <span class="m">g</span></td><td>error signal flowing backward; the gradient of one parameter</td></tr>
-</table>
-</section>
+<!-- ======================= 1 ======================= -->
+<h2 id="s1"><span class="n">1.</span> The Unit of the Network, in Isolation</h2>
 
-<hr>
+<p>Before layers, one number-producing unit. A classifier reads one crop — a small grid of ink — and answers with a class. The crop is a matrix of numbers:</p>
 
-<!-- ============================ 1 · THE CROP ============================ -->
-<section id="crop">
-<h2><span class="n">1</span>The crop</h2>
-<p>One symbol, scaled to a fixed grid before anything else.</p>
+$$
+x_{i,j} \quad 0 \le i \lt H,\ 0 \le j \lt W
+$$
 
-<div class="eq">
-  <div class="body m">
-    dst(<span class="up">x</span>, <span class="up">y</span>) =
-    (1 / |<span class="m">R</span>|) ·
-    <span class="sum"><span class="op">∑</span><span class="lim">(u,v) ∈ R</span></span>
-    src(<span class="up">u</span>, <span class="up">v</span>)
-  </div>
-  <div class="num">(1)</div>
-  <div class="name">shrink — the average of the source pixels the output pixel covers</div>
+<div class="syms">
+<p>\(x_{i,j}\) — the ink of one pixel, a scalar between \(0\) (paper) and \(1\) (ink)</p>
+<p>\(i\) — the column index; \(j\) — the row index (image coordinates, \(y\) down)</p>
+<p>\(H,\ W\) — the grid's width and height; the crop is normalized to \(H = W = 48\) before anything else</p>
 </div>
 
-<div class="eq">
-  <div class="body m">
-    dst(<span class="up">x</span>, <span class="up">y</span>) =
-    (1−α)(1−β)·<span class="m">Q</span><sub>00</sub> + α(1−β)·<span class="m">Q</span><sub>01</sub> +
-    (1−α)β·<span class="m">Q</span><sub>10</sub> + αβ·<span class="m">Q</span><sub>11</sub>
-  </div>
-  <div class="num">(2)</div>
-  <div class="name">enlarge — bilinear blend of the 2×2 neighbourhood Q; α, β are the fractional sample offsets</div>
-</div>
-</section>
+<p>One unit of the network takes such numbers and produces one number:</p>
 
-<hr>
+$$
+a = \sigma\Bigl(\sum_{i,j} x_{i,j}\, w_{i,j} + b\Bigr) \tag{1}
+$$
 
-<!-- ============================ 2 · FORWARD ============================ -->
-<section id="forward">
-<h2><span class="n">2</span>The forward pass</h2>
-<p>Convolution, in the sum form and in the matrix form the code runs.</p>
-
-<div class="eq">
-  <div class="body m">
-    z<sub>i,j,k</sub> = b<sub>k</sub> +
-    <span class="sum"><span class="op">∑</span><span class="lim">p,q = 0..F−1</span></span>
-    <span class="sum"><span class="op">∑</span><span class="lim">c</span></span>
-    W<sub>p,q,c,k</sub> · a<sub>i+p, j+q, c</sub>
-  </div>
-  <div class="num">(3)</div>
-  <div class="name">convolution — out-of-bounds reads paper (padding = 0)</div>
+<div class="syms">
+<p>\(a\) — the result, or activation, of the unit</p>
+<p>\(w_{i,j}\) — the weight the unit gives to the pixel at \((i, j)\)</p>
+<p>\(b\) — the bias, a scalar shift</p>
+<p>\(\sigma\) — the activation function; we use \(\mathrm{ReLU}(z) = \max(0, z)\)</p>
 </div>
 
-<div class="eq">
-  <div class="body m">
-    <span class="m">Z</span> = <span class="m">P</span> <span class="m">Ŵ</span><sup>T</sup> + <span class="m">1</span> <span class="m">b</span><sup>T</sup>,
-    &nbsp;&nbsp; <span class="m">P</span> ∈ ℝ<sup>(HW)×R</sup>, &nbsp; <span class="m">Ŵ</span> ∈ ℝ<sup>K×R</sup>, &nbsp; R = F<sup>2</sup>C
-  </div>
-  <div class="num">(4)</div>
-  <div class="name">im2col — each window of the input becomes a row of P; the layer is one multiply</div>
+<p>A convolutional layer is nothing but many such units, each reading only a small window of the image. A dense layer is many such units, each reading everything.</p>
+
+<!-- ======================= 2 ======================= -->
+<h2 id="s2"><span class="n">2.</span> The Convolutional Layer</h2>
+
+<p>One unit of a convolutional layer — a <em>filter</em> — reads a small window of size \(F \times F\) and slides over the whole image. For output position \((i, j)\) and filter index \(k\):</p>
+
+$$
+z_{i,j,k} = b_k + \sum_{p=0}^{F-1} \sum_{q=0}^{F-1} \sum_{c=1}^{C} w_{p,q,c,k}\, a_{i+p,\, j+q,\, c} \tag{2}
+$$
+
+<div class="syms">
+<p>\(z_{i,j,k}\) — the pre-activation of filter \(k\) at position \((i, j)\)</p>
+<p>\(w_{p,q,c,k}\) — the weight of filter \(k\) at window offset \((p, q)\) of input channel \(c\); this is what training finds</p>
+<p>\(b_k\) — the bias of filter \(k\), one per filter</p>
+<p>\(a_{i+p,\,j+q,\,c}\) — the input activation; out-of-bounds positions read \(0\) ("same" padding), so the grid keeps its size</p>
+<p>\(F\) — the window size, \(3\) in our model; \(C\) — the number of input channels; \(K\) — the number of filters</p>
 </div>
 
-<div class="eq">
-  <div class="body m">a = max(0, z)</div>
-  <div class="num">(5)</div>
-  <div class="name">ReLU</div>
+<p>Then the activation:</p>
+
+$$
+a_{i,j,k} = \max(0,\ z_{i,j,k}) \tag{3}
+$$
+
+<p>Now the form the code actually runs. Every window of the input is cut into one row of a matrix — this is called <em>im2col</em>:</p>
+
+$$
+P \in \mathbb{R}^{(H W) \times R}, \qquad \hat{W} \in \mathbb{R}^{K \times R}, \qquad R = F^{2} C \tag{4}
+$$
+
+<div class="syms">
+<p>\(P\) — the patch matrix; row \((j H + i)\) is the flattened window starting at \((i, j)\)</p>
+<p>\(\hat W\) — the same weights as \(w_{p,q,c,k}\), flattened so one filter is one row of length \(R\)</p>
 </div>
 
-<div class="eq">
-  <div class="body m">
-    a<sup>pool</sup><sub>i,j,c</sub> = max<sub>u,v ∈ {0,1}</sub> &nbsp; a<sub>2i+u, 2j+v, c</sub>
-  </div>
-  <div class="num">(6)</div>
-  <div class="name">max-pool, 2×2 — the winning index is remembered for the backward pass</div>
+<p>Then the whole layer is one matrix product:</p>
+
+$$
+Z = P\, \hat{W}^{T} + \mathbf{1}\, b^{T} \tag{5}
+$$
+
+<div class="claim">
+<b>Claim.</b> The matrix form (5) computes exactly the sums of (2).
+<div class="proof">
+<b>Proof.</b> Row \(m = jH + i\) of \(P\) holds the window of (2) in the same order \(\hat W\) holds \(w_{p,q,c,k}\). The product of row \(m\) of \(P\) with column \(k\) of \(\hat W^T\) is therefore the triple sum of (2), and adding \(b_k\) gives \(z_{i,j,k}\). This holds for every \((i, j)\), so the matrices agree element by element. <span class="step">∎</span>
+</div>
 </div>
 
-<div class="eq">
-  <div class="body m">z = <span class="m">W</span> a + b</div>
-  <div class="num">(7)</div>
-  <div class="name">dense — every output on every input; before it, the maps are flattened: vec</div>
+<p>Why bother: a matrix product is one loop everyone knows, and — as section 11 shows — its derivatives come for free.</p>
+
+<!-- ======================= 3 ======================= -->
+<h2 id="s3"><span class="n">3.</span> Activation and Pooling</h2>
+
+$$
+a = \max(0,\ z) \tag{6}
+$$
+
+<p>Element by element. The derivative exists everywhere except at \(z = 0\):</p>
+
+$$
+\frac{\partial a}{\partial z} =
+\begin{cases}
+0 & z \lt 0 \\
+1 & z \gt 0 \\
+\varepsilon & z = 0
+\end{cases} \tag{7}
+$$
+
+<div class="syms">
+<p>\(\varepsilon\) — an arbitrarily small number; \(\max(0, z)\) has no derivative at \(0\), so we agree on one. It changes nothing and removes the exception</p>
 </div>
 
-<div class="eq">
-  <div class="body m">
-    p<sub>c</sub> =
-    <span class="frac">
-      <span class="num">e<sup> z<sub>c</sub> − m </sup></span>
-      <span class="den"><span class="sum"><span class="op">∑</span><span class="lim">j = 1..K</span></span> e<sup> z<sub>j</sub> − m</sup></span>
-    </span>,
-    &nbsp;&nbsp; m = max<sub>j</sub> z<sub>j</sub>
-  </div>
-  <div class="num">(8)</div>
-  <div class="name">softmax — the shift by m is a constant; ∑ p<sub>c</sub> = 1</div>
-</div>
-</section>
+<p>Pooling shrinks the grid by half, keeping only the strongest value of each \(2 \times 2\) window:</p>
 
-<hr>
+$$
+a^{\mathrm{pool}}_{i,j,c} = \max_{u,v \in \{0,1\}}\ a_{2i+u,\ 2j+v,\ c} \tag{8}
+$$
 
-<!-- ============================ 3 · LOSS ============================ -->
-<section id="loss">
-<h2><span class="n">3</span>The loss</h2>
-
-<div class="eq">
-  <div class="body m">
-    L<sub>CE</sub> = −
-    <span class="frac">
-      <span class="num">1</span>
-      <span class="den">N</span>
-    </span>
-    <span class="sum"><span class="op">∑</span><span class="lim">n = 1..N</span></span>
-    log p<sub>n, y<sub>n</sub></sub>
-  </div>
-  <div class="num">(9)</div>
-  <div class="name">cross-entropy — only the probability of the right class counts</div>
+<div class="syms">
+<p>\(a^{\mathrm{pool}}_{i,j,c}\) — the pooled value at half the resolution</p>
+<p>\((u, v)\) — the offset inside the \(2 \times 2\) window</p>
+<p>the winning offset is <em>remembered</em>; the backward pass will need it</p>
 </div>
 
-<div class="eq">
-  <div class="body m">
-    L<sub>reg</sub> = λ <span class="sum"><span class="op">∑</span><span class="lim">θ</span></span> θ<sup>2</sup>
-  </div>
-  <div class="num">(10)</div>
-  <div class="name">L2 — keeps the learned numbers small</div>
+<!-- ======================= 4 ======================= -->
+<h2 id="s4"><span class="n">4.</span> The Dense Layer and the Softmax</h2>
+
+<p>Before the dense layer the maps are flattened into one vector \(a^{(0)} \in \mathbb{R}^{n_0}\). A dense layer is (1) in vector form:</p>
+
+$$
+z^{(l)} = W^{(l)} a^{(l-1)} + b^{(l)}, \qquad a^{(l)} = \mathrm{ReLU}(z^{(l)}) \tag{9}
+$$
+
+<div class="syms">
+<p>\(a^{(l-1)}\) — the input of layer \(l\), the output of layer \(l-1\); \(a^{(0)}\) is the flattened crop</p>
+<p>\(W^{(l)} \in \mathbb{R}^{n_l \times n_{l-1}}\) — the weights; row \(j\) holds the weights of output neuron \(j\)</p>
+<p>\(b^{(l)} \in \mathbb{R}^{n_l}\) — the biases; \(n_l\) — the number of outputs of layer \(l\)</p>
 </div>
 
-<div class="eq">
-  <div class="body m">L = L<sub>CE</sub> + L<sub>reg</sub></div>
-  <div class="num">(11)</div>
-  <div class="name">the total loss — the one number training pushes down</div>
-</div>
-</section>
+<p>The last layer produces class scores \(z \in \mathbb{R}^{K}\), and the softmax turns them into probabilities:</p>
 
-<hr>
+$$
+p_c = \frac{e^{\,z_c - m}}{\sum_{j=1}^{K} e^{\,z_j - m}}, \qquad m = \max_j z_j \tag{10}
+$$
 
-<!-- ============================ 4 · BACKWARD ============================ -->
-<section id="backward">
-<h2><span class="n">4</span>The backward pass</h2>
-<p>One gradient rule per stage, in reverse order. For a single sample; a batch sums and divides.</p>
-
-<div class="eq">
-  <div class="body m">
-    δ<sup>(L)</sup> = p − onehot(y)
-  </div>
-  <div class="num">(12)</div>
-  <div class="name">softmax + cross-entropy collapse to one subtraction</div>
+<div class="syms">
+<p>\(p_c\) — the probability the crop belongs to class \(c\); the whole vector \(p\) sums to \(1\)</p>
+<p>\(m\) — the largest score, subtracted only so the exponentials cannot overflow</p>
 </div>
 
-<div class="eq">
-  <div class="body m">
-    d<span class="m">W</span> = δ a<sup>T</sup>, &nbsp;&nbsp; db = δ, &nbsp;&nbsp; da = <span class="m">W</span><sup>T</sup> δ
-  </div>
-  <div class="num">(13)</div>
-  <div class="name">dense — blame on the weights, the bias, and backward through to the input</div>
+<div class="claim">
+<b>Claim.</b> Subtracting \(m\) does not change \(p\).
+<div class="proof">
+<b>Proof.</b> \(e^{z_c - m} = e^{-m} e^{z_c}\), so both numerator and denominator carry the same factor \(e^{-m}\), which cancels. <span class="step">∎</span>
+</div>
 </div>
 
-<div class="eq">
-  <div class="body m">
-    δ<sub>z</sub> = δ<sub>a</sub> ⊙ 1[z &gt; 0]
-  </div>
-  <div class="num">(14)</div>
-  <div class="name">ReLU — blame passes only where the gate was open</div>
+<!-- ======================= 5 ======================= -->
+<h2 id="s5"><span class="n">5.</span> The Cost Function</h2>
+
+<p>For one crop with known class \(y\), the price of the guess is the negative log-likelihood of the truth:</p>
+
+$$
+C_{\mathrm{CE}} = -\log p_y \tag{11}
+$$
+
+<p>Over a batch of \(N\) crops, plus a penalty on the size of the learned numbers:</p>
+
+$$
+C = \underbrace{-\frac{1}{N} \sum_{n=1}^{N} \log p_{n,\, y_n}}_{\text{cross-entropy}} \ +\ \underbrace{\lambda \sum_{\theta} \theta^{2}}_{L_2} \tag{12}
+$$
+
+<div class="syms">
+<p>\(n\) — the index of a crop in the batch, \(1 \le n \le N\)</p>
+<p>\(y_n\) — the true class of crop \(n\) (a number, \(1 \le y_n \le K\))</p>
+<p>\(p_{n,\,y_n}\) — the probability the model gave to that true class</p>
+<p>\(\theta\) — every learned number together: all \(w\) and all \(b\)</p>
+<p>\(\lambda\) — how hard the penalty bites; tiny, \(0.0005\)</p>
 </div>
 
-<div class="eq">
-  <div class="body m">
-    δ<sub>z</sub>(2i+u, 2j+v, c) =
-    <span class="cases">
-      δ<sub>a</sub>(i, j, c) &nbsp;<span class="up">at the remembered argmax</span><br>
-      0 &nbsp;<span class="up">everywhere else</span>
-    </span>
-  </div>
-  <div class="num">(15)</div>
-  <div class="name">max-pool — the blame goes back to the cell that won</div>
+<p>Why \(-\log\): \(p_y = 1\) costs \(0\); \(p_y = 0.5\) costs \(0.69\); \(p_y = 0.01\) costs \(4.6\). Confident and wrong is punished hard. Why \(\lambda\sum\theta^2\): without it the model can grow huge numbers to memorize the training pictures, and then fail on any picture it has not seen.</p>
+
+<!-- ======================= 6 ======================= -->
+<h2 id="s6"><span class="n">6.</span> The Learning Goal</h2>
+
+<p>Training means: find the \(\theta\) that makes \(C\) as small as possible. When \(C\) is near zero <em>and</em> stays near zero on crops the model has never seen, the model has learned the symbol — not the picture. Everything below is machinery for descending the slope of \(C\).</p>
+
+<!-- ======================= 7 ======================= -->
+<h2 id="s7"><span class="n">7.</span> Initial Values</h2>
+
+<p>Every weight starts as a draw from a bell curve scaled by its fan-in, and every bias starts at zero:</p>
+
+$$
+w \sim \sqrt{\frac{2}{\mathrm{fan\text{-}in}}}\ \cdot\ \mathcal{N}(0, 1), \qquad b = 0 \tag{13}
+$$
+
+<div class="syms">
+<p>\(\mathrm{fan\text{-}in}\) — how many inputs the unit reads: \(F^2 C\) for a conv, \(n_{l-1}\) for a dense layer</p>
+<p>the \(\sqrt{2/\mathrm{fan\text{-}in}}\) factor keeps the size of \(z\) stable from layer to layer, so neither explosion nor vanishing</p>
+<p>the draws come from one seeded generator: the same seed gives the same starting model, everywhere</p>
 </div>
 
-<p>Convolution through the same im2col as (4). With <span class="m">D</span> = the error reshaped to ℝ<sup>(HW)×K</sup>:</p>
+<!-- ======================= 8 ======================= -->
+<h2 id="s8"><span class="n">8.</span> Finding the Minimum</h2>
 
-<div class="eq">
-  <div class="body m">
-    d<span class="m">Ŵ</span> = <span class="m">D</span><sup>T</sup> <span class="m">P</span>, &nbsp;&nbsp;
-    db = <span class="m">1</span><sup>T</sup> <span class="m">D</span>, &nbsp;&nbsp;
-    d<span class="m">P</span> = <span class="m">D</span> <span class="m">Ŵ</span>
-  </div>
-  <div class="num">(16)</div>
-  <div class="name">the layer is a matrix multiply, so its gradients are matrix gradients</div>
+<p>Gradient descent says: stand where you are, step against the slope.</p>
+
+$$
+\theta_{t+1} = \theta_t - \eta\, g_t, \qquad g_t = \frac{\partial C}{\partial \theta}\Big|_{\theta_t} \tag{14}
+$$
+
+<div class="syms">
+<p>\(t\) — the step index</p>
+<p>\(g_t\) — the gradient at step \(t\): for every learned number, how much \(C\) grows when that number grows by a hair</p>
+<p>\(\eta\) — the learning rate, the step size</p>
 </div>
 
-<div class="eq">
-  <div class="body m">
-    d<span class="m">a</span> = <span class="up">col2im</span>(d<span class="m">P</span>)
-  </div>
-  <div class="num">(17)</div>
-  <div class="name">each patch value returns to where it was cut from; where windows overlap, the blames add</div>
+<p>One pass over the whole training set is an <em>epoch</em>; one small group of crops averaged together is a <em>batch</em>. The loop is:</p>
+
+<ol class="algo">
+<li>Take a batch of crops with their true classes.</li>
+<li>Run the forward pass (2)–(10) for each crop; compute \(C\) by (12).</li>
+<li>Run the backward pass (sections 9–11) to get every \(g_t\).</li>
+<li>Update every \(\theta\) (section 12).</li>
+<li>Repeat until the validation cost stops falling.</li>
+</ol>
+
+<p>All the work is in step 3. We find the derivatives layer by layer, starting at the last layer, because — as we will see — each layer needs the one behind it.</p>
+
+<!-- ======================= 9 ======================= -->
+<h2 id="s9"><span class="n">9.</span> Finding the Derivative of Cost with Regard to Weights</h2>
+
+<p>By the chain rule, the gradient reaching any parameter factors through the stages that followed it. For one crop (the batch sum is written at the end):</p>
+
+$$
+\frac{\partial C}{\partial \theta} = \frac{\partial C}{\partial p}\cdot\frac{\partial p}{\partial z^{(L)}}\cdot\frac{\partial z^{(L)}}{\partial a^{(L-1)}}\cdot\frac{\partial a^{(L-1)}}{\partial z^{(L-1)}} \cdots \frac{\partial z^{(l)}}{\partial \theta} \tag{15}
+$$
+
+<h3>9.1 The last layer: softmax + cross-entropy</h3>
+
+<div class="claim">
+<b>Claim.</b> For \(C = -\log p_y\) with \(p = \mathrm{softmax}(z)\),
+\(\dfrac{\partial C}{\partial z} = p - \mathrm{onehot}(y)\).
+<div class="proof">
+<b>Proof.</b> Write the cost through the scores. From (10) and (11),
+
+$$
+C = -z_y + m + \log \sum_{j} e^{\,z_j - m}
+$$
+
+The \(m\) terms cancel under the log, so
+
+$$
+C = -z_y + \log \sum_{j} e^{z_j} \tag{16}
+$$
+
+<span class="step">(a)</span> Differentiate the log-sum. For one score \(z_c\),
+
+$$
+\frac{\partial}{\partial z_c} \log \sum_j e^{z_j} = \frac{e^{z_c}}{\sum_j e^{z_j}} = p_c \tag{17}
+$$
+
+<span class="step">(b)</span> Differentiate the first term: \(\partial(-z_y)/\partial z_c = -1\) if \(c = y\), else \(0\). That is exactly \(-\mathrm{onehot}(y)_c\). <span class="step">[1]</span>
+
+Combining (a) and (b):
+
+$$
+\frac{\partial C}{\partial z_c} = p_c - \mathrm{onehot}(y)_c \qquad \Longrightarrow \qquad \delta^{(L)} = p - \mathrm{onehot}(y) \tag{18}
+$$
+
+which is one subtraction of vectors. <span class="step">∎</span>
+</div>
 </div>
 
-<div class="eq">
-  <div class="body m">
-    <span class="frac">
-      <span class="num">∂L<sub>reg</sub></span>
-      <span class="den">∂θ</span>
-    </span>
-    = 2λθ
-  </div>
-  <div class="num">(18)</div>
-  <div class="name">the L2 share joins every weight gradient</div>
-</div>
-</section>
-
-<hr>
-
-<!-- ============================ 5 · ADAM ============================ -->
-<section id="adam">
-<h2><span class="n">5</span>The nudge</h2>
-<p>Adam, per parameter, per step <span class="m">t</span>. <span class="m">g<sub>t</sub></span> is that parameter's gradient from (12)–(18).</p>
-
-<div class="eq">
-  <div class="body m">
-    m<sub>t</sub> = β<sub>1</sub> m<sub>t−1</sub> + (1 − β<sub>1</sub>) g<sub>t</sub>
-  </div>
-  <div class="num">(19)</div>
-  <div class="name">smoothed direction — β<sub>1</sub> = 0.9</div>
+<div class="syms">
+<p>\(\delta^{(L)}\) — the error signal at the last layer: how far each score was from certain</p>
+<p>\(\mathrm{onehot}(y)\) — all zeros except \(1\) at the true class</p>
 </div>
 
-<div class="eq">
-  <div class="body m">
-    v<sub>t</sub> = β<sub>2</sub> v<sub>t−1</sub> + (1 − β<sub>2</sub>) g<sub>t</sub><sup>2</sup>
-  </div>
-  <div class="num">(20)</div>
-  <div class="name">smoothed scale — β<sub>2</sub> = 0.999</div>
+<h3>9.2 The dense layer</h3>
+
+<p>For \(z = W a + b\), one output is \(z_j = \sum_k W_{jk} a_k + b_j\), so element by element:</p>
+
+$$
+\frac{\partial C}{\partial W_{jk}} = \frac{\partial C}{\partial z_j} \cdot a_k = \delta_j\, a_k,
+\qquad
+\frac{\partial C}{\partial b_j} = \delta_j,
+\qquad
+\frac{\partial C}{\partial a_k} = \sum_j W_{jk}\, \delta_j \tag{19}
+$$
+
+<p>Collecting (19) over all \(j, k\) gives the matrix forms the code runs:</p>
+
+$$
+\mathrm{d}W = \delta\, a^{T}, \qquad \mathrm{d}b = \delta, \qquad \mathrm{d}a = W^{T} \delta \tag{20}
+$$
+
+<div class="syms">
+<p>\(\delta\) — the error signal coming into this layer from the one after it</p>
+<p>\(\mathrm{d}a\) — the blame handed further back; it becomes the next layer's \(\delta\)</p>
+<p>over a batch, \(\mathrm{d}W\) and \(\mathrm{d}b\) are summed over crops and divided by \(N\)</p>
 </div>
 
-<div class="eq">
-  <div class="body m">
-    m̂<sub>t</sub> =
-    <span class="frac"><span class="num">m<sub>t</sub></span><span class="den">1 − β<sub>1</sub><sup> t</sup></span></span>,
-    &nbsp;&nbsp;
-    v̂<sub>t</sub> =
-    <span class="frac"><span class="num">v<sub>t</sub></span><span class="den">1 − β<sub>2</sub><sup> t</sup></span></span>
-  </div>
-  <div class="num">(21)</div>
-  <div class="name">the correction for the first steps, when both start at zero</div>
+<h3>9.3 ReLU and max-pool</h3>
+
+<p>Both are element-wise gates on the blame. With the convention of (7):</p>
+
+$$
+\delta_z = \delta_a \odot \mathbf{1}[z \gt 0] \tag{21}
+$$
+
+$$
+\delta_z(2i+u,\, 2j+v,\, c) =
+\begin{cases}
+\delta_a(i, j, c) & \text{at the remembered argmax} \\
+0 & \text{everywhere else}
+\end{cases} \tag{22}
+$$
+
+<div class="syms">
+<p>\(\odot\) — element-by-element multiplication</p>
+<p>\(\mathbf{1}[\cdot]\) — \(1\) when true, \(0\) when false</p>
+<p>max-pool routes each blame to the single cell that won — which is why the forward pass remembers the winners</p>
 </div>
 
-<div class="eq">
-  <div class="body m">
-    θ<sub>t</sub> = θ<sub>t−1</sub> − η ·
-    <span class="frac"><span class="num">m̂<sub>t</sub></span><span class="den">√v̂<sub>t</sub> + ε</span></span>
-  </div>
-  <div class="num">(22)</div>
-  <div class="name">the nudge — η = 0.001, ε = 10<sup>−8</sup></div>
+<h3>9.4 The general pattern</h3>
+
+<p>As sections 9.1–9.3 show, every stage contributes exactly one factor, and the factors chain backward:</p>
+
+$$
+\frac{\partial C}{\partial W^{(l)}} = \Bigl(\cdots\bigl((p - \mathrm{onehot}(y))\, W^{(L)T}\bigr) \odot \mathbf{1}[z^{(L-1)} \gt 0]\ W^{(L-1)T} \cdots\Bigr) \odot \mathbf{1}[z^{(l)} \gt 0]\ a^{(l-1)T} \tag{23}
+$$
+
+<p>Read (23) right to left: each layer turns the blame it receives into blame for the layer before, and multiplies it by its own input. That is the whole backward pass — implemented once per layer type, then simply run in reverse order.</p>
+
+<!-- ======================= 10 ======================= -->
+<h2 id="s10"><span class="n">10.</span> Finding the Derivative with Regard to Biases</h2>
+
+<p>Biases sit inside the sums as pure shifts, so their gradients are the error signals themselves. From (19):</p>
+
+$$
+\frac{\partial C}{\partial b^{(l)}} = \delta^{(l)}, \qquad \frac{\partial C}{\partial b^{(L)}} = p - \mathrm{onehot}(y) \tag{24}
+$$
+
+<div class="syms">
+<p>over a batch: \(\mathrm{d}b = \frac{1}{N}\sum_n \delta_n\) — the mean error of the batch, one per neuron</p>
+<p>nothing stops each neuron from carrying its own bias, so each gets its own update</p>
 </div>
-</section>
 
-<hr>
+<!-- ======================= 11 ======================= -->
+<h2 id="s11"><span class="n">11.</span> The Derivative of the Convolution</h2>
 
-<!-- ============================ 6 · CHECK ============================ -->
-<section id="check">
-<h2><span class="n">6</span>The check</h2>
-<p>The backward pass is believed only where the finite difference agrees.</p>
+<p>Through im2col the convolution is \(Z = P\hat W^{T} + \mathbf{1}b^{T}\) — a matrix product — so its gradients are matrix gradients. With the error reshaped to match, \(D \in \mathbb{R}^{(HW) \times K}\), row \(m\) = position \(m\):</p>
 
-<div class="eq">
-  <div class="body m">
-    <span class="frac"><span class="num">∂L</span><span class="den">∂θ<sub>i</sub></span></span>
-    ≈
-    <span class="frac">
-      <span class="num">L(θ + ε e<sub>i</sub>) − L(θ − ε e<sub>i</sub>)</span>
-      <span class="den">2ε</span>
-    </span>
-  </div>
-  <div class="num">(23)</div>
-  <div class="name">central difference — meaningful only away from ReLU corners, where the loss has no derivative</div>
+$$
+\mathrm{d}\hat W = D^{T} P, \qquad \mathrm{d}b = \mathbf{1}^{T} D, \qquad \mathrm{d}P = D\, \hat W \tag{25}
+$$
+
+<div class="syms">
+<p>\(D\) — the blame arriving at the convolution's output, in the same layout as \(Z\)</p>
+<p>\(\mathrm{d}\hat W\) — one row per filter: how each weight of that filter contributed to the error</p>
+<p>\(\mathrm{d}P\) — the blame for every patch; patches overlap, so it must be scattered back</p>
 </div>
-</section>
 
-<hr>
+<div class="claim">
+<b>Claim.</b> (25) holds element-wise: \(\dfrac{\partial C}{\partial w_{p,q,c,k}} = \sum_{i,j} D_{i,j,k}\, a_{i+p,\, j+q,\, c}\).
+<div class="proof">
+<b>Proof.</b> By (2), \(z_{i,j,k}\) is linear in \(w_{p,q,c,k}\) with coefficient \(a_{i+p,j+q,c}\), so
 
-<!-- ============================ 7 · COUNT ============================ -->
-<section id="count">
-<h2><span class="n">7</span>The count</h2>
-<p>How many learned numbers each stage owns.</p>
+$$
+\frac{\partial C}{\partial w_{p,q,c,k}} = \sum_{i,j} \frac{\partial C}{\partial z_{i,j,k}}\, a_{i+p,\, j+q,\, c} = \sum_{i,j} D_{i,j,k}\, a_{i+p,\, j+q,\, c}
+$$
 
-<div class="eq">
-  <div class="body m">
-    |θ<sub>conv</sub>| = K(F<sup>2</sup>C + 1), &nbsp;&nbsp;
-    |θ<sub>dense</sub>| = out · in + out
-  </div>
-  <div class="num">(24)</div>
-  <div class="name">weights and biases; for the 48×48 model — conv 160 + 4 640, dense 294 976 + 6 405 ≈ 306K</div>
+which is precisely the \((k, p, q, c)\) entry of \(D^{T}P\), since row \((i,j)\) of \(P\) holds \(a_{i+p,j+q,c}\) at that offset. The bias case is the same sum with coefficient \(1\). <span class="step">∎</span>
 </div>
-</section>
 </div>
+
+<p>The input's share goes back through \(\hat W\) and is scattered to where each patch was cut from — overlapping windows add their blames:</p>
+
+$$
+\mathrm{d}a = \mathrm{col2im}(\mathrm{d}P), \qquad \mathrm{col2im}(P)_{i,j,c} = \sum_{\text{patches covering }(i,j,c)} (\cdot) \tag{26}
+$$
+
+<p>Finally, the penalty of (12) differentiates to:</p>
+
+$$
+\frac{\partial C_{L_2}}{\partial \theta} = 2 \lambda \theta \tag{27}
+$$
+
+<p>and joins every gradient before the update.</p>
+
+<!-- ======================= 12 ======================= -->
+<h2 id="s12"><span class="n">12.</span> The Nudge: Adam</h2>
+
+<p>Plain steps (14) treat every number the same. Adam gives each number its own memory of direction and scale:</p>
+
+$$
+m_t = \beta_1 m_{t-1} + (1 - \beta_1) g_t, \qquad v_t = \beta_2 v_{t-1} + (1 - \beta_2) g_t^{2} \tag{28}
+$$
+
+$$
+\hat m_t = \frac{m_t}{1 - \beta_1^{t}}, \qquad \hat v_t = \frac{v_t}{1 - \beta_2^{t}} \tag{29}
+$$
+
+$$
+\theta_t = \theta_{t-1} - \eta \cdot \frac{\hat m_t}{\sqrt{\hat v_t} + \varepsilon} \tag{30}
+$$
+
+<div class="syms">
+<p>\(m_t\) — smoothed direction: which way the gradients have been pointing lately</p>
+<p>\(v_t\) — smoothed scale: how big they have been lately</p>
+<p>\(\beta_1 = 0.9,\ \beta_2 = 0.999\) — how much history to keep</p>
+<p>\(\eta = 0.001\) — the learning rate; \(\varepsilon = 10^{-8}\) — only to keep the denominator away from zero</p>
+</div>
+
+<div class="claim">
+<b>Claim.</b> The correction (29) removes the bias of the first steps.
+<div class="proof">
+<b>Proof.</b> Both memories start at zero, so after one step \(m_1 = (1-\beta_1) g_1\) is far too small. Taking expectations with \(g\) roughly constant in direction, \(\mathbb{E}[m_t] = (1 - \beta_1) \sum_{i=1}^{t} \beta_1^{\,t-i}\, \mathbb{E}[g] = (1-\beta_1^{t})\, \mathbb{E}[g]\). Dividing by \(1 - \beta_1^{t}\) gives \(\mathbb{E}[\hat m_t] = \mathbb{E}[g]\) — an honest estimate from step one. The same argument holds for \(v_t\) with \(\beta_2\). <span class="step">∎</span>
+</div>
+</div>
+
+<!-- ======================= 13 ======================= -->
+<h2 id="s13"><span class="n">13.</span> Checking the Derivative</h2>
+
+<p>The backward pass is believed only where the finite difference agrees. With \(e_i\) the vector that is \(1\) at parameter \(i\) and \(0\) elsewhere:</p>
+
+$$
+\frac{\partial C}{\partial \theta_i} \approx \frac{C(\theta + \varepsilon e_i) - C(\theta - \varepsilon e_i)}{2\varepsilon} \tag{31}
+$$
+
+<div class="claim">
+<b>Claim.</b> The right side of (31) is the true derivative plus an error of order \(\varepsilon^2\).
+<div class="proof">
+<b>Proof.</b> Taylor-expand the two costs around \(\theta\):
+
+$$
+C(\theta \pm \varepsilon e_i) = C(\theta) \pm \varepsilon \frac{\partial C}{\partial \theta_i} + \frac{\varepsilon^2}{2} \frac{\partial^2 C}{\partial \theta_i^2} \pm \frac{\varepsilon^3}{6} \frac{\partial^3 C}{\partial \theta_i^3} + \cdots
+$$
+
+Subtracting cancels the even terms and divides out one \(\varepsilon\):
+
+$$
+\frac{C(\theta + \varepsilon e_i) - C(\theta - \varepsilon e_i)}{2\varepsilon} = \frac{\partial C}{\partial \theta_i} + \frac{\varepsilon^2}{6} \frac{\partial^3 C}{\partial \theta_i^3} + \cdots \tag{32}
+$$
+
+so the agreement improves by two orders when \(\varepsilon\) shrinks by one. One caveat, the same as (7): at a ReLU corner the third derivative does not exist, and the finite difference lands between two slopes — so the check runs on a crop whose gates are all clearly open or shut. <span class="step">∎</span>
+</div>
+</div>
+
+<!-- ======================= 14 ======================= -->
+<h2 id="s14"><span class="n">14.</span> How to Train the Classifier</h2>
+
+<ol class="algo">
+<li>Build the training set: one crop per picture, jittered and degraded, labeled with the class it was drawn from.</li>
+<li>Give every weight its initial value by (13); every bias zero. Keep one seed — the same seed gives the same model.</li>
+<li>Take a batch of \(N\) crops; run (2)–(10) for each; compute \(C\) by (12).</li>
+<li>Compute \(\delta^{(L)}\) by (18), then walk backward: (20) for dense layers, (21) for ReLU, (22) for pools, (25)–(26) for convolutions. Add (27) to every weight gradient.</li>
+<li>Update every number with (28)–(30).</li>
+<li>Repeat 3–5 for one epoch; then measure \(C\) and accuracy on the validation set — pictures the model has not trained on.</li>
+<li>Stop when the validation cost stops falling; keep the weights that scored best on validation. Check them once with (31); record their hash; ship.</li>
+</ol>
+
+<p>That is the whole of it. The forward pass answers, the cost measures, the backward pass assigns blame, and the nudge moves. Everything else is pictures.</p>
+</div>
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" crossorigin="anonymous"
+  onload="renderMathInElement(document.body, { delimiters: [ {left: '$$', right: '$$', display: true}, {left: '\\(', right: '\\)', display: false} ], throwOnError: false });"></script>
