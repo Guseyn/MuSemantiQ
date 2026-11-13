@@ -144,8 +144,38 @@ figcaption { font: 12px var(--mono); color: var(--muted); margin-top: 6px; }
 ./remote-training-scripts/remote-start-training.sh</code></pre>
 <p>The first script has the server check out the branch and reset to it — <code>ssh … 'cd MuSemantiQ && git fetch --all && git checkout omr && git reset --hard origin/omr'</code>. The second starts training detached with <code>nohup</code> and tells you its pid; the run keeps going after the command returns, and it <b>logs itself</b> to <code>training-data/training.log</code> on the server: the config it started with, one line per epoch, the sha of the weights it wrote, and any error it died of.</p>
 
-<p>The defaults are the smoke run (360 samples, 15 epochs — seconds). A run worth keeping takes its size as flags, and they pass through the script:</p>
-<pre><code>./remote-training-scripts/remote-start-training.sh --samples-per-class=400 --epochs=40</code></pre>
+<p>The defaults are the smoke run (360 samples, 15 epochs — seconds). A run worth keeping takes its size as flags, and they pass through the script.</p>
+
+<h3>The production run — every parameter</h3>
+<pre><code>./remote-training-scripts/remote-start-training.sh \
+  --samples-per-class=400 \
+  --epochs=40 \
+  --grid=48 \
+  --filters=16,32 \
+  --dense=64 \
+  --batch=32 \
+  --learning-rate=0.001 \
+  --seed=20261110</code></pre>
+
+<table style="border-collapse:collapse;width:100%;font-size:13.5px">
+<tr style="border-bottom:2px solid var(--ink)"><th style="text-align:left;padding:6px 10px;font:600 11px var(--mono)">flag</th><th style="text-align:left;padding:6px 10px;font:600 11px var(--mono)">value</th><th style="text-align:left;padding:6px 10px;font:600 11px var(--mono)">why</th></tr>
+<tr style="border-bottom:1px solid var(--rule)"><td style="padding:7px 10px"><code>--samples-per-class</code></td><td style="padding:7px 10px">400</td><td style="padding:7px 10px">43 classes × 400 = 17,200 flashcards. Variation is the lesson: 400 different-looking flats teach flatness, one flat teaches a bitmap</td></tr>
+<tr style="border-bottom:1px solid var(--rule)"><td style="padding:7px 10px"><code>--epochs</code></td><td style="padding:7px 10px">40</td><td style="padding:7px 10px">passes over the set. Read the validation column: if the last epoch is still the best, the run was cut short</td></tr>
+<tr style="border-bottom:1px solid var(--rule)"><td style="padding:7px 10px"><code>--grid</code></td><td style="padding:7px 10px">48</td><td style="padding:7px 10px">the crop size the model is built for — dots and flag counts stay legible. 24 is twice as fast and half as sharp</td></tr>
+<tr style="border-bottom:1px solid var(--rule)"><td style="padding:7px 10px"><code>--filters</code></td><td style="padding:7px 10px">16,32</td><td style="padding:7px 10px">the two conv layers' widths — this is the ~300K-parameter model from the docs</td></tr>
+<tr style="border-bottom:1px solid var(--rule)"><td style="padding:7px 10px"><code>--dense</code></td><td style="padding:7px 10px">64</td><td style="padding:7px 10px">the mixing layer before the class head; 64 is the plan's shape</td></tr>
+<tr style="border-bottom:1px solid var(--rule)"><td style="padding:7px 10px"><code>--batch</code></td><td style="padding:7px 10px">32</td><td style="padding:7px 10px">samples averaged per nudge — steadier gradients than the smoke run's 8</td></tr>
+<tr style="border-bottom:1px solid var(--rule)"><td style="padding:7px 10px"><code>--learning-rate</code></td><td style="padding:7px 10px">0.001</td><td style="padding:7px 10px">Adam's step. The tiny model tolerates 0.01; the real one wants 0.001</td></tr>
+<tr><td style="padding:7px 10px"><code>--seed</code></td><td style="padding:7px 10px">20261110</td><td style="padding:7px 10px">the dataset and the weight init. Same seed + same flags = the same run on any machine</td></tr>
+</table>
+
+<p>Every value lands in the log's first line, so a run can be read back exactly. What to expect and how to read it:</p>
+<ul>
+  <li><b>Time</b>: ~2–3 hours at grid 24, ~8–10 hours at grid 48, on one core (the trainer is single-threaded today).</li>
+  <li><b>Done</b> is the last log line: <code>✓ done in 8h 12m — best validation 0.87 at epoch 31</code>.</li>
+  <li><b>Validation still best at the last epoch</b> → more epochs. <b>Training at 1.0 but validation far below</b> → more samples or stronger jitter. <b>Both flat and low</b> → the shapes, not the run: look at the contact sheets before spending hours.</li>
+  <li>Look first, train after: <code>node src/omr/training/inspectDataset.js --class=flat --count=24</code>.</li>
+</ul>
 
 <p>Watching is one more command; <code>Ctrl-c</code> stops the watching, not the training:</p>
 <pre><code>ssh user@server 'tail -f MuSemantiQ/training-data/training.log'   <span class="cm"># one line per epoch</span>
@@ -244,6 +274,7 @@ for (const sample of samples) {
 <span class="cm"># every run — your three scripts in remote-training-scripts/ (not tracked)</span>
 ./remote-training-scripts/remote-git-pull.sh
 ./remote-training-scripts/remote-start-training.sh
+./remote-training-scripts/remote-start-training.sh --samples-per-class=400 --epochs=40 --grid=48 --filters=16,32 --dense=64 --batch=32 --learning-rate=0.001   <span class="cm"># the production run</span>
 ssh user@server 'tail -f MuSemantiQ/training-data/training.log'   <span class="cm"># Ctrl-c stops the watching, not the training</span>
 
 <span class="cm"># take the result</span>

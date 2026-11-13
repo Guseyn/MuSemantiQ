@@ -107,13 +107,18 @@ const RUN_LOG = 'training-data/training.log'
 
 export function runTraining () {
   mkdirSync('training-data', { recursive: true })
-  // The size of the run is the user's choice: --samples-per-class, --epochs,
-  // --grid. The defaults are the smoke run — seconds, to see that it works.
+  // Every value of the run is the user's choice; the defaults are the smoke
+  // run — seconds, to see that it works. The production values live in
+  // dev-docs/training.html.
   const samplesPerClass = numberFlag('samples-per-class', 40)
   const epochs = numberFlag('epochs', 15)
   const gridSize = numberFlag('grid', 24)
-  const shape = { gridSize, filterSize: 3, filterCounts: [ 8, 16 ], denseSize: 24, classCount: 0 }
-  const seed = 20261110
+  const filterCounts = listFlag('filters', [ 8, 16 ])
+  const denseSize = numberFlag('dense', 24)
+  const batchSize = numberFlag('batch', 8)
+  const learningRate = numberFlag('learning-rate', 0.01)
+  const seed = numberFlag('seed', 20261110)
+  const shape = { gridSize, filterSize: 3, filterCounts, denseSize, classCount: 0 }
   const { classIds, samples } = generateTrainingSet({ seed, samplesPerClass, gridSize: shape.gridSize })
   shape.classCount = classIds.length
   const log = (line) => {
@@ -122,7 +127,7 @@ export function runTraining () {
   }
   try {
     const startedAt = Date.now()
-    log(`=== ${new Date().toISOString()} · seed ${seed} · grid ${shape.gridSize} · ${classIds.length} classes · ${samples.length} samples · ${epochs} epochs`)
+    log(`=== ${new Date().toISOString()} · seed ${seed} · grid ${gridSize} · filters ${filterCounts.join(',')} · dense ${denseSize} · ${classIds.length} classes · ${samples.length} samples · ${epochs} epochs`)
     const split = Math.floor(samples.length * 0.8)
     const model = createModel({ ...shape, classCount: classIds.length }, 1)
     const { history } = trainModel({
@@ -130,8 +135,8 @@ export function runTraining () {
       trainingSamples: samples.slice(0, split),
       validationSamples: samples.slice(split),
       epochs,
-      batchSize: 8,
-      learningRate: 0.01,
+      batchSize,
+      learningRate,
       onEpoch: (entry) => log(
         `epoch ${entry.epoch}: loss ${entry.loss}, accuracy ${entry.accuracy}, validation ${entry.validationAccuracy}`
       )
@@ -157,6 +162,11 @@ export function runTraining () {
 function numberFlag (name, fallback) {
   const found = process.argv.find((argument) => argument.startsWith(`--${name}=`))
   return found ? Number(found.slice(name.length + 3)) : fallback
+}
+
+function listFlag (name, fallback) {
+  const found = process.argv.find((argument) => argument.startsWith(`--${name}=`))
+  return found ? found.slice(name.length + 3).split(',').map(Number) : fallback
 }
 
 function durationSince (startedAt) {
