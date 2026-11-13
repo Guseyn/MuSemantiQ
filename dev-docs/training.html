@@ -129,12 +129,9 @@ figcaption { font: 12px var(--mono); color: var(--muted); margin-top: 6px; }
 <h2><span class="n">2</span>Set up the server, once <a class="totop" href="#workflow">↑</a></h2>
 <p>Any CPU droplet with 4–8 vCPU will do; the model is small and the trainer uses the CPU. From your laptop:</p>
 
-<pre><code>ssh-copy-id user@server        <span class="cm"># so every ssh below needs no password</span>
-git push -u origin omr         <span class="cm"># the branch goes to GitHub first</span>
+<pre><code>./remote-training-scripts/remote-setup-server.sh</code></pre>
 
-ssh user@server 'git clone https://github.com/Guseyn/MuSemantiQ.git && cd MuSemantiQ && git checkout omr && node -v'</code></pre>
-
-<p><code>node -v</code> should print v22 or newer — that is the server's only requirement. From here on the work is three scripts in <code>remote-training-scripts/</code>: yours, not tracked, because they name your server and your ssh key. What each one runs is shown at every step below, so the doc stays true even without the scripts.</p>
+<p>It copies your key to the server, publishes the branch to GitHub, and has the server clone the project and check its Node — <code>ssh -i your-key user@server 'git clone … && cd MuSemantiQ && git checkout omr && node -v'</code>. <code>node -v</code> should print v22 or newer — that is the server's only requirement. From here on the work is four scripts in <code>remote-training-scripts/</code>: yours, not tracked, because they name your server and your ssh key. What each one runs is shown at every step below, so the doc stays true even without the scripts.</p>
 </section>
 
 <hr>
@@ -239,9 +236,7 @@ for (const sample of samples) {
 <h2><span class="n">7</span>Cheat sheet <a class="totop" href="#workflow">↑</a></h2>
 <p>Everything below, typed on your laptop:</p>
 <pre><code><span class="cm"># once</span>
-ssh-copy-id user@server
-git push -u origin omr
-ssh user@server 'git clone https://github.com/Guseyn/MuSemantiQ.git && cd MuSemantiQ && git checkout omr && node -v'
+./remote-training-scripts/remote-setup-server.sh
 
 <span class="cm"># every run — your three scripts in remote-training-scripts/ (not tracked)</span>
 ./remote-training-scripts/remote-git-pull.sh
