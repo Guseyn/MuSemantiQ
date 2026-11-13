@@ -29,7 +29,6 @@ nav a { font: 500 12.5px var(--mono); color: var(--muted); }
 nav a:hover { color: var(--accent); text-decoration: none; }
 h2 { font: 400 25px/1.25 var(--serif); margin: 0 0 10px; }
 h2 .n { color: var(--muted); font-size: 17px; margin-right: 8px; }
-h3 { font: 600 15px var(--font); margin: 24px 0 6px; }
 p { max-width: 72ch; margin: 8px 0; }
 ul, ol { max-width: 72ch; padding-left: 22px; }
 li { margin: 4px 0; }
@@ -60,7 +59,7 @@ figcaption { font: 12px var(--mono); color: var(--muted); margin-top: 6px; }
 <header>
   <div class="eyebrow">MuSemantiQ · dev docs · src/omr</div>
   <h1>Training on a server</h1>
-  <p class="sub">Clone the project on a rented server, train there, keep the model out of git, and bring the weights home to test. Code travels by git; weights travel by <code>rsync</code>; the training set travels nowhere.</p>
+  <p class="sub">Clone the project on a rented server, train there, keep the model out of git, and bring the weights home to test. <b>Every command on this page is typed on your laptop</b> — the server is only ever reached over <code>ssh</code>.</p>
 </header>
 
 <nav>
@@ -78,7 +77,7 @@ figcaption { font: 12px var(--mono); color: var(--muted); margin-top: 6px; }
 <h2><span class="n">1</span>The shape of it <a class="totop" href="#workflow">↑</a></h2>
 
 <figure>
-<svg class="diagram" viewBox="0 0 900 360" role="img" aria-label="Code travels to the server by git, weights travel back by rsync">
+<svg class="diagram" viewBox="0 0 900 360" role="img" aria-label="Code travels to the server by git, weights travel back by rsync, all driven from the laptop">
   <defs>
     <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="currentColor" style="fill: var(--muted)"></path>
@@ -88,22 +87,22 @@ figcaption { font: 12px var(--mono); color: var(--muted); margin-top: 6px; }
     </marker>
   </defs>
   <!-- laptop -->
-  <rect class="box" x="20" y="60" width="280" height="200"></rect>
+  <rect class="box hot" x="20" y="60" width="280" height="200"></rect>
   <text x="160" y="92">your laptop</text>
-  <text x="160" y="128" class="k">edit the code · run the tests</text>
-  <text x="160" y="152" class="k">npm run test:omr:all</text>
+  <text x="160" y="128" class="k acc">you type everything here</text>
+  <text x="160" y="152" class="k">ssh · rsync · git · node</text>
   <text x="160" y="184" class="k acc">src/omr/model/weights.json</text>
   <text x="160" y="204" class="k">arrives here — gitignored</text>
   <!-- server -->
-  <rect class="box hot" x="600" y="60" width="280" height="200"></rect>
+  <rect class="box" x="600" y="60" width="280" height="200"></rect>
   <text x="740" y="92">the server</text>
-  <text x="740" y="128" class="k">git clone · tmux · node</text>
-  <text x="740" y="152" class="k">src/omr/training/train.js</text>
+  <text x="740" y="128" class="k">reached only over ssh</text>
+  <text x="740" y="152" class="k">nohup node …/train.js</text>
   <text x="740" y="184" class="k acc">model/weights.json</text>
   <text x="740" y="204" class="k">born here — gitignored</text>
   <!-- lanes -->
   <path class="arrow" d="M310,120 L590,120"></path>
-  <text x="450" y="102" class="k">git push / git pull — the code</text>
+  <text x="450" y="102" class="k">ssh 'git clone / git pull' — the code</text>
   <path class="arrow down" d="M590,220 L310,220" marker-end="url(#arr-acc)"></path>
   <text x="450" y="248" class="k acc">rsync — the weights, and their hash</text>
   <circle r="6" fill="#a5322a" class="pulse">
@@ -112,7 +111,7 @@ figcaption { font: 12px var(--mono); color: var(--muted); margin-top: 6px; }
   <!-- the dataset -->
   <text x="450" y="310" class="k">the training set travels nowhere: one seed regenerates the same bytes on any machine</text>
 </svg>
-<figcaption>fig 1 · two lanes. Git is for source; rsync is for model data.</figcaption>
+<figcaption>fig 1 · two lanes, one keyboard. Git is for source; rsync is for model data.</figcaption>
 </figure>
 
 <p>Three facts make this simple:</p>
@@ -128,17 +127,17 @@ figcaption { font: 12px var(--mono); color: var(--muted); margin-top: 6px; }
 <!-- ============================ 2 ============================ -->
 <section id="setup">
 <h2><span class="n">2</span>Set up the server, once <a class="totop" href="#workflow">↑</a></h2>
-<p>Any CPU droplet with 4–8 vCPU will do; the model is small and the trainer uses the CPU. On the laptop, put the branch on GitHub first.</p>
+<p>Any CPU droplet with 4–8 vCPU will do; the model is small and the trainer uses the CPU. From your laptop:</p>
 
-<pre><code><span class="cm"># on your laptop</span>
-git push -u origin omr
+<pre><code>ssh-copy-id user@server        <span class="cm"># so every ssh below needs no password</span>
+git push -u origin omr         <span class="cm"># the branch goes to GitHub first</span>
 
-<span class="cm"># on the server</span>
-ssh user@server
-git clone https://github.com/Guseyn/MuSemantiQ.git
-cd MuSemantiQ
-git checkout omr
-node -v                     <span class="cm"># v22 or newer — nothing else is needed</span></code></pre>
+ssh user@server 'git clone https://github.com/Guseyn/MuSemantiQ.git && cd MuSemantiQ && git checkout omr && node -v'</code></pre>
+
+<p><code>node -v</code> should print v22 or newer — that is the server's only requirement. To type less, add a host alias to <code>~/.ssh/config</code> and use it in place of <code>user@server</code> everywhere below:</p>
+<pre><code>Host omr
+  HostName server
+  User user</code></pre>
 </section>
 
 <hr>
@@ -147,16 +146,15 @@ node -v                     <span class="cm"># v22 or newer — nothing else is 
 <section id="run">
 <h2><span class="n">3</span>A training run <a class="totop" href="#workflow">↑</a></h2>
 
-<pre><code>git pull                                        <span class="cm"># the latest code</span>
+<pre><code>ssh user@server 'cd MuSemantiQ && git pull'                        <span class="cm"># the latest code</span>
 
-tmux new -s train                               <span class="cm"># the run survives your ssh session</span>
-node src/omr/training/train.js \
-  --out=src/omr/model/weights.json | tee run.log
+ssh user@server 'cd MuSemantiQ && nohup node src/omr/training/train.js --out=src/omr/model/weights.json &gt; /dev/null 2&gt;&amp;1 &amp; echo "training: pid $!"'</code></pre>
 
-<span class="cm"># from another ssh session, any time:</span>
-tail -f run.log                                 <span class="cm"># one line per epoch</span></code></pre>
+<p>The second command returns immediately and the training keeps running after <code>ssh</code> hangs up — <code>nohup</code> detaches it. The run <b>logs itself</b> to <code>training-data/training.log</code> on the server: the config it started with, one line per epoch, the sha of the weights it wrote, and any error it died of. Watching is another one-liner; <code>Ctrl-c</code> stops the watching, not the training:</p>
 
-<p>The run prints a line per epoch — loss, training accuracy, validation accuracy — and writes <code>model/weights.json</code> with its <b>sha256</b> at the end. <code>Ctrl-b d</code> detaches tmux, <code>tmux attach -t train</code> returns.</p>
+<pre><code>ssh user@server 'tail -f MuSemantiQ/training-data/training.log'   <span class="cm"># one line per epoch</span>
+
+ssh user@server 'pkill -f train.js'                               <span class="cm"># to stop the run</span></code></pre>
 <div class="note"><b>Reproducible</b> The seeds live in the run itself: the same code and seed give the same dataset and the same weights on any machine. The seed and shape are in <code>runTraining()</code> in <code>src/omr/training/train.js</code>.</div>
 </section>
 
@@ -181,10 +179,10 @@ training-data/</code></pre>
 <section id="home">
 <h2><span class="n">5</span>Bring the model home <a class="totop" href="#workflow">↑</a></h2>
 
-<pre><code>rsync -av server:~/MuSemantiQ/src/omr/model/ ./src/omr/model/
-rsync -av server:~/MuSemantiQ/run.log ./              <span class="cm"># optional: the loss history</span>
+<pre><code>rsync -av user@server:~/MuSemantiQ/src/omr/model/ ./src/omr/model/
+rsync -av user@server:~/MuSemantiQ/training-data/training.log ./training-data/   <span class="cm"># optional: the run history</span>
 
-shasum -a 256 src/omr/model/weights.json              <span class="cm"># must match the sha the trainer printed</span></code></pre>
+shasum -a 256 src/omr/model/weights.json                   <span class="cm"># must match the sha in the log</span></code></pre>
 
 <p>The trainer hashes exactly the bytes it wrote, so a mismatch means a broken transfer or a different run — re-rsync before trusting the file. Once the weights are in <code>src/omr/model/</code>, the code picks them up where you load them (see below).</p>
 </section>
@@ -220,22 +218,20 @@ for (const sample of samples) {
 <!-- ============================ 7 ============================ -->
 <section id="cheat">
 <h2><span class="n">7</span>Cheat sheet <a class="totop" href="#workflow">↑</a></h2>
-<pre><code><span class="cm"># laptop — publish the branch</span>
+<p>Everything below, typed on your laptop:</p>
+<pre><code><span class="cm"># once</span>
+ssh-copy-id user@server
 git push -u origin omr
+ssh user@server 'git clone https://github.com/Guseyn/MuSemantiQ.git && cd MuSemantiQ && git checkout omr && node -v'
 
-<span class="cm"># server — first time</span>
-git clone https://github.com/Guseyn/MuSemantiQ.git && cd MuSemantiQ
-git checkout omr
+<span class="cm"># every run</span>
+ssh user@server 'cd MuSemantiQ && git pull'
+ssh user@server 'cd MuSemantiQ && nohup node src/omr/training/train.js --out=src/omr/model/weights.json &gt; /dev/null 2&gt;&amp;1 &amp; echo "training: pid $!"'
+ssh user@server 'tail -f MuSemantiQ/training-data/training.log'   <span class="cm"># Ctrl-c stops the watching, not the training</span>
 
-<span class="cm"># server — every run</span>
-git pull
-tmux new -s train
-node src/omr/training/train.js --out=src/omr/model/weights.json | tee run.log
-<span class="cm"># … wait, or Ctrl-b d and come back …</span>
-tail run.log
-
-<span class="cm"># laptop — take the result</span>
-rsync -av server:~/MuSemantiQ/src/omr/model/ ./src/omr/model/
+<span class="cm"># take the result</span>
+rsync -av user@server:~/MuSemantiQ/src/omr/model/ ./src/omr/model/
+rsync -av user@server:~/MuSemantiQ/training-data/training.log ./training-data/
 shasum -a 256 src/omr/model/weights.json
 npm run test:omr:all</code></pre>
 

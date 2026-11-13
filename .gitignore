@@ -163,7 +163,8 @@ test/omr-tests/actual/
 
 # The trained model and its runs: generated on the training server and copied
 # home by hand (see dev-docs/training.html). The dataset is not here at all —
-# seeds regenerate it. Weights are data, not source.
+# seeds regenerate it — but the run's log is, at training-data/training.log.
+# Weights are data, not source.
 src/omr/model/weights.json
 src/omr/model/checkpoints/
 training-data/

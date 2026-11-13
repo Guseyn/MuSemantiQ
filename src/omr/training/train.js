@@ -1,6 +1,6 @@
 'use strict'
 
-import { writeFileSync } from 'node:fs'
+import { appendFileSync, mkdirSync, writeFileSync } from 'node:fs'
 
 import { forwardModel } from '../model/forwardModel.js'
 import { createModel } from '../model/createModel.js'
@@ -100,30 +100,48 @@ export function trainModel ({
   return { model: best.weights ? { ...model, ...best.weights } : model, history }
 }
 
+// The run's own record: what was trained, how it went, what came out. It is
+// appended to, so the history of runs survives, and it is what `tail -f`
+// watches — no shell redirection needed.
+const RUN_LOG = 'training-data/training.log'
+
 export function runTraining () {
+  mkdirSync('training-data', { recursive: true })
   const shape = { gridSize: 24, filterSize: 3, filterCounts: [ 8, 16 ], denseSize: 24, classCount: 9 }
-  const { classIds, samples } = generateTrainingSet({ seed: 20261110, samplesPerClass: 40, gridSize: shape.gridSize })
-  const split = Math.floor(samples.length * 0.8)
-  const model = createModel({ ...shape, classCount: classIds.length }, 1)
-  const { history } = trainModel({
-    model,
-    trainingSamples: samples.slice(0, split),
-    validationSamples: samples.slice(split),
-    epochs: 15,
-    batchSize: 8,
-    learningRate: 0.01,
-    onEpoch: (entry) => console.log(
-      `epoch ${entry.epoch}: loss ${entry.loss}, accuracy ${entry.accuracy}, validation ${entry.validationAccuracy}`
-    )
-  })
-  const outIndex = process.argv.findIndex((argument) => argument.startsWith('--out='))
-  if (outIndex !== -1) {
-    const outPath = process.argv[outIndex].slice('--out='.length)
-    const { json, hash } = exportWeights(model)
-    writeFileSync(outPath, json)
-    console.log(`weights written to ${outPath}\nsha256 ${hash}`)
+  const seed = 20261110
+  const { classIds, samples } = generateTrainingSet({ seed, samplesPerClass: 40, gridSize: shape.gridSize })
+  const log = (line) => {
+    appendFileSync(RUN_LOG, `${line}\n`)
+    console.log(line)
   }
-  return { model, history }
+  try {
+    log(`=== ${new Date().toISOString()} · seed ${seed} · grid ${shape.gridSize} · ${classIds.length} classes · ${samples.length} samples · 15 epochs`)
+    const split = Math.floor(samples.length * 0.8)
+    const model = createModel({ ...shape, classCount: classIds.length }, 1)
+    const { history } = trainModel({
+      model,
+      trainingSamples: samples.slice(0, split),
+      validationSamples: samples.slice(split),
+      epochs: 15,
+      batchSize: 8,
+      learningRate: 0.01,
+      onEpoch: (entry) => log(
+        `epoch ${entry.epoch}: loss ${entry.loss}, accuracy ${entry.accuracy}, validation ${entry.validationAccuracy}`
+      )
+    })
+    const outIndex = process.argv.findIndex((argument) => argument.startsWith('--out='))
+    if (outIndex !== -1) {
+      const outPath = process.argv[outIndex].slice('--out='.length)
+      const { json, hash } = exportWeights(model)
+      writeFileSync(outPath, json)
+      log(`weights written to ${outPath}`)
+      log(`sha256 ${hash}`)
+    }
+    return { model, history }
+  } catch (error) {
+    appendFileSync(RUN_LOG, `error: ${error.message}\n${error.stack}\n`)
+    throw error
+  }
 }
 
 function shuffledIndexes (length, random) {
