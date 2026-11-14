@@ -491,6 +491,22 @@ export {
 
 /**
  * ⟅━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━⟆
+ *
+ * Reading a picture of a score. The OMR translator keeps its own surface in
+ * #msq/omr/api.js and is re-exported here, so the main API stays one door:
+ * a PNG in, MSQ text out, with what the classifier was unsure of in the
+ * report instead of silently decided.
+ */
+export {
+  decodeImageToGrayscale,
+  readBitmapFromImage,
+  analyzeImage,
+  translateImageToMsq,
+  translateImagesToMsqPages
+} from '#msq/omr/api.js'
+
+/**
+ * ⟅━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━⟆
  *                  4. generateStylesForSinglePage
  * ⟅━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━⟆
  * /

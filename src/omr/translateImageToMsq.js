@@ -4,6 +4,7 @@ import deskewBitmap from '#msq/omr/analysis/deskewBitmap.js'
 import { analyzeStraightenedImage } from '#msq/omr/analysis/analyzeImage.js'
 import extractSymbols from '#msq/omr/analysis/extractSymbols.js'
 import classifyComponent from '#msq/omr/analysis/classifyComponent.js'
+import shippedModel from '#msq/omr/model/shippedModel.js'
 import buildMusicModel from '#msq/omr/translation/buildMusicModel.js'
 import buildPageSchemaFromMusicModel from '#msq/omr/translation/buildPageSchemaFromMusicModel.js'
 import carryStateAcrossPages from '#msq/omr/translation/carryStateAcrossPages.js'
@@ -48,7 +49,13 @@ export function translatePage (bitmap, options = {}, carried = {}) {
 }
 
 function classifyWithModel ({ model, classIds, threshold }) {
-  return (pixels) => classifyComponent(model, pixels, classIds, threshold)
+  // no numbers given, no problem: the shipped model knows the classes it
+  // was trained with, and says so in its own file
+  const loaded = model ? { model, classIds } : shippedModel()
+  if (!loaded.classIds) {
+    throw new Error('a model needs its classIds — the order it was trained with')
+  }
+  return (pixels) => classifyComponent(loaded.model, pixels, loaded.classIds, threshold)
 }
 
 // Sizes in staff spaces and colours as measured; the one pixel anchor

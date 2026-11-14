@@ -46,7 +46,8 @@
     "docs": "npm run setup:symlinks && npm run msq:apps:update && npm run web-components:update && node docs/web-app/main.js",
     "browser-app:setup": "npm run setup:symlinks && npm run msq:apps:update && npm run web-components:update",
     "browser-app": "node browser-app/web-app/main.js",
-    "cli-app": "node cli-app/msq.js"
+    "cli-app": "node cli-app/msq.js",
+    "omr-cli-app": "node omr-cli-app/omr.js"
   },
   "repository": {
     "type": "git",
