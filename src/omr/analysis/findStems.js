@@ -19,8 +19,12 @@ export function findStems ({ width, height, grayscale }, staves) {
   for (let staveIndex = 0; staveIndex < staves.length; staveIndex++) {
     const stave = staves[staveIndex]
     const staffSpace = stave.staffSpaceHeightPx
-    for (let x = stave.xStart; x <= stave.xEnd; x++) {
-      for (const run of verticalRuns({ width, height, grayscale }, x)) {
+    const fromY = Math.max(0, Math.floor(stave.topY - MAX_STEM_LENGTH_IN_STAFF_SPACES * staffSpace))
+    const toY = Math.min(height - 1, Math.ceil(stave.bottomY + MAX_STEM_LENGTH_IN_STAFF_SPACES * staffSpace))
+    // A beamed note's stem may extend just beyond the final staff-line pixel.
+    const toX = Math.min(width - 1, stave.xEnd + Math.ceil(staffSpace))
+    for (let x = stave.xStart; x <= toX; x++) {
+      for (const run of verticalRuns({ width, height, grayscale }, x, fromY, toY)) {
         const length = run.y2 - run.y1 + 1
         const tooShort = length < MIN_STEM_LENGTH_IN_STAFF_SPACES * staffSpace
         const isBarline = length > MAX_STEM_LENGTH_IN_STAFF_SPACES * staffSpace
@@ -57,13 +61,13 @@ export function measureStemEnds (stem, bitmap, staffSpace, outerEnd) {
   }
   stem.beamRows = beamRows
   stem.beamCount = beamCount
-  stem.flagCount = beamCount ? 0 : Math.min(Math.ceil(flagRows / 2), 3)
+  stem.flagCount = beamCount ? 0 : Math.min(Math.ceil(flagRows / 2), 6)
 }
 
-function verticalRuns ({ width, height, grayscale }, x) {
+function verticalRuns ({ width, grayscale }, x, fromY, toY) {
   const runs = []
   let start = null
-  for (let y = 0; y < height; y++) {
+  for (let y = fromY; y <= toY; y++) {
     const ink = grayscale[y * width + x] > 0.5
     if (ink && start === null) {
       start = y
@@ -74,7 +78,7 @@ function verticalRuns ({ width, height, grayscale }, x) {
     }
   }
   if (start !== null) {
-    runs.push({ y1: start, y2: height - 1 })
+    runs.push({ y1: start, y2: toY })
   }
   return runs
 }
@@ -99,6 +103,7 @@ function mergeAdjacentColumns (stems) {
   const merged = []
   for (const stem of stems) {
     const neighbour = merged.find((other) =>
+      other.staveIndex === stem.staveIndex &&
       Math.abs(other.x - stem.x) <= 1 &&
       Math.abs(other.y1 - stem.y1) <= 2 &&
       Math.abs(other.y2 - stem.y2) <= 2

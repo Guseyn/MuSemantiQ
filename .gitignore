@@ -21,6 +21,9 @@ lib-cov
 
 # Coverage directory used by tools like istanbul
 coverage
+# OMR's feature registry is source, not an istanbul report.
+!src/omr/coverage/
+!src/omr/coverage/**
 *.lcov
 
 # nyc test coverage

@@ -8,6 +8,7 @@ import backpropagateModel from '#msq/omr/training/backpropagateModel.js'
 import { createAdamState, updateWeightsWithAdam } from '#msq/omr/training/updateWeightsWithAdam.js'
 import { createSeededRandom } from '#msq/omr/training/seededRandom.js'
 import { generateTrainingSet } from '#msq/omr/training/generateTrainingSet.js'
+import { generateRendererTrainingSet } from '#msq/omr/training/generateRendererTrainingSet.js'
 import { drawableClassIds } from '#msq/omr/training/drawSymbols.js'
 import { evaluateModel } from '#msq/omr/training/evaluate.js'
 import { exportWeights } from '#msq/omr/training/exportWeights.js'
@@ -15,22 +16,25 @@ import { exportWeights } from '#msq/omr/training/exportWeights.js'
 /**
  * The training loop: show a batch, guess, measure how wrong, nudge.
  *
- * Loss is cross-entropy over the batch plus a small L2 penalty so weights
- * cannot grow into memorizing. Shuffling is seeded — one seed, one run. Each
- * epoch reports the loss and both accuracies; the best model is kept.
+ * Reported loss is cross-entropy only. The `l2` option keeps its CLI name but
+ * means decoupled AdamW decay on weights, not an L2 term in the gradients or
+ * loss. Shuffling is seeded — one seed, one run. Each epoch reports the loss
+ * and both accuracies; the model with the lowest validation loss is kept.
  */
 
 const LAYER_NAMES = [ 'conv1', 'conv2', 'dense1', 'dense2' ]
 
-export function trainModel ({
+export async function trainModel ({
   model,
   trainingSamples,
+  trainingSamplesForEpoch = null,
   validationSamples,
   epochs,
   batchSize = 32,
   learningRate = 0.001,
   l2 = 0.0005,
   seed = 1,
+  earlyStoppingPatience = 5,
   onEpoch = null,
   onBatch = null
 }) {
@@ -44,18 +48,21 @@ export function trainModel ({
   }
   const history = []
   let step = 0
-  let best = { accuracy: -1, weights: null }
+  let best = { loss: Infinity, weights: null }
+  let epochsSinceBest = 0
   for (let epoch = 1; epoch <= epochs; epoch++) {
     const epochStartedAt = Date.now()
-    const order = shuffledIndexes(trainingSamples.length, random)
-    const batchesTotal = Math.ceil(trainingSamples.length / batchSize)
+    const epochTrainingSamples = trainingSamplesForEpoch ? await trainingSamplesForEpoch(epoch) : trainingSamples
+    const order = shuffledIndexes(epochTrainingSamples.length, random)
+    const batchesTotal = Math.ceil(epochTrainingSamples.length / batchSize)
     let batchesDone = 0
+    let samplesDone = 0
     let lossTotal = 0
     for (let start = 0; start < order.length; start += batchSize) {
       const batch = order.slice(start, start + batchSize)
       const gradients = freshGradients(model)
       for (const index of batch) {
-        const sample = trainingSamples[index]
+        const sample = epochTrainingSamples[index]
         const forward = forwardModel(model, sample.pixels)
         lossTotal += -Math.log(Math.max(forward.probabilities[sample.classIndex], 1e-12))
         const sampleGradients = backpropagateModel(model, forward, sample.classIndex)
@@ -68,13 +75,13 @@ export function trainModel ({
       for (const name of LAYER_NAMES) {
         scale(gradients[name].gradWeights, 1 / batch.length)
         scale(gradients[name].gradBiases, 1 / batch.length)
-        addL2(gradients[name].gradWeights, model[name].weights, l2)
         updateWeightsWithAdam({
           weights: model[name].weights,
           gradWeights: gradients[name].gradWeights,
           state: states[name].weights,
           learningRate,
-          step
+          step,
+          weightDecay: l2
         })
         updateWeightsWithAdam({
           weights: model[name].biases,
@@ -85,23 +92,24 @@ export function trainModel ({
         })
       }
       batchesDone++
+      samplesDone += batch.length
       if (onBatch) {
         onBatch({
           epoch,
           batchesDone,
           batchesTotal,
-          runningLoss: Math.round(lossTotal / batchesDone / batchSize * 1e6) / 1e6
+          runningLoss: Math.round(lossTotal / samplesDone * 1e6) / 1e6
         })
       }
     }
-    const training = evaluateModel({ model, samples: trainingSamples })
+    const training = evaluateModel({ model, samples: epochTrainingSamples })
     const validation = validationSamples
       ? evaluateModel({ model, samples: validationSamples })
       : training
     history.push({
       epoch,
       epochs,
-      loss: Math.round(lossTotal / trainingSamples.length * 1e6) / 1e6,
+      loss: Math.round(lossTotal / epochTrainingSamples.length * 1e6) / 1e6,
       accuracy: training.accuracy,
       validationLoss: validation.loss,
       validationAccuracy: validation.accuracy,
@@ -110,20 +118,25 @@ export function trainModel ({
     if (onEpoch) {
       onEpoch(history[history.length - 1])
     }
-    if (validation.accuracy > best.accuracy) {
-      best = { accuracy: validation.accuracy, weights: copyWeights(model) }
+    if (validation.rawLoss < best.loss) {
+      best = { loss: validation.rawLoss, weights: copyWeights(model) }
+      epochsSinceBest = 0
+    } else {
+      epochsSinceBest++
+      if (earlyStoppingPatience > 0 && epochsSinceBest >= earlyStoppingPatience) {
+        break
+      }
     }
   }
   return { model: best.weights ? { ...model, ...best.weights } : model, history }
 }
 
-// The run's own record: what was trained, how it went, what came out. It is
-// appended to, so the history of runs survives, and it is what `tail -f`
-// watches — no shell redirection needed.
-const RUN_LOG = 'training-data/training.log'
-
-export function runTraining () {
-  mkdirSync('training-data', { recursive: true })
+// Every run owns its records, so a later run cannot overwrite the evidence
+// for the weights being tested.
+export async function runTraining () {
+  const runDirectory = `training-data/runs/${new Date().toISOString().replace(/[:.]/g, '-')}-${process.pid}`
+  mkdirSync(runDirectory, { recursive: true })
+  const runLog = `${runDirectory}/training.log`
   // Every value of the run is the user's choice; the defaults are the smoke
   // run — seconds, to see that it works. The production values live in
   // dev-docs/training.html.
@@ -135,17 +148,27 @@ export function runTraining () {
   const batchSize = numberFlag('batch', 8)
   const learningRate = numberFlag('learning-rate', 0.01)
   const seed = numberFlag('seed', 20261110)
+  const dataset = stringFlag('dataset', 'renderer')
+  if (![ 'templates', 'renderer' ].includes(dataset)) {
+    throw new Error(`unknown dataset: ${dataset}`)
+  }
+  const validationMode = stringFlag('validation', 'font')
+  if (![ 'font', 'mixed' ].includes(validationMode)) {
+    throw new Error(`unknown validation mode: ${validationMode}`)
+  }
+  const generateSamples = dataset === 'renderer' ? generateRendererTrainingSet : generateTrainingSet
   const shape = { gridSize, filterSize: 3, filterCounts, denseSize, classCount: 0 }
   const log = (line) => {
-    appendFileSync(RUN_LOG, `${line}\n`)
+    appendFileSync(runLog, `${line}\n`)
     console.log(line)
   }
   try {
     const startedAt = Date.now()
-    log(`=== ${new Date().toISOString()} · seed ${seed} · grid ${gridSize} · filters ${filterCounts.join(',')} · dense ${denseSize} · ${drawableClassIds.length} classes · ${drawableClassIds.length * samplesPerClass} samples · ${epochs} epochs`)
+    log(`run directory ${runDirectory}`)
+    log(`=== ${new Date().toISOString()} · dataset ${dataset} · seed ${seed} · grid ${gridSize} · filters ${filterCounts.join(',')} · dense ${denseSize} · ${drawableClassIds.length} classes · ${epochs} epochs`)
     log(`drawing the training set — ${samplesPerClass} pictures per class…`)
     const generationStartedAt = Date.now()
-    const { classIds, samples } = generateTrainingSet({
+    const { classIds, samples } = await generateSamples({
       seed,
       samplesPerClass,
       gridSize,
@@ -154,13 +177,26 @@ export function runTraining () {
     shape.classCount = classIds.length
     log(`dataset ready in ${durationSince(generationStartedAt)} — ${samples.length} samples`)
     const split = Math.floor(samples.length * 0.8)
-    log(`training on ${split} · validating on ${samples.length - split} · batch ${batchSize} · learning rate ${learningRate}`)
-    const model = createModel({ ...shape, classCount: classIds.length }, 1)
+    const holdOutLeland = dataset === 'renderer' && validationMode === 'font'
+    const trainingSamples = holdOutLeland
+      ? samples.filter((sample) => sample.font !== 'leland')
+      : samples.slice(0, split)
+    const validationSamples = holdOutLeland
+      ? samples.filter((sample) => sample.font === 'leland')
+      : samples.slice(split)
+    log(`training on ${trainingSamples.length} · validating on ${validationSamples.length} · validation ${validationMode} · batch ${batchSize} · learning rate ${learningRate}`)
+    const model = createModel({ ...shape, classCount: classIds.length }, seed)
     let lastBeatAt = Date.now()
-    const { history } = trainModel({
+    const { model: bestModel, history } = await trainModel({
       model,
-      trainingSamples: samples.slice(0, split),
-      validationSamples: samples.slice(split),
+      trainingSamples,
+      trainingSamplesForEpoch: async (epoch) => {
+        const generated = await generateSamples({ seed: seed + epoch, samplesPerClass, gridSize })
+        return holdOutLeland
+          ? generated.samples.filter((sample) => sample.font !== 'leland')
+          : generated.samples
+      },
+      validationSamples,
       epochs,
       batchSize,
       learningRate,
@@ -178,22 +214,30 @@ export function runTraining () {
           (left > 0 ? ` · ~${formatDuration(left)} left` : ''))
       }
     })
+    const { json, hash } = exportWeights(bestModel, classIds)
+    writeFileSync(`${runDirectory}/best-weights.json`, json)
+    writeFileSync(`${runDirectory}/history.json`, JSON.stringify(history, null, 2))
+    log(`best weights written to ${runDirectory}/best-weights.json`)
+    log(`sha256 ${hash}`)
     const outIndex = process.argv.findIndex((argument) => argument.startsWith('--out='))
     if (outIndex !== -1) {
       const outPath = process.argv[outIndex].slice('--out='.length)
-      const { json, hash } = exportWeights(model, classIds)
       writeFileSync(outPath, json)
       log(`weights written to ${outPath}`)
-      log(`sha256 ${hash}`)
     }
     const best = history.reduce((winner, entry) =>
-      entry.validationAccuracy > winner.validationAccuracy ? entry : winner, history[0])
-    log(`✓ done in ${durationSince(startedAt)} — best validation ${best.validationAccuracy} at epoch ${best.epoch}`)
-    return { model, history }
+      entry.validationLoss < winner.validationLoss ? entry : winner, history[0])
+    log(`✓ done in ${durationSince(startedAt)} — best validation loss ${best.validationLoss} at epoch ${best.epoch}`)
+    return { model: bestModel, history }
   } catch (error) {
-    appendFileSync(RUN_LOG, `error: ${error.message}\n${error.stack}\n`)
+    appendFileSync(runLog, `error: ${error.message}\n${error.stack}\n`)
     throw error
   }
+}
+
+function stringFlag (name, fallback) {
+  const found = process.argv.find((argument) => argument.startsWith(`--${name}=`))
+  return found ? found.slice(name.length + 3) : fallback
 }
 
 function numberFlag (name, fallback) {
@@ -249,12 +293,6 @@ function scale (values, factor) {
   }
 }
 
-function addL2 (gradWeights, weights, l2) {
-  for (let index = 0; index < gradWeights.length; index++) {
-    gradWeights[index] += 2 * l2 * weights[index]
-  }
-}
-
 function copyWeights (model) {
   const copy = {}
   for (const name of LAYER_NAMES) {
@@ -267,5 +305,5 @@ function copyWeights (model) {
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
-  runTraining()
+  await runTraining()
 }

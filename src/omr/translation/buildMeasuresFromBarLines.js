@@ -10,17 +10,21 @@
 
 export function buildMeasuresFromBarLines (units, barLines) {
   const sortedUnits = [ ...units ].sort((first, second) => first.x - second.x)
-  const sortedBarLines = [ ...barLines ].sort((first, second) => first - second)
+  const sortedBarLines = [ ...barLines ].sort((first, second) => xOf(first) - xOf(second))
   const measures = [ [] ]
   let barLineIndex = 0
   for (const unit of sortedUnits) {
-    while (barLineIndex < sortedBarLines.length && unit.x > sortedBarLines[barLineIndex]) {
+    while (barLineIndex < sortedBarLines.length && unit.x > xOf(sortedBarLines[barLineIndex])) {
       measures.push([])
       barLineIndex++
     }
     measures[measures.length - 1].push(unit)
   }
   return measures
+}
+
+function xOf (barLine) {
+  return typeof barLine === 'number' ? barLine : barLine.x
 }
 
 export default buildMeasuresFromBarLines

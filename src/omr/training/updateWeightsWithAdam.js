@@ -1,11 +1,12 @@
 'use strict'
 
 /**
- * The nudge: Adam.
+ * The nudge: Adam, with optional decoupled AdamW weight decay.
  *
  * Each learned number gets its step scaled by how big its gradients have been
  * lately (v) and pointed by which way they have been pointing (m). The
- * correction for the first steps (m̂, v̂) matters — they start at zero.
+ * correction for the first steps (m̂, v̂) matters — they start at zero. Decay
+ * acts on the weight itself, not on the gradient Adam normalizes.
  */
 
 const BETA_1 = 0.9
@@ -16,7 +17,7 @@ export function createAdamState (length) {
   return { m: new Float64Array(length), v: new Float64Array(length) }
 }
 
-export function updateWeightsWithAdam ({ weights, gradWeights, state, learningRate, step }) {
+export function updateWeightsWithAdam ({ weights, gradWeights, state, learningRate, step, weightDecay = 0 }) {
   const correction1 = 1 - BETA_1 ** step
   const correction2 = 1 - BETA_2 ** step
   for (let index = 0; index < weights.length; index++) {
@@ -25,7 +26,7 @@ export function updateWeightsWithAdam ({ weights, gradWeights, state, learningRa
     state.v[index] = BETA_2 * state.v[index] + (1 - BETA_2) * gradient * gradient
     const direction = state.m[index] / correction1
     const scale = Math.sqrt(state.v[index] / correction2) + EPSILON
-    weights[index] -= learningRate * direction / scale
+    weights[index] -= learningRate * (direction / scale + weightDecay * weights[index])
   }
 }
 

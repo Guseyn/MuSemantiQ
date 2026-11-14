@@ -1,21 +1,25 @@
 'use strict'
 
 /**
- * Stems up and stems down are two voices.
+ * Opposing stems suggest two voices only when their onsets coincide.
  *
- * One stave can carry two lines of music, and the engraving says which is
- * which by the way the stems point. When a measure has both, the stems-up
- * units are one voice and the stems-down units the other; when all agree, the
- * measure is one voice.
+ * Stem direction alone is engraving, not polyphony. Rests stay in the first
+ * voice and never create a second one by themselves.
  */
 
-export function splitVoicesByStemDirection (units) {
-  const stemsUp = units.filter((unit) => unit.stemDirection === 'up')
-  const stemsDown = units.filter((unit) => unit.stemDirection === 'down')
-  if (stemsUp.length && stemsDown.length) {
-    return [ stemsUp, stemsDown ]
+export function splitVoicesByStemDirection (units, staffSpaceHeightPx = 12) {
+  const notes = units.filter((unit) => !unit.isRest)
+  const stemsUp = notes.filter((unit) => unit.stemDirection === 'up')
+  const stemsDown = notes.filter((unit) => unit.stemDirection === 'down')
+  const simultaneous = stemsUp.some((up) => stemsDown.some((down) =>
+    Math.abs(up.x - down.x) <= 0.35 * staffSpaceHeightPx))
+  if (!simultaneous) {
+    return [ units ]
   }
-  return [ units ]
+  return [
+    units.filter((unit) => unit.isRest || unit.stemDirection === 'up'),
+    units.filter((unit) => !unit.isRest && unit.stemDirection === 'down')
+  ]
 }
 
 export default splitVoicesByStemDirection

@@ -142,12 +142,14 @@ figcaption { font: 12px var(--mono); color: var(--muted); margin-top: 6px; }
 
 <pre><code>./remote-training-scripts/remote-git-pull.sh
 ./remote-training-scripts/remote-start-training.sh</code></pre>
-<p>The first script has the server check out the branch and reset to it — <code>ssh … 'cd MuSemantiQ && git fetch --all && git checkout omr && git reset --hard origin/omr'</code>. The second starts training detached with <code>nohup</code> and tells you its pid; the run keeps going after the command returns. The third stops it. And the run <b>logs itself</b> to <code>training-data/training.log</code> on the server — every phase, so nothing is silent.</p>
+<p>The first script has the server check out the branch and reset to it — <code>ssh … 'cd MuSemantiQ && git fetch --all && git checkout omr && git reset --hard origin/omr'</code>. The second starts training detached with <code>nohup</code> and tells you its pid; the run keeps going after the command returns. The third stops it. Every run owns <code>training-data/runs/&lt;run-id&gt;/</code>, containing <code>training.log</code>, <code>history.json</code> and <code>best-weights.json</code>, so one run cannot overwrite another run's evidence.</p>
 
 <p>The defaults are the smoke run (360 samples, 15 epochs — seconds). A run worth keeping takes its size as flags, and they pass through the script.</p>
 
 <h3>The production run — every parameter</h3>
 <pre><code>./remote-training-scripts/remote-start-training.sh \
+  --dataset=renderer \
+  --validation=mixed \
   --samples-per-class=400 \
   --epochs=40 \
   --grid=48 \
@@ -159,7 +161,9 @@ figcaption { font: 12px var(--mono); color: var(--muted); margin-top: 6px; }
 
 <table style="border-collapse:collapse;width:100%;font-size:13.5px">
 <tr style="border-bottom:2px solid var(--ink)"><th style="text-align:left;padding:6px 10px;font:600 11px var(--mono)">flag</th><th style="text-align:left;padding:6px 10px;font:600 11px var(--mono)">value</th><th style="text-align:left;padding:6px 10px;font:600 11px var(--mono)">why</th></tr>
-<tr style="border-bottom:1px solid var(--rule)"><td style="padding:7px 10px"><code>--samples-per-class</code></td><td style="padding:7px 10px">400</td><td style="padding:7px 10px">43 classes × 400 = 17,200 flashcards. Variation is the lesson: 400 different-looking flats teach flatness, one flat teaches a bitmap</td></tr>
+<tr style="border-bottom:1px solid var(--rule)"><td style="padding:7px 10px"><code>--dataset</code></td><td style="padding:7px 10px">renderer</td><td style="padding:7px 10px">73 classes drawn by the real parser and drawer in Bravura and Leland. <code>templates</code> keeps the old hand-drawn baseline for comparison</td></tr>
+<tr style="border-bottom:1px solid var(--rule)"><td style="padding:7px 10px"><code>--validation</code></td><td style="padding:7px 10px">mixed</td><td style="padding:7px 10px">Both fonts train; a mixed held-out split judges them. <code>font</code> instead holds Leland completely out of training for a domain-gap measurement</td></tr>
+<tr style="border-bottom:1px solid var(--rule)"><td style="padding:7px 10px"><code>--samples-per-class</code></td><td style="padding:7px 10px">400</td><td style="padding:7px 10px">73 classes × 400 fresh degraded variants per font. Clean normalized crops are cached; mutated copies are never stored</td></tr>
 <tr style="border-bottom:1px solid var(--rule)"><td style="padding:7px 10px"><code>--epochs</code></td><td style="padding:7px 10px">40</td><td style="padding:7px 10px">passes over the set. Read the validation column: if the last epoch is still the best, the run was cut short</td></tr>
 <tr style="border-bottom:1px solid var(--rule)"><td style="padding:7px 10px"><code>--grid</code></td><td style="padding:7px 10px">48</td><td style="padding:7px 10px">the crop size the model is built for — dots and flag counts stay legible. 24 is twice as fast and half as sharp</td></tr>
 <tr style="border-bottom:1px solid var(--rule)"><td style="padding:7px 10px"><code>--filters</code></td><td style="padding:7px 10px">16,32</td><td style="padding:7px 10px">the two conv layers' widths — this is the ~300K-parameter model from the docs</td></tr>
@@ -172,31 +176,31 @@ figcaption { font: 12px var(--mono); color: var(--muted); margin-top: 6px; }
 <p>Every value lands in the log's first line, so a run can be read back exactly. What to expect and how to read it:</p>
 <ul>
   <li><b>Time</b>: ~2–3 hours at grid 24, ~8–10 hours at grid 48, on one core (the trainer is single-threaded today).</li>
-  <li><b>Done</b> is the last log line: <code>✓ done in 8h 12m — best validation 0.87 at epoch 31</code>.</li>
+  <li><b>Done</b> is the last log line: <code>✓ done in 8h 12m — best validation loss 1.008583 at epoch 10</code>. The exported checkpoint is the one with the lowest validation loss, not necessarily the last epoch.</li>
   <li><b>Validation still best at the last epoch</b> → more epochs. <b>Training at 1.0 but validation far below</b> → more samples or stronger jitter. <b>Both flat and low</b> → the shapes, not the run: look at the contact sheets before spending hours.</li>
-  <li>Look first, train after: <code>node src/omr/training/inspectDataset.js --class=flat --count=24</code>.</li>
+  <li>Look first, train after: <code>node src/omr/training/inspectDataset.js --dataset=renderer --class=flat --count=24</code>.</li>
 </ul>
 
 <p>Watching is one more command; <code>Ctrl-c</code> stops the watching, not the training:</p>
-<pre><code>ssh user@server 'tail -f MuSemantiQ/training-data/training.log'   <span class="cm"># follows every line below</span>
+<pre><code>ssh user@server 'tail -f MuSemantiQ/training-data/runs/&lt;run-id&gt;/training.log'   <span class="cm"># follows this run</span>
 
 ./remote-training-scripts/remote-stop-training.sh                  <span class="cm"># to stop the run</span></code></pre>
 
 <p>What the log tells you, from the first minute to the last:</p>
-<pre><code>=== 2026-11-13T18:00:00Z · seed 20261110 · grid 48 · filters 16,32 · dense 64 · 43 classes · 17200 samples · 40 epochs
+<pre><code>=== 2026-11-13T18:00:00Z · dataset renderer · seed 20261110 · grid 48 · filters 16,32 · dense 64 · 73 classes · 58400 samples · 40 epochs
 drawing the training set — 400 pictures per class…
-  1/43 notehead-filled
-  2/43 notehead-open
+  1/73 notehead-filled
+  2/73 notehead-open
   …
-dataset ready in 3m 12s — 17200 samples
-training on 13760 · validating on 3440 · batch 32 · learning rate 0.001
+dataset ready in 3m 12s — 58400 samples
+training on 46720 · validating on 11680 · validation mixed · batch 32 · learning rate 0.001
   epoch 1 · 128/430 batches · running loss 2.91
   epoch 1 · 256/430 batches · running loss 2.42
 epoch 1/40 · 11m 04s · loss 2.31 · accuracy 0.38 · validation loss 1.98 · validation 0.47 · ~7h 15m left
 …
-weights written to src/omr/model/weights.json
+best weights written to training-data/runs/&lt;run-id&gt;/best-weights.json
 sha256 7190c2b9…
-✓ done in 8h 12m — best validation 0.87 at epoch 31</code></pre>
+✓ done in 8h 12m — best validation loss 1.008583 at epoch 10</code></pre>
 <div class="note"><b>Reproducible</b> The seeds live in the run itself: the same code and seed give the same dataset and the same weights on any machine. The seed and shape are in <code>runTraining()</code> in <code>src/omr/training/train.js</code>.</div>
 </section>
 
@@ -222,7 +226,7 @@ training-data/</code></pre>
 <h2><span class="n">5</span>Bring the model home <a class="totop" href="#workflow">↑</a></h2>
 
 <pre><code>./remote-training-scripts/remote-download-model.sh</code></pre>
-<p>It rsyncs <code>src/omr/model/</code> and the run log to the same paths here, then prints the sha of what arrived — <code>rsync -av -e "ssh -i your-key" user@server:~/MuSemantiQ/src/omr/model/ ./src/omr/model/</code> and <code>shasum -a 256 src/omr/model/weights.json</code>. The sha must match the one at the end of <code>training-data/training.log</code>: a mismatch means a broken transfer or a different run — re-download before trusting the file. Once the weights are in <code>src/omr/model/</code>, the code picks them up where you load them (see below).</p>
+<p>Download the chosen run's <code>best-weights.json</code> and <code>training.log</code>, then compare the file's SHA-256 with the hash in that log. Adopt the candidate by copying it to <code>src/omr/model/weights.json</code> only after held-out and real-page evaluation. A perfect synthetic score is not an adoption reason by itself.</p>
 </section>
 
 <hr>
@@ -230,6 +234,9 @@ training-data/</code></pre>
 <!-- ============================ 6 ============================ -->
 <section id="test">
 <h2><span class="n">6</span>Test it locally <a class="totop" href="#workflow">↑</a></h2>
+<p>Start with the candidate, not with the shipped file. This evaluates fresh renderer samples in both fonts and runs the real CLI fixture without replacing anything:</p>
+<pre><code>npm run omr:evaluate -- --weights=training-data/runs/&lt;run-id&gt;/best-weights.json --fixture=omr-cli-app/score.png</code></pre>
+<p>Compare the metrics and the class histogram. A candidate is adopted only when the real output is also acceptable.</p>
 
 <h3>The API under test</h3>
 <p>The one that matters is the first line: <b>any image → MSQ</b>. The others are the same pipeline taken apart.</p>
@@ -290,8 +297,8 @@ for (const sample of samples) {
 <span class="cm"># every run — your scripts in remote-training-scripts/ (not tracked)</span>
 ./remote-training-scripts/remote-git-pull.sh
 ./remote-training-scripts/remote-start-training.sh
-./remote-training-scripts/remote-start-training.sh --samples-per-class=400 --epochs=40 --grid=48 --filters=16,32 --dense=64 --batch=32 --learning-rate=0.001   <span class="cm"># the production run</span>
-ssh user@server 'tail -f MuSemantiQ/training-data/training.log'   <span class="cm"># Ctrl-c stops the watching, not the training</span>
+./remote-training-scripts/remote-start-training.sh --dataset=renderer --validation=mixed --samples-per-class=400 --epochs=40 --grid=48 --filters=16,32 --dense=64 --batch=32 --learning-rate=0.001   <span class="cm"># the production run</span>
+ssh user@server 'tail -f MuSemantiQ/training-data/runs/&lt;run-id&gt;/training.log'   <span class="cm"># Ctrl-c stops the watching, not the training</span>
 ./remote-training-scripts/remote-stop-training.sh                 <span class="cm"># to stop the run</span>
 
 <span class="cm"># take the result</span>

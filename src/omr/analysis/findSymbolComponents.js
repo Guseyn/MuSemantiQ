@@ -44,10 +44,14 @@ function floodFill ({ width, height, grayscale }, visited, startX, startY) {
     maxX = Math.max(maxX, x)
     minY = Math.min(minY, y)
     maxY = Math.max(maxY, y)
-    if (x > 0) stack.push([ x - 1, y ])
-    if (x < width - 1) stack.push([ x + 1, y ])
-    if (y > 0) stack.push([ x, y - 1 ])
-    if (y < height - 1) stack.push([ x, y + 1 ])
+    // Antialiasing and diagonal strokes often meet only at a corner.
+    for (const offsetY of [ -1, 0, 1 ]) {
+      for (const offsetX of [ -1, 0, 1 ]) {
+        if ((offsetX || offsetY) && x + offsetX >= 0 && x + offsetX < width && y + offsetY >= 0 && y + offsetY < height) {
+          stack.push([ x + offsetX, y + offsetY ])
+        }
+      }
+    }
   }
   return { box: { x: minX, y: minY, w: maxX - minX + 1, h: maxY - minY + 1 }, ink }
 }

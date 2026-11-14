@@ -121,7 +121,7 @@ function buildStave (rawLines, profile, bitmap) {
   const staffSpaceHeightPx = mean(gaps)
   const topY = linesY[0]
   const bottomY = linesY[4]
-  const { xStart, xEnd } = lineExtents(linesY, staffSpaceHeightPx, bitmap)
+  const { xStart, xEnd } = lineExtents(linesY, bitmap)
   return { linesY, staffSpaceHeightPx, topY, bottomY, xStart, xEnd }
 }
 
@@ -138,29 +138,50 @@ function recenterLine (line, profile) {
   return total > 0 ? weighted / total : line
 }
 
-// The stave's horizontal extent is where most of its lines carry ink, so text
-// sitting beside the stave does not stretch it.
-function lineExtents (linesY, staffSpaceHeightPx, { width, height, grayscale }) {
-  let xStart = width
-  let xEnd = 0
-  for (let x = 0; x < width; x++) {
-    let linesWithInk = 0
-    for (const line of linesY) {
-      const y = Math.round(line)
-      if (y >= 0 && y < height && grayscale[y * width + x] > 0.5) {
-        linesWithInk++
-      }
-    }
-    if (linesWithInk >= 3) {
-      xStart = Math.min(xStart, x)
-      xEnd = Math.max(xEnd, x)
-    }
-  }
-  if (xStart > xEnd) {
-    xStart = 0
-    xEnd = width - 1
+// Each staff line owns one long horizontal span. Their consensus excludes a
+// brace at the left, while a slur or beam crossing the line cannot shorten it.
+function lineExtents (linesY, { width, height, grayscale }) {
+  const runs = linesY.map((line) => horizontalSpan({ width, height, grayscale }, Math.round(line)))
+  const starts = runs.map((run) => run.start)
+  const ends = runs.map((run) => run.end)
+  const xStart = Math.min(...starts)
+  const xEnd = Math.max(...ends)
+  if (!runs.length || xStart > xEnd) {
+    return { xStart: 0, xEnd: width - 1 }
   }
   return { xStart, xEnd }
+}
+
+function horizontalSpan ({ width, height, grayscale }, lineY) {
+  let best = { start: 0, end: -1, length: 0 }
+  for (const offset of [ 0, -1, 1 ]) {
+    const y = lineY + offset
+    if (y < 0 || y >= height) {
+      continue
+    }
+    let firstInk = -1
+    let lastInk = -1
+    let runStart = 0
+    let longestStart = 0
+    let longestLength = 0
+    for (let x = 0; x <= width; x++) {
+      const ink = x < width && grayscale[y * width + x] > 0.5
+      if (ink) {
+        if (firstInk < 0) firstInk = x
+        lastInk = x
+      } else {
+        if (x - runStart > longestLength) {
+          longestStart = runStart
+          longestLength = x - runStart
+        }
+        runStart = x + 1
+      }
+    }
+    if (lastInk - firstInk + 1 > best.length) {
+      best = { start: longestStart, end: lastInk, length: lastInk - firstInk + 1 }
+    }
+  }
+  return best
 }
 
 function mean (values) {

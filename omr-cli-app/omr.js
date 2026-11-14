@@ -12,7 +12,7 @@ import { helpText } from './help.js'
 import { askForImagePlan } from './interactive.js'
 import { decodeImageToGrayscale, translateImageToMsq } from '#msq/api.js'
 
-function summarizeReport(report) {
+function summarizeReport (report) {
   const lines = []
   if (report.uncertain.length) {
     const shown = report.uncertain.slice(0, 5)
@@ -32,7 +32,7 @@ function summarizeReport(report) {
   return lines
 }
 
-async function main() {
+async function main () {
   let plan
   try {
     plan = parseArgs(process.argv.slice(2))
@@ -48,13 +48,16 @@ async function main() {
   try {
     const { input, output } = await askForImagePlan(plan)
     const bitmap = decodeImageToGrayscale(fs.readFileSync(input))
-    const { msqText, report } = translateImageToMsq(bitmap)
+    const { msqText, report, diagnostics } = translateImageToMsq(bitmap, { diagnostics: plan.diagnostics })
     fs.writeFileSync(output, msqText)
     const written = msqText.split('\n').filter((line) => /^\d/.test(line)).length
     process.stdout.write(`wrote ${output} (${written} line(s) of MSQ)\n`)
     const summary = summarizeReport(report)
     if (summary.length) {
       process.stdout.write(summary.join('\n') + '\n')
+    }
+    if (diagnostics) {
+      process.stdout.write(JSON.stringify(diagnostics, null, 2) + '\n')
     }
   } catch (error) {
     process.stderr.write(error.message + '\n')

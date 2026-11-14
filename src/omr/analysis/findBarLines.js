@@ -1,51 +1,80 @@
 'use strict'
 
 /**
- * Barlines: ink that crosses a whole stave.
+ * Barlines: continuous ink that crosses a whole stave.
  *
- * A barline runs from the top line to the bottom line and a little beyond —
- * longer than any stem, so length alone separates them. Barlines of the same
- * system line up, so positions are clustered and the cluster is what ends the
- * measure on every stave at once.
+ * Candidates are measured inside one stave, then aligned into one boundary
+ * per system. Initial and final boundaries stay in the result for their
+ * notation meaning, but only internal boundaries divide the music model.
  */
 
 const COVERS_STAVE_FRACTION = 0.95
-const CLUSTER_TOLERANCE_IN_STAFF_SPACES = 0.3
+const CLUSTER_TOLERANCE_IN_STAFF_SPACES = 0.8
+const EDGE_TOLERANCE_IN_STAFF_SPACES = 0.6
 
 export function findBarLines ({ width, height, grayscale }, staves) {
-  const positions = []
+  const candidates = []
   for (const stave of staves) {
     const staffSpace = stave.staffSpaceHeightPx
     const staveHeight = stave.bottomY - stave.topY
     const thinEnough = Math.max(3, 0.3 * staffSpace)
+    const fromY = Math.max(0, Math.floor(stave.topY - 0.35 * staffSpace))
+    const toY = Math.min(height - 1, Math.ceil(stave.bottomY + 0.35 * staffSpace))
     for (let x = stave.xStart; x <= stave.xEnd; x++) {
-      const { y1, y2 } = inkExtent({ width, height, grayscale }, x)
-      const covers = y2 - y1 + 1 >= COVERS_STAVE_FRACTION * staveHeight &&
-        y1 <= stave.topY + 0.3 * staffSpace &&
-        y2 >= stave.bottomY - 0.3 * staffSpace
-      // thin everywhere along the way: a note whose stem and head stack up
-      // into one tall run is wide where the head is
-      const thin = covers && samplesAcross({ width, height, grayscale }, y1, y2, x)
-        .every((extent) => extent <= thinEnough)
-      if (thin) {
-        positions.push(x)
+      for (const run of verticalRuns({ width, grayscale }, x, fromY, toY)) {
+        const covers = run.y2 - run.y1 + 1 >= COVERS_STAVE_FRACTION * staveHeight &&
+          run.y1 <= stave.topY + 0.3 * staffSpace &&
+          run.y2 >= stave.bottomY - 0.3 * staffSpace
+        if (covers && thinCore({ width, grayscale }, run, x, thinEnough)) {
+          candidates.push({
+            x,
+            y1: run.y1,
+            y2: run.y2,
+            staveIndex: stave.index,
+            systemIndex: stave.systemIndex ?? 0
+          })
+        }
       }
     }
   }
-  return cluster(positions, meanStaffSpace(staves) * CLUSTER_TOLERANCE_IN_STAFF_SPACES)
+  return cluster(candidates, staves)
 }
 
-function samplesAcross (bitmap, y1, y2, x) {
-  const samples = []
-  for (let step = 0; step <= 6; step++) {
-    const y = Math.round(y1 + ((y2 - y1) * step) / 6)
-    samples.push(horizontalExtent(bitmap, y, x))
+function verticalRuns ({ width, grayscale }, x, fromY, toY) {
+  const runs = []
+  let start = null
+  for (let y = fromY; y <= toY; y++) {
+    const ink = grayscale[y * width + x] > 0.5
+    if (ink && start === null) {
+      start = y
+    }
+    if (!ink && start !== null) {
+      runs.push({ y1: start, y2: y - 1 })
+      start = null
+    }
   }
-  return samples
+  if (start !== null) {
+    runs.push({ y1: start, y2: toY })
+  }
+  return runs
 }
 
-function horizontalExtent ({ width, height, grayscale }, y, x) {
-  if (y < 0 || y >= height) {
+// A head or repeat dot may protrude at a few rows; the line's vertical core
+// still has to be thin almost everywhere.
+function thinCore ({ width, grayscale }, run, x, thinEnough) {
+  let thinRows = 0
+  const rows = run.y2 - run.y1 + 1
+  for (let y = run.y1; y <= run.y2; y++) {
+    const extent = horizontalExtent({ width, grayscale }, y, x)
+    if (extent > 0 && extent <= thinEnough) {
+      thinRows++
+    }
+  }
+  return thinRows / rows >= 0.9
+}
+
+function horizontalExtent ({ width, grayscale }, y, x) {
+  if (grayscale[y * width + x] <= 0.5) {
     return 0
   }
   let left = x
@@ -59,36 +88,45 @@ function horizontalExtent ({ width, height, grayscale }, y, x) {
   return right - left + 1
 }
 
-function inkExtent ({ width, height, grayscale }, x) {
-  let y1 = -1
-  let y2 = -1
-  for (let y = 0; y < height; y++) {
-    if (grayscale[y * width + x] > 0.5) {
-      if (y1 === -1) {
-        y1 = y
-      }
-      y2 = y
-    }
-  }
-  return { y1, y2 }
-}
-
-function cluster (positions, tolerance) {
-  const sorted = [ ...new Set(positions) ].sort((first, second) => first - second)
+function cluster (candidates, staves) {
+  const sorted = candidates.sort((first, second) => first.systemIndex - second.systemIndex || first.x - second.x)
   const clustered = []
-  for (const position of sorted) {
+  for (const candidate of sorted) {
     const current = clustered[clustered.length - 1]
-    if (current !== undefined && position - current[current.length - 1] <= tolerance) {
-      current.push(position)
+    const staffSpace = staves[candidate.staveIndex].staffSpaceHeightPx
+    if (current && current.systemIndex === candidate.systemIndex &&
+      Math.abs(candidate.x - current.x) <= staffSpace * CLUSTER_TOLERANCE_IN_STAFF_SPACES) {
+      current.candidates.push(candidate)
+      current.x = mean(current.candidates.map((item) => item.x))
     } else {
-      clustered.push([ position ])
+      clustered.push({ systemIndex: candidate.systemIndex, x: candidate.x, candidates: [ candidate ] })
     }
   }
-  return clustered.map((group) => Math.round(group.reduce((sum, value) => sum + value, 0) / group.length))
+  return clustered.map((group) => {
+    const staveIndexes = [ ...new Set(group.candidates.map((candidate) => candidate.staveIndex)) ]
+    const systemStaves = staves.filter((stave) => (stave.systemIndex ?? 0) === group.systemIndex)
+    // A grand staff's measure boundary has support on every stave. A long
+    // beamed-note run on only one stave is not a system barline.
+    if (staveIndexes.length < systemStaves.length) {
+      return null
+    }
+    const staffSpace = mean(systemStaves.map((stave) => stave.staffSpaceHeightPx))
+    const x = Math.round(group.x)
+    const atStart = systemStaves.every((stave) => Math.abs(x - stave.xStart) <= EDGE_TOLERANCE_IN_STAFF_SPACES * staffSpace)
+    const atEnd = systemStaves.every((stave) => Math.abs(x - stave.xEnd) <= EDGE_TOLERANCE_IN_STAFF_SPACES * staffSpace)
+    return {
+      x,
+      y1: Math.min(...group.candidates.map((candidate) => candidate.y1)),
+      y2: Math.max(...group.candidates.map((candidate) => candidate.y2)),
+      systemIndex: group.systemIndex,
+      staveIndexes,
+      kind: atStart ? 'opening' : atEnd ? 'closing' : 'internal'
+    }
+  }).filter(Boolean).sort((first, second) => first.systemIndex - second.systemIndex || first.x - second.x)
 }
 
-function meanStaffSpace (staves) {
-  return staves.reduce((sum, stave) => sum + stave.staffSpaceHeightPx, 0) / staves.length
+function mean (values) {
+  return values.reduce((sum, value) => sum + value, 0) / values.length
 }
 
 export default findBarLines

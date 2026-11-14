@@ -8,7 +8,13 @@
  * the way the schema keeps them.
  */
 
-export function inferDurationFromNoteShapes ({ isOpenHead, hasStem, beamCount = 0, flagCount = 0 }) {
+export function inferDurationFromNoteShapes ({ isOpenHead, hasStem, beamCount = 0, flagCount = 0, headClassName = null }) {
+  if (headClassName === 'notehead-double-whole') {
+    return 4
+  }
+  if (headClassName === 'notehead-quadruple-whole') {
+    return 2
+  }
   if (!hasStem) {
     return 1
   }

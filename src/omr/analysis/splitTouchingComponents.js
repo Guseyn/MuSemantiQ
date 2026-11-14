@@ -43,13 +43,34 @@ function splitComponent (bitmap, component) {
   const pieces = []
   let start = 0
   for (const boundary of [ ...splitAfter, profile.length - 1 ]) {
-    pieces.push({
-      box: { x: box.x + start, y: box.y, w: boundary - start + 1, h: box.h },
-      ink: component.ink
-    })
+    pieces.push(measurePiece(bitmap, box, start, boundary))
     start = boundary + 1
   }
-  return pieces.filter((piece) => piece.box.w > 0)
+  return pieces.filter(Boolean)
+}
+
+// A vertical cut does not give every piece the old component's height or ink.
+// Measure the actual pixels so pitch, crops and area filters see the piece.
+function measurePiece ({ width, grayscale }, box, start, end) {
+  let minY = Infinity
+  let maxY = -1
+  let ink = 0
+  for (let x = box.x + start; x <= box.x + end; x++) {
+    for (let y = box.y; y < box.y + box.h; y++) {
+      if (grayscale[y * width + x] > 0.5) {
+        minY = Math.min(minY, y)
+        maxY = Math.max(maxY, y)
+        ink++
+      }
+    }
+  }
+  if (maxY < minY) {
+    return null
+  }
+  return {
+    box: { x: box.x + start, y: minY, w: end - start + 1, h: maxY - minY + 1 },
+    ink
+  }
 }
 
 function columnProfile ({ width, grayscale }, box) {

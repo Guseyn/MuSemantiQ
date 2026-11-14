@@ -4,7 +4,8 @@ import deskewBitmap from '#msq/omr/analysis/deskewBitmap.js'
 import { analyzeStraightenedImage } from '#msq/omr/analysis/analyzeImage.js'
 import extractSymbols from '#msq/omr/analysis/extractSymbols.js'
 import classifyComponent from '#msq/omr/analysis/classifyComponent.js'
-import { resampleToGrid } from '#msq/omr/training/cropComponents.js'
+import { roleOf } from '#msq/omr/analysis/symbolClasses.js'
+import { resampleComponentToGrid } from '#msq/omr/training/cropComponents.js'
 import shippedModel from '#msq/omr/model/shippedModel.js'
 import buildMusicModel from '#msq/omr/translation/buildMusicModel.js'
 import buildPageSchemaFromMusicModel from '#msq/omr/translation/buildPageSchemaFromMusicModel.js'
@@ -32,7 +33,7 @@ export function translatePage (bitmap, options = {}, carried = {}) {
   const upright = deskewBitmap(bitmap)
   const analysis = analyzeStraightenedImage(upright)
   const classify = options.classify || classifyWithModel(options)
-  const symbols = extractSymbols(upright, analysis.staves, { classify })
+  const symbols = extractSymbols(upright, analysis.staves, { classify, textBlocks: analysis.textBlocks })
   const built = buildMusicModel(symbols, analysis.staves)
   const withState = carryStateAcrossPages(
     { musicModel: built, customStyles: customStylesFrom(analysis) },
@@ -43,7 +44,8 @@ export function translatePage (bitmap, options = {}, carried = {}) {
   return {
     result: {
       msqText,
-      report: createReport(symbols, withState.musicModel, msqText)
+      report: createReport(symbols, withState.musicModel, msqText),
+      ...(options.diagnostics ? { diagnostics: createDiagnostics(analysis, symbols) } : {})
     },
     carried: withState.carried
   }
@@ -56,25 +58,12 @@ function classifyWithModel ({ model, classIds, threshold }) {
   if (!loaded.classIds) {
     throw new Error('a model needs its classIds — the order it was trained with')
   }
-  // Training drew each symbol centred in a square of twice its nominal size,
-  // and the model has only ever seen symbols framed like that. The
-  // component's own box, framed twice as wide, puts it in the same picture.
-  return (pixels, box, source) => {
-    const side = 2 * Math.max(box.w, box.h)
-    const centerX = box.x + box.w / 2
-    const centerY = box.y + box.h / 2
-    return classifyComponent(
-      loaded.model,
-      resampleToGrid(source, {
-        x1: centerX - side / 2,
-        y1: centerY - side / 2,
-        x2: centerX + side / 2,
-        y2: centerY + side / 2
-      }, loaded.model.shape.gridSize),
-      loaded.classIds,
-      threshold
-    )
-  }
+  return (pixels, box, source) => classifyComponent(
+    loaded.model,
+    resampleComponentToGrid(source, box, loaded.model.shape.gridSize),
+    loaded.classIds,
+    threshold
+  )
 }
 
 // Sizes in staff spaces and colours as measured; the one pixel anchor
@@ -97,8 +86,27 @@ function customStylesFrom (analysis) {
   }
 }
 
+function createDiagnostics (analysis, symbols) {
+  const classes = {}
+  for (const blob of symbols.blobs) {
+    classes[blob.className] = (classes[blob.className] || 0) + 1
+  }
+  return {
+    staves: analysis.staves.length,
+    systems: analysis.systems.map((system) => system.staveIndexes),
+    barLines: symbols.barLines,
+    stems: symbols.stems.length,
+    curves: symbols.curves.length,
+    hairpins: symbols.hairpins.length,
+    blobs: symbols.blobs.length,
+    unassignedBlobs: symbols.blobs.filter((blob) => blob.staveIndex === null).length,
+    classes
+  }
+}
+
 function createReport ({ blobs }, musicModel, msqText) {
   const unitsInTextOrder = unitsInSerializationOrder(musicModel)
+  const consumedBlobs = new Set(unitsInTextOrder.flatMap((entry) => entry.unit.sourceBlobs || []))
   const unitLines = msqText.split('\n')
     .map((line, index) => ({ line, msqLine: index + 1 }))
     .filter(({ line }) => /^\d/.test(line))
@@ -118,7 +126,21 @@ function createReport ({ blobs }, musicModel, msqText) {
           msqLine: position ? (unitLines[position.flatIndex] || {}).msqLine || null : null
         }
       }),
-    ignored: []
+    ignored: blobs.flatMap((blob) => {
+      const supportedRoles = [ 'head', 'rest', 'clef', 'accidental', 'dot', 'digit' ]
+      const unsupported = blob.className === 'other' ||
+        (!supportedRoles.includes(roleOf(blob.className)) && !consumedBlobs.has(blob))
+      if (!unsupported && blob.staveIndex !== null) {
+        return []
+      }
+      return [ {
+        box: blob.box,
+        staveIndex: blob.staveIndex,
+        className: blob.className,
+        confidence: blob.confidence,
+        reason: blob.staveIndex === null ? 'no staff owns this ink' : 'this class has no music translation'
+      } ]
+    })
   }
 }
 

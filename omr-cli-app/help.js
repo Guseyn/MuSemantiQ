@@ -7,6 +7,7 @@ export const helpText = `MuSemantiQ's OMR command line — a picture of a score 
 
   -i, --input <image.png>   the score image to read (PNG)
   -o, --output <out.msq>    where the MSQ text is written
+      --diagnostics         print staves, barlines and candidate counts
   -h, --help                this text
 
 Whatever you leave out is asked for; with no --output the image's name

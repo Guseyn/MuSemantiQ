@@ -12,11 +12,11 @@
 const MAX_GAP_IN_STAFF_SPACES = 2.5
 const MIN_X_OVERLAP_FRACTION = 0.25
 
-export function groupStavesIntoSystems (staves) {
+export function groupStavesIntoSystems (staves, bitmap = null) {
   const systems = []
   for (const stave of [ ...staves ].sort((first, second) => first.topY - second.topY)) {
     const current = systems[systems.length - 1]
-    if (current && belongsToSystem(stave, current)) {
+    if (current && belongsToSystem(stave, current, bitmap)) {
       current.staves.push(stave)
       current.topY = Math.min(current.topY, stave.topY)
       current.bottomY = Math.max(current.bottomY, stave.bottomY)
@@ -42,14 +42,49 @@ export function groupStavesIntoSystems (staves) {
   }))
 }
 
-function belongsToSystem (stave, system) {
+function belongsToSystem (stave, system, bitmap) {
   const lastStave = system.staves[system.staves.length - 1]
   const gap = stave.topY - lastStave.bottomY
   const staffSpace = (stave.staffSpaceHeightPx + lastStave.staffSpaceHeightPx) / 2
   const overlap = Math.min(stave.xEnd, system.xEnd) - Math.max(stave.xStart, system.xStart)
   const smallerWidth = Math.min(stave.xEnd - stave.xStart, system.xEnd - system.xStart)
-  return gap <= MAX_GAP_IN_STAFF_SPACES * staffSpace &&
-    overlap >= MIN_X_OVERLAP_FRACTION * smallerWidth
+  const aligned = overlap >= MIN_X_OVERLAP_FRACTION * smallerWidth
+  if (!aligned) {
+    return false
+  }
+  // A shared barline or connector proves a grand staff even when its large
+  // central gap is full of notes, dynamics and tuplets.
+  if (bitmap && hasVerticalConnector(bitmap, lastStave, stave, overlap)) {
+    return true
+  }
+  return gap <= MAX_GAP_IN_STAFF_SPACES * staffSpace
+}
+
+function hasVerticalConnector ({ width, height, grayscale }, upper, lower, overlap) {
+  if (overlap <= 0) {
+    return false
+  }
+  const fromX = Math.max(0, Math.ceil(Math.max(upper.xStart, lower.xStart)))
+  const toX = Math.min(width - 1, Math.floor(Math.min(upper.xEnd, lower.xEnd)))
+  const fromY = Math.max(0, Math.round(upper.topY))
+  const toY = Math.min(height - 1, Math.round(lower.bottomY))
+  const required = 0.9 * (toY - fromY + 1)
+  for (let x = fromX; x <= toX; x++) {
+    let longest = 0
+    let run = 0
+    for (let y = fromY; y <= toY; y++) {
+      if (grayscale[y * width + x] > 0.5) {
+        run++
+        longest = Math.max(longest, run)
+      } else {
+        run = 0
+      }
+    }
+    if (longest >= required) {
+      return true
+    }
+  }
+  return false
 }
 
 export default groupStavesIntoSystems

@@ -36,6 +36,8 @@ import { translateImageToMsq } from '#msq/omr/translateImageToMsq.js'
 import { translateImagesToMsqPages } from '#msq/omr/translateImagesToMsqPages.js'
 import { decodeImageToGrayscale } from '#msq/omr/analysis/decodeImageToGrayscale.js'
 import { encodePng } from '#msq/omr/training/encodePng.js'
+import { resampleToGrid } from '#msq/omr/training/cropComponents.js'
+import splitVoicesByStemDirection from '#msq/omr/translation/splitVoicesByStemDirection.js'
 import { generateIntermediateStructuresForSinglePage } from '#msq/language/api.js'
 import {
   drawEllipse,
@@ -366,14 +368,14 @@ const TESTS = [
   },
   {
     name: 'training learns a small set',
-    run () {
+    async run () {
       const classIds = [ 'notehead-filled', 'notehead-open', 'sharp', 'flat' ]
       const { samples } = generateTrainingSet({ seed: 21, samplesPerClass: 6, gridSize: 12, classIds })
       const model = createModel(
         { gridSize: 12, filterSize: 3, filterCounts: [ 4, 8 ], denseSize: 12, classCount: classIds.length },
         3
       )
-      const { history } = trainModel({
+      const { history } = await trainModel({
         model,
         trainingSamples: samples,
         epochs: 60,
@@ -414,6 +416,10 @@ const TESTS = [
       assert.deepStrictEqual(assignPitchByStaffPosition(10, 'treble'), { noteName: 'c', octaveNumber: '4' })
       assert.deepStrictEqual(assignPitchByStaffPosition(0, 'bass'), { noteName: 'a', octaveNumber: '3' })
       assert.deepStrictEqual(assignPitchByStaffPosition(2, 'bass'), { noteName: 'f', octaveNumber: '3' })
+      assert.deepStrictEqual(assignPitchByStaffPosition(-1, 'treble'), { noteName: 'g', octaveNumber: '5' })
+      assert.deepStrictEqual(assignPitchByStaffPosition(-2, 'treble'), { noteName: 'a', octaveNumber: '5' })
+      assert.deepStrictEqual(assignPitchByStaffPosition(0, 'alto'), { noteName: 'g', octaveNumber: '4' })
+      assert.deepStrictEqual(assignPitchByStaffPosition(0, 'tenor'), { noteName: 'e', octaveNumber: '4' })
     }
   },
   {
@@ -574,6 +580,42 @@ const TESTS = [
       near(decoded.grayscale[0], positive.grayscale[0], 1 / 255, 'paper matches')
       near(decoded.grayscale[10], positive.grayscale[10], 1 / 255, 'ink matches')
       near(decoded.grayscale[10], 1, 1 / 255, 'and it is ink')
+    }
+  },
+  {
+    name: 'resampling counts partial pixels and outside paper by area',
+    run () {
+      const bitmap = createPlainBitmap(2, 2)
+      drawFilledRect(bitmap, 0, 0, 2, 2)
+      const pixels = resampleToGrid(bitmap, { x1: -1, y1: -1, x2: 1, y2: 1 }, 1)
+      near(pixels[0], 0.25, 1e-12, 'one quarter of the footprint is ink')
+    }
+  },
+  {
+    name: 'sequential opposite stems stay in one voice',
+    run () {
+      const units = [
+        { x: 100, isRest: false, stemDirection: 'up', unitDuration: 0.25 },
+        { x: 140, isRest: false, stemDirection: 'down', unitDuration: 0.25 },
+        { x: 180, isRest: false, stemDirection: 'up', unitDuration: 0.25 }
+      ]
+      assert.strictEqual(splitVoicesByStemDirection(units, 12).length, 1)
+      units.push({ x: 100, isRest: false, stemDirection: 'down', unitDuration: 0.5 })
+      assert.strictEqual(splitVoicesByStemDirection(units, 12).length, 2)
+    }
+  },
+  {
+    name: 'the real score fixture is one grand staff and two measures',
+    async run () {
+      const bitmap = decodeImageToGrayscale(await fs.readFile('omr-cli-app/score.png'))
+      const { msqText, diagnostics } = translateImageToMsq(bitmap, { diagnostics: true })
+      assert.deepStrictEqual(diagnostics.systems, [ [ 0, 1 ] ], 'one grand-staff system')
+      assert.deepStrictEqual(diagnostics.barLines.map((line) => line.kind), [ 'opening', 'internal', 'closing' ])
+      assert.strictEqual(diagnostics.curves, 2, 'two slurs, not glyph fragments')
+      assert.strictEqual(diagnostics.hairpins, 1, 'one crescendo, not tuplet brackets')
+      assert.strictEqual((msqText.match(/^measure$/gm) || []).length, 2, 'one internal boundary makes two measures')
+      const parsed = generateIntermediateStructuresForSinglePage({ pageText: msqText })
+      assert.deepStrictEqual(parsed.errors, [], 'the recovered text parses')
     }
   },
   {

@@ -3,6 +3,7 @@
 import { mkdirSync, writeFileSync } from 'node:fs'
 
 import { generateTrainingSet } from '#msq/omr/training/generateTrainingSet.js'
+import { generateRendererTrainingSet } from '#msq/omr/training/generateRendererTrainingSet.js'
 import { encodePng } from '#msq/omr/training/encodePng.js'
 import { drawableClassIds } from '#msq/omr/training/drawSymbols.js'
 
@@ -35,8 +36,9 @@ export function buildContactSheet (samples, gridSize, gap = 2) {
   return sheet
 }
 
-export function inspectDataset ({ classIds, samplesPerClass = 24, gridSize = 48, seed = 20261110, outPath }) {
-  const { samples } = generateTrainingSet({ seed, samplesPerClass, gridSize, classIds })
+export async function inspectDataset ({ classIds, samplesPerClass = 24, gridSize = 48, seed = 20261110, dataset = 'templates', outPath }) {
+  const generate = dataset === 'renderer' ? generateRendererTrainingSet : generateTrainingSet
+  const { samples } = await generate({ seed, samplesPerClass, gridSize, classIds })
   const sheet = buildContactSheet(samples, gridSize)
   mkdirSync('training-data/inspection', { recursive: true })
   writeFileSync(outPath, encodePng(sheet))
@@ -51,7 +53,8 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   const classId = flag('class')
   const count = Number(flag('count') || 24)
   const classIds = classId ? [ classId ] : drawableClassIds
-  const outPath = `training-data/inspection/${classId || 'every-class'}.png`
-  inspectDataset({ classIds, samplesPerClass: classId ? count : 1, outPath })
+  const dataset = flag('dataset') || 'templates'
+  const outPath = `training-data/inspection/${classId || `every-class-${dataset}`}.png`
+  await inspectDataset({ classIds, samplesPerClass: classId ? count : 1, dataset, outPath })
   console.log(`${outPath} — ${classId ? `${count} pictures of ${classId}` : 'one picture of every class'}`)
 }

@@ -56,20 +56,49 @@ function keySignatureOf (leftOfNotes, firstHeadX, staffSpaceHeightPx) {
 }
 
 function timeSignatureOf (leftOfNotes, firstHeadX, staffSpaceHeightPx) {
+  const commonTime = leftOfNotes.find((blob) => blob.className === 'common-time' || blob.className === 'cut-time')
+  if (commonTime) {
+    return {
+      numerator: commonTime.className === 'cut-time' ? '2' : '4',
+      denominator: commonTime.className === 'cut-time' ? '2' : '4',
+      cMode: true
+    }
+  }
   const digits = leftOfNotes.filter((blob) => blob.className.startsWith('digit-'))
-  const stacked = digits.filter((blob) => blob.box.x < firstHeadX - 0.3 * staffSpaceHeightPx)
-  if (stacked.length !== 2) {
+  const rows = digitRows(digits, staffSpaceHeightPx)
+  if (rows.length !== 2) {
     return null
   }
-  const [ top, bottom ] = stacked.sort((first, second) => first.box.y - second.box.y)
-  const aligned = Math.abs(top.box.x - bottom.box.x) <= 0.4 * staffSpaceHeightPx
-  if (!aligned) {
+  const [ top, bottom ] = rows
+  if (Math.abs(top.x - bottom.x) > 0.5 * staffSpaceHeightPx) {
     return null
   }
   return {
-    numerator: top.className.slice('digit-'.length),
-    denominator: bottom.className.slice('digit-'.length)
+    numerator: top.value,
+    denominator: bottom.value
   }
+}
+
+function digitRows (digits, staffSpaceHeightPx) {
+  const centerY = (blob) => blob.box.y + (blob.box.h - 1) / 2
+  const centerX = (blob) => blob.box.x + (blob.box.w - 1) / 2
+  const rows = []
+  for (const blob of [ ...digits ].sort((first, second) => centerY(first) - centerY(second))) {
+    const current = rows[rows.length - 1]
+    if (current && Math.abs(centerY(blob) - current.centerY) <= 0.75 * staffSpaceHeightPx) {
+      current.blobs.push(blob)
+      current.centerY = current.blobs.reduce((sum, item) => sum + centerY(item), 0) / current.blobs.length
+    } else {
+      rows.push({ centerY: centerY(blob), blobs: [ blob ] })
+    }
+  }
+  return rows.map((row) => {
+    const blobs = row.blobs.sort((first, second) => centerX(first) - centerX(second))
+    return {
+      x: centerX(blobs[0]),
+      value: blobs.map((blob) => blob.className.slice('digit-'.length)).join('')
+    }
+  })
 }
 
 export default inferKeyAndTimeSignature

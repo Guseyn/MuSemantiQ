@@ -81,7 +81,7 @@ dl.gloss dd { margin: 2px 0 0; color: var(--muted); max-width: 74ch; }
   <a href="#s9">9 dC/dW</a>
   <a href="#s10">10 dC/db</a>
   <a href="#s11">11 convolution</a>
-  <a href="#s12">12 adam</a>
+  <a href="#s12">12 adamw</a>
   <a href="#s13">13 the check</a>
   <a href="#s14">14 how to train</a>
   <a href="#glossary">glossary</a>
@@ -477,7 +477,7 @@ $$
 <p>One unit of a convolutional layer — a <a class="term" href="#g-filter">filter</a> — reads a small <a class="term" href="#g-window">window</a> of size \(F \times F\) and slides over the whole image. For output position \((i, j)\) and <a class="term" href="#g-filter">filter</a> index \(k\):</p>
 
 $$
-z_{i,j,k} = b_k + \sum_{p=0}^{F-1} \sum_{q=0}^{F-1} \sum_{c=1}^{C} w_{p,q,c,k}\, a_{i+p,\, j+q,\, c} \tag{2}
+z_{i,j,k} = b_k + \sum_{p=0}^{F-1} \sum_{q=0}^{F-1} \sum_{c=1}^{C} w_{p,q,c,k}\, a_{i+p-(F-1)/2,\, j+q-(F-1)/2,\, c} \tag{2}
 $$
 
 <div class="syms">
@@ -488,7 +488,7 @@ $$
 <p>\(F\) — the window size, \(3\) in our model; \(p, q\) — the offset inside the window, \(0 \le p, q \lt F\)</p>
 <p>\(C\) — the number of <a class="term" href="#g-channel">input channels</a> (\(1\) for the first layer, more deeper in)</p>
 <p>\(w_{p,q,c,k}\) — the <a class="term" href="#g-weight">weight</a> of filter \(k\) at window offset \((p, q)\) of input channel \(c\); what training finds</p>
-<p>\(a_{i+p,\, j+q,\, c}\) — the <a class="term" href="#g-activation">input activation</a> at the window position; out-of-bounds positions read \(0\) (zero <a class="term" href="#g-padding">padding</a>), so the grid keeps its size</p>
+<p>\(a_{i+p-(F-1)/2,\, j+q-(F-1)/2,\, c}\) — the <a class="term" href="#g-activation">input activation</a> at the window position; out-of-bounds positions read \(0\) (zero <a class="term" href="#g-padding">padding</a>), so the grid keeps its size</p>
 <p>\(i, j\) — the output column and row; \(k\) — the filter index, \(1 \le k \le K\), where \(K\) is the number of filters</p>
 </div>
 
@@ -3186,14 +3186,14 @@ $$
 \begin{cases}
 0 & z \lt 0 \\
 1 & z \gt 0 \\
-\varepsilon & z = 0
+0 & z = 0
 \end{cases} \tag{7}
 $$
 
 <div class="syms">
 <p>\(\frac{\partial a}{\partial z}\) — the <a class="term" href="#g-gradient">derivative</a> of the activation with respect to its pre-activation: how much \(a\) moves when \(z\) moves by a hair</p>
 <p>\(a\) — the activation from (6); \(z\) — the pre-activation from (6)</p>
-<p>\(\varepsilon\) — an arbitrarily small number; \(\max(0, z)\) has no derivative at \(0\), so we agree on one. It changes nothing and removes the exception</p>
+<p>\(0\) — the subgradient the implementation chooses at the corner; ReLU has no derivative at \(0\), and the backward pass uses this exact convention</p>
 <p>the cases say: the gate is shut (\(0\)) below zero, open (\(1\)) above</p>
 </div>
 
@@ -4132,10 +4132,10 @@ $$
 <figcaption>fig 8 · the cost (11) as a function of the probability of the true class.</figcaption>
 </figure>
 
-<p>Over a <a class="term" href="#g-batch">batch</a> of \(N\) crops, plus a penalty on the size of the learned numbers:</p>
+<p>Over a <a class="term" href="#g-batch">batch</a> of \(N\) crops, the reported cost is mean cross-entropy:</p>
 
 $$
-C = \underbrace{-\frac{1}{N} \sum_{n=1}^{N} \log p_{n,\, y_n}}_{\text{cross-entropy}} \ +\ \underbrace{\lambda \sum_{\theta} \theta^{2}}_{L_2} \tag{12}
+C = -\frac{1}{N} \sum_{n=1}^{N} \log p_{n,\, y_n} \tag{12}
 $$
 
 <div class="syms">
@@ -4144,10 +4144,7 @@ $$
 <p>\(\sum_{n=1}^{N}\) — the sum over the crops of the batch; \(n\) — the crop index, \(1 \le n \le N\)</p>
 <p>\(\log p_{n,\, y_n}\) — the log-probability crop \(n\) gave to its own true class \(y_n\)</p>
 <p>\(y_n\) — the true class of crop \(n\)</p>
-<p>\(\lambda\) — how hard the size penalty bites; tiny, \(0.0005\)</p>
-<p>\(\sum_{\theta} \theta^{2}\) — the sum of the squares of every learned number (all <a class="term" href="#g-weight">weights</a> and <a class="term" href="#g-bias">biases</a>)</p>
-<p>\(\theta\) — any one learned number; the sum ranges over all of them</p>
-<p>\(L_2\) — the name of this penalty, the sum of squares</p>
+<p>Weight decay is a separate update term in (30), not part of the reported cross-entropy.</p>
 </div>
 
 <figure data-figs="fig-09-the-two-part-cost" data-alt="A stacked bar: the fit and the penalty make the cost">
@@ -4467,7 +4464,7 @@ $$
 </figure>
 
 
-<p>Why \(\lambda\sum\theta^2\): without it the model can grow huge numbers to memorize the training pictures, and then fail on any picture it has not seen.</p>
+<p>Weights are regularized by decoupled AdamW decay in (30). Keeping decay out of Adam's normalized gradient prevents inactive paths from being driven toward zero by an almost pure decay gradient.</p>
 
 <!-- ======================= 6 ======================= -->
 <h2 id="s6"><span class="n">6.</span> The Learning Goal</h2>
@@ -11127,24 +11124,24 @@ $$
 
 
 <div class="claim">
-<b>Claim.</b> (25) holds element-wise: \(\dfrac{\partial C}{\partial w_{p,q,c,k}} = \sum_{i,j} D_{i,j,k}\, a_{i+p,\, j+q,\, c}\).
+<b>Claim.</b> (25) holds element-wise: \(\dfrac{\partial C}{\partial w_{p,q,c,k}} = \sum_{i,j} D_{i,j,k}\, a_{i+p-(F-1)/2,\, j+q-(F-1)/2,\, c}\).
 <div class="proof">
-<b>Proof.</b> By (2), \(z_{i,j,k}\) is linear in \(w_{p,q,c,k}\) with coefficient \(a_{i+p,j+q,c}\), so
+<b>Proof.</b> By (2), \(z_{i,j,k}\) is linear in \(w_{p,q,c,k}\) with coefficient \(a_{i+p-(F-1)/2,\,j+q-(F-1)/2,\,c}\), so
 
 $$
-\frac{\partial C}{\partial w_{p,q,c,k}} = \sum_{i,j} \frac{\partial C}{\partial z_{i,j,k}}\, a_{i+p,\, j+q,\, c} = \sum_{i,j} D_{i,j,k}\, a_{i+p,\, j+q,\, c}
+\frac{\partial C}{\partial w_{p,q,c,k}} = \sum_{i,j} \frac{\partial C}{\partial z_{i,j,k}}\, a_{i+p-(F-1)/2,\, j+q-(F-1)/2,\, c} = \sum_{i,j} D_{i,j,k}\, a_{i+p-(F-1)/2,\, j+q-(F-1)/2,\, c}
 $$
 
 <div class="syms tight">
 <p>\(\frac{\partial C}{\partial w_{p,q,c,k}}\) — the gradient of cost with respect to one weight of filter \(k\), window offset \((p, q)\), channel \(c\)</p>
 <p>\(\sum_{i,j}\) — the sum over every output position where that weight takes part</p>
 <p>\(\frac{\partial C}{\partial z_{i,j,k}}\) — the blame at pre-activation \((i, j, k)\); by definition the entry \(D_{i,j,k}\) of \(D\)</p>
-<p>\(a_{i+p,\, j+q,\, c}\) — the input value the weight multiplied at that position</p>
+<p>\(a_{i+p-(F-1)/2,\, j+q-(F-1)/2,\, c}\) — the input value the weight multiplied at that position</p>
 <p>\(D_{i,j,k}\) — the entry of the error matrix \(D\) at position \((i, j)\), filter \(k\)</p>
 <p>\(C\) — the cost from (12); \(w_{p,q,c,k}\) — the weight from (2)</p>
 </div>
 
-which is precisely the \((k, p, q, c)\) entry of \(D^{T}P\), since row \((i,j)\) of \(P\) holds \(a_{i+p,j+q,c}\) at that offset. The bias case is the same sum with coefficient \(1\). <span class="step">∎</span>
+which is precisely the \((k, p, q, c)\) entry of \(D^{T}P\), since row \((i,j)\) of \(P\) holds \(a_{i+p-(F-1)/2,\,j+q-(F-1)/2,\,c}\) at that offset. The bias case is the same sum with coefficient \(1\). <span class="step">∎</span>
 </div>
 </div>
 
@@ -11511,18 +11508,16 @@ $$
 </figure>
 
 
-<p>Finally, the penalty of (12) differentiates to:</p>
+<p>AdamW adds a decoupled decay term for each weight:</p>
 
 $$
-\frac{\partial C_{L_2}}{\partial \theta} = 2 \lambda \theta \tag{27}
+\mathrm{decay}(\theta_{t-1}) = \lambda\theta_{t-1} \tag{27}
 $$
 
 <div class="syms">
-<p>\(C_{L_2}\) — the size penalty \(\lambda\sum_\theta \theta^2\) from (12)</p>
-<p>\(\frac{\partial C_{L_2}}{\partial \theta}\) — its gradient with respect to one learned number</p>
-<p>\(\lambda\) — the penalty strength from (12)</p>
-<p>\(\theta\) — that learned number (a weight or a bias)</p>
-<p>the factor \(2\) comes from differentiating the square</p>
+<p>\(\lambda\) — the decay strength, \(0.0005\) by default</p>
+<p>\(\theta_{t-1}\) — a weight before the update; biases have zero decay</p>
+<p>this term is added after Adam's normalized direction, never to the gradient in (18)–(26)</p>
 </div>
 
 <figure data-figs="fig-24-the-pull-to-zero" data-alt="A line through the origin whose arrows pull toward zero">
@@ -11750,7 +11745,7 @@ $$
 <p>and joins every gradient before the update.</p>
 
 <!-- ======================= 12 ======================= -->
-<h2 id="s12"><span class="n">12.</span> The Nudge: Adam</h2>
+<h2 id="s12"><span class="n">12.</span> The Nudge: AdamW</h2>
 
 <p>Plain steps (14) treat every number the same. <a class="term" href="#g-adam">Adam</a> gives each number its own memory of direction and scale:</p>
 
@@ -12354,7 +12349,7 @@ $$
 
 
 $$
-\theta_t = \theta_{t-1} - \eta \cdot \frac{\hat m_t}{\sqrt{\hat v_t} + \varepsilon} \tag{30}
+\theta_t = \theta_{t-1} - \eta \left(\frac{\hat m_t}{\sqrt{\hat v_t} + \varepsilon} + \lambda\theta_{t-1}\right) \tag{30}
 $$
 
 <div class="syms">
@@ -12364,6 +12359,7 @@ $$
 <p>\(\hat m_t\) — the corrected direction from (29)</p>
 <p>\(\sqrt{\hat v_t}\) — the corrected scale from (29), square-rooted so it shares the units of the gradient</p>
 <p>\(\varepsilon = 10^{-8}\) — only to keep the denominator away from zero</p>
+<p>\(\lambda\theta_{t-1}\) — decoupled weight decay from (27); it is zero for biases</p>
 </div>
 
 <figure data-figs="fig-27-the-adam-step" data-alt="A number line: theta steps by the direction over the scale">
@@ -13335,7 +13331,7 @@ so the agreement improves by two orders when \(\varepsilon\) shrinks by one. One
 <li>Compute \(\delta^{(L)}\) by (18), then walk backward: (20) for dense layers, (21) for ReLU, (22) for pools, (25)–(26) for convolutions. Add (27) to every weight gradient.</li>
 <li>Update every number with (28)–(30).</li>
 <li>Repeat 3–5 for one <a class="term" href="#g-epoch">epoch</a>; then measure \(C\) and accuracy on the <a class="term" href="#g-validation">validation set</a> — pictures the model has not trained on.</li>
-<li>Stop when the validation cost stops falling; keep the weights that scored best on validation. Check them once with (31); record their hash; ship.</li>
+<li>Stop when validation cross-entropy stops falling; keep the weights with the lowest validation loss. Check them once with (31); record their hash; ship only after real-page evaluation.</li>
 </ol>
 
 <p>That is the whole of it. The forward pass answers, the cost measures, the backward pass assigns blame, and the nudge moves. Everything else is pictures.</p>
@@ -13349,7 +13345,7 @@ so the agreement improves by two orders when \(\varepsilon\) shrinks by one. One
 <dl class="gloss">
 <div><dt id="g-activation">activation</dt><dd>the number a unit outputs after its activation function. In the code it is the array <code>a</code>.</dd></div>
 <div><dt id="g-activation-function">activation function</dt><dd>the fixed nonlinearity applied to a unit's sum — here <a class="term" href="#g-relu">ReLU</a>.</dd></div>
-<div><dt id="g-adam">Adam</dt><dd>the update rule (28)–(30): each number steps by its own smoothed direction and scale.</dd></div>
+<div><dt id="g-adam">AdamW</dt><dd>the update rule (28)–(30): Adam's smoothed direction and scale, with decoupled weight decay.</dd></div>
 <div><dt id="g-batch">batch</dt><dd>a small group of crops (32) averaged into one update — steadier than one at a time, still fast.</dd></div>
 <div><dt id="g-bellcurve">bell curve</dt><dd>the normal distribution \(\mathcal N(0,1)\): values mostly near zero, tails thinning fast.</dd></div>
 <div><dt id="g-bias">bias</dt><dd>one learned number added per unit after the sum — it shifts how easily the unit fires.</dd></div>

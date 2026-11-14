@@ -2,8 +2,8 @@
  * The flags: what to read, where to write. Whatever a flag leaves out, the
  * CLI asks about instead.
  */
-export function parseArgs(argv) {
-  const plan = { input: null, output: null, help: false }
+export function parseArgs (argv) {
+  const plan = { input: null, output: null, help: false, diagnostics: false }
   const takeValue = (flag, index) => {
     const value = argv[index + 1]
     if (value === undefined || value.startsWith('-')) {
@@ -15,6 +15,8 @@ export function parseArgs(argv) {
     const arg = argv[i]
     if (arg === '--help' || arg === '-h') {
       plan.help = true
+    } else if (arg === '--diagnostics') {
+      plan.diagnostics = true
     } else if (arg === '--input' || arg === '-i') {
       plan.input = takeValue(arg, i)
       i++

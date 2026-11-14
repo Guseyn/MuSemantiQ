@@ -15,7 +15,7 @@
     "test:visual:all": "node scripts/visual-tests.js",
     "test:audio:all": "node scripts/audio-tests.js",
     "test:serializer:all": "node scripts/serializer-tests.js",
-    "test:omr:all": "node scripts/omr-tests.js",
+    "test:omr:all": "node scripts/omr-tests.js && node scripts/omr-coverage.js",
     "test:all": "npm run test:visual:all && npm run test:audio:all && npm run test:serializer:all && npm run test:omr:all && npm run docs:walkthroughs:check",
     "lint": "eslint src",
     "coverage": "c8 npm run test:all",
@@ -47,7 +47,8 @@
     "browser-app:setup": "npm run setup:symlinks && npm run msq:apps:update && npm run web-components:update",
     "browser-app": "node browser-app/web-app/main.js",
     "cli-app": "node cli-app/msq.js",
-    "omr-cli-app": "node omr-cli-app/omr.js"
+    "omr-cli-app": "node omr-cli-app/omr.js",
+    "omr:evaluate": "node scripts/omr-evaluate-model.js"
   },
   "repository": {
     "type": "git",

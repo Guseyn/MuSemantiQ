@@ -9,7 +9,7 @@
  */
 import readline from 'node:readline'
 
-export async function askForImagePlan({ input, output }) {
+export async function askForImagePlan ({ input, output }) {
   const rl = readline.createInterface({ input: process.stdin, output: process.stdout })
   const waiting = []
   const answered = []

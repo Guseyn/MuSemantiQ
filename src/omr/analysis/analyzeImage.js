@@ -25,7 +25,7 @@ export function analyzeImage ({ width, height, grayscale }) {
 
 export function analyzeStraightenedImage (upright) {
   const { staves, staffSpaceHeightPx } = detectStaves(upright)
-  const systems = groupStavesIntoSystems(staves)
+  const systems = groupStavesIntoSystems(staves, upright)
   const textBlocks = findTextBlocks({ ...upright, staves, systems, staffSpaceHeightPx })
   const { fontSizes, colors } = measureStyles({ ...upright, staves, systems, textBlocks, staffSpaceHeightPx })
   return {

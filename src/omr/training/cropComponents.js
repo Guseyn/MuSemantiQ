@@ -22,6 +22,19 @@ export function cropComponent ({ width, height, grayscale }, box, staffSpaceHeig
   return resampleToGrid({ width, height, grayscale }, from, gridSize)
 }
 
+// The one framing contract used by generated samples and real candidates.
+export function resampleComponentToGrid (bitmap, box, gridSize) {
+  const side = 2 * Math.max(box.w, box.h)
+  const centerX = box.x + (box.w - 1) / 2
+  const centerY = box.y + (box.h - 1) / 2
+  return resampleToGrid(bitmap, {
+    x1: centerX - side / 2,
+    y1: centerY - side / 2,
+    x2: centerX + side / 2,
+    y2: centerY + side / 2
+  }, gridSize)
+}
+
 export function resampleToGrid ({ width, height, grayscale }, from, gridSize) {
   const pixels = new Float64Array(gridSize * gridSize)
   const stepX = (from.x2 - from.x1) / gridSize
@@ -38,17 +51,20 @@ export function resampleToGrid ({ width, height, grayscale }, from, gridSize) {
 }
 
 function areaAverage (grayscale, width, height, x1, y1, stepX, stepY) {
+  const x2 = x1 + stepX
+  const y2 = y1 + stepY
   let total = 0
-  let count = 0
-  for (let y = Math.floor(y1); y < Math.ceil(y1 + stepY); y++) {
-    for (let x = Math.floor(x1); x < Math.ceil(x1 + stepX); x++) {
+  for (let y = Math.floor(y1); y < Math.ceil(y2); y++) {
+    for (let x = Math.floor(x1); x < Math.ceil(x2); x++) {
       if (x >= 0 && y >= 0 && x < width && y < height) {
-        total += grayscale[y * width + x]
-        count++
+        const overlapX = Math.max(0, Math.min(x2, x + 1) - Math.max(x1, x))
+        const overlapY = Math.max(0, Math.min(y2, y + 1) - Math.max(y1, y))
+        total += grayscale[y * width + x] * overlapX * overlapY
       }
     }
   }
-  return count ? total / count : 0
+  // Paper outside the bitmap contributes zero, but still owns its area.
+  return total / (stepX * stepY)
 }
 
 function bilinearSample (grayscale, width, height, x, y) {

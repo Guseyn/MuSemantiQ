@@ -12,10 +12,13 @@
 export function carryStateAcrossPages ({ musicModel, customStyles }, carried = {}) {
   const keySignatureName = musicModel.keySignatureName || carried.keySignatureName || null
   const timeSignatureParams = musicModel.timeSignatureParams || carried.timeSignatureParams || null
+  const clefs = musicModel.clefs.map((clef, index) =>
+    musicModel.clefsExplicit[index] || !carried.clefs ? clef : carried.clefs[index] || clef)
   return {
-    musicModel: { ...musicModel, keySignatureName, timeSignatureParams },
+    musicModel: { ...musicModel, clefs, keySignatureName, timeSignatureParams },
     customStyles: { ...carried.customStyles, ...prune(customStyles) },
     carried: {
+      clefs,
       keySignatureName,
       timeSignatureParams,
       customStyles: { ...carried.customStyles, ...prune(customStyles) }

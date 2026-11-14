@@ -1,6 +1,7 @@
 'use strict'
 
 import { createBitmap, drawLine, drawEllipse, drawEllipseOutline, drawFilledRect } from '#msq/omr/training/drawBitmap.js'
+import { classifiedClassIds } from '#msq/omr/analysis/symbolClasses.js'
 
 /**
  * Symbol shapes, drawn as the training set's stand-in glyphs.
@@ -35,6 +36,20 @@ export const drawableSymbols = {
   },
   'notehead-open' (bitmap, x, y, size, random) {
     drawEllipseOutline(bitmap, x, y, size * (0.52 + 0.1 * random()), size * (0.36 + 0.08 * random()), 1 + random())
+  },
+  'notehead-double-whole' (bitmap, x, y, size, random) {
+    const weight = 1 + random()
+    for (const side of [ -1, 1 ]) {
+      drawLine(bitmap, x + side * size * 0.5, y - size * 0.35, x + side * size * 0.5, y + size * 0.35, weight)
+      drawLine(bitmap, x + side * size * 0.35, y - size * 0.22, x + side * size * 0.35, y + size * 0.22, weight)
+    }
+    drawLine(bitmap, x - size * 0.5, y - size * 0.35, x + size * 0.5, y - size * 0.35, weight)
+    drawLine(bitmap, x - size * 0.5, y + size * 0.35, x + size * 0.5, y + size * 0.35, weight)
+  },
+  'notehead-quadruple-whole' (bitmap, x, y, size, random) {
+    drawableSymbols['notehead-open'](bitmap, x, y, size, random)
+    drawLine(bitmap, x - size * 0.48, y - size * 0.45, x - size * 0.48, y + size * 0.45, 1 + random())
+    drawLine(bitmap, x + size * 0.48, y - size * 0.45, x + size * 0.48, y + size * 0.45, 1 + random())
   },
   'ghost-head' (bitmap, x, y, size, random) {
     const spread = size * 0.5
@@ -75,6 +90,22 @@ export const drawableSymbols = {
     drawableSymbols.flat(bitmap, x - size * 0.28, y + size * 0.05, size * 0.9, random)
     drawableSymbols.flat(bitmap, x + size * 0.22, y + size * 0.05, size * 0.9, random)
   },
+  demiflat (bitmap, x, y, size, random) {
+    drawableSymbols.flat(bitmap, x, y, size, random)
+    drawLine(bitmap, x - size * 0.45, y - size * 0.62, x + size * 0.1, y - size * 0.62, 1 + random())
+  },
+  sesquiflat (bitmap, x, y, size, random) {
+    drawableSymbols.demiflat(bitmap, x - size * 0.18, y, size, random)
+    drawableSymbols.flat(bitmap, x + size * 0.28, y, size * 0.85, random)
+  },
+  demisharp (bitmap, x, y, size, random) {
+    drawableSymbols.sharp(bitmap, x, y, size, random)
+    drawLine(bitmap, x - size * 0.45, y - size * 0.58, x + size * 0.45, y + size * 0.5, 1 + random())
+  },
+  sesquisharp (bitmap, x, y, size, random) {
+    drawableSymbols.demisharp(bitmap, x - size * 0.18, y, size, random)
+    drawableSymbols.sharp(bitmap, x + size * 0.28, y, size * 0.85, random)
+  },
   'clef-treble' (bitmap, x, y, size, random) {
     const weight = 1 + random()
     arc(bitmap, x - size * 0.05, y + size * 0.18, size * 0.32, size * 0.4, 0, 2 * Math.PI, weight)
@@ -100,6 +131,42 @@ export const drawableSymbols = {
     drawEllipse(bitmap, x - size * 0.14, y - size * 0.32, size * 0.08, size * 0.08)
     drawEllipse(bitmap, x - size * 0.14, y + size * 0.32, size * 0.08, size * 0.08)
   },
+  'clef-tenor' (bitmap, x, y, size, random) {
+    drawableSymbols['clef-alto'](bitmap, x, y + size * 0.12, size, random)
+  },
+  'clef-soprano' (bitmap, x, y, size, random) {
+    drawableSymbols['clef-alto'](bitmap, x, y - size * 0.18, size, random)
+  },
+  'clef-mezzo-soprano' (bitmap, x, y, size, random) {
+    drawableSymbols['clef-alto'](bitmap, x, y - size * 0.06, size, random)
+  },
+  'clef-baritone' (bitmap, x, y, size, random) {
+    drawableSymbols['clef-alto'](bitmap, x, y + size * 0.24, size, random)
+  },
+  'clef-octave-eight-up' (bitmap, x, y, size, random) {
+    drawableSymbols['clef-treble'](bitmap, x, y, size, random)
+    drawableSymbols['digit-8'](bitmap, x, y - size * 0.85, size * 0.3)
+  },
+  'clef-octave-eight-down' (bitmap, x, y, size, random) {
+    drawableSymbols['clef-treble'](bitmap, x, y, size, random)
+    drawableSymbols['digit-8'](bitmap, x, y + size * 0.85, size * 0.3)
+  },
+  'clef-octave-fifteen-up' (bitmap, x, y, size, random) {
+    drawableSymbols['clef-treble'](bitmap, x, y, size, random)
+    drawableSymbols['digit-1'](bitmap, x - size * 0.12, y - size * 0.85, size * 0.3)
+    drawableSymbols['digit-5'](bitmap, x + size * 0.12, y - size * 0.85, size * 0.3)
+  },
+  'clef-octave-fifteen-down' (bitmap, x, y, size, random) {
+    drawableSymbols['clef-treble'](bitmap, x, y, size, random)
+    drawableSymbols['digit-1'](bitmap, x - size * 0.12, y + size * 0.85, size * 0.3)
+    drawableSymbols['digit-5'](bitmap, x + size * 0.12, y + size * 0.85, size * 0.3)
+  },
+  'rest-quadruple-whole' (bitmap, x, y, size, random) {
+    drawFilledRect(bitmap, x - size * 0.4, y - size * 0.45, size * 0.8, size * 0.9)
+  },
+  'rest-double-whole' (bitmap, x, y, size, random) {
+    drawFilledRect(bitmap, x - size * 0.4, y - size * 0.25, size * 0.8, size * 0.5)
+  },
   'rest-whole' (bitmap, x, y, size, random) {
     drawFilledRect(bitmap, x - size * 0.3, y - size * 0.16, size * 0.6, size * (0.28 + 0.08 * random()))
   },
@@ -117,6 +184,26 @@ export const drawableSymbols = {
     const weight = 2 + random()
     drawLine(bitmap, x - size * 0.12, y - size * 0.55, x - size * 0.12, y + size * 0.2, weight)
     drawEllipse(bitmap, x + size * 0.08, y - size * 0.32, size * 0.17, size * 0.24)
+  },
+  'rest-sixteenth' (bitmap, x, y, size, random) {
+    drawableSymbols['rest-eighth'](bitmap, x, y, size, random)
+    drawEllipse(bitmap, x - size * 0.08, y + size * 0.02, size * 0.17, size * 0.24)
+  },
+  'rest-thirty-second' (bitmap, x, y, size, random) {
+    drawableSymbols['rest-sixteenth'](bitmap, x, y, size, random)
+    drawEllipse(bitmap, x - size * 0.24, y + size * 0.34, size * 0.17, size * 0.24)
+  },
+  'rest-sixty-fourth' (bitmap, x, y, size, random) {
+    drawableSymbols['rest-thirty-second'](bitmap, x, y, size, random)
+    drawEllipse(bitmap, x - size * 0.4, y + size * 0.58, size * 0.14, size * 0.2)
+  },
+  'rest-one-hundred-twenty-eighth' (bitmap, x, y, size, random) {
+    drawableSymbols['rest-sixty-fourth'](bitmap, x, y, size, random)
+    drawEllipse(bitmap, x - size * 0.5, y + size * 0.78, size * 0.12, size * 0.18)
+  },
+  'rest-two-hundred-fifty-sixth' (bitmap, x, y, size, random) {
+    drawableSymbols['rest-one-hundred-twenty-eighth'](bitmap, x, y, size, random)
+    drawEllipse(bitmap, x - size * 0.6, y + size * 0.95, size * 0.1, size * 0.16)
   },
   'digit-0' (bitmap, x, y, size) {
     drawEllipseOutline(bitmap, x, y, size * 0.28, size * 0.5, 2)
@@ -178,6 +265,33 @@ export const drawableSymbols = {
   },
   staccato (bitmap, x, y, size) {
     drawEllipse(bitmap, x, y, size * 0.11, size * 0.11)
+  },
+  spiccato (bitmap, x, y, size, random) {
+    drawLine(bitmap, x, y - size * 0.22, x, y + size * 0.22, 2 + random())
+  },
+  'left-hand-pizzicato' (bitmap, x, y, size, random) {
+    drawEllipseOutline(bitmap, x, y, size * 0.3, size * 0.3, 1 + random())
+    drawLine(bitmap, x - size * 0.35, y + size * 0.35, x + size * 0.35, y - size * 0.35, 1 + random())
+  },
+  'snap-pizzicato' (bitmap, x, y, size, random) {
+    drawEllipseOutline(bitmap, x, y, size * 0.3, size * 0.3, 1 + random())
+    drawLine(bitmap, x, y - size * 0.45, x, y + size * 0.45, 1 + random())
+  },
+  'natural-harmonic' (bitmap, x, y, size, random) {
+    drawEllipseOutline(bitmap, x, y, size * 0.28, size * 0.28, 1 + random())
+  },
+  'up-bow' (bitmap, x, y, size, random) {
+    polyline(bitmap, [ [ x - size * 0.3, y + size * 0.3 ], [ x, y - size * 0.3 ], [ x + size * 0.3, y + size * 0.3 ] ], 1 + random())
+  },
+  'down-bow' (bitmap, x, y, size, random) {
+    drawFilledRect(bitmap, x - size * 0.28, y - size * 0.3, size * 0.56, size * 0.6)
+  },
+  'common-time' (bitmap, x, y, size, random) {
+    arc(bitmap, x, y, size * 0.32, size * 0.45, Math.PI * 0.35, Math.PI * 1.65, 2 + random())
+  },
+  'cut-time' (bitmap, x, y, size, random) {
+    drawableSymbols['common-time'](bitmap, x, y, size, random)
+    drawLine(bitmap, x, y - size * 0.65, x, y + size * 0.65, 1 + random())
   },
   accent (bitmap, x, y, size, random) {
     const weight = 2 + random()
@@ -270,16 +384,20 @@ export const drawableSymbols = {
         1 + random()
       )
     }
+  },
+  other (bitmap, x, y, size, random) {
+    drawableSymbols.junk(bitmap, x, y, size, random)
   }
 }
 
-export const drawableClassIds = Object.keys(drawableSymbols).filter((id) => id !== 'junk')
+export const drawableClassIds = classifiedClassIds
 
 // One symbol on a fresh bitmap, jittered. The full bitmap is the crop source.
 export function drawSymbolSample (classId, drawSize, random) {
   const bitmap = createBitmap(drawSize, drawSize)
-  const center = drawSize / 2
+  const centerX = drawSize * (0.5 + 0.08 * (random() - 0.5))
+  const centerY = drawSize * (0.5 + 0.08 * (random() - 0.5))
   const size = drawSize * (0.5 + 0.12 * (random() - 0.5))
-  drawableSymbols[classId](bitmap, center, center, size, random)
+  drawableSymbols[classId](bitmap, centerX, centerY, size, random)
   return bitmap
 }

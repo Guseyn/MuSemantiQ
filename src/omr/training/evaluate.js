@@ -33,8 +33,10 @@ export function evaluateModel ({ model, samples, worstCount = 10 }) {
       })
     }
   }
+  const rawLoss = samples.length ? lossTotal / samples.length : 0
   return {
-    loss: samples.length ? Math.round(lossTotal / samples.length * 1e6) / 1e6 : 0,
+    loss: Math.round(rawLoss * 1e6) / 1e6,
+    rawLoss,
     accuracy: samples.length ? Math.round(correct / samples.length * 1e4) / 1e4 : 0,
     confusion,
     worst: mistakes

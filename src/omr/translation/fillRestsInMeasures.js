@@ -23,7 +23,7 @@ export function fillRestsInMeasures (voices, measureDuration) {
         x: Infinity,
         notes: [],
         isRest: true,
-        restPosition: 2,
+        restPosition: 4,
         unitDuration: duration,
         numberOfDots: 0,
         stemDirection: 'up',
@@ -36,6 +36,9 @@ export function fillRestsInMeasures (voices, measureDuration) {
 }
 
 function soundingDuration (unit) {
+  if (unit.isGrace) {
+    return 0
+  }
   const dotFactor = 2 - 1 / 2 ** (unit.numberOfDots || 0)
   return unit.unitDuration * dotFactor
 }
