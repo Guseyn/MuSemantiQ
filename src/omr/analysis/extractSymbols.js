@@ -25,7 +25,7 @@ export function extractSymbols (bitmap, staves, { classify }) {
   const components = splitTouchingComponents(withoutLinesAndStems, findSymbolComponents(withoutLinesAndStems))
   const blobs = components.map((component) => {
     const pixels = cropPixels(withoutLinesAndStems, component.box)
-    const answer = classify(pixels, component.box)
+    const answer = classify(pixels, component.box, withoutLinesAndStems)
     return {
       kind: 'blob',
       className: answer.className,

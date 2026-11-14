@@ -13,14 +13,42 @@
 
 const PEAK_THRESHOLD = 0.15
 const SPACING_TOLERANCE = 0.25
+const LINE_COVERAGE_MIN = 0.85
 
 export function detectStaves ({ width, height, grayscale }) {
   const profile = rowInkProfile({ width, height, grayscale })
   const peaks = findPeakCandidates(profile)
+    .filter((y) => lineCoverage({ width, height, grayscale }, y) >= LINE_COVERAGE_MIN)
   const lines = groupPeaksIntoStaves(peaks)
   const staves = lines.map((rawLines) => buildStave(rawLines, profile, { width, height, grayscale }))
-  const staffSpaceHeightPx = mean(staves.map((stave) => stave.staffSpaceHeightPx))
+  const staffSpaceHeightPx = staves.length ? mean(staves.map((stave) => stave.staffSpaceHeightPx)) : 0
   return { staves, staffSpaceHeightPx }
+}
+
+// A staff line runs unbroken along its own ink; a row of letters, a dashed
+// bracket or a row crossing scattered noteheads does not. Ink columns over
+// the row's own extent separates them before any grouping starts — and
+// keeps a short stave in a narrow system, because the extent is its own.
+function lineCoverage ({ width, height, grayscale }, lineY) {
+  let start = -1
+  let end = -1
+  let inked = 0
+  for (let x = 0; x < width; x++) {
+    let hasInk = false
+    for (let offset = -1; offset <= 1; offset++) {
+      const y = lineY + offset
+      if (y >= 0 && y < height && grayscale[y * width + x] > 0.5) {
+        hasInk = true
+        break
+      }
+    }
+    if (hasInk) {
+      if (start < 0) start = x
+      end = x
+      inked++
+    }
+  }
+  return end > start ? inked / (end - start) : 0
 }
 
 function rowInkProfile ({ width, height, grayscale }) {

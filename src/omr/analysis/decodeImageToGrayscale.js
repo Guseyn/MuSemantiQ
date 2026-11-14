@@ -1,5 +1,7 @@
 'use strict'
 
+import normalizeInkPolarity from '#msq/omr/analysis/normalizeInkPolarity.js'
+
 /**
  * PNG bytes → the numbers the analysis works in.
  *
@@ -37,7 +39,7 @@ export function decodeImageToGrayscale (bytes) {
   for (let index = 0; index < grayscale.length; index++) {
     grayscale[index] = inkAt(pixels, header.colorType, palette, index)
   }
-  return { width: header.width, height: header.height, grayscale }
+  return normalizeInkPolarity({ width: header.width, height: header.height, grayscale })
 }
 
 function isPng (buffer) {

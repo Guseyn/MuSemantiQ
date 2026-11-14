@@ -1,5 +1,7 @@
 'use strict'
 
+import normalizeInkPolarity from '#msq/omr/analysis/normalizeInkPolarity.js'
+
 /**
  * Image pixels, as the numbers the analysis works in.
  *
@@ -15,7 +17,7 @@ export function readBitmapFromImage ({ width, height, data }) {
     const luma = (0.299 * data[offset] + 0.587 * data[offset + 1] + 0.114 * data[offset + 2]) / 255
     grayscale[index] = 1 - luma
   }
-  return { width, height, grayscale }
+  return normalizeInkPolarity({ width, height, grayscale })
 }
 
 export default readBitmapFromImage

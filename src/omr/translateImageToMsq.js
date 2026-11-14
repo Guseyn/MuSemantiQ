@@ -4,6 +4,7 @@ import deskewBitmap from '#msq/omr/analysis/deskewBitmap.js'
 import { analyzeStraightenedImage } from '#msq/omr/analysis/analyzeImage.js'
 import extractSymbols from '#msq/omr/analysis/extractSymbols.js'
 import classifyComponent from '#msq/omr/analysis/classifyComponent.js'
+import { resampleToGrid } from '#msq/omr/training/cropComponents.js'
 import shippedModel from '#msq/omr/model/shippedModel.js'
 import buildMusicModel from '#msq/omr/translation/buildMusicModel.js'
 import buildPageSchemaFromMusicModel from '#msq/omr/translation/buildPageSchemaFromMusicModel.js'
@@ -28,9 +29,9 @@ export function translateImageToMsq (bitmap, options = {}) {
 // The same, with the page's carry-over state in and out — what
 // translateImagesToMsqPages threads through a project's pages.
 export function translatePage (bitmap, options = {}, carried = {}) {
-  const classify = options.classify || classifyWithModel(options)
   const upright = deskewBitmap(bitmap)
   const analysis = analyzeStraightenedImage(upright)
+  const classify = options.classify || classifyWithModel(options)
   const symbols = extractSymbols(upright, analysis.staves, { classify })
   const built = buildMusicModel(symbols, analysis.staves)
   const withState = carryStateAcrossPages(
@@ -55,7 +56,25 @@ function classifyWithModel ({ model, classIds, threshold }) {
   if (!loaded.classIds) {
     throw new Error('a model needs its classIds — the order it was trained with')
   }
-  return (pixels) => classifyComponent(loaded.model, pixels, loaded.classIds, threshold)
+  // Training drew each symbol centred in a square of twice its nominal size,
+  // and the model has only ever seen symbols framed like that. The
+  // component's own box, framed twice as wide, puts it in the same picture.
+  return (pixels, box, source) => {
+    const side = 2 * Math.max(box.w, box.h)
+    const centerX = box.x + box.w / 2
+    const centerY = box.y + box.h / 2
+    return classifyComponent(
+      loaded.model,
+      resampleToGrid(source, {
+        x1: centerX - side / 2,
+        y1: centerY - side / 2,
+        x2: centerX + side / 2,
+        y2: centerY + side / 2
+      }, loaded.model.shape.gridSize),
+      loaded.classIds,
+      threshold
+    )
+  }
 }
 
 // Sizes in staff spaces and colours as measured; the one pixel anchor

@@ -192,17 +192,22 @@ const TESTS = [
   {
     name: 'readBitmapFromImage turns pixels into ink',
     run () {
+      // ink is 1 and paper is 0 on any picture whose ground is the majority
+      // of its pixels — the pages this reads always are
       const data = [
+        255, 255, 255, 255,
+        255, 255, 255, 255,
         255, 255, 255, 255,
         0, 0, 0, 255,
         128, 128, 128, 255,
-        255, 0, 0, 255
+        255, 0, 0, 255,
+        255, 255, 255, 255
       ]
-      const { grayscale } = readBitmapFromImage({ width: 4, height: 1, data })
+      const { grayscale } = readBitmapFromImage({ width: 7, height: 1, data })
       near(grayscale[0], 0, 1e-6, 'white paper')
-      near(grayscale[1], 1, 1e-6, 'black ink')
-      near(grayscale[2], 1 - 128 / 255, 1e-6, 'mid gray')
-      near(grayscale[3], 1 - 0.299, 1e-6, 'red by luma')
+      near(grayscale[3], 1, 1e-6, 'black ink')
+      near(grayscale[4], 1 - 128 / 255, 1e-6, 'mid gray')
+      near(grayscale[5], 1 - 0.299, 1e-6, 'red by luma')
     }
   },
   {
@@ -543,13 +548,32 @@ const TESTS = [
   {
     name: 'decodeImageToGrayscale reads a PNG',
     run () {
-      const bitmap = createPlainBitmap(4, 2)
-      drawFilledRect(bitmap, 0, 0, 2, 2) // ink in one corner
+      const bitmap = createPlainBitmap(8, 4)
+      drawFilledRect(bitmap, 2, 1, 2, 2) // ink in one corner
       const decoded = decodeImageToGrayscale(encodePng(bitmap))
-      assert.strictEqual(decoded.width, 4, 'width')
-      assert.strictEqual(decoded.height, 2, 'height')
-      near(decoded.grayscale[0], 1, 1 / 255, 'ink where it was drawn')
-      near(decoded.grayscale[3], 0, 1 / 255, 'paper where it was not')
+      assert.strictEqual(decoded.width, 8, 'width')
+      assert.strictEqual(decoded.height, 4, 'height')
+      near(decoded.grayscale[10], 1, 1 / 255, 'ink where it was drawn')
+      near(decoded.grayscale[0], 0, 1 / 255, 'paper where it was not')
+    }
+  },
+  {
+    name: 'a negative page reads the same as its positive',
+    run () {
+      // a score printed white on a dark ground is the same page — ink is
+      // still ink after the picture is turned inside out
+      const page = createPlainBitmap(8, 4)
+      drawFilledRect(page, 2, 1, 2, 2)
+      const negative = {
+        width: page.width,
+        height: page.height,
+        grayscale: Float32Array.from(page.grayscale, (value) => 1 - value)
+      }
+      const positive = decodeImageToGrayscale(encodePng(page))
+      const decoded = decodeImageToGrayscale(encodePng(negative))
+      near(decoded.grayscale[0], positive.grayscale[0], 1 / 255, 'paper matches')
+      near(decoded.grayscale[10], positive.grayscale[10], 1 / 255, 'ink matches')
+      near(decoded.grayscale[10], 1, 1 / 255, 'and it is ink')
     }
   },
   {
