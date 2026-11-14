@@ -8,7 +8,7 @@
  * box of each blob is what the classifier crops and what the rules measure.
  */
 
-const INK_THRESHOLD = 0.5
+const INK_THRESHOLD = 0.25
 
 export function findSymbolComponents ({ width, height, grayscale }) {
   const visited = new Uint8Array(width * height)

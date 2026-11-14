@@ -10,7 +10,7 @@
 
 const COVERS_STAVE_FRACTION = 0.95
 const CLUSTER_TOLERANCE_IN_STAFF_SPACES = 0.8
-const EDGE_TOLERANCE_IN_STAFF_SPACES = 0.6
+const EDGE_TOLERANCE_IN_STAFF_SPACES = 1
 
 export function findBarLines ({ width, height, grayscale }, staves) {
   const candidates = []
@@ -21,11 +21,11 @@ export function findBarLines ({ width, height, grayscale }, staves) {
     const fromY = Math.max(0, Math.floor(stave.topY - 0.35 * staffSpace))
     const toY = Math.min(height - 1, Math.ceil(stave.bottomY + 0.35 * staffSpace))
     for (let x = stave.xStart; x <= stave.xEnd; x++) {
-      for (const run of verticalRuns({ width, grayscale }, x, fromY, toY)) {
+      for (const run of verticalRuns({ width, grayscale }, x, fromY, toY, Math.max(1, 0.25 * staffSpace))) {
         const covers = run.y2 - run.y1 + 1 >= COVERS_STAVE_FRACTION * staveHeight &&
           run.y1 <= stave.topY + 0.3 * staffSpace &&
           run.y2 >= stave.bottomY - 0.3 * staffSpace
-        if (covers && thinCore({ width, grayscale }, run, x, thinEnough)) {
+        if (covers && thinCore({ width, grayscale }, run, x, thinEnough, stave)) {
           candidates.push({
             x,
             y1: run.y1,
@@ -40,49 +40,61 @@ export function findBarLines ({ width, height, grayscale }, staves) {
   return cluster(candidates, staves)
 }
 
-function verticalRuns ({ width, grayscale }, x, fromY, toY) {
+function verticalRuns ({ width, grayscale }, x, fromY, toY, maximumGap) {
   const runs = []
   let start = null
+  let lastInk = null
+  let gap = 0
   for (let y = fromY; y <= toY; y++) {
-    const ink = grayscale[y * width + x] > 0.5
-    if (ink && start === null) {
-      start = y
-    }
-    if (!ink && start !== null) {
-      runs.push({ y1: start, y2: y - 1 })
-      start = null
+    const ink = grayscale[y * width + x] > 0.25
+    if (ink) {
+      if (start === null) start = y
+      lastInk = y
+      gap = 0
+    } else if (start !== null) {
+      gap++
+      if (gap > maximumGap) {
+        runs.push({ y1: start, y2: lastInk })
+        start = null
+        gap = 0
+      }
     }
   }
   if (start !== null) {
-    runs.push({ y1: start, y2: toY })
+    runs.push({ y1: start, y2: lastInk })
   }
   return runs
 }
 
 // A head or repeat dot may protrude at a few rows; the line's vertical core
 // still has to be thin almost everywhere.
-function thinCore ({ width, grayscale }, run, x, thinEnough) {
+function thinCore ({ width, grayscale }, run, x, thinEnough, stave) {
   let thinRows = 0
-  const rows = run.y2 - run.y1 + 1
+  let measuredRows = 0
+  const lineThickness = stave.lineThicknessPx || 1
   for (let y = run.y1; y <= run.y2; y++) {
+    if (stave.linesY.some((line) => Math.abs(y - line) <= lineThickness / 2)) {
+      continue
+    }
+    measuredRows++
     const extent = horizontalExtent({ width, grayscale }, y, x)
     if (extent > 0 && extent <= thinEnough) {
       thinRows++
     }
   }
-  return thinRows / rows >= 0.9
+  return measuredRows > 0 && thinRows / measuredRows >= 0.9
 }
 
 function horizontalExtent ({ width, grayscale }, y, x) {
-  if (grayscale[y * width + x] <= 0.5) {
+  if (grayscale[y * width + x] <= 0.25) {
     return 0
   }
   let left = x
   let right = x
-  while (left - 1 >= 0 && grayscale[y * width + left - 1] > 0.5) {
+  while (left - 1 >= 0 && grayscale[y * width + left - 1] > 0.25) {
     left--
   }
-  while (right + 1 < width && grayscale[y * width + right + 1] > 0.5) {
+  while (right + 1 < width && grayscale[y * width + right + 1] > 0.25) {
     right++
   }
   return right - left + 1
@@ -112,10 +124,16 @@ function cluster (candidates, staves) {
     }
     const staffSpace = mean(systemStaves.map((stave) => stave.staffSpaceHeightPx))
     const x = Math.round(group.x)
-    const atStart = systemStaves.every((stave) => Math.abs(x - stave.xStart) <= EDGE_TOLERANCE_IN_STAFF_SPACES * staffSpace)
+    const x1 = Math.min(...group.candidates.map((candidate) => candidate.x))
+    const x2 = Math.max(...group.candidates.map((candidate) => candidate.x))
+    const nearLeftConnector = x - Math.min(...systemStaves.map((stave) => stave.xStart)) <= 4 * staffSpace
+    const atStart = nearLeftConnector || systemStaves.every((stave) => Math.abs(x - stave.xStart) <= EDGE_TOLERANCE_IN_STAFF_SPACES * staffSpace)
     const atEnd = systemStaves.every((stave) => Math.abs(x - stave.xEnd) <= EDGE_TOLERANCE_IN_STAFF_SPACES * staffSpace)
     return {
       x,
+      x1,
+      x2,
+      columns: x2 - x1 + 1,
       y1: Math.min(...group.candidates.map((candidate) => candidate.y1)),
       y2: Math.max(...group.candidates.map((candidate) => candidate.y2)),
       systemIndex: group.systemIndex,

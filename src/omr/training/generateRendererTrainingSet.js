@@ -34,9 +34,10 @@ export async function generateRendererTrainingSet ({
   gridSize = 48,
   classIds = drawableClassIds,
   degrade = true,
+  scales = [ 0.5, 0.75, 1, 1.5, 2, 3 ],
   onClass = null
 }) {
-  const baseSamples = await rendererSourceSamples(gridSize * 2)
+  const baseSamples = await rendererSourceSamples(gridSize * 2, scales)
   const random = createSeededRandom(seed)
   const samples = []
   for (const [ classIndex, classId ] of classIds.entries()) {
@@ -52,7 +53,8 @@ export async function generateRendererTrainingSet ({
           pixels: resampleToGrid(source, { x1: 0, y1: 0, x2: source.width, y2: source.height }, gridSize),
           classId,
           classIndex,
-          font: base.font
+          font: base.font,
+          scale: base.scale
         })
       }
     }
@@ -60,49 +62,53 @@ export async function generateRendererTrainingSet ({
   return { classIds, samples }
 }
 
-async function rendererSourceSamples (drawSize) {
-  if (!sourceCache.has(drawSize)) {
-    sourceCache.set(drawSize, buildRendererSourceSamples(drawSize))
+async function rendererSourceSamples (drawSize, scales) {
+  const cacheKey = `${drawSize}:${scales.join(',')}`
+  if (!sourceCache.has(cacheKey)) {
+    sourceCache.set(cacheKey, buildRendererSourceSamples(drawSize, scales))
   }
-  return sourceCache.get(drawSize)
+  return sourceCache.get(cacheKey)
 }
 
-async function buildRendererSourceSamples (drawSize) {
+async function buildRendererSourceSamples (drawSize, scales) {
   const supportedFontSources = await setupFonts({ music: FONT_SOURCES })
   const supportedFontNames = supportedFontNamesFrom(supportedFontSources)
   const samples = []
   for (const [ classId, definition ] of Object.entries(rendererSymbolDefinitions)) {
     for (const font of Object.keys(FONT_SOURCES)) {
-      const pageText = `music font is ${font}\n${definition.msq}`
-      const parsed = generateIntermediateStructuresForSinglePage({ pageText, supportedFontNames })
-      if (parsed.errors.length) {
-        throw new Error(`${classId}: ${parsed.errors.map((error) => error.message).join(', ')}`)
+      for (const scale of scales) {
+        const pageText = `music font is ${font}\n${definition.msq}`
+        const parsed = generateIntermediateStructuresForSinglePage({ pageText, supportedFontNames })
+        if (parsed.errors.length) {
+          throw new Error(`${classId}: ${parsed.errors.map((error) => error.message).join(', ')}`)
+        }
+        const pageStylesForEachPage = generateStylesForMultiplePages({
+          customStylesForEachPage: [ parsed.customStyles ],
+          supportedFontSources
+        })
+        const svg = generateSvgForMultiplePages({
+          pageSchemaForEachPage: [ parsed.pageSchema ],
+          pageStylesForEachPage
+        })
+        const bitmap = rasterizeSvg(svg, { scale })
+        const { staves } = detectStaves(bitmap)
+        const withoutStaffLines = removeStaffLines(bitmap, staves)
+        const document = parseSvgPrimitives(svg)
+        const group = document.groups.filter((candidate) => candidate.name === definition.targetName)
+          .sort((first, second) => areaOf(first.bounds) - areaOf(second.bounds))[0]
+        if (!group) {
+          throw new Error(`${classId}: no ${definition.targetName} group; available: ${[ ...new Set(document.groups.map((item) => item.name)) ].filter(Boolean).join(', ')}`)
+        }
+        const box = definition.primitiveIndex === undefined
+          ? boxFromBounds(group.bounds, scale)
+          : primitiveBox(document, group, definition.primitiveIndex, scale)
+        samples.push({
+          classId,
+          font,
+          scale,
+          pixels: resampleComponentToGrid(withoutStaffLines, box, drawSize)
+        })
       }
-      const pageStylesForEachPage = generateStylesForMultiplePages({
-        customStylesForEachPage: [ parsed.customStyles ],
-        supportedFontSources
-      })
-      const svg = generateSvgForMultiplePages({
-        pageSchemaForEachPage: [ parsed.pageSchema ],
-        pageStylesForEachPage
-      })
-      const bitmap = rasterizeSvg(svg)
-      const { staves } = detectStaves(bitmap)
-      const withoutStaffLines = removeStaffLines(bitmap, staves)
-      const document = parseSvgPrimitives(svg)
-      const group = document.groups.filter((candidate) => candidate.name === definition.targetName)
-        .sort((first, second) => areaOf(first.bounds) - areaOf(second.bounds))[0]
-      if (!group) {
-        throw new Error(`${classId}: no ${definition.targetName} group; available: ${[ ...new Set(document.groups.map((item) => item.name)) ].filter(Boolean).join(', ')}`)
-      }
-      const box = definition.primitiveIndex === undefined
-        ? boxFromBounds(group.bounds)
-        : primitiveBox(document, group, definition.primitiveIndex)
-      samples.push({
-        classId,
-        font,
-        pixels: resampleComponentToGrid(withoutStaffLines, box, drawSize)
-      })
     }
   }
   const random = createSeededRandom(1)
@@ -110,7 +116,7 @@ async function buildRendererSourceSamples (drawSize) {
   return samples
 }
 
-function primitiveBox (document, group, index) {
+function primitiveBox (document, group, index, scale) {
   const centerY = (group.bounds.top + group.bounds.bottom) / 2
   const primitives = document.primitives.filter((primitive) =>
     primitive.attributes.d && primitive.bounds &&
@@ -121,21 +127,21 @@ function primitiveBox (document, group, index) {
   if (!primitives[index]) {
     throw new Error(`No text primitive ${index} in ${group.name}`)
   }
-  return boxFromBounds(primitives[index].bounds)
+  return boxFromBounds(primitives[index].bounds, scale)
 }
 
 function areaOf (bounds) {
   return Math.max(0, bounds.right - bounds.left) * Math.max(0, bounds.bottom - bounds.top)
 }
 
-function boxFromBounds (bounds) {
-  const x = Math.floor(bounds.left)
-  const y = Math.floor(bounds.top)
+function boxFromBounds (bounds, scale = 1) {
+  const x = Math.floor(bounds.left * scale)
+  const y = Math.floor(bounds.top * scale)
   return {
     x,
     y,
-    w: Math.max(1, Math.ceil(bounds.right) - x),
-    h: Math.max(1, Math.ceil(bounds.bottom) - y)
+    w: Math.max(1, Math.ceil(bounds.right * scale) - x),
+    h: Math.max(1, Math.ceil(bounds.bottom * scale) - y)
   }
 }
 

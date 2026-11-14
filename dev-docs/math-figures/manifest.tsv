@@ -1,3 +1,15 @@
+0.1	fig-00-scale-distance
+0.2	fig-00-scale-thickness
+0.3	fig-00-scale-thresholds
+0.4	fig-00-scale-area
+0.5	fig-00-scale-sequence
+1	fig-omr-overview
+2	fig-omr-measure
+2.5	fig-omr-cross-stave
+3	fig-omr-network
+4	fig-omr-training-loop
+5	fig-omr-data-factory
+6	fig-omr-evaluation
 1	fig-01-the-crop
 2	fig-02-the-convolution-window-1
 2	fig-02-the-convolution-window-2

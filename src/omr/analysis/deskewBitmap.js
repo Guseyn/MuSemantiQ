@@ -12,7 +12,7 @@ import estimateSkewAngleInDegrees from '#msq/omr/analysis/estimateSkewAngleInDeg
 
 export function deskewBitmap (bitmap) {
   const skewAngleInDegrees = estimateSkewAngleInDegrees(bitmap)
-  if (Math.abs(skewAngleInDegrees) < 0.05) {
+  if (Math.abs(skewAngleInDegrees) < 0.25) {
     return { ...bitmap, skewAngleInDegrees: 0 }
   }
   return {

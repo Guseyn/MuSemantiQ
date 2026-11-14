@@ -48,7 +48,8 @@
     "browser-app": "node browser-app/web-app/main.js",
     "cli-app": "node cli-app/msq.js",
     "omr-cli-app": "node omr-cli-app/omr.js",
-    "omr:evaluate": "node scripts/omr-evaluate-model.js"
+    "omr:evaluate": "node scripts/omr-evaluate-model.js",
+    "omr:scale": "node scripts/omr-scale-check.js"
   },
   "repository": {
     "type": "git",

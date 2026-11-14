@@ -47,7 +47,7 @@ function spreadAt ({ width, grayscale }, box, fromFraction, toFraction) {
     let minY = Infinity
     let maxY = -1
     for (let y = box.y; y < box.y + box.h; y++) {
-      if (grayscale[y * width + x] > 0.5) {
+      if (grayscale[y * width + x] > 0.25) {
         minY = Math.min(minY, y)
         maxY = Math.max(maxY, y)
       }

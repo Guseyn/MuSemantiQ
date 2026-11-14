@@ -5,6 +5,8 @@
 
 out <- "dev-docs/math-figures"
 dir.create(out, showWarnings = FALSE, recursive = TRUE)
+status <- system2("node", "scripts/render-omr-examples.js")
+if (status != 0) stop("Could not render the OMR example pages")
 
 # ── the paper palette of the docs ──
 ink <- "#17181a"; muted <- "#6b7076"; rule <- "#e4e4e0"; soft <- "#f4f3ef"
@@ -18,10 +20,11 @@ marks <- list(); fig_w <- 0; fig_h <- 0
 
 open_fig <- function(name, w, h) {
   marks <<- list(); fig_w <<- w; fig_h <<- h
-  svg(file.path(out, paste0(name, ".svg")), width = w / 100, height = h / 100, bg = "white")
+  fig_file <<- file.path(out, paste0(name, ".svg"))
+  svg(fig_file, width = w / 100, height = h / 100, bg = "white")
   par(mar = rep(0, 4), xpd = NA, ps = 12 * 72 / 100, family = mathfont)
   # y grows downward, like the coordinates the figures were designed in
-  plot(0, 0, type = "n", xlim = c(0, w), ylim = c(h, 0), axes = FALSE, xlab = "", ylab = "")
+  plot(0, 0, type = "n", xlim = c(0, w), ylim = c(h, 0), axes = FALSE, xlab = "", ylab = "", xaxs = "i", yaxs = "i")
 }
 
 # everything drawn is recorded, so check_marks can find collisions
@@ -54,12 +57,13 @@ math <- function(x, y, e, size = 18, col = ink, adj = c(0, 0.5)) {
   text(x, y, e, adj = adj, cex = size / 12, col = col)
 }
 note <- function(x, y, s, adj = c(0, 0.5)) mono(x, y, s, size = 15, col = ink, adj = adj)
-# the text face has no ⋅ or ⊙ — plotmath's %.% came out as an empty box. A
-# formula with such an operator is set in pieces, the operator in the math face
+# the text face has no ⋅, ⊙ or ≈ — some plotmath operators come out as empty
+# boxes. A formula with such an operator is set in pieces, with the operator in
+# the math face
 mathfont_ops <- "NewComputerModern Math"
 pieces <- function(x, y, parts, size = 16, adj = c(0, 0.5)) {
   cex <- size / 12
-  fam <- sapply(parts, function(p) if (is.character(p) && p %in% c("⋅", "⊙")) mathfont_ops else mathfont)
+  fam <- sapply(parts, function(p) if (is.character(p) && p %in% c("⋅", "⊙", "≈")) mathfont_ops else mathfont)
   gap <- abs(strwidth(" ", cex = cex)) * 0.6
   ws <- mapply(function(p, f) abs(strwidth(p, cex = cex, family = f)), parts, fam)
   ws <- ws + ifelse(fam == mathfont_ops, 2 * gap, 0)
@@ -171,7 +175,242 @@ crop_fig <- function(name) {
   writeLines(svg_text, f)
 }
 
-# ── 1 · the crop ──
+# A real MuSemantiQ page can sit inside an R figure. The renderer writes the
+# score and its semantic bounds; this inserts the score before crop_fig runs.
+include_rendered_svg <- function(name, x, y, scale = 1) {
+  example <- file.path(out, "omr-examples", paste0(name, ".svg"))
+  lines <- readLines(example, warn = FALSE)
+  first <- grep("^<svg ", lines)[1]
+  view_height <- as.numeric(sub('.*viewBox="[^"]*? ([0-9.]+)".*', '\\1', lines[first]))
+  text <- paste(lines, collapse = "\n")
+  opening_end <- regexpr(">", text)[1]
+  closing_start <- regexpr("</svg>", text)[1]
+  body <- substr(text, opening_end + 1, closing_start - 1)
+  inserted <- c(sprintf('<g transform="translate(%.4f,%.4f) scale(%.6f)">', x * 0.72, y * 0.72, scale * 0.72), body, "</g>")
+  figure <- readLines(fig_file, warn = FALSE)
+  insert_at <- grep('^<rect x=.*fill="rgb', figure)[1]
+  if (is.na(insert_at)) insert_at <- length(figure) - 1
+  figure <- append(figure, inserted, after = insert_at)
+  writeLines(figure, fig_file)
+  mark_box(x, y, x + 980 * scale, y + view_height * scale)
+}
+
+# ── 0 · scale is part of the model ──
+fig_00_scale_distance <- function() {
+  open_fig("fig-00-scale-distance", 900, 285)
+  ys <- seq(60, 108, 12)
+  for (y in ys) draw_seg(80, y, 390, y, col = muted, lwd = 1.3)
+  draw_seg(58, 60, 58, 84, col = accent, lwd = 2)
+  draw_seg(62, 60, 68, 60, col = accent, lwd = 2)
+  draw_seg(62, 84, 68, 84, col = accent, lwd = 2)
+  note(24, 140, "u = 24 px", adj = c(0, 0.5))
+  dashed(406, 60, 406, 72, col = accent)
+  note(418, 68, "s = 12 px")
+  math(570, 100, expression(hat(u) == u / s), size = 22, adj = c(0.5, 0.5))
+  note(570, 136, "= 24 / 12 = 2 staff spaces")
+  math(420, 206, expression("pixels can change; " * hat(u) * " stays musical"), size = 17, adj = c(0.5, 0.5))
+  dev.off()
+  add(0.1, "fig-00-scale-distance")
+}
+
+fig_00_scale_thickness <- function() {
+  open_fig("fig-00-scale-thickness", 900, 285)
+  for (y in c(70, 94, 118, 142, 166)) draw_seg(80, y, 380, y, col = rule, lwd = 1.2)
+  cell(80, 104, 300, 6, fill = ink, border = ink)
+  draw_seg(400, 104, 400, 110, col = accent, lwd = 2)
+  note(414, 108, "t = 6 px")
+  note(88, 218, "the staff space remains s = 24 px")
+  math(580, 108, expression(hat(t) == t / s), size = 21, adj = c(0.5, 0.5))
+  note(580, 144, "= 6 / 24 = 0.25 staff spaces")
+  dev.off()
+  add(0.2, "fig-00-scale-thickness")
+}
+
+fig_00_scale_thresholds <- function() {
+  open_fig("fig-00-scale-thresholds", 900, 310)
+  for (y in seq(55, 103, 12)) draw_seg(60, y, 330, y, col = muted, lwd = 1.2)
+  draw_seg(52, 55, 52, 79, col = accent, lwd = 2)
+  note(40, 68, "2s", adj = c(1, 0.5))
+  cell(440, 55, 260, 5, fill = ink, border = ink)
+  draw_seg(420, 55, 420, 60, col = accent, lwd = 2)
+  note(408, 58, "2t", adj = c(1, 0.5))
+  math(205, 176, expression(x[musical] == k[s] * s), size = 20, adj = c(0.5, 0.5))
+  math(610, 176, expression(x[stroke] == k[t] * t), size = 20, adj = c(0.5, 0.5))
+  note(205, 214, "musical distance: use the staff space")
+  note(610, 214, "stroke operation: use line thickness")
+  note(450, 274, "k_s and k_t are dimensionless; s and t are measured on this page", adj = c(0.5, 0.5))
+  dev.off()
+  add(0.3, "fig-00-scale-thresholds")
+}
+
+fig_00_scale_area <- function() {
+  open_fig("fig-00-scale-area", 900, 330)
+  cell(180, 60, 100, 100, fill = soft, border = muted)
+  cell(180, 160, 100, 100, fill = soft, border = muted)
+  cell(280, 60, 100, 100, fill = soft, border = muted)
+  cell(280, 160, 100, 100, fill = ink, border = ink)
+  cell(180, 60, 200, 200, fill = NA, border = accent, lwd = 2)
+  note(170, 42, "footprint R: 2 × 2 source pixels")
+  note(170, 284, "only one quarter is inside the bitmap")
+  dashed(420, 160, 520, 160, col = accent)
+  math(584, 146, expression(D == 1 / 4), size = 25, adj = c(0.5, 0.5))
+  note(584, 182, "outside paper contributes zero ink,")
+  note(584, 202, "but remains in |R| = 4")
+  dev.off()
+  add(0.4, "fig-00-scale-area")
+}
+
+fig_00_scale_sequence <- function() {
+  open_fig("fig-00-scale-sequence", 1000, 330)
+  qs <- c(0.5, 1, 2, 3)
+  centers <- c(100, 270, 450, 640)
+  for (k in seq_along(qs)) {
+    q <- qs[k]; cx <- centers[k]
+    for (j in 0:4) draw_seg(cx - 35 * q, 70 + j * 8 * q, cx + 35 * q, 70 + j * 8 * q, col = muted, lwd = 1.1)
+    dot(cx, 86, col = ink, cex = 0.65 * q)
+    draw_seg(cx + 5 * q, 86, cx + 5 * q, 42, col = ink, lwd = 1.5)
+    note(cx, 200, paste0("q = ", q), adj = c(0.5, 0.5))
+    flow(cx + 35 * q + 10, 180, 772, 180)
+  }
+  cell(790, 52, 144, 96, fill = soft, border = accent)
+  for (i in 0:6) dashed(790 + i * 24, 52, 790 + i * 24, 148)
+  for (j in 0:4) dashed(790, 52 + j * 24, 934, 52 + j * 24)
+  note(862, 170, "the same normalized crop", adj = c(0.5, 0.5))
+  pieces(500, 230, list(expression(B^{(q)} == q * B %->% D^{(q)}), "≈", expression(D)), size = 21, adj = c(0.5, 0.5))
+  note(500, 266, "the source box scales; the model grid does not", adj = c(0.5, 0.5))
+  dev.off()
+  add(0.5, "fig-00-scale-sequence")
+}
+
+fig_omr_overview <- function() {
+  open_fig("fig-omr-overview", 1000, 440)
+  labels <- c("image", "analysis", "symbols", "music graph", "page schema", "MSQ")
+  for (i in seq_along(labels)) {
+    x <- 45 + (i - 1) * 155
+    cell(x, 50, 122, 52, fill = if (i == 3) accent_soft else soft, border = if (i == 3) accent else rule)
+    value_in(x, 50, 122, 52, labels[i], size = 16)
+    if (i > 1) flow(x - 33, 76, x - 8, 76)
+  }
+  note(45, 196, "an actual MuSemantiQ-rendered page")
+  note(640, 224, "inspectable output:")
+  mono(640, 250, "measure")
+  mono(640, 274, "stave")
+  mono(640, 298, "treble clef")
+  mono(640, 322, "1/4 c5 a4 with flat key")
+  mono(640, 346, "1/8 b4 a4")
+  note(640, 388, "unknown and ignored ink stays in the report")
+  dev.off()
+  include_rendered_svg("simple-score", 45, 220, 0.52)
+  add(1, "fig-omr-overview")
+}
+
+fig_omr_measure <- function() {
+  open_fig("fig-omr-measure", 1000, 465)
+  steps <- c("staff geometry", "line removal", "components", "music rules", "schema")
+  for (i in seq_along(steps)) {
+    x <- 45 + (i - 1) * 190
+    cell(x, 42, 150, 50, fill = soft, border = rule)
+    value_in(x, 42, 150, 50, steps[i], size = 15)
+    if (i > 1) flow(x - 40, 67, x - 8, 67)
+  }
+  metadata <- read.delim(file.path(out, "omr-examples", "simple-score.tsv"), header = FALSE)
+  first_head <- metadata[which(metadata$V1 == "noteHead")[1], ]
+  first_staff <- metadata[which(metadata$V1 == "stavePiece" & metadata$V3 - metadata$V2 > 100)[1], ]
+  frame(40 + first_head$V2 * 0.65 - 4, 220 + first_head$V4 * 0.65 - 4,
+        (first_head$V3 - first_head$V2) * 0.65 + 8, (first_head$V5 - first_head$V4) * 0.65 + 8)
+  frame(40 + first_staff$V2 * 0.65 - 4, 220 + first_staff$V4 * 0.65 - 4,
+        (first_staff$V3 - first_staff$V2) * 0.65 + 8, (first_staff$V5 - first_staff$V4) * 0.65 + 8)
+  note(40, 196, "the highlights come from the renderer's own bounds")
+  dev.off()
+  include_rendered_svg("simple-score", 40, 220, 0.65)
+  add(2, "fig-omr-measure")
+}
+
+fig_omr_cross_stave <- function() {
+  open_fig("fig-omr-cross-stave", 1000, 520)
+  note(35, 160, "one system: two staves, shared geometry")
+  note(35, 455, "connections, cross-stave notes and spans belong to the graph, not to independent pages")
+  dev.off()
+  include_rendered_svg("cross-stave-score", 35, 190, 0.67)
+  add(2.5, "fig-omr-cross-stave")
+}
+
+fig_omr_network <- function() {
+  open_fig("fig-omr-network", 1000, 310)
+  layers <- c("48×48", "conv 3×3", "ReLU + pool", "conv 3×3", "ReLU + pool", "dense", "softmax")
+  for (i in seq_along(layers)) {
+    x <- 30 + (i - 1) * 140
+    cell(x, 80, 110, 58, fill = if (i == 7) accent_soft else soft, border = if (i == 7) accent else rule)
+    value_in(x, 80, 110, 58, layers[i], size = 15)
+    if (i > 1) flow(x - 30, 109, x - 5, 109)
+  }
+  note(45, 196, "forward for training and inference; backward only while training")
+  note(45, 230, "the cache stores patches, activations and pool argmax positions")
+  dev.off()
+  add(3, "fig-omr-network")
+}
+
+fig_omr_training_loop <- function() {
+  open_fig("fig-omr-training-loop", 1000, 320)
+  steps <- c("sample", "forward", "cross-entropy", "backward", "AdamW")
+  for (i in seq_along(steps)) {
+    x <- 55 + (i - 1) * 185
+    cell(x, 78, 145, 56, fill = soft, border = rule)
+    value_in(x, 78, 145, 56, steps[i], size = 16)
+    if (i > 1) flow(x - 40, 106, x - 8, 106)
+  }
+  flow(882, 152, 882, 230)
+  flow(882, 230, 128, 230)
+  flow(128, 230, 128, 152)
+  note(500, 196, "repeat per batch; validate per epoch", adj = c(0.5, 0.5))
+  note(500, 266, "keep the lowest validation loss and stop when it stops improving", adj = c(0.5, 0.5))
+  dev.off()
+  add(4, "fig-omr-training-loop")
+}
+
+fig_omr_data_factory <- function() {
+  open_fig("fig-omr-data-factory", 1000, 320)
+  steps <- c("isolated MSQ", "page schema", "SVG", "PNG at 6 scales", "labelled crops")
+  for (i in seq_along(steps)) {
+    x <- 45 + (i - 1) * 190
+    cell(x, 70, 150, 54, fill = soft, border = rule)
+    value_in(x, 70, 150, 54, steps[i], size = 15)
+    if (i > 1) flow(x - 40, 97, x - 8, 97)
+  }
+  note(500, 218, "the renderer supplies the class and the box")
+  note(500, 244, "fresh degradation is applied after the clean cache")
+  dev.off()
+  include_rendered_svg("simple-score", 45, 205, 0.38)
+  add(5, "fig-omr-data-factory")
+}
+
+fig_omr_evaluation <- function() {
+  open_fig("fig-omr-evaluation", 1000, 360)
+  cell(45, 55, 270, 210, fill = soft, border = rule)
+  note(70, 42, "confusion matrix")
+  values <- matrix(c(18, 1, 0, 1, 0, 2, 15, 1, 0, 0, 1, 17, 0, 0, 0, 1), 4, 4, byrow = TRUE)
+  for (r in 1:4) for (c in 1:4) {
+    cell(70 + (c - 1) * 48, 70 + (r - 1) * 42, 48, 42, fill = if (r == c) ok_soft else accent_soft, border = "white")
+    value_in(70 + (c - 1) * 48, 70 + (r - 1) * 42, 48, 42, as.character(values[r, c]), size = 14)
+  }
+  cell(385, 55, 270, 210, fill = soft, border = rule)
+  note(410, 42, "scale matrix")
+  for (i in 1:4) {
+    note(410, 76 + (i - 1) * 42, paste0("scale ", c(0.5, 1, 2, 3)[i]))
+    cell(500, 62 + (i - 1) * 42, 110, 24, fill = ok_soft, border = "white")
+    value_in(500, 62 + (i - 1) * 42, 110, 24, "staff + measures", size = 12)
+  }
+  cell(725, 55, 230, 210, fill = soft, border = rule)
+  note(750, 42, "real page")
+  note(750, 82, "uncertain")
+  note(750, 112, "ignored")
+  note(750, 142, "candidates")
+  note(750, 184, "no silent guesses")
+  note(45, 306, "a high crop score is useful only when the complete page schema also holds")
+  dev.off()
+  add(6, "fig-omr-evaluation")
+}
+
 fig_01_the_crop <- function() {
   open_fig("fig-01-the-crop", 640, 252)
   x0 <- 120; y0 <- 60; n <- 8; cw <- 20
@@ -782,7 +1021,12 @@ fig_29_the_check_error <- function() {
   add(29, "fig-29-the-check-error")
 }
 
-for (f in list(fig_01_the_crop, fig_02_the_convolution_window, fig_03_the_relu_over_a_map,
+for (f in list(fig_00_scale_distance, fig_00_scale_thickness, fig_00_scale_thresholds,
+               fig_00_scale_area, fig_00_scale_sequence,
+               fig_omr_overview, fig_omr_measure, fig_omr_cross_stave,
+               fig_omr_network, fig_omr_training_loop, fig_omr_data_factory,
+               fig_omr_evaluation,
+               fig_01_the_crop, fig_02_the_convolution_window, fig_03_the_relu_over_a_map,
                fig_04_im2col, fig_05_relu_and_pool, fig_06_the_two_slopes,
                fig_07_dense_and_softmax, fig_08_the_cost_curve, fig_09_the_two_part_cost,
                fig_10_the_initial_bell, fig_11_gradient_descent, fig_12_the_backward_pass,

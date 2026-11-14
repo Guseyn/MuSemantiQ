@@ -77,6 +77,9 @@ const UNIT_ARTICULATIONS = {
 }
 
 export function buildMusicModel ({ blobs, stems, barLines, curves = [], hairpins = [] }, staves) {
+  if (!staves.length) {
+    return { clefs: [], clefsExplicit: [], keySignatureName: null, timeSignatureParams: null, measures: [] }
+  }
   const staveMusic = staves.map((stave, staveIndex) =>
     buildStaveMusic(blobs, stems, stave, staveIndex)
   )
@@ -93,7 +96,7 @@ export function buildMusicModel ({ blobs, stems, barLines, curves = [], hairpins
       const stavesOfMeasure = systemMusic.map((music, index) => {
         const units = measuresOfStaves[index][measureIndex] || []
         const voices = fillRestsInMeasures(splitVoicesByStemDirection(units, staves[music.staveIndex].staffSpaceHeightPx), measureDuration)
-        markBeamedWithNext(voices)
+        markBeamedWithNext(voices, staves[music.staveIndex].staffSpaceHeightPx)
         return { staveIndex: music.staveIndex, voices }
       })
       measures.push({ measureIndex: measures.length, systemIndex, staves: stavesOfMeasure })
@@ -351,14 +354,14 @@ function dotsOf (chord, staveBlobs, staffSpace) {
 
 // A beam reaches from one stem's end to the next stem's end: the earlier unit
 // of the pair is the beamed one.
-function markBeamedWithNext (voices) {
+function markBeamedWithNext (voices, staffSpaceHeightPx) {
   for (const voice of voices) {
     const withStems = voice.filter((unit) => unit.stem)
     for (let index = 1; index < withStems.length; index++) {
       const previous = withStems[index - 1]
       const current = withStems[index]
       const sharesBeam = previous.stem.beamCount > 0 && current.stem.beamCount > 0 &&
-        previous.stem.beamRows.some((row) => current.stem.beamRows.some((other) => Math.abs(other - row) <= 3))
+        previous.stem.beamRows.some((row) => current.stem.beamRows.some((other) => Math.abs(other - row) <= 0.25 * staffSpaceHeightPx))
       if (sharesBeam) {
         previous.beamedWithNext = true
       }

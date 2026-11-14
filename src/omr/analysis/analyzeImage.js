@@ -36,6 +36,7 @@ export function analyzeStraightenedImage (upright) {
       systemIndex: systemIndexOf(staves, systems, index),
       linesY: stave.linesY.map(roundTo2),
       staffSpaceHeightPx: roundTo2(stave.staffSpaceHeightPx),
+      lineThicknessPx: roundTo2(stave.lineThicknessPx),
       topY: roundTo2(stave.topY),
       bottomY: roundTo2(stave.bottomY),
       xStart: stave.xStart,

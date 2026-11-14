@@ -73,7 +73,7 @@ function hasVerticalConnector ({ width, height, grayscale }, upper, lower, overl
     let longest = 0
     let run = 0
     for (let y = fromY; y <= toY; y++) {
-      if (grayscale[y * width + x] > 0.5) {
+      if (grayscale[y * width + x] > 0.25) {
         run++
         longest = Math.max(longest, run)
       } else {

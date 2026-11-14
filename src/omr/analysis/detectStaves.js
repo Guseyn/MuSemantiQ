@@ -11,9 +11,10 @@
  * of the tool reads against (pixels are removed later, coordinates are not).
  */
 
-const PEAK_THRESHOLD = 0.15
+const PEAK_THRESHOLD = 0.05
 const SPACING_TOLERANCE = 0.25
 const LINE_COVERAGE_MIN = 0.85
+const ANTIALIASED_LINE_INK_THRESHOLD = 0.25
 
 export function detectStaves ({ width, height, grayscale }) {
   const profile = rowInkProfile({ width, height, grayscale })
@@ -37,7 +38,7 @@ function lineCoverage ({ width, height, grayscale }, lineY) {
     let hasInk = false
     for (let offset = -1; offset <= 1; offset++) {
       const y = lineY + offset
-      if (y >= 0 && y < height && grayscale[y * width + x] > 0.5) {
+      if (y >= 0 && y < height && grayscale[y * width + x] > ANTIALIASED_LINE_INK_THRESHOLD) {
         hasInk = true
         break
       }
@@ -116,19 +117,43 @@ function groupPeaksIntoStaves (peaks) {
 }
 
 function buildStave (rawLines, profile, bitmap) {
-  const linesY = rawLines.map((line) => recenterLine(line, profile))
+  const spacing = mean(rawLines.slice(1).map((line, index) => line - rawLines[index]))
+  const linesY = rawLines.map((line) => recenterLine(line, profile, Math.max(2, Math.round(spacing / 4))))
   const gaps = linesY.slice(1).map((line, index) => line - linesY[index])
   const staffSpaceHeightPx = mean(gaps)
   const topY = linesY[0]
   const bottomY = linesY[4]
-  const { xStart, xEnd } = lineExtents(linesY, bitmap)
-  return { linesY, staffSpaceHeightPx, topY, bottomY, xStart, xEnd }
+  const { xStart, xEnd } = lineExtents(linesY, staffSpaceHeightPx, bitmap)
+  const lineThicknessPx = measureLineThickness(linesY, bitmap, xStart, xEnd)
+  return { linesY, staffSpaceHeightPx, lineThicknessPx, topY, bottomY, xStart, xEnd }
+}
+
+function measureLineThickness (linesY, { width, height, grayscale }, xStart, xEnd) {
+  const runs = []
+  const samples = Math.max(5, Math.min(40, xEnd - xStart + 1))
+  for (const line of linesY) {
+    const centerY = Math.round(line)
+    for (let sample = 0; sample < samples; sample++) {
+      const x = Math.round(xStart + (xEnd - xStart) * sample / Math.max(1, samples - 1))
+      let before = 0
+      let after = 0
+      while (centerY - before - 1 >= 0 && grayscale[(centerY - before - 1) * width + x] > 0.25) {
+        before++
+      }
+      while (centerY + after + 1 < height && grayscale[(centerY + after + 1) * width + x] > 0.25) {
+        after++
+      }
+      runs.push(before + after + 1)
+    }
+  }
+  runs.sort((first, second) => first - second)
+  return runs.length ? Math.max(1, runs[Math.floor(runs.length / 2)]) : 1
 }
 
 // Interpolated lines have no ink to re-centre on and keep their guess.
-function recenterLine (line, profile) {
-  const from = Math.max(0, Math.round(line) - 2)
-  const to = Math.min(profile.length - 1, Math.round(line) + 2)
+function recenterLine (line, profile, window) {
+  const from = Math.max(0, Math.round(line) - window)
+  const to = Math.min(profile.length - 1, Math.round(line) + window)
   let weighted = 0
   let total = 0
   for (let y = from; y <= to; y++) {
@@ -140,8 +165,8 @@ function recenterLine (line, profile) {
 
 // Each staff line owns one long horizontal span. Their consensus excludes a
 // brace at the left, while a slur or beam crossing the line cannot shorten it.
-function lineExtents (linesY, { width, height, grayscale }) {
-  const runs = linesY.map((line) => horizontalSpan({ width, height, grayscale }, Math.round(line)))
+function lineExtents (linesY, staffSpaceHeightPx, { width, height, grayscale }) {
+  const runs = linesY.map((line) => horizontalSpan({ width, height, grayscale }, Math.round(line), 8 * staffSpaceHeightPx))
   const starts = runs.map((run) => run.start)
   const ends = runs.map((run) => run.end)
   const xStart = Math.min(...starts)
@@ -152,7 +177,7 @@ function lineExtents (linesY, { width, height, grayscale }) {
   return { xStart, xEnd }
 }
 
-function horizontalSpan ({ width, height, grayscale }, lineY) {
+function horizontalSpan ({ width, height, grayscale }, lineY, minimumRunLength) {
   let best = { start: 0, end: -1, length: 0 }
   for (const offset of [ 0, -1, 1 ]) {
     const y = lineY + offset
@@ -164,21 +189,32 @@ function horizontalSpan ({ width, height, grayscale }, lineY) {
     let runStart = 0
     let longestStart = 0
     let longestLength = 0
+    let firstValidStart = -1
+    let lastValidEnd = -1
     for (let x = 0; x <= width; x++) {
-      const ink = x < width && grayscale[y * width + x] > 0.5
+      const ink = x < width && grayscale[y * width + x] > 0.25
       if (ink) {
         if (firstInk < 0) firstInk = x
         lastInk = x
       } else {
-        if (x - runStart > longestLength) {
+        const length = x - runStart
+        if (length > longestLength) {
           longestStart = runStart
-          longestLength = x - runStart
+          longestLength = length
+        }
+        if (length >= minimumRunLength) {
+          if (firstValidStart < 0) firstValidStart = runStart
+          lastValidEnd = x - 1
         }
         runStart = x + 1
       }
     }
     if (lastInk - firstInk + 1 > best.length) {
-      best = { start: longestStart, end: lastInk, length: lastInk - firstInk + 1 }
+      best = {
+        start: firstValidStart >= 0 ? firstValidStart : longestStart,
+        end: lastValidEnd >= 0 ? lastValidEnd : lastInk,
+        length: lastInk - firstInk + 1
+      }
     }
   }
   return best

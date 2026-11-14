@@ -234,6 +234,9 @@ training-data/</code></pre>
 <!-- ============================ 6 ============================ -->
 <section id="test">
 <h2><span class="n">6</span>Test it locally <a class="totop" href="#workflow">↑</a></h2>
+<p>Renderer examples are generated at <b>0.5×, 0.75×, 1×, 1.5×, 2× and 3×</b>. SVG bounds are scaled into raster coordinates, staff space and line thickness are measured again at each scale, and only then is the crop normalized. This is part of the data contract, not an augmentation afterthought.</p>
+<p>Check complete-page staff and measure structure at several scales without training:</p>
+<pre><code>npm run omr:scale -- --weights=training-data/runs/&lt;run-id&gt;/best-weights.json --scales=0.5,1,2,3</code></pre>
 <p>Start with the candidate, not with the shipped file. This evaluates fresh renderer samples in both fonts and runs the real CLI fixture without replacing anything:</p>
 <pre><code>npm run omr:evaluate -- --weights=training-data/runs/&lt;run-id&gt;/best-weights.json --fixture=omr-cli-app/score.png</code></pre>
 <p>Compare the metrics and the class histogram. A candidate is adopted only when the real output is also acceptable.</p>

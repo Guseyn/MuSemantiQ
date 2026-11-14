@@ -35,8 +35,8 @@ export function findStems ({ width, height, grayscale }, staves) {
       }
     }
   }
-  return mergeAdjacentColumns(stems).filter((stem) =>
-    stem.columns <= Math.max(3, 0.3 * staves[stem.staveIndex].staffSpaceHeightPx))
+  return mergeAdjacentColumns(stems, staves).filter((stem) =>
+    stem.columns <= Math.max(1, 0.3 * staves[stem.staveIndex].staffSpaceHeightPx))
 }
 
 // Wide rows at the outer end are beams; smaller ink beside the tip is flags.
@@ -55,20 +55,20 @@ export function measureStemEnds (stem, bitmap, staffSpace, outerEnd) {
   }
   let beamCount = 0
   for (let index = 0; index < beamRows.length; index++) {
-    if (index === 0 || beamRows[index] - beamRows[index - 1] > 1) {
+    if (index === 0 || beamRows[index] - beamRows[index - 1] > Math.max(1, 0.15 * staffSpace)) {
       beamCount++
     }
   }
   stem.beamRows = beamRows
   stem.beamCount = beamCount
-  stem.flagCount = beamCount ? 0 : Math.min(Math.ceil(flagRows / 2), 6)
+  stem.flagCount = beamCount ? 0 : Math.min(Math.ceil(flagRows / Math.max(1, staffSpace / 4)), 6)
 }
 
 function verticalRuns ({ width, grayscale }, x, fromY, toY) {
   const runs = []
   let start = null
   for (let y = fromY; y <= toY; y++) {
-    const ink = grayscale[y * width + x] > 0.5
+    const ink = grayscale[y * width + x] > 0.25
     if (ink && start === null) {
       start = y
     }
@@ -89,24 +89,24 @@ function horizontalExtent ({ width, height, grayscale }, y, centerX) {
   }
   let left = Math.round(centerX)
   let right = Math.round(centerX)
-  while (left - 1 >= 0 && grayscale[y * width + left - 1] > 0.5) {
+  while (left - 1 >= 0 && grayscale[y * width + left - 1] > 0.25) {
     left--
   }
-  while (right + 1 < width && grayscale[y * width + right + 1] > 0.5) {
+  while (right + 1 < width && grayscale[y * width + right + 1] > 0.25) {
     right++
   }
   return right - left + 1
 }
 
 // A stem two pixels wide is one stem, found once per column it covers.
-function mergeAdjacentColumns (stems) {
+function mergeAdjacentColumns (stems, staves) {
   const merged = []
   for (const stem of stems) {
     const neighbour = merged.find((other) =>
       other.staveIndex === stem.staveIndex &&
       Math.abs(other.x - stem.x) <= 1 &&
-      Math.abs(other.y1 - stem.y1) <= 2 &&
-      Math.abs(other.y2 - stem.y2) <= 2
+      Math.abs(other.y1 - stem.y1) <= Math.max(1, 0.15 * staves[stem.staveIndex].staffSpaceHeightPx) &&
+      Math.abs(other.y2 - stem.y2) <= Math.max(1, 0.15 * staves[stem.staveIndex].staffSpaceHeightPx)
     )
     if (neighbour) {
       neighbour.x = (neighbour.x + stem.x) / 2

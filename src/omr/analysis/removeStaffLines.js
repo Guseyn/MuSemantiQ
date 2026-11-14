@@ -17,20 +17,21 @@
  * survive outside the line band.
  */
 
-const LINE_HALF_WIDTH_IN_PIXELS = 1.5
 const LINE_LENGTH_IN_STAFF_SPACES = 8
-const THIN_RUN_IN_PIXELS = 6
 
 export function removeStaffLines ({ width, height, grayscale }, staves) {
   const cleaned = new Float32Array(grayscale)
   for (const stave of staves) {
     const lineLength = LINE_LENGTH_IN_STAFF_SPACES * stave.staffSpaceHeightPx
+    const lineThickness = stave.lineThicknessPx || measureLineThickness(stave, { width, height, grayscale })
+    const halfWidth = lineThickness / 2 + 0.25
+    const maximumThinRun = Math.max(2, 2 * lineThickness)
     for (const line of stave.linesY) {
-      const from = Math.round(line - LINE_HALF_WIDTH_IN_PIXELS)
-      const to = Math.round(line + LINE_HALF_WIDTH_IN_PIXELS)
+      const from = Math.round(line - halfWidth)
+      const to = Math.round(line + halfWidth)
       for (let y = from; y <= to; y++) {
         for (let x = stave.xStart; x <= stave.xEnd; x++) {
-          if (grayscale[y * width + x] > 0.5 && isLinePixel(grayscale, width, height, x, y, lineLength)) {
+          if (grayscale[y * width + x] > 0.25 && isLinePixel(grayscale, width, height, x, y, lineLength, maximumThinRun)) {
             cleaned[y * width + x] = 0
           }
         }
@@ -40,22 +41,36 @@ export function removeStaffLines ({ width, height, grayscale }, staves) {
   return { width, height, grayscale: cleaned }
 }
 
-function isLinePixel (grayscale, width, height, x, y, lineLength) {
+function isLinePixel (grayscale, width, height, x, y, lineLength, maximumThinRun) {
   const vertical = verticalRunAround(grayscale, width, height, x, y)
-  if (vertical > THIN_RUN_IN_PIXELS) {
+  if (vertical > maximumThinRun) {
     return false
   }
   const horizontal = horizontalRunLength(grayscale, width, y, x)
-  return horizontal >= lineLength || horizontal <= 3
+  return horizontal >= lineLength
+}
+
+function measureLineThickness (stave, { width, height, grayscale }) {
+  const runs = []
+  const samples = Math.max(5, Math.min(40, stave.xEnd - stave.xStart + 1))
+  for (const line of stave.linesY) {
+    const centerY = Math.round(line)
+    for (let sample = 0; sample < samples; sample++) {
+      const x = Math.round(stave.xStart + (stave.xEnd - stave.xStart) * sample / Math.max(1, samples - 1))
+      runs.push(verticalRunAround(grayscale, width, height, x, centerY))
+    }
+  }
+  runs.sort((first, second) => first - second)
+  return runs.length ? Math.max(1, runs[Math.floor(runs.length / 2)]) : 1
 }
 
 function verticalRunAround (grayscale, width, height, x, y) {
   let before = 0
-  while (y - before - 1 >= 0 && grayscale[(y - before - 1) * width + x] > 0.5) {
+  while (y - before - 1 >= 0 && grayscale[(y - before - 1) * width + x] > 0.25) {
     before++
   }
   let after = 0
-  while (y + after + 1 < height && grayscale[(y + after + 1) * width + x] > 0.5) {
+  while (y + after + 1 < height && grayscale[(y + after + 1) * width + x] > 0.25) {
     after++
   }
   return before + after + 1
@@ -64,10 +79,10 @@ function verticalRunAround (grayscale, width, height, x, y) {
 function horizontalRunLength (grayscale, width, y, x) {
   let left = x
   let right = x
-  while (left - 1 >= 0 && grayscale[y * width + left - 1] > 0.5) {
+  while (left - 1 >= 0 && grayscale[y * width + left - 1] > 0.25) {
     left--
   }
-  while (right + 1 < width && grayscale[y * width + right + 1] > 0.5) {
+  while (right + 1 < width && grayscale[y * width + right + 1] > 0.25) {
     right++
   }
   return right - left + 1

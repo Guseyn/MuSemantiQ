@@ -9,7 +9,7 @@
  * from where they sit around the systems. What the words say is not read here.
  */
 
-const INK_THRESHOLD = 0.5
+const INK_THRESHOLD = 0.25
 const STAVE_MARGIN_IN_STAFF_SPACES = 0.3
 const ROW_GAP_IN_STAFF_SPACES = 0.4
 const COLUMN_GAP_IN_STAFF_SPACES = 1
@@ -102,6 +102,9 @@ function splitBandIntoBlocks (band, mask, width, staffSpaceHeightPx) {
 }
 
 function roleOfBlock (block, { width, systems, staffSpaceHeightPx, blocks }) {
+  if (!systems.length) {
+    return 'text'
+  }
   const centerX = block.x + block.w / 2
   const centerY = block.y + block.h / 2
   const pageCenterX = width / 2

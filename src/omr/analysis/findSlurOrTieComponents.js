@@ -46,7 +46,7 @@ function averageCenterAt (grayscale, width, box, fromFraction, toFraction) {
   let count = 0
   for (let x = fromX; x <= toX; x++) {
     for (let y = box.y; y < box.y + box.h; y++) {
-      if (grayscale[y * width + x] > 0.5) {
+      if (grayscale[y * width + x] > 0.25) {
         totalY += y
         count++
       }

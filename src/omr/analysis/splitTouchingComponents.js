@@ -57,7 +57,7 @@ function measurePiece ({ width, grayscale }, box, start, end) {
   let ink = 0
   for (let x = box.x + start; x <= box.x + end; x++) {
     for (let y = box.y; y < box.y + box.h; y++) {
-      if (grayscale[y * width + x] > 0.5) {
+      if (grayscale[y * width + x] > 0.25) {
         minY = Math.min(minY, y)
         maxY = Math.max(maxY, y)
         ink++

@@ -81,7 +81,8 @@ function clearVerticalRuns (bitmap, runs) {
   const cleared = new Float32Array(bitmap.grayscale)
   for (const run of runs) {
     const center = Math.round(run.x)
-    for (let x = center - 1; x <= center + 1; x++) {
+    const halfWidth = Math.max(0, Math.floor((run.columns || 1) / 2))
+    for (let x = center - halfWidth; x <= center + halfWidth; x++) {
       for (let y = Math.round(run.y1); y <= Math.round(run.y2); y++) {
         if (x >= 0 && x < bitmap.width && y >= 0 && y < bitmap.height) {
           cleared[y * bitmap.width + x] = 0
