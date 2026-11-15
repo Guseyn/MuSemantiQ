@@ -16,4 +16,4 @@ rsync -az -e "ssh -i $HOME/unisonofficial_rsa" \
   "$REMOTE_HOST:$REMOTE_DIR/$SYMBOL_RUN_DIR/" "$REPOSITORY_ROOT/$SYMBOL_RUN_DIR/"
 rsync -az -e "ssh -i $HOME/unisonofficial_rsa" \
   "$REMOTE_HOST:$REMOTE_DIR/$OCR_RUN_DIR/" "$REPOSITORY_ROOT/$OCR_RUN_DIR/"
-"$SCRIPT_DIR/combine"
+printf 'Both runs downloaded. Run combine next.\n'

@@ -40,8 +40,4 @@ ssh -A -i "$HOME/unisonofficial_rsa" "$REMOTE_HOST" "cd $(printf '%q' "$REMOTE_D
   --isolated-per-class=$ISOLATED_PER_CLASS \
   --out=$RUN_DIR"
 
-printf '==> Download the symbol artifact\n'
-mkdir -p "$REPOSITORY_ROOT/$RUN_DIR"
-rsync -az -e "ssh -i $HOME/unisonofficial_rsa" \
-  "$REMOTE_HOST:$REMOTE_DIR/$RUN_DIR/" "$REPOSITORY_ROOT/$RUN_DIR/"
-printf 'Symbol artifact and training.log: %s\n' "$RUN_DIR"
+printf 'Symbol training finished remotely. Run download when both trainers are done.\n'

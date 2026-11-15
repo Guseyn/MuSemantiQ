@@ -8,4 +8,5 @@ export OMR_SKIP_UPLOAD=0
 "$SCRIPT_DIR/train-symbols"
 export OMR_SKIP_UPLOAD=1
 "$SCRIPT_DIR/train-ocr"
+"$SCRIPT_DIR/download"
 "$SCRIPT_DIR/combine"
