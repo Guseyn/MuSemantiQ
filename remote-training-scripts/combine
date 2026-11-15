@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+SYMBOL_RUN_DIR='training-data/symbol-runs/candidate'
+OCR_RUN_DIR='training-data/text-runs/candidate-ocr'
+CANDIDATE='training-data/candidates/combined.json'
+REPOSITORY_ROOT="$(cd "$(dirname "$0")" && pwd)"
+REPOSITORY_ROOT="$(cd "$REPOSITORY_ROOT/.." && pwd)"
+
+if [[ ! -f "$REPOSITORY_ROOT/$SYMBOL_RUN_DIR/best-weights.json" ]]; then
+  printf 'error: symbol weights are missing: %s\n' "$SYMBOL_RUN_DIR/best-weights.json" >&2
+  exit 1
+fi
+if [[ ! -f "$REPOSITORY_ROOT/$OCR_RUN_DIR/best-weights.json" ]]; then
+  printf 'error: OCR weights are missing: %s\n' "$OCR_RUN_DIR/best-weights.json" >&2
+  exit 1
+fi
+(cd "$REPOSITORY_ROOT" && node scripts/omr-combine-artifacts.js \
+  --symbols="$SYMBOL_RUN_DIR/best-weights.json" \
+  --ocr="$OCR_RUN_DIR/best-weights.json" \
+  --out="$CANDIDATE")
+printf 'Combined candidate: %s\n' "$CANDIDATE"

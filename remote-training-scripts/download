@@ -6,9 +6,8 @@ REMOTE_HOST='root@146.190.232.49'
 REMOTE_DIR='MuSemantiQ'
 SYMBOL_RUN_DIR='training-data/symbol-runs/candidate'
 OCR_RUN_DIR='training-data/text-runs/candidate-ocr'
-CANDIDATE='training-data/candidates/combined.json'
-REPOSITORY_ROOT="$(cd "$(dirname "$0")" && pwd)"
-REPOSITORY_ROOT="$(cd "$REPOSITORY_ROOT/.." && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+REPOSITORY_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 printf '==> Download both training runs\n'
 ssh-add --apple-use-keychain "$HOME/unisonofficial_rsa"
@@ -17,8 +16,4 @@ rsync -az -e "ssh -i $HOME/unisonofficial_rsa" \
   "$REMOTE_HOST:$REMOTE_DIR/$SYMBOL_RUN_DIR/" "$REPOSITORY_ROOT/$SYMBOL_RUN_DIR/"
 rsync -az -e "ssh -i $HOME/unisonofficial_rsa" \
   "$REMOTE_HOST:$REMOTE_DIR/$OCR_RUN_DIR/" "$REPOSITORY_ROOT/$OCR_RUN_DIR/"
-(cd "$REPOSITORY_ROOT" && node scripts/omr-combine-artifacts.js \
-  --symbols="$SYMBOL_RUN_DIR/best-weights.json" \
-  --ocr="$OCR_RUN_DIR/best-weights.json" \
-  --out="$CANDIDATE")
-printf 'Combined candidate: %s\n' "$CANDIDATE"
+"$SCRIPT_DIR/combine"

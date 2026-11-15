@@ -34,7 +34,8 @@ p { max-width: 72ch; margin: 8px 0; }
 ul, ol { max-width: 72ch; padding-left: 22px; }
 li { margin: 4px 0; }
 code { font: .87em var(--mono); background: var(--soft); padding: 0 4px; border-radius: 3px; }
-pre { background: #fff; border: 1px solid var(--rule); border-radius: 4px; padding: 12px 16px; overflow-x: auto; font: 12.5px/1.7 var(--mono); margin: 12px 0; }
+pre { background: var(--soft); border: 1px solid var(--rule); border-radius: 8px; padding: 16px 18px; overflow-x: auto; font: 14px/1.75 var(--mono); margin: 16px 0 20px; }
+pre code { background: transparent; padding: 0; font: inherit; }
 pre .cm { color: var(--muted); }
 .totop { float: right; font: 500 11.5px var(--mono); }
 .note { border-left: 3px solid var(--accent); background: var(--accent-soft); padding: 10px 14px; border-radius: 0 7px 7px 0; margin: 14px 0; max-width: 72ch; }
@@ -156,16 +157,30 @@ figcaption { font: 12px var(--mono); color: var(--muted); margin-top: 6px; }
 
 <h3>3.3 Train the symbol model remotely</h3>
 <p>Run the symbol trainer against the frozen bundle. The script uploads the checkout if needed, starts the remote run, downloads its log, history and manifest, and leaves the symbol artifact in the configured run directory:</p>
-<pre><code>./remote-training-scripts/train</code></pre>
+<pre><code>./remote-training-scripts/train-symbols</code></pre>
 <p>The composition split is already frozen. Training reads only the <code>train</code> partition and validates on <code>validation</code>; <code>test</code>, including Allegro Burlesco, remains untouched until candidate verification. The flags select a candidate's shape and data, not an accuracy guarantee.</p>
 
 <h3>3.4 Train the six-language OCR model remotely</h3>
-<p>The same <code>train</code> file also starts the OCR run from the frozen checkout. It writes <code>best-weights.json</code>, <code>history.json</code>, <code>manifest.json</code> and <code>training.log</code> in the configured OCR run directory:</p>
-<pre><code>./remote-training-scripts/train</code></pre>
+<p>Run <code>train-ocr</code> separately when you are ready for the text model. It writes <code>best-weights.json</code>, <code>history.json</code>, <code>manifest.json</code> and <code>training.log</code> in the configured OCR run directory:</p>
+<pre><code>./remote-training-scripts/train-ocr</code></pre>
 <p>The alphabet covers English, French, German, Italian, Spanish and Russian, with accented Latin and Cyrillic characters, digits, punctuation and typographic spaces. Training uses the renderer's own Noto Serif, Noto Sans, Gentium Plus and Gothic A1 glyph paths, at several sizes and scales. Dynamic and chord-letter targets are extracted from the page schema; no dictionary or spelling stage repairs an uncertain character.</p>
 
 <div class="note"><b>Implemented is not verified</b> These commands and data paths are implemented. Do not publish a weight-based accuracy claim until a named combined candidate has passed candidate verification and you have read its remaining differences and uncertainties.</div>
 </section>
+
+<h3>3.5 The files in one training run</h3>
+<p>Each symbol or OCR run directory contains four different artifacts:</p>
+<table>
+<thead><tr><th>File</th><th>What it contains</th><th>Why you need it</th></tr></thead>
+<tbody>
+<tr><td><code>best-weights.json</code></td><td>The model's <code>shape</code>, convolutional and dense layer weights and biases, and the ordered <code>classIds</code>. The checkpoint is the one with the lowest validation loss, not necessarily the last epoch. Symbol classes are notation classes; OCR classes are Unicode characters.</td><td>This is the actual inference model. It has no optimizer state.</td></tr>
+<tr><td><code>history.json</code></td><td>One record per epoch: training loss and accuracy, validation loss and accuracy, and elapsed seconds.</td><td>Shows how training progressed and why the best checkpoint was selected.</td></tr>
+<tr><td><code>manifest.json</code></td><td>Run metadata: run type, seed, grid size, sample and validation counts, and the SHA-256 of <code>best-weights.json</code>.</td><td>Identifies the exact run and lets you verify that the downloaded weights were not changed.</td></tr>
+<tr><td><code>training.log</code></td><td>Human-readable epoch, batch, validation and error output, including the final checkpoint path and hash.</td><td>Use it to watch progress and diagnose a failed run.</td></tr>
+</tbody>
+</table>
+<p>The run-level <code>manifest.json</code> is not the same as <code>training-data/remote-bundle/manifest.json</code>. The latter is the frozen dataset manifest: it records the code, data and config hashes and all full-page samples, splits, styles, mutations, canonical targets and PNG hashes. The training run consumes that dataset manifest and produces its own smaller run manifest.</p>
+<p>After both runs finish, <code>omr-combine-artifacts</code> writes <code>training-data/candidates/combined.json</code>. That candidate contains the symbol model at the top level, the OCR model under <code>ocr</code>, and metadata with both input hashes. It is the file you pass to translation and verification.</p>
 
 <hr>
 
@@ -201,8 +216,10 @@ training-data/</code></pre>
 <!-- ============================ 5 ============================ -->
 <section id="home">
 <h2><span class="n">5</span>Bring both artifacts home and combine them <a class="totop" href="#workflow">↑</a></h2>
-<p>Download both runs and combine them without changing either model. The script checks the artifact shapes and records both source hashes:</p>
-<pre><code>./remote-training-scripts/download</code></pre>
+<p>Download both runs and combine them without changing either model. The script checks the artifact shapes and records both source hashes. The combined <code>train</code> workflow calls <code>combine</code> directly instead, so it does not download twice:</p>
+<pre><code>./remote-training-scripts/download
+# or, with both run directories already present:
+./remote-training-scripts/combine</code></pre>
 <p>The metadata records both source hashes. Pass <code>training-data/candidates/combined.json</code> to every later check; do not replace it halfway through verification.</p>
 </section>
 
@@ -248,17 +265,24 @@ console.log(report.uncertain)</code></pre>
 <!-- ============================ 7 ============================ -->
 <section id="cheat">
 <h2><span class="n">7</span>Cheat sheet <a class="totop" href="#workflow">↑</a></h2>
-<p>Set the host once, then use the complete workflow or its individual phases:</p>
+<p>Freeze once, then train the two models in parallel in separate terminals. Each trainer downloads its own artifact and log, so you <code>tail -F</code> either <code>training.log</code> while it runs. When both terminals finish, nest and verify yourself:</p>
 <pre><code><span class="cm"># the host and settings are inside each self-contained script</span>
 ssh -A -i ~/unisonofficial_rsa root@146.190.232.49
 
-<span class="cm"># everything: checks, bundle, upload, both runs, download, combine and verify</span>
-./remote-training-scripts/run
-
-<span class="cm"># or run each phase yourself</span>
+<span class="cm"># once: freeze code, docs, data and configuration</span>
 ./remote-training-scripts/prepare
-./remote-training-scripts/train
+
+<span class="cm"># terminal 1                          # terminal 2</span>
+./remote-training-scripts/train-symbols
+                                      ./remote-training-scripts/train-ocr
+
+<span class="cm"># when both terminals finish, nest the two artifacts</span>
+./remote-training-scripts/combine
+
+<span class="cm"># re-fetch both artifacts without retraining (combine runs again)</span>
 ./remote-training-scripts/download
+
+<span class="cm"># verify the combined candidate</span>
 ./remote-training-scripts/verify</code></pre>
 <p>Keep the selected artifact, both training manifests and logs, and the verification JSON together. They are the evidence for that candidate; the implementation alone is not an accuracy result.</p>
 </section>

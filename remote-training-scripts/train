@@ -2,58 +2,10 @@
 
 set -euo pipefail
 
-REMOTE_HOST='root@146.190.232.49'
-REMOTE_DIR='MuSemantiQ'
-BUNDLE_DIR='training-data/remote-bundle'
-SYMBOL_RUN_DIR='training-data/symbol-runs/candidate'
-OCR_RUN_DIR='training-data/text-runs/candidate-ocr'
-CANDIDATE='training-data/candidates/combined.json'
-REPOSITORY_ROOT="$(cd "$(dirname "$0")" && pwd)"
-REPOSITORY_ROOT="$(cd "$REPOSITORY_ROOT/.." && pwd)"
-EPOCHS=40
-OCR_EPOCHS=20
-GRID=48
-SEED=20261115
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
-if [[ ! -f "$REPOSITORY_ROOT/$BUNDLE_DIR/manifest.json" ]]; then
-  printf 'error: no frozen bundle; run remote-training-scripts/prepare first\n' >&2
-  exit 1
-fi
-
-printf '==> Upload the frozen checkout\n'
-ssh-add --apple-use-keychain "$HOME/unisonofficial_rsa"
-ssh -A -i "$HOME/unisonofficial_rsa" "$REMOTE_HOST" "mkdir -p $(printf '%q' "$REMOTE_DIR")"
-rsync -az -e "ssh -i $HOME/unisonofficial_rsa" \
-  --exclude=.git \
-  --exclude=node_modules \
-  --exclude=training-data/runs \
-  --exclude=training-data/text-runs \
-  --exclude=training-data/candidates \
-  "$REPOSITORY_ROOT/" "$REMOTE_HOST:$REMOTE_DIR/"
-
-printf '==> Train symbols remotely\n'
-ssh -A -i "$HOME/unisonofficial_rsa" "$REMOTE_HOST" "cd $(printf '%q' "$REMOTE_DIR") && node scripts/omr-train-full-page.js \
-  --data=$BUNDLE_DIR/manifest.json \
-  --epochs=$EPOCHS \
-  --grid=$GRID \
-  --seed=$SEED \
-  --out=$SYMBOL_RUN_DIR"
-
-printf '==> Train six-language OCR remotely\n'
-ssh -A -i "$HOME/unisonofficial_rsa" "$REMOTE_HOST" "cd $(printf '%q' "$REMOTE_DIR") && node scripts/omr-train-text.js \
-  --epochs=$OCR_EPOCHS \
-  --grid=$GRID \
-  --seed=$SEED \
-  --out=$OCR_RUN_DIR"
-
-printf '==> Download and combine the artifacts\n'
-mkdir -p "$REPOSITORY_ROOT/$SYMBOL_RUN_DIR" "$REPOSITORY_ROOT/$OCR_RUN_DIR"
-rsync -az -e "ssh -i $HOME/unisonofficial_rsa" \
-  "$REMOTE_HOST:$REMOTE_DIR/$SYMBOL_RUN_DIR/" "$REPOSITORY_ROOT/$SYMBOL_RUN_DIR/"
-rsync -az -e "ssh -i $HOME/unisonofficial_rsa" \
-  "$REMOTE_HOST:$REMOTE_DIR/$OCR_RUN_DIR/" "$REPOSITORY_ROOT/$OCR_RUN_DIR/"
-(cd "$REPOSITORY_ROOT" && node scripts/omr-combine-artifacts.js \
-  --symbols="$SYMBOL_RUN_DIR/best-weights.json" \
-  --ocr="$OCR_RUN_DIR/best-weights.json" \
-  --out="$CANDIDATE")
-printf 'Combined candidate: %s\n' "$CANDIDATE"
+export OMR_SKIP_UPLOAD=0
+"$SCRIPT_DIR/train-symbols"
+export OMR_SKIP_UPLOAD=1
+"$SCRIPT_DIR/train-ocr"
+"$SCRIPT_DIR/combine"

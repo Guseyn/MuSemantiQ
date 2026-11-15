@@ -619,11 +619,11 @@ svg.sys { display: block; width: 100%; height: auto; }
 .node text.k { font: 500 9.5px var(--font-mono); fill: var(--muted); }
 .state { padding: 10px 12px; display: grid; gap: 7px; }
 .state h3 { margin: 0; font: 500 11px var(--font-mono); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
-pre.msg { margin: 0; font: 11.5px/1.5 var(--font-mono); background: var(--code-bg); border: 1px solid var(--line); border-radius: 5px; padding: 8px 10px; overflow: auto; max-height: 320px; white-space: pre-wrap; overflow-wrap: anywhere; }
-.codebox { height: min(72vh, 760px); overflow: auto; background: var(--code-bg); border-radius: 0 0 8px 8px; }
-.codebox ol { list-style: none; margin: 0; padding: 8px 0; font: 12px/1.55 var(--font-mono); min-width: max-content; }
-.codebox li { display: grid; grid-template-columns: 54px 1fr; padding-right: 16px; border-left: 3px solid transparent; }
-.codebox li .n { color: var(--muted); text-align: right; padding-right: 14px; user-select: none; opacity: .7; }
+pre.msg { margin: 0; font: 13px/1.65 var(--font-mono); background: var(--code-bg); border: 1px solid var(--line); border-radius: 7px; padding: 12px 14px; overflow: auto; max-height: 360px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.codebox { height: min(78vh, 900px); overflow: auto; background: var(--code-bg); border-radius: 0 0 8px 8px; }
+.codebox ol { list-style: none; margin: 0; padding: 10px 0; font: 14px/1.7 var(--font-mono); min-width: max-content; }
+.codebox li { display: grid; grid-template-columns: 64px 1fr; padding-right: 18px; border-left: 3px solid transparent; }
+.codebox li .n { color: var(--muted); text-align: right; padding-right: 18px; user-select: none; opacity: .7; }
 .codebox li code { font: inherit; white-space: pre; color: var(--fg); }
 .codebox li.hl { background: var(--accent-soft); border-left-color: var(--accent); }
 .codebox li.hl .n { color: var(--accent); opacity: 1; }
@@ -637,7 +637,7 @@ h3 { margin: 18px 0 6px; font-size: 15px; }
 .workflow p, .workflow li, .inventory p { max-width: 100ch; }
 .workflow ol { padding-left: 24px; }
 .workflow li { margin: 7px 0; }
-pre.command { background: var(--code-bg); border: 1px solid var(--line); border-radius: 5px; padding: 10px 12px; overflow-x: auto; font-size: 12px; }
+pre.command { background: var(--code-bg); border: 1px solid var(--line); border-radius: 7px; padding: 14px 16px; overflow-x: auto; font: 14px/1.7 var(--font-mono); }
 .warning { color: var(--muted); font-size: 14px; }
 .inventory-tools { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin: 10px 0; }
 #filter { flex: 1; min-width: 240px; font: 13px var(--font-mono); color: var(--fg); background: var(--code-bg); border: 1px solid var(--line); border-radius: 5px; padding: 7px 10px; }

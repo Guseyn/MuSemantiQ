@@ -26,12 +26,18 @@ const gridSize = Number(options.grid || 48)
 const training = await loadFullPageSymbolTrainingSet({ manifestPath: options.data, split: 'train', gridSize, seed })
 const validation = await loadFullPageSymbolTrainingSet({ manifestPath: options.data, split: 'validation', gridSize, otherSamples: 20, seed: seed + 1 })
 const { classIds } = training
-const isolated = await generateRendererTrainingSet({
-  seed,
-  samplesPerClass: Number(options['isolated-per-class'] || 1),
-  gridSize,
-  classIds
-})
+const log = (line) => {
+  fs.appendFileSync(`${runDirectory}/training.log`, `${line}\n`)
+  console.log(line)
+}
+log(`data loaded: ${training.samples.length} training · ${validation.samples.length} validation`)
+const isolatedPerClass = Number(options['isolated-per-class'] ?? 0)
+if (isolatedPerClass > 0) {
+  log(`generating isolated renderer samples: ${isolatedPerClass} per class`)
+}
+const isolated = isolatedPerClass > 0
+  ? await generateRendererTrainingSet({ seed, samplesPerClass: isolatedPerClass, gridSize, classIds })
+  : { samples: [] }
 const trainingSamples = [ ...training.samples, ...isolated.samples ]
 const validationSamples = [ ...validation.samples, ...isolated.samples.filter((sample, index) => index % 5 === 0) ]
 const model = createModel({
@@ -41,10 +47,7 @@ const model = createModel({
   denseSize: Number(options.dense || 64),
   classCount: classIds.length
 }, seed)
-const log = (line) => {
-  fs.appendFileSync(`${runDirectory}/training.log`, `${line}\n`)
-  console.log(line)
-}
+log(`model created; starting training`)
 const { model: bestModel, history } = await trainModel({
   model,
   trainingSamples,
@@ -60,6 +63,11 @@ const { model: bestModel, history } = await trainModel({
   batchSize: Number(options.batch || 32),
   learningRate: Number(options['learning-rate'] || 0.001),
   seed,
+  onBatch: ({ epoch, batchesDone, batchesTotal, runningLoss }) => {
+    if (batchesDone % 25 === 0 || batchesDone === batchesTotal) {
+      log(`epoch ${epoch} · batch ${batchesDone}/${batchesTotal} · running loss ${runningLoss}`)
+    }
+  },
   onEpoch: (entry) => log(JSON.stringify(entry))
 })
 const { json, hash } = exportWeights(bestModel, classIds)
