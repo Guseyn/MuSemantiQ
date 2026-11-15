@@ -136,10 +136,10 @@ details.file summary:hover { background: var(--accent-soft); }
   </header>
   <p class="intro">The animated walkthrough follows the current implementation, not the earlier OMR draft. Below it, the inventory contains every JavaScript file under <code>src/omr/</code>, the OMR CLI and scripts, and the remote shell scripts. Select any file or function to read the exact source captured by the generator.</p>
   <div class="facts">
-    <span>161 source files</span>
+    <span>162 source files</span>
     <span>482 declared functions</span>
     <span>6 walkthroughs · 54 frames</span>
-    <span>snapshot cf81d6dc49539af7</span>
+    <span>snapshot e33d9ae0e87f04e5</span>
   </div>
   <div class="notice"><b>Pre-training status.</b> This page describes code and data preparation, not a trained result. It makes no accuracy claim. The documented sequence freezes code and documentation first, then starts the symbol and six-language OCR runs manually on the remote trainer. This HTML was generated without running OMR tests, data preparation, training, scale checks, verification or the CLI.</div>
 
@@ -214,7 +214,7 @@ node omr-cli-app/omr.js --weights=&lt;combined-candidate.json&gt; --input=score.
     <p>Paths, exports, line ranges and source come directly from the working tree at generation time. The function list includes named function declarations and named block-bodied arrow functions, exported or internal; anonymous callbacks are not listed separately. Constant-only modules and shell scripts correctly have an empty function list.</p>
     <div class="inventory-tools">
       <input id="filter" type="search" placeholder="Filter by path, export, function or summary" aria-label="Filter source inventory">
-      <span id="inventory-count">161 / 161 files</span>
+      <span id="inventory-count">162 / 162 files</span>
     </div>
     <div class="files" id="files">
       <details class="file" data-search="omr-cli-app/args.js the flags: what to read, where to write. whatever a flag leaves out, the cli asks about instead. parseargs parseargs takevalue">
@@ -299,7 +299,7 @@ node omr-cli-app/omr.js --weights=&lt;combined-candidate.json&gt; --input=score.
         </div>
       </details>
       <details class="file" data-search="remote-training-scripts/pull ">
-        <summary><span class="file-path">remote-training-scripts/pull</span><span class="file-meta">13 lines · 0 functions</span></summary>
+        <summary><span class="file-path">remote-training-scripts/pull</span><span class="file-meta">15 lines · 0 functions</span></summary>
         <div class="file-body">
 
           <div class="exports"><b>exports:</b> none (script or internal data module)</div>
@@ -313,6 +313,15 @@ node omr-cli-app/omr.js --weights=&lt;combined-candidate.json&gt; --input=score.
 
           <div class="exports"><b>exports:</b> none (script or internal data module)</div>
           <div><button class="view" data-file="remote-training-scripts/run">view whole file</button></div>
+          <div class="empty">No declared functions in this file.</div>
+        </div>
+      </details>
+      <details class="file" data-search="remote-training-scripts/stop ">
+        <summary><span class="file-path">remote-training-scripts/stop</span><span class="file-meta">27 lines · 0 functions</span></summary>
+        <div class="file-body">
+
+          <div class="exports"><b>exports:</b> none (script or internal data module)</div>
+          <div><button class="view" data-file="remote-training-scripts/stop">view whole file</button></div>
           <div class="empty">No declared functions in this file.</div>
         </div>
       </details>
@@ -1749,11 +1758,15 @@ node omr-cli-app/omr.js --weights=&lt;combined-candidate.json&gt; --input=score.
     "functions": []
   },
   "remote-training-scripts/pull": {
-    "source": "#!/usr/bin/env bash\n\nset -euo pipefail\n\nREMOTE_HOST='root@146.190.232.49'\nREMOTE_DIR='MuSemantiQ'\nREPOSITORY_ROOT=\"$(cd \"$(dirname \"$0\")\" \u0026\u0026 pwd)\"\nREPOSITORY_ROOT=\"$(cd \"$REPOSITORY_ROOT/..\" \u0026\u0026 pwd)\"\nREVISION=\"${OMR_CODE_VERSION:-$(git -C \"$REPOSITORY_ROOT\" rev-parse HEAD)}\"\n\nssh-add --apple-use-keychain \"$HOME/unisonofficial_rsa\"\nssh -A -i \"$HOME/unisonofficial_rsa\" \"$REMOTE_HOST\" \"cd $(printf '%q' \"$REMOTE_DIR\") \u0026\u0026 git fetch --all \u0026\u0026 git checkout $(printf '%q' \"$REVISION\") \u0026\u0026 git reset --hard $(printf '%q' \"$REVISION\")\"\nprintf 'Remote checkout is at %s\\n' \"$REVISION\"\n",
+    "source": "#!/usr/bin/env bash\n\nset -euo pipefail\n\nREMOTE_HOST='root@146.190.232.49'\nREMOTE_DIR='MuSemantiQ'\nREPOSITORY_ROOT=\"$(cd \"$(dirname \"$0\")\" \u0026\u0026 pwd)\"\nREPOSITORY_ROOT=\"$(cd \"$REPOSITORY_ROOT/..\" \u0026\u0026 pwd)\"\nREVISION=\"${OMR_CODE_VERSION:-$(git -C \"$REPOSITORY_ROOT\" rev-parse HEAD)}\"\n\nssh-add --apple-use-keychain \"$HOME/unisonofficial_rsa\"\n# The checkout is uploaded by rsync, which keeps the Mac's ownership, so root\n# sees a foreign-owned repo. Trust it explicitly before any git command.\nssh -A -i \"$HOME/unisonofficial_rsa\" \"$REMOTE_HOST\" \"cd $(printf '%q' \"$REMOTE_DIR\") \u0026\u0026 git config --global --add safe.directory \\\"\\$(pwd)\\\" \u0026\u0026 git fetch --all \u0026\u0026 git checkout -f $(printf '%q' \"$REVISION\") \u0026\u0026 git reset --hard $(printf '%q' \"$REVISION\")\"\nprintf 'Remote checkout is at %s\\n' \"$REVISION\"\n",
     "functions": []
   },
   "remote-training-scripts/run": {
     "source": "#!/usr/bin/env bash\n\nset -euo pipefail\n\nSCRIPT_DIR=\"$(cd \"$(dirname \"$0\")\" \u0026\u0026 pwd)\"\n\n\"$SCRIPT_DIR/pull\"\n\"$SCRIPT_DIR/prepare\"\n\"$SCRIPT_DIR/train\"\n\"$SCRIPT_DIR/verify\"\n",
+    "functions": []
+  },
+  "remote-training-scripts/stop": {
+    "source": "#!/usr/bin/env bash\n\nset -euo pipefail\n\nREMOTE_HOST='root@146.190.232.49'\nSSH_KEY=\"$HOME/unisonofficial_rsa\"\n\n# The two trainers, matched by their script paths. The `[.]` keeps the pattern\n# from matching this very command's own command line on the server.\nssh -A -i \"$SSH_KEY\" \"$REMOTE_HOST\" 'bash -s' \u003c\u003c'REMOTE'\nset -euo pipefail\npattern='scripts/omr-train-full-page[.]js|scripts/omr-train-text[.]js'\npids=\"$(pgrep -f \"$pattern\" || true)\"\nif [[ -z \"$pids\" ]]; then\n  echo 'No training is running.'\n  exit 0\nfi\necho \"Stopping training process(es): $(echo $pids)\"\nkill $pids 2\u003e/dev/null || true\nsleep 3\nstill=\"$(pgrep -f \"$pattern\" || true)\"\nif [[ -n \"$still\" ]]; then\n  echo \"Still running after SIGTERM, force-killing: $(echo $still)\"\n  kill -9 $still 2\u003e/dev/null || true\nfi\necho 'Training stopped.'\nREMOTE\n",
     "functions": []
   },
   "remote-training-scripts/train": {
@@ -6886,7 +6899,7 @@ node omr-cli-app/omr.js --weights=&lt;combined-candidate.json&gt; --input=score.
       item.hidden = query && !item.dataset.search.includes(query)
       if (!item.hidden) visible++
     })
-    byId('inventory-count').textContent = visible + ' / ' + 161 + ' files'
+    byId('inventory-count').textContent = visible + ' / ' + 162 + ' files'
   })
   byId('play').addEventListener('click', () => timer ? stop() : play())
   byId('next').addEventListener('click', () => { stop(); go(1) })
