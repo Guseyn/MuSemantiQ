@@ -172,10 +172,9 @@ src/omr/model/weights.json
 src/omr/model/checkpoints/
 training-data/
 
-# The remote training scripts are personal — they name a server and an ssh
-# key — so the folder stays local; the tutorial describes the same workflow.
-remote-training-scripts/*
-!remote-training-scripts/.gitinfo
+# The generic remote training workflow is shared. Personal remote-*.sh helpers
+# may name a real server and key, so those stay local.
+remote-training-scripts/remote-*.sh
 browser-app/web-app/static/magenta-sound-font/
 
 # Each app's static/js/msq is assembled rather than written: the components are

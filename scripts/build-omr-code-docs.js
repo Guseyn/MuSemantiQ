@@ -58,7 +58,8 @@ function collectRecursively (directory, extension, paths) {
     const relativePath = `${directory}/${entry.name}`
     if (entry.isDirectory()) {
       collectRecursively(relativePath, extension, paths)
-    } else if (entry.isFile() && entry.name.endsWith(extension)) {
+    } else if (entry.isFile() && entry.name.endsWith(extension) &&
+      !(directory === 'remote-training-scripts' && entry.name.startsWith('remote-'))) {
       paths.push(relativePath)
     }
   }
@@ -441,9 +442,9 @@ function buildScenes () {
     scene('training', 'frozen code → manual remote training', [
       frame(
         'Freeze code and documentation first',
-        'The pre-training boundary is the reviewed source and this documentation. Publish that exact state, then remote-git-pull makes the server match origin/omr. Training does not redefine the implementation.',
-        'remote-training-scripts/remote-git-pull.sh', null, [ 'training' ],
-        { sequence: '1 · freeze and publish code/docs → 2 · sync the remote checkout', note: 'The script fetches, checks out omr and resets it to origin/omr.' }
+        'The pre-training boundary is the reviewed source and this documentation. Publish that exact state, then prepare.sh runs the permitted checks, generates the frozen bundle and uploads it. Training does not redefine the implementation.',
+        'remote-training-scripts/prepare.sh', null, [ 'training' ],
+        { sequence: '1 · freeze and publish code/docs → 2 · generate and upload the frozen bundle', note: 'The script refuses a dirty checkout unless OMR_ALLOW_DIRTY=1 is set deliberately.' }
       ),
       frame(
         'Freeze the full-page bundle before training',
@@ -473,7 +474,7 @@ function buildScenes () {
         'The older isolated-renderer entry point remains explicit',
         'runTraining is the separate renderer/template symbol workflow used by remote-start-training. It creates a timestamp/pid run directory and logs best weights and their SHA-256; it is not the full-page bundle trainer.',
         'src/omr/training/train.js', 'runTraining', [ 'training', 'dataset', 'artifacts' ],
-        { alternative: './remote-training-scripts/remote-start-training.sh --dataset=renderer --validation=mixed', output: 'training-data/runs/<run-id>/{training.log,history.json,best-weights.json}' }
+        { alternative: 'npm run omr:remote:run', output: 'training-data/runs/<run-id>/{training.log,history.json,best-weights.json}' }
       ),
       frame(
         'Six-language OCR is a separate manual remote run',
@@ -490,7 +491,7 @@ function buildScenes () {
       frame(
         'Weights are data and travel separately',
         'remote-download-model copies model data and the legacy symbol training log with rsync, then prints a local SHA-256 for comparison. It does not fetch every custom run directory, adopt a candidate or validate it.',
-        'remote-training-scripts/remote-download-model.sh', null, [ 'training', 'artifacts' ],
+        'remote-training-scripts/download.sh', null, [ 'training', 'artifacts' ],
         { sequence: '7 · retrieve the chosen run outputs explicitly and compare their hashes' }
       ),
       frame(
@@ -722,7 +723,7 @@ details.file summary:hover { background: var(--accent-soft); }
     <h2>The frozen pre-training sequence</h2>
     <p>The order matters. Training starts only after the implementation and documentation are frozen and published. Full-page symbols and six-language OCR have separate manual entry points; the combiner creates the nested artifact that translation expects.</p>
     <ol>
-      <li>Freeze and publish the reviewed code and docs. Sync the remote checkout with <code>./remote-training-scripts/remote-git-pull.sh</code>. That script checks out <code>omr</code> and resets it to <code>origin/omr</code>.</li>
+      <li>Freeze and publish the reviewed code and docs. Use <code>npm run omr:remote:prepare</code> to run the permitted checks, generate the frozen bundle and upload the checkout.</li>
       <li>On the remote trainer, generate and retain the frozen full-page bundle. Pin its code version explicitly; the default <code>working-tree</code> label is not a revision identifier:</li>
     </ol>
     <pre class="command">node scripts/omr-prepare-remote.js --out=training-data/remote-bundle --code-version=&lt;frozen-revision&gt;</pre>

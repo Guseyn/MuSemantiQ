@@ -56,6 +56,11 @@
     "omr:verify": "node scripts/omr-verify.js",
     "omr:verify:remote": "node scripts/omr-verify-remote.js",
     "omr:prepare-remote": "node scripts/omr-prepare-remote.js",
+    "omr:remote:prepare": "bash remote-training-scripts/prepare.sh",
+    "omr:remote:train": "bash remote-training-scripts/train.sh",
+    "omr:remote:download": "bash remote-training-scripts/download.sh",
+    "omr:remote:verify": "bash remote-training-scripts/verify.sh",
+    "omr:remote:run": "bash remote-training-scripts/run.sh",
     "omr:train:full-page": "node scripts/omr-train-full-page.js",
     "omr:train:text": "node scripts/omr-train-text.js",
     "omr:combine-artifacts": "node scripts/omr-combine-artifacts.js"
