@@ -21,15 +21,16 @@ if (!options.data || !options.out) {
 }
 const runDirectory = options.out
 fs.mkdirSync(runDirectory, { recursive: true })
+const log = (line) => {
+  fs.appendFileSync(`${runDirectory}/training.log`, `${line}\n`)
+  console.log(line)
+}
+log(`training started (pid ${process.pid})`)
 const seed = Number(options.seed || 20261115)
 const gridSize = Number(options.grid || 48)
 const training = await loadFullPageSymbolTrainingSet({ manifestPath: options.data, split: 'train', gridSize, seed })
 const validation = await loadFullPageSymbolTrainingSet({ manifestPath: options.data, split: 'validation', gridSize, otherSamples: 20, seed: seed + 1 })
 const { classIds } = training
-const log = (line) => {
-  fs.appendFileSync(`${runDirectory}/training.log`, `${line}\n`)
-  console.log(line)
-}
 log(`data loaded: ${training.samples.length} training · ${validation.samples.length} validation`)
 const isolatedPerClass = Number(options['isolated-per-class'] ?? 0)
 if (isolatedPerClass > 0) {

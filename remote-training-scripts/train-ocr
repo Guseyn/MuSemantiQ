@@ -25,16 +25,12 @@ if [[ "${OMR_SKIP_UPLOAD:-0}" != 1 ]]; then
     --exclude=.git \
     --exclude=node_modules \
     --exclude=training-data/runs \
+    --exclude=training-data/symbol-runs \
     --exclude=training-data/text-runs \
     --exclude=training-data/candidates \
     "$REPOSITORY_ROOT/" "$REMOTE_HOST:$REMOTE_DIR/"
 fi
 
-printf '==> Train six-language OCR remotely\n'
-ssh -A -i "$HOME/unisonofficial_rsa" "$REMOTE_HOST" "cd $(printf '%q' "$REMOTE_DIR") && node scripts/omr-train-text.js \
-  --epochs=$EPOCHS \
-  --grid=$GRID \
-  --seed=$SEED \
-  --out=$RUN_DIR"
-
-printf 'OCR training finished remotely. Run download when both trainers are done.\n'
+printf '==> Start six-language OCR training on the server (detached)\n'
+pid="$(ssh -A -i "$HOME/unisonofficial_rsa" "$REMOTE_HOST" "cd $(printf '%q' "$REMOTE_DIR") && mkdir -p $RUN_DIR && : > $RUN_DIR/training.log; nohup node scripts/omr-train-text.js --epochs=$EPOCHS --grid=$GRID --seed=$SEED --out=$RUN_DIR < /dev/null > /dev/null 2>> $RUN_DIR/training.log & echo \$!")"
+printf 'OCR training is running on the server (pid %s). Check it with: ./remote-training-scripts/logs ocr\n' "$pid"

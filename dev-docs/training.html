@@ -156,13 +156,15 @@ figcaption { font: 12px var(--mono); color: var(--muted); margin-top: 6px; }
 <p>The bundle freezes full-page evidence; it does not claim recognition accuracy. It also carries in-context symbol crops with unambiguous renderer labels. The symbol trainer adds isolated renderer crops for shared-target classes and generates fresh crop degradation per epoch; the OCR trainer generates character crops.</p>
 
 <h3>3.3 Train the symbol model remotely</h3>
-<p>Run the symbol trainer against the frozen bundle. The script uploads the checkout if needed, starts the remote run, and leaves the artifact and log in the configured run directory on the server. It does not download anything; <code>download</code> is a separate step:</p>
-<pre><code>./remote-training-scripts/train-symbols</code></pre>
+<p>Run the symbol trainer against the frozen bundle. The script uploads the checkout if needed, then launches the run <b>detached</b> on the server and returns immediately. All output goes to <code>training.log</code> — the terminal stays clean. The first line in that log is <code>training started</code>, written before the slow data load, so you can tell the process is alive right away. Follow it with:</p>
+<pre><code>./remote-training-scripts/train-symbols
+./remote-training-scripts/logs symbols</code></pre>
 <p>The composition split is already frozen. Training reads only the <code>train</code> partition and validates on <code>validation</code>; <code>test</code>, including Allegro Burlesco, remains untouched until candidate verification. The flags select a candidate's shape and data, not an accuracy guarantee.</p>
 
 <h3>3.4 Train the six-language OCR model remotely</h3>
-<p>Run <code>train-ocr</code> separately when you are ready for the text model. It writes <code>best-weights.json</code>, <code>history.json</code>, <code>manifest.json</code> and <code>training.log</code> in the configured OCR run directory on the server; fetch them later with <code>download</code>:</p>
-<pre><code>./remote-training-scripts/train-ocr</code></pre>
+<p>Run <code>train-ocr</code> separately when you are ready for the text model. Like the symbol trainer, it launches detached, logs to file only, and writes <code>best-weights.json</code>, <code>history.json</code>, <code>manifest.json</code> and <code>training.log</code> in the configured OCR run directory on the server. Follow it with <code>logs ocr</code> and fetch the result later with <code>download</code>:</p>
+<pre><code>./remote-training-scripts/train-ocr
+./remote-training-scripts/logs ocr</code></pre>
 <p>The alphabet covers English, French, German, Italian, Spanish and Russian, with accented Latin and Cyrillic characters, digits, punctuation and typographic spaces. Training uses the renderer's own Noto Serif, Noto Sans, Gentium Plus and Gothic A1 glyph paths, at several sizes and scales. Dynamic and chord-letter targets are extracted from the page schema; no dictionary or spelling stage repairs an uncertain character.</p>
 
 <div class="note"><b>Implemented is not verified</b> These commands and data paths are implemented. Do not publish a weight-based accuracy claim until a named combined candidate has passed candidate verification and you have read its remaining differences and uncertainties.</div>
@@ -264,24 +266,24 @@ console.log(report.uncertain)</code></pre>
 <!-- ============================ 7 ============================ -->
 <section id="cheat">
 <h2><span class="n">7</span>Cheat sheet <a class="totop" href="#workflow">↑</a></h2>
-<p>Freeze once, then train the two models in parallel in separate terminals. Each trainer trains and writes its <code>training.log</code> on the server, so <code>tail -F</code> it over <code>ssh</code>, or download both when they finish. Then download, combine and verify:</p>
+<p>Freeze once, then launch both trainers — each starts detached on the server and returns immediately, logging only to its own file. Follow the logs, then download, combine and verify once both finish:</p>
 <pre><code><span class="cm"># the host and settings are inside each self-contained script</span>
 ssh -A -i ~/unisonofficial_rsa root@146.190.232.49
 
 <span class="cm"># once: freeze code, docs, data and configuration</span>
 ./remote-training-scripts/prepare
 
-<span class="cm"># terminal 1                          # terminal 2</span>
+<span class="cm"># launch both trainers — each returns immediately, detached</span>
 ./remote-training-scripts/train-symbols
-                                      ./remote-training-scripts/train-ocr
+./remote-training-scripts/train-ocr
 
 <span class="cm"># watch a trainer's log while it runs (symbols, ocr or both)</span>
 ./remote-training-scripts/logs symbols
 
-<span class="cm"># to cancel a running trainer from another terminal</span>
+<span class="cm"># to cancel a running trainer</span>
 ./remote-training-scripts/stop
 
-<span class="cm"># when both terminals finish, bring both artifacts home</span>
+<span class="cm"># when both finish, bring both artifacts home</span>
 ./remote-training-scripts/download
 
 <span class="cm"># then nest the two artifacts into one candidate</span>

@@ -15,6 +15,11 @@ const options = Object.fromEntries(process.argv.slice(2).map((argument) => {
 }))
 const runDirectory = options.out || `training-data/text-runs/${new Date().toISOString().replace(/[:.]/g, '-')}-${process.pid}`
 fs.mkdirSync(runDirectory, { recursive: true })
+const log = (line) => {
+  fs.appendFileSync(`${runDirectory}/training.log`, `${line}\n`)
+  console.log(line)
+}
+log(`training started (pid ${process.pid})`)
 const seed = Number(options.seed || 20261115)
 const gridSize = Number(options.grid || 48)
 const epochs = Number(options.epochs || 20)
@@ -29,10 +34,6 @@ const model = createModel({
   classCount: classIds.length
 }, seed)
 const validationSamples = generated.samples.filter((sample, index) => index % 5 === 0)
-const log = (line) => {
-  fs.appendFileSync(`${runDirectory}/training.log`, `${line}\n`)
-  console.log(line)
-}
 const { model: bestModel, history } = await trainModel({
   model,
   trainingSamples: generated.samples.filter((sample, index) => index % 5 !== 0),
