@@ -2,10 +2,59 @@
 
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+REMOTE_HOST='root@146.190.232.49'
+REMOTE_DIR='MuSemantiQ'
+BUNDLE_DIR='training-data/remote-bundle'
+SYMBOL_RUN_DIR='training-data/symbol-runs/candidate'
+OCR_RUN_DIR='training-data/text-runs/candidate-ocr'
+REPOSITORY_ROOT="$(cd "$(dirname "$0")" && pwd)"
+REPOSITORY_ROOT="$(cd "$REPOSITORY_ROOT/.." && pwd)"
+EPOCHS="${OMR_EPOCHS:-40}"
+OCR_EPOCHS="${OMR_OCR_EPOCHS:-20}"
+GRID="${OMR_GRID:-48}"
+SEED="${OMR_SEED:-20261115}"
+ISOLATED_PER_CLASS="${OMR_ISOLATED_PER_CLASS:-0}"
 
-export OMR_SKIP_UPLOAD=0
-"$SCRIPT_DIR/train-symbols"
-export OMR_SKIP_UPLOAD=1
-"$SCRIPT_DIR/train-ocr"
-printf 'Both trainers are running on the server. Follow them with logs, then download, combine and verify when they finish.\n'
+target="${1:-both}"
+case "$target" in
+  symbols|ocr|both) ;;
+  *)
+    printf 'usage: %s [symbols|ocr|both]\n' "$(basename "$0")" >&2
+    exit 1
+    ;;
+esac
+
+if [[ ! -f "$REPOSITORY_ROOT/$BUNDLE_DIR/manifest.json" ]]; then
+  printf 'error: no frozen bundle; run remote-training-scripts/prepare first\n' >&2
+  exit 1
+fi
+
+if [[ "${OMR_SKIP_UPLOAD:-0}" != 1 ]]; then
+  printf '==> Upload the frozen checkout\n'
+  ssh-add --apple-use-keychain "$HOME/unisonofficial_rsa"
+  ssh -A -i "$HOME/unisonofficial_rsa" "$REMOTE_HOST" "mkdir -p $(printf '%q' "$REMOTE_DIR")"
+  rsync -az -e "ssh -i $HOME/unisonofficial_rsa" \
+    --exclude=.git \
+    --exclude=node_modules \
+    --exclude=training-data/runs \
+    --exclude=training-data/symbol-runs \
+    --exclude=training-data/text-runs \
+    --exclude=training-data/candidates \
+    "$REPOSITORY_ROOT/" "$REMOTE_HOST:$REMOTE_DIR/"
+fi
+
+if [[ "$target" == symbols || "$target" == both ]]; then
+  printf '==> Start symbol training on the server (detached)\n'
+  pid="$(ssh -A -i "$HOME/unisonofficial_rsa" "$REMOTE_HOST" "cd $(printf '%q' "$REMOTE_DIR") && mkdir -p $SYMBOL_RUN_DIR && : > $SYMBOL_RUN_DIR/training.log; nohup node scripts/omr-train-full-page.js --data=$BUNDLE_DIR/manifest.json --epochs=$EPOCHS --grid=$GRID --seed=$SEED --isolated-per-class=$ISOLATED_PER_CLASS --out=$SYMBOL_RUN_DIR < /dev/null > /dev/null 2>> $SYMBOL_RUN_DIR/training.log & echo \$!")"
+  printf 'Symbol training is running on the server (pid %s). Check it with: ./remote-training-scripts/logs symbols\n' "$pid"
+fi
+
+if [[ "$target" == ocr || "$target" == both ]]; then
+  printf '==> Start six-language OCR training on the server (detached)\n'
+  pid="$(ssh -A -i "$HOME/unisonofficial_rsa" "$REMOTE_HOST" "cd $(printf '%q' "$REMOTE_DIR") && mkdir -p $OCR_RUN_DIR && : > $OCR_RUN_DIR/training.log; nohup node scripts/omr-train-text.js --epochs=$OCR_EPOCHS --grid=$GRID --seed=$SEED --out=$OCR_RUN_DIR < /dev/null > /dev/null 2>> $OCR_RUN_DIR/training.log & echo \$!")"
+  printf 'OCR training is running on the server (pid %s). Check it with: ./remote-training-scripts/logs ocr\n' "$pid"
+fi
+
+if [[ "$target" == both ]]; then
+  printf 'Both trainers are running. Follow them with logs, then download, combine and verify when they finish.\n'
+fi

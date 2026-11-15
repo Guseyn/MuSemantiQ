@@ -28,11 +28,15 @@ const log = (line) => {
 log(`training started (pid ${process.pid})`)
 const seed = Number(options.seed || 20261115)
 const gridSize = Number(options.grid || 48)
+const epochs = Number(options.epochs || 20)
+const batchSize = Number(options.batch || 32)
+const learningRate = Number(options['learning-rate'] || 0.001)
+const isolatedPerClass = Number(options['isolated-per-class'] ?? 0)
+log(`loading frozen bundle and extracting in-context symbol crops`)
 const training = await loadFullPageSymbolTrainingSet({ manifestPath: options.data, split: 'train', gridSize, seed })
 const validation = await loadFullPageSymbolTrainingSet({ manifestPath: options.data, split: 'validation', gridSize, otherSamples: 20, seed: seed + 1 })
 const { classIds } = training
-log(`data loaded: ${training.samples.length} training · ${validation.samples.length} validation`)
-const isolatedPerClass = Number(options['isolated-per-class'] ?? 0)
+log(`symbol classifier: ${classIds.length} notation classes from in-context page crops · ${training.samples.length} training · ${validation.samples.length} validation · grid ${gridSize}×${gridSize} · ${epochs} epochs · batch ${batchSize} · lr ${learningRate}`)
 if (isolatedPerClass > 0) {
   log(`generating isolated renderer samples: ${isolatedPerClass} per class`)
 }
@@ -60,12 +64,13 @@ const { model: bestModel, history } = await trainModel({
     }))
   },
   validationSamples,
-  epochs: Number(options.epochs || 20),
-  batchSize: Number(options.batch || 32),
-  learningRate: Number(options['learning-rate'] || 0.001),
+  epochs,
+  batchSize,
+  learningRate,
   seed,
   onBatch: ({ epoch, batchesDone, batchesTotal, runningLoss }) => {
-    if (batchesDone % 25 === 0 || batchesDone === batchesTotal) {
+    const every = Math.max(1, Math.floor(batchesTotal / 4))
+    if (batchesDone % every === 0 || batchesDone === batchesTotal) {
       log(`epoch ${epoch} · batch ${batchesDone}/${batchesTotal} · running loss ${runningLoss}`)
     }
   },

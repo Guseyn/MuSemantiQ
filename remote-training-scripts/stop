@@ -5,14 +5,25 @@ set -euo pipefail
 REMOTE_HOST='root@146.190.232.49'
 SSH_KEY="$HOME/unisonofficial_rsa"
 
-# The two trainers, matched by their script paths. The `[.]` keeps the pattern
-# from matching this very command's own command line on the server.
-ssh -A -i "$SSH_KEY" "$REMOTE_HOST" 'bash -s' <<'REMOTE'
+target="${1:-both}"
+case "$target" in
+  symbols) pattern='scripts/omr-train-full-page[.]js' ;;
+  ocr)     pattern='scripts/omr-train-text[.]js' ;;
+  both)    pattern='scripts/omr-train-full-page[.]js|scripts/omr-train-text[.]js' ;;
+  *)
+    printf 'usage: %s [symbols|ocr|both]\n' "$(basename "$0")" >&2
+    exit 1
+    ;;
+esac
+
+# The `[.]` keeps the pattern from matching this very command's own command
+# line on the server. The pattern is passed as an argument to `bash -s`.
+ssh -A -i "$SSH_KEY" "$REMOTE_HOST" 'bash -s' "$pattern" <<'REMOTE'
 set -euo pipefail
-pattern='scripts/omr-train-full-page[.]js|scripts/omr-train-text[.]js'
+pattern="$1"
 pids="$(pgrep -f "$pattern" || true)"
 if [[ -z "$pids" ]]; then
-  echo 'No training is running.'
+  echo 'No matching training is running.'
   exit 0
 fi
 echo "Stopping training process(es): $(echo $pids)"
