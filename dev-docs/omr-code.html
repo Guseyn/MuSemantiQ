@@ -139,7 +139,7 @@ details.file summary:hover { background: var(--accent-soft); }
     <span>162 source files</span>
     <span>482 declared functions</span>
     <span>6 walkthroughs · 54 frames</span>
-    <span>snapshot e33d9ae0e87f04e5</span>
+    <span>snapshot 57457949d02e78d8</span>
   </div>
   <div class="notice"><b>Pre-training status.</b> This page describes code and data preparation, not a trained result. It makes no accuracy claim. The documented sequence freezes code and documentation first, then starts the symbol and six-language OCR runs manually on the remote trainer. This HTML was generated without running OMR tests, data preparation, training, scale checks, verification or the CLI.</div>
 
@@ -326,7 +326,7 @@ node omr-cli-app/omr.js --weights=&lt;combined-candidate.json&gt; --input=score.
         </div>
       </details>
       <details class="file" data-search="remote-training-scripts/train ">
-        <summary><span class="file-path">remote-training-scripts/train</span><span class="file-meta">11 lines · 0 functions</span></summary>
+        <summary><span class="file-path">remote-training-scripts/train</span><span class="file-meta">12 lines · 0 functions</span></summary>
         <div class="file-body">
 
           <div class="exports"><b>exports:</b> none (script or internal data module)</div>
@@ -335,7 +335,7 @@ node omr-cli-app/omr.js --weights=&lt;combined-candidate.json&gt; --input=score.
         </div>
       </details>
       <details class="file" data-search="remote-training-scripts/train-ocr ">
-        <summary><span class="file-path">remote-training-scripts/train-ocr</span><span class="file-meta">44 lines · 0 functions</span></summary>
+        <summary><span class="file-path">remote-training-scripts/train-ocr</span><span class="file-meta">40 lines · 0 functions</span></summary>
         <div class="file-body">
 
           <div class="exports"><b>exports:</b> none (script or internal data module)</div>
@@ -344,7 +344,7 @@ node omr-cli-app/omr.js --weights=&lt;combined-candidate.json&gt; --input=score.
         </div>
       </details>
       <details class="file" data-search="remote-training-scripts/train-symbols ">
-        <summary><span class="file-path">remote-training-scripts/train-symbols</span><span class="file-meta">47 lines · 0 functions</span></summary>
+        <summary><span class="file-path">remote-training-scripts/train-symbols</span><span class="file-meta">43 lines · 0 functions</span></summary>
         <div class="file-body">
 
           <div class="exports"><b>exports:</b> none (script or internal data module)</div>
@@ -1750,7 +1750,7 @@ node omr-cli-app/omr.js --weights=&lt;combined-candidate.json&gt; --input=score.
     "functions": []
   },
   "remote-training-scripts/download": {
-    "source": "#!/usr/bin/env bash\n\nset -euo pipefail\n\nREMOTE_HOST='root@146.190.232.49'\nREMOTE_DIR='MuSemantiQ'\nSYMBOL_RUN_DIR='training-data/symbol-runs/candidate'\nOCR_RUN_DIR='training-data/text-runs/candidate-ocr'\nSCRIPT_DIR=\"$(cd \"$(dirname \"$0\")\" \u0026\u0026 pwd)\"\nREPOSITORY_ROOT=\"$(cd \"$SCRIPT_DIR/..\" \u0026\u0026 pwd)\"\n\nprintf '==\u003e Download both training runs\\n'\nssh-add --apple-use-keychain \"$HOME/unisonofficial_rsa\"\nmkdir -p \"$REPOSITORY_ROOT/$SYMBOL_RUN_DIR\" \"$REPOSITORY_ROOT/$OCR_RUN_DIR\"\nrsync -az -e \"ssh -i $HOME/unisonofficial_rsa\" \\\n  \"$REMOTE_HOST:$REMOTE_DIR/$SYMBOL_RUN_DIR/\" \"$REPOSITORY_ROOT/$SYMBOL_RUN_DIR/\"\nrsync -az -e \"ssh -i $HOME/unisonofficial_rsa\" \\\n  \"$REMOTE_HOST:$REMOTE_DIR/$OCR_RUN_DIR/\" \"$REPOSITORY_ROOT/$OCR_RUN_DIR/\"\n\"$SCRIPT_DIR/combine\"\n",
+    "source": "#!/usr/bin/env bash\n\nset -euo pipefail\n\nREMOTE_HOST='root@146.190.232.49'\nREMOTE_DIR='MuSemantiQ'\nSYMBOL_RUN_DIR='training-data/symbol-runs/candidate'\nOCR_RUN_DIR='training-data/text-runs/candidate-ocr'\nSCRIPT_DIR=\"$(cd \"$(dirname \"$0\")\" \u0026\u0026 pwd)\"\nREPOSITORY_ROOT=\"$(cd \"$SCRIPT_DIR/..\" \u0026\u0026 pwd)\"\n\nprintf '==\u003e Download both training runs\\n'\nssh-add --apple-use-keychain \"$HOME/unisonofficial_rsa\"\nmkdir -p \"$REPOSITORY_ROOT/$SYMBOL_RUN_DIR\" \"$REPOSITORY_ROOT/$OCR_RUN_DIR\"\nrsync -az -e \"ssh -i $HOME/unisonofficial_rsa\" \\\n  \"$REMOTE_HOST:$REMOTE_DIR/$SYMBOL_RUN_DIR/\" \"$REPOSITORY_ROOT/$SYMBOL_RUN_DIR/\"\nrsync -az -e \"ssh -i $HOME/unisonofficial_rsa\" \\\n  \"$REMOTE_HOST:$REMOTE_DIR/$OCR_RUN_DIR/\" \"$REPOSITORY_ROOT/$OCR_RUN_DIR/\"\nprintf 'Both runs downloaded. Run combine next.\\n'\n",
     "functions": []
   },
   "remote-training-scripts/prepare": {
@@ -1770,15 +1770,15 @@ node omr-cli-app/omr.js --weights=&lt;combined-candidate.json&gt; --input=score.
     "functions": []
   },
   "remote-training-scripts/train": {
-    "source": "#!/usr/bin/env bash\n\nset -euo pipefail\n\nSCRIPT_DIR=\"$(cd \"$(dirname \"$0\")\" \u0026\u0026 pwd)\"\n\nexport OMR_SKIP_UPLOAD=0\n\"$SCRIPT_DIR/train-symbols\"\nexport OMR_SKIP_UPLOAD=1\n\"$SCRIPT_DIR/train-ocr\"\n\"$SCRIPT_DIR/combine\"\n",
+    "source": "#!/usr/bin/env bash\n\nset -euo pipefail\n\nSCRIPT_DIR=\"$(cd \"$(dirname \"$0\")\" \u0026\u0026 pwd)\"\n\nexport OMR_SKIP_UPLOAD=0\n\"$SCRIPT_DIR/train-symbols\"\nexport OMR_SKIP_UPLOAD=1\n\"$SCRIPT_DIR/train-ocr\"\n\"$SCRIPT_DIR/download\"\n\"$SCRIPT_DIR/combine\"\n",
     "functions": []
   },
   "remote-training-scripts/train-ocr": {
-    "source": "#!/usr/bin/env bash\n\nset -euo pipefail\n\nREMOTE_HOST='root@146.190.232.49'\nREMOTE_DIR='MuSemantiQ'\nBUNDLE_DIR='training-data/remote-bundle'\nRUN_DIR='training-data/text-runs/candidate-ocr'\nREPOSITORY_ROOT=\"$(cd \"$(dirname \"$0\")\" \u0026\u0026 pwd)\"\nREPOSITORY_ROOT=\"$(cd \"$REPOSITORY_ROOT/..\" \u0026\u0026 pwd)\"\nEPOCHS=\"${OMR_OCR_EPOCHS:-20}\"\nGRID=\"${OMR_GRID:-48}\"\nSEED=\"${OMR_SEED:-20261115}\"\n\nif [[ ! -f \"$REPOSITORY_ROOT/$BUNDLE_DIR/manifest.json\" ]]; then\n  printf 'error: no frozen bundle; run remote-training-scripts/prepare first\\n' \u003e\u00262\n  exit 1\nfi\n\nif [[ \"${OMR_SKIP_UPLOAD:-0}\" != 1 ]]; then\n  printf '==\u003e Upload the frozen checkout\\n'\n  ssh-add --apple-use-keychain \"$HOME/unisonofficial_rsa\"\n  ssh -A -i \"$HOME/unisonofficial_rsa\" \"$REMOTE_HOST\" \"mkdir -p $(printf '%q' \"$REMOTE_DIR\")\"\n  rsync -az -e \"ssh -i $HOME/unisonofficial_rsa\" \\\n    --exclude=.git \\\n    --exclude=node_modules \\\n    --exclude=training-data/runs \\\n    --exclude=training-data/text-runs \\\n    --exclude=training-data/candidates \\\n    \"$REPOSITORY_ROOT/\" \"$REMOTE_HOST:$REMOTE_DIR/\"\nfi\n\nprintf '==\u003e Train six-language OCR remotely\\n'\nssh -A -i \"$HOME/unisonofficial_rsa\" \"$REMOTE_HOST\" \"cd $(printf '%q' \"$REMOTE_DIR\") \u0026\u0026 node scripts/omr-train-text.js \\\n  --epochs=$EPOCHS \\\n  --grid=$GRID \\\n  --seed=$SEED \\\n  --out=$RUN_DIR\"\n\nprintf '==\u003e Download the OCR artifact\\n'\nmkdir -p \"$REPOSITORY_ROOT/$RUN_DIR\"\nrsync -az -e \"ssh -i $HOME/unisonofficial_rsa\" \\\n  \"$REMOTE_HOST:$REMOTE_DIR/$RUN_DIR/\" \"$REPOSITORY_ROOT/$RUN_DIR/\"\nprintf 'OCR artifact and training.log: %s\\n' \"$RUN_DIR\"\n",
+    "source": "#!/usr/bin/env bash\n\nset -euo pipefail\n\nREMOTE_HOST='root@146.190.232.49'\nREMOTE_DIR='MuSemantiQ'\nBUNDLE_DIR='training-data/remote-bundle'\nRUN_DIR='training-data/text-runs/candidate-ocr'\nREPOSITORY_ROOT=\"$(cd \"$(dirname \"$0\")\" \u0026\u0026 pwd)\"\nREPOSITORY_ROOT=\"$(cd \"$REPOSITORY_ROOT/..\" \u0026\u0026 pwd)\"\nEPOCHS=\"${OMR_OCR_EPOCHS:-20}\"\nGRID=\"${OMR_GRID:-48}\"\nSEED=\"${OMR_SEED:-20261115}\"\n\nif [[ ! -f \"$REPOSITORY_ROOT/$BUNDLE_DIR/manifest.json\" ]]; then\n  printf 'error: no frozen bundle; run remote-training-scripts/prepare first\\n' \u003e\u00262\n  exit 1\nfi\n\nif [[ \"${OMR_SKIP_UPLOAD:-0}\" != 1 ]]; then\n  printf '==\u003e Upload the frozen checkout\\n'\n  ssh-add --apple-use-keychain \"$HOME/unisonofficial_rsa\"\n  ssh -A -i \"$HOME/unisonofficial_rsa\" \"$REMOTE_HOST\" \"mkdir -p $(printf '%q' \"$REMOTE_DIR\")\"\n  rsync -az -e \"ssh -i $HOME/unisonofficial_rsa\" \\\n    --exclude=.git \\\n    --exclude=node_modules \\\n    --exclude=training-data/runs \\\n    --exclude=training-data/text-runs \\\n    --exclude=training-data/candidates \\\n    \"$REPOSITORY_ROOT/\" \"$REMOTE_HOST:$REMOTE_DIR/\"\nfi\n\nprintf '==\u003e Train six-language OCR remotely\\n'\nssh -A -i \"$HOME/unisonofficial_rsa\" \"$REMOTE_HOST\" \"cd $(printf '%q' \"$REMOTE_DIR\") \u0026\u0026 node scripts/omr-train-text.js \\\n  --epochs=$EPOCHS \\\n  --grid=$GRID \\\n  --seed=$SEED \\\n  --out=$RUN_DIR\"\n\nprintf 'OCR training finished remotely. Run download when both trainers are done.\\n'\n",
     "functions": []
   },
   "remote-training-scripts/train-symbols": {
-    "source": "#!/usr/bin/env bash\n\nset -euo pipefail\n\nREMOTE_HOST='root@146.190.232.49'\nREMOTE_DIR='MuSemantiQ'\nBUNDLE_DIR='training-data/remote-bundle'\nRUN_DIR='training-data/symbol-runs/candidate'\nREPOSITORY_ROOT=\"$(cd \"$(dirname \"$0\")\" \u0026\u0026 pwd)\"\nREPOSITORY_ROOT=\"$(cd \"$REPOSITORY_ROOT/..\" \u0026\u0026 pwd)\"\nEPOCHS=\"${OMR_EPOCHS:-40}\"\nGRID=\"${OMR_GRID:-48}\"\nSEED=\"${OMR_SEED:-20261115}\"\nISOLATED_PER_CLASS=\"${OMR_ISOLATED_PER_CLASS:-0}\"\n\nif [[ ! -f \"$REPOSITORY_ROOT/$BUNDLE_DIR/manifest.json\" ]]; then\n  printf 'error: no frozen bundle; run remote-training-scripts/prepare first\\n' \u003e\u00262\n  exit 1\nfi\n\nif [[ \"${OMR_SKIP_UPLOAD:-0}\" != 1 ]]; then\n  printf '==\u003e Upload the frozen checkout\\n'\n  ssh-add --apple-use-keychain \"$HOME/unisonofficial_rsa\"\n  ssh -A -i \"$HOME/unisonofficial_rsa\" \"$REMOTE_HOST\" \"mkdir -p $(printf '%q' \"$REMOTE_DIR\")\"\n  rsync -az -e \"ssh -i $HOME/unisonofficial_rsa\" \\\n    --exclude=.git \\\n    --exclude=node_modules \\\n    --exclude=training-data/runs \\\n    --exclude=training-data/text-runs \\\n    --exclude=training-data/candidates \\\n    \"$REPOSITORY_ROOT/\" \"$REMOTE_HOST:$REMOTE_DIR/\"\nfi\n\nprintf '==\u003e Train symbols remotely\\n'\nssh -A -i \"$HOME/unisonofficial_rsa\" \"$REMOTE_HOST\" \"cd $(printf '%q' \"$REMOTE_DIR\") \u0026\u0026 node scripts/omr-train-full-page.js \\\n  --data=$BUNDLE_DIR/manifest.json \\\n  --epochs=$EPOCHS \\\n  --grid=$GRID \\\n  --seed=$SEED \\\n  --isolated-per-class=$ISOLATED_PER_CLASS \\\n  --out=$RUN_DIR\"\n\nprintf '==\u003e Download the symbol artifact\\n'\nmkdir -p \"$REPOSITORY_ROOT/$RUN_DIR\"\nrsync -az -e \"ssh -i $HOME/unisonofficial_rsa\" \\\n  \"$REMOTE_HOST:$REMOTE_DIR/$RUN_DIR/\" \"$REPOSITORY_ROOT/$RUN_DIR/\"\nprintf 'Symbol artifact and training.log: %s\\n' \"$RUN_DIR\"\n",
+    "source": "#!/usr/bin/env bash\n\nset -euo pipefail\n\nREMOTE_HOST='root@146.190.232.49'\nREMOTE_DIR='MuSemantiQ'\nBUNDLE_DIR='training-data/remote-bundle'\nRUN_DIR='training-data/symbol-runs/candidate'\nREPOSITORY_ROOT=\"$(cd \"$(dirname \"$0\")\" \u0026\u0026 pwd)\"\nREPOSITORY_ROOT=\"$(cd \"$REPOSITORY_ROOT/..\" \u0026\u0026 pwd)\"\nEPOCHS=\"${OMR_EPOCHS:-40}\"\nGRID=\"${OMR_GRID:-48}\"\nSEED=\"${OMR_SEED:-20261115}\"\nISOLATED_PER_CLASS=\"${OMR_ISOLATED_PER_CLASS:-0}\"\n\nif [[ ! -f \"$REPOSITORY_ROOT/$BUNDLE_DIR/manifest.json\" ]]; then\n  printf 'error: no frozen bundle; run remote-training-scripts/prepare first\\n' \u003e\u00262\n  exit 1\nfi\n\nif [[ \"${OMR_SKIP_UPLOAD:-0}\" != 1 ]]; then\n  printf '==\u003e Upload the frozen checkout\\n'\n  ssh-add --apple-use-keychain \"$HOME/unisonofficial_rsa\"\n  ssh -A -i \"$HOME/unisonofficial_rsa\" \"$REMOTE_HOST\" \"mkdir -p $(printf '%q' \"$REMOTE_DIR\")\"\n  rsync -az -e \"ssh -i $HOME/unisonofficial_rsa\" \\\n    --exclude=.git \\\n    --exclude=node_modules \\\n    --exclude=training-data/runs \\\n    --exclude=training-data/text-runs \\\n    --exclude=training-data/candidates \\\n    \"$REPOSITORY_ROOT/\" \"$REMOTE_HOST:$REMOTE_DIR/\"\nfi\n\nprintf '==\u003e Train symbols remotely\\n'\nssh -A -i \"$HOME/unisonofficial_rsa\" \"$REMOTE_HOST\" \"cd $(printf '%q' \"$REMOTE_DIR\") \u0026\u0026 node scripts/omr-train-full-page.js \\\n  --data=$BUNDLE_DIR/manifest.json \\\n  --epochs=$EPOCHS \\\n  --grid=$GRID \\\n  --seed=$SEED \\\n  --isolated-per-class=$ISOLATED_PER_CLASS \\\n  --out=$RUN_DIR\"\n\nprintf 'Symbol training finished remotely. Run download when both trainers are done.\\n'\n",
     "functions": []
   },
   "remote-training-scripts/verify": {
