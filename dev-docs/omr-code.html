@@ -139,7 +139,7 @@ details.file summary:hover { background: var(--accent-soft); }
     <span>163 source files</span>
     <span>482 declared functions</span>
     <span>6 walkthroughs · 54 frames</span>
-    <span>snapshot 275d5ba014b67cef</span>
+    <span>snapshot 145091152170fe36</span>
   </div>
   <div class="notice"><b>Pre-training status.</b> This page describes code and data preparation, not a trained result. It makes no accuracy claim. The documented sequence freezes code and documentation first, then starts the symbol and six-language OCR runs manually on the remote trainer. This HTML was generated without running OMR tests, data preparation, training, scale checks, verification or the CLI.</div>
 
@@ -317,7 +317,7 @@ node omr-cli-app/omr.js --weights=&lt;combined-candidate.json&gt; --input=score.
         </div>
       </details>
       <details class="file" data-search="remote-training-scripts/run ">
-        <summary><span class="file-path">remote-training-scripts/run</span><span class="file-meta">10 lines · 0 functions</span></summary>
+        <summary><span class="file-path">remote-training-scripts/run</span><span class="file-meta">9 lines · 0 functions</span></summary>
         <div class="file-body">
 
           <div class="exports"><b>exports:</b> none (script or internal data module)</div>
@@ -335,7 +335,7 @@ node omr-cli-app/omr.js --weights=&lt;combined-candidate.json&gt; --input=score.
         </div>
       </details>
       <details class="file" data-search="remote-training-scripts/train ">
-        <summary><span class="file-path">remote-training-scripts/train</span><span class="file-meta">12 lines · 0 functions</span></summary>
+        <summary><span class="file-path">remote-training-scripts/train</span><span class="file-meta">11 lines · 0 functions</span></summary>
         <div class="file-body">
 
           <div class="exports"><b>exports:</b> none (script or internal data module)</div>
@@ -344,7 +344,7 @@ node omr-cli-app/omr.js --weights=&lt;combined-candidate.json&gt; --input=score.
         </div>
       </details>
       <details class="file" data-search="remote-training-scripts/train-ocr ">
-        <summary><span class="file-path">remote-training-scripts/train-ocr</span><span class="file-meta">40 lines · 0 functions</span></summary>
+        <summary><span class="file-path">remote-training-scripts/train-ocr</span><span class="file-meta">36 lines · 0 functions</span></summary>
         <div class="file-body">
 
           <div class="exports"><b>exports:</b> none (script or internal data module)</div>
@@ -353,7 +353,7 @@ node omr-cli-app/omr.js --weights=&lt;combined-candidate.json&gt; --input=score.
         </div>
       </details>
       <details class="file" data-search="remote-training-scripts/train-symbols ">
-        <summary><span class="file-path">remote-training-scripts/train-symbols</span><span class="file-meta">43 lines · 0 functions</span></summary>
+        <summary><span class="file-path">remote-training-scripts/train-symbols</span><span class="file-meta">37 lines · 0 functions</span></summary>
         <div class="file-body">
 
           <div class="exports"><b>exports:</b> none (script or internal data module)</div>
@@ -443,21 +443,21 @@ node omr-cli-app/omr.js --weights=&lt;combined-candidate.json&gt; --input=score.
         </div>
       </details>
       <details class="file" data-search="scripts/omr-train-full-page.js  log">
-        <summary><span class="file-path">scripts/omr-train-full-page.js</span><span class="file-meta">86 lines · 1 functions</span></summary>
+        <summary><span class="file-path">scripts/omr-train-full-page.js</span><span class="file-meta">87 lines · 1 functions</span></summary>
         <div class="file-body">
 
           <div class="exports"><b>exports:</b> none (script or internal data module)</div>
           <div><button class="view" data-file="scripts/omr-train-full-page.js">view whole file</button></div>
-          <div class="function-list"><button class="fn" data-file="scripts/omr-train-full-page.js" data-start="29" data-end="32">log <small>29–32</small></button></div>
+          <div class="function-list"><button class="fn" data-file="scripts/omr-train-full-page.js" data-start="24" data-end="27">log <small>24–27</small></button></div>
         </div>
       </details>
       <details class="file" data-search="scripts/omr-train-text.js  log">
-        <summary><span class="file-path">scripts/omr-train-text.js</span><span class="file-meta">62 lines · 1 functions</span></summary>
+        <summary><span class="file-path">scripts/omr-train-text.js</span><span class="file-meta">63 lines · 1 functions</span></summary>
         <div class="file-body">
 
           <div class="exports"><b>exports:</b> none (script or internal data module)</div>
           <div><button class="view" data-file="scripts/omr-train-text.js">view whole file</button></div>
-          <div class="function-list"><button class="fn" data-file="scripts/omr-train-text.js" data-start="32" data-end="35">log <small>32–35</small></button></div>
+          <div class="function-list"><button class="fn" data-file="scripts/omr-train-text.js" data-start="18" data-end="21">log <small>18–21</small></button></div>
         </div>
       </details>
       <details class="file" data-search="scripts/omr-verify-remote.js ">
@@ -1775,7 +1775,7 @@ node omr-cli-app/omr.js --weights=&lt;combined-candidate.json&gt; --input=score.
     "functions": []
   },
   "remote-training-scripts/run": {
-    "source": "#!/usr/bin/env bash\n\nset -euo pipefail\n\nSCRIPT_DIR=\"$(cd \"$(dirname \"$0\")\" \u0026\u0026 pwd)\"\n\n\"$SCRIPT_DIR/pull\"\n\"$SCRIPT_DIR/prepare\"\n\"$SCRIPT_DIR/train\"\n\"$SCRIPT_DIR/verify\"\n",
+    "source": "#!/usr/bin/env bash\n\nset -euo pipefail\n\nSCRIPT_DIR=\"$(cd \"$(dirname \"$0\")\" \u0026\u0026 pwd)\"\n\n\"$SCRIPT_DIR/pull\"\n\"$SCRIPT_DIR/prepare\"\n\"$SCRIPT_DIR/train\"\n",
     "functions": []
   },
   "remote-training-scripts/stop": {
@@ -1783,15 +1783,15 @@ node omr-cli-app/omr.js --weights=&lt;combined-candidate.json&gt; --input=score.
     "functions": []
   },
   "remote-training-scripts/train": {
-    "source": "#!/usr/bin/env bash\n\nset -euo pipefail\n\nSCRIPT_DIR=\"$(cd \"$(dirname \"$0\")\" \u0026\u0026 pwd)\"\n\nexport OMR_SKIP_UPLOAD=0\n\"$SCRIPT_DIR/train-symbols\"\nexport OMR_SKIP_UPLOAD=1\n\"$SCRIPT_DIR/train-ocr\"\n\"$SCRIPT_DIR/download\"\n\"$SCRIPT_DIR/combine\"\n",
+    "source": "#!/usr/bin/env bash\n\nset -euo pipefail\n\nSCRIPT_DIR=\"$(cd \"$(dirname \"$0\")\" \u0026\u0026 pwd)\"\n\nexport OMR_SKIP_UPLOAD=0\n\"$SCRIPT_DIR/train-symbols\"\nexport OMR_SKIP_UPLOAD=1\n\"$SCRIPT_DIR/train-ocr\"\nprintf 'Both trainers are running on the server. Follow them with logs, then download, combine and verify when they finish.\\n'\n",
     "functions": []
   },
   "remote-training-scripts/train-ocr": {
-    "source": "#!/usr/bin/env bash\n\nset -euo pipefail\n\nREMOTE_HOST='root@146.190.232.49'\nREMOTE_DIR='MuSemantiQ'\nBUNDLE_DIR='training-data/remote-bundle'\nRUN_DIR='training-data/text-runs/candidate-ocr'\nREPOSITORY_ROOT=\"$(cd \"$(dirname \"$0\")\" \u0026\u0026 pwd)\"\nREPOSITORY_ROOT=\"$(cd \"$REPOSITORY_ROOT/..\" \u0026\u0026 pwd)\"\nEPOCHS=\"${OMR_OCR_EPOCHS:-20}\"\nGRID=\"${OMR_GRID:-48}\"\nSEED=\"${OMR_SEED:-20261115}\"\n\nif [[ ! -f \"$REPOSITORY_ROOT/$BUNDLE_DIR/manifest.json\" ]]; then\n  printf 'error: no frozen bundle; run remote-training-scripts/prepare first\\n' \u003e\u00262\n  exit 1\nfi\n\nif [[ \"${OMR_SKIP_UPLOAD:-0}\" != 1 ]]; then\n  printf '==\u003e Upload the frozen checkout\\n'\n  ssh-add --apple-use-keychain \"$HOME/unisonofficial_rsa\"\n  ssh -A -i \"$HOME/unisonofficial_rsa\" \"$REMOTE_HOST\" \"mkdir -p $(printf '%q' \"$REMOTE_DIR\")\"\n  rsync -az -e \"ssh -i $HOME/unisonofficial_rsa\" \\\n    --exclude=.git \\\n    --exclude=node_modules \\\n    --exclude=training-data/runs \\\n    --exclude=training-data/text-runs \\\n    --exclude=training-data/candidates \\\n    \"$REPOSITORY_ROOT/\" \"$REMOTE_HOST:$REMOTE_DIR/\"\nfi\n\nprintf '==\u003e Train six-language OCR remotely\\n'\nssh -A -i \"$HOME/unisonofficial_rsa\" \"$REMOTE_HOST\" \"cd $(printf '%q' \"$REMOTE_DIR\") \u0026\u0026 node scripts/omr-train-text.js \\\n  --epochs=$EPOCHS \\\n  --grid=$GRID \\\n  --seed=$SEED \\\n  --out=$RUN_DIR\"\n\nprintf 'OCR training finished remotely. Run download when both trainers are done.\\n'\n",
+    "source": "#!/usr/bin/env bash\n\nset -euo pipefail\n\nREMOTE_HOST='root@146.190.232.49'\nREMOTE_DIR='MuSemantiQ'\nBUNDLE_DIR='training-data/remote-bundle'\nRUN_DIR='training-data/text-runs/candidate-ocr'\nREPOSITORY_ROOT=\"$(cd \"$(dirname \"$0\")\" \u0026\u0026 pwd)\"\nREPOSITORY_ROOT=\"$(cd \"$REPOSITORY_ROOT/..\" \u0026\u0026 pwd)\"\nEPOCHS=\"${OMR_OCR_EPOCHS:-20}\"\nGRID=\"${OMR_GRID:-48}\"\nSEED=\"${OMR_SEED:-20261115}\"\n\nif [[ ! -f \"$REPOSITORY_ROOT/$BUNDLE_DIR/manifest.json\" ]]; then\n  printf 'error: no frozen bundle; run remote-training-scripts/prepare first\\n' \u003e\u00262\n  exit 1\nfi\n\nif [[ \"${OMR_SKIP_UPLOAD:-0}\" != 1 ]]; then\n  printf '==\u003e Upload the frozen checkout\\n'\n  ssh-add --apple-use-keychain \"$HOME/unisonofficial_rsa\"\n  ssh -A -i \"$HOME/unisonofficial_rsa\" \"$REMOTE_HOST\" \"mkdir -p $(printf '%q' \"$REMOTE_DIR\")\"\n  rsync -az -e \"ssh -i $HOME/unisonofficial_rsa\" \\\n    --exclude=.git \\\n    --exclude=node_modules \\\n    --exclude=training-data/runs \\\n    --exclude=training-data/symbol-runs \\\n    --exclude=training-data/text-runs \\\n    --exclude=training-data/candidates \\\n    \"$REPOSITORY_ROOT/\" \"$REMOTE_HOST:$REMOTE_DIR/\"\nfi\n\nprintf '==\u003e Start six-language OCR training on the server (detached)\\n'\npid=\"$(ssh -A -i \"$HOME/unisonofficial_rsa\" \"$REMOTE_HOST\" \"cd $(printf '%q' \"$REMOTE_DIR\") \u0026\u0026 mkdir -p $RUN_DIR \u0026\u0026 : \u003e $RUN_DIR/training.log; nohup node scripts/omr-train-text.js --epochs=$EPOCHS --grid=$GRID --seed=$SEED --out=$RUN_DIR \u003c /dev/null \u003e /dev/null 2\u003e\u003e $RUN_DIR/training.log \u0026 echo \\$!\")\"\nprintf 'OCR training is running on the server (pid %s). Check it with: ./remote-training-scripts/logs ocr\\n' \"$pid\"\n",
     "functions": []
   },
   "remote-training-scripts/train-symbols": {
-    "source": "#!/usr/bin/env bash\n\nset -euo pipefail\n\nREMOTE_HOST='root@146.190.232.49'\nREMOTE_DIR='MuSemantiQ'\nBUNDLE_DIR='training-data/remote-bundle'\nRUN_DIR='training-data/symbol-runs/candidate'\nREPOSITORY_ROOT=\"$(cd \"$(dirname \"$0\")\" \u0026\u0026 pwd)\"\nREPOSITORY_ROOT=\"$(cd \"$REPOSITORY_ROOT/..\" \u0026\u0026 pwd)\"\nEPOCHS=\"${OMR_EPOCHS:-40}\"\nGRID=\"${OMR_GRID:-48}\"\nSEED=\"${OMR_SEED:-20261115}\"\nISOLATED_PER_CLASS=\"${OMR_ISOLATED_PER_CLASS:-0}\"\n\nif [[ ! -f \"$REPOSITORY_ROOT/$BUNDLE_DIR/manifest.json\" ]]; then\n  printf 'error: no frozen bundle; run remote-training-scripts/prepare first\\n' \u003e\u00262\n  exit 1\nfi\n\nif [[ \"${OMR_SKIP_UPLOAD:-0}\" != 1 ]]; then\n  printf '==\u003e Upload the frozen checkout\\n'\n  ssh-add --apple-use-keychain \"$HOME/unisonofficial_rsa\"\n  ssh -A -i \"$HOME/unisonofficial_rsa\" \"$REMOTE_HOST\" \"mkdir -p $(printf '%q' \"$REMOTE_DIR\")\"\n  rsync -az -e \"ssh -i $HOME/unisonofficial_rsa\" \\\n    --exclude=.git \\\n    --exclude=node_modules \\\n    --exclude=training-data/runs \\\n    --exclude=training-data/text-runs \\\n    --exclude=training-data/candidates \\\n    \"$REPOSITORY_ROOT/\" \"$REMOTE_HOST:$REMOTE_DIR/\"\nfi\n\nprintf '==\u003e Train symbols remotely\\n'\nssh -A -i \"$HOME/unisonofficial_rsa\" \"$REMOTE_HOST\" \"cd $(printf '%q' \"$REMOTE_DIR\") \u0026\u0026 node scripts/omr-train-full-page.js \\\n  --data=$BUNDLE_DIR/manifest.json \\\n  --epochs=$EPOCHS \\\n  --grid=$GRID \\\n  --seed=$SEED \\\n  --isolated-per-class=$ISOLATED_PER_CLASS \\\n  --out=$RUN_DIR\"\n\nprintf 'Symbol training finished remotely. Run download when both trainers are done.\\n'\n",
+    "source": "#!/usr/bin/env bash\n\nset -euo pipefail\n\nREMOTE_HOST='root@146.190.232.49'\nREMOTE_DIR='MuSemantiQ'\nBUNDLE_DIR='training-data/remote-bundle'\nRUN_DIR='training-data/symbol-runs/candidate'\nREPOSITORY_ROOT=\"$(cd \"$(dirname \"$0\")\" \u0026\u0026 pwd)\"\nREPOSITORY_ROOT=\"$(cd \"$REPOSITORY_ROOT/..\" \u0026\u0026 pwd)\"\nEPOCHS=\"${OMR_EPOCHS:-40}\"\nGRID=\"${OMR_GRID:-48}\"\nSEED=\"${OMR_SEED:-20261115}\"\nISOLATED_PER_CLASS=\"${OMR_ISOLATED_PER_CLASS:-0}\"\n\nif [[ ! -f \"$REPOSITORY_ROOT/$BUNDLE_DIR/manifest.json\" ]]; then\n  printf 'error: no frozen bundle; run remote-training-scripts/prepare first\\n' \u003e\u00262\n  exit 1\nfi\n\nif [[ \"${OMR_SKIP_UPLOAD:-0}\" != 1 ]]; then\n  printf '==\u003e Upload the frozen checkout\\n'\n  ssh-add --apple-use-keychain \"$HOME/unisonofficial_rsa\"\n  ssh -A -i \"$HOME/unisonofficial_rsa\" \"$REMOTE_HOST\" \"mkdir -p $(printf '%q' \"$REMOTE_DIR\")\"\n  rsync -az -e \"ssh -i $HOME/unisonofficial_rsa\" \\\n    --exclude=.git \\\n    --exclude=node_modules \\\n    --exclude=training-data/runs \\\n    --exclude=training-data/symbol-runs \\\n    --exclude=training-data/text-runs \\\n    --exclude=training-data/candidates \\\n    \"$REPOSITORY_ROOT/\" \"$REMOTE_HOST:$REMOTE_DIR/\"\nfi\n\nprintf '==\u003e Start symbol training on the server (detached)\\n'\npid=\"$(ssh -A -i \"$HOME/unisonofficial_rsa\" \"$REMOTE_HOST\" \"cd $(printf '%q' \"$REMOTE_DIR\") \u0026\u0026 mkdir -p $RUN_DIR \u0026\u0026 : \u003e $RUN_DIR/training.log; nohup node scripts/omr-train-full-page.js --data=$BUNDLE_DIR/manifest.json --epochs=$EPOCHS --grid=$GRID --seed=$SEED --isolated-per-class=$ISOLATED_PER_CLASS --out=$RUN_DIR \u003c /dev/null \u003e /dev/null 2\u003e\u003e $RUN_DIR/training.log \u0026 echo \\$!\")\"\nprintf 'Symbol training is running on the server (pid %s). Check it with: ./remote-training-scripts/logs symbols\\n' \"$pid\"\n",
     "functions": []
   },
   "remote-training-scripts/verify": {
@@ -2056,24 +2056,24 @@ node omr-cli-app/omr.js --weights=&lt;combined-candidate.json&gt; --input=score.
     ]
   },
   "scripts/omr-train-full-page.js": {
-    "source": "#!/usr/bin/env node\n\n'use strict'\n\nimport fs from 'node:fs'\nimport { createModel } from '#msq/omr/model/createModel.js'\nimport { trainModel } from '#msq/omr/training/train.js'\nimport loadFullPageSymbolTrainingSet from '#msq/omr/training/fullPage/loadFullPageSymbolTrainingSet.js'\nimport { exportWeights } from '#msq/omr/training/exportWeights.js'\nimport { applyDegradations } from '#msq/omr/training/applyDegradations.js'\nimport { createSeededRandom } from '#msq/omr/training/seededRandom.js'\nimport { generateRendererTrainingSet } from '#msq/omr/training/generateRendererTrainingSet.js'\n\n// Manual remote entry point. The bundle was frozen before this process starts.\nconst options = Object.fromEntries(process.argv.slice(2).map((argument) =\u003e {\n  const match = argument.match(/^--([^=]+)(?:=(.*))?$/)\n  return match ? [ match[1], match[2] ?? true ] : [ argument, true ]\n}))\nif (!options.data || !options.out) {\n  throw new Error('Pass --data=\u003cremote-bundle/manifest.json\u003e and --out=\u003crun-directory\u003e')\n}\nconst runDirectory = options.out\nfs.mkdirSync(runDirectory, { recursive: true })\nconst seed = Number(options.seed || 20261115)\nconst gridSize = Number(options.grid || 48)\nconst training = await loadFullPageSymbolTrainingSet({ manifestPath: options.data, split: 'train', gridSize, seed })\nconst validation = await loadFullPageSymbolTrainingSet({ manifestPath: options.data, split: 'validation', gridSize, otherSamples: 20, seed: seed + 1 })\nconst { classIds } = training\nconst log = (line) =\u003e {\n  fs.appendFileSync(`${runDirectory}/training.log`, `${line}\\n`)\n  console.log(line)\n}\nlog(`data loaded: ${training.samples.length} training · ${validation.samples.length} validation`)\nconst isolatedPerClass = Number(options['isolated-per-class'] ?? 0)\nif (isolatedPerClass \u003e 0) {\n  log(`generating isolated renderer samples: ${isolatedPerClass} per class`)\n}\nconst isolated = isolatedPerClass \u003e 0\n  ? await generateRendererTrainingSet({ seed, samplesPerClass: isolatedPerClass, gridSize, classIds })\n  : { samples: [] }\nconst trainingSamples = [ ...training.samples, ...isolated.samples ]\nconst validationSamples = [ ...validation.samples, ...isolated.samples.filter((sample, index) =\u003e index % 5 === 0) ]\nconst model = createModel({\n  gridSize,\n  filterSize: 3,\n  filterCounts: String(options.filters || '8,16').split(',').map(Number),\n  denseSize: Number(options.dense || 64),\n  classCount: classIds.length\n}, seed)\nlog(`model created; starting training`)\nconst { model: bestModel, history } = await trainModel({\n  model,\n  trainingSamples,\n  trainingSamplesForEpoch: async (epoch) =\u003e {\n    const random = createSeededRandom(seed + epoch)\n    return trainingSamples.map((sample) =\u003e ({\n      ...sample,\n      pixels: Array.from(applyDegradations({ width: gridSize, height: gridSize, grayscale: Float32Array.from(sample.pixels) }, random).grayscale)\n    }))\n  },\n  validationSamples,\n  epochs: Number(options.epochs || 20),\n  batchSize: Number(options.batch || 32),\n  learningRate: Number(options['learning-rate'] || 0.001),\n  seed,\n  onBatch: ({ epoch, batchesDone, batchesTotal, runningLoss }) =\u003e {\n    if (batchesDone % 25 === 0 || batchesDone === batchesTotal) {\n      log(`epoch ${epoch} · batch ${batchesDone}/${batchesTotal} · running loss ${runningLoss}`)\n    }\n  },\n  onEpoch: (entry) =\u003e log(JSON.stringify(entry))\n})\nconst { json, hash } = exportWeights(bestModel, classIds)\nfs.writeFileSync(`${runDirectory}/best-weights.json`, json)\nfs.writeFileSync(`${runDirectory}/history.json`, JSON.stringify(history, null, 2))\nfs.writeFileSync(`${runDirectory}/manifest.json`, JSON.stringify({\n  type: 'full-page-symbol-training',\n  data: options.data,\n  seed,\n  gridSize,\n  trainingSamples: trainingSamples.length,\n  validationSamples: validationSamples.length,\n  sha256: hash\n}, null, 2))\nlog(`best weights written to ${runDirectory}/best-weights.json`)\nlog(`sha256 ${hash}`)\n",
+    "source": "#!/usr/bin/env node\n\n'use strict'\n\nimport fs from 'node:fs'\nimport { createModel } from '#msq/omr/model/createModel.js'\nimport { trainModel } from '#msq/omr/training/train.js'\nimport loadFullPageSymbolTrainingSet from '#msq/omr/training/fullPage/loadFullPageSymbolTrainingSet.js'\nimport { exportWeights } from '#msq/omr/training/exportWeights.js'\nimport { applyDegradations } from '#msq/omr/training/applyDegradations.js'\nimport { createSeededRandom } from '#msq/omr/training/seededRandom.js'\nimport { generateRendererTrainingSet } from '#msq/omr/training/generateRendererTrainingSet.js'\n\n// Manual remote entry point. The bundle was frozen before this process starts.\nconst options = Object.fromEntries(process.argv.slice(2).map((argument) =\u003e {\n  const match = argument.match(/^--([^=]+)(?:=(.*))?$/)\n  return match ? [ match[1], match[2] ?? true ] : [ argument, true ]\n}))\nif (!options.data || !options.out) {\n  throw new Error('Pass --data=\u003cremote-bundle/manifest.json\u003e and --out=\u003crun-directory\u003e')\n}\nconst runDirectory = options.out\nfs.mkdirSync(runDirectory, { recursive: true })\nconst log = (line) =\u003e {\n  fs.appendFileSync(`${runDirectory}/training.log`, `${line}\\n`)\n  console.log(line)\n}\nlog(`training started (pid ${process.pid})`)\nconst seed = Number(options.seed || 20261115)\nconst gridSize = Number(options.grid || 48)\nconst training = await loadFullPageSymbolTrainingSet({ manifestPath: options.data, split: 'train', gridSize, seed })\nconst validation = await loadFullPageSymbolTrainingSet({ manifestPath: options.data, split: 'validation', gridSize, otherSamples: 20, seed: seed + 1 })\nconst { classIds } = training\nlog(`data loaded: ${training.samples.length} training · ${validation.samples.length} validation`)\nconst isolatedPerClass = Number(options['isolated-per-class'] ?? 0)\nif (isolatedPerClass \u003e 0) {\n  log(`generating isolated renderer samples: ${isolatedPerClass} per class`)\n}\nconst isolated = isolatedPerClass \u003e 0\n  ? await generateRendererTrainingSet({ seed, samplesPerClass: isolatedPerClass, gridSize, classIds })\n  : { samples: [] }\nconst trainingSamples = [ ...training.samples, ...isolated.samples ]\nconst validationSamples = [ ...validation.samples, ...isolated.samples.filter((sample, index) =\u003e index % 5 === 0) ]\nconst model = createModel({\n  gridSize,\n  filterSize: 3,\n  filterCounts: String(options.filters || '8,16').split(',').map(Number),\n  denseSize: Number(options.dense || 64),\n  classCount: classIds.length\n}, seed)\nlog(`model created; starting training`)\nconst { model: bestModel, history } = await trainModel({\n  model,\n  trainingSamples,\n  trainingSamplesForEpoch: async (epoch) =\u003e {\n    const random = createSeededRandom(seed + epoch)\n    return trainingSamples.map((sample) =\u003e ({\n      ...sample,\n      pixels: Array.from(applyDegradations({ width: gridSize, height: gridSize, grayscale: Float32Array.from(sample.pixels) }, random).grayscale)\n    }))\n  },\n  validationSamples,\n  epochs: Number(options.epochs || 20),\n  batchSize: Number(options.batch || 32),\n  learningRate: Number(options['learning-rate'] || 0.001),\n  seed,\n  onBatch: ({ epoch, batchesDone, batchesTotal, runningLoss }) =\u003e {\n    if (batchesDone % 25 === 0 || batchesDone === batchesTotal) {\n      log(`epoch ${epoch} · batch ${batchesDone}/${batchesTotal} · running loss ${runningLoss}`)\n    }\n  },\n  onEpoch: (entry) =\u003e log(JSON.stringify(entry))\n})\nconst { json, hash } = exportWeights(bestModel, classIds)\nfs.writeFileSync(`${runDirectory}/best-weights.json`, json)\nfs.writeFileSync(`${runDirectory}/history.json`, JSON.stringify(history, null, 2))\nfs.writeFileSync(`${runDirectory}/manifest.json`, JSON.stringify({\n  type: 'full-page-symbol-training',\n  data: options.data,\n  seed,\n  gridSize,\n  trainingSamples: trainingSamples.length,\n  validationSamples: validationSamples.length,\n  sha256: hash\n}, null, 2))\nlog(`best weights written to ${runDirectory}/best-weights.json`)\nlog(`sha256 ${hash}`)\n",
     "functions": [
       {
         "name": "log",
         "exported": false,
-        "startLine": 29,
-        "endLine": 32
+        "startLine": 24,
+        "endLine": 27
       }
     ]
   },
   "scripts/omr-train-text.js": {
-    "source": "#!/usr/bin/env node\n\n'use strict'\n\nimport fs from 'node:fs'\nimport { createModel } from '#msq/omr/model/createModel.js'\nimport { trainModel } from '#msq/omr/training/train.js'\nimport generateTextOcrTrainingSet from '#msq/omr/training/text/generateTextOcrTrainingSet.js'\nimport { exportWeights } from '#msq/omr/training/exportWeights.js'\n\n// This entry point is run manually on the remote trainer, never by tests.\nconst options = Object.fromEntries(process.argv.slice(2).map((argument) =\u003e {\n  const match = argument.match(/^--([^=]+)(?:=(.*))?$/)\n  return match ? [ match[1], match[2] ?? true ] : [ argument, true ]\n}))\nconst runDirectory = options.out || `training-data/text-runs/${new Date().toISOString().replace(/[:.]/g, '-')}-${process.pid}`\nfs.mkdirSync(runDirectory, { recursive: true })\nconst seed = Number(options.seed || 20261115)\nconst gridSize = Number(options.grid || 48)\nconst epochs = Number(options.epochs || 20)\nconst samplesPerCharacter = Number(options['samples-per-character'] || 4)\nconst generated = await generateTextOcrTrainingSet({ seed, gridSize, samplesPerCharacter })\nconst { classIds } = generated\nconst model = createModel({\n  gridSize,\n  filterSize: 3,\n  filterCounts: [ 8, 16 ],\n  denseSize: Number(options.dense || 64),\n  classCount: classIds.length\n}, seed)\nconst validationSamples = generated.samples.filter((sample, index) =\u003e index % 5 === 0)\nconst log = (line) =\u003e {\n  fs.appendFileSync(`${runDirectory}/training.log`, `${line}\\n`)\n  console.log(line)\n}\nconst { model: bestModel, history } = await trainModel({\n  model,\n  trainingSamples: generated.samples.filter((sample, index) =\u003e index % 5 !== 0),\n  trainingSamplesForEpoch: async (epoch) =\u003e {\n    const fresh = await generateTextOcrTrainingSet({ seed: seed + epoch, gridSize, samplesPerCharacter })\n    return fresh.samples.filter((sample, index) =\u003e index % 5 !== 0)\n  },\n  validationSamples,\n  epochs,\n  batchSize: Number(options.batch || 32),\n  learningRate: Number(options['learning-rate'] || 0.001),\n  seed,\n  onEpoch: (entry) =\u003e log(JSON.stringify(entry))\n})\nconst { json, hash } = exportWeights(bestModel, classIds)\nfs.writeFileSync(`${runDirectory}/best-weights.json`, json)\nfs.writeFileSync(`${runDirectory}/history.json`, JSON.stringify(history, null, 2))\nfs.writeFileSync(`${runDirectory}/manifest.json`, JSON.stringify({\n  type: 'six-language-text-ocr-training',\n  seed,\n  gridSize,\n  samples: generated.samples.length,\n  validationSamples: validationSamples.length,\n  sha256: hash\n}, null, 2))\nlog(`best weights written to ${runDirectory}/best-weights.json`)\nlog(`sha256 ${hash}`)\n",
+    "source": "#!/usr/bin/env node\n\n'use strict'\n\nimport fs from 'node:fs'\nimport { createModel } from '#msq/omr/model/createModel.js'\nimport { trainModel } from '#msq/omr/training/train.js'\nimport generateTextOcrTrainingSet from '#msq/omr/training/text/generateTextOcrTrainingSet.js'\nimport { exportWeights } from '#msq/omr/training/exportWeights.js'\n\n// This entry point is run manually on the remote trainer, never by tests.\nconst options = Object.fromEntries(process.argv.slice(2).map((argument) =\u003e {\n  const match = argument.match(/^--([^=]+)(?:=(.*))?$/)\n  return match ? [ match[1], match[2] ?? true ] : [ argument, true ]\n}))\nconst runDirectory = options.out || `training-data/text-runs/${new Date().toISOString().replace(/[:.]/g, '-')}-${process.pid}`\nfs.mkdirSync(runDirectory, { recursive: true })\nconst log = (line) =\u003e {\n  fs.appendFileSync(`${runDirectory}/training.log`, `${line}\\n`)\n  console.log(line)\n}\nlog(`training started (pid ${process.pid})`)\nconst seed = Number(options.seed || 20261115)\nconst gridSize = Number(options.grid || 48)\nconst epochs = Number(options.epochs || 20)\nconst samplesPerCharacter = Number(options['samples-per-character'] || 4)\nconst generated = await generateTextOcrTrainingSet({ seed, gridSize, samplesPerCharacter })\nconst { classIds } = generated\nconst model = createModel({\n  gridSize,\n  filterSize: 3,\n  filterCounts: [ 8, 16 ],\n  denseSize: Number(options.dense || 64),\n  classCount: classIds.length\n}, seed)\nconst validationSamples = generated.samples.filter((sample, index) =\u003e index % 5 === 0)\nconst { model: bestModel, history } = await trainModel({\n  model,\n  trainingSamples: generated.samples.filter((sample, index) =\u003e index % 5 !== 0),\n  trainingSamplesForEpoch: async (epoch) =\u003e {\n    const fresh = await generateTextOcrTrainingSet({ seed: seed + epoch, gridSize, samplesPerCharacter })\n    return fresh.samples.filter((sample, index) =\u003e index % 5 !== 0)\n  },\n  validationSamples,\n  epochs,\n  batchSize: Number(options.batch || 32),\n  learningRate: Number(options['learning-rate'] || 0.001),\n  seed,\n  onEpoch: (entry) =\u003e log(JSON.stringify(entry))\n})\nconst { json, hash } = exportWeights(bestModel, classIds)\nfs.writeFileSync(`${runDirectory}/best-weights.json`, json)\nfs.writeFileSync(`${runDirectory}/history.json`, JSON.stringify(history, null, 2))\nfs.writeFileSync(`${runDirectory}/manifest.json`, JSON.stringify({\n  type: 'six-language-text-ocr-training',\n  seed,\n  gridSize,\n  samples: generated.samples.length,\n  validationSamples: validationSamples.length,\n  sha256: hash\n}, null, 2))\nlog(`best weights written to ${runDirectory}/best-weights.json`)\nlog(`sha256 ${hash}`)\n",
     "functions": [
       {
         "name": "log",
         "exported": false,
-        "startLine": 32,
-        "endLine": 35
+        "startLine": 18,
+        "endLine": 21
       }
     ]
   },
@@ -6434,7 +6434,7 @@ node omr-cli-app/omr.js --weights=&lt;combined-candidate.json&gt; --input=score.
         "file": "scripts/omr-train-full-page.js",
         "range": [
           1,
-          86
+          87
         ],
         "activeNodes": [
           "training",
@@ -6447,7 +6447,7 @@ node omr-cli-app/omr.js --weights=&lt;combined-candidate.json&gt; --input=score.
         },
         "message": {
           "file": "scripts/omr-train-full-page.js",
-          "lines": "1–86",
+          "lines": "1–87",
           "sequence": "4 · manually start full-page symbol training only after the code, docs and bundle are frozen",
           "command": "node scripts/omr-train-full-page.js --data=training-data/remote-bundle/manifest.json --out=training-data/full-page-runs/\u003crun-id\u003e"
         }
@@ -6502,7 +6502,7 @@ node omr-cli-app/omr.js --weights=&lt;combined-candidate.json&gt; --input=score.
         "file": "scripts/omr-train-text.js",
         "range": [
           1,
-          62
+          63
         ],
         "activeNodes": [
           "training",
@@ -6515,7 +6515,7 @@ node omr-cli-app/omr.js --weights=&lt;combined-candidate.json&gt; --input=score.
         },
         "message": {
           "file": "scripts/omr-train-text.js",
-          "lines": "1–62",
+          "lines": "1–63",
           "sequence": "5 · manually run on the remote trainer after the same code/docs freeze",
           "command": "node scripts/omr-train-text.js --out=training-data/text-runs/\u003crun-id\u003e --seed=20261115 --grid=48 --epochs=20 --samples-per-character=4"
         }
