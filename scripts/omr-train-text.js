@@ -58,8 +58,13 @@ const { model: bestModel, history } = await trainModel({
       log(`epoch ${epoch} · batch ${batchesDone}/${batchesTotal} · running loss ${runningLoss}`)
     }
   },
-  onEpoch: (entry) => log(JSON.stringify(entry))
+  onEpoch: (entry) => log(JSON.stringify(entry)),
+  onEarlyStop: ({ epoch, epochs, patience, bestEpoch, bestLoss }) => {
+    log(`early stopping at epoch ${epoch}/${epochs} — validation loss has not improved for ${patience} epochs (best ${bestLoss} at epoch ${bestEpoch})`)
+  }
 })
+const bestEntry = history.reduce((winner, entry) => entry.validationLoss < winner.validationLoss ? entry : winner)
+log(`training finished: ${history.length}/${epochs} epochs · best validation loss ${bestEntry.validationLoss} at epoch ${bestEntry.epoch}`)
 const { json, hash } = exportWeights(bestModel, classIds)
 fs.writeFileSync(`${runDirectory}/best-weights.json`, json)
 fs.writeFileSync(`${runDirectory}/history.json`, JSON.stringify(history, null, 2))

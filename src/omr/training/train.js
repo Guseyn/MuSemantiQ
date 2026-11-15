@@ -36,7 +36,8 @@ export async function trainModel ({
   seed = 1,
   earlyStoppingPatience = 5,
   onEpoch = null,
-  onBatch = null
+  onBatch = null,
+  onEarlyStop = null
 }) {
   const random = createSeededRandom(seed)
   const states = {}
@@ -48,7 +49,7 @@ export async function trainModel ({
   }
   const history = []
   let step = 0
-  let best = { loss: Infinity, weights: null }
+  let best = { loss: Infinity, epoch: 0, weights: null }
   let epochsSinceBest = 0
   for (let epoch = 1; epoch <= epochs; epoch++) {
     const epochStartedAt = Date.now()
@@ -119,11 +120,14 @@ export async function trainModel ({
       onEpoch(history[history.length - 1])
     }
     if (validation.rawLoss < best.loss) {
-      best = { loss: validation.rawLoss, weights: copyWeights(model) }
+      best = { loss: validation.rawLoss, epoch, weights: copyWeights(model) }
       epochsSinceBest = 0
     } else {
       epochsSinceBest++
       if (earlyStoppingPatience > 0 && epochsSinceBest >= earlyStoppingPatience) {
+        if (onEarlyStop) {
+          onEarlyStop({ epoch, epochs, patience: earlyStoppingPatience, bestEpoch: best.epoch, bestLoss: Math.round(best.loss * 1e6) / 1e6 })
+        }
         break
       }
     }

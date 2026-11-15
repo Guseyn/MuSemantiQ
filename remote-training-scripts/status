@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+REMOTE_HOST='root@146.190.232.49'
+REMOTE_DIR='MuSemantiQ'
+SSH_KEY="$HOME/unisonofficial_rsa"
+
+SYMBOL_LOG="$REMOTE_DIR/training-data/symbol-runs/candidate/training.log"
+OCR_LOG="$REMOTE_DIR/training-data/text-runs/candidate-ocr/training.log"
+
+ssh -i "$SSH_KEY" "$REMOTE_HOST" 'bash -s' "$SYMBOL_LOG" "$OCR_LOG" <<'REMOTE'
+set -euo pipefail
+symbol_log="$1"
+ocr_log="$2"
+pattern='omr-train-full-page[.]js|omr-train-text[.]js'
+
+echo '== running trainers =='
+pgrep -af "$pattern" || echo '(none)'
+echo
+
+pids="$(pgrep -f "$pattern" | tr '\n' ',' | sed 's/,$//' || true)"
+if [[ -n "$pids" ]]; then
+  echo '== cpu / memory / elapsed =='
+  ps -o pid,pcpu,pmem,etime,rss,comm -p "$pids"
+  echo
+fi
+
+echo "== symbol log (last 10): $symbol_log =="
+if [[ -f "$symbol_log" ]]; then
+  tail -n 10 "$symbol_log"
+else
+  echo '(no symbol log yet)'
+fi
+echo
+
+echo "== ocr log (last 10): $ocr_log =="
+if [[ -f "$ocr_log" ]]; then
+  tail -n 10 "$ocr_log"
+else
+  echo '(no ocr log yet)'
+fi
+echo
+
+echo '== kernel errors (oom / kill / segfault) =='
+dmesg -T 2>/dev/null | tail -n 20 | grep -iE 'oom|killed|segfault|out of memory' || echo '(none)'
+REMOTE
