@@ -19,6 +19,7 @@ import assert from 'assert'
 
 import { readBitmapFromImage, analyzeImage } from '#msq/omr/api.js'
 import removeStaffLines from '#msq/omr/analysis/removeStaffLines.js'
+import measurePositionNumber from '#msq/omr/analysis/measurePositionNumber.js'
 import findSymbolComponents from '#msq/omr/analysis/findSymbolComponents.js'
 import splitTouchingComponents from '#msq/omr/analysis/splitTouchingComponents.js'
 import classifyComponent from '#msq/omr/analysis/classifyComponent.js'
@@ -28,7 +29,7 @@ import backpropagateModel from '#msq/omr/training/backpropagateModel.js'
 import { trainModel } from '#msq/omr/training/train.js'
 import { generateTrainingSet } from '#msq/omr/training/generateTrainingSet.js'
 import { createSeededRandom } from '#msq/omr/training/seededRandom.js'
-import assignPitchByStaffPosition from '#msq/omr/translation/assignPitchByStaffPosition.js'
+import assignPitchByPositionNumber from '#msq/omr/translation/assignPitchByPositionNumber.js'
 import inferDurationFromNoteShapes from '#msq/omr/translation/inferDurationFromNoteShapes.js'
 import { roleOf, classifiedClassIds } from '#msq/omr/analysis/symbolClasses.js'
 import { drawableSymbols } from '#msq/omr/training/drawSymbols.js'
@@ -38,6 +39,7 @@ import { decodeImageToGrayscale } from '#msq/omr/analysis/decodeImageToGrayscale
 import { encodePng } from '#msq/omr/training/encodePng.js'
 import { resampleToGrid } from '#msq/omr/training/cropComponents.js'
 import splitVoicesByStemDirection from '#msq/omr/translation/splitVoicesByStemDirection.js'
+import loadModelArtifact from '#msq/omr/model/loadModelArtifact.js'
 import { generateIntermediateStructuresForSinglePage } from '#msq/language/api.js'
 import {
   drawEllipse,
@@ -50,6 +52,12 @@ import {
   drawStave,
   drawFilledRect as drawTextBlock
 } from '../test/omr-tests/helpers/buildScoreBitmap.js'
+
+if (!process.env.OMR_WEIGHTS) {
+  throw new Error('OMR tests require OMR_WEIGHTS=<candidate-weights.json>; they never run without real weights')
+}
+const candidateWeights = JSON.parse(await fs.readFile(process.env.OMR_WEIGHTS, 'utf8'))
+loadModelArtifact(candidateWeights)
 
 const ROOT = 'test/omr-tests'
 
@@ -217,28 +225,47 @@ const TESTS = [
     run () {
       const bitmap = createBitmap(600, 300)
       drawStave(bitmap, 50, 550, 60, 12)
-      const { staves, staffSpaceHeightPx } = analyzeImage(bitmap)
+      const { staves, referenceIntervalBetweenStaveLines } = analyzeImage(bitmap)
       assert.strictEqual(staves.length, 1, 'one stave')
-      near(staffSpaceHeightPx, 12, 0.3, 'staff space')
+      near(referenceIntervalBetweenStaveLines, 12, 0.3, 'referenceIntervalBetweenStaveLines')
       staves[0].linesY.forEach((line, index) => near(line, 60 + index * 12, 1, `line ${index}`))
       near(staves[0].xStart, 50, 1, 'stave starts at its first line ink')
       near(staves[0].xEnd, 550, 1, 'stave ends at its last line ink')
     }
   },
   {
+    name: 'local geometry keeps unequal stave and page-line intervals',
+    run () {
+      const bitmap = createBitmap(600, 420)
+      drawStave(bitmap, 60, 560, 60, 10)
+      drawStave(bitmap, 60, 560, 110, 14)
+      drawStave(bitmap, 60, 560, 300, 12)
+      const { staves, localIntervals } = analyzeImage(bitmap)
+      near(staves[0].intervalBetweenStaveLines, 10, 0.3, 'first stave interval')
+      near(staves[1].intervalBetweenStaveLines, 14, 0.3, 'second stave interval')
+      near(staves[2].intervalBetweenStaveLines, 12, 0.3, 'third stave interval')
+      assert.strictEqual(localIntervals.intervalBetweenStaves.length, 1)
+      near(localIntervals.intervalBetweenStaves[0].pixels, 10, 1, 'gap between adjacent staves')
+      near(localIntervals.intervalBetweenStaves[0].value, 10 / 12, 0.1, 'local intervalBetweenStaves')
+      assert.strictEqual(localIntervals.intervalBetweenPageLines.length, 1)
+      near(localIntervals.intervalBetweenPageLines[0].pixels, 134, 1, 'gap between page lines')
+      near(measurePositionNumber([ 60, 70, 84, 100, 120 ], 77), 3, 0, 'positionNumber between unequal lines')
+    }
+  },
+  {
     name: 'analyzeImage reads a clean page',
     run () {
-      const { staves, systems, textBlocks, measuredStyles, colors, staffSpaceHeightPx } =
+      const { staves, systems, textBlocks, measuredStyles, colors, referenceIntervalBetweenStaveLines } =
         analyzeImage(cleanPage())
-      near(staffSpaceHeightPx, 12, 0.3, 'staff space')
+      near(referenceIntervalBetweenStaveLines, 12, 0.3, 'referenceIntervalBetweenStaveLines')
       assert.strictEqual(staves.length, 2, 'two staves')
       assert.strictEqual(systems.length, 1, 'close staves form one system')
       assert.deepStrictEqual(staves.map((stave) => stave.systemIndex), [ 0, 0 ], 'both staves in the system')
       const roles = textBlocks.map((block) => block.role)
       assert.ok(roles.includes('title'), `title found, got ${roles}`)
       assert.ok(roles.includes('instrument'), `instrument found, got ${roles}`)
-      near(measuredStyles.titleFontSize, 1, 0.1, 'title size in staff spaces')
-      near(measuredStyles.instrumentFontSize, 1, 0.1, 'instrument size in staff spaces')
+      near(measuredStyles.titleFontSize, 1, 0.1, 'title size in stave-line intervals')
+      near(measuredStyles.instrumentFontSize, 1, 0.1, 'instrument size in stave-line intervals')
       assert.strictEqual(colors.background, '#ffffff', 'paper is white')
       assert.strictEqual(colors.staveLines, '#000000', 'stave lines are black')
       assert.strictEqual(colors.text, '#000000', 'words are black')
@@ -262,10 +289,10 @@ const TESTS = [
       const slope = Math.tan(0.8 * Math.PI / 180)
       const bitmap = createBitmap(600, 400)
       drawStave(bitmap, 80, 560, 200, 12, slope)
-      const { staves, skewAngleInDegrees, staffSpaceHeightPx } = analyzeImage(bitmap)
+      const { staves, skewAngleInDegrees, referenceIntervalBetweenStaveLines } = analyzeImage(bitmap)
       near(skewAngleInDegrees, 0.8, 0.3, 'tilt of the page')
       assert.strictEqual(staves.length, 1, 'the stave survives the tilt')
-      near(staffSpaceHeightPx, 12, 0.5, 'staff space after straightening')
+      near(referenceIntervalBetweenStaveLines, 12, 0.5, 'referenceIntervalBetweenStaveLines after straightening')
       staves[0].linesY.forEach((line, index) => near(line, 200 + index * 12, 2, `line ${index}`))
     }
   },
@@ -287,7 +314,7 @@ const TESTS = [
       const bitmap = createPlainBitmap(300, 200)
       drawStave(bitmap, 20, 280, 60, 12)
       drawEllipse(bitmap, 150, 84, 10, 6) // a head sitting on the middle line
-      const stave = { linesY: [ 60, 72, 84, 96, 108 ], xStart: 20, xEnd: 280, staffSpaceHeightPx: 12 }
+      const stave = { linesY: [ 60, 72, 84, 96, 108 ], xStart: 20, xEnd: 280, intervalBetweenStaveLines: 12 }
       const cleaned = removeStaffLines(bitmap, [ stave ])
       assert.ok(cleaned.grayscale[84 * 300 + 150] > 0.5, 'head ink survives')
       assert.ok(cleaned.grayscale[60 * 300 + 50] < 0.5, 'line ink is gone away from the head')
@@ -409,17 +436,17 @@ const TESTS = [
     }
   },
   {
-    name: 'assignPitchByStaffPosition reads the grid',
+    name: 'assignPitchByPositionNumber reads the grid',
     run () {
-      assert.deepStrictEqual(assignPitchByStaffPosition(0, 'treble'), { noteName: 'f', octaveNumber: '5' })
-      assert.deepStrictEqual(assignPitchByStaffPosition(4, 'treble'), { noteName: 'b', octaveNumber: '4' })
-      assert.deepStrictEqual(assignPitchByStaffPosition(10, 'treble'), { noteName: 'c', octaveNumber: '4' })
-      assert.deepStrictEqual(assignPitchByStaffPosition(0, 'bass'), { noteName: 'a', octaveNumber: '3' })
-      assert.deepStrictEqual(assignPitchByStaffPosition(2, 'bass'), { noteName: 'f', octaveNumber: '3' })
-      assert.deepStrictEqual(assignPitchByStaffPosition(-1, 'treble'), { noteName: 'g', octaveNumber: '5' })
-      assert.deepStrictEqual(assignPitchByStaffPosition(-2, 'treble'), { noteName: 'a', octaveNumber: '5' })
-      assert.deepStrictEqual(assignPitchByStaffPosition(0, 'alto'), { noteName: 'g', octaveNumber: '4' })
-      assert.deepStrictEqual(assignPitchByStaffPosition(0, 'tenor'), { noteName: 'e', octaveNumber: '4' })
+      assert.deepStrictEqual(assignPitchByPositionNumber(0, 'treble'), { noteName: 'f', octaveNumber: '5' })
+      assert.deepStrictEqual(assignPitchByPositionNumber(4, 'treble'), { noteName: 'b', octaveNumber: '4' })
+      assert.deepStrictEqual(assignPitchByPositionNumber(10, 'treble'), { noteName: 'c', octaveNumber: '4' })
+      assert.deepStrictEqual(assignPitchByPositionNumber(0, 'bass'), { noteName: 'a', octaveNumber: '3' })
+      assert.deepStrictEqual(assignPitchByPositionNumber(2, 'bass'), { noteName: 'f', octaveNumber: '3' })
+      assert.deepStrictEqual(assignPitchByPositionNumber(-1, 'treble'), { noteName: 'g', octaveNumber: '5' })
+      assert.deepStrictEqual(assignPitchByPositionNumber(-2, 'treble'), { noteName: 'a', octaveNumber: '5' })
+      assert.deepStrictEqual(assignPitchByPositionNumber(0, 'alto'), { noteName: 'g', octaveNumber: '4' })
+      assert.deepStrictEqual(assignPitchByPositionNumber(0, 'tenor'), { noteName: 'e', octaveNumber: '4' })
     }
   },
   {
@@ -608,7 +635,7 @@ const TESTS = [
     name: 'the real score fixture is one grand staff and two measures',
     async run () {
       const bitmap = decodeImageToGrayscale(await fs.readFile('omr-cli-app/score.png'))
-      const { msqText, diagnostics } = translateImageToMsq(bitmap, { diagnostics: true })
+      const { msqText, diagnostics } = translateImageToMsq(bitmap, { weights: candidateWeights, diagnostics: true })
       assert.deepStrictEqual(diagnostics.systems, [ [ 0, 1 ] ], 'one grand-staff system')
       assert.deepStrictEqual(diagnostics.barLines.map((line) => line.kind), [ 'opening', 'internal', 'closing' ])
       assert.strictEqual(diagnostics.curves, 2, 'two slurs, not glyph fragments')

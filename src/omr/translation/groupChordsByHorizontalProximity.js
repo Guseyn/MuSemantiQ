@@ -10,8 +10,8 @@
 
 const MAX_HORIZONTAL_DISTANCE_IN_STAFF_SPACES = 0.3
 
-export function groupChordsByHorizontalProximity (headBlobs, staffSpaceHeightPx) {
-  const tolerance = MAX_HORIZONTAL_DISTANCE_IN_STAFF_SPACES * staffSpaceHeightPx
+export function groupChordsByHorizontalProximity (headBlobs, intervalBetweenStaveLines) {
+  const tolerance = MAX_HORIZONTAL_DISTANCE_IN_STAFF_SPACES * intervalBetweenStaveLines
   const sorted = [ ...headBlobs ].sort((first, second) => centerX(first) - centerX(second))
   const units = []
   for (const head of sorted) {

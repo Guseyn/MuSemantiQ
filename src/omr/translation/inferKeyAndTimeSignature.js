@@ -27,22 +27,22 @@ const KEY_SIGNATURE_NAMES = [
   'c flat major|a flat minor'
 ]
 
-export function inferKeyAndTimeSignature (blobs, headBlobs, staffSpaceHeightPx) {
+export function inferKeyAndTimeSignature (blobs, headBlobs, intervalBetweenStaveLines) {
   const firstHeadX = headBlobs.length
     ? Math.min(...headBlobs.map((blob) => blob.box.x))
     : Infinity
-  const leftOfNotes = blobs.filter((blob) => blob.box.x < firstHeadX - 0.3 * staffSpaceHeightPx)
+  const leftOfNotes = blobs.filter((blob) => blob.box.x < firstHeadX - 0.3 * intervalBetweenStaveLines)
   return {
-    keySignatureName: keySignatureOf(leftOfNotes, firstHeadX, staffSpaceHeightPx),
-    timeSignatureParams: timeSignatureOf(leftOfNotes, firstHeadX, staffSpaceHeightPx)
+    keySignatureName: keySignatureOf(leftOfNotes, firstHeadX, intervalBetweenStaveLines),
+    timeSignatureParams: timeSignatureOf(leftOfNotes, firstHeadX, intervalBetweenStaveLines)
   }
 }
 
 // Accidentals that are not hugging a head belong to the key.
-function keySignatureOf (leftOfNotes, firstHeadX, staffSpaceHeightPx) {
+function keySignatureOf (leftOfNotes, firstHeadX, intervalBetweenStaveLines) {
   const keyAccidentals = leftOfNotes.filter((blob) =>
     (blob.className === 'sharp' || blob.className === 'flat') &&
-    blob.box.x < firstHeadX - 0.7 * staffSpaceHeightPx
+    blob.box.x < firstHeadX - 0.7 * intervalBetweenStaveLines
   )
   const sharps = keyAccidentals.filter((blob) => blob.className === 'sharp').length
   const flats = keyAccidentals.filter((blob) => blob.className === 'flat').length
@@ -55,7 +55,7 @@ function keySignatureOf (leftOfNotes, firstHeadX, staffSpaceHeightPx) {
   return null
 }
 
-function timeSignatureOf (leftOfNotes, firstHeadX, staffSpaceHeightPx) {
+function timeSignatureOf (leftOfNotes, firstHeadX, intervalBetweenStaveLines) {
   const commonTime = leftOfNotes.find((blob) => blob.className === 'common-time' || blob.className === 'cut-time')
   if (commonTime) {
     return {
@@ -65,12 +65,12 @@ function timeSignatureOf (leftOfNotes, firstHeadX, staffSpaceHeightPx) {
     }
   }
   const digits = leftOfNotes.filter((blob) => blob.className.startsWith('digit-'))
-  const rows = digitRows(digits, staffSpaceHeightPx)
+  const rows = digitRows(digits, intervalBetweenStaveLines)
   if (rows.length !== 2) {
     return null
   }
   const [ top, bottom ] = rows
-  if (Math.abs(top.x - bottom.x) > 0.5 * staffSpaceHeightPx) {
+  if (Math.abs(top.x - bottom.x) > 0.5 * intervalBetweenStaveLines) {
     return null
   }
   return {
@@ -79,13 +79,13 @@ function timeSignatureOf (leftOfNotes, firstHeadX, staffSpaceHeightPx) {
   }
 }
 
-function digitRows (digits, staffSpaceHeightPx) {
+function digitRows (digits, intervalBetweenStaveLines) {
   const centerY = (blob) => blob.box.y + (blob.box.h - 1) / 2
   const centerX = (blob) => blob.box.x + (blob.box.w - 1) / 2
   const rows = []
   for (const blob of [ ...digits ].sort((first, second) => centerY(first) - centerY(second))) {
     const current = rows[rows.length - 1]
-    if (current && Math.abs(centerY(blob) - current.centerY) <= 0.75 * staffSpaceHeightPx) {
+    if (current && Math.abs(centerY(blob) - current.centerY) <= 0.75 * intervalBetweenStaveLines) {
       current.blobs.push(blob)
       current.centerY = current.blobs.reduce((sum, item) => sum + centerY(item), 0) / current.blobs.length
     } else {

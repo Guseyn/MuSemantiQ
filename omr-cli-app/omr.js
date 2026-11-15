@@ -46,12 +46,21 @@ async function main () {
     return
   }
   try {
+    if (!plan.weights) {
+      throw new Error('OMR weights are required; pass --weights <candidate-weights.json>')
+    }
     const { input, output } = await askForImagePlan(plan)
+    const weights = JSON.parse(fs.readFileSync(plan.weights, 'utf8'))
     const bitmap = decodeImageToGrayscale(fs.readFileSync(input))
-    const { msqText, report, diagnostics } = translateImageToMsq(bitmap, { diagnostics: plan.diagnostics })
+    const { msqText, report, status, diagnostics } = translateImageToMsq(bitmap, { weights, diagnostics: plan.diagnostics })
+    if (status === 'rejected') {
+      process.stderr.write('conversion rejected: no reliable stave or measure structure was found\n')
+      process.exitCode = 1
+      return
+    }
     fs.writeFileSync(output, msqText)
     const written = msqText.split('\n').filter((line) => /^\d/.test(line)).length
-    process.stdout.write(`wrote ${output} (${written} line(s) of MSQ)\n`)
+    process.stdout.write(`${status}: wrote ${output} (${written} line(s) of MSQ)\n`)
     const summary = summarizeReport(report)
     if (summary.length) {
       process.stdout.write(summary.join('\n') + '\n')

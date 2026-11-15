@@ -6,9 +6,9 @@ import { roleOf } from '#msq/omr/analysis/symbolClasses.js'
  * A confident class still has to fit the ink's measured musical size.
  * Rejection happens before pitch, duration or clef state can consume it.
  */
-export function hasPlausibleClassGeometry (className, box, staffSpaceHeightPx) {
-  const width = box.w / staffSpaceHeightPx
-  const height = box.h / staffSpaceHeightPx
+export function hasPlausibleClassGeometry (className, box, intervalBetweenStaveLines) {
+  const width = box.w / intervalBetweenStaveLines
+  const height = box.h / intervalBetweenStaveLines
   const ratio = box.w / box.h
   switch (roleOf(className)) {
     case 'head':

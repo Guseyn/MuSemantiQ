@@ -6,11 +6,18 @@ import extractSymbols from '#msq/omr/analysis/extractSymbols.js'
 import classifyComponent from '#msq/omr/analysis/classifyComponent.js'
 import { roleOf } from '#msq/omr/analysis/symbolClasses.js'
 import { resampleComponentToGrid } from '#msq/omr/training/cropComponents.js'
-import shippedModel from '#msq/omr/model/shippedModel.js'
+import loadModelArtifact from '#msq/omr/model/loadModelArtifact.js'
 import buildMusicModel from '#msq/omr/translation/buildMusicModel.js'
 import buildPageSchemaFromMusicModel from '#msq/omr/translation/buildPageSchemaFromMusicModel.js'
 import carryStateAcrossPages from '#msq/omr/translation/carryStateAcrossPages.js'
 import serialize from '#msq/language/serializer/serialize.js'
+import recognizeTextLines from '#msq/omr/ocr/recognizeTextLines.js'
+import createCharacterClassifier from '#msq/omr/ocr/createCharacterClassifier.js'
+import attachRecognizedPageMetadata from '#msq/omr/ocr/attachRecognizedPageMetadata.js'
+import attachRecognizedUnitText from '#msq/omr/ocr/attachRecognizedUnitText.js'
+import attachRecognizedInstrumentTitles from '#msq/omr/ocr/attachRecognizedInstrumentTitles.js'
+import assignTextBlockTargets from '#msq/omr/ocr/assignTextBlockTargets.js'
+import classifyRecognizedTextTargets from '#msq/omr/ocr/classifyRecognizedTextTargets.js'
 
 /**
  * A score image becomes MSQ text and a report.
@@ -39,22 +46,76 @@ export function translatePage (bitmap, options = {}, carried = {}) {
     { musicModel: built, customStyles: customStylesFrom(analysis) },
     carried
   )
-  const pageSchema = buildPageSchemaFromMusicModel(withState.musicModel)
+  const recognizedText = classifyRecognizedTextTargets(recognizePageText(upright, analysis, withState.musicModel, options))
+  const musicSchema = buildPageSchemaFromMusicModel(withState.musicModel)
+  const metadataSchema = attachRecognizedPageMetadata(musicSchema, recognizedText)
+  const instrumentSchema = attachRecognizedInstrumentTitles(metadataSchema, recognizedText)
+  const pageSchema = attachRecognizedUnitText(instrumentSchema, recognizedText)
   const msqText = serialize(pageSchema, withState.customStyles, {}, [])
+  const report = createReport(symbols, withState.musicModel, msqText)
+  report.uncertain.push(...recognizedText.uncertainties)
+  const result = {
+    msqText,
+    report,
+    status: statusOf(analysis, withState.musicModel, report)
+  }
+  if (options.diagnostics) {
+    result.diagnostics = {
+      ...createDiagnostics(analysis, symbols, options),
+      ocr: { status: recognizedText.status, lines: recognizedText.lines }
+    }
+  }
   return {
-    result: {
-      msqText,
-      report: createReport(symbols, withState.musicModel, msqText),
-      ...(options.diagnostics ? { diagnostics: createDiagnostics(analysis, symbols) } : {})
-    },
+    result,
     carried: withState.carried
   }
 }
 
-function classifyWithModel ({ model, classIds, threshold }) {
-  // no numbers given, no problem: the shipped model knows the classes it
-  // was trained with, and says so in its own file
-  const loaded = model ? { model, classIds } : shippedModel()
+function statusOf (analysis, musicModel, report) {
+  if (!analysis.staves.length || !musicModel.measures.length) {
+    return 'rejected'
+  }
+  return report.uncertain.length || report.ignored.length ? 'draft' : 'accepted'
+}
+
+function isTextCandidate (block, intervalBetweenStaveLines) {
+  if ([ 'title', 'subtitle', 'leftSubtitle', 'rightSubtitle', 'pageNumber', 'instrument' ].includes(block.role)) {
+    return true
+  }
+  return block.role === 'text' &&
+    block.box.h >= 0.5 * intervalBetweenStaveLines &&
+    block.box.h <= 5 * intervalBetweenStaveLines &&
+    block.box.w >= 0.25 * intervalBetweenStaveLines
+}
+
+function recognizePageText (bitmap, analysis, musicModel, options) {
+  const textBlocks = assignTextBlockTargets(analysis.textBlocks, musicModel, analysis.staves, analysis.systems)
+    .filter((block) => isTextCandidate(block, analysis.referenceIntervalBetweenStaveLines))
+  const ocrArtifact = options.ocrWeights || options.weights?.ocr
+  let classifyCharacter = options.classifyCharacter
+  if (!classifyCharacter && ocrArtifact) {
+    classifyCharacter = createCharacterClassifier(ocrArtifact)
+  }
+  if (!classifyCharacter) {
+    return {
+      status: textBlocks.length ? 'rejected' : 'exact',
+      text: null,
+      lines: [],
+      uncertainties: textBlocks.map((block) => ({
+        box: block.box,
+        role: block.role,
+        reason: 'OCR weights are required to recognize this text'
+      }))
+    }
+  }
+  return recognizeTextLines(bitmap, textBlocks, {
+    classifyCharacter,
+    intervalBetweenStaveLines: analysis.referenceIntervalBetweenStaveLines
+  })
+}
+
+function classifyWithModel ({ model, classIds, weights, threshold }) {
+  const loaded = model ? { model, classIds } : loadModelArtifact(weights)
   if (!loaded.classIds) {
     throw new Error('a model needs its classIds — the order it was trained with')
   }
@@ -86,18 +147,34 @@ function customStylesFrom (analysis) {
   }
 }
 
-function createDiagnostics (analysis, symbols) {
+function createDiagnostics (analysis, symbols, options) {
   const classes = {}
   for (const blob of symbols.blobs) {
     classes[blob.className] = (classes[blob.className] || 0) + 1
   }
   return {
+    modelArtifact: options.weights?.metadata || null,
     staves: analysis.staves.length,
+    referenceIntervalBetweenStaveLines: analysis.referenceIntervalBetweenStaveLines,
+    staveGeometry: analysis.staves.map((stave) => ({
+      staveIndex: stave.index,
+      intervalBetweenStaveLines: stave.intervalBetweenStaveLines,
+      staveLineThickness: stave.staveLineThickness,
+      linesY: stave.linesY
+    })),
+    intervalBetweenStaves: analysis.localIntervals.intervalBetweenStaves,
+    intervalBetweenPageLines: analysis.localIntervals.intervalBetweenPageLines,
     systems: analysis.systems.map((system) => system.staveIndexes),
     barLines: symbols.barLines,
     stems: symbols.stems.length,
     curves: symbols.curves.length,
     hairpins: symbols.hairpins.length,
+    tupletBrackets: symbols.tupletBrackets.length,
+    voltaBrackets: symbols.voltaBrackets.length,
+    octaveSpans: symbols.octaveSpans.length,
+    pedalBrackets: symbols.pedalBrackets.length,
+    glissandoLines: symbols.glissandoLines.length,
+    tremoloStrokes: symbols.tremoloStrokes.length,
     blobs: symbols.blobs.length,
     unassignedBlobs: symbols.blobs.filter((blob) => blob.staveIndex === null).length,
     classes
@@ -106,7 +183,7 @@ function createDiagnostics (analysis, symbols) {
 
 function createReport ({ blobs }, musicModel, msqText) {
   const unitsInTextOrder = unitsInSerializationOrder(musicModel)
-  const consumedBlobs = new Set(unitsInTextOrder.flatMap((entry) => entry.unit.sourceBlobs || []))
+  const consumedBlobs = sourceBlobsIn(musicModel)
   const unitLines = msqText.split('\n')
     .map((line, index) => ({ line, msqLine: index + 1 }))
     .filter(({ line }) => /^\d/.test(line))
@@ -118,7 +195,7 @@ function createReport ({ blobs }, musicModel, msqText) {
         return {
           box: blob.box,
           staveIndex: blob.staveIndex,
-          staffPosition: blob.staffPosition,
+          positionNumber: blob.positionNumber,
           className: blob.className,
           confidence: blob.confidence,
           candidates: blob.candidates,
@@ -142,6 +219,25 @@ function createReport ({ blobs }, musicModel, msqText) {
       } ]
     })
   }
+}
+
+function sourceBlobsIn (value, consumed = new Set()) {
+  if (!value || typeof value !== 'object') {
+    return consumed
+  }
+  if (Array.isArray(value)) {
+    value.forEach((item) => sourceBlobsIn(item, consumed))
+    return consumed
+  }
+  if (Array.isArray(value.sourceBlobs)) {
+    value.sourceBlobs.forEach((blob) => consumed.add(blob))
+  }
+  for (const [ key, child ] of Object.entries(value)) {
+    if (key !== 'sourceBlobs') {
+      sourceBlobsIn(child, consumed)
+    }
+  }
+  return consumed
 }
 
 function unitsInSerializationOrder (musicModel) {

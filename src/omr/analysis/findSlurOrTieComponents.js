@@ -12,14 +12,14 @@ export function findSlurOrTieComponents (bitmap, components, staves) {
     if (!stave) {
       return []
     }
-    const staffSpace = stave.staffSpaceHeightPx
-    const wide = box.w >= 2 * staffSpace && box.w >= 2 * box.h
+    const intervalBetweenStaveLines = stave.intervalBetweenStaveLines
+    const wide = box.w >= 2 * intervalBetweenStaveLines && box.w >= 2 * box.h
     const thin = ink / (box.w * box.h) <= 0.3
-    if (!wide || !thin || box.h < Math.max(2, 0.2 * staffSpace) || box.h > 6 * staffSpace) {
+    if (!wide || !thin || box.h < Math.max(2, 0.2 * intervalBetweenStaveLines) || box.h > 6 * intervalBetweenStaveLines) {
       return []
     }
     const depth = curveDepth(bitmap, box)
-    if (Math.abs(depth) < 0.2 * staffSpace) {
+    if (Math.abs(depth) < 0.2 * intervalBetweenStaveLines) {
       return []
     }
     return [ {
@@ -60,7 +60,7 @@ function nearestStave (box, staves) {
   return staves.map((stave) => {
     const anchor = centerY < stave.topY ? stave.topY : centerY > stave.bottomY ? stave.bottomY : centerY
     return { stave, distance: Math.abs(centerY - anchor) }
-  }).filter((entry) => entry.distance <= 6 * entry.stave.staffSpaceHeightPx)
+  }).filter((entry) => entry.distance <= 6 * entry.stave.intervalBetweenStaveLines)
     .sort((first, second) => first.distance - second.distance)[0]?.stave || null
 }
 

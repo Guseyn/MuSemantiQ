@@ -7,12 +7,12 @@
  * voice and never create a second one by themselves.
  */
 
-export function splitVoicesByStemDirection (units, staffSpaceHeightPx = 12) {
+export function splitVoicesByStemDirection (units, intervalBetweenStaveLines = 12) {
   const notes = units.filter((unit) => !unit.isRest)
   const stemsUp = notes.filter((unit) => unit.stemDirection === 'up')
   const stemsDown = notes.filter((unit) => unit.stemDirection === 'down')
   const simultaneous = stemsUp.some((up) => stemsDown.some((down) =>
-    Math.abs(up.x - down.x) <= 0.35 * staffSpaceHeightPx))
+    Math.abs(up.x - down.x) <= 0.35 * intervalBetweenStaveLines))
   if (!simultaneous) {
     return [ units ]
   }

@@ -79,7 +79,8 @@ export default [
     id: 'layout.measure-visibility',
     category: 'layout',
     description: 'Suppression of the final measure on a page.',
-    observability: 'layout',
+    observability: 'nonvisual',
+    nonvisualCategory: 'rendering-configuration',
     scenarios: { exact: [], patterns: [ '^hide the last measure on a page$' ] },
     schema: [ { path: '$.hideLastMeasure', values: [ true ] } ]
   },
@@ -599,8 +600,7 @@ export default [
     id: 'configuration.style',
     category: 'configuration',
     description: 'Font, color, and rendering style declarations.',
-    observability: 'nonvisual',
-    nonvisualCategory: 'rendering-configuration',
+    observability: 'visual',
     scenarios: { exact: [], patterns: [ '^(?:color style|music font style|text font style|chord letters font style|style (?:name|value))' ] },
     schema: []
   },

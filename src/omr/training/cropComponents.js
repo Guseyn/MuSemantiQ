@@ -9,8 +9,8 @@
  * same symbol from any zoom or camera arrives as the same numbers.
  */
 
-export function cropComponent ({ width, height, grayscale }, box, staffSpaceHeightPx, gridSize) {
-  const side = 3 * staffSpaceHeightPx
+export function cropComponent ({ width, height, grayscale }, box, intervalBetweenStaveLines, gridSize) {
+  const side = 3 * intervalBetweenStaveLines
   const centerX = box.x + box.w / 2
   const centerY = box.y + box.h / 2
   const from = {

@@ -1,5 +1,7 @@
 'use strict'
 
+import measureLocalIntervals from '#msq/omr/analysis/measureLocalIntervals.js'
+
 /**
  * The page's palette, text sizes and spacing, as proportions.
  *
@@ -11,7 +13,8 @@
  * pixel anchor) stays out and keeps its default.
  */
 
-export function measureStyles ({ width, height, grayscale, staves, systems, textBlocks, staffSpaceHeightPx }) {
+export function measureStyles ({ width, height, grayscale, rgb, staves, systems, textBlocks }) {
+  const localIntervals = measureLocalIntervals(staves, systems)
   const fontSizes = {
     titleFontSize: largestBlockSize(textBlocks, [ 'title' ]),
     subtitleFontSize: largestBlockSize(textBlocks, [ 'subtitle' ]),
@@ -19,15 +22,15 @@ export function measureStyles ({ width, height, grayscale, staves, systems, text
     rightSubtitleFontSize: largestBlockSize(textBlocks, [ 'rightSubtitle' ]),
     instrumentFontSize: largestBlockSize(textBlocks, [ 'instrument' ]),
     pageNumberFontSize: largestBlockSize(textBlocks, [ 'pageNumber' ]),
-    intervalBetweenStaves: averageGapInStaffSpaces(groupedStaves(staves, systems), staffSpaceHeightPx),
-    intervalBetweenPageLines: averageGapInStaffSpaces([ systems ], staffSpaceHeightPx)
+    intervalBetweenStaves: averageValue(localIntervals.intervalBetweenStaves),
+    intervalBetweenPageLines: averageValue(localIntervals.intervalBetweenPageLines)
   }
   const colors = {
-    background: backgroundHex({ width, height, grayscale }),
-    staveLines: staveLinesHex({ width, height, grayscale, staves }),
-    text: textHex({ width, height, grayscale, textBlocks })
+    background: backgroundHex({ width, height, grayscale, rgb }),
+    staveLines: staveLinesHex({ width, height, grayscale, rgb, staves }),
+    text: textHex({ width, height, grayscale, rgb, textBlocks })
   }
-  return { fontSizes, colors }
+  return { fontSizes, colors, localIntervals }
 }
 
 function largestBlockSize (textBlocks, roles) {
@@ -35,30 +38,26 @@ function largestBlockSize (textBlocks, roles) {
   return sizes.length ? Math.round(Math.max(...sizes) * 100) / 100 : null
 }
 
-// Staves grouped by the system they belong to; spacing is measured inside
-// each group, so a gap between systems is never mistaken for stave spacing.
-function groupedStaves (staves, systems) {
-  return systems.map((system) =>
-    system.staveIndexes.map((index) => staves[index]).sort((first, second) => first.topY - second.topY)
-  )
-}
-
-function averageGapInStaffSpaces (groups, staffSpaceHeightPx) {
-  const spacings = []
-  for (const group of groups) {
-    for (let index = 1; index < group.length; index++) {
-      spacings.push((group[index].topY - group[index - 1].topY) / staffSpaceHeightPx)
-    }
-  }
-  if (!spacings.length) {
+function averageValue (entries) {
+  if (!entries.length) {
     return null
   }
-  return Math.round(spacings.reduce((sum, spacing) => sum + spacing, 0) / spacings.length * 100) / 100
+  const average = entries.reduce((sum, entry) => sum + entry.value, 0) / entries.length
+  return Math.round(average * 100) / 100
 }
 
 // The paper is what almost everything that is not ink is: the most common
 // value among the light pixels.
-function backgroundHex ({ width, height, grayscale }) {
+function backgroundHex ({ width, height, grayscale, rgb }) {
+  if (rgb) {
+    const paper = []
+    for (let index = 0; index < grayscale.length; index++) {
+      if (grayscale[index] < 0.1) {
+        paper.push(index)
+      }
+    }
+    return rgbHex(paper, rgb)
+  }
   const histogram = new Float64Array(256)
   for (let index = 0; index < grayscale.length; index++) {
     if (grayscale[index] < 0.1) {
@@ -68,34 +67,49 @@ function backgroundHex ({ width, height, grayscale }) {
   return hexOfChannel(strongestChannel(histogram))
 }
 
-function staveLinesHex ({ width, height, grayscale, staves }) {
+function staveLinesHex ({ width, height, grayscale, rgb, staves }) {
   const samples = []
   for (const stave of staves) {
     for (const line of stave.linesY) {
       const y = Math.round(line)
       for (let x = stave.xStart; x <= stave.xEnd; x += 3) {
         if (y >= 0 && y < height && grayscale[y * width + x] > 0.5) {
-          samples.push(grayscale[y * width + x])
+          samples.push(y * width + x)
         }
       }
     }
   }
-  return samples.length ? hexOfChannel(Math.round((1 - median(samples)) * 255)) : null
+  if (!samples.length) {
+    return null
+  }
+  return rgb ? rgbHex(samples, rgb) : hexOfChannel(Math.round((1 - median(samples.map((index) => grayscale[index]))) * 255))
 }
 
-function textHex ({ width, height, grayscale, textBlocks }) {
+function textHex ({ width, height, grayscale, rgb, textBlocks }) {
   const samples = []
   for (const block of textBlocks) {
     for (let y = block.box.y; y < block.box.y + block.box.h; y++) {
       for (let x = block.box.x; x < block.box.x + block.box.w; x++) {
-        const ink = grayscale[y * width + x]
-        if (ink > 0.5) {
-          samples.push(ink)
+        if (grayscale[y * width + x] > 0.5) {
+          samples.push(y * width + x)
         }
       }
     }
   }
-  return samples.length ? hexOfChannel(Math.round((1 - median(samples)) * 255)) : null
+  if (!samples.length) {
+    return null
+  }
+  return rgb ? rgbHex(samples, rgb) : hexOfChannel(Math.round((1 - median(samples.map((index) => grayscale[index]))) * 255))
+}
+
+function rgbHex (samples, rgb) {
+  if (!samples.length) {
+    return null
+  }
+  return '#' + [ 0, 1, 2 ].map((channel) => {
+    const values = samples.map((index) => Math.round(rgb[index * 3 + channel] * 255))
+    return median(values).toString(16).padStart(2, '0')
+  }).join('')
 }
 
 function strongestChannel (histogram) {

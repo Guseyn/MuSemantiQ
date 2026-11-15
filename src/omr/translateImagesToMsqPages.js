@@ -14,14 +14,21 @@ import { translatePage } from '#msq/omr/translateImageToMsq.js'
 export function translateImagesToMsqPages (bitmaps, options = {}) {
   const pagesText = []
   const report = []
+  const statuses = []
   let carried = {}
   for (const bitmap of bitmaps) {
     const page = translatePage(bitmap, options, carried)
     pagesText.push(page.result.msqText)
     report.push(page.result.report)
+    statuses.push(page.result.status)
     carried = page.carried
   }
-  return { pagesText, report }
+  return {
+    pagesText,
+    report,
+    statuses,
+    status: statuses.includes('rejected') ? 'rejected' : statuses.includes('draft') ? 'draft' : 'accepted'
+  }
 }
 
 export default translateImagesToMsqPages

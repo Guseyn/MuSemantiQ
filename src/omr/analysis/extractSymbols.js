@@ -8,6 +8,8 @@ import splitTouchingComponents from '#msq/omr/analysis/splitTouchingComponents.j
 import findSlurOrTieComponents from '#msq/omr/analysis/findSlurOrTieComponents.js'
 import findHairpinComponents from '#msq/omr/analysis/findHairpinComponents.js'
 import hasPlausibleClassGeometry from '#msq/omr/analysis/hasPlausibleClassGeometry.js'
+import measurePositionNumber from '#msq/omr/analysis/measurePositionNumber.js'
+import findFeatureGeometry from '#msq/omr/analysis/geometry/findFeatureGeometry.js'
 import { roleOf } from '#msq/omr/analysis/symbolClasses.js'
 
 /**
@@ -17,7 +19,7 @@ import { roleOf } from '#msq/omr/analysis/symbolClasses.js'
  * is blobs, and each blob is classified. Every symbol carries its stave and,
  * for blobs, its staff position in half staff-spaces from the top line: the
  * number the pitch rule reads. The classifier is passed in, so the rules stay
- * testable against exact classes and the default stays the trained model.
+ * testable against exact classes and the default uses the explicit candidate artifact.
  */
 
 export function extractSymbols (bitmap, staves, { classify, textBlocks = [] }) {
@@ -39,9 +41,9 @@ export function extractSymbols (bitmap, staves, { classify, textBlocks = [] }) {
       ? { className: 'other', confidence: 1, candidates: [] }
       : classify(pixels, component.box, withoutLinesAndStems)
     const staveIndex = staveIndexOf(component.box, staves)
-    const staffSpace = staveIndex === null ? mean(staves.map((stave) => stave.staffSpaceHeightPx)) : staves[staveIndex].staffSpaceHeightPx
+    const intervalBetweenStaveLines = staveIndex === null ? mean(staves.map((stave) => stave.intervalBetweenStaveLines)) : staves[staveIndex].intervalBetweenStaveLines
     const plausible = answer.className === 'unknown' || answer.className === 'other' ||
-      hasPlausibleClassGeometry(answer.className, component.box, staffSpace)
+      hasPlausibleClassGeometry(answer.className, component.box, intervalBetweenStaveLines)
     return {
       kind: 'blob',
       className: plausible ? answer.className : 'other',
@@ -50,22 +52,36 @@ export function extractSymbols (bitmap, staves, { classify, textBlocks = [] }) {
       ...(!plausible ? { rejectedClassName: answer.className, rejectionReason: 'implausible glyph geometry' } : {}),
       box: component.box,
       staveIndex,
-      staffPosition: staffPositionOf(component.box, staves)
+      positionNumber: positionNumberOf(component.box, staves)
     }
   })
+  const featureGeometry = findFeatureGeometry(withoutLinesAndStems,
+    rawComponents.filter((component) => !hairpinBoxes.has(component.box) && !curveBoxes.has(component.box)),
+    staves,
+    stems,
+    blobs
+  )
+  const translatedBlobs = blobs.filter((blob) => roleOf(blob.className) === 'digit' || !featureGeometry.geometryBoxes.has(blob.box))
   for (const stem of stems) {
     stem.kind = 'stem'
-    stem.stemDirection = headSideOf(stem, blobs)
+    stem.stemDirection = headSideOf(stem, translatedBlobs)
     // the head hangs at one end, so beams and flags can only be at the other
     const outerEnd = stem.stemDirection === 'up' ? stem.y1 : stem.y2
-    measureStemEnds(stem, withoutLines, staves[stem.staveIndex].staffSpaceHeightPx, outerEnd)
+    measureStemEnds(stem, withoutLines, staves[stem.staveIndex].intervalBetweenStaveLines, outerEnd)
   }
   return {
-    blobs,
+    blobs: translatedBlobs,
     stems,
     barLines,
     curves,
-    hairpins
+    hairpins,
+    tupletBrackets: featureGeometry.tupletBrackets,
+    voltaBrackets: featureGeometry.voltaBrackets,
+    octaveSpans: featureGeometry.octaveSpans,
+    pedalBrackets: featureGeometry.pedalBrackets,
+    glissandoLines: featureGeometry.glissandoLines,
+    tremoloStrokes: featureGeometry.tremoloStrokes,
+    lines: featureGeometry.lines
   }
 }
 
@@ -110,7 +126,7 @@ function staveIndexOf (box, staves) {
   staves.forEach((stave, index) => {
     // Ledger notes need several spaces, but distant titles and page furniture
     // must not silently become notes on the first staff.
-    const margin = 4.5 * stave.staffSpaceHeightPx
+    const margin = 4.5 * stave.intervalBetweenStaveLines
     const distance = centerY < stave.topY
       ? stave.topY - centerY
       : centerY > stave.bottomY
@@ -128,16 +144,13 @@ function mean (values) {
   return values.reduce((sum, value) => sum + value, 0) / values.length
 }
 
-// Half staff-spaces down from the top line: 0 is the top line, 1 is the first
-// space, 2 the second line. This is the pitch rule's input.
-function staffPositionOf (box, staves) {
+function positionNumberOf (box, staves) {
   const staveIndex = staveIndexOf(box, staves)
   if (staveIndex === null) {
     return null
   }
-  const stave = staves[staveIndex]
   const centerY = box.y + (box.h - 1) / 2
-  return Math.round((centerY - stave.linesY[0]) / (stave.staffSpaceHeightPx / 2))
+  return measurePositionNumber(staves[staveIndex].linesY, centerY)
 }
 
 // A stem points away from its head: up when the head hangs below it.

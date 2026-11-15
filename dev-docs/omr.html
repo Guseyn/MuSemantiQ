@@ -149,7 +149,7 @@ dl.terms dd em { color: var(--muted); }
 <div class="page">
 <header>
   <h1>src/omr — an image becomes a page</h1>
-  <p class="sub">Everything implemented by hand: what each file does, the full math with every variable named, every MSQ feature it recognizes, and how training runs on a rented server. One small model; everything else is measuring pixels.</p>
+  <p class="sub">Everything implemented by hand: what each file does, the full math with every variable named, every MSQ feature it recognizes, and how two frozen training runs produce one candidate. Small symbol and OCR models; everything else is measuring pixels.</p>
 </header>
 
 <nav>
@@ -171,7 +171,7 @@ dl.terms dd em { color: var(--muted); }
 <!-- ============================ 1 · OVERVIEW ============================ -->
 <section id="overview">
 <h2><span class="n">1</span>Overview</h2>
-<p>Score image in → MSQ text + a report out. The report says what the tool was unsure about, with the place in the image and the line in the text. Draft, not copy.</p>
+<p>Score image and an explicit candidate artifact in → MSQ text + status and report out. <code>accepted</code> means every detected ink item and character was consumed. <code>draft</code> keeps the text with located uncertainties. <code>rejected</code> means no reliable stave or measure structure, and the CLI writes no file.</p>
 
 <figure data-figs="fig-omr-overview" data-alt="The OMR pipeline beside an actual MuSemantiQ-rendered score and its MSQ output">
 <svg role="img" aria-label="The OMR pipeline beside an actual MuSemantiQ-rendered score and its MSQ output" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="677.5pt" height="277.5pt" viewBox="16.6 20.2 677.5 277.5">
@@ -590,15 +590,15 @@ dl.terms dd em { color: var(--muted); }
 <use xlink:href="#f-fig-omr-overview-glyph-1-4" x="652.970781" y="282.070312"/>
 </g>
 </svg>
-<figcaption>fig 1 · the whole tool. Nine stages, one of them learned.</figcaption>
+<figcaption>fig 1 · the whole tool. Geometry around two learned classifiers: symbols and characters.</figcaption>
 </figure>
 
 <h4>The plan in one line each</h4>
 <ul>
   <li><b>Lines are geometry, blobs are classes.</b> Staff lines, stems, beams and barlines are straight lines — found by math, not by the model. Only ink blobs (heads, clefs, accidentals, rests, digits) go through the classifier.</li>
   <li><b>Proportions, not absolutes.</b> Everything is measured in <a class="t" href="#term-staff-space">staff spaces</a>; one screenshot at any zoom gives the same output.</li>
-  <li><b>The model is small</b> — ~300K <a class="t" href="#term-parameter">numbers</a> you can print. Trained on pages your own renderer draws, so labels are exact and cost nothing.</li>
-  <li><b>Training is plain code</b>: a forward pass, a loss, gradients, a nudging loop. Nothing hidden; the deployed model runs the same functions the trainer does.</li>
+  <li><b>Two small classifiers, one candidate.</b> Symbol weights classify notation blobs; nested <code>ocr</code> weights classify characters from a six-language alphabet. Both are trained from renderer-known labels.</li>
+  <li><b>Training is plain code</b>: a forward pass, a loss, gradients, a nudging loop. Nothing hidden; inference runs the same functions the trainer does. Accuracy belongs to a verified artifact, not to the implementation alone.</li>
 </ul>
 </section>
 
@@ -612,7 +612,7 @@ dl.terms dd em { color: var(--muted); }
 <div class="folder">
   <div class="name">src/omr/ — public entry and page orchestration</div>
   <div class="row"><span class="f2">api.js</span><span class="d">reexports the five public functions: decode, read pixels, analyze, translate one image, translate pages</span></div>
-  <div class="row"><span class="f2">translateImageToMsq.js</span><span class="d">deskew → analyze → extract → music model → page schema → MSQ and report; optional diagnostics</span></div>
+  <div class="row"><span class="f2">translateImageToMsq.js</span><span class="d">explicit symbol and nested OCR artifacts → deskew → analyze → extract → music model and exact OCR → page schema → MSQ and report</span></div>
   <div class="row"><span class="f2">translateImagesToMsqPages.js</span><span class="d">run that pipeline in page order, carrying clef, key, meter and styles</span></div>
 </div>
 
@@ -632,7 +632,9 @@ dl.terms dd em { color: var(--muted); }
   <div class="row"><span class="f2">normalizeInkPolarity.js</span><span class="d">paper-level estimation, polarity normalization and contrast normalization</span></div>
   <div class="row"><span class="f2">estimateSkewAngleInDegrees.js</span><span class="d">projection sharpness over candidate angles → page skew estimate</span></div>
   <div class="row"><span class="f2">deskewBitmap.js</span><span class="d">rotate only meaningful skew; sub-quarter-degree estimates stay untouched</span></div>
-  <div class="row"><span class="f2">detectStaves.js</span><span class="d">staff peaks and spacing → lines, staff space, line thickness and horizontal extents</span></div>
+  <div class="row"><span class="f2">detectStaves.js</span><span class="d">staff peaks → per-stave lines, <code>intervalBetweenStaveLines</code>, <code>staveLineThickness</code> and horizontal extents</span></div>
+  <div class="row"><span class="f2">measureLocalIntervals.js</span><span class="d">adjacent stave and page-line gaps as local pixel measurements and staff-space ratios, not page-wide stand-ins</span></div>
+  <div class="row"><span class="f2">measurePositionNumber.js</span><span class="d">interpolate a y-position inside the measured, possibly unequal line intervals of one stave</span></div>
   <div class="row"><span class="f2">groupStavesIntoSystems.js</span><span class="d">horizontal alignment plus shared connectors/barlines → systems</span></div>
   <div class="row"><span class="f2">removeStaffLines.js</span><span class="d">remove horizontal-line evidence using measured thickness, preserving vertical and diagonal strokes</span></div>
   <div class="row"><span class="f2">findBarLines.js</span><span class="d">bounded-gap vertical cores → opening, internal and closing boundaries per system</span></div>
@@ -644,15 +646,25 @@ dl.terms dd em { color: var(--muted); }
   <div class="row"><span class="f2">extractSymbols.js</span><span class="d">run all geometry extraction, page-text exclusion, candidate classification and staff assignment</span></div>
   <div class="row"><span class="f2">classifyComponent.js</span><span class="d">forward pass → ranked class candidates, confidence and <code>unknown</code></span></div>
   <div class="row"><span class="f2">hasPlausibleClassGeometry.js</span><span class="d">reject a confident class when its size in staff spaces cannot be that glyph</span></div>
-  <div class="row"><span class="f2">symbolClasses.js</span><span class="d">the 73-class table: IDs, blob/glyph/line kinds, musical roles and MSQ meaning</span></div>
+  <div class="row"><span class="f2">symbolClasses.js</span><span class="d">the 108-class table: IDs, blob/glyph/line kinds, musical roles and MSQ meaning</span></div>
   <div class="row"><span class="f2">findTextBlocks.js</span><span class="d">ink outside staves → title, subtitle, instrument, page-number and generic text regions</span></div>
-  <div class="row"><span class="f2">measureStyles.js</span><span class="d">text sizes in staff spaces, staff/system spacing and palette</span></div>
+  <div class="row"><span class="f2">measureStyles.js</span><span class="d">text sizes in staff spaces and palette; keep the local interval arrays while computing page-level style summaries</span></div>
   <div class="row"><span class="f2">analyzeImage.js</span><span class="d">coordinate the measurements into staves, systems, text blocks, styles and colors</span></div>
 </div>
 
 <div class="folder">
+  <div class="name">src/omr/analysis/geometry/ — feature-specific measured geometry</div>
+  <div class="row"><span class="f2">measureInkGeometry.js</span><span class="d">nearest-stave selection, column profiles, straight-line fitting, interpolated center lines and shared boxes</span></div>
+  <div class="row"><span class="f2">findBracketComponents.js</span><span class="d">digit-associated bracket candidates → tuplets and voltas</span></div>
+  <div class="row"><span class="f2">findOctaveAndPedalSpanComponents.js</span><span class="d">label-associated horizontal spans → octave and pedal geometry</span></div>
+  <div class="row"><span class="f2">findGlissandoComponents.js</span><span class="d">diagonal straight or periodically curved ink → glissando lines and waves</span></div>
+  <div class="row"><span class="f2">findTremoloStrokeComponents.js</span><span class="d">diagonal stem-crossing strokes, explicitly excluding horizontal beams</span></div>
+  <div class="row"><span class="f2">findFeatureGeometry.js</span><span class="d">coordinate those finders and return typed geometry plus consumed boxes</span></div>
+</div>
+
+<div class="folder">
   <div class="name">src/omr/translation/ — evidence → music model → page schema</div>
-  <div class="row"><span class="f2">assignPitchByStaffPosition.js</span><span class="d">signed half-staff position + canonical clef anchor → letter and octave, including ledger lines</span></div>
+  <div class="row"><span class="f2">assignPitchByPositionNumber.js</span><span class="d">position measured against the local line intervals + canonical clef anchor → letter and octave, including ledger lines</span></div>
   <div class="row"><span class="f2">inferDurationFromNoteShapes.js</span><span class="d">head class + stem + beam/flag count → every base duration through 1/256</span></div>
   <div class="row"><span class="f2">groupChordsByHorizontalProximity.js</span><span class="d">heads close in x → candidate chord units</span></div>
   <div class="row"><span class="f2">splitVoicesByStemDirection.js</span><span class="d">simultaneous opposing stems → separate voices; sequential mixed stems stay one voice</span></div>
@@ -662,6 +674,29 @@ dl.terms dd em { color: var(--muted); }
   <div class="row"><span class="f2">buildMusicModel.js</span><span class="d">the main graph builder: systems, measures, units, clefs, marks, repeats, ties/slurs and hairpins</span></div>
   <div class="row"><span class="f2">carryStateAcrossPages.js</span><span class="d">carry explicit clefs, key, meter and styles to the next page</span></div>
   <div class="row"><span class="f2">buildPageSchemaFromMusicModel.js</span><span class="d">write the graph as the parser/serializer/drawer's actual page schema</span></div>
+  <div class="row"><span class="f2">features/</span><span class="d">parentheses, arpeggios, fermatas, rest positions, cross-stave merging, octave/pedal/tuplet spans, similes, measure rests, tremolos, glissandi, voltas, measure numbers and layout-density corrections</span></div>
+</div>
+
+<div class="folder">
+  <div class="name">src/omr/canonical/ — full-page semantic verification</div>
+  <div class="row"><span class="f2">parseAndSerializeGeneratedMsq.js</span><span class="d">parse generated MSQ with the real language parser and serialize its visible page and styles again</span></div>
+  <div class="row"><span class="f2">normalizePageSchemaForVisibleComparison.js</span><span class="d">keep the closed allowlist of visible schema fields, drop editor reference IDs and canonicalize object keys</span></div>
+  <div class="row"><span class="f2">findSemanticDifferences.js</span><span class="d">recursive expected/actual comparison with a precise schema path for every mismatch</span></div>
+  <div class="row"><span class="f2">compareVisiblePageSchemas.js</span><span class="d">normalize expected and recognized pages, then report equality and semantic differences</span></div>
+  <div class="row"><span class="f2">compareVisibleCustomStyles.js</span><span class="d">compare visible scalar styles, excluding playback settings, with an optional numeric tolerance</span></div>
+  <div class="row"><span class="f2">index.js</span><span class="d">reexport the canonical comparison functions</span></div>
+</div>
+
+<div class="folder">
+  <div class="name">src/omr/ocr/ — exact character recognition and attachment</div>
+  <div class="row"><span class="f2">segmentTextLines.js</span><span class="d">text blocks → physical lines, spaces and character crops; split touching runs only at supported valleys</span></div>
+  <div class="row"><span class="f2">recognizeTextLines.js</span><span class="d">classify every character against the alphabet; exact lines only, with draft/rejected status and located uncertainties</span></div>
+  <div class="row"><span class="f2">createCharacterClassifier.js</span><span class="d">load nested OCR weights, require the exact six-language class order and classify one normalized character crop</span></div>
+  <div class="row"><span class="f2">assignTextBlockTargets.js</span><span class="d">use text and music geometry to select instrument, dynamic, chord-letter, lyric and tempo candidates without inventing units</span></div>
+  <div class="row"><span class="f2">classifyRecognizedTextTargets.js</span><span class="d">after exact OCR, distinguish dynamic marks and chord letters from lyrics and tempo text by syntax and position</span></div>
+  <div class="row"><span class="f2">attachRecognizedPageMetadata.js</span><span class="d">attach only exact title, subtitle, left/right subtitle and page-number lines</span></div>
+  <div class="row"><span class="f2">attachRecognizedInstrumentTitles.js</span><span class="d">attach exact instrument text to its measured system and stave</span></div>
+  <div class="row"><span class="f2">attachRecognizedUnitText.js</span><span class="d">write exact dynamics, chord letters, lyrics and tempo text to existing schema units and measures</span></div>
 </div>
 
 <div class="folder">
@@ -670,8 +705,9 @@ dl.terms dd em { color: var(--muted); }
   <div class="row"><span class="f2">forwardConvolution.js</span><span class="d">centered zero-padded convolution as im2col + matrix multiply</span></div>
   <div class="row"><span class="f2">forwardDense.js</span><span class="d">ReLU, max-pool with argmax, dense layers and stable softmax</span></div>
   <div class="row"><span class="f2">forwardModel.js</span><span class="d">the complete shared training/inference forward pass and its backward cache</span></div>
-  <div class="row"><span class="f2">shippedModel.js</span><span class="d">load the adopted shape, layers and class order into fresh typed arrays</span></div>
-  <div class="row"><span class="f2">weights.json</span><span class="d">the adopted shape, flat weights, biases and class IDs; candidates live elsewhere</span></div>
+  <div class="row"><span class="f2">loadModelArtifact.js</span><span class="d">require an explicit artifact, validate its shape/layers/class IDs and load fresh typed arrays; never substitute fallback weights</span></div>
+  <div class="row"><span class="f2">shippedModel.js</span><span class="d">compatibility entry point that now delegates to the same explicit artifact loader</span></div>
+  <div class="row"><span class="f2">weights.json</span><span class="d">optional, gitignored adopted data; normal calls pass a candidate path instead of depending on this file</span></div>
 </div>
 
 <div class="folder">
@@ -703,9 +739,56 @@ dl.terms dd em { color: var(--muted); }
 </div>
 
 <div class="folder">
+  <div class="name">src/omr/training/style/ — balanced renderer styles</div>
+  <div class="row"><span class="f2">rendererStylePresets.js</span><span class="d">20 palette/layout definitions × Bravura and Leland = 40 complete style presets</span></div>
+  <div class="row"><span class="f2">selectBalancedRendererStylePreset.js</span><span class="d">seeded shuffled cycles visit every preset once before any preset repeats</span></div>
+  <div class="row"><span class="f2">rendererStylePresetToMsq.js</span><span class="d">turn a preset into the language's actual style declarations and reject unknown style names</span></div>
+  <div class="row"><span class="f2">appendRendererStylePresetToMsq.js</span><span class="d">append deliberate dataset styles so they override declarations already in the fixture</span></div>
+  <div class="row"><span class="f2">prependRendererStylePresetToMsq.js</span><span class="d">prepend preset declarations for callers that need source declarations to take precedence</span></div>
+</div>
+
+<div class="folder">
+  <div class="name">src/omr/training/mutation/ — complete-page mutations</div>
+  <div class="row"><span class="f2">fullPageMutationProfiles.js</span><span class="d"><code>clean</code>, <code>screenshot</code>, <code>scan-light</code>, <code>scan-medium</code> and <code>scan-hard</code> parameter ranges</span></div>
+  <div class="row"><span class="f2">mutateFullPageBitmap.js</span><span class="d">seed the whole operation chain, derive pixel values from local staff geometry and retain all mutation metadata</span></div>
+  <div class="row"><span class="f2">varyFullPageLocalGeometry.js</span><span class="d">vary each stave's line interval and each stave/page-line gap independently without clipping notation</span></div>
+  <div class="row"><span class="f2">warpFullPageBitmap.js</span><span class="d">scale, offset, rotation, skew and perspective through inverse homography; expand the canvas around all four transformed corners</span></div>
+  <div class="row"><span class="f2">blurFullPageBitmap.js</span><span class="d">separable Gaussian blur with a radius measured from stave-line thickness</span></div>
+  <div class="row"><span class="f2">changeFullPageBitmapInkThickness.js</span><span class="d">disc-neighbourhood dilation or erosion for thinner and thicker ink</span></div>
+  <div class="row"><span class="f2">illuminateFullPageBitmap.js</span><span class="d">directional illumination, radial vignette and paper-level variation</span></div>
+  <div class="row"><span class="f2">changeFullPageBitmapContrast.js</span><span class="d">contrast around the middle ink value, clamped to the bitmap range</span></div>
+  <div class="row"><span class="f2">addFullPageBitmapNoise.js</span><span class="d">seeded independent Gaussian noise on the complete page</span></div>
+</div>
+
+<div class="folder">
+  <div class="name">src/omr/training/fullPage/ — frozen page datasets and remote evidence</div>
+  <div class="row"><span class="f2">generateFullPageRendererDataset.js</span><span class="d">source MSQ → styled full pages → local/global mutation, canonical schema and MSQ, source geometry and text targets</span></div>
+  <div class="row"><span class="f2">assignFullPageCompositionSplits.js</span><span class="d">assign train/validation/test once per composition before pages and variants, with explicit split overrides</span></div>
+  <div class="row"><span class="f2">deriveFullPageSeed.js</span><span class="d">independent deterministic seeds for splits, styles, mutation and local geometry</span></div>
+  <div class="row"><span class="f2">loadVisualFixtureSourceRecords.js</span><span class="d">load the repository's visual MSQ fixtures as composition source records</span></div>
+  <div class="row"><span class="f2">loadTitleSubtitleSourceRecords.js</span><span class="d">turn the six-language corpus into full-page title/subtitle records with train, validation and held-out splits</span></div>
+  <div class="row"><span class="f2">loadAllegroBurlescoSourceRecord.js</span><span class="d">load the larger inspector composition and pin it to the test split</span></div>
+  <div class="row"><span class="f2">extractSourceSvgSemanticGeometry.js</span><span class="d">retain unmutated semantic element names, ref IDs, bounds and transforms beside rasterization metadata</span></div>
+  <div class="row"><span class="f2">cropFullPageTrainingSamples.js</span><span class="d">transform SVG truth through local geometry and page mutation, then crop and normalize labelled symbol samples</span></div>
+  <div class="row"><span class="f2">loadFullPageSymbolTrainingSet.js</span><span class="d">read one composition split from a frozen manifest and remap symbol labels, with seeded hard negatives</span></div>
+  <div class="row"><span class="f2">createFullPageRemoteRunManifest.js</span><span class="d">hash code, data and configuration into a host-independent remote-run manifest</span></div>
+</div>
+
+<div class="folder">
+  <div class="name">src/omr/training/text/ — six-language OCR data</div>
+  <div class="row"><span class="f2">textOcrAlphabet.js</span><span class="d">ASCII, accented Latin, Russian Cyrillic, digits, punctuation and typographic spaces as unique Unicode code points</span></div>
+  <div class="row"><span class="f2">createTextOcrAlphabetManifest.js</span><span class="d">name English, French, German, Italian, Spanish and Russian and publish the exact class order expected by OCR weights</span></div>
+  <div class="row"><span class="f2">generateTextOcrTrainingSet.js</span><span class="d">renderer font paths at several sizes/scales → degraded character crops for both text and chord-letter fonts</span></div>
+  <div class="row"><span class="f2">titleSubtitleTextCorpus.js</span><span class="d">six-language titles and subtitles with whole compositions held out to prevent sibling-text leakage</span></div>
+  <div class="row"><span class="f2">extractTextTrainingTargets.js</span><span class="d">combine page-metadata and unit-text targets from a known page schema</span></div>
+  <div class="row"><span class="f2">extractTitleSubtitleTextTrainingTargets.js</span><span class="d">extract expected title and subtitle strings from the schema</span></div>
+  <div class="row"><span class="f2">extractDynamicAndChordLetterTextTrainingTargets.js</span><span class="d">extract expected dynamic marks and chord letters with their measure/stave/voice/unit locations</span></div>
+</div>
+
+<div class="folder">
   <div class="name">omr-cli-app/ — the command you run</div>
   <div class="row"><span class="f2">omr.js</span><span class="d">read a PNG, call the public translator, write MSQ, print the report and optional diagnostics</span></div>
-  <div class="row"><span class="f2">args.js</span><span class="d">input/output/help and <code>--diagnostics</code> parsing</span></div>
+  <div class="row"><span class="f2">args.js</span><span class="d">required explicit <code>--weights</code>, input/output/help and <code>--diagnostics</code> parsing</span></div>
   <div class="row"><span class="f2">interactive.js</span><span class="d">ask for any paths omitted from the flags</span></div>
   <div class="row"><span class="f2">help.js</span><span class="d">the CLI usage text</span></div>
   <div class="row"><span class="f2">README.md</span><span class="d">commands and diagnostics</span></div>
@@ -719,15 +802,24 @@ dl.terms dd em { color: var(--muted); }
   <div class="row"><span class="f2">omr-coverage.js</span><span class="d">assert that all 578 parser scenarios have an explicit feature assignment</span></div>
   <div class="row"><span class="f2">omr-raster-check.js</span><span class="d">hash and validate one or all renderer SVGs without writing by default</span></div>
   <div class="row"><span class="f2">omr-scale-check.js</span><span class="d">compare expected and actual staff/measure structure at several raster scales</span></div>
-  <div class="row"><span class="f2">omr-evaluate-model.js</span><span class="d">evaluate a candidate on fresh renderer crops and the real fixture without adopting it</span></div>
+  <div class="row"><span class="f2">omr-evaluate-model.js</span><span class="d">evaluate a candidate on fresh renderer crops and the CLI fixture without adopting it</span></div>
+  <div class="row"><span class="f2">omr-prepare-remote.js</span><span class="d">write the frozen full-page PNG/metadata bundle and its code/data/config manifest; this prepares evidence, not a recognition result</span></div>
+  <div class="row"><span class="f2">omr-train-full-page.js</span><span class="d">manual remote symbol training from frozen full-page train/validation splits plus isolated renderer samples</span></div>
+  <div class="row"><span class="f2">omr-train-text.js</span><span class="d">manual remote entry point for the six-language OCR model and its run manifest</span></div>
+  <div class="row"><span class="f2">omr-combine-artifacts.js</span><span class="d">validate symbol and OCR artifacts, nest the latter under <code>ocr</code>, and record both SHA-256 values</span></div>
+  <div class="row"><span class="f2">omr-verify.js</span><span class="d">require <code>--weights</code>, verify complete pages at six scales against canonical visible schemas and styles, and retain failure artifacts</span></div>
+  <div class="row"><span class="f2">omr-verify-remote.js</span><span class="d">run the same candidate against the frozen bundle's styled, degraded and locally warped PNGs</span></div>
 </div>
 
 <div class="folder">
   <div class="name">training-data/ (gitignored) — generated bytes and run evidence</div>
   <div class="row"><span class="f2">generated/&lt;recipe-hash&gt;/</span><span class="d">reproducible clean pages, crops, labels and dataset manifest</span></div>
-  <div class="row"><span class="f2">real/&lt;dataset-name&gt;/</span><span class="d">local real-book images, corrected labels and provenance</span></div>
-  <div class="row"><span class="f2">runs/&lt;run-id&gt;/</span><span class="d">training.log, history.json, best-weights.json and other run evidence</span></div>
+  <div class="row"><span class="f2">remote-bundle/</span><span class="d">an example frozen full-page bundle: PNGs, canonical targets, source geometry, text targets and manifest hashes</span></div>
+  <div class="row"><span class="f2">runs/&lt;run-id&gt;/</span><span class="d">symbol training.log, history.json, best-weights.json and other run evidence</span></div>
+  <div class="row"><span class="f2">text-runs/&lt;run-id&gt;/</span><span class="d">OCR training.log, history.json, best-weights.json and alphabet/training manifest</span></div>
+  <div class="row"><span class="f2">candidates/</span><span class="d">named symbol artifacts and combined artifacts with nested <code>ocr</code>, passed explicitly to inference and verification</span></div>
   <div class="row"><span class="f2">inspection/</span><span class="d">contact sheets and error galleries for looking at the data</span></div>
+  <div class="row"><span class="f2">real/&lt;dataset-name&gt;/</span><span class="d">deferred: real-book images, corrected labels and provenance are not part of the current pre-training workflow</span></div>
 </div>
 </section>
 
@@ -1173,85 +1265,86 @@ dl.terms dd em { color: var(--muted); }
 
 <h3>The MSQ feature coverage contract</h3>
 <p>The complete vocabulary of the language — every command in <code>command-index.md</code>, grouped as the language docs group it (578 constructs in <code>docs/concepts.js</code>). This is the coverage contract, not a claim that every row is implemented. Run <code>node scripts/omr-coverage.js</code> for the current machine-checked status: all 578 scenarios are assigned, with visual, layout, ambiguous and nonvisual rows kept separate. Current implementation is partial; unsupported and unrecognized ink goes to the report.</p>
+<p>The OCR path reads the six-language alphabet for English, French, German, Italian, Spanish and Russian. It classifies characters, not words: a title, dynamic or chord letter is attached only when every non-space character is in the alphabet and clears the confidence threshold. There is no spelling model to turn an uncertain glyph into plausible text.</p>
 
 <h4>The page</h4>
 <table class="grid">
 <tr><th>feature</th><th>written as</th><th>signal in the image</th><th>who reads it</th><th></th></tr>
-<tr><td>clefs</td><td><code>treble clef</code>, <code>bass</code>, <code>alto</code>, <code>tenor</code>, <code>soprano</code>, <code>mezzo soprano</code>, <code>baritone</code>, <code>octave up/down</code>, <code>two octaves …</code></td><td>large glyph at the stave's left edge — every clef a distinct shape; small 8 above/below for octave clefs</td><td>classes + position</td><td><span class="tag">planned</span></td></tr>
-<tr><td>staves</td><td><code>stave</code>, <code>stave with bass clef</code></td><td>another group of 5 lines</td><td>geometry</td><td><span class="tag">planned</span></td></tr>
-<tr><td>cross-stave connections</td><td><code>bracket from stave N to stave M</code>, <code>brace</code></td><td>brace (curly) or bracket (thick line + serifs) at the left of several staves</td><td>class + left-edge position → <code>connectionsParams</code></td><td><span class="tag">planned</span></td></tr>
-<tr><td>measures</td><td><code>measure</code></td><td>barlines slicing the system; boundaries align across staves</td><td>geometry</td><td><span class="tag">planned</span></td></tr>
-<tr><td>barlines</td><td><code>opening barline</code>, <code>ends with closing double barline</code>, <code>bold</code>, <code>dotted</code>, <code>no opening barline</code></td><td>vertical lines; their count, thickness, and dots at the junction</td><td>geometry</td><td><span class="tag">planned</span></td></tr>
-<tr><td>repeat signs</td><td><code>repeat sign at the start</code>, <code>at the end</code></td><td>double barline + two dots beside it</td><td>geometry + dot pair</td><td><span class="tag">planned</span></td></tr>
-<tr><td>time signature</td><td><code>time signature is 3:4</code>, <code>c</code>, <code>crossed c</code></td><td>two digits stacked after the key, or the C / ℄ glyph</td><td>digit classes + stacking</td><td><span class="tag">planned</span></td></tr>
-<tr><td>key signature</td><td><code>key signature is f major</code></td><td>row of sharps/flats after the clef, on fixed heights</td><td>count + type = key</td><td><span class="tag">planned</span></td></tr>
-<tr><td>page lines</td><td><code>new line</code></td><td>systems stacked down the page</td><td>row structure</td><td><span class="tag">planned</span></td></tr>
-<tr><td>voices</td><td><code>voice</code></td><td>interleaved groups with opposite stem directions</td><td><code>splitVoicesByStemDirection</code></td><td><span class="tag">planned</span></td></tr>
-<tr><td>titles, page meta</td><td><code>title is "…"</code>, <code>subtitle</code>, <code>composer</code>, <code>left/right subtitle</code>, <code>description</code>, <code>page number</code></td><td>text blocks at known positions — top, corners, bottom</td><td><code>findTextBlocks</code> + role by position</td><td><span class="tag">planned</span></td></tr>
-<tr><td>instrument titles</td><td><code>instrument title is "Piano" for stave 1</code>, <code>between stave N and stave M</code></td><td>text left of a system, centered on the stave(s) it names</td><td>text role + stave alignment</td><td><span class="tag">planned</span></td></tr>
-<tr><td>measure numbers</td><td><code>measure numbers for first measures</code>, <code>above measures</code></td><td>small digits above/below system starts</td><td>digit classes + position</td><td><span class="tag">planned</span></td></tr>
-<tr><td>styles, sizes, colours</td><td><code>font size is 7</code>, <code>title font size is 5.4</code>, <code>background color …</code></td><td>text heights ÷ <i>s</i>; median pixel of each region</td><td><code>measureStyles</code> (§3.4)</td><td><span class="tag">planned</span></td></tr>
-<tr><td>voices across staves</td><td>a voice continuing on the next stave</td><td>one voice's beam/stem chain continues on the adjacent stave</td><td>chain rule across <code>stavesParams</code></td><td><span class="tag">planned</span></td></tr>
-<tr><td>mid-measure clef / key</td><td><code>with bass clef before</code>, <code>with key signature g major before</code></td><td>the same glyphs appearing mid-measure</td><td>same rules, at a unit</td><td><span class="tag">planned</span></td></tr>
-<tr><td>unit spacing</td><td><code>compress units by 2 times</code>, <code>stretch …</code>, <code>hide the last measure</code></td><td>x-spacing wider or narrower than the default rhythm would give</td><td>measured ratio (or absorbed in layout)</td><td><span class="tag">planned</span></td></tr>
+<tr><td>clefs</td><td><code>treble clef</code>, <code>bass</code>, <code>alto</code>, <code>tenor</code>, <code>soprano</code>, <code>mezzo soprano</code>, <code>baritone</code>, <code>octave up/down</code>, <code>two octaves …</code></td><td>large glyph at the stave's left edge — every clef a distinct shape; small 8 above/below for octave clefs</td><td>classes + position</td><td><span class="tag">implemented</span></td></tr>
+<tr><td>staves</td><td><code>stave</code>, <code>stave with bass clef</code></td><td>another group of 5 lines</td><td>geometry</td><td><span class="tag">implemented</span></td></tr>
+<tr><td>cross-stave connections</td><td><code>bracket from stave N to stave M</code>, <code>brace</code></td><td>brace (curly) or bracket (thick line + serifs) at the left of several staves</td><td>class + left-edge position → <code>connectionsParams</code></td><td><span class="tag">implemented</span></td></tr>
+<tr><td>measures</td><td><code>measure</code></td><td>barlines slicing the system; boundaries align across staves</td><td>geometry</td><td><span class="tag">implemented</span></td></tr>
+<tr><td>barlines</td><td><code>opening barline</code>, <code>ends with closing double barline</code>, <code>bold</code>, <code>dotted</code>, <code>no opening barline</code></td><td>vertical lines; their count, thickness, and dots at the junction</td><td>geometry</td><td><span class="tag">implemented</span></td></tr>
+<tr><td>repeat signs</td><td><code>repeat sign at the start</code>, <code>at the end</code></td><td>double barline + two dots beside it</td><td>geometry + dot pair</td><td><span class="tag">implemented</span></td></tr>
+<tr><td>time signature</td><td><code>time signature is 3:4</code>, <code>c</code>, <code>crossed c</code></td><td>two digits stacked after the key, or the C / ℄ glyph</td><td>digit classes + stacking</td><td><span class="tag">implemented</span></td></tr>
+<tr><td>key signature</td><td><code>key signature is f major</code></td><td>row of sharps/flats after the clef, on fixed heights</td><td>count + type = key</td><td><span class="tag">implemented</span></td></tr>
+<tr><td>page lines</td><td><code>new line</code></td><td>systems stacked down the page</td><td>row structure</td><td><span class="tag">implemented</span></td></tr>
+<tr><td>voices</td><td><code>voice</code></td><td>interleaved groups with opposite stem directions</td><td><code>splitVoicesByStemDirection</code></td><td><span class="tag">implemented</span></td></tr>
+<tr><td>titles, page meta</td><td><code>title is "…"</code>, <code>subtitle</code>, <code>composer</code>, <code>left/right subtitle</code>, <code>description</code>, <code>page number</code></td><td>text blocks at known positions — top, corners, bottom</td><td><code>findTextBlocks</code> → exact six-language OCR → <code>attachRecognizedPageMetadata</code>; unresolved lines stay in the report</td><td><span class="tag">implemented</span></td></tr>
+<tr><td>instrument titles</td><td><code>instrument title is "Piano" for stave 1</code>, <code>between stave N and stave M</code></td><td>text left of a system, centered on the stave(s) it names</td><td>text role + stave alignment + exact OCR → <code>attachRecognizedInstrumentTitles</code></td><td><span class="tag">implemented</span></td></tr>
+<tr><td>measure numbers</td><td><code>measure numbers for first measures</code>, <code>above measures</code></td><td>small digits above/below system starts</td><td>digit classes + position</td><td><span class="tag">implemented</span></td></tr>
+<tr><td>styles, sizes, colours</td><td><code>font size is 7</code>, <code>title font size is 5.4</code>, <code>background color …</code></td><td>text heights ÷ <i>s</i>; median pixel of each region</td><td><code>measureStyles</code> (§3.4)</td><td><span class="tag">implemented</span></td></tr>
+<tr><td>voices across staves</td><td>a voice continuing on the next stave</td><td>one voice's beam/stem chain continues on the adjacent stave</td><td>chain rule across <code>stavesParams</code></td><td><span class="tag">implemented</span></td></tr>
+<tr><td>mid-measure clef / key</td><td><code>with bass clef before</code>, <code>with key signature g major before</code></td><td>the same glyphs appearing mid-measure</td><td>same rules, at a unit</td><td><span class="tag">implemented</span></td></tr>
+<tr><td>unit spacing</td><td><code>compress units by 2 times</code>, <code>stretch …</code>, <code>hide the last measure</code></td><td>x-spacing wider or narrower than the default rhythm would give</td><td>measured ratio (or absorbed in layout)</td><td><span class="tag">implemented</span></td></tr>
 </table>
 
 <h4>Units</h4>
 <table class="grid">
 <tr><th>feature</th><th>written as</th><th>signal in the image</th><th>who reads it</th><th></th></tr>
-<tr><td>pitch, octave</td><td><code>c</code>, <code>g4</code></td><td>head center vs the <b>stored</b> line positions, half-space resolution; ledger lines extend the grid — <a href="#pixels">§4.4</a></td><td><code>clefTable[clef][position]</code></td><td><span class="tag">planned</span></td></tr>
-<tr><td>duration</td><td><code>1/4</code> … <code>1/256</code>, <code>whole</code>, <code>half</code> …</td><td>head fill (solid/hollow) + stem + number of flags or beams</td><td>classes + decision table</td><td><span class="tag">planned</span></td></tr>
-<tr><td>dots</td><td><code>dotted</code>, <code>with dot</code>, <code>with 2 dots</code></td><td>dot blob right of the head at its height (one or two)</td><td>class + proximity</td><td><span class="tag">planned</span></td></tr>
-<tr><td>accidentals</td><td><code>flat</code>, <code>sharp</code>, <code>natural</code>, <code>double flat</code>, <code>double sharp</code>, <code>demiflat</code>, <code>sesquiflat</code>, <code>demisharp</code>, <code>sesquisharp</code></td><td>blob left of the head at its height</td><td>9 shape classes + microtone shapes</td><td><span class="tag">planned</span></td></tr>
-<tr><td>rests</td><td><code>is rest</code>, <code>top rest</code>, <code>mid rest</code>, <code>bottom rest</code></td><td>rest glyph per duration; or a gap the measure must fill</td><td>classes + <code>fillRestsInMeasures</code></td><td><span class="tag">planned</span></td></tr>
-<tr><td>measure rests</td><td><code>measure rest</code>, <code>multi measure rest N times</code></td><td>whole-measure rest glyph; barred rest with a number</td><td>class + digit</td><td><span class="tag">planned</span></td></tr>
-<tr><td>chords</td><td><code>1/4 c e g</code>, <code>chord</code></td><td>heads sharing x within 0.3 <i>s</i></td><td><code>groupChordsByHorizontalProximity</code></td><td><span class="tag">planned</span></td></tr>
-<tr><td>stems</td><td><code>with stem up</code>, <code>with stem down</code></td><td>which side of the head the stem is on</td><td>geometry</td><td><span class="tag">planned</span></td></tr>
-<tr><td>beams</td><td><code>beamed</code>, <code>not beamed</code>, <code>beamed with only primary line</code></td><td>horizontal ink runs at stem ends; parallel count = number of beams</td><td>geometry</td><td><span class="tag">planned</span></td></tr>
-<tr><td>ties</td><td><code>tied with next</code>, <code>tied before</code>, <code>… measure N</code>, <code>with roundness N</code></td><td>curve joining two heads at the same height</td><td><code>buildMusicModel</code></td><td><span class="tag">planned</span></td></tr>
-<tr><td>cross-stave chords</td><td><code>on the next stave</code>, <code>on the previous stave</code>, <code>on the current stave</code></td><td>one stem crossing the gap, heads on two staves — fig 2b</td><td>stem geometry → <code>notes[].stave</code></td><td><span class="tag">planned</span></td></tr>
-<tr><td>ghost units</td><td><code>is ghost</code></td><td>x-shaped head</td><td>class</td><td><span class="tag">planned</span></td></tr>
-<tr><td>grace units</td><td><code>is grace</code>, <code>crushed grace</code>, <code>with crush line</code></td><td>small head (≈ 0.65 <i>s</i>) + optional slash through the stem</td><td>size ratio + class</td><td><span class="tag">planned</span></td></tr>
-<tr><td>parentheses</td><td><code>with parentheses</code>, for a chord <code>from note N to note M</code></td><td>arc pair around a unit, or around part of a chord</td><td>geometry + placement</td><td><span class="tag">planned</span></td></tr>
-<tr><td>arpeggiated chords</td><td><code>is arpeggiated</code>, <code>with chord below</code>, <code>with arrow up/down</code>; across staves</td><td>wavy vertical line left of a chord; optional arrow head</td><td>geometry + class</td><td><span class="tag">planned</span></td></tr>
-<tr><td>centralized units</td><td><code>is centralized</code></td><td>a lone unit centered in a half-empty measure</td><td>x-position within the measure</td><td><span class="tag">planned</span></td></tr>
+<tr><td>pitch, octave</td><td><code>c</code>, <code>g4</code></td><td>head center vs the <b>stored</b> line positions, half-space resolution; ledger lines extend the grid — <a href="#pixels">§4.4</a></td><td><code>clefTable[clef][position]</code></td><td><span class="tag">implemented</span></td></tr>
+<tr><td>duration</td><td><code>1/4</code> … <code>1/256</code>, <code>whole</code>, <code>half</code> …</td><td>head fill (solid/hollow) + stem + number of flags or beams</td><td>classes + decision table</td><td><span class="tag">implemented</span></td></tr>
+<tr><td>dots</td><td><code>dotted</code>, <code>with dot</code>, <code>with 2 dots</code></td><td>dot blob right of the head at its height (one or two)</td><td>class + proximity</td><td><span class="tag">implemented</span></td></tr>
+<tr><td>accidentals</td><td><code>flat</code>, <code>sharp</code>, <code>natural</code>, <code>double flat</code>, <code>double sharp</code>, <code>demiflat</code>, <code>sesquiflat</code>, <code>demisharp</code>, <code>sesquisharp</code></td><td>blob left of the head at its height</td><td>9 shape classes + microtone shapes</td><td><span class="tag">implemented</span></td></tr>
+<tr><td>rests</td><td><code>is rest</code>, <code>top rest</code>, <code>mid rest</code>, <code>bottom rest</code></td><td>rest glyph per duration; or a gap the measure must fill</td><td>classes + <code>fillRestsInMeasures</code></td><td><span class="tag">implemented</span></td></tr>
+<tr><td>measure rests</td><td><code>measure rest</code>, <code>multi measure rest N times</code></td><td>whole-measure rest glyph; barred rest with a number</td><td>class + digit</td><td><span class="tag">implemented</span></td></tr>
+<tr><td>chords</td><td><code>1/4 c e g</code>, <code>chord</code></td><td>heads sharing x within 0.3 <i>s</i></td><td><code>groupChordsByHorizontalProximity</code></td><td><span class="tag">implemented</span></td></tr>
+<tr><td>stems</td><td><code>with stem up</code>, <code>with stem down</code></td><td>which side of the head the stem is on</td><td>geometry</td><td><span class="tag">implemented</span></td></tr>
+<tr><td>beams</td><td><code>beamed</code>, <code>not beamed</code>, <code>beamed with only primary line</code></td><td>horizontal ink runs at stem ends; parallel count = number of beams</td><td>geometry</td><td><span class="tag">implemented</span></td></tr>
+<tr><td>ties</td><td><code>tied with next</code>, <code>tied before</code>, <code>… measure N</code>, <code>with roundness N</code></td><td>curve joining two heads at the same height</td><td><code>buildMusicModel</code></td><td><span class="tag">implemented</span></td></tr>
+<tr><td>cross-stave chords</td><td><code>on the next stave</code>, <code>on the previous stave</code>, <code>on the current stave</code></td><td>one stem crossing the gap, heads on two staves — fig 2b</td><td>stem geometry → <code>notes[].stave</code></td><td><span class="tag">implemented</span></td></tr>
+<tr><td>ghost units</td><td><code>is ghost</code></td><td>x-shaped head</td><td>class</td><td><span class="tag">implemented</span></td></tr>
+<tr><td>grace units</td><td><code>is grace</code>, <code>crushed grace</code>, <code>with crush line</code></td><td>small head (≈ 0.65 <i>s</i>) + optional slash through the stem</td><td>size ratio + class</td><td><span class="tag">implemented</span></td></tr>
+<tr><td>parentheses</td><td><code>with parentheses</code>, for a chord <code>from note N to note M</code></td><td>arc pair around a unit, or around part of a chord</td><td>geometry + placement</td><td><span class="tag">implemented</span></td></tr>
+<tr><td>arpeggiated chords</td><td><code>is arpeggiated</code>, <code>with chord below</code>, <code>with arrow up/down</code>; across staves</td><td>wavy vertical line left of a chord; optional arrow head</td><td>geometry + class</td><td><span class="tag">implemented</span></td></tr>
+<tr><td>centralized units</td><td><code>is centralized</code></td><td>a lone unit centered in a half-empty measure</td><td>x-position within the measure</td><td><span class="tag">implemented</span></td></tr>
 </table>
 
 <h4>Marks on units</h4>
 <table class="grid">
 <tr><th>feature</th><th>written as</th><th>signal in the image</th><th>who reads it</th><th></th></tr>
-<tr><td>articulations</td><td><code>with staccato</code>, <code>spiccato</code>, <code>accent</code>, <code>tenuto</code>, <code>marcato</code>, <code>fermata</code>, <code>left hand pizzicato</code>, <code>snap pizzicato</code>, <code>natural harmonic</code>, <code>up bow</code>, <code>down bow</code></td><td>small glyphs above/below a head or stem end; side and N-up/N-down offsets measured</td><td>classes + proximity + side</td><td><span class="tag">planned</span></td></tr>
-<tr><td>ornaments</td><td><code>with trill</code>, <code>with turn</code>, <code>with mordent</code>, <code>inverted</code>, <code>with wave after</code>, <code>with sharp key above</code></td><td>ornament glyph shapes over units</td><td>classes</td><td><span class="tag">planned</span></td></tr>
-<tr><td>dynamics</td><td><code>with dynamic "mp"</code>, <code>up</code>, <code>above stave</code></td><td>bold-italic word under/over the stave from a closed vocabulary (pp … fff, sfz, fp …)</td><td>word-shape classes (closed set)</td><td><span class="tag">planned</span></td></tr>
-<tr><td>pedal marks</td><td><code>with pedal before</code>, <code>"Ped."</code>, <code>opens with bracket</code>, <code>with release</code>, <code>under stave N</code></td><td>Ped. glyph + bracket line under a stave; notch at release</td><td>class + geometry</td><td><span class="tag">planned</span></td></tr>
-<tr><td>breath marks</td><td><code>with breath mark before</code>, <code>breath double slash</code></td><td>comma or double slash above the stave between units</td><td>class</td><td><span class="tag">planned</span></td></tr>
-<tr><td>tremolo</td><td><code>with tremolo</code>, <code>with tremolo with next</code>, <code>with 1/2/3 strokes</code></td><td>diagonal strokes through a stem, or between two notes</td><td>geometry (stroke count)</td><td><span class="tag">planned</span></td></tr>
-<tr><td>fermata over barline</td><td><code>ends with fermata</code></td><td>fermata glyph over the closing barline</td><td>class + position</td><td><span class="tag">planned</span></td></tr>
-<tr><td>chord letters</td><td><code>with chord "Cm7"</code>, <code>above measure</code></td><td>letter group above the measure</td><td>small reader over the chord vocabulary; unreadable → report</td><td><span class="tag">planned</span></td></tr>
-<tr><td>text labels</td><td><code>with text "…"</code></td><td>small text near a unit</td><td>text blocks + letter reader; unreadable wording → report</td><td><span class="tag">planned</span></td></tr>
-<tr><td>lyrics</td><td><code>with lyrics "…"</code>, <code>followed by dash</code>, <code>lyrics is under stave N</code></td><td>text row under a stave, syllables aligned to heads</td><td>row + alignment + letter reader; unreadable words → report</td><td><span class="tag">planned</span></td></tr>
+<tr><td>articulations</td><td><code>with staccato</code>, <code>spiccato</code>, <code>accent</code>, <code>tenuto</code>, <code>marcato</code>, <code>fermata</code>, <code>left hand pizzicato</code>, <code>snap pizzicato</code>, <code>natural harmonic</code>, <code>up bow</code>, <code>down bow</code></td><td>small glyphs above/below a head or stem end; side and N-up/N-down offsets measured</td><td>classes + proximity + side</td><td><span class="tag">implemented</span></td></tr>
+<tr><td>ornaments</td><td><code>with trill</code>, <code>with turn</code>, <code>with mordent</code>, <code>inverted</code>, <code>with wave after</code>, <code>with sharp key above</code></td><td>ornament glyph shapes over units</td><td>classes</td><td><span class="tag">implemented</span></td></tr>
+<tr><td>dynamics</td><td><code>with dynamic "mp"</code>, <code>up</code>, <code>above stave</code></td><td>bold-italic letters under/over the stave from a closed vocabulary (pp … fff, sfz, fp …)</td><td>exact character OCR + dynamic syntax + unit geometry → <code>attachRecognizedUnitText</code></td><td><span class="tag">implemented</span></td></tr>
+<tr><td>pedal marks</td><td><code>with pedal before</code>, <code>"Ped."</code>, <code>opens with bracket</code>, <code>with release</code>, <code>under stave N</code></td><td>Ped. glyph + bracket line under a stave; notch at release</td><td>class + geometry</td><td><span class="tag">implemented</span></td></tr>
+<tr><td>breath marks</td><td><code>with breath mark before</code>, <code>breath double slash</code></td><td>comma or double slash above the stave between units</td><td>class</td><td><span class="tag">implemented</span></td></tr>
+<tr><td>tremolo</td><td><code>with tremolo</code>, <code>with tremolo with next</code>, <code>with 1/2/3 strokes</code></td><td>diagonal strokes through a stem, or between two notes</td><td>geometry (stroke count)</td><td><span class="tag">implemented</span></td></tr>
+<tr><td>fermata over barline</td><td><code>ends with fermata</code></td><td>fermata glyph over the closing barline</td><td>class + position</td><td><span class="tag">implemented</span></td></tr>
+<tr><td>chord letters</td><td><code>with chord "Cm7"</code>, <code>above measure</code></td><td>letter group above the measure</td><td>exact character OCR + chord syntax + above-stave target → <code>attachRecognizedUnitText</code>; unreadable → report</td><td><span class="tag">implemented</span></td></tr>
+<tr><td>text labels</td><td><code>with text "…"</code></td><td>small text near a unit</td><td>text blocks + character OCR; unreadable wording → report</td><td><span class="tag">implemented</span></td></tr>
+<tr><td>lyrics</td><td><code>with lyrics "…"</code>, <code>followed by dash</code>, <code>lyrics is under stave N</code></td><td>text row under a stave, syllables aligned to heads</td><td>row + alignment + exact character OCR; unreadable words → report</td><td><span class="tag">implemented</span></td></tr>
 </table>
 
 <h4>Spans</h4>
 <table class="grid">
 <tr><th>feature</th><th>written as</th><th>signal in the image</th><th>who reads it</th><th></th></tr>
-<tr><td>slurs</td><td><code>slur from … to …</code>, <code>starts before</code>, <code>finishes after</code>, <code>with s shape</code>, <code>with roundness N</code></td><td>arc over/under units at different heights; ends may sit before/after a unit; s = double curve</td><td><code>buildMusicModel</code> + shape flags</td><td><span class="tag">planned</span></td></tr>
-<tr><td>cross-stave slurs</td><td><code>changes stave</code>, <code>goes through unit N</code>, <code>goes through above unit N</code></td><td>arc whose ends sit on different staves — fig 2b</td><td>pairing with (measure, stave, voice, unit) ends</td><td><span class="tag">planned</span></td></tr>
-<tr><td>crescendo / diminuendo</td><td><code>crescendo from … to …</code>, <code>dim.</code>, <code>above stave</code></td><td>two diverging (or converging) hairpin lines</td><td>geometry + direction</td><td><span class="tag">planned</span></td></tr>
-<tr><td>octave signs</td><td><code>octave up from … to …</code>, <code>two octaves down</code>, <code>is octave up</code></td><td>dashed line + "8" / "15" text over a span or one unit</td><td>text class + dashed span</td><td><span class="tag">planned</span></td></tr>
-<tr><td>tuplets</td><td><code>tuplet 3 from … to …</code>, <code>tuplet 3:2</code>, <code>with brackets</code></td><td>digit (with optional bracket) over a group of units</td><td>digit class + geometry</td><td><span class="tag">planned</span></td></tr>
-<tr><td>glissando</td><td><code>glissando from … to …</code>, <code>as wave</code>, <code>as line</code>, <code>with glissando after</code></td><td>straight or wavy line between heads — or running off a unit to the edge</td><td>geometry + pairing</td><td><span class="tag">planned</span></td></tr>
-<tr><td>volta brackets</td><td><code>volta with text "1." from … to …</code></td><td>bracket with a number over measures at a repeat</td><td>geometry + digit/text</td><td><span class="tag">planned</span></td></tr>
-<tr><td>similes</td><td><code>simile of previous measure</code>, <code>repeat of previous beat</code>, <code>simile from … to …</code></td><td>simile slash glyphs (% style) standing in for notes or measures</td><td>special classes + measure geometry</td><td><span class="tag">planned</span></td></tr>
+<tr><td>slurs</td><td><code>slur from … to …</code>, <code>starts before</code>, <code>finishes after</code>, <code>with s shape</code>, <code>with roundness N</code></td><td>arc over/under units at different heights; ends may sit before/after a unit; s = double curve</td><td><code>buildMusicModel</code> + shape flags</td><td><span class="tag">implemented</span></td></tr>
+<tr><td>cross-stave slurs</td><td><code>changes stave</code>, <code>goes through unit N</code>, <code>goes through above unit N</code></td><td>arc whose ends sit on different staves — fig 2b</td><td>pairing with (measure, stave, voice, unit) ends</td><td><span class="tag">implemented</span></td></tr>
+<tr><td>crescendo / diminuendo</td><td><code>crescendo from … to …</code>, <code>dim.</code>, <code>above stave</code></td><td>two diverging (or converging) hairpin lines</td><td>geometry + direction</td><td><span class="tag">implemented</span></td></tr>
+<tr><td>octave signs</td><td><code>octave up from … to …</code>, <code>two octaves down</code>, <code>is octave up</code></td><td>dashed line + "8" / "15" text over a span or one unit</td><td>text class + dashed span</td><td><span class="tag">implemented</span></td></tr>
+<tr><td>tuplets</td><td><code>tuplet 3 from … to …</code>, <code>tuplet 3:2</code>, <code>with brackets</code></td><td>digit (with optional bracket) over a group of units</td><td>digit class + geometry</td><td><span class="tag">implemented</span></td></tr>
+<tr><td>glissando</td><td><code>glissando from … to …</code>, <code>as wave</code>, <code>as line</code>, <code>with glissando after</code></td><td>straight or wavy line between heads — or running off a unit to the edge</td><td>geometry + pairing</td><td><span class="tag">implemented</span></td></tr>
+<tr><td>volta brackets</td><td><code>volta with text "1." from … to …</code></td><td>bracket with a number over measures at a repeat</td><td>geometry + digit/text</td><td><span class="tag">implemented</span></td></tr>
+<tr><td>similes</td><td><code>simile of previous measure</code>, <code>repeat of previous beat</code>, <code>simile from … to …</code></td><td>simile slash glyphs (% style) standing in for notes or measures</td><td>special classes + measure geometry</td><td><span class="tag">implemented</span></td></tr>
 </table>
 
 <h4>Measure furniture</h4>
 <table class="grid">
 <tr><th>feature</th><th>written as</th><th>signal in the image</th><th>who reads it</th><th></th></tr>
-<tr><td>tempo marks</td><td><code>tempo is "Andante"</code>, <code>metronome</code>, <code>N up/down</code></td><td>text above a measure; digits in brackets after it</td><td>text block + digit reading</td><td><span class="tag">planned</span></td></tr>
-<tr><td>sign (segno)</td><td><code>sign</code>, <code>at the start of the measure</code></td><td>segno glyph at a measure end/start</td><td>class + position</td><td><span class="tag">planned</span></td></tr>
-<tr><td>coda</td><td><code>coda</code>, <code>N up/down</code></td><td>coda glyph (crossed circles) at a measure</td><td>class + position</td><td><span class="tag">planned</span></td></tr>
-<tr><td>repetition instructions</td><td><code>repetition note "D.C. al Coda"</code></td><td>text at a measure start/end from a closed vocabulary</td><td>text + vocabulary</td><td><span class="tag">planned</span></td></tr>
+<tr><td>tempo marks</td><td><code>tempo is "Andante"</code>, <code>metronome</code>, <code>N up/down</code></td><td>text above a measure; digits in brackets after it</td><td>text block + digit reading</td><td><span class="tag">implemented</span></td></tr>
+<tr><td>sign (segno)</td><td><code>sign</code>, <code>at the start of the measure</code></td><td>segno glyph at a measure end/start</td><td>class + position</td><td><span class="tag">implemented</span></td></tr>
+<tr><td>coda</td><td><code>coda</code>, <code>N up/down</code></td><td>coda glyph (crossed circles) at a measure</td><td>class + position</td><td><span class="tag">implemented</span></td></tr>
+<tr><td>repetition instructions</td><td><code>repetition note "D.C. al Coda"</code></td><td>text at a measure start/end from a closed vocabulary</td><td>text + vocabulary</td><td><span class="tag">implemented</span></td></tr>
 </table>
 
 <h4>Not read from the image</h4>
@@ -1293,7 +1386,7 @@ rows(i) = Σ<sub>x</sub> ink(x, i) &nbsp;→&nbsp; peaks = five parallel peaks, 
 <tr><td>u<sub>0</sub></td><td>the origin (the staff's top-left corner)</td></tr>
 <tr><td>û</td><td>the coordinate in staff spaces — scale-free; two zooms of one page give the same û</td></tr>
 </table>
-<p>Staff-line thickness <i>t</i> is measured from vertical ink runs. Removal and clearing use <i>t</i>; musical distances use <i>s</i>. <code>npm run omr:scale</code> checks complete-page staff and measure structure at several raster scales, so this is tested on the whole pipeline, not inferred from crop normalization alone.</p>
+<p>Each stave owns its own <code>intervalBetweenStaveLines</code> (<i>s</i>) and <code>staveLineThickness</code> (<i>t</i>). Removal and clearing use that stave's <i>t</i>; pitch and other musical distances use its <i>s</i>. The page-wide reference interval is only a reference for page text and broad candidates, not a replacement for local geometry. <code>measureLocalIntervals</code> also returns every adjacent stave gap and page-line gap in <code>intervalBetweenStaves</code> and <code>intervalBetweenPageLines</code>, in both pixels and staff-space ratios. <code>npm run omr:scale</code> checks complete-page staff and measure structure at several raster scales.</p>
 
 <h3>4.2 Cutting out one symbol</h3>
 <p>Take a box of fixed <em>musical</em> size (3 <i>s</i> tall), pad it to a square — never stretch, aspect ratio carries meaning (stem vs notehead) — then scale it to 48×48. This is <b>size normalization</b>; the scaling inside is <b>image resampling</b>:</p>
@@ -1316,20 +1409,18 @@ enlarge: dst(<i>x</i>, <i>y</i>) = (1−α)(1−β)·<i>Q</i><sub>00</sub> + α(
 <p>Straight lines (staff lines, stems, beams, barlines) are found by geometry — a line is a run of ink with a consistent angle, free to detect exactly. They are removed; what remains are <b>components</b>: connected blobs of ink. Those are what the model classifies. Lines never need learning.</p>
 
 <h3>4.4 The pixels go; the coordinates stay</h3>
-<p>Staff lines are measured <em>before</em> being subtracted, and their positions are kept. A note's position is measured against those stored coordinates — not against visible pixels. Each line is kept as a line model (a photo's stave is rarely perfectly flat):</p>
+<p>Staff lines are measured <em>before</em> being subtracted, and their positions are kept. A note's position is measured against those stored coordinates — not against visible pixels or a page average. Between two lines, the measured interval itself supplies the scale:</p>
 
 <div class="f">
-<i>y</i><sub>i</sub>(<i>x</i>) = <i>a</i><sub>i</sub>·<i>x</i> + <i>b</i><sub>i</sub> &nbsp;&nbsp;(i = 1..5) &nbsp;&nbsp;&nbsp;&nbsp;
-<i>d</i> = (<i>y<sub>h</sub></i> − <i>y</i><sub>3</sub>(<i>x<sub>h</sub></i>)) / (<i>s</i>/2) &nbsp;&nbsp;&nbsp;&nbsp; position = round(<i>d</i>)
-<span class="who">analysis/detectStaves.js → translation/assignPitchByStaffPosition.js</span>
+position = round(2 · (<i>i</i> + (<i>y<sub>h</sub></i> − <i>y<sub>i</sub></i>) / (<i>y</i><sub>i+1</sub> − <i>y<sub>i</sub></i>))) &nbsp;&nbsp;&nbsp;&nbsp; <i>y<sub>i</sub></i> ≤ <i>y<sub>h</sub></i> ≤ <i>y</i><sub>i+1</sub>
+<span class="who">analysis/detectStaves.js + measurePositionNumber.js → translation/assignPitchByPositionNumber.js</span>
 </div>
 <table class="legend">
-<tr><td>y<sub>i</sub>(x)</td><td>row of staff line <i>i</i> at column <i>x</i> — stored from the measurement, survives subtraction</td></tr>
-<tr><td>a<sub>i</sub>, b<sub>i</sub></td><td>the line's slope and offset (slope ≈ 0 after deskew; kept so tilted photos work)</td></tr>
-<tr><td>x<sub>h</sub>, y<sub>h</sub></td><td>the notehead blob's center</td></tr>
-<tr><td>y<sub>3</sub></td><td>the middle line — the zero of the scale</td></tr>
-<tr><td>s/2</td><td>half a staff space: positions step by halves (line, space, line…)</td></tr>
-<tr><td>d, position</td><td>0 = middle line, odd = spaces, even = lines; then <code>clefTable[clef][position]</code> gives letter and octave</td></tr>
+<tr><td>y<sub>i</sub></td><td>stored row of staff line <i>i</i>, counted from the top — the line positions survive subtraction</td></tr>
+<tr><td>y<sub>h</sub></td><td>the notehead blob's center row</td></tr>
+<tr><td>y<sub>i+1</sub>−y<sub>i</sub></td><td>the local interval containing the head; above or below the stave, the nearest end interval is used</td></tr>
+<tr><td>i</td><td>zero-based line index; two position steps per interval give line, space, line…</td></tr>
+<tr><td>position</td><td>rounded half-interval position from the top line; the clef's anchor then gives letter and octave</td></tr>
 </table>
 <p>Subtraction cannot move the head's center — the lines pass through it horizontally and symmetrically — and when in doubt, the center is taken from the original grayscale using the blob's pixel mask.</p>
 <ul>
@@ -1343,7 +1434,7 @@ enlarge: dst(<i>x</i>, <i>y</i>) = (1−α)(1−β)·<i>Q</i><sub>00</sub> + α(
 <!-- ============================ 5 · MODEL ============================ -->
 <section id="model">
 <h2><span class="n">5</span>The model, built by hand</h2>
-<p>A crop of 48×48 numbers goes in; <i>K</i> probabilities come out (currently 73 classes: note and rest durations, clefs, accidentals, digits, articulations, ornaments, ghost and grace heads, meter, connections, marks and <code>other</code>. <code>symbolClasses.js</code> is the class table; <i>K</i> follows it). The model is a chain of simple layers; each transforms an array of numbers.</p>
+<p>A crop of 48×48 numbers goes in; <i>K</i> probabilities come out (currently 108 classes: note and rest durations, clefs, accidentals, digits, articulations, ornaments, ghost and grace heads, meter, connections, marks and <code>other</code>. <code>symbolClasses.js</code> is the class table; <i>K</i> follows it). The model is a chain of simple layers; each transforms an array of numbers.</p>
 
 <figure data-figs="fig-omr-network" data-alt="The convolutional network from a 48 by 48 crop through two convolutions, pooling, dense and softmax">
 <svg role="img" aria-label="The convolutional network from a 48 by 48 crop through two convolutions, pooling, dense and softmax" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="715.7pt" height="142.1pt" viewBox="5.8 41.8 715.7 142.1">
@@ -2037,6 +2128,9 @@ decision: class = argmax<sub>c</sub> <i>p</i><sub>c</sub> &nbsp; if max <i>p</i>
 
 <h3>6.1 The data: drawn by your own renderer</h3>
 <p>You never label anything. The generator writes random MSQ pages, your own drawer renders them, and since the drawer knows exactly what it drew, every symbol's class and position comes attached.</p>
+<p>There are three related data paths. The symbol trainer makes isolated crops in Bravura and Leland. The full-page generator renders repository compositions with <b>40 style presets</b>, local stave/page-line geometry variation and the <code>clean</code>, <code>screenshot</code>, <code>scan-light</code>, <code>scan-medium</code> and <code>scan-hard</code> mutation profiles. The text generator makes character crops from the actual text and chord-letter fonts for English, French, German, Italian, Spanish and Russian.</p>
+<p>Full-page targets are the unmutated canonical page schema and, when serialization supports it, canonical MSQ. Source SVG semantic geometry, title/subtitle text and dynamic/chord-letter targets stay beside the mutated bitmap. Train, validation and test are assigned by <b>composition</b>, before pages and variants, so the same work cannot cross a split through another rendering. Real-book collection and correction are deferred.</p>
+<p>Before a remote run, <code>npm run omr:prepare-remote -- --out=training-data/remote-bundle --code-version=&lt;frozen-commit&gt;</code> writes the full-page bundle and hashes. The symbol and OCR trainers are then started manually from that same frozen code/documentation checkout; changing source, data or configuration starts a new candidate.</p>
 
 <figure data-figs="fig-omr-data-factory" data-alt="Isolated MSQ becomes a page schema, SVG, six raster scales and labelled crops">
 <svg role="img" aria-label="Isolated MSQ becomes a page schema, SVG, six raster scales and labelled crops" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="686.9pt" height="215.9pt" viewBox="16.6 34.6 686.9 215.9">
@@ -2886,7 +2980,7 @@ d<i>W</i> = δ · <i>a</i><sub>prev</sub><sup>T</sup> &nbsp;&nbsp;&nbsp; d<i>b</
     </div>
   </div>
 </div>
-<p>Training is done when the validation curve stops falling and the matrix is mostly diagonal. <code>evaluate.js</code> writes exactly these images; errors are looked at, not read in a log.</p>
+<p>The validation curve and confusion matrix help you read a run; they do not adopt it. The exported checkpoint has the lowest validation loss, then the combined symbol + OCR candidate still has to pass full-page canonical verification. Do not turn a crop metric into a page-accuracy claim.</p>
 
 <h3>6.6 Getting better</h3>
 <table class="grid">
@@ -2903,27 +2997,26 @@ d<i>W</i> = δ · <i>a</i><sub>prev</sub><sup>T</sup> &nbsp;&nbsp;&nbsp; d<i>b</
 <!-- ============================ 7 · SERVER ============================ -->
 <section id="server">
 <h2><span class="n">7</span>Training on a rented server</h2>
-<p>The trainer is plain Node — no framework, no GPU needed. A small server with 8–16 cores just makes it faster and keeps gigabytes of crops off your laptop. The workflow:</p>
+<p>Both trainers are plain Node — no framework and no GPU requirement. The important boundary is the freeze: finish code and docs, run the non-OMR pre-training tests, choose a commit, and keep that commit unchanged through training and verification. The detailed remote workflow is in <a href="./training.html">Training on a server</a>.</p>
 
-<pre><code><span class="cm"># 1 · put the code (and nothing else) on the server</span>
-rsync -a src/omr/ server:omr/
+<pre><code><span class="cm"># 1 · before the freeze, on your laptop</span>
+npm run test:pretraining
+npm run omr:prepare-remote -- --out=training-data/remote-bundle --code-version=&lt;frozen-commit&gt;
 
-<span class="cm"># 2 · generate the dataset there — seeded, so it exists everywhere by name</span>
-ssh server 'cd MuSemantiQ && node src/omr/training/train.js --dataset=renderer --validation=mixed --seed=20261110'
+<span class="cm"># 2 · on the frozen remote checkout: symbols</span>
+ssh user@server 'cd MuSemantiQ &amp;&amp; node src/omr/training/train.js --dataset=renderer --validation=mixed --samples-per-class=400 --epochs=40 --grid=48 --filters=16,32 --dense=64 --batch=32 --learning-rate=0.001 --seed=20261110 --out=training-data/candidates/symbols.json'
 
-<span class="cm"># 3 · train; it writes loss.svg / confusion.svg each epoch</span>
-ssh server 'cd omr && node training/train.js'
+<span class="cm"># 3 · on the same frozen checkout: six-language OCR</span>
+ssh user@server 'cd MuSemantiQ &amp;&amp; npm run omr:train:text -- --seed=20261115 --grid=48 --epochs=20 --samples-per-character=4 --dense=64 --batch=32 --learning-rate=0.001 --out=training-data/text-runs/candidate-ocr'
 
-<span class="cm"># 4 · watch the pictures without downloading anything</span>
-rsync server:omr/run/*.svg ./run/        <span class="cm"># open loss.svg after each epoch</span>
-
-<span class="cm"># 5 · take the result home — weights + hash go into the repo</span>
-rsync server:omr/model/weights.json src/omr/model/</code></pre>
+<span class="cm"># 4 · after downloading both runs: one explicit candidate</span>
+npm run omr:combine-artifacts -- --symbols=training-data/candidates/symbols.json --ocr=training-data/text-runs/candidate-ocr/best-weights.json --out=training-data/candidates/combined.json
+npm run omr:verify -- --weights=training-data/candidates/combined.json --all --out=training-data/verification-failures</code></pre>
 
 <ul>
-  <li><b>Same seed → same dataset</b> on the server and on your laptop; only the speed differs.</li>
-  <li><b>Release weights come from one machine</b> — different CPUs can round floats differently in the last decimal. The hash in the repo settles it anyway: once exported, weights never move.</li>
-  <li>A bigger server later is the same five commands; the model at ~300K numbers trains in an evening on 8 cores.</li>
+  <li><b>Same seed → same generated data</b>; the full-page manifest also pins code, data, configuration and every PNG hash.</li>
+  <li><b>Composition splits come before rendering</b>, and the 40 renderer styles and five full-page mutation profiles are selected deterministically.</li>
+  <li><b>Weights never travel through git.</b> Combine the two downloaded artifacts, pass <code>--weights</code> explicitly, and keep the verification evidence beside that candidate.</li>
 </ul>
 </section>
 
@@ -2937,10 +3030,11 @@ rsync server:omr/model/weights.json src/omr/model/</code></pre>
 <table class="grid">
 <tr><th>function</th><th>in</th><th>out</th></tr>
 <tr><td><code>decodeImageToGrayscale(bytes)</code></td><td>png bytes (node zlib; jpeg: convert first)</td><td><code>{ width, height, grayscale }</code> — plain numbers, no DOM</td></tr>
-<tr><td><code>analyzeImage(image)</code></td><td>the same</td><td>staves, components (box, class, confidence), text blocks, measured styles — painted back over the source by tools</td></tr>
-<tr><td><code>translateImageToMsq(image)</code></td><td>the same</td><td><code>{ msqText, report }</code></td></tr>
-<tr><td><code>translateImagesToMsqPages(images)</code></td><td>one image per page</td><td><code>{ pagesText, report }</code> — <code>pagesText[i]</code> becomes <code>page-(i+1).txt</code>; measure numbers, key and meter carry on</td></tr>
+<tr><td><code>analyzeImage(image)</code></td><td>the same</td><td>staves with local spacing/thickness, local interval arrays, systems, text blocks and measured styles</td></tr>
+<tr><td><code>translateImageToMsq(image, { weights })</code></td><td>the same + an explicit artifact with optional nested <code>ocr</code></td><td><code>{ msqText, report }</code>, plus <code>diagnostics</code> when requested</td></tr>
+<tr><td><code>translateImagesToMsqPages(images, { weights })</code></td><td>one image per page + the same artifact</td><td><code>{ pagesText, report }</code> — <code>pagesText[i]</code> becomes <code>page-(i+1).txt</code>; measure numbers, key and meter carry on</td></tr>
 </table>
+<p>There is no fallback model. <code>weights</code> supplies <code>shape</code>, <code>layers</code> and <code>classIds</code> for symbols; <code>weights.ocr</code> supplies the complete character artifact. A missing OCR model does not invent text: affected blocks become located uncertainties. You can also pass an already loaded <code>model</code> and <code>classIds</code>, or explicit <code>ocrWeights</code>, when composing the API yourself.</p>
 
 <h3>The report — what the tool was unsure about</h3>
 <pre><code>{ line: 42,                                    <span class="cm">// the MSQ line the unit became</span>
@@ -2955,16 +3049,21 @@ rsync server:omr/model/weights.json src/omr/model/</code></pre>
 <!-- ============================ 9 · TESTING ============================ -->
 <section id="testing">
 <h2><span class="n">9</span>Testing</h2>
+<p>Pre-training checks need no model. Legacy OMR tests and candidate verification each require an explicit artifact:</p>
+<pre><code>npm run test:pretraining
+npm run omr:verify -- --weights=training-data/candidates/combined.json --all --out=training-data/verification-failures
+OMR_WEIGHTS=training-data/candidates/combined.json npm run test:omr:all</code></pre>
+<p><code>omr:verify</code> tests full pages at <b>0.5×, 0.75×, 1×, 1.5×, 2× and 3×</b>. Generated MSQ must parse, its normalized visible schema must equal the fixture's schema, and no uncertain or ignored item may remain. Failure JSON, MSQ and diagnostics go under <code>--out</code>. <code>OMR_WEIGHTS</code> is mandatory for the legacy suite; without it, <code>test:omr:all</code> stops instead of loading a fallback.</p>
 <table class="grid">
 <tr><th>layer</th><th>proves</th><th>how</th></tr>
 <tr><td>unit</td><td>each rule is right alone</td><td>tiny tests per function: position → pitch, shapes → duration, gaps → rests</td></tr>
 <tr><td>round-trip</td><td>the output really is MSQ</td><td><code>parse(serialize(x))</code> equals <code>x</code>; the parser reports no errors on generated text</td></tr>
 <tr><td><b>golden</b></td><td>same version → same output</td><td>fixture image → expected <code>.msq</code>, compared byte for byte</td></tr>
-<tr><td>model eval</td><td>the classifier is good enough</td><td>held-out seeds; per-class recall floors; confusion + gallery kept as artifacts</td></tr>
-<tr><td>reproducibility</td><td>the seed <em>is</em> the dataset</td><td>regenerate → same hash; retrain → same weights hash</td></tr>
+<tr><td>candidate verification</td><td>the two classifiers work in the complete page pipeline</td><td>held-out samples for diagnosis; full-page canonical schemas, zero uncertainty and zero ignored ink for acceptance</td></tr>
+<tr><td>reproducibility</td><td>the run has a stable identity</td><td>frozen commit + seeds + composition splits + code/data/config and PNG hashes</td></tr>
 <tr><td>extensibility</td><td>the class table is honest</td><td>add one new MSQ element end to end; it must cost a row, samples and one rule</td></tr>
 </table>
-<p>When a real image fails, reproduce it <em>synthetically</em> (new seed + harsher degradation) and keep it as a test. Real failure → synthetic reproduction → fixed → green. Nobody labels big images.</p>
+<p>Features and training commands are implemented, but no weight-based accuracy is claimed until a named combined candidate has been verified. Crop validation is not full-page verification, and neither is a real-book benchmark. Real books and corrected real-page labels are deferred.</p>
 </section>
 
 <hr>
@@ -2989,7 +3088,7 @@ rsync server:omr/model/weights.json src/omr/model/</code></pre>
 <div><dt id="term-adam">AdamW</dt><dd>Adam's adaptive step, with decoupled weight decay applied after the normalized gradient.</dd></div>
 <div><dt id="term-backprop">backpropagation</dt><dd>computing all gradients in one backward sweep, layer by layer, reusing each layer's forward values.</dd></div>
 <div><dt id="term-overfit">overfitting</dt><dd>memorizing the training images instead of learning the symbols. Fought by held-out validation, variety in generation, and decoupled weight decay.</dd></div>
-<div><dt id="term-splits">train / validation / test</dt><dd>three disjoint seed ranges: learn on the first, tune on the second, judge on the third — never the same crops twice.</dd></div>
+<div><dt id="term-splits">train / validation / test</dt><dd>three disjoint uses of the data. Full pages are split once per composition before any page or variant is rendered; learn on train, tune on validation, judge on test.</dd></div>
 <div><dt id="term-confusion">confusion matrix</dt><dd>a table of true class vs predicted class. The diagonal is right; bright cells off it are the mix-ups to fix.</dd></div>
 <div><dt id="term-im2col">im2col</dt><dd>cutting every small window of the image into a row of a big matrix, so a whole convolution becomes one matrix multiply (and one backprop).</dd></div>
 <div><dt id="term-staff-space">staff space</dt><dd>the distance between two staff lines — music's natural ruler. Nearly everything here is measured in it.</dd></div>
@@ -3008,7 +3107,7 @@ rsync server:omr/model/weights.json src/omr/model/</code></pre>
 <tr><th>formula</th><th>file that computes it</th><th>§</th></tr>
 <tr><td>staff peaks → s</td><td><code>analysis/detectStaves.js</code></td><td><a href="#features">3</a></td></tr>
 <tr><td>û = (u − u₀)/s</td><td><code>analysis/detectStaves.js</code></td><td><a href="#pixels">4.1</a></td></tr>
-<tr><td>y<sub>i</sub>(x) = a<sub>i</sub>x + b<sub>i</sub>, d = (y<sub>h</sub> − y<sub>3</sub>)/(s/2)</td><td><code>analysis/detectStaves.js</code> → <code>translation/assignPitchByStaffPosition.js</code></td><td><a href="#pixels">4.4</a></td></tr>
+<tr><td>position = round(2 · (i + (y<sub>h</sub> − y<sub>i</sub>)/(y<sub>i+1</sub> − y<sub>i</sub>)))</td><td><code>analysis/measurePositionNumber.js</code> → <code>translation/assignPitchByPositionNumber.js</code></td><td><a href="#pixels">4.4</a></td></tr>
 <tr><td>resampling (average / blend)</td><td><code>training/cropComponents.js</code></td><td><a href="#pixels">4.2</a></td></tr>
 <tr><td>convolution (im2col)</td><td><code>model/forwardConvolution.js</code></td><td><a href="#model">5.1</a></td></tr>
 <tr><td>ReLU, maxpool, dense, softmax</td><td><code>model/forwardDense.js</code></td><td><a href="#model">5.2</a></td></tr>

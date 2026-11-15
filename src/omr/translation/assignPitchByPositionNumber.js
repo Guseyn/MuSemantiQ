@@ -1,10 +1,10 @@
 'use strict'
 
 /**
- * Staff position → pitch.
+ * positionNumber → pitch.
  *
- * The position is half staff-spaces down from the top line (0 is the top
- * line, 2 the first space). Walking it downward walks the letters d, c, b…,
+ * The position is half stave-line intervals down from the top line (0 is the
+ * top line, 1 the first space). Walking it downward walks the letters d, c, b…,
  * and the octave ticks down whenever the walk passes from c to b. The clef
  * says which pitch the top line starts at — the same table the drawer reads
  * in reverse.
@@ -26,11 +26,11 @@ const TOP_LINE_PITCH = {
   octaveFifteenDown: { letter: 'f', octave: 3 }
 }
 
-export function assignPitchByStaffPosition (staffPosition, clef = 'treble') {
+export function assignPitchByPositionNumber (positionNumber, clef = 'treble') {
   const start = TOP_LINE_PITCH[clef] || TOP_LINE_PITCH.treble
-  const diatonicIndex = start.octave * LETTERS.length + LETTERS.indexOf(start.letter) - staffPosition
+  const diatonicIndex = start.octave * LETTERS.length + LETTERS.indexOf(start.letter) - positionNumber
   const noteName = LETTERS[(diatonicIndex % LETTERS.length + LETTERS.length) % LETTERS.length]
   return { noteName, octaveNumber: String(Math.floor(diatonicIndex / LETTERS.length)) }
 }
 
-export default assignPitchByStaffPosition
+export default assignPitchByPositionNumber

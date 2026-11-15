@@ -14,12 +14,12 @@ export { createBitmap, drawFilledRect }
 
 // Five lines from yTop downward. A slope tilts the stave like a photographed
 // page: y grows by slope for every x.
-export function drawStave (bitmap, x1, x2, yTop, staffSpace, slope = 0) {
+export function drawStave (bitmap, x1, x2, yTop, intervalBetweenStaveLines, slope = 0) {
   for (let line = 0; line < 5; line++) {
     drawLine(
       bitmap,
-      x1, yTop + line * staffSpace - (x1 + x2) / 2 * slope,
-      x2, yTop + line * staffSpace + (x2 - x1) / 2 * slope,
+      x1, yTop + line * intervalBetweenStaveLines - (x1 + x2) / 2 * slope,
+      x2, yTop + line * intervalBetweenStaveLines + (x2 - x1) / 2 * slope,
       3
     )
   }

@@ -15,21 +15,22 @@ const EDGE_TOLERANCE_IN_STAFF_SPACES = 1
 export function findBarLines ({ width, height, grayscale }, staves) {
   const candidates = []
   for (const stave of staves) {
-    const staffSpace = stave.staffSpaceHeightPx
+    const intervalBetweenStaveLines = stave.intervalBetweenStaveLines
     const staveHeight = stave.bottomY - stave.topY
-    const thinEnough = Math.max(3, 0.3 * staffSpace)
-    const fromY = Math.max(0, Math.floor(stave.topY - 0.35 * staffSpace))
-    const toY = Math.min(height - 1, Math.ceil(stave.bottomY + 0.35 * staffSpace))
+    const thinEnough = Math.max(3, 0.3 * intervalBetweenStaveLines)
+    const fromY = Math.max(0, Math.floor(stave.topY - 0.35 * intervalBetweenStaveLines))
+    const toY = Math.min(height - 1, Math.ceil(stave.bottomY + 0.35 * intervalBetweenStaveLines))
     for (let x = stave.xStart; x <= stave.xEnd; x++) {
-      for (const run of verticalRuns({ width, grayscale }, x, fromY, toY, Math.max(1, 0.25 * staffSpace))) {
+      for (const run of verticalRuns({ width, grayscale }, x, fromY, toY, Math.max(1, 0.75 * intervalBetweenStaveLines))) {
         const covers = run.y2 - run.y1 + 1 >= COVERS_STAVE_FRACTION * staveHeight &&
-          run.y1 <= stave.topY + 0.3 * staffSpace &&
-          run.y2 >= stave.bottomY - 0.3 * staffSpace
+          run.y1 <= stave.topY + 0.3 * intervalBetweenStaveLines &&
+          run.y2 >= stave.bottomY - 0.3 * intervalBetweenStaveLines
         if (covers && thinCore({ width, grayscale }, run, x, thinEnough, stave)) {
           candidates.push({
             x,
             y1: run.y1,
             y2: run.y2,
+            dotted: run.gaps >= 3,
             staveIndex: stave.index,
             systemIndex: stave.systemIndex ?? 0
           })
@@ -45,6 +46,7 @@ function verticalRuns ({ width, grayscale }, x, fromY, toY, maximumGap) {
   let start = null
   let lastInk = null
   let gap = 0
+  let gaps = 0
   for (let y = fromY; y <= toY; y++) {
     const ink = grayscale[y * width + x] > 0.25
     if (ink) {
@@ -53,15 +55,17 @@ function verticalRuns ({ width, grayscale }, x, fromY, toY, maximumGap) {
       gap = 0
     } else if (start !== null) {
       gap++
+      gaps++
       if (gap > maximumGap) {
-        runs.push({ y1: start, y2: lastInk })
+        runs.push({ y1: start, y2: lastInk, gaps })
         start = null
         gap = 0
+        gaps = 0
       }
     }
   }
   if (start !== null) {
-    runs.push({ y1: start, y2: lastInk })
+    runs.push({ y1: start, y2: lastInk, gaps })
   }
   return runs
 }
@@ -71,7 +75,7 @@ function verticalRuns ({ width, grayscale }, x, fromY, toY, maximumGap) {
 function thinCore ({ width, grayscale }, run, x, thinEnough, stave) {
   let thinRows = 0
   let measuredRows = 0
-  const lineThickness = stave.lineThicknessPx || 1
+  const lineThickness = stave.staveLineThickness || 1
   for (let y = run.y1; y <= run.y2; y++) {
     if (stave.linesY.some((line) => Math.abs(y - line) <= lineThickness / 2)) {
       continue
@@ -105,9 +109,9 @@ function cluster (candidates, staves) {
   const clustered = []
   for (const candidate of sorted) {
     const current = clustered[clustered.length - 1]
-    const staffSpace = staves[candidate.staveIndex].staffSpaceHeightPx
+    const intervalBetweenStaveLines = staves[candidate.staveIndex].intervalBetweenStaveLines
     if (current && current.systemIndex === candidate.systemIndex &&
-      Math.abs(candidate.x - current.x) <= staffSpace * CLUSTER_TOLERANCE_IN_STAFF_SPACES) {
+      Math.abs(candidate.x - current.x) <= intervalBetweenStaveLines * CLUSTER_TOLERANCE_IN_STAFF_SPACES) {
       current.candidates.push(candidate)
       current.x = mean(current.candidates.map((item) => item.x))
     } else {
@@ -122,13 +126,13 @@ function cluster (candidates, staves) {
     if (staveIndexes.length < systemStaves.length) {
       return null
     }
-    const staffSpace = mean(systemStaves.map((stave) => stave.staffSpaceHeightPx))
+    const intervalBetweenStaveLines = mean(systemStaves.map((stave) => stave.intervalBetweenStaveLines))
     const x = Math.round(group.x)
     const x1 = Math.min(...group.candidates.map((candidate) => candidate.x))
     const x2 = Math.max(...group.candidates.map((candidate) => candidate.x))
-    const nearLeftConnector = x - Math.min(...systemStaves.map((stave) => stave.xStart)) <= 4 * staffSpace
-    const atStart = nearLeftConnector || systemStaves.every((stave) => Math.abs(x - stave.xStart) <= EDGE_TOLERANCE_IN_STAFF_SPACES * staffSpace)
-    const atEnd = systemStaves.every((stave) => Math.abs(x - stave.xEnd) <= EDGE_TOLERANCE_IN_STAFF_SPACES * staffSpace)
+    const nearLeftConnector = x - Math.min(...systemStaves.map((stave) => stave.xStart)) <= 4 * intervalBetweenStaveLines
+    const atStart = nearLeftConnector || systemStaves.every((stave) => Math.abs(x - stave.xStart) <= EDGE_TOLERANCE_IN_STAFF_SPACES * intervalBetweenStaveLines)
+    const atEnd = systemStaves.every((stave) => Math.abs(x - stave.xEnd) <= EDGE_TOLERANCE_IN_STAFF_SPACES * intervalBetweenStaveLines)
     return {
       x,
       x1,
@@ -138,9 +142,27 @@ function cluster (candidates, staves) {
       y2: Math.max(...group.candidates.map((candidate) => candidate.y2)),
       systemIndex: group.systemIndex,
       staveIndexes,
-      kind: atStart ? 'opening' : atEnd ? 'closing' : 'internal'
+      kind: atStart ? 'opening' : atEnd ? 'closing' : 'internal',
+      barLineName: barLineName(atStart, x2 - x1 + 1, intervalBetweenStaveLines,
+        group.candidates.every((candidate) => candidate.dotted))
     }
   }).filter(Boolean).sort((first, second) => first.systemIndex - second.systemIndex || first.x - second.x)
+}
+
+function barLineName (atStart, columns, intervalBetweenStaveLines, dotted) {
+  if (dotted) {
+    return 'dottedBarLine'
+  }
+  if (atStart) {
+    return columns >= 0.55 * intervalBetweenStaveLines ? 'startBoldDoubleBarLine' : 'startBarLine'
+  }
+  if (columns >= 1.25 * intervalBetweenStaveLines) {
+    return 'doubleBarLine'
+  }
+  if (columns >= 0.55 * intervalBetweenStaveLines) {
+    return 'boldDoubleBarLine'
+  }
+  return 'barLine'
 }
 
 function mean (values) {

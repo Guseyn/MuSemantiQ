@@ -27,13 +27,19 @@ export function rasterizeSvg (svgText, { scale = 1, supersample = 2 } = {}) {
   const height = Math.max(1, Math.round(cssHeight * scale))
   const sampleWidth = width * supersample
   const sampleHeight = height * supersample
-  const samples = new Float32Array(sampleWidth * sampleHeight)
+  const samples = new Float32Array(sampleWidth * sampleHeight * 3)
   const view = viewBoxMatrix(document, cssWidth, cssHeight)
   const device = multiplyMatrices([ scale * supersample, 0, 0, scale * supersample, 0, 0 ], view)
-  const background = document.primitives.find((primitive) => primitive.name === 'page-background')
-  const backgroundColor = background && parseColor(background.style.fill)
-  const paperLuma = backgroundColor ? backgroundColor.luma : 1
   const unsupportedColors = new Set()
+  const background = document.primitives.find((primitive) => primitive.name === 'page-background')
+  const backgroundPaint = background && paint(background.style.fill, background.style.fillOpacity * background.style.opacity, unsupportedColors)
+  const paper = backgroundPaint ? overWhite(backgroundPaint) : { red: 1, green: 1, blue: 1 }
+  const paperLuma = luminance(Math.fround(paper.red), Math.fround(paper.green), Math.fround(paper.blue))
+  for (let index = 0; index < samples.length; index += 3) {
+    samples[index] = paper.red
+    samples[index + 1] = paper.green
+    samples[index + 2] = paper.blue
+  }
 
   for (const primitive of document.primitives) {
     if (!primitive.visible || !primitive.contours.length) {
@@ -41,13 +47,14 @@ export function rasterizeSvg (svgText, { scale = 1, supersample = 2 } = {}) {
     }
     const matrix = multiplyMatrices(device, primitive.transform)
     const contours = flattenContours(primitive.contours, matrix)
-    if (primitive.canFill) {
-      const fill = paint(primitive.style.fill, primitive.style.fillOpacity * primitive.style.opacity, paperLuma, unsupportedColors)
+    // The initial paper already contains this fill; painting it again would apply its opacity twice.
+    if (primitive.canFill && primitive !== background) {
+      const fill = paint(primitive.style.fill, primitive.style.fillOpacity * primitive.style.opacity, unsupportedColors)
       if (fill) {
         fillContours(samples, sampleWidth, sampleHeight, contours, primitive.style.fillRule, fill)
       }
     }
-    const stroke = paint(primitive.style.stroke, primitive.style.strokeOpacity * primitive.style.opacity, paperLuma, unsupportedColors)
+    const stroke = paint(primitive.style.stroke, primitive.style.strokeOpacity * primitive.style.opacity, unsupportedColors)
     const strokeScale = (Math.hypot(matrix[0], matrix[1]) + Math.hypot(matrix[2], matrix[3])) / 2
     const strokeWidth = primitive.style.strokeWidth * strokeScale
     if (stroke && strokeWidth > 0) {
@@ -57,17 +64,30 @@ export function rasterizeSvg (svgText, { scale = 1, supersample = 2 } = {}) {
   }
 
   const grayscale = new Float32Array(width * height)
+  const rgb = new Float32Array(width * height * 3)
   const sampleCount = supersample * supersample
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
       let total = 0
+      let red = 0
+      let green = 0
+      let blue = 0
       for (let sampleY = 0; sampleY < supersample; sampleY++) {
         const row = (y * supersample + sampleY) * sampleWidth
         for (let sampleX = 0; sampleX < supersample; sampleX++) {
-          total += samples[row + x * supersample + sampleX]
+          const offset = (row + x * supersample + sampleX) * 3
+          const sampleLuma = luminance(samples[offset], samples[offset + 1], samples[offset + 2])
+          total += inkFromLuma(sampleLuma, paperLuma)
+          red += samples[offset]
+          green += samples[offset + 1]
+          blue += samples[offset + 2]
         }
       }
       grayscale[y * width + x] = total / sampleCount
+      const output = (y * width + x) * 3
+      rgb[output] = red / sampleCount
+      rgb[output + 1] = green / sampleCount
+      rgb[output + 2] = blue / sampleCount
     }
   }
 
@@ -75,6 +95,7 @@ export function rasterizeSvg (svgText, { scale = 1, supersample = 2 } = {}) {
     width,
     height,
     grayscale,
+    rgb,
     unsupportedElements: document.unsupportedElements,
     unsupportedCommands: document.unsupportedCommands,
     unsupportedTransforms: document.unsupportedTransforms,
@@ -451,7 +472,7 @@ function boundsOf (points) {
   return { minimumX, minimumY, maximumX, maximumY }
 }
 
-function paint (value, opacity, paperLuma, unsupportedColors) {
+function paint (value, opacity, unsupportedColors) {
   if (value === undefined || value === null || value === '' || value === 'none' || value === 'transparent') {
     return null
   }
@@ -464,10 +485,7 @@ function paint (value, opacity, paperLuma, unsupportedColors) {
   if (!alpha) {
     return null
   }
-  return {
-    alpha,
-    ink: Math.max(0, Math.min(1, (paperLuma - color.luma) / Math.max(paperLuma, 1e-12)))
-  }
+  return { ...color, alpha }
 }
 
 function parseColor (value) {
@@ -513,11 +531,35 @@ function parseColor (value) {
 }
 
 function color (red, green, blue, alpha = 1) {
-  return { luma: (0.2126 * red + 0.7152 * green + 0.0722 * blue) / 255, alpha }
+  return { red: red / 255, green: green / 255, blue: blue / 255, alpha }
+}
+
+function luminance (red, green, blue) {
+  return 0.2126 * red + 0.7152 * green + 0.0722 * blue
+}
+
+function overWhite (paint) {
+  return {
+    red: paint.red * paint.alpha + 1 - paint.alpha,
+    green: paint.green * paint.alpha + 1 - paint.alpha,
+    blue: paint.blue * paint.alpha + 1 - paint.alpha
+  }
+}
+
+function inkFromLuma (sampleLuma, paperLuma) {
+  const negative = paperLuma < 0.5
+  const contrast = negative
+    ? (sampleLuma - paperLuma) / Math.max(1 - paperLuma, 1e-12)
+    : (paperLuma - sampleLuma) / Math.max(paperLuma, 1e-12)
+  return Math.max(0, Math.min(1, contrast))
 }
 
 function composite (pixels, index, paint) {
-  pixels[index] = paint.ink * paint.alpha + pixels[index] * (1 - paint.alpha)
+  const offset = index * 3
+  const remainder = 1 - paint.alpha
+  pixels[offset] = paint.red * paint.alpha + pixels[offset] * remainder
+  pixels[offset + 1] = paint.green * paint.alpha + pixels[offset + 1] * remainder
+  pixels[offset + 2] = paint.blue * paint.alpha + pixels[offset + 2] * remainder
 }
 
 function transformPoint (point, matrix) {

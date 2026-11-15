@@ -48,3 +48,13 @@
 27	fig-27-the-adam-step
 28	fig-28-the-central-difference
 29	fig-29-the-check-error
+30	fig-30-local-stave-space
+31	fig-31-local-stave-thickness
+32	fig-32-position-interpolation
+33	fig-33-local-stave-interval
+34	fig-34-local-page-line-interval
+35	fig-35-full-page-warp
+36	fig-36-full-page-mutation-pipeline
+37	fig-37-full-page-mutation-profiles
+38	fig-38-canonical-page-equality
+39	fig-39-ocr-whole-string-accuracy

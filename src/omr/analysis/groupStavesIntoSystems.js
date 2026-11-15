@@ -45,7 +45,7 @@ export function groupStavesIntoSystems (staves, bitmap = null) {
 function belongsToSystem (stave, system, bitmap) {
   const lastStave = system.staves[system.staves.length - 1]
   const gap = stave.topY - lastStave.bottomY
-  const staffSpace = (stave.staffSpaceHeightPx + lastStave.staffSpaceHeightPx) / 2
+  const intervalBetweenStaveLines = (stave.intervalBetweenStaveLines + lastStave.intervalBetweenStaveLines) / 2
   const overlap = Math.min(stave.xEnd, system.xEnd) - Math.max(stave.xStart, system.xStart)
   const smallerWidth = Math.min(stave.xEnd - stave.xStart, system.xEnd - system.xStart)
   const aligned = overlap >= MIN_X_OVERLAP_FRACTION * smallerWidth
@@ -57,7 +57,7 @@ function belongsToSystem (stave, system, bitmap) {
   if (bitmap && hasVerticalConnector(bitmap, lastStave, stave, overlap)) {
     return true
   }
-  return gap <= MAX_GAP_IN_STAFF_SPACES * staffSpace
+  return gap <= MAX_GAP_IN_STAFF_SPACES * intervalBetweenStaveLines
 }
 
 function hasVerticalConnector ({ width, height, grayscale }, upper, lower, overlap) {

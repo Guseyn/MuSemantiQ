@@ -5,8 +5,7 @@
 import fs from 'node:fs/promises'
 import { rasterizeSvg } from '#msq/omr/training/raster/rasterizeSvg.js'
 import { translateImageToMsq } from '#msq/omr/api.js'
-import { modelFromWeights } from '#msq/omr/training/exportWeights.js'
-import shippedModel from '#msq/omr/model/shippedModel.js'
+import loadModelArtifact from '#msq/omr/model/loadModelArtifact.js'
 
 const options = Object.fromEntries(process.argv.slice(2).map((argument) => {
   const match = argument.match(/^--([^=]+)(?:=(.*))?$/)
@@ -16,13 +15,11 @@ const scales = String(options.scales || '0.5,1,2,3').split(',').map(Number)
 const names = options.all
   ? (await fs.readdir('test/visual-tests/bravura/svg/expected')).filter((name) => name.endsWith('.svg')).map((name) => name.slice(0, -4))
   : String(options.fixtures || 'chords-basics,rhythm-rests,pitch-clefs,structure-connections,score-two-part-invention').split(',')
-let loaded
-if (options.weights) {
-  const { shape, layers, classIds } = JSON.parse(await fs.readFile(options.weights, 'utf8'))
-  loaded = { model: modelFromWeights({ shape, layers }), classIds }
-} else {
-  loaded = shippedModel()
+if (!options.weights || options.weights === true) {
+  throw new Error('Pass --weights=<candidate-weights.json>')
 }
+const weights = JSON.parse(await fs.readFile(options.weights, 'utf8'))
+const loaded = loadModelArtifact(weights)
 const results = []
 for (const name of names) {
   const expectedSchema = JSON.parse(await fs.readFile(`test/visual-tests/bravura/page-schema/expected/${name}.json`, 'utf8'))[0]

@@ -18,16 +18,16 @@ export function findStems ({ width, height, grayscale }, staves) {
   const stems = []
   for (let staveIndex = 0; staveIndex < staves.length; staveIndex++) {
     const stave = staves[staveIndex]
-    const staffSpace = stave.staffSpaceHeightPx
-    const fromY = Math.max(0, Math.floor(stave.topY - MAX_STEM_LENGTH_IN_STAFF_SPACES * staffSpace))
-    const toY = Math.min(height - 1, Math.ceil(stave.bottomY + MAX_STEM_LENGTH_IN_STAFF_SPACES * staffSpace))
+    const intervalBetweenStaveLines = stave.intervalBetweenStaveLines
+    const fromY = Math.max(0, Math.floor(stave.topY - MAX_STEM_LENGTH_IN_STAFF_SPACES * intervalBetweenStaveLines))
+    const toY = Math.min(height - 1, Math.ceil(stave.bottomY + MAX_STEM_LENGTH_IN_STAFF_SPACES * intervalBetweenStaveLines))
     // A beamed note's stem may extend just beyond the final staff-line pixel.
-    const toX = Math.min(width - 1, stave.xEnd + Math.ceil(staffSpace))
+    const toX = Math.min(width - 1, stave.xEnd + Math.ceil(intervalBetweenStaveLines))
     for (let x = stave.xStart; x <= toX; x++) {
       for (const run of verticalRuns({ width, height, grayscale }, x, fromY, toY)) {
         const length = run.y2 - run.y1 + 1
-        const tooShort = length < MIN_STEM_LENGTH_IN_STAFF_SPACES * staffSpace
-        const isBarline = length > MAX_STEM_LENGTH_IN_STAFF_SPACES * staffSpace
+        const tooShort = length < MIN_STEM_LENGTH_IN_STAFF_SPACES * intervalBetweenStaveLines
+        const isBarline = length > MAX_STEM_LENGTH_IN_STAFF_SPACES * intervalBetweenStaveLines
         if (tooShort || isBarline) {
           continue
         }
@@ -36,32 +36,32 @@ export function findStems ({ width, height, grayscale }, staves) {
     }
   }
   return mergeAdjacentColumns(stems, staves).filter((stem) =>
-    stem.columns <= Math.max(1, 0.3 * staves[stem.staveIndex].staffSpaceHeightPx))
+    stem.columns <= Math.max(1, 0.3 * staves[stem.staveIndex].intervalBetweenStaveLines))
 }
 
 // Wide rows at the outer end are beams; smaller ink beside the tip is flags.
-export function measureStemEnds (stem, bitmap, staffSpace, outerEnd) {
+export function measureStemEnds (stem, bitmap, intervalBetweenStaveLines, outerEnd) {
   const beamRows = []
   let flagRows = 0
-  const from = Math.round(outerEnd - END_REGION_IN_STAFF_SPACES * staffSpace)
-  const to = Math.round(outerEnd + END_REGION_IN_STAFF_SPACES * staffSpace)
+  const from = Math.round(outerEnd - END_REGION_IN_STAFF_SPACES * intervalBetweenStaveLines)
+  const to = Math.round(outerEnd + END_REGION_IN_STAFF_SPACES * intervalBetweenStaveLines)
   for (let y = from; y <= to; y++) {
     const extent = horizontalExtent(bitmap, y, stem.x)
-    if (extent >= BEAM_WIDTH_IN_STAFF_SPACES * staffSpace) {
+    if (extent >= BEAM_WIDTH_IN_STAFF_SPACES * intervalBetweenStaveLines) {
       beamRows.push(y)
-    } else if (extent >= 0.25 * staffSpace) {
+    } else if (extent >= 0.25 * intervalBetweenStaveLines) {
       flagRows++
     }
   }
   let beamCount = 0
   for (let index = 0; index < beamRows.length; index++) {
-    if (index === 0 || beamRows[index] - beamRows[index - 1] > Math.max(1, 0.15 * staffSpace)) {
+    if (index === 0 || beamRows[index] - beamRows[index - 1] > Math.max(1, 0.15 * intervalBetweenStaveLines)) {
       beamCount++
     }
   }
   stem.beamRows = beamRows
   stem.beamCount = beamCount
-  stem.flagCount = beamCount ? 0 : Math.min(Math.ceil(flagRows / Math.max(1, staffSpace / 4)), 6)
+  stem.flagCount = beamCount ? 0 : Math.min(Math.ceil(flagRows / Math.max(1, intervalBetweenStaveLines / 4)), 6)
 }
 
 function verticalRuns ({ width, grayscale }, x, fromY, toY) {
@@ -105,8 +105,8 @@ function mergeAdjacentColumns (stems, staves) {
     const neighbour = merged.find((other) =>
       other.staveIndex === stem.staveIndex &&
       Math.abs(other.x - stem.x) <= 1 &&
-      Math.abs(other.y1 - stem.y1) <= Math.max(1, 0.15 * staves[stem.staveIndex].staffSpaceHeightPx) &&
-      Math.abs(other.y2 - stem.y2) <= Math.max(1, 0.15 * staves[stem.staveIndex].staffSpaceHeightPx)
+      Math.abs(other.y1 - stem.y1) <= Math.max(1, 0.15 * staves[stem.staveIndex].intervalBetweenStaveLines) &&
+      Math.abs(other.y2 - stem.y2) <= Math.max(1, 0.15 * staves[stem.staveIndex].intervalBetweenStaveLines)
     )
     if (neighbour) {
       neighbour.x = (neighbour.x + stem.x) / 2

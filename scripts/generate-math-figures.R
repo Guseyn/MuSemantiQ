@@ -1021,6 +1021,215 @@ fig_29_the_check_error <- function() {
   add(29, "fig-29-the-check-error")
 }
 
+# ── 30–34 · local stave geometry ──
+fig_30_local_stave_space <- function() {
+  open_fig("fig-30-local-stave-space", 900, 330)
+  draw_stave <- function(ys) for (y in ys) draw_seg(90, y, 500, y, col = muted, lwd = 1.3)
+  draw_stave(c(50, 60, 84, 100, 120))
+  draw_stave(c(190, 200, 210, 220, 230))
+  note(90, 30, "stave a: measured gaps 10, 24, 16, 20")
+  note(90, 172, "stave b: measured gaps 10, 10, 10, 10")
+  math(555, 84, expression(s[a] == (120 - 50) / 4), size = 19)
+  note(760, 84, "= 17.5 px", adj = c(0.5, 0.5))
+  math(555, 208, expression(s[b] == (230 - 190) / 4), size = 19)
+  note(760, 208, "= 10 px", adj = c(0.5, 0.5))
+  note(90, 278, "the mean is local to the stave; all five measured line positions remain available")
+  dev.off()
+  add(30, "fig-30-local-stave-space")
+}
+
+fig_31_local_stave_thickness <- function() {
+  open_fig("fig-31-local-stave-thickness", 900, 320)
+  draw_seg(90, 116, 480, 116, col = rule, lwd = 1.2)
+  runs <- list(c(160, 4), c(280, 6), c(400, 9))
+  for (run in runs) {
+    x <- run[1]; length <- run[2]
+    cell(x - 18, 116 - length / 2, 36, length, fill = ink, border = ink)
+    dashed(x, 70, x, 162, col = accent)
+    note(x, 186, paste0("run = ", length, " px"), adj = c(0.5, 0.5))
+  }
+  note(90, 42, "vertical samples across one measured stave line")
+  math(575, 108, expression(t[r] == umedian(4, 6, 9)), size = 18)
+  note(780, 108, "= 6 px", adj = c(0.5, 0.5))
+  note(575, 150, "ink > 0.25; include the centre pixel")
+  cell(90, 242, 390, 3, fill = ink, border = ink)
+  note(510, 244, "another stave can have t = 3 px")
+  note(90, 292, "the upper median is measured per stave, never borrowed from the page")
+  dev.off()
+  add(31, "fig-31-local-stave-thickness")
+}
+
+fig_32_position_interpolation <- function() {
+  open_fig("fig-32-position-interpolation", 900, 440)
+  values <- c(60, 70, 84, 100, 120)
+  ys <- 50 + (values - 60) * 5
+  for (j in seq_along(values)) {
+    draw_seg(120, ys[j], 520, ys[j], col = muted, lwd = 1.3)
+    note(108, ys[j], paste0("y = ", values[j]), adj = c(1, 0.5))
+    math(548, ys[j], bquote(q == .(2 * (j - 1))), size = 16)
+  }
+  point_y <- 50 + (77 - 60) * 5
+  dashed(120, point_y, 520, point_y, col = accent)
+  dot(430, point_y, col = accent, cex = 1.1)
+  note(108, point_y, "y = 77", adj = c(1, 0.5))
+  draw_seg(465, ys[2], 465, ys[3], col = accent, lwd = 2)
+  note(478, (ys[2] + point_y) / 2, "7 px")
+  note(478, (point_y + ys[3]) / 2, "7 px")
+  note(610, point_y, "halfway through gap j = 1")
+  math(610, point_y + 38, expression(q == 2 * (1 + 7 / 14) ~ "=" ~ 3), size = 19)
+  note(120, 400, "the enclosing measured gap is 14 px, not the stave's 15 px mean")
+  dev.off()
+  add(32, "fig-32-position-interpolation")
+}
+
+fig_33_local_stave_interval <- function() {
+  open_fig("fig-33-local-stave-interval", 900, 330)
+  for (y in seq(45, 85, 10)) draw_seg(90, y, 410, y, col = muted, lwd = 1.3)
+  for (y in seq(155, 211, 14)) draw_seg(90, y, 410, y, col = muted, lwd = 1.3)
+  note(90, 26, "upper stave a: s = 10 px")
+  note(90, 136, "lower stave b: s = 14 px")
+  draw_seg(448, 85, 448, 155, col = accent, lwd = 2)
+  draw_seg(440, 85, 456, 85, col = accent, lwd = 2)
+  draw_seg(440, 155, 456, 155, col = accent, lwd = 2)
+  note(466, 120, "G = 70 px")
+  math(620, 82, expression(bar(s)[a * "," * b] == (10 + 14) / 2 ~ "=" ~ 12), size = 18)
+  math(620, 132, expression(I[a * "," * b] == 70 / 12), size = 21)
+  note(620, 170, "= 5.833 staff spaces", adj = c(0.5, 0.5))
+  note(90, 270, "bottom of a to top of b; only a and b set the denominator")
+  dev.off()
+  add(33, "fig-33-local-stave-interval")
+}
+
+fig_34_local_page_line_interval <- function() {
+  open_fig("fig-34-local-page-line-interval", 900, 465)
+  for (y in seq(50, 90, 10)) draw_seg(90, y, 410, y, col = muted, lwd = 1.2)
+  for (y in seq(125, 181, 14)) draw_seg(90, y, 410, y, col = muted, lwd = 1.2)
+  for (y in seq(305, 353, 12)) draw_seg(90, y, 410, y, col = muted, lwd = 1.2)
+  note(90, 28, "page line p: local scales 10 and 14 px")
+  note(90, 283, "page line q: local scale 12 px")
+  draw_seg(448, 181, 448, 305, col = accent, lwd = 2)
+  draw_seg(440, 181, 456, 181, col = accent, lwd = 2)
+  draw_seg(440, 305, 456, 305, col = accent, lwd = 2)
+  note(466, 243, "G = 124 px")
+  math(630, 116, expression(bar(s)[p * "," * q] == (10 + 14 + 12) / 3), size = 18)
+  note(630, 150, "= 12 px", adj = c(0.5, 0.5))
+  math(630, 208, expression(I[p * "," * q]^line == 124 / 12), size = 20)
+  note(630, 244, "= 10.333 staff spaces", adj = c(0.5, 0.5))
+  note(90, 414, "every stave in both page lines contributes once to the denominator")
+  dev.off()
+  add(34, "fig-34-local-page-line-interval")
+}
+
+# ── 35–37 · full-page warp and mutation ──
+fig_35_full_page_warp <- function() {
+  open_fig("fig-35-full-page-warp", 900, 390)
+  frame(80, 60, 240, 180, border = muted, lwd = 1.5)
+  source_corners <- list(c(80, 60), c(320, 60), c(320, 240), c(80, 240))
+  for (p in source_corners) dot(p[1], p[2], col = ink, cex = 0.8)
+  note(80, 272, "source W × H")
+  note(80, 304, "four source corners")
+  output_corners <- list(c(480, 45), c(760, 82), c(710, 288), c(438, 238))
+  draw_line(c(sapply(output_corners, function(p) p[1]), output_corners[[1]][1]),
+            c(sapply(output_corners, function(p) p[2]), output_corners[[1]][2]), col = accent, lwd = 2)
+  for (p in output_corners) dot(p[1], p[2], col = accent, cex = 0.9)
+  dashed(410, 22, 792, 22, col = muted); dashed(792, 22, 792, 326, col = muted)
+  dashed(792, 326, 410, 326, col = muted); dashed(410, 326, 410, 22, col = muted)
+  flow(350, 150, 420, 150)
+  math(385, 126, expression(H), size = 20, adj = c(0.5, 0.5))
+  note(470, 350, "expanded output: every transformed corner is inside")
+  note(80, 356, "fill by H^-1 and bilinear samples")
+  dev.off()
+  add(35, "fig-35-full-page-warp")
+}
+
+fig_36_full_page_mutation_pipeline <- function() {
+  open_fig("fig-36-full-page-mutation-pipeline", 1000, 310)
+  labels <- c("geometry", "blur", "ink thickness", "illumination", "contrast", "noise")
+  for (i in seq_along(labels)) {
+    x <- 30 + (i - 1) * 160
+    cell(x, 90, 130, 56, fill = if (i == 1) accent_soft else soft, border = if (i == 1) accent else rule)
+    value_in(x, 90, 130, 56, labels[i], size = 14)
+    if (i > 1) flow(x - 30, 118, x - 6, 118)
+  }
+  note(30, 40, "seed + exact profile + localPixelScale")
+  note(30, 190, "clean: copy the bitmap and stop; operations: []")
+  note(30, 226, "all other profiles: this order, with every stage recorded in metadata")
+  note(30, 272, "the canonical target remains the unmutated page schema")
+  dev.off()
+  add(36, "fig-36-full-page-mutation-pipeline")
+}
+
+fig_37_full_page_mutation_profiles <- function() {
+  open_fig("fig-37-full-page-mutation-profiles", 1000, 390)
+  names <- c("clean", "screenshot", "scan-light", "scan-medium", "scan-hard")
+  details <- list(
+    c("scale 1", "rotation 0 deg", "blur 0", "noise 0"),
+    c("scale +/-6%", "rotation 0 deg", "blur 0", "noise .001-.004"),
+    c("scale +/-8%", "rotation +/-0.7 deg", "blur 0-.35 t", "noise .002-.009"),
+    c("scale +/-18%", "rotation +/-2 deg", "blur .15-.75 t", "noise .006-.02"),
+    c("scale +/-28%", "rotation +/-4 deg", "blur .3-1.25 t", "noise .012-.038")
+  )
+  for (i in seq_along(names)) {
+    x <- 25 + (i - 1) * 195
+    cell(x, 58, 175, 250, fill = if (i == 1) soft else accent_soft, border = if (i == 1) rule else accent)
+    value_in(x, 58, 175, 42, names[i], size = 15, font = 2)
+    for (j in seq_along(details[[i]])) note(x + 14, 126 + (j - 1) * 42, details[[i]][j], adj = c(0, 0.5))
+  }
+  note(25, 348, "blur is measured in stave-line thicknesses t; every complete range is listed in the profile table")
+  dev.off()
+  add(37, "fig-37-full-page-mutation-profiles")
+}
+
+# ── 38–39 · exact page and OCR evaluation ──
+fig_38_canonical_page_equality <- function() {
+  open_fig("fig-38-canonical-page-equality", 1000, 390)
+  cell(45, 55, 250, 120, fill = soft, border = rule)
+  cell(375, 55, 250, 120, fill = soft, border = rule)
+  cell(745, 55, 210, 120, fill = ok_soft, border = ok)
+  note(65, 40, "expected schema")
+  note(395, 40, "actual schema")
+  note(765, 40, "normalized values")
+  mono(65, 88, "positionNumber: 2", size = 14)
+  mono(65, 118, "id: 17", size = 14)
+  mono(395, 88, "id: 99", size = 14)
+  mono(395, 118, "positionNumber: 2", size = 14)
+  mono(765, 100, "positionNumber: 2", size = 14)
+  flow(300, 115, 365, 115); flow(630, 115, 735, 115)
+  note(65, 216, "key order and editor ids do not matter")
+  cell(45, 250, 580, 82, fill = accent_soft, border = accent)
+  mono(65, 282, "actual positionNumber: 2.5", size = 14)
+  mono(65, 310, "diff: $.notes[0].positionNumber  2 -> 2.5", size = 14)
+  cell(745, 250, 210, 82, fill = accent_soft, border = accent)
+  value_in(745, 250, 210, 82, "E = 0", size = 20, col = accent, font = 2)
+  mono(765, 208, "E = 1: no differences", size = 15, col = ok)
+  note(45, 366, "one remaining semantic difference rejects the whole page")
+  dev.off()
+  add(38, "fig-38-canonical-page-equality")
+}
+
+fig_39_ocr_whole_string_accuracy <- function() {
+  open_fig("fig-39-ocr-whole-string-accuracy", 1000, 365)
+  note(55, 38, "expected string")
+  note(370, 38, "recognized string")
+  note(790, 38, "whole-string score")
+  expected <- c("Andante", "Lascia ch'io pianga", "Allegro")
+  actual <- c("Andante", "Lascia ch'io piange", "Allegro")
+  scores <- c(1, 0, 1)
+  for (i in seq_along(expected)) {
+    y <- 62 + (i - 1) * 66
+    cell(45, y, 285, 48, fill = soft, border = rule)
+    cell(360, y, 285, 48, fill = if (scores[i] == 1) ok_soft else accent_soft, border = if (scores[i] == 1) ok else accent)
+    cell(775, y, 150, 48, fill = if (scores[i] == 1) ok_soft else accent_soft, border = if (scores[i] == 1) ok else accent)
+    value_in(45, y, 285, 48, expected[i], size = 14)
+    value_in(360, y, 285, 48, actual[i], size = 14)
+    value_in(775, y, 150, 48, as.character(scores[i]), size = 18, col = if (scores[i] == 1) ok else accent, font = 2)
+  }
+  math(500, 296, expression(A[ocr] == (1 + 0 + 1) / 3 ~ "=" ~ 2 / 3), size = 22, adj = c(0.5, 0.5))
+  note(500, 338, "one wrong character, or one unresolved character, scores zero", adj = c(0.5, 0.5))
+  dev.off()
+  add(39, "fig-39-ocr-whole-string-accuracy")
+}
+
 for (f in list(fig_00_scale_distance, fig_00_scale_thickness, fig_00_scale_thresholds,
                fig_00_scale_area, fig_00_scale_sequence,
                fig_omr_overview, fig_omr_measure, fig_omr_cross_stave,
@@ -1036,7 +1245,12 @@ for (f in list(fig_00_scale_distance, fig_00_scale_thickness, fig_00_scale_thres
                fig_20_the_factor_chain, fig_21_the_bias_split, fig_22_the_convolution_products,
                fig_23_col2im, fig_24_the_pull_to_zero, fig_25_the_adam_memories,
                fig_26_the_bias_correction, fig_27_the_adam_step, fig_28_the_central_difference,
-               fig_29_the_check_error)) f()
+               fig_29_the_check_error,
+               fig_30_local_stave_space, fig_31_local_stave_thickness,
+               fig_32_position_interpolation, fig_33_local_stave_interval,
+               fig_34_local_page_line_interval, fig_35_full_page_warp,
+               fig_36_full_page_mutation_pipeline, fig_37_full_page_mutation_profiles,
+               fig_38_canonical_page_equality, fig_39_ocr_whole_string_accuracy)) f()
 
 writeLines(manifest, file.path(out, "manifest.tsv"))
 cat("figures written:", length(manifest), "\n")

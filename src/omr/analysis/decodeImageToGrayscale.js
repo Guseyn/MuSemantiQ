@@ -36,10 +36,15 @@ export function decodeImageToGrayscale (bytes) {
   const raw = zlib.inflateSync(Buffer.concat(compressed))
   const pixels = unfilter(raw, header.width, header.height, channels)
   const grayscale = new Float32Array(header.width * header.height)
+  const rgb = new Float32Array(header.width * header.height * 3)
   for (let index = 0; index < grayscale.length; index++) {
     grayscale[index] = inkAt(pixels, header.colorType, palette, index)
+    const color = rgbAt(pixels, header.colorType, palette, index)
+    rgb[index * 3] = color[0] / 255
+    rgb[index * 3 + 1] = color[1] / 255
+    rgb[index * 3 + 2] = color[2] / 255
   }
-  return normalizeInkPolarity({ width: header.width, height: header.height, grayscale })
+  return { ...normalizeInkPolarity({ width: header.width, height: header.height, grayscale }), rgb }
 }
 
 function isPng (buffer) {
@@ -134,6 +139,32 @@ function inkAt (pixels, colorType, palette, index) {
     return 1 - luma(red, green, blue) / 255
   }
   return 1 - luma(pixels[offset], pixels[offset + 1], pixels[offset + 2]) / 255
+}
+
+function rgbAt (pixels, colorType, palette, index) {
+  if (colorType === 0) {
+    const value = pixels[index]
+    return [ value, value, value ]
+  }
+  if (colorType === 4) {
+    const alpha = pixels[index * 2 + 1] / 255
+    const value = pixels[index * 2] * alpha + 255 * (1 - alpha)
+    return [ value, value, value ]
+  }
+  if (colorType === 3) {
+    const offset = pixels[index] * 3
+    return [ palette[offset], palette[offset + 1], palette[offset + 2] ]
+  }
+  if (colorType === 6) {
+    const alpha = pixels[index * 4 + 3] / 255
+    return [
+      pixels[index * 4] * alpha + 255 * (1 - alpha),
+      pixels[index * 4 + 1] * alpha + 255 * (1 - alpha),
+      pixels[index * 4 + 2] * alpha + 255 * (1 - alpha)
+    ]
+  }
+  const offset = index * 3
+  return [ pixels[offset], pixels[offset + 1], pixels[offset + 2] ]
 }
 
 function luma (red, green, blue) {

@@ -3,8 +3,8 @@
 'use strict'
 
 import fs from 'node:fs/promises'
-import { modelFromWeights } from '#msq/omr/training/exportWeights.js'
 import { generateRendererTrainingSet } from '#msq/omr/training/generateRendererTrainingSet.js'
+import loadModelArtifact from '#msq/omr/model/loadModelArtifact.js'
 import { evaluateModel } from '#msq/omr/training/evaluate.js'
 import { decodeImageToGrayscale, translateImageToMsq } from '#msq/omr/api.js'
 
@@ -12,9 +12,13 @@ const options = Object.fromEntries(process.argv.slice(2).map((argument) => {
   const match = argument.match(/^--([^=]+)(?:=(.*))?$/)
   return match ? [ match[1], match[2] ?? true ] : [ argument, true ]
 }))
-const weightsPath = options.weights || 'src/omr/model/weights.json'
-const { shape, layers, classIds } = JSON.parse(await fs.readFile(weightsPath, 'utf8'))
-const model = modelFromWeights({ shape, layers })
+if (!options.weights || options.weights === true) {
+  throw new Error('Pass --weights=<candidate-weights.json>')
+}
+const weightsPath = options.weights
+const weights = JSON.parse(await fs.readFile(weightsPath, 'utf8'))
+const { model } = loadModelArtifact(weights)
+const { shape } = weights
 const { samples } = await generateRendererTrainingSet({
   seed: Number(options.seed || 777),
   samplesPerClass: 1,
@@ -32,7 +36,7 @@ const result = {
 }
 if (options.fixture !== false) {
   const bitmap = decodeImageToGrayscale(await fs.readFile(options.fixture || 'omr-cli-app/score.png'))
-  const { msqText, report, diagnostics } = translateImageToMsq(bitmap, { model, classIds, diagnostics: true })
+  const { msqText, report, diagnostics } = translateImageToMsq(bitmap, { weights, diagnostics: true })
   result.realFixture = {
     measures: (msqText.match(/^measure$/gm) || []).length,
     uncertain: report.uncertain.length,

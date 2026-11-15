@@ -5,8 +5,9 @@
  *                          src/omr — image → MSQ
  * ⟅━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━⟆
  *
- * The image translator. A score image in, an MSQ draft and a report out.
- * One small model classifies ink blobs; everything else is measurement.
+ * The image translator. A score image and an explicit candidate artifact in,
+ * an MSQ draft and a report out. Symbol and OCR models classify ink blobs and
+ * characters; everything else is measurement.
  *
  * The public surface, and nothing else:
  *

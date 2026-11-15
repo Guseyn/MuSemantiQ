@@ -22,8 +22,8 @@ export function detectStaves ({ width, height, grayscale }) {
     .filter((y) => lineCoverage({ width, height, grayscale }, y) >= LINE_COVERAGE_MIN)
   const lines = groupPeaksIntoStaves(peaks)
   const staves = lines.map((rawLines) => buildStave(rawLines, profile, { width, height, grayscale }))
-  const staffSpaceHeightPx = staves.length ? mean(staves.map((stave) => stave.staffSpaceHeightPx)) : 0
-  return { staves, staffSpaceHeightPx }
+  const referenceIntervalBetweenStaveLines = staves.length ? mean(staves.map((stave) => stave.intervalBetweenStaveLines)) : 0
+  return { staves, referenceIntervalBetweenStaveLines }
 }
 
 // A staff line runs unbroken along its own ink; a row of letters, a dashed
@@ -120,12 +120,12 @@ function buildStave (rawLines, profile, bitmap) {
   const spacing = mean(rawLines.slice(1).map((line, index) => line - rawLines[index]))
   const linesY = rawLines.map((line) => recenterLine(line, profile, Math.max(2, Math.round(spacing / 4))))
   const gaps = linesY.slice(1).map((line, index) => line - linesY[index])
-  const staffSpaceHeightPx = mean(gaps)
+  const intervalBetweenStaveLines = mean(gaps)
   const topY = linesY[0]
   const bottomY = linesY[4]
-  const { xStart, xEnd } = lineExtents(linesY, staffSpaceHeightPx, bitmap)
-  const lineThicknessPx = measureLineThickness(linesY, bitmap, xStart, xEnd)
-  return { linesY, staffSpaceHeightPx, lineThicknessPx, topY, bottomY, xStart, xEnd }
+  const { xStart, xEnd } = lineExtents(linesY, intervalBetweenStaveLines, bitmap)
+  const staveLineThickness = measureLineThickness(linesY, bitmap, xStart, xEnd)
+  return { linesY, intervalBetweenStaveLines, staveLineThickness, topY, bottomY, xStart, xEnd }
 }
 
 function measureLineThickness (linesY, { width, height, grayscale }, xStart, xEnd) {
@@ -165,8 +165,8 @@ function recenterLine (line, profile, window) {
 
 // Each staff line owns one long horizontal span. Their consensus excludes a
 // brace at the left, while a slur or beam crossing the line cannot shorten it.
-function lineExtents (linesY, staffSpaceHeightPx, { width, height, grayscale }) {
-  const runs = linesY.map((line) => horizontalSpan({ width, height, grayscale }, Math.round(line), 8 * staffSpaceHeightPx))
+function lineExtents (linesY, intervalBetweenStaveLines, { width, height, grayscale }) {
+  const runs = linesY.map((line) => horizontalSpan({ width, height, grayscale }, Math.round(line), 8 * intervalBetweenStaveLines))
   const starts = runs.map((run) => run.start)
   const ends = runs.map((run) => run.end)
   const xStart = Math.min(...starts)

@@ -22,8 +22,8 @@ const LINE_LENGTH_IN_STAFF_SPACES = 8
 export function removeStaffLines ({ width, height, grayscale }, staves) {
   const cleaned = new Float32Array(grayscale)
   for (const stave of staves) {
-    const lineLength = LINE_LENGTH_IN_STAFF_SPACES * stave.staffSpaceHeightPx
-    const lineThickness = stave.lineThicknessPx || measureLineThickness(stave, { width, height, grayscale })
+    const lineLength = LINE_LENGTH_IN_STAFF_SPACES * stave.intervalBetweenStaveLines
+    const lineThickness = stave.staveLineThickness || measureLineThickness(stave, { width, height, grayscale })
     const halfWidth = lineThickness / 2 + 0.25
     const maximumThinRun = Math.max(2, 2 * lineThickness)
     for (const line of stave.linesY) {

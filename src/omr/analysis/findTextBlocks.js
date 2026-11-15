@@ -14,39 +14,39 @@ const STAVE_MARGIN_IN_STAFF_SPACES = 0.3
 const ROW_GAP_IN_STAFF_SPACES = 0.4
 const COLUMN_GAP_IN_STAFF_SPACES = 1
 
-export function findTextBlocks ({ width, height, grayscale, staves, systems, staffSpaceHeightPx }) {
-  const mask = buildMaskOutsideStaves({ width, height, grayscale, staves, staffSpaceHeightPx })
-  const bands = splitIntoRowBands(mask, width, height, staffSpaceHeightPx)
-  const blocks = bands.flatMap((band) => splitBandIntoBlocks(band, mask, width, staffSpaceHeightPx))
+export function findTextBlocks ({ width, height, grayscale, staves, systems, intervalBetweenStaveLines }) {
+  const mask = buildMaskOutsideStaves({ width, height, grayscale, staves, intervalBetweenStaveLines })
+  const bands = splitIntoRowBands(mask, width, height, intervalBetweenStaveLines)
+  const blocks = bands.flatMap((band) => splitBandIntoBlocks(band, mask, width, intervalBetweenStaveLines))
   return blocks.map((block) => ({
     box: { x: block.x, y: block.y, w: block.w, h: block.h },
-    role: roleOfBlock(block, { width, systems, staffSpaceHeightPx, blocks }),
-    sizeInStaffSpaces: roundTo2(block.h / staffSpaceHeightPx)
+    role: roleOfBlock(block, { width, systems, intervalBetweenStaveLines, blocks }),
+    sizeInStaffSpaces: roundTo2(block.h / intervalBetweenStaveLines)
   }))
 }
 
-function buildMaskOutsideStaves ({ width, height, grayscale, staves, staffSpaceHeightPx }) {
+function buildMaskOutsideStaves ({ width, height, grayscale, staves, intervalBetweenStaveLines }) {
   const mask = new Uint8Array(width * height)
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
       if (grayscale[y * width + x] <= INK_THRESHOLD) {
         continue
       }
-      mask[y * width + x] = isInsideStave(x, y, staves, staffSpaceHeightPx) ? 0 : 1
+      mask[y * width + x] = isInsideStave(x, y, staves, intervalBetweenStaveLines) ? 0 : 1
     }
   }
   return mask
 }
 
-function isInsideStave (x, y, staves, staffSpaceHeightPx) {
+function isInsideStave (x, y, staves, intervalBetweenStaveLines) {
   return staves.some((stave) => {
-    const margin = STAVE_MARGIN_IN_STAFF_SPACES * stave.staffSpaceHeightPx
+    const margin = STAVE_MARGIN_IN_STAFF_SPACES * stave.intervalBetweenStaveLines
     return y >= stave.topY - margin && y <= stave.bottomY + margin &&
       x >= stave.xStart - margin && x <= stave.xEnd + margin
   })
 }
 
-function splitIntoRowBands (mask, width, height, staffSpaceHeightPx) {
+function splitIntoRowBands (mask, width, height, intervalBetweenStaveLines) {
   const rowHasInk = []
   for (let y = 0; y < height; y++) {
     let ink = false
@@ -55,7 +55,7 @@ function splitIntoRowBands (mask, width, height, staffSpaceHeightPx) {
     }
     rowHasInk.push(ink)
   }
-  const gapLimit = ROW_GAP_IN_STAFF_SPACES * staffSpaceHeightPx
+  const gapLimit = ROW_GAP_IN_STAFF_SPACES * intervalBetweenStaveLines
   const bands = []
   let band = null
   for (let y = 0; y < height; y++) {
@@ -71,7 +71,7 @@ function splitIntoRowBands (mask, width, height, staffSpaceHeightPx) {
   return bands
 }
 
-function splitBandIntoBlocks (band, mask, width, staffSpaceHeightPx) {
+function splitBandIntoBlocks (band, mask, width, intervalBetweenStaveLines) {
   const columnsWithInk = []
   for (let x = 0; x < width; x++) {
     let ink = false
@@ -80,7 +80,7 @@ function splitBandIntoBlocks (band, mask, width, staffSpaceHeightPx) {
     }
     columnsWithInk.push(ink)
   }
-  const gapLimit = COLUMN_GAP_IN_STAFF_SPACES * staffSpaceHeightPx
+  const gapLimit = COLUMN_GAP_IN_STAFF_SPACES * intervalBetweenStaveLines
   const blocks = []
   let block = null
   for (let x = 0; x < width; x++) {
@@ -101,7 +101,7 @@ function splitBandIntoBlocks (band, mask, width, staffSpaceHeightPx) {
   }))
 }
 
-function roleOfBlock (block, { width, systems, staffSpaceHeightPx, blocks }) {
+function roleOfBlock (block, { width, systems, intervalBetweenStaveLines, blocks }) {
   if (!systems.length) {
     return 'text'
   }
@@ -111,19 +111,22 @@ function roleOfBlock (block, { width, systems, staffSpaceHeightPx, blocks }) {
   const isCentered = Math.abs(centerX - pageCenterX) < 0.25 * width
   const firstSystemTopY = systems[0].topY
   const lastSystemBottomY = systems[systems.length - 1].bottomY
-  if (block.y + block.h < firstSystemTopY - 0.5 * staffSpaceHeightPx && isCentered) {
+  if (block.y + block.h < firstSystemTopY - 0.5 * intervalBetweenStaveLines) {
+    if (!isCentered) {
+      return centerX < pageCenterX ? 'leftSubtitle' : 'rightSubtitle'
+    }
     const centeredAbove = blocks
-      .filter((other) => other.y + other.h < firstSystemTopY - 0.5 * staffSpaceHeightPx &&
+      .filter((other) => other.y + other.h < firstSystemTopY - 0.5 * intervalBetweenStaveLines &&
         Math.abs(other.x + other.w / 2 - pageCenterX) < 0.25 * width)
       .sort((first, second) => first.y - second.y)
     return centeredAbove[0] === block ? 'title' : 'subtitle'
   }
-  if (block.y > lastSystemBottomY + 0.5 * staffSpaceHeightPx && isCentered) {
+  if (block.y > lastSystemBottomY + 0.5 * intervalBetweenStaveLines && isCentered) {
     return 'pageNumber'
   }
   for (const system of systems) {
-    const leftOfSystem = block.x + block.w < system.xStart - 0.2 * staffSpaceHeightPx
-    const atStaveHeight = centerY > system.topY - staffSpaceHeightPx && centerY < system.bottomY + staffSpaceHeightPx
+    const leftOfSystem = block.x + block.w < system.xStart - 0.2 * intervalBetweenStaveLines
+    const atStaveHeight = centerY > system.topY - intervalBetweenStaveLines && centerY < system.bottomY + intervalBetweenStaveLines
     if (leftOfSystem && atStaveHeight) {
       return 'instrument'
     }

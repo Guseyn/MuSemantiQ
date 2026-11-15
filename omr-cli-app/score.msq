@@ -1,29 +1,25 @@
-title font size is 5.41
-subtitle font size is 5.41
-instrument font size is 22.36
-interval between staves is 18.51
+title font size is 5.42
+subtitle font size is 5.42
+instrument font size is 22.45
+interval between staves is 18.53
 background color is #ffffff
 font color is #292929
 stave lines color is #292929
 
 measure
+key signature is f major
 stave
 treble clef
 1 rest
 stave
 treble clef
-1 f4 is ghost, with stem up
-1 chord, with stem up
-e5, c5
-
+1 rest
 
 measure
-sign at the end of the measure
+sign at the start of the measure
 stave
 treble clef
-1 a5, with stem up
-1/8 c5, with trill down, beamed with next, with stem down
-1/8 d5, not beamed, with stem down
+1/8 c5, with trill down, with stem down
 1/8 a4, beamed with next, with stem up
 1/8 b4, beamed with next, with stem up
 1/8 c5, not beamed, with stem up
@@ -33,11 +29,9 @@ treble clef
 1/8 g5, not beamed, with stem down
 stave
 treble clef
-1/128 g4, is crushed grace, with stem up
-1/32 d4, with stem up
 1/8 g4, is crushed grace, with stem down
+1/16 d4, with stem up
+1/8 g4, with stem down
 1/16 d4, with stem up
 1/2 rest
 1/4 rest
-1/8 rest
-1/32 rest

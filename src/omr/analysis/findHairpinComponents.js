@@ -12,20 +12,20 @@ export function findHairpinComponents (bitmap, components, staves) {
     if (!stave) {
       return []
     }
-    const staffSpace = stave.staffSpaceHeightPx
-    const wide = box.w >= 3 * staffSpace && box.w >= 3 * box.h
+    const intervalBetweenStaveLines = stave.intervalBetweenStaveLines
+    const wide = box.w >= 3 * intervalBetweenStaveLines && box.w >= 3 * box.h
     const thin = ink / (box.w * box.h) <= 0.3
     if (!wide || !thin) {
       return []
     }
     const middleSpread = spreadAt(bitmap, box, 0.45, 0.55)
-    if (middleSpread < 0.25 * staffSpace) {
+    if (middleSpread < 0.25 * intervalBetweenStaveLines) {
       return []
     }
     const leftSpread = spreadAt(bitmap, box, 0, 0.05)
     const rightSpread = spreadAt(bitmap, box, 0.95, 1)
     const opening = rightSpread - leftSpread
-    if (Math.abs(opening) < 0.4 * staffSpace) {
+    if (Math.abs(opening) < 0.4 * intervalBetweenStaveLines) {
       return []
     }
     return [ {
@@ -64,7 +64,7 @@ function nearestStave (box, staves) {
   return staves.map((stave) => {
     const anchor = centerY < stave.topY ? stave.topY : centerY > stave.bottomY ? stave.bottomY : centerY
     return { stave, distance: Math.abs(centerY - anchor) }
-  }).filter((entry) => entry.distance <= 8 * entry.stave.staffSpaceHeightPx)
+  }).filter((entry) => entry.distance <= 8 * entry.stave.intervalBetweenStaveLines)
     .sort((first, second) => first.distance - second.distance)[0]?.stave || null
 }
 

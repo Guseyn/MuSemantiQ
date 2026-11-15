@@ -24,25 +24,26 @@ export function analyzeImage ({ width, height, grayscale }) {
 }
 
 export function analyzeStraightenedImage (upright) {
-  const { staves, staffSpaceHeightPx } = detectStaves(upright)
+  const { staves, referenceIntervalBetweenStaveLines } = detectStaves(upright)
   const systems = groupStavesIntoSystems(staves, upright)
-  const textBlocks = findTextBlocks({ ...upright, staves, systems, staffSpaceHeightPx })
-  const { fontSizes, colors } = measureStyles({ ...upright, staves, systems, textBlocks, staffSpaceHeightPx })
+  const textBlocks = findTextBlocks({ ...upright, staves, systems, intervalBetweenStaveLines: referenceIntervalBetweenStaveLines })
+  const { fontSizes, colors, localIntervals } = measureStyles({ ...upright, staves, systems, textBlocks })
   return {
     skewAngleInDegrees: upright.skewAngleInDegrees || 0,
-    staffSpaceHeightPx: roundTo2(staffSpaceHeightPx),
+    referenceIntervalBetweenStaveLines: roundTo2(referenceIntervalBetweenStaveLines),
     staves: staves.map((stave, index) => ({
       index,
       systemIndex: systemIndexOf(staves, systems, index),
       linesY: stave.linesY.map(roundTo2),
-      staffSpaceHeightPx: roundTo2(stave.staffSpaceHeightPx),
-      lineThicknessPx: roundTo2(stave.lineThicknessPx),
+      intervalBetweenStaveLines: roundTo2(stave.intervalBetweenStaveLines),
+      staveLineThickness: roundTo2(stave.staveLineThickness),
       topY: roundTo2(stave.topY),
       bottomY: roundTo2(stave.bottomY),
       xStart: stave.xStart,
       xEnd: stave.xEnd
     })),
     systems,
+    localIntervals,
     textBlocks,
     measuredStyles: fontSizes,
     colors
