@@ -9,5 +9,7 @@ REPOSITORY_ROOT="$(cd "$REPOSITORY_ROOT/.." && pwd)"
 REVISION="${OMR_CODE_VERSION:-$(git -C "$REPOSITORY_ROOT" rev-parse HEAD)}"
 
 ssh-add --apple-use-keychain "$HOME/unisonofficial_rsa"
-ssh -A -i "$HOME/unisonofficial_rsa" "$REMOTE_HOST" "cd $(printf '%q' "$REMOTE_DIR") && git fetch --all && git checkout $(printf '%q' "$REVISION") && git reset --hard $(printf '%q' "$REVISION")"
+# The checkout is uploaded by rsync, which keeps the Mac's ownership, so root
+# sees a foreign-owned repo. Trust it explicitly before any git command.
+ssh -A -i "$HOME/unisonofficial_rsa" "$REMOTE_HOST" "cd $(printf '%q' "$REMOTE_DIR") && git config --global --add safe.directory \"\$(pwd)\" && git fetch --all && git checkout -f $(printf '%q' "$REVISION") && git reset --hard $(printf '%q' "$REVISION")"
 printf 'Remote checkout is at %s\n' "$REVISION"
