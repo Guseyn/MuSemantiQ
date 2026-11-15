@@ -132,7 +132,7 @@ figcaption { font: 12px var(--mono); color: var(--muted); margin-top: 6px; }
 <h2><span class="n">2</span>Set up the server, once <a class="totop" href="#workflow">↑</a></h2>
 <p>A CPU server with Node 22 or newer is enough; both trainers are plain Node and use no training framework. Check out the project and its font files there, then check the version from your laptop:</p>
 <pre><code>ssh user@server 'cd MuSemantiQ && node -v'</code></pre>
-<p>The tracked helpers in <code>remote-training-scripts/</code> handle upload, training, download and verification. Each file is self-contained and uses <code>ssh -A -i ~/unisonofficial_rsa root@146.190.232.49</code>, so there is no shared config to source and no npm remote wrapper. The default requires a clean frozen commit; the prepare script uploads that checkout rather than a moving branch.</p>
+<p>The tracked helpers in <code>remote-training-scripts/</code> handle upload, training, stopping, download and verification. Each file is self-contained and uses <code>ssh -A -i ~/unisonofficial_rsa root@146.190.232.49</code>, so there is no shared config to source and no npm remote wrapper. The default requires a clean frozen commit; the prepare script uploads that checkout rather than a moving branch.</p>
 <p>From this point until verification ends, a source or documentation change means a new freeze and a new candidate, not a quiet continuation of the old run.</p>
 </section>
 
@@ -275,6 +275,9 @@ ssh -A -i ~/unisonofficial_rsa root@146.190.232.49
 <span class="cm"># terminal 1                          # terminal 2</span>
 ./remote-training-scripts/train-symbols
                                       ./remote-training-scripts/train-ocr
+
+<span class="cm"># to cancel a running trainer from another terminal</span>
+./remote-training-scripts/stop
 
 <span class="cm"># when both terminals finish, nest the two artifacts</span>
 ./remote-training-scripts/combine
