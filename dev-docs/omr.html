@@ -765,7 +765,7 @@ dl.terms dd em { color: var(--muted); }
   <div class="row"><span class="f2">generateFullPageRendererDataset.js</span><span class="d">source MSQ → styled full pages → local/global mutation, canonical schema and MSQ, source geometry and text targets</span></div>
   <div class="row"><span class="f2">assignFullPageCompositionSplits.js</span><span class="d">assign train/validation/test once per composition before pages and variants, with explicit split overrides</span></div>
   <div class="row"><span class="f2">deriveFullPageSeed.js</span><span class="d">independent deterministic seeds for splits, styles, mutation and local geometry</span></div>
-  <div class="row"><span class="f2">loadVisualFixtureSourceRecords.js</span><span class="d">load the repository's visual MSQ fixtures as composition source records</span></div>
+  <div class="row"><span class="f2">loadVisualFixtureSourceRecords.js</span><span class="d">load valid visual MSQ fixtures as composition source records, excluding intentional <code>error-*</code> parser scenarios by default</span></div>
   <div class="row"><span class="f2">loadTitleSubtitleSourceRecords.js</span><span class="d">turn the six-language corpus into full-page title/subtitle records with train, validation and held-out splits</span></div>
   <div class="row"><span class="f2">loadAllegroBurlescoSourceRecord.js</span><span class="d">load the larger inspector composition and pin it to the test split</span></div>
   <div class="row"><span class="f2">extractSourceSvgSemanticGeometry.js</span><span class="d">retain unmutated semantic element names, ref IDs, bounds and transforms beside rasterization metadata</span></div>
@@ -812,14 +812,13 @@ dl.terms dd em { color: var(--muted); }
 </div>
 
 <div class="folder">
-  <div class="name">remote-training-scripts/ — one host config, no repeated SSH commands</div>
-  <div class="row"><span class="f2">config.sh</span><span class="d">remote host, paths, seeds, scales, style and run settings in one place</span></div>
-  <div class="row"><span class="f2">lib.sh</span><span class="d">freeze checks, bundle generation, rsync, remote training, download, combination and verification</span></div>
-  <div class="row"><span class="f2">prepare.sh</span><span class="d">pre-training checks, frozen bundle and upload</span></div>
-  <div class="row"><span class="f2">train.sh</span><span class="d">remote symbol and OCR runs, then download and combine</span></div>
-  <div class="row"><span class="f2">download.sh</span><span class="d">download existing runs and combine their artifacts</span></div>
-  <div class="row"><span class="f2">verify.sh</span><span class="d">both clean-font matrices, frozen-bundle verification and the legacy OMR suite</span></div>
-  <div class="row"><span class="f2">run.sh</span><span class="d">the entire prepare → train → download → verify workflow in one command</span></div>
+  <div class="name">remote-training-scripts/ — self-contained scripts, one SSH identity</div>
+  <div class="row"><span class="f2">pull</span><span class="d">fetch and reset the remote checkout to the chosen commit with <code>ssh -A -i ~/unisonofficial_rsa</code></span></div>
+  <div class="row"><span class="f2">prepare</span><span class="d">pre-training checks, frozen bundle generation and upload, with all settings inside the file</span></div>
+  <div class="row"><span class="f2">train</span><span class="d">remote symbol and OCR runs, then download and combine, with no shared config or npm wrapper</span></div>
+  <div class="row"><span class="f2">download</span><span class="d">download existing runs and combine their artifacts</span></div>
+  <div class="row"><span class="f2">verify</span><span class="d">both clean-font matrices, frozen-bundle verification and the legacy OMR suite</span></div>
+  <div class="row"><span class="f2">run</span><span class="d">pull → prepare → train → verify in one command</span></div>
 </div>
 
 <div class="folder">

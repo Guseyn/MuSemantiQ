@@ -40,7 +40,7 @@ function collectSourcePaths () {
   const paths = []
   collectRecursively('src/omr', '.js', paths)
   collectRecursively('omr-cli-app', '.js', paths)
-  collectRecursively('remote-training-scripts', '.sh', paths)
+  collectRecursively('remote-training-scripts', '', paths)
   for (const name of fs.readdirSync(path.join(repositoryRoot, 'scripts'))) {
     if ((name.startsWith('omr-') && name.endsWith('.js')) || name === 'build-omr-code-docs.js') {
       paths.push(`scripts/${name}`)
@@ -442,8 +442,8 @@ function buildScenes () {
     scene('training', 'frozen code → manual remote training', [
       frame(
         'Freeze code and documentation first',
-        'The pre-training boundary is the reviewed source and this documentation. Publish that exact state, then prepare.sh runs the permitted checks, generates the frozen bundle and uploads it. Training does not redefine the implementation.',
-        'remote-training-scripts/prepare.sh', null, [ 'training' ],
+        'The pre-training boundary is the reviewed source and this documentation. Publish that exact state, then prepare runs the permitted checks, generates the frozen bundle and uploads it. Training does not redefine the implementation.',
+        'remote-training-scripts/prepare', null, [ 'training' ],
         { sequence: '1 · freeze and publish code/docs → 2 · generate and upload the frozen bundle', note: 'The script refuses a dirty checkout unless OMR_ALLOW_DIRTY=1 is set deliberately.' }
       ),
       frame(
@@ -472,9 +472,9 @@ function buildScenes () {
       ),
       frame(
         'The older isolated-renderer entry point remains explicit',
-        'runTraining is the separate renderer/template symbol workflow used by remote-start-training. It creates a timestamp/pid run directory and logs best weights and their SHA-256; it is not the full-page bundle trainer.',
+        'runTraining is the separate renderer/template symbol workflow used by train. It creates a timestamp/pid run directory and logs best weights and their SHA-256; it is not the full-page bundle trainer.',
         'src/omr/training/train.js', 'runTraining', [ 'training', 'dataset', 'artifacts' ],
-        { alternative: 'npm run omr:remote:run', output: 'training-data/runs/<run-id>/{training.log,history.json,best-weights.json}' }
+        { alternative: './remote-training-scripts/run', output: 'training-data/runs/<run-id>/{training.log,history.json,best-weights.json}' }
       ),
       frame(
         'Six-language OCR is a separate manual remote run',
@@ -491,7 +491,7 @@ function buildScenes () {
       frame(
         'Weights are data and travel separately',
         'remote-download-model copies model data and the legacy symbol training log with rsync, then prints a local SHA-256 for comparison. It does not fetch every custom run directory, adopt a candidate or validate it.',
-        'remote-training-scripts/download.sh', null, [ 'training', 'artifacts' ],
+        'remote-training-scripts/download', null, [ 'training', 'artifacts' ],
         { sequence: '7 · retrieve the chosen run outputs explicitly and compare their hashes' }
       ),
       frame(
@@ -723,7 +723,7 @@ details.file summary:hover { background: var(--accent-soft); }
     <h2>The frozen pre-training sequence</h2>
     <p>The order matters. Training starts only after the implementation and documentation are frozen and published. Full-page symbols and six-language OCR have separate manual entry points; the combiner creates the nested artifact that translation expects.</p>
     <ol>
-      <li>Freeze and publish the reviewed code and docs. Use <code>npm run omr:remote:prepare</code> to run the permitted checks, generate the frozen bundle and upload the checkout.</li>
+      <li>Freeze and publish the reviewed code and docs. Use <code>./remote-training-scripts/prepare</code> to run the permitted checks, generate the frozen bundle and upload the checkout.</li>
       <li>On the remote trainer, generate and retain the frozen full-page bundle. Pin its code version explicitly; the default <code>working-tree</code> label is not a revision identifier:</li>
     </ol>
     <pre class="command">node scripts/omr-prepare-remote.js --out=training-data/remote-bundle --code-version=&lt;frozen-revision&gt;</pre>
@@ -744,7 +744,7 @@ details.file summary:hover { background: var(--accent-soft); }
     </ol>
     <pre class="command">node scripts/omr-evaluate-model.js --weights=&lt;combined-candidate.json&gt; --fixture=omr-cli-app/score.png
 node omr-cli-app/omr.js --weights=&lt;combined-candidate.json&gt; --input=score.png --output=score.msq --diagnostics</pre>
-    <p class="warning">The older isolated renderer/template workflow is still present as <code>remote-start-training.sh</code> → <code>runTraining()</code>. It is separate from <code>omr-prepare-remote.js</code> → <code>omr-train-full-page.js</code>; the commands are not interchangeable.</p>
+    <p class="warning">The older isolated renderer/template workflow is still present as <code>train</code> → <code>runTraining()</code>. It is separate from <code>omr-prepare-remote.js</code> → <code>omr-train-full-page.js</code>; the commands are not interchangeable.</p>
     <p>Regenerate this page after source changes with <code>node scripts/build-omr-code-docs.js</code>. The generator reads source files and writes only <code>dev-docs/omr-code.html</code>.</p>
   </section>
 

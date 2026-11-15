@@ -131,7 +131,7 @@ figcaption { font: 12px var(--mono); color: var(--muted); margin-top: 6px; }
 <h2><span class="n">2</span>Set up the server, once <a class="totop" href="#workflow">↑</a></h2>
 <p>A CPU server with Node 22 or newer is enough; both trainers are plain Node and use no training framework. Check out the project and its font files there, then check the version from your laptop:</p>
 <pre><code>ssh user@server 'cd MuSemantiQ && node -v'</code></pre>
-<p>The tracked helpers in <code>remote-training-scripts/</code> handle upload, training, download and verification. Your host stays in one config file, not in every command. The default requires a clean frozen commit; the prepare script uploads that checkout rather than a moving branch.</p>
+<p>The tracked helpers in <code>remote-training-scripts/</code> handle upload, training, download and verification. Each file is self-contained and uses <code>ssh -A -i ~/unisonofficial_rsa root@146.190.232.49</code>, so there is no shared config to source and no npm remote wrapper. The default requires a clean frozen commit; the prepare script uploads that checkout rather than a moving branch.</p>
 <p>From this point until verification ends, a source or documentation change means a new freeze and a new candidate, not a quiet continuation of the old run.</p>
 </section>
 
@@ -148,20 +148,20 @@ figcaption { font: 12px var(--mono); color: var(--muted); margin-top: 6px; }
 
 <h3>3.2 Freeze the full-page evidence</h3>
 <p>Generate the remote bundle from the same checkout. It contains complete rendered pages at <b>0.5×, 0.75×, 1×, 1.5×, 2× and 3×</b>, their unmutated canonical page schemas, source SVG geometry, text targets and a manifest of hashes. The six-language title/subtitle corpus is included as full pages with its own composition-level splits:</p>
-<p>Set the remote host and paths once in <code>remote-training-scripts/config.sh</code>, then run:</p>
-<pre><code>npm run omr:remote:prepare</code></pre>
+<p>The host and run settings are inside <code>remote-training-scripts/prepare</code>, then run:</p>
+<pre><code>./remote-training-scripts/prepare</code></pre>
 <p>The script runs the pre-training checks, generates the bundle with the current commit hash, uploads the frozen checkout with <code>rsync</code>, and leaves <code>training-data/remote-bundle/manifest.json</code> on the server. It refuses a dirty checkout unless you deliberately set <code>OMR_ALLOW_DIRTY=1</code>.</p>
-<p>The generator balances <b>40 style presets</b> — 20 definitions in both Bravura and Leland — and cycles through the <code>clean</code>, <code>screenshot</code>, <code>scan-light</code>, <code>scan-medium</code> and <code>scan-hard</code> mutation profiles. Local stave spacing, line thickness, stave gaps and page-line gaps vary independently. A composition receives one split before any of its pages or variants are drawn, so two versions of one work cannot leak into different splits.</p>
+<p>The generator balances <b>40 style presets</b> — 20 definitions in both Bravura and Leland — and cycles through the <code>clean</code>, <code>screenshot</code>, <code>scan-light</code>, <code>scan-medium</code> and <code>scan-hard</code> mutation profiles. Intentional <code>error-*</code> parser scenarios are excluded from renderer training pages but remain available for explicit negative tests. Local stave spacing, line thickness, stave gaps and page-line gaps vary independently. A composition receives one split before any of its pages or variants are drawn, so two versions of one work cannot leak into different splits.</p>
 <p>The bundle freezes full-page evidence; it does not claim recognition accuracy. It also carries in-context symbol crops with unambiguous renderer labels. The symbol trainer adds isolated renderer crops for shared-target classes and generates fresh crop degradation per epoch; the OCR trainer generates character crops.</p>
 
 <h3>3.3 Train the symbol model remotely</h3>
 <p>Run the symbol trainer against the frozen bundle. The script uploads the checkout if needed, starts the remote run, downloads its log, history and manifest, and leaves the symbol artifact in the configured run directory:</p>
-<pre><code>npm run omr:remote:train</code></pre>
+<pre><code>./remote-training-scripts/train</code></pre>
 <p>The composition split is already frozen. Training reads only the <code>train</code> partition and validates on <code>validation</code>; <code>test</code>, including Allegro Burlesco, remains untouched until candidate verification. The flags select a candidate's shape and data, not an accuracy guarantee.</p>
 
 <h3>3.4 Train the six-language OCR model remotely</h3>
-<p>The same <code>omr:remote:train</code> command also starts the OCR run from the frozen checkout. It writes <code>best-weights.json</code>, <code>history.json</code>, <code>manifest.json</code> and <code>training.log</code> in the configured OCR run directory:</p>
-<pre><code>npm run omr:remote:train</code></pre>
+<p>The same <code>train</code> file also starts the OCR run from the frozen checkout. It writes <code>best-weights.json</code>, <code>history.json</code>, <code>manifest.json</code> and <code>training.log</code> in the configured OCR run directory:</p>
+<pre><code>./remote-training-scripts/train</code></pre>
 <p>The alphabet covers English, French, German, Italian, Spanish and Russian, with accented Latin and Cyrillic characters, digits, punctuation and typographic spaces. Training uses the renderer's own Noto Serif, Noto Sans, Gentium Plus and Gothic A1 glyph paths, at several sizes and scales. Dynamic and chord-letter targets are extracted from the page schema; no dictionary or spelling stage repairs an uncertain character.</p>
 
 <div class="note"><b>Implemented is not verified</b> These commands and data paths are implemented. Do not publish a weight-based accuracy claim until a named combined candidate has passed candidate verification and you have read its remaining differences and uncertainties.</div>
@@ -202,7 +202,7 @@ training-data/</code></pre>
 <section id="home">
 <h2><span class="n">5</span>Bring both artifacts home and combine them <a class="totop" href="#workflow">↑</a></h2>
 <p>Download both runs and combine them without changing either model. The script checks the artifact shapes and records both source hashes:</p>
-<pre><code>npm run omr:remote:download</code></pre>
+<pre><code>./remote-training-scripts/download</code></pre>
 <p>The metadata records both source hashes. Pass <code>training-data/candidates/combined.json</code> to every later check; do not replace it halfway through verification.</p>
 </section>
 
@@ -249,18 +249,17 @@ console.log(report.uncertain)</code></pre>
 <section id="cheat">
 <h2><span class="n">7</span>Cheat sheet <a class="totop" href="#workflow">↑</a></h2>
 <p>Set the host once, then use the complete workflow or its individual phases:</p>
-<pre><code><span class="cm"># edit remote-training-scripts/config.sh once</span>
-OMR_REMOTE_HOST=user@server
-OMR_REMOTE_DIR=MuSemantiQ
+<pre><code><span class="cm"># the host and settings are inside each self-contained script</span>
+ssh -A -i ~/unisonofficial_rsa root@146.190.232.49
 
 <span class="cm"># everything: checks, bundle, upload, both runs, download, combine and verify</span>
-npm run omr:remote:run
+./remote-training-scripts/run
 
 <span class="cm"># or run each phase yourself</span>
-npm run omr:remote:prepare
-npm run omr:remote:train
-npm run omr:remote:download
-npm run omr:remote:verify</code></pre>
+./remote-training-scripts/prepare
+./remote-training-scripts/train
+./remote-training-scripts/download
+./remote-training-scripts/verify</code></pre>
 <p>Keep the selected artifact, both training manifests and logs, and the verification JSON together. They are the evidence for that candidate; the implementation alone is not an accuracy result.</p>
 </section>
 </div>
