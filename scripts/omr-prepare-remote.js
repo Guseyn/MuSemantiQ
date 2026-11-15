@@ -31,11 +31,19 @@ if (options.allegro !== 'false') {
   sourceRecords.push(await loadAllegroBurlescoSourceRecord())
 }
 const scales = String(options.scales || '0.5,0.75,1,1.5,2,3').split(',').map(Number)
+const variantsPerRecord = Number(options.variants || 1)
+const progressEvery = Number(options.progress ?? 10)
+if (!Number.isSafeInteger(progressEvery) || progressEvery < 0) {
+  throw new Error('progress must be a non-negative integer')
+}
+const totalSamples = sourceRecords.length * variantsPerRecord * scales.length
+let completedSamples = 0
 const samples = []
-for (const scale of scales) {
+for (const [ scaleIndex, scale ] of scales.entries()) {
+  console.log(`scale ${scale} started (${scaleIndex + 1}/${scales.length})`)
   await generateFullPageRendererDataset({
     sourceRecords,
-    variantsPerRecord: Number(options.variants || 1),
+    variantsPerRecord,
     seed: Number(options.seed || 20261115),
     scale,
     localGeometryVariation: Number(options['local-geometry'] ?? 0.15),
@@ -54,15 +62,22 @@ for (const scale of scales) {
       }
       await fs.writeFile(`${output}/${id}.json`, JSON.stringify(metadata, null, 2))
       samples.push(metadata)
+      completedSamples++
+      if (progressEvery > 0 && (completedSamples % progressEvery === 0 || completedSamples === totalSamples)) {
+        const percent = Math.round(completedSamples / totalSamples * 100)
+        console.log(`progress ${completedSamples}/${totalSamples} (${percent}%) · scale ${scale} · ${sample.mutationMetadata.profile} · ${sample.stylePreset.id} · ${sample.compositionId}`)
+      }
     }
   })
+  console.log(`scale ${scale} finished (${scaleIndex + 1}/${scales.length})`)
 }
 const config = {
   scales,
-  variantsPerRecord: Number(options.variants || 1),
+  variantsPerRecord,
   seed: Number(options.seed || 20261115),
   localGeometryVariation: Number(options['local-geometry'] ?? 0.15),
   gridSize: Number(options.grid || 48),
+  progressEvery,
   fixtures: fixtures || 'all',
   multilingualTitlesAndSubtitles: true,
   allegroBurlesco: options.allegro !== 'false'

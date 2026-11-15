@@ -12,6 +12,7 @@ SCALES='0.5,0.75,1,1.5,2,3'
 VARIANTS=1
 SEED=20261115
 LOCAL_GEOMETRY=0.15
+PROGRESS="${OMR_PROGRESS:-10}"
 ALLOW_DIRTY="${OMR_ALLOW_DIRTY:-0}"
 
 if [[ "$ALLOW_DIRTY" != 1 && -n "$(git -C "$REPOSITORY_ROOT" status --porcelain)" ]]; then
@@ -36,7 +37,8 @@ printf '==> Generate the frozen bundle at %s\n' "$REVISION"
   --scales="$SCALES" \
   --variants="$VARIANTS" \
   --seed="$SEED" \
-  --local-geometry="$LOCAL_GEOMETRY")
+  --local-geometry="$LOCAL_GEOMETRY" \
+  --progress="$PROGRESS")
 
 printf '==> Upload the frozen checkout\n'
 ssh-add --apple-use-keychain "$HOME/unisonofficial_rsa"

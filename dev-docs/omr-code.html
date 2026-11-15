@@ -139,7 +139,7 @@ details.file summary:hover { background: var(--accent-soft); }
     <span>158 source files</span>
     <span>482 declared functions</span>
     <span>6 walkthroughs · 54 frames</span>
-    <span>snapshot 7ebcdbcbdeead944</span>
+    <span>snapshot 249c4dd5f8123f94</span>
   </div>
   <div class="notice"><b>Pre-training status.</b> This page describes code and data preparation, not a trained result. It makes no accuracy claim. The documented sequence freezes code and documentation first, then starts the symbol and six-language OCR runs manually on the remote trainer. This HTML was generated without running OMR tests, data preparation, training, scale checks, verification or the CLI.</div>
 
@@ -281,7 +281,7 @@ node omr-cli-app/omr.js --weights=&lt;combined-candidate.json&gt; --input=score.
         </div>
       </details>
       <details class="file" data-search="remote-training-scripts/prepare ">
-        <summary><span class="file-path">remote-training-scripts/prepare</span><span class="file-meta">51 lines · 0 functions</span></summary>
+        <summary><span class="file-path">remote-training-scripts/prepare</span><span class="file-meta">53 lines · 0 functions</span></summary>
         <div class="file-body">
 
           <div class="exports"><b>exports:</b> none (script or internal data module)</div>
@@ -362,7 +362,7 @@ node omr-cli-app/omr.js --weights=&lt;combined-candidate.json&gt; --input=score.
         </div>
       </details>
       <details class="file" data-search="scripts/omr-prepare-remote.js ">
-        <summary><span class="file-path">scripts/omr-prepare-remote.js</span><span class="file-meta">79 lines · 0 functions</span></summary>
+        <summary><span class="file-path">scripts/omr-prepare-remote.js</span><span class="file-meta">94 lines · 0 functions</span></summary>
         <div class="file-body">
 
           <div class="exports"><b>exports:</b> none (script or internal data module)</div>
@@ -1714,7 +1714,7 @@ node omr-cli-app/omr.js --weights=&lt;combined-candidate.json&gt; --input=score.
     "functions": []
   },
   "remote-training-scripts/prepare": {
-    "source": "#!/usr/bin/env bash\n\nset -euo pipefail\n\nREMOTE_HOST='root@146.190.232.49'\nREMOTE_DIR='MuSemantiQ'\nBUNDLE_DIR='training-data/remote-bundle'\nREPOSITORY_ROOT=\"$(cd \"$(dirname \"$0\")\" \u0026\u0026 pwd)\"\nREPOSITORY_ROOT=\"$(cd \"$REPOSITORY_ROOT/..\" \u0026\u0026 pwd)\"\nREVISION=\"${OMR_CODE_VERSION:-$(git -C \"$REPOSITORY_ROOT\" rev-parse HEAD)}\"\nSCALES='0.5,0.75,1,1.5,2,3'\nVARIANTS=1\nSEED=20261115\nLOCAL_GEOMETRY=0.15\nALLOW_DIRTY=\"${OMR_ALLOW_DIRTY:-0}\"\n\nif [[ \"$ALLOW_DIRTY\" != 1 \u0026\u0026 -n \"$(git -C \"$REPOSITORY_ROOT\" status --porcelain)\" ]]; then\n  printf 'error: commit the frozen code and docs first, or set OMR_ALLOW_DIRTY=1 deliberately\\n' \u003e\u00262\n  exit 1\nfi\n\nprintf '==\u003e Run pre-training checks\\n'\n(cd \"$REPOSITORY_ROOT\" \u0026\u0026 \\\n  node scripts/visual-tests.js \u0026\u0026 \\\n  node scripts/audio-tests.js \u0026\u0026 \\\n  node scripts/serializer-tests.js \u0026\u0026 \\\n  node scripts/build-walkthrough-docs.js --check \u0026\u0026 \\\n  node scripts/build-omr-code-docs.js --check)\n\nprintf '==\u003e Generate the frozen bundle at %s\\n' \"$REVISION\"\n(cd \"$REPOSITORY_ROOT\" \u0026\u0026 node scripts/omr-prepare-remote.js \\\n  --out=\"$BUNDLE_DIR\" \\\n  --code-version=\"$REVISION\" \\\n  --data-version=1 \\\n  --config-version=1 \\\n  --scales=\"$SCALES\" \\\n  --variants=\"$VARIANTS\" \\\n  --seed=\"$SEED\" \\\n  --local-geometry=\"$LOCAL_GEOMETRY\")\n\nprintf '==\u003e Upload the frozen checkout\\n'\nssh-add --apple-use-keychain \"$HOME/unisonofficial_rsa\"\nssh -A -i \"$HOME/unisonofficial_rsa\" \"$REMOTE_HOST\" \"mkdir -p $(printf '%q' \"$REMOTE_DIR\")\"\nrsync -az -e \"ssh -i $HOME/unisonofficial_rsa\" \\\n  --exclude=.git \\\n  --exclude=node_modules \\\n  --exclude=training-data/runs \\\n  --exclude=training-data/text-runs \\\n  --exclude=training-data/candidates \\\n  \"$REPOSITORY_ROOT/\" \"$REMOTE_HOST:$REMOTE_DIR/\"\nprintf 'Frozen bundle is ready at %s:%s/%s\\n' \"$REMOTE_HOST\" \"$REMOTE_DIR\" \"$BUNDLE_DIR\"\n",
+    "source": "#!/usr/bin/env bash\n\nset -euo pipefail\n\nREMOTE_HOST='root@146.190.232.49'\nREMOTE_DIR='MuSemantiQ'\nBUNDLE_DIR='training-data/remote-bundle'\nREPOSITORY_ROOT=\"$(cd \"$(dirname \"$0\")\" \u0026\u0026 pwd)\"\nREPOSITORY_ROOT=\"$(cd \"$REPOSITORY_ROOT/..\" \u0026\u0026 pwd)\"\nREVISION=\"${OMR_CODE_VERSION:-$(git -C \"$REPOSITORY_ROOT\" rev-parse HEAD)}\"\nSCALES='0.5,0.75,1,1.5,2,3'\nVARIANTS=1\nSEED=20261115\nLOCAL_GEOMETRY=0.15\nPROGRESS=\"${OMR_PROGRESS:-10}\"\nALLOW_DIRTY=\"${OMR_ALLOW_DIRTY:-0}\"\n\nif [[ \"$ALLOW_DIRTY\" != 1 \u0026\u0026 -n \"$(git -C \"$REPOSITORY_ROOT\" status --porcelain)\" ]]; then\n  printf 'error: commit the frozen code and docs first, or set OMR_ALLOW_DIRTY=1 deliberately\\n' \u003e\u00262\n  exit 1\nfi\n\nprintf '==\u003e Run pre-training checks\\n'\n(cd \"$REPOSITORY_ROOT\" \u0026\u0026 \\\n  node scripts/visual-tests.js \u0026\u0026 \\\n  node scripts/audio-tests.js \u0026\u0026 \\\n  node scripts/serializer-tests.js \u0026\u0026 \\\n  node scripts/build-walkthrough-docs.js --check \u0026\u0026 \\\n  node scripts/build-omr-code-docs.js --check)\n\nprintf '==\u003e Generate the frozen bundle at %s\\n' \"$REVISION\"\n(cd \"$REPOSITORY_ROOT\" \u0026\u0026 node scripts/omr-prepare-remote.js \\\n  --out=\"$BUNDLE_DIR\" \\\n  --code-version=\"$REVISION\" \\\n  --data-version=1 \\\n  --config-version=1 \\\n  --scales=\"$SCALES\" \\\n  --variants=\"$VARIANTS\" \\\n  --seed=\"$SEED\" \\\n  --local-geometry=\"$LOCAL_GEOMETRY\" \\\n  --progress=\"$PROGRESS\")\n\nprintf '==\u003e Upload the frozen checkout\\n'\nssh-add --apple-use-keychain \"$HOME/unisonofficial_rsa\"\nssh -A -i \"$HOME/unisonofficial_rsa\" \"$REMOTE_HOST\" \"mkdir -p $(printf '%q' \"$REMOTE_DIR\")\"\nrsync -az -e \"ssh -i $HOME/unisonofficial_rsa\" \\\n  --exclude=.git \\\n  --exclude=node_modules \\\n  --exclude=training-data/runs \\\n  --exclude=training-data/text-runs \\\n  --exclude=training-data/candidates \\\n  \"$REPOSITORY_ROOT/\" \"$REMOTE_HOST:$REMOTE_DIR/\"\nprintf 'Frozen bundle is ready at %s:%s/%s\\n' \"$REMOTE_HOST\" \"$REMOTE_DIR\" \"$BUNDLE_DIR\"\n",
     "functions": []
   },
   "remote-training-scripts/pull": {
@@ -1895,7 +1895,7 @@ node omr-cli-app/omr.js --weights=&lt;combined-candidate.json&gt; --input=score.
     "functions": []
   },
   "scripts/omr-prepare-remote.js": {
-    "source": "#!/usr/bin/env node\n\n'use strict'\n\nimport fs from 'node:fs/promises'\nimport { createHash } from 'node:crypto'\nimport { encodePng } from '#msq/omr/training/encodePng.js'\nimport loadVisualFixtureSourceRecords from '#msq/omr/training/fullPage/loadVisualFixtureSourceRecords.js'\nimport loadAllegroBurlescoSourceRecord from '#msq/omr/training/fullPage/loadAllegroBurlescoSourceRecord.js'\nimport loadTitleSubtitleSourceRecords from '#msq/omr/training/fullPage/loadTitleSubtitleSourceRecords.js'\nimport generateFullPageRendererDataset from '#msq/omr/training/fullPage/generateFullPageRendererDataset.js'\nimport createFullPageRemoteRunManifest from '#msq/omr/training/fullPage/createFullPageRemoteRunManifest.js'\nimport cropFullPageTrainingSamples from '#msq/omr/training/fullPage/cropFullPageTrainingSamples.js'\n\n// Generates a frozen remote-training bundle. This is not recognition testing.\nconst options = Object.fromEntries(process.argv.slice(2).map((argument) =\u003e {\n  const match = argument.match(/^--([^=]+)(?:=(.*))?$/)\n  return match ? [ match[1], match[2] ?? true ] : [ argument, true ]\n}))\nif (!options.out || options.out === true) {\n  throw new Error('Pass --out=\u003cremote-bundle-directory\u003e')\n}\nconst output = options.out\nawait fs.mkdir(output, { recursive: true })\nconst fixtures = options.fixtures \u0026\u0026 options.fixtures !== true\n  ? String(options.fixtures).split(',').map((name) =\u003e name.endsWith('.txt') ? name : `${name}.txt`)\n  : null\nconst sourceRecords = await loadVisualFixtureSourceRecords({ fixtures })\nsourceRecords.push(...loadTitleSubtitleSourceRecords())\nif (options.allegro !== 'false') {\n  sourceRecords.push(await loadAllegroBurlescoSourceRecord())\n}\nconst scales = String(options.scales || '0.5,0.75,1,1.5,2,3').split(',').map(Number)\nconst samples = []\nfor (const scale of scales) {\n  await generateFullPageRendererDataset({\n    sourceRecords,\n    variantsPerRecord: Number(options.variants || 1),\n    seed: Number(options.seed || 20261115),\n    scale,\n    localGeometryVariation: Number(options['local-geometry'] ?? 0.15),\n    collectSamples: false,\n    onSample: async (sample) =\u003e {\n      const id = `${sample.sampleId}-${scale}`.replace(/[^a-zA-Z0-9_-]+/g, '-')\n      const png = encodePng(sample.bitmap)\n      await fs.writeFile(`${output}/${id}.png`, png)\n      const symbolSamples = cropFullPageTrainingSamples(sample, { gridSize: Number(options.grid || 48) })\n      const metadata = {\n        ...sample,\n        bitmap: undefined,\n        png: `${id}.png`,\n        sha256: createHash('sha256').update(png).digest('hex'),\n        symbolSamples\n      }\n      await fs.writeFile(`${output}/${id}.json`, JSON.stringify(metadata, null, 2))\n      samples.push(metadata)\n    }\n  })\n}\nconst config = {\n  scales,\n  variantsPerRecord: Number(options.variants || 1),\n  seed: Number(options.seed || 20261115),\n  localGeometryVariation: Number(options['local-geometry'] ?? 0.15),\n  gridSize: Number(options.grid || 48),\n  fixtures: fixtures || 'all',\n  multilingualTitlesAndSubtitles: true,\n  allegroBurlesco: options.allegro !== 'false'\n}\nconst manifest = createFullPageRemoteRunManifest({\n  codeVersion: String(options['code-version'] || 'working-tree'),\n  dataVersion: String(options['data-version'] || '1'),\n  configVersion: String(options['config-version'] || '1'),\n  code: String(options['code-version'] || 'working-tree'),\n  data: samples,\n  config\n})\nawait fs.writeFile(`${output}/manifest.json`, JSON.stringify({ ...manifest, config, samples }, null, 2))\nconsole.log(`remote bundle written to ${output}: ${samples.length} pages`)\n",
+    "source": "#!/usr/bin/env node\n\n'use strict'\n\nimport fs from 'node:fs/promises'\nimport { createHash } from 'node:crypto'\nimport { encodePng } from '#msq/omr/training/encodePng.js'\nimport loadVisualFixtureSourceRecords from '#msq/omr/training/fullPage/loadVisualFixtureSourceRecords.js'\nimport loadAllegroBurlescoSourceRecord from '#msq/omr/training/fullPage/loadAllegroBurlescoSourceRecord.js'\nimport loadTitleSubtitleSourceRecords from '#msq/omr/training/fullPage/loadTitleSubtitleSourceRecords.js'\nimport generateFullPageRendererDataset from '#msq/omr/training/fullPage/generateFullPageRendererDataset.js'\nimport createFullPageRemoteRunManifest from '#msq/omr/training/fullPage/createFullPageRemoteRunManifest.js'\nimport cropFullPageTrainingSamples from '#msq/omr/training/fullPage/cropFullPageTrainingSamples.js'\n\n// Generates a frozen remote-training bundle. This is not recognition testing.\nconst options = Object.fromEntries(process.argv.slice(2).map((argument) =\u003e {\n  const match = argument.match(/^--([^=]+)(?:=(.*))?$/)\n  return match ? [ match[1], match[2] ?? true ] : [ argument, true ]\n}))\nif (!options.out || options.out === true) {\n  throw new Error('Pass --out=\u003cremote-bundle-directory\u003e')\n}\nconst output = options.out\nawait fs.mkdir(output, { recursive: true })\nconst fixtures = options.fixtures \u0026\u0026 options.fixtures !== true\n  ? String(options.fixtures).split(',').map((name) =\u003e name.endsWith('.txt') ? name : `${name}.txt`)\n  : null\nconst sourceRecords = await loadVisualFixtureSourceRecords({ fixtures })\nsourceRecords.push(...loadTitleSubtitleSourceRecords())\nif (options.allegro !== 'false') {\n  sourceRecords.push(await loadAllegroBurlescoSourceRecord())\n}\nconst scales = String(options.scales || '0.5,0.75,1,1.5,2,3').split(',').map(Number)\nconst variantsPerRecord = Number(options.variants || 1)\nconst progressEvery = Number(options.progress ?? 10)\nif (!Number.isSafeInteger(progressEvery) || progressEvery \u003c 0) {\n  throw new Error('progress must be a non-negative integer')\n}\nconst totalSamples = sourceRecords.length * variantsPerRecord * scales.length\nlet completedSamples = 0\nconst samples = []\nfor (const [ scaleIndex, scale ] of scales.entries()) {\n  console.log(`scale ${scale} started (${scaleIndex + 1}/${scales.length})`)\n  await generateFullPageRendererDataset({\n    sourceRecords,\n    variantsPerRecord,\n    seed: Number(options.seed || 20261115),\n    scale,\n    localGeometryVariation: Number(options['local-geometry'] ?? 0.15),\n    collectSamples: false,\n    onSample: async (sample) =\u003e {\n      const id = `${sample.sampleId}-${scale}`.replace(/[^a-zA-Z0-9_-]+/g, '-')\n      const png = encodePng(sample.bitmap)\n      await fs.writeFile(`${output}/${id}.png`, png)\n      const symbolSamples = cropFullPageTrainingSamples(sample, { gridSize: Number(options.grid || 48) })\n      const metadata = {\n        ...sample,\n        bitmap: undefined,\n        png: `${id}.png`,\n        sha256: createHash('sha256').update(png).digest('hex'),\n        symbolSamples\n      }\n      await fs.writeFile(`${output}/${id}.json`, JSON.stringify(metadata, null, 2))\n      samples.push(metadata)\n      completedSamples++\n      if (progressEvery \u003e 0 \u0026\u0026 (completedSamples % progressEvery === 0 || completedSamples === totalSamples)) {\n        const percent = Math.round(completedSamples / totalSamples * 100)\n        console.log(`progress ${completedSamples}/${totalSamples} (${percent}%) · scale ${scale} · ${sample.mutationMetadata.profile} · ${sample.stylePreset.id} · ${sample.compositionId}`)\n      }\n    }\n  })\n  console.log(`scale ${scale} finished (${scaleIndex + 1}/${scales.length})`)\n}\nconst config = {\n  scales,\n  variantsPerRecord,\n  seed: Number(options.seed || 20261115),\n  localGeometryVariation: Number(options['local-geometry'] ?? 0.15),\n  gridSize: Number(options.grid || 48),\n  progressEvery,\n  fixtures: fixtures || 'all',\n  multilingualTitlesAndSubtitles: true,\n  allegroBurlesco: options.allegro !== 'false'\n}\nconst manifest = createFullPageRemoteRunManifest({\n  codeVersion: String(options['code-version'] || 'working-tree'),\n  dataVersion: String(options['data-version'] || '1'),\n  configVersion: String(options['config-version'] || '1'),\n  code: String(options['code-version'] || 'working-tree'),\n  data: samples,\n  config\n})\nawait fs.writeFile(`${output}/manifest.json`, JSON.stringify({ ...manifest, config, samples }, null, 2))\nconsole.log(`remote bundle written to ${output}: ${samples.length} pages`)\n",
     "functions": []
   },
   "scripts/omr-raster-check.js": {
@@ -6120,7 +6120,7 @@ node omr-cli-app/omr.js --weights=&lt;combined-candidate.json&gt; --input=score.
         "file": "scripts/omr-prepare-remote.js",
         "range": [
           1,
-          79
+          94
         ],
         "activeNodes": [
           "dataset",
@@ -6133,7 +6133,7 @@ node omr-cli-app/omr.js --weights=&lt;combined-candidate.json&gt; --input=score.
         },
         "message": {
           "file": "scripts/omr-prepare-remote.js",
-          "lines": "1–79",
+          "lines": "1–94",
           "command": "node scripts/omr-prepare-remote.js --out=training-data/remote-bundle --code-version=\u003cfrozen-revision\u003e",
           "output": "PNG pages · JSON labels and symbolSamples · manifest.json",
           "note": "This is data generation, not recognition testing or training."
@@ -6303,7 +6303,7 @@ node omr-cli-app/omr.js --weights=&lt;combined-candidate.json&gt; --input=score.
         "file": "remote-training-scripts/prepare",
         "range": [
           1,
-          51
+          53
         ],
         "activeNodes": [
           "training"
@@ -6314,7 +6314,7 @@ node omr-cli-app/omr.js --weights=&lt;combined-candidate.json&gt; --input=score.
         },
         "message": {
           "file": "remote-training-scripts/prepare",
-          "lines": "1–51",
+          "lines": "1–53",
           "sequence": "1 · freeze and publish code/docs → 2 · generate and upload the frozen bundle",
           "note": "The script refuses a dirty checkout unless OMR_ALLOW_DIRTY=1 is set deliberately."
         }
@@ -6325,7 +6325,7 @@ node omr-cli-app/omr.js --weights=&lt;combined-candidate.json&gt; --input=score.
         "file": "scripts/omr-prepare-remote.js",
         "range": [
           1,
-          79
+          94
         ],
         "activeNodes": [
           "dataset",
@@ -6337,7 +6337,7 @@ node omr-cli-app/omr.js --weights=&lt;combined-candidate.json&gt; --input=score.
         },
         "message": {
           "file": "scripts/omr-prepare-remote.js",
-          "lines": "1–79",
+          "lines": "1–94",
           "sequence": "3 · generate and retain the frozen full-page bundle",
           "command": "node scripts/omr-prepare-remote.js --out=training-data/remote-bundle --code-version=\u003cfrozen-revision\u003e"
         }
