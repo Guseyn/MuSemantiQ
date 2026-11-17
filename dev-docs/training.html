@@ -1,0 +1,299 @@
+<title>MuSemantiQ — training on a server</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root {
+  --paper: #fdfdfb;
+  --ink: #17181a;
+  --muted: #6b7076;
+  --rule: #e4e4e0;
+  --soft: #f4f3ef;
+  --accent: #a5322a;
+  --accent-soft: #f6e9e6;
+  --ok: #2f6b3c;
+  --font: system-ui, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+  --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+  --serif: Georgia, "Times New Roman", serif;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 64px; }
+body { background: var(--paper); color: var(--ink); font: 15.5px/1.6 var(--font); margin: 0; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.page { max-width: 860px; margin: 0 auto; padding: 36px 22px 120px; }
+header h1 { font: 400 34px/1.2 var(--serif); margin: 0 0 6px; }
+header .sub { color: var(--muted); max-width: 70ch; }
+.eyebrow { font: 500 12px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+hr { border: 0; border-top: 1px solid var(--rule); margin: 34px 0; }
+nav { position: sticky; top: 0; z-index: 10; background: var(--paper); border-bottom: 1px solid var(--rule); padding: 10px 0; margin: 22px 0 26px; display: flex; flex-wrap: wrap; gap: 4px 14px; }
+nav a { font: 500 12.5px var(--mono); color: var(--muted); }
+nav a:hover { color: var(--accent); text-decoration: none; }
+h2 { font: 400 25px/1.25 var(--serif); margin: 0 0 10px; }
+h2 .n { color: var(--muted); font-size: 17px; margin-right: 8px; }
+h3 { font: 600 15px var(--font); margin: 28px 0 6px; }
+p { max-width: 72ch; margin: 8px 0; }
+ul, ol { max-width: 72ch; padding-left: 22px; }
+li { margin: 4px 0; }
+code { font: .87em var(--mono); background: var(--soft); padding: 0 4px; border-radius: 3px; }
+pre { background: var(--soft); border: 1px solid var(--rule); border-radius: 8px; padding: 16px 18px; overflow-x: auto; font: 14px/1.75 var(--mono); margin: 16px 0 20px; }
+pre code { background: transparent; padding: 0; font: inherit; }
+pre .cm { color: var(--muted); }
+.totop { float: right; font: 500 11.5px var(--mono); }
+.note { border-left: 3px solid var(--accent); background: var(--accent-soft); padding: 10px 14px; border-radius: 0 7px 7px 0; margin: 14px 0; max-width: 72ch; }
+.note b { font: 600 11px var(--mono); text-transform: uppercase; letter-spacing: .06em; display: block; margin-bottom: 3px; color: var(--muted); }
+figure { margin: 18px 0; }
+figure svg { display: block; width: 100%; height: auto; background: #fff; border: 1px solid var(--rule); border-radius: 4px; }
+figcaption { font: 12px var(--mono); color: var(--muted); margin-top: 6px; }
+.diagram .box { fill: #fff; stroke: #c9c9c4; stroke-width: 1.5; rx: 8; }
+.diagram .box.hot { stroke: var(--accent); stroke-width: 2; fill: var(--accent-soft); }
+.diagram text { font: 600 12.5px var(--font); fill: var(--ink); text-anchor: middle; }
+.diagram text.k { font: 500 10.5px var(--mono); fill: var(--muted); }
+.diagram text.k.acc { fill: var(--accent); }
+.diagram .arrow { stroke: var(--muted); stroke-width: 1.8; fill: none; marker-end: url(#arr); }
+.diagram .arrow.down { stroke: var(--accent); }
+@keyframes pulse { 0%, 100% { opacity: .45; } 50% { opacity: 1; } }
+.pulse { animation: pulse 2.4s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
+</style>
+
+<div class="page">
+<header>
+  <div class="eyebrow">MuSemantiQ · dev docs · src/omr</div>
+  <h1>Training on a server</h1>
+  <p class="sub">Freeze the code, documentation, data and configuration; train symbol and text models on a rented server; bring both artifacts home and verify the combined candidate. <b>You drive the remote work from your laptop over <code>ssh</code></b>. Weights stay out of git and are always passed by path.</p>
+</header>
+
+<nav>
+  <a href="#workflow">the shape</a>
+  <a href="#setup">set up once</a>
+  <a href="#run">freeze and train</a>
+  <a href="#gitignore">model data</a>
+  <a href="#home">combine</a>
+  <a href="#test">verify locally</a>
+  <a href="#cheat">cheat sheet</a>
+</nav>
+
+<!-- ============================ 1 ============================ -->
+<section id="workflow">
+<h2><span class="n">1</span>The shape of it <a class="totop" href="#workflow">↑</a></h2>
+
+<figure>
+<svg class="diagram" viewBox="0 0 900 360" role="img" aria-label="Code travels to the server by git, weights travel back by rsync, all driven from the laptop">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="currentColor" style="fill: var(--muted)"></path>
+    </marker>
+    <marker id="arr-acc" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="currentColor" style="fill: var(--accent)"></path>
+    </marker>
+  </defs>
+  <!-- laptop -->
+  <rect class="box hot" x="20" y="60" width="280" height="200"></rect>
+  <text x="160" y="92">your laptop</text>
+  <text x="160" y="128" class="k acc">you type everything here</text>
+  <text x="160" y="152" class="k">ssh · rsync · git · node</text>
+  <text x="160" y="184" class="k acc">src/omr/model/weights.json</text>
+  <text x="160" y="204" class="k">arrives here — gitignored</text>
+  <!-- server -->
+  <rect class="box" x="600" y="60" width="280" height="200"></rect>
+  <text x="740" y="92">the server</text>
+  <text x="740" y="128" class="k">reached only over ssh</text>
+  <text x="740" y="152" class="k">nohup node …/train.js</text>
+  <text x="740" y="184" class="k acc">model/weights.json</text>
+  <text x="740" y="204" class="k">born here — gitignored</text>
+  <!-- lanes -->
+  <path class="arrow" d="M310,120 L590,120"></path>
+  <text x="450" y="102" class="k">ssh 'git clone / git pull' — the code</text>
+  <path class="arrow down" d="M590,220 L310,220" marker-end="url(#arr-acc)"></path>
+  <text x="450" y="248" class="k acc">rsync — the weights, and their hash</text>
+  <circle r="6" fill="#a5322a" class="pulse">
+    <animateMotion dur="3s" repeatCount="indefinite" path="M590,220 L310,220"></animateMotion>
+  </circle>
+  <!-- the dataset -->
+  <text x="450" y="310" class="k">the training set travels nowhere: one seed regenerates the same bytes on any machine</text>
+</svg>
+<figcaption>fig 1 · source goes one way, generated artifacts come back. The current workflow makes two: symbols and OCR.</figcaption>
+</figure>
+
+<p>Four rules keep a run reviewable:</p>
+<ul>
+  <li><b>Freeze first.</b> Choose one commit after the code and documentation are finished. Do not change the renderer, training data, configuration or docs while that candidate is being trained and verified.</li>
+  <li><b>Train two classifiers.</b> The symbol artifact classifies notation blobs. The nested <code>ocr</code> artifact reads titles, subtitles, instrument titles, page metadata and unit text, including dynamics and chord letters.</li>
+  <li><b>Generated data has an identity.</b> Seeds regenerate crop datasets. A full-page bundle also records each PNG, canonical target, style, mutation and SHA-256, with composition-level train / validation / test splits.</li>
+  <li><b>Weights are candidates, not source.</b> There is no fallback model. The CLI, verifier and legacy OMR tests all need an explicit artifact.</li>
+</ul>
+</section>
+
+<hr>
+
+<!-- ============================ 2 ============================ -->
+<section id="setup">
+<h2><span class="n">2</span>Set up the server, once <a class="totop" href="#workflow">↑</a></h2>
+<p>A CPU server with Node 22 or newer is enough; both trainers are plain Node and use no training framework. Check out the project and its font files there, then check the version from your laptop:</p>
+<pre><code>ssh user@server 'cd MuSemantiQ && node -v'</code></pre>
+<p>The tracked helpers in <code>remote-training-scripts/</code> handle upload, training, stopping, reading logs, checking status, download and verification. Each file is self-contained and uses <code>ssh -A -i ~/unisonofficial_rsa root@146.190.232.49</code>, so there is no shared config to source and no npm remote wrapper. The default requires a clean frozen commit; the prepare script uploads that checkout rather than a moving branch.</p>
+<p>From this point until verification ends, a source or documentation change means a new freeze and a new candidate, not a quiet continuation of the old run.</p>
+</section>
+
+<hr>
+
+<!-- ============================ 3 ============================ -->
+<section id="run">
+<h2><span class="n">3</span>Freeze, then train <a class="totop" href="#workflow">↑</a></h2>
+
+<h3>3.1 Run the pre-training tests</h3>
+<p>Before starting remote work, test the renderer, audio, serializer and generated walkthroughs. These tests do not load OMR weights:</p>
+<pre><code>npm run test:pretraining</code></pre>
+<p>Record the commit used for this green run. It is the <code>&lt;frozen-commit&gt;</code> in every later step.</p>
+
+<h3>3.2 Freeze the full-page evidence</h3>
+<p>Generate the remote bundle from the same checkout. It contains complete rendered pages at <b>0.5×, 0.75×, 1×, 1.5×, 2× and 3×</b>, their unmutated canonical page schemas, source SVG geometry, text targets and a manifest of hashes. The six-language title/subtitle corpus is included as full pages with its own composition-level splits:</p>
+<p>The host and run settings are inside <code>remote-training-scripts/prepare</code>, then run:</p>
+<pre><code>./remote-training-scripts/prepare</code></pre>
+<p>The script runs the pre-training checks, generates the bundle with the current commit hash, uploads the frozen checkout with <code>rsync</code>, and leaves <code>training-data/remote-bundle/manifest.json</code> on the server. It refuses a dirty checkout unless you deliberately set <code>OMR_ALLOW_DIRTY=1</code>. Progress is printed per scale and every 10 pages by default; use <code>OMR_PROGRESS=1 ./remote-training-scripts/prepare</code> for page-by-page logs, or a larger interval for quieter output.</p>
+<p>The generator balances <b>40 style presets</b> — 20 definitions in both Bravura and Leland — and cycles through the <code>clean</code>, <code>screenshot</code>, <code>scan-light</code>, <code>scan-medium</code> and <code>scan-hard</code> mutation profiles. Intentional <code>error-*</code> parser scenarios are excluded from renderer training pages but remain available for explicit negative tests. Local stave spacing, line thickness, stave gaps and page-line gaps vary independently. A composition receives one split before any of its pages or variants are drawn, so two versions of one work cannot leak into different splits.</p>
+<p>The bundle freezes full-page evidence; it does not claim recognition accuracy. It also carries in-context symbol crops with unambiguous renderer labels. The symbol trainer adds isolated renderer crops for shared-target classes and generates fresh crop degradation per epoch; the OCR trainer generates character crops.</p>
+
+<h3>3.3 Train the symbol model remotely</h3>
+<p>Run the symbol trainer against the frozen bundle. The script uploads the checkout if needed, then launches the run <b>detached</b> on the server and returns immediately. All output goes to <code>training.log</code> — the terminal stays clean. The first line in that log is <code>training started</code>, written before the slow data load, so you can tell the process is alive right away. Follow it with:</p>
+<pre><code>./remote-training-scripts/train symbols
+./remote-training-scripts/logs symbols</code></pre>
+<p>The composition split is already frozen. Training reads only the <code>train</code> partition and validates on <code>validation</code>; <code>test</code>, including Allegro Burlesco, remains untouched until candidate verification. The flags select a candidate's shape and data, not an accuracy guarantee.</p>
+
+<h3>3.4 Train the six-language OCR model remotely</h3>
+<p>Run <code>train ocr</code> separately when you are ready for the text model. Like the symbol trainer, it launches detached, logs to file only, and writes <code>best-weights.json</code>, <code>history.json</code>, <code>manifest.json</code> and <code>training.log</code> in the configured OCR run directory on the server. Follow it with <code>logs ocr</code> and fetch the result later with <code>download</code>:</p>
+<pre><code>./remote-training-scripts/train ocr
+./remote-training-scripts/logs ocr</code></pre>
+<p>The alphabet covers English, French, German, Italian, Spanish and Russian, with accented Latin and Cyrillic characters, digits, punctuation and typographic spaces. Training uses the renderer's own Noto Serif, Noto Sans, Gentium Plus and Gothic A1 glyph paths, at several sizes and scales. Dynamic and chord-letter targets are extracted from the page schema; no dictionary or spelling stage repairs an uncertain character.</p>
+
+<div class="note"><b>Implemented is not verified</b> These commands and data paths are implemented. Do not publish a weight-based accuracy claim until a named combined candidate has passed candidate verification and you have read its remaining differences and uncertainties.</div>
+</section>
+
+<h3>3.5 The files in one training run</h3>
+<p>Each symbol or OCR run directory contains four different artifacts:</p>
+<table>
+<thead><tr><th>File</th><th>What it contains</th><th>Why you need it</th></tr></thead>
+<tbody>
+<tr><td><code>best-weights.json</code></td><td>The model's <code>shape</code>, convolutional and dense layer weights and biases, and the ordered <code>classIds</code>. The checkpoint is the one with the lowest validation loss, not necessarily the last epoch. Symbol classes are notation classes; OCR classes are Unicode characters.</td><td>This is the actual inference model. It has no optimizer state.</td></tr>
+<tr><td><code>history.json</code></td><td>One record per epoch: training loss and accuracy, validation loss and accuracy, and elapsed seconds.</td><td>Shows how training progressed and why the best checkpoint was selected.</td></tr>
+<tr><td><code>manifest.json</code></td><td>Run metadata: run type, seed, grid size, sample and validation counts, and the SHA-256 of <code>best-weights.json</code>.</td><td>Identifies the exact run and lets you verify that the downloaded weights were not changed.</td></tr>
+<tr><td><code>training.log</code></td><td>Human-readable epoch, batch, validation and error output, including the final checkpoint path and hash.</td><td>Use it to watch progress and diagnose a failed run.</td></tr>
+</tbody>
+</table>
+<p>The run-level <code>manifest.json</code> is not the same as <code>training-data/remote-bundle/manifest.json</code>. The latter is the frozen dataset manifest: it records the code, data and config hashes and all full-page samples, splits, styles, mutations, canonical targets and PNG hashes. The training run consumes that dataset manifest and produces its own smaller run manifest.</p>
+<p>After both runs finish, <code>omr-combine-artifacts</code> writes <code>training-data/candidates/combined.json</code>. That candidate contains the symbol model at the top level, the OCR model under <code>ocr</code>, and metadata with both input hashes. It is the file you pass to translation and verification.</p>
+
+<hr>
+
+<!-- ============================ 4 ============================ -->
+<section id="gitignore">
+<h2><span class="n">4</span>Model data stays out of git <a class="totop" href="#workflow">↑</a></h2>
+<p>The generated bundle, run logs and candidates live under <code>training-data/</code>, which is gitignored. The old optional adopted path is ignored too:</p>
+<pre><code>src/omr/model/weights.json
+src/omr/model/checkpoints/
+training-data/</code></pre>
+<p>Keep using explicit paths instead of relying on that old path. A combined candidate has the symbol model at the top level and the complete text model under <code>ocr</code>:</p>
+<pre><code>{
+  "shape": { … },
+  "layers": { … },
+  "classIds": [ … ],
+  "ocr": {
+    "shape": { … },
+    "layers": { … },
+    "classIds": [ … ]
+  },
+  "metadata": {
+    "type": "mu-semanti-q-omr-candidate",
+    "version": 1,
+    "symbolSha256": "…",
+    "ocrSha256": "…"
+  }
+}</code></pre>
+<p>A symbol-only artifact can run, but visible text then produces OCR uncertainties. Combining validates both model shapes and requires the OCR class order to match the six-language alphabet exactly.</p>
+</section>
+
+<hr>
+
+<!-- ============================ 5 ============================ -->
+<section id="home">
+<h2><span class="n">5</span>Bring both artifacts home and combine them <a class="totop" href="#workflow">↑</a></h2>
+<p>Download both runs, then nest them into one candidate. <code>download</code> only fetches the two run directories; <code>combine</code> validates the artifact shapes and records both source hashes. The combined <code>train</code> workflow runs both trainers, then these two steps in order:</p>
+<pre><code>./remote-training-scripts/download
+./remote-training-scripts/combine</code></pre>
+<p>The metadata records both source hashes. Pass <code>training-data/candidates/combined.json</code> to every later check; do not replace it halfway through verification.</p>
+</section>
+
+<hr>
+
+<!-- ============================ 6 ============================ -->
+<section id="test">
+<h2><span class="n">6</span>Verify the candidate locally <a class="totop" href="#workflow">↑</a></h2>
+<p>The canonical verifier rasterizes complete visual fixtures at all six scales, translates each page with the named candidate, parses the generated MSQ again, and compares visible page-schema fields and custom styles. Editor reference IDs and playback-only settings are outside that comparison. A case is accepted only when the visible schemas and styles are equal and both <code>report.uncertain</code> and <code>report.ignored</code> are empty.</p>
+<pre><code>npm run omr:verify -- \
+  --weights=training-data/candidates/combined.json \
+  --scales=0.5,0.75,1,1.5,2,3 \
+  --out=training-data/verification-failures</code></pre>
+<p>The default fixture set is a small first check. Use <code>--all</code> for every Bravura visual fixture, <code>--fixture-font=leland</code> for the Leland fixtures, or <code>--fixtures=chords-basics,rhythm-rests</code> for a named subset. The JSON output separates semantic and style mismatches, parser errors, uncertain symbols and ignored ink; <code>--out</code> keeps failed MSQ and diagnostics for inspection.</p>
+<p>Then verify the frozen bundle itself, including every style preset, local-geometry variant and degradation profile:</p>
+<pre><code>npm run omr:verify:remote -- \
+  --weights=training-data/candidates/combined.json \
+  --data=training-data/remote-bundle/manifest.json</code></pre>
+<p>The legacy OMR suite has its own explicit requirement. Set <code>OMR_WEIGHTS</code> to the same candidate:</p>
+<pre><code>OMR_WEIGHTS=training-data/candidates/combined.json npm run test:omr:all</code></pre>
+<p>Without <code>OMR_WEIGHTS</code>, that suite stops rather than substituting a model. This is separate from <code>npm run test:pretraining</code>, which needs no weights.</p>
+
+<h3>What the result means</h3>
+<p>Validation loss and crop accuracy describe their own samples. Canonical verification describes complete renderer fixtures. Neither is a real-book accuracy measurement. Real books and hand-corrected real-page labels are deferred; do not turn a synthetic pass into a claim about scans or photographs.</p>
+<p>The main API takes the artifact explicitly as well:</p>
+<pre><code><span class="cm"># node --input-type=module -e "…paste this…"</span>
+import { readFileSync, writeFileSync } from 'node:fs'
+import { decodeImageToGrayscale, translateImageToMsq } from '#msq/omr/api.js'
+
+const weights = JSON.parse(readFileSync(
+  'training-data/candidates/combined.json', 'utf8'
+))
+const image = decodeImageToGrayscale(readFileSync('score.png'))
+const { msqText, report } = translateImageToMsq(image, { weights })
+
+writeFileSync('score.msq', msqText)
+console.log(report.uncertain)</code></pre>
+<p>For a project, <code>translateImagesToMsqPages(images, { weights })</code> applies the same artifact in page order and carries clef, key, meter and styles. JPEG input still needs conversion to PNG, or canvas pixels through <code>readBitmapFromImage</code>.</p>
+</section>
+
+<hr>
+
+<!-- ============================ 7 ============================ -->
+<section id="cheat">
+<h2><span class="n">7</span>Cheat sheet <a class="totop" href="#workflow">↑</a></h2>
+<p>Freeze once, then launch both trainers — each starts detached on the server and returns immediately, logging only to its own file. Follow the logs, then download, combine and verify once both finish:</p>
+<pre><code><span class="cm"># the host and settings are inside each self-contained script</span>
+ssh -A -i ~/unisonofficial_rsa root@146.190.232.49
+
+<span class="cm"># once: freeze code, docs, data and configuration</span>
+./remote-training-scripts/prepare
+
+<span class="cm"># launch trainers — symbols, ocr or both (each detached, returns immediately)</span>
+./remote-training-scripts/train symbols
+./remote-training-scripts/train ocr
+
+<span class="cm"># watch a trainer's log while it runs (symbols, ocr or both)</span>
+./remote-training-scripts/logs symbols
+
+<span class="cm"># one-shot picture: who is running, cpu/memory, log tails, kernel errors</span>
+./remote-training-scripts/status
+
+<span class="cm"># to cancel a running trainer (symbols, ocr or both)</span>
+./remote-training-scripts/stop symbols
+
+<span class="cm"># when both finish, bring both artifacts home</span>
+./remote-training-scripts/download
+
+<span class="cm"># then nest the two artifacts into one candidate</span>
+./remote-training-scripts/combine
+
+<span class="cm"># verify the combined candidate</span>
+./remote-training-scripts/verify</code></pre>
+<p>Keep the selected artifact, both training manifests and logs, and the verification JSON together. They are the evidence for that candidate; the implementation alone is not an accuracy result.</p>
+</section>
+</div>

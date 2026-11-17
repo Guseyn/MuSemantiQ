@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+REMOTE_HOST='root@146.190.232.49'
+REMOTE_DIR='MuSemantiQ'
+SYMBOL_RUN_DIR='training-data/symbol-runs/candidate'
+OCR_RUN_DIR='training-data/text-runs/candidate-ocr'
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+REPOSITORY_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+printf '==> Download both training runs\n'
+ssh-add --apple-use-keychain "$HOME/unisonofficial_rsa"
+mkdir -p "$REPOSITORY_ROOT/$SYMBOL_RUN_DIR" "$REPOSITORY_ROOT/$OCR_RUN_DIR"
+rsync -az -e "ssh -i $HOME/unisonofficial_rsa" \
+  "$REMOTE_HOST:$REMOTE_DIR/$SYMBOL_RUN_DIR/" "$REPOSITORY_ROOT/$SYMBOL_RUN_DIR/"
+rsync -az -e "ssh -i $HOME/unisonofficial_rsa" \
+  "$REMOTE_HOST:$REMOTE_DIR/$OCR_RUN_DIR/" "$REPOSITORY_ROOT/$OCR_RUN_DIR/"
+printf 'Both runs downloaded. Run combine next.\n'

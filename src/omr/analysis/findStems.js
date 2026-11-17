@@ -1,0 +1,121 @@
+'use strict'
+
+/**
+ * Stems: tall, thin runs of ink.
+ *
+ * A stem is a vertical run about two staff spaces long inside a stave — long
+ * enough to be more than a stray mark, short enough to be less than a barline,
+ * and thin enough to be less than a clef. What sits at the stem's outer end
+ * (beams, flags) is measured later, once the head says which end is outer.
+ */
+
+const MIN_STEM_LENGTH_IN_STAFF_SPACES = 1.8
+const MAX_STEM_LENGTH_IN_STAFF_SPACES = 4.4
+const BEAM_WIDTH_IN_STAFF_SPACES = 1.5
+const END_REGION_IN_STAFF_SPACES = 0.6
+
+export function findStems ({ width, height, grayscale }, staves) {
+  const stems = []
+  for (let staveIndex = 0; staveIndex < staves.length; staveIndex++) {
+    const stave = staves[staveIndex]
+    const intervalBetweenStaveLines = stave.intervalBetweenStaveLines
+    const fromY = Math.max(0, Math.floor(stave.topY - MAX_STEM_LENGTH_IN_STAFF_SPACES * intervalBetweenStaveLines))
+    const toY = Math.min(height - 1, Math.ceil(stave.bottomY + MAX_STEM_LENGTH_IN_STAFF_SPACES * intervalBetweenStaveLines))
+    // A beamed note's stem may extend just beyond the final staff-line pixel.
+    const toX = Math.min(width - 1, stave.xEnd + Math.ceil(intervalBetweenStaveLines))
+    for (let x = stave.xStart; x <= toX; x++) {
+      for (const run of verticalRuns({ width, height, grayscale }, x, fromY, toY)) {
+        const length = run.y2 - run.y1 + 1
+        const tooShort = length < MIN_STEM_LENGTH_IN_STAFF_SPACES * intervalBetweenStaveLines
+        const isBarline = length > MAX_STEM_LENGTH_IN_STAFF_SPACES * intervalBetweenStaveLines
+        if (tooShort || isBarline) {
+          continue
+        }
+        stems.push({ x, y1: run.y1, y2: run.y2, staveIndex, columns: 1 })
+      }
+    }
+  }
+  return mergeAdjacentColumns(stems, staves).filter((stem) =>
+    stem.columns <= Math.max(1, 0.3 * staves[stem.staveIndex].intervalBetweenStaveLines))
+}
+
+// Wide rows at the outer end are beams; smaller ink beside the tip is flags.
+export function measureStemEnds (stem, bitmap, intervalBetweenStaveLines, outerEnd) {
+  const beamRows = []
+  let flagRows = 0
+  const from = Math.round(outerEnd - END_REGION_IN_STAFF_SPACES * intervalBetweenStaveLines)
+  const to = Math.round(outerEnd + END_REGION_IN_STAFF_SPACES * intervalBetweenStaveLines)
+  for (let y = from; y <= to; y++) {
+    const extent = horizontalExtent(bitmap, y, stem.x)
+    if (extent >= BEAM_WIDTH_IN_STAFF_SPACES * intervalBetweenStaveLines) {
+      beamRows.push(y)
+    } else if (extent >= 0.25 * intervalBetweenStaveLines) {
+      flagRows++
+    }
+  }
+  let beamCount = 0
+  for (let index = 0; index < beamRows.length; index++) {
+    if (index === 0 || beamRows[index] - beamRows[index - 1] > Math.max(1, 0.15 * intervalBetweenStaveLines)) {
+      beamCount++
+    }
+  }
+  stem.beamRows = beamRows
+  stem.beamCount = beamCount
+  stem.flagCount = beamCount ? 0 : Math.min(Math.ceil(flagRows / Math.max(1, intervalBetweenStaveLines / 4)), 6)
+}
+
+function verticalRuns ({ width, grayscale }, x, fromY, toY) {
+  const runs = []
+  let start = null
+  for (let y = fromY; y <= toY; y++) {
+    const ink = grayscale[y * width + x] > 0.25
+    if (ink && start === null) {
+      start = y
+    }
+    if (!ink && start !== null) {
+      runs.push({ y1: start, y2: y - 1 })
+      start = null
+    }
+  }
+  if (start !== null) {
+    runs.push({ y1: start, y2: toY })
+  }
+  return runs
+}
+
+function horizontalExtent ({ width, height, grayscale }, y, centerX) {
+  if (y < 0 || y >= height) {
+    return 0
+  }
+  let left = Math.round(centerX)
+  let right = Math.round(centerX)
+  while (left - 1 >= 0 && grayscale[y * width + left - 1] > 0.25) {
+    left--
+  }
+  while (right + 1 < width && grayscale[y * width + right + 1] > 0.25) {
+    right++
+  }
+  return right - left + 1
+}
+
+// A stem two pixels wide is one stem, found once per column it covers.
+function mergeAdjacentColumns (stems, staves) {
+  const merged = []
+  for (const stem of stems) {
+    const neighbour = merged.find((other) =>
+      other.staveIndex === stem.staveIndex &&
+      Math.abs(other.x - stem.x) <= 1 &&
+      Math.abs(other.y1 - stem.y1) <= Math.max(1, 0.15 * staves[stem.staveIndex].intervalBetweenStaveLines) &&
+      Math.abs(other.y2 - stem.y2) <= Math.max(1, 0.15 * staves[stem.staveIndex].intervalBetweenStaveLines)
+    )
+    if (neighbour) {
+      neighbour.x = (neighbour.x + stem.x) / 2
+      neighbour.columns++
+    } else {
+      merged.push({ ...stem })
+    }
+  }
+  return merged.sort((first, second) => first.x - second.x)
+}
+
+export default findStems

@@ -1,0 +1,17 @@
+
+:root { --ok-soft: #e2f0e4; }
+.scrollbox { overflow: auto; max-height: 580px; border-bottom: 1px solid var(--line); position: relative; }
+.scrollbox.tree { padding: 8px 6px; }
+.trow { font: 500 12px var(--font-mono); padding: 3px 10px; border-radius: 6px; white-space: nowrap; border-left: 2px solid transparent; }
+.trow.dir { color: var(--muted); }
+.trow.file { cursor: pointer; }
+.trow.file:hover { color: var(--accent); border-left-color: var(--accent); }
+.trow.file.in { background: var(--accent-soft); border-left-color: var(--accent); }
+.trow.file.on { background: var(--ok-soft); border-left-color: var(--ok); }
+.stack { margin: 0; display: grid; gap: 2px; }
+.stack .frame { font: 12px var(--font-mono); color: var(--muted); padding: 2px 0 2px 14px; border-left: 2px solid var(--line); overflow-wrap: anywhere; }
+.stack .frame.here { border-left-color: var(--ok); color: var(--fg); background: var(--ok-soft); border-radius: 0 5px 5px 0; }
+.stack .frame.here::after { content: " \u2190 here"; color: var(--ok); }
+dl.kv dd { overflow-wrap: anywhere; }
+.state { grid-template-columns: minmax(0, 1fr); }
+.stackwrap { min-width: 0; }

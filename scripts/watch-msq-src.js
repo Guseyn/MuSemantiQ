@@ -13,7 +13,7 @@ let isBuilding = false
 let pendingRebuild = false
 
 /**
- * Run the build script
+ * Run the build scripts: the worker environment, then the walkthrough docs
  */
 function runBuild() {
   if (isBuilding) {
@@ -23,29 +23,40 @@ function runBuild() {
 
   isBuilding = true
   const timestamp = new Date().toLocaleTimeString()
-  console.log(`[watch-msq-src] ${timestamp} - Rebuilding worker environment...`)
+  console.log(`[watch-msq-src] ${timestamp} - Rebuilding worker environment and walkthrough docs...`)
 
-  const child = spawn('node', [
-    path.join(__dirname, 'copy-msq-into-apps.js')
-  ], {
-    stdio: 'inherit',
-    cwd: projectRoot
-  })
+  const steps = [
+    { script: 'copy-msq-into-apps.js', done: 'Worker environment rebuilt successfully' },
+    { script: 'build-walkthrough-docs.js', done: 'Walkthrough docs rebuilt successfully' }
+  ]
 
-  child.on('exit', (code) => {
-    isBuilding = false
-    if (code === 0) {
+  const runNext = () => {
+    const step = steps.shift()
+    const child = spawn('node', [
+      path.join(__dirname, step.script)
+    ], {
+      stdio: 'inherit',
+      cwd: projectRoot
+    })
+
+    child.on('exit', (code) => {
       const timestamp = new Date().toLocaleTimeString()
-      console.log(`[watch-msq-src] ${timestamp} - Worker environment rebuilt successfully`)
-    } else {
-      console.error(`[watch-msq-src] Build failed with code ${code}`)
-    }
+      if (code !== 0) {
+        console.error(`[watch-msq-src] ${step.script} failed with code ${code}`)
+      } else {
+        console.log(`[watch-msq-src] ${timestamp} - ${step.done}`)
+        if (steps.length > 0) return runNext()
+      }
 
-    if (pendingRebuild) {
-      pendingRebuild = false
-      runBuild()
-    }
-  })
+      isBuilding = false
+      if (pendingRebuild) {
+        pendingRebuild = false
+        runBuild()
+      }
+    })
+  }
+
+  runNext()
 }
 
 /**

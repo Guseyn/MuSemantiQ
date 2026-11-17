@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+REMOTE_HOST='root@146.190.232.49'
+REMOTE_DIR='MuSemantiQ'
+BUNDLE_DIR='training-data/remote-bundle'
+REPOSITORY_ROOT="$(cd "$(dirname "$0")" && pwd)"
+REPOSITORY_ROOT="$(cd "$REPOSITORY_ROOT/.." && pwd)"
+REVISION="${OMR_CODE_VERSION:-$(git -C "$REPOSITORY_ROOT" rev-parse HEAD)}"
+SCALES='0.5,0.75,1,1.5,2,3'
+VARIANTS=1
+SEED=20261115
+LOCAL_GEOMETRY=0.15
+PROGRESS="${OMR_PROGRESS:-10}"
+ALLOW_DIRTY="${OMR_ALLOW_DIRTY:-0}"
+
+if [[ "$ALLOW_DIRTY" != 1 && -n "$(git -C "$REPOSITORY_ROOT" status --porcelain)" ]]; then
+  printf 'error: commit the frozen code and docs first, or set OMR_ALLOW_DIRTY=1 deliberately\n' >&2
+  exit 1
+fi
+
+printf '==> Run pre-training checks\n'
+(cd "$REPOSITORY_ROOT" && \
+  node scripts/visual-tests.js && \
+  node scripts/audio-tests.js && \
+  node scripts/serializer-tests.js && \
+  node scripts/build-walkthrough-docs.js --check && \
+  node scripts/build-omr-code-docs.js --check)
+
+printf '==> Generate the frozen bundle at %s\n' "$REVISION"
+(cd "$REPOSITORY_ROOT" && node scripts/omr-prepare-remote.js \
+  --out="$BUNDLE_DIR" \
+  --code-version="$REVISION" \
+  --data-version=1 \
+  --config-version=1 \
+  --scales="$SCALES" \
+  --variants="$VARIANTS" \
+  --seed="$SEED" \
+  --local-geometry="$LOCAL_GEOMETRY" \
+  --progress="$PROGRESS")
+
+printf '==> Upload the frozen checkout\n'
+ssh-add --apple-use-keychain "$HOME/unisonofficial_rsa"
+ssh -A -i "$HOME/unisonofficial_rsa" "$REMOTE_HOST" "mkdir -p $(printf '%q' "$REMOTE_DIR")"
+rsync -az -e "ssh -i $HOME/unisonofficial_rsa" \
+  --exclude=.git \
+  --exclude=node_modules \
+  --exclude=training-data/runs \
+  --exclude=training-data/text-runs \
+  --exclude=training-data/candidates \
+  "$REPOSITORY_ROOT/" "$REMOTE_HOST:$REMOTE_DIR/"
+printf 'Frozen bundle is ready at %s:%s/%s\n' "$REMOTE_HOST" "$REMOTE_DIR" "$BUNDLE_DIR"

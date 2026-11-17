@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+CANDIDATE='training-data/candidates/combined.json'
+BUNDLE_DIR='training-data/remote-bundle'
+REPOSITORY_ROOT="$(cd "$(dirname "$0")" && pwd)"
+REPOSITORY_ROOT="$(cd "$REPOSITORY_ROOT/.." && pwd)"
+
+if [[ ! -f "$REPOSITORY_ROOT/$CANDIDATE" ]]; then
+  printf 'error: candidate not found: %s; run download first\n' "$CANDIDATE" >&2
+  exit 1
+fi
+
+printf '==> Verify Bravura\n'
+(cd "$REPOSITORY_ROOT" && node scripts/omr-verify.js \
+  --weights="$CANDIDATE" \
+  --all \
+  --out=training-data/verification-failures-bravura)
+printf '==> Verify Leland\n'
+(cd "$REPOSITORY_ROOT" && node scripts/omr-verify.js \
+  --weights="$CANDIDATE" \
+  --all \
+  --fixture-font=leland \
+  --out=training-data/verification-failures-leland)
+printf '==> Verify the frozen styled and degraded bundle\n'
+(cd "$REPOSITORY_ROOT" && node scripts/omr-verify-remote.js \
+  --weights="$CANDIDATE" \
+  --data="$BUNDLE_DIR/manifest.json")
+printf '==> Run the legacy OMR suite with the same artifact\n'
+(cd "$REPOSITORY_ROOT" && OMR_WEIGHTS="$CANDIDATE" node scripts/omr-tests.js && node scripts/omr-coverage.js)
+printf 'Candidate verified; run the CLI with --weights=%s\n' "$CANDIDATE"
